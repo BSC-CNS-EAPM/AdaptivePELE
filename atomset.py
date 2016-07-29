@@ -1,5 +1,6 @@
 import numpy as np
 import re
+import StringIO
 
 class Atom:
     ATOM_WEIGHTS = {"H":1.00794,
@@ -108,6 +109,12 @@ class Atom:
         print self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.x, self.y, self.z, self.type, self.mass
         #print self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.r, self.type, self.mass
 
+    def __eq__(self, atom2):
+        return self.id == atom2.id
+
+    def __lt__(self, atom2):
+        return self.serial < atom2.serial
+
     def __str__(self):
         return "%s: %s %s %s [%f, %f, %f] %s %f"%(self.id, self.atomSerial, self.resChain, self.resnum, self.x, self.y, self.z, self.type, self.mass)
         #return "%s: %s %s %s [%f, %f, %f] %s %f"%(self.id, self.atomSerial, self.resChain, self.resnum, self.r[0], self.r[1], self.r[2], self.type, self.mass)
@@ -134,19 +141,25 @@ class PDB:
         self.totalMass = 0
         self.pdb = ""
         self.com = 0
-
-    def initialise(self, stringWithPDBContent, heavyAtoms=True, resname="", atomname="", type=typeAll):
+        
+    def initialise(self, PDBstr, heavyAtoms=True, resname="", atomname="", type=typeAll):
         """
             heavyAtoms=True --> just consider heavy atoms
+            PDBstr may be a path to the PDB file or a string with
+            the contents of the PDB
         """
-        self.pdb = stringWithPDBContent #in case one wants to write it
+        PDBContent = StringIO.StringIO(readPDB(PDBstr)) # Using StringIO
+        # creates a buffer that can handle a pdb file or a string containing
+        # the PDB
+        self.pdb = PDBContent.read() #in case one wants to write it
 
-        stringWithPDBContent = stringWithPDBContent.split('\n')
+        stringWithPDBContent = self.pdb.split('\n')
+
         for atomLine in stringWithPDBContent:
 
             #HUGE optimisation (not to create an atom each time ~ 2e-5 s/atom)
-            if resname != "" and not atomLine[17:20] == resname: continue #optimisation
-            if atomname != "" and not atomLine[12:16] == atomname: continue #optimisation
+            if resname != "" and not atomLine[17:20].strip() == resname: continue #optimisation
+            if atomname != "" and not atomLine[12:16].strip() == atomname: continue #optimisation
 
               
             atom = Atom(atomLine)
@@ -177,8 +190,9 @@ class PDB:
         self.computeTotalMass()
         COM = np.array([0.,0.,0.])
         for atomId, atom in self.atoms.items():
-            COM += atom.mass * [atom.x, atom.y, atom.z]
+            COM += atom.mass * np.array([atom.x, atom.y, atom.z])
         COM /= self.totalMass
+        self.com = COM
         return COM
 
     def getCOM(self):
@@ -259,3 +273,11 @@ def getPDBSnapshots(file, verbose=False):
     remarkInfo = "REMARK 000 File created using PELE++\nREMARK source            : %s\nREMARK original model nr : %d\nREMARK First snapshot is 1, not 0 (as opposed to report)\n"
     snapshotsWithInfo  = [remarkInfo%(file, i+1) + snapshot for i,snapshot in enumerate(snapshots)]
     return snapshotsWithInfo
+
+def readPDB(pdbfile):
+        ##Finish more robust PDB initialization
+        
+        try:
+           return open(pdbfile, "r").read()
+        except IOError:
+           return pdbfile

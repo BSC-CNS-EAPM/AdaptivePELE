@@ -69,11 +69,7 @@ class TestStartingConformationsCalculator(unittest.TestCase):
         trajs = 20
         degeneracy4 = epsilon.calculate(clusters.clusters, trajs, params)
         golden4 = np.array([7,4,4,5])
-
-        self.assertTrue(np.array_equal(degeneracy4,golden4))
-
-        falsegolden4 = np.array([7,4,4,4])
-        self.assertFalse(np.array_equal(degeneracy4,falsegolden4))
+        np.testing.assert_array_equal(degeneracy4, golden4)
 
         #test 5
     def testSameWeightDegeneracyCalcuulator(self):
