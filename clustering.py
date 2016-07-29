@@ -1,0 +1,153 @@
+import sys
+import atomset
+import glob
+import numpy as np
+import os
+
+class Clusters:
+    def __init__(self):
+        self.clusters = []
+    def addCluster(self, cluster):
+        self.clusters.append(cluster)
+    def printClusters(self, verbose=False):
+        for i,cluster in enumerate(self.clusters):
+            print "--------------"
+            print "CLUSTER #%d" % i 
+            print "--------------"
+            cluster.printCluster(verbose)
+            print ""
+
+class Cluster:
+    def __init__(self, pdb, thresholdRadius, contacts=0, metric=0):
+        self.pdb = pdb
+        self.elements = 1
+        self.threshold = thresholdRadius
+        self.contacts = contacts
+        self.metric = metric
+    def addElement(self, metric):
+        self.elements += 1
+        self.metric = min(metric, self.metric) #this for the moment
+    def printCluster(self, verbose=False):
+        if verbose:
+            print self.pdb.printAtoms()
+        print "Elements: ", self.elements
+        print "Radius threshold: ", self.threshold
+        print "Min energy: ", self.metric
+    def writePDB(self, path):
+        self.pdb.writePDB(path)
+    def getMetric(self):
+        return self.metric
+
+class Clustering:
+    def __init__(self, resname=None, reportBaseFilename=None, columnOfReportFile=None):
+        self.clusters = Clusters()
+        if reportBaseFilename:
+            self.reportBaseFilename = reportBaseFilename + "_%d"
+        else:
+            self.reportBaseFilename = None
+        self.resname = resname
+        self.col = columnOfReportFile
+
+    def cluster(self, paths):
+        trajectories = getAllTrajectories(paths)
+        for trajectory in trajectories:
+            trajNum = int(trajectory.split("_")[-1][:-4])
+            if self.reportBaseFilename:
+                reportFilename = os.path.join(os.path.split(trajectory)[0], self.reportBaseFilename%trajNum)
+                energies = np.loadtxt(reportFilename, usecols=(self.col,)) #4th column is always the energy
+            for num, snapshot in enumerate(getSnapshots(trajectory, True)):
+                if self.reportBaseFilename:
+                    if energies.shape == ():
+                        energies = np.array([energies])
+                    self.addSnapshotToCluster(snapshot, energies[num])
+                else:
+                    self.addSnapshotToCluster(snapshot, 0)
+
+    def addSnapshotToCluster(self, snapshot, energy):
+        pdb = atomset.PDB()
+        pdb.initialise(snapshot, resname = self.resname)
+        for clusterNum,cluster in enumerate(self.clusters.clusters):
+            if atomset.computeRMSD(cluster.pdb, pdb) < cluster.threshold:
+                cluster.addElement(energy)
+                return clusterNum
+
+        #if made it here, the snapshot was not added into any cluster
+        threshold, contacts = self.thresholdCalculator(pdb, self.resname)
+        cluster = Cluster (pdb, threshold, contacts, energy)
+        self.clusters.addCluster(cluster)
+        return len(self.clusters.clusters)-1
+
+    def thresholdCalculator(self, pdb, ligandResname):
+        contactThresholdDistance = 8
+
+        numberOfContactsThresholdCompletelyBuried = 15
+        numberOfContactsThresholdSemiBuried = 10
+        numberOfContactsThresholdBulk = 1
+
+        contacts = pdb.countContacts(ligandResname, contactThresholdDistance)
+
+        """
+        if contacts > numberOfContactsThresholdCompletelyBuried:
+            return 1, contacts
+        elif contacts > numberOfContactsThresholdSemiBuried:
+            return 3, contacts
+        elif contacts > numberOfContactsThresholdBulk:
+            return 5, contacts
+        else:
+            return 8, contacts
+
+        #with PR, works diamonds
+        if contacts > numberOfContactsThresholdCompletelyBuried:
+            return 3, contacts
+        elif contacts > numberOfContactsThresholdSemiBuried:
+            return 5, contacts
+        elif contacts > numberOfContactsThresholdBulk:
+            return 7, contacts
+        else:
+            return 10, contacts
+
+        if contacts > numberOfContactsThresholdCompletelyBuried:
+            return 2, contacts
+        elif contacts > numberOfContactsThresholdSemiBuried:
+            return 4, contacts
+        elif contacts > numberOfContactsThresholdBulk:
+            return 6, contacts
+        else:
+            return 8, contacts
+        """
+
+        #return 2, contacts
+        if contacts > numberOfContactsThresholdCompletelyBuried:
+            return 2, contacts
+        elif contacts > numberOfContactsThresholdSemiBuried:
+            return 3, contacts
+        elif contacts > numberOfContactsThresholdBulk:
+            return 4, contacts
+        else:
+            return 4, contacts
+
+def getAllTrajectories(paths):
+    files = []
+    for path in paths:
+        files += glob.glob(path)
+    return files
+
+def getSnapshots(trajectoryFile, verbose=False):
+    return atomset.getPDBSnapshots(trajectoryFile, verbose)
+
+
+def main():
+    #path = sys.argv[1]
+    resname  = "AEN"
+
+    paths = ["3ptb_test/0/traj*", "3ptb_test/1/traj*"]
+    clustering = Clustering(resname, "report")
+    clustering.cluster(paths)
+
+    clustering.clusters.printClusters()
+    for i, cluster in enumerate(clustering.clusters.clusters):
+        cluster.writePDB(str(i) + ".pdb")
+    
+
+if __name__ == "__main__":
+    main()
