@@ -1,10 +1,10 @@
 import unittest
-import testStartingConformationsCalculator
+import tests.testStartingConformationsCalculator as tStartConf
 
 def main():
     testSuite = unittest.TestSuite()
 
-    testSuite.addTest(unittest.makeSuite(testStartingConformationsCalculator.TestStartingConformationsCalculator))
+    testSuite.addTest(unittest.makeSuite(tStartConf.TestStartingConformationsCalculator))
 
     runner = unittest.TextTestRunner()
     runner.run(testSuite)
