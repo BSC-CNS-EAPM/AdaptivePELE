@@ -85,7 +85,7 @@ class Atom:
             self.z = float(atomContent[46:54])
 
             chargePattern = re.compile("[0-9]|\+|\-")
-            self.type = re.sub(chargePattern, "", atomContent[76:80]).strip()
+            self.type = re.sub(chargePattern, "", atomContent[76:80]).strip().upper()
             self.mass = self.ATOM_WEIGHTS[self.type]
 
             if atomContent.startswith('ATOM'):
@@ -172,7 +172,8 @@ class PDB:
             except:
                 pass
 
-            #self.printAtoms()
+        if self.atoms == {}:
+            raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
     def computeTotalMass(self):
         self.totalMass = 0
