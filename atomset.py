@@ -75,11 +75,11 @@ class Atom:
     def __init__(self, atomContent):
         #atomContent = atomContent.split()
         if len(atomContent) > 6 and (atomContent[:4] == 'ATOM' or atomContent[:6] == 'HETATM'):
-            self.atomSerial = atomContent[6:11]
-            self.name = atomContent[12:16]
-            self.resname = atomContent[17:20]
+            self.atomSerial = atomContent[6:11].strip()
+            self.name = atomContent[12:16].strip()
+            self.resname = atomContent[17:20].strip()
             self.resChain = atomContent[21]
-            self.resnum = atomContent[22:26]
+            self.resnum = atomContent[22:26].strip()
             self.x = float(atomContent[30:38])
             self.y = float(atomContent[38:46])
             self.z = float(atomContent[46:54])
@@ -211,7 +211,7 @@ class PDB:
         ligandPDB.initialise(self.pdb, resname=ligandResname, heavyAtoms=True)
         
         alphaCarbonsPDB = PDB()
-        alphaCarbonsPDB.initialise(self.pdb, type = self.typeProtein, atomname = " CA ")
+        alphaCarbonsPDB.initialise(self.pdb, type = self.typeProtein, atomname = "CA")
 
         #count contacts
         contacts = set([])

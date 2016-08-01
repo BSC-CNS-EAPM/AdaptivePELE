@@ -211,11 +211,33 @@ END   \n"
     def testPDB_RMSD(self):
         #preparation
         pdb_native = atomset.PDB()
-        pdb_native.initialise("tests/data/ain_native_fixed.pdb", heavyAtoms=False)
+        pdb_native.initialise("tests/data/ain_native_fixed.pdb", resname='AIN')
         pdb_traj =  atomset.PDB()
-        pdb_traj.initialise("tests/data/ain_trajectory.pdb", heavyAtoms=False)
+        pdb_traj.initialise("tests/data/ain_trajectory.pdb", resname='AIN')
 
         #function to test
         RMSD = atomset.computeRMSD(pdb_native, pdb_traj)
-        golden_RMSD = 3.85969
-        self.assertAlmostEqual(RMSD, golden_RMSD)
+        golden_RMSD = 3.928617
+        self.assertAlmostEqual(RMSD, golden_RMSD, 5)
+
+    def testPDB_RMSD_symmetries(self):
+        #preparation
+        pdb_native = atomset.PDB()
+        pdb_native.initialise("tests/data/ain_native_fixed.pdb", resname='AIN')
+        pdb_traj =  atomset.PDB()
+        pdb_traj.initialise("tests/data/ain_trajectory.pdb", resname='AIN')
+
+        #function to test
+        RMSD = atomset.computeRMSD(pdb_native, pdb_traj, {"1733:O1:AIN":"1735:O2:AIN", "1735:O2:AIN":"1733:O1:AIN"})
+        golden_RMSD = 3.860743
+        self.assertAlmostEqual(RMSD, golden_RMSD, 5)
+
+    def testPDB_contacts(self):
+        #preparation
+        pdb_native = atomset.PDB()
+        pdb_native.initialise("tests/data/native_ain.pdb")
+
+        #function to test
+        contacts = pdb_native.countContacts("AIN", 8)
+        golden_contacts = 19
+        self.assertEqual(contacts, golden_contacts)
