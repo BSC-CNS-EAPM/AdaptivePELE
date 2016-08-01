@@ -51,29 +51,31 @@ class Clustering:
     def cluster(self, paths):
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
-            trajNum = int(trajectory.split("_")[-1][:-4])
+            trajNum = getTrajNum(trajectory)
+
+            snapshots = getSnapshots(trajectory, True)
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0], self.reportBaseFilename%trajNum)
-                energies = np.loadtxt(reportFilename, usecols=(self.col,)) #4th column is always the energy
-            for num, snapshot in enumerate(getSnapshots(trajectory, True)):
-                if self.reportBaseFilename:
-                    if energies.shape == ():
-                        energies = np.array([energies])
-                    self.addSnapshotToCluster(snapshot, energies[num])
-                else:
-                    self.addSnapshotToCluster(snapshot, 0)
+                metrics = np.loadtxt(reportFilename, usecols=(self.col,))
+                if metrics.shape == ():
+                    metrics = np.array([metrics])
+            else:
+                metrics = np.zeros(len(snapshots))
 
-    def addSnapshotToCluster(self, snapshot, energy):
+            for num, snapshot in enumerate(snapshots):
+                self.addSnapshotToCluster(snapshot, metrics[num])
+
+    def addSnapshotToCluster(self, snapshot, metric=0):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname = self.resname)
         for clusterNum,cluster in enumerate(self.clusters.clusters):
             if atomset.computeRMSD(cluster.pdb, pdb) < cluster.threshold:
-                cluster.addElement(energy)
-                return clusterNum
+                cluster.addElement(metric)
+                return
 
         #if made it here, the snapshot was not added into any cluster
         threshold, contacts = self.thresholdCalculator(pdb, self.resname)
-        cluster = Cluster (pdb, threshold, contacts, energy)
+        cluster = Cluster (pdb, threshold, contacts, metric)
         self.clusters.addCluster(cluster)
         return len(self.clusters.clusters)-1
 
@@ -135,6 +137,8 @@ def getAllTrajectories(paths):
 def getSnapshots(trajectoryFile, verbose=False):
     return atomset.getPDBSnapshots(trajectoryFile, verbose)
 
+def getTrajNum(trajFilename):
+    return int(trajFilename.split("_")[-1][:-4])
 
 def main():
     #path = sys.argv[1]
