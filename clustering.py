@@ -16,6 +16,8 @@ class Clusters:
             print "--------------"
             cluster.printCluster(verbose)
             print ""
+    def __eq__(self, other):
+        return self.clusters == other.clusters
 
 class Cluster:
     def __init__(self, pdb, thresholdRadius, contacts=0, metric=0):
@@ -38,6 +40,13 @@ class Cluster:
     def getMetric(self):
         return self.metric
 
+    def __eq__(self, other):
+        return self.pdb == other.pdb\
+             and self.elements == other.elements\
+             and self.threshold == other.threshold\
+             and self.contacts == other.contacts\
+             and self.metric == other.metric
+
 class Clustering:
     def __init__(self, resname=None, reportBaseFilename=None, columnOfReportFile=None):
         self.clusters = Clusters()
@@ -47,6 +56,12 @@ class Clustering:
             self.reportBaseFilename = None
         self.resname = resname
         self.col = columnOfReportFile
+
+    def __eq__(self, other):
+        return self.clusters == other.clusters\
+            and self.reportBaseFilename == other.reportBaseFilename\
+            and self.resname == other.resname\
+            and self.col == other.col
 
     def cluster(self, paths):
         trajectories = getAllTrajectories(paths)
