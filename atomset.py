@@ -142,6 +142,12 @@ class PDB:
         self.pdb = ""
         self.com = 0
         
+    def __eq__(self, other):
+        """ Compare two pdb strings, remark lines should be ignored and only the atoms and its information should be compared"""
+        pdb1 = [element.strip() for element in self.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
+        pdb2 = [element.strip() for element in other.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
+        return pdb1 == pdb2
+
     def initialise(self, PDBstr, heavyAtoms=True, resname="", atomname="", type=typeAll):
         """
             heavyAtoms=True --> just consider heavy atoms

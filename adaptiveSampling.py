@@ -22,29 +22,15 @@ from functools import partial
 import SimulationRunner
 
 
-def makeWorkingControlFile(templetizedControlFile, workingControlFilename, dictionary):
-    inputFile = open(templetizedControlFile, "r")
-    inputFileContent = inputFile.read()
-    inputFile.close()
-
-    inputFileTemplate = string.Template(inputFileContent)
-    outputFileContent = inputFileTemplate.substitute(dictionary)
-
-    outputFile = open(workingControlFilename, "w")
-    outputFile.write(outputFileContent)
-    outputFile.close()
-
-
-
-def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate):                                                   
+def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, iteration):
     for i, name in enumerate(initialStructures):
-        shutil.copyfile(name, tmpInitialStructuresTemplate%i)
+        shutil.copyfile(name, tmpInitialStructuresTemplate%(iteration,i))
 
-def createMultipleComplexesFilenames(numberOfSnapshots, inputFileTemplate, tmpInitialStructuresTemplate):
+def createMultipleComplexesFilenames(numberOfSnapshots, inputFileTemplate, tmpInitialStructuresTemplate, iteration):
     jsonString = "\n"
     for i in range(numberOfSnapshots-1):
-        jsonString += inputFileTemplate%(tmpInitialStructuresTemplate%i) + ",\n"
-    jsonString += inputFileTemplate%(tmpInitialStructuresTemplate%(numberOfSnapshots-1))
+        jsonString += inputFileTemplate%(tmpInitialStructuresTemplate%(iteration,i)) + ",\n"
+    jsonString += inputFileTemplate%(tmpInitialStructuresTemplate%(iteration,numberOfSnapshots-1))
     return jsonString
 
 def cleanup(tmpFolder):
@@ -189,12 +175,12 @@ def makeClusterRepresentativesInitialStructures(representativesFile, tmpInitialS
     print "counts & cluster centers", counts, len(models)
     return counts
 
-def makeOwnClusteringClusterRepresentativesInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clustering):
+def makeOwnClusteringClusterRepresentativesInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clustering, iteration):
 
     counts = 0
     for i, cluster in enumerate(clustering.clusters.clusters):
         for j in range(int(degeneracyOfRepresentatives[i])):
-            outputFilename = tmpInitialStructuresTemplate%counts
+            outputFilename = tmpInitialStructuresTemplate%(iteration,counts)
             print 'Writing to ', outputFilename, 'cluster', i
             cluster.writePDB(outputFilename)
 
@@ -205,6 +191,7 @@ def makeOwnClusteringClusterRepresentativesInitialStructures(tmpInitialStructure
 
 def findFirstRun(outputPath):
     """ Assumes that the outputPath is XXX/%d """
+    #TODO: Check if object.pkl exists to know if last run was finished
 
     folderWithSimulationData = outputPath
     allFolders = os.listdir(folderWithSimulationData)
@@ -399,7 +386,7 @@ def main(jsonParams=None):
     tmpFolder = "tmp_" +  outputPath.replace("/", "_")
 
     inputFileTemplate = "{ \"files\" : [ { \"path\" : \"%s\" } ] }"
-    tmpInitialStructuresTemplate = tmpFolder+"/initial_%d.pdb"
+    tmpInitialStructuresTemplate = tmpFolder+"/initial_%d_%d.pdb"
     tmpControlFilename = tmpFolder+"/controlFile%d.conf"
     tmpControlFilename_pyproct = tmpFolder+"/pyproct_controlFile%d.conf"
     tmpControlFilename_pyproct_thisEpoch = tmpFolder+"/pyproct_thisEpoch_controlFile%d.conf"
@@ -471,18 +458,19 @@ def main(jsonParams=None):
             startingConformationsCalculator.log()
             print "Degeneracy", degeneracyOfRepresentatives
 
-            seedingPoints = makeOwnClusteringClusterRepresentativesInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod)
+            seedingPoints = makeOwnClusteringClusterRepresentativesInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, firstRun)
 
-            initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, inputFileTemplate, tmpInitialStructuresTemplate)
+            initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, inputFileTemplate, tmpInitialStructuresTemplate, firstRun)
             
     if not RESTART or firstRun == 0: # if RESTART and firstRun = 0, it must check into the initial structures
         #Choose initial structures
         if not DEBUG: shutil.rmtree(outputPath)
         makeFolder(outputPath)
-        saveInitialControlFile(jsonParams, ORIGINAL_CONTROLFILE)
-        copyInitialStructures(initialStructures, tmpInitialStructuresTemplate)
-        initialStructuresAsString = createMultipleComplexesFilenames(len(initialStructures), inputFileTemplate, tmpInitialStructuresTemplate)
         firstRun = 0
+        saveInitialControlFile(jsonParams, ORIGINAL_CONTROLFILE)
+        copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, firstRun)
+        initialStructuresAsString = createMultipleComplexesFilenames(len(initialStructures), inputFileTemplate, tmpInitialStructuresTemplate, firstRun)
+
 
     peleControlFileDictionary = {"COMPLEXES":initialStructuresAsString, "PELE_STEPS":peleSteps}
     """
@@ -497,7 +485,7 @@ def main(jsonParams=None):
     makeFolder(outputDir)
     peleControlFileDictionary["OUTPUT_PATH"] = outputDir
     peleControlFileDictionary["SEED"] = seed + firstRun*simulationRunner.parameters.processors
-    makeWorkingControlFile(simulationRunner.parameters.runningControlfilename, tmpControlFilename%firstRun, peleControlFileDictionary) 
+    simulationRunner.makeWorkingControlFile(simulationRunner.parameters.runningControlfilename, tmpControlFilename%firstRun, peleControlFileDictionary) 
 
     for i in range(firstRun, iterations):
         print "Iteration", i
@@ -574,32 +562,31 @@ def main(jsonParams=None):
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
 
+        """
+        degeneracyOfRepresentatives = calculateDegeneracyOfClusterRepresentatives(PYPROCT_REPRESENTATIVE_OUTPUT%i, PYPROCT_RESULTS_OUTPUT%i, spawning, processors)
+        numberOfSeedingPoints = makeClusterRepresentativesInitialStructures(PYPROCT_REPRESENTATIVE_OUTPUT%i, tmpInitialStructuresTemplate, degeneracyOfRepresentatives, ligandTrajectoryBasename, trajectoryBasename)
+        """
+        degeneracyOfRepresentatives = startingConformationsCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
+        startingConformationsCalculator.log()
+        print "Degeneracy", degeneracyOfRepresentatives
+
+        numberOfSeedingPoints = makeOwnClusteringClusterRepresentativesInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, i+1)
+
+        writeClusteringOutput(CLUSTERING_OUTPUT_DIR%i, clusteringMethod, degeneracyOfRepresentatives, CLUSTERING_OUTPUT_OBJECT%i)
+
+        #Prepare for next pele iteration
         if i != iterations-1:
-            #Prepare for next pele iteration
-            """
-            degeneracyOfRepresentatives = calculateDegeneracyOfClusterRepresentatives(PYPROCT_REPRESENTATIVE_OUTPUT%i, PYPROCT_RESULTS_OUTPUT%i, spawning, processors)
-            numberOfSeedingPoints = makeClusterRepresentativesInitialStructures(PYPROCT_REPRESENTATIVE_OUTPUT%i, tmpInitialStructuresTemplate, degeneracyOfRepresentatives, ligandTrajectoryBasename, trajectoryBasename)
-            """
-            degeneracyOfRepresentatives = startingConformationsCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
-            startingConformationsCalculator.log()
-            print "Degeneracy", degeneracyOfRepresentatives
-
-            numberOfSeedingPoints = makeOwnClusteringClusterRepresentativesInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod)
-
-            writeClusteringOutput(CLUSTERING_OUTPUT_DIR%i, clusteringMethod, degeneracyOfRepresentatives, CLUSTERING_OUTPUT_OBJECT%i)
-
-            initialStructuresAsString = createMultipleComplexesFilenames(numberOfSeedingPoints, inputFileTemplate, tmpInitialStructuresTemplate)
+            initialStructuresAsString = createMultipleComplexesFilenames(numberOfSeedingPoints, inputFileTemplate, tmpInitialStructuresTemplate, i+1)
             peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
 
             outputDir = outputPathTempletized%(i+1)
             makeFolder(outputDir) #PELE does not do it automatically
             peleControlFileDictionary["OUTPUT_PATH"] = outputDir
             peleControlFileDictionary["SEED"] = seed + (i+1)*simulationRunner.parameters.processors
-            makeWorkingControlFile(simulationRunner.parameters.runningControlfilename, tmpControlFilename%(i+1), peleControlFileDictionary) 
+            simulationRunner.makeWorkingControlFile(simulationRunner.parameters.runningControlfilename, tmpControlFilename%(i+1), peleControlFileDictionary) 
 
     #cleanup
     #cleanup(tmpFolder)
-
 
 if __name__ == '__main__':
     main()

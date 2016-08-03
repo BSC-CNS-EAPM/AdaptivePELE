@@ -1,8 +1,9 @@
 import time
+import os
 import constants
 import subprocess
 import blockNames
-import shutils
+import shutil
 
 class SIMULATION_TYPE:
     PELE, MD, TEST = range(3)
@@ -21,9 +22,23 @@ class SimulationRunner:
     
     def run_simulation(self):
         pass 
+    def makeWorkingControlFile(self, templ, work, dictionary):
+        pass
 
 class PeleSimulation(SimulationRunner):
     
+    def makeWorkingControlFile(self, templetizedControlFile, workingControlFilename, dictionary):
+        inputFile = open(templetizedControlFile, "r")
+        inputFileContent = inputFile.read()
+        inputFile.close()
+
+        inputFileTemplate = string.Template(inputFileContent)
+        outputFileContent = inputFileTemplate.substitute(dictionary)
+
+        outputFile = open(workingControlFilename, "w")
+        outputFile.write(outputFileContent)
+        outputFile.close()
+
     def createSymbolicLinks(self):
         if not os.path.islink("Data"):
             os.system("ln -s " + self.parameters.DATA_FOLDER + " Data")
@@ -46,10 +61,16 @@ class PeleSimulation(SimulationRunner):
         print "PELE took %.2f sec" % (endTime - startTime)
 
 class TestSimulation(SimulationRunner):
-    self.copied = False
+    def __init__(self, parameters):
+        self.copied = False
+        self.parameters = parameters
+
     def run_simulation(self):
-        shutil.copy(self.params.origin, self.params.destination)
-        self.copied = True
+        if not self.copied:
+            if os.path.exists(self.parameters.destination):
+                shutil.rmtree(self.parameters.destination)
+            shutil.copytree(self.parameters.origin, self.parameters.destination)
+            self.copied = True
 
 class RunnerBuilder:
 
@@ -58,17 +79,18 @@ class RunnerBuilder:
         paramsBlock = simulationRunnerBlock[blockNames.SIMULATION_PARAMS.params]
         params = SimulationParameters()
         if simulationType == blockNames.SIMULATION_TYPE.PELE:
-            params.processors = paramsBlock[blockNames.SIMULATION_PARAMS.processors] 
-            params.Datafolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Datafolder, constants.DATA_FOLDER) 
-            params.Documentsfolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Documentsfolder, constants.DOCUMENTS_FOLDER) 
-            params.executable = paramsBlock.get(blockNames.SIMULATION_PARAMS.executable, constants.PELE_EXECUTABLE) 
+            params.processors = paramsBlock[blockNames.SIMULATION_PARAMS.processors]
+            params.Datafolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Datafolder, constants.DATA_FOLDER)
+            params.Documentsfolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Documentsfolder, constants.DOCUMENTS_FOLDER)
+            params.executable = paramsBlock.get(blockNames.SIMULATION_PARAMS.executable, constants.PELE_EXECUTABLE)
             params.runningControlfilename = paramsBlock[blockNames.SIMULATION_PARAMS.runningControlfilename]
             SimulationRunner = PeleSimulation(params)
         elif simulationType == blockNames.SIMULATION_TYPE.MD:
             pass
         elif simulationType == blockNames.SIMULATION_TYPE.TEST:
+            params.processors = paramsBlock[blockNames.SIMULATION_PARAMS.processors]
             params.destination = paramsBlock[blockNames.SIMULATION_PARAMS.destination]
-            params.origin = paramsBlock[blockNames.SIMULATION_PARAMS.destination]
+            params.origin = paramsBlock[blockNames.SIMULATION_PARAMS.origin]
             SimulationRunner = TestSimulation(params)
         else:
             sys.exit("Unknown simulation type! Choices are: " + str(blockNames.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))

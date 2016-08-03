@@ -45,7 +45,7 @@ class Cluster:
              and self.elements == other.elements\
              and self.threshold == other.threshold\
              and self.contacts == other.contacts\
-             and self.metric == other.metric
+             and abs(self.metric-other.metric) < 1e-7
 
 class Clustering:
     def __init__(self, resname=None, reportBaseFilename=None, columnOfReportFile=None):
