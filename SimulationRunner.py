@@ -2,6 +2,7 @@ import time
 import constants
 import subprocess
 import blockNames
+import shutils
 
 class SIMULATION_TYPE:
     PELE, MD, TEST = range(3)
@@ -45,9 +46,10 @@ class PeleSimulation(SimulationRunner):
         print "PELE took %.2f sec" % (endTime - startTime)
 
 class TestSimulation(SimulationRunner):
-    
+    self.copied = False
     def run_simulation(self):
-        pass
+        shutil.copy(self.params.origin, self.params.destination)
+        self.copied = True
 
 class RunnerBuilder:
 
@@ -65,6 +67,8 @@ class RunnerBuilder:
         elif simulationType == blockNames.SIMULATION_TYPE.MD:
             pass
         elif simulationType == blockNames.SIMULATION_TYPE.TEST:
+            params.destination = paramsBlock[blockNames.SIMULATION_PARAMS.destination]
+            params.origin = paramsBlock[blockNames.SIMULATION_PARAMS.destination]
             SimulationRunner = TestSimulation(params)
         else:
             sys.exit("Unknown simulation type! Choices are: " + str(blockNames.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))

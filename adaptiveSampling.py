@@ -366,8 +366,9 @@ def writeClusteringOutput(outputPath, clustering, degeneracy, outputObject):
 
 
 
-def main():
-    jsonParams = sys.argv[1]
+def main(jsonParams=None):
+    if jsonParams is None:
+        jsonParams = sys.argv[1]
 
     RESTART, iterations, peleSteps, spawningBlock, outputPath, initialStructures, seed, ligandResname, DEBUG, simulationrunnerBlock = loadParams(jsonParams)
 
