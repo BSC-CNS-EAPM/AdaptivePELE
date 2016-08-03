@@ -19,7 +19,7 @@ import atomset
 
 import multiprocessing
 from functools import partial
-
+import SimulationRunner
 
 
 def makeWorkingControlFile(templetizedControlFile, workingControlFilename, dictionary):
@@ -34,11 +34,7 @@ def makeWorkingControlFile(templetizedControlFile, workingControlFilename, dicti
     outputFile.write(outputFileContent)
     outputFile.close()
 
-def createSymbolicLinks(DATA_FOLDER, DOCUMENTS_FOLDER):
-    if not os.path.islink("Data"):
-        os.system("ln -s " + DATA_FOLDER + " Data")
-    if not os.path.islink("Documents"):
-        os.system("ln -s " + DOCUMENTS_FOLDER + " Documents")
+
 
 def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate):                                                   
     for i, name in enumerate(initialStructures):
@@ -58,21 +54,6 @@ def cleanup(tmpFolder):
 def makeFolder(outputDir):
     if not os.path.exists(outputDir):
         os.makedirs(outputDir)
-
-def runPeleSimulations(processors, runningControlFilename, peleExecutable, DATA_FOLDER, DOCUMENTS_FOLDER):
-    createSymbolicLinks(DATA_FOLDER, DOCUMENTS_FOLDER)
-
-    toRun = ["mpirun -np " + str(processors), peleExecutable, runningControlFilename]
-    toRun = " ".join(toRun)
-    print toRun
-    startTime = time.time() 
-    proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True)
-    (out, err) = proc.communicate()
-    print out
-    if err: print err
-
-    endTime = time.time() 
-    print "PELE took %.2f sec" % (endTime - startTime)
 
 def generateFilteredListSnapshotSelectionString(currentEpoch, compressionPath):
     selectionString = ""
@@ -278,11 +259,11 @@ def loadParams(jsonParams):
     parsedJSON = json.loads(jsonFile)
 
     return parsedJSON["RESTART"], parsedJSON['iterations'],\
-            parsedJSON['processors'], parsedJSON['peleSteps'],\
+            parsedJSON['peleSteps'],\
             parsedJSON['spawning'],\
             parsedJSON['outputPath'], parsedJSON['initialStructures'],\
-            parsedJSON['peleControlFile'], parsedJSON['seed'],\
-            parsedJSON['ligandResname'].upper(), parsedJSON['debug']
+            parsedJSON['seed'],\
+            parsedJSON['ligandResname'].upper(), parsedJSON['debug'], parsedJSON[blockNames.SIMULATION_BLOCK.blockname]
 
 def saveInitialControlFile(jsonParams, originalControlFile):
     file = open(originalControlFile, 'w')
@@ -388,9 +369,10 @@ def writeClusteringOutput(outputPath, clustering, degeneracy, outputObject):
 def main():
     jsonParams = sys.argv[1]
 
-    RESTART, iterations, processors, peleSteps, spawningBlock, outputPath, initialStructures, TEMPLETIZED_CONTROLFILENAME, seed, ligandResname, DEBUG = loadParams(jsonParams)
+    RESTART, iterations, peleSteps, spawningBlock, outputPath, initialStructures, seed, ligandResname, DEBUG, simulationrunnerBlock = loadParams(jsonParams)
 
     startingConformationsCalculator, spawningParams = spawningBuilder(spawningBlock)
+    simulationRunner = SimulationRunner.RunnerBuilder(simulationrunnerBlock)
 
     print "================================"
     print "            PARAMS              "
@@ -425,20 +407,7 @@ def main():
     trajectoryWildcard = trajectoryBasename + "_%d.pdb"
     ligandTrajectory = ligandTrajectoryBasename + "_%s.pdb" #e.g. ligandSnapshots_%s.pdb
 
-    import socket
-    machine = socket.gethostname()
-    if "bsccv" in machine:
-        PELE_EXECUTABLE  = "/data/EAPM/PELE/PELE++/bin/rev12025/Pele_rev12025_mpi"
-        DATA_FOLDER  = "/data/EAPM/PELE/PELE++/data/rev12025/Data"
-        DOCUMENTS_FOLDER  = "/data/EAPM/PELE/PELE++/Documents/rev12025"
 
-        PYTHON = "/data2/apps/PYTHON/2.7.5/bin/python2.7"
-    else:
-        PELE_EXECUTABLE  = "/gpfs/projects/bsc72/PELE++/bin/rev12025/Pele_rev12025_mpi"
-        DATA_FOLDER  = "/gpfs/projects/bsc72/PELE++/data/rev12025/Data"
-        DOCUMENTS_FOLDER  = "/gpfs/projects/bsc72/PELE++/Documents/rev12025"
-
-        PYTHON = "python"
 
     PYPROCT = "pyproct.main"
     PYPROCT_OUTPUT_DIR = outputPathTempletized+"/pyproct"
@@ -534,7 +503,8 @@ def main():
         print "Production run..."
         if not DEBUG:
             startTime = time.time() 
-            runPeleSimulations(processors, tmpControlFilename%i, PELE_EXECUTABLE, DATA_FOLDER, DOCUMENTS_FOLDER)
+           # runPeleSimulations(processors, tmpControlFilename%i, PELE_EXECUTABLE, DATA_FOLDER, DOCUMENTS_FOLDER)
+            simulationRunner.run_simulation()
             endTime = time.time() 
             print "PELE %s sec" % (endTime - startTime)
 
