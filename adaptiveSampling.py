@@ -372,7 +372,8 @@ def main():
     RESTART, iterations, peleSteps, spawningBlock, outputPath, initialStructures, seed, ligandResname, DEBUG, simulationrunnerBlock = loadParams(jsonParams)
 
     startingConformationsCalculator, spawningParams = spawningBuilder(spawningBlock)
-    simulationRunner = SimulationRunner.RunnerBuilder(simulationrunnerBlock)
+    runnerbuilder = SimulationRunner.RunnerBuilder()
+    simulationRunner = runnerbuilder.build(simulationrunnerBlock)
 
     print "================================"
     print "            PARAMS              "
@@ -380,7 +381,7 @@ def main():
     print "Restarting simulations", RESTART
     print "Debug:", DEBUG
 
-    print "Iterations: %d, Mpi processors: %d, Pele steps: %d"%(iterations, processors, peleSteps)
+    print "Iterations: %d, Mpi processors: %d, Pele steps: %d"%(iterations, simulationRunner.parameters.processors, peleSteps)
 
     print "SpawningType:", blockNames.SPAWNING_TYPE_TO_STRING_DICTIONARY[startingConformationsCalculator.type]
 
@@ -494,8 +495,8 @@ def main():
     outputDir = outputPathTempletized%firstRun
     makeFolder(outputDir)
     peleControlFileDictionary["OUTPUT_PATH"] = outputDir
-    peleControlFileDictionary["SEED"] = seed + firstRun*processors
-    makeWorkingControlFile(TEMPLETIZED_CONTROLFILENAME, tmpControlFilename%firstRun, peleControlFileDictionary) 
+    peleControlFileDictionary["SEED"] = seed + firstRun*simulationRunner.parameters.processors
+    makeWorkingControlFile(simulationRunner.parameters.runningControlfilename, tmpControlFilename%firstRun, peleControlFileDictionary) 
 
     for i in range(firstRun, iterations):
         print "Iteration", i
@@ -578,7 +579,7 @@ def main():
             degeneracyOfRepresentatives = calculateDegeneracyOfClusterRepresentatives(PYPROCT_REPRESENTATIVE_OUTPUT%i, PYPROCT_RESULTS_OUTPUT%i, spawning, processors)
             numberOfSeedingPoints = makeClusterRepresentativesInitialStructures(PYPROCT_REPRESENTATIVE_OUTPUT%i, tmpInitialStructuresTemplate, degeneracyOfRepresentatives, ligandTrajectoryBasename, trajectoryBasename)
             """
-            degeneracyOfRepresentatives = startingConformationsCalculator.calculate(clusteringMethod.clusters.clusters, processors-1, spawningParams, i)
+            degeneracyOfRepresentatives = startingConformationsCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
             startingConformationsCalculator.log()
             print "Degeneracy", degeneracyOfRepresentatives
 
@@ -592,8 +593,8 @@ def main():
             outputDir = outputPathTempletized%(i+1)
             makeFolder(outputDir) #PELE does not do it automatically
             peleControlFileDictionary["OUTPUT_PATH"] = outputDir
-            peleControlFileDictionary["SEED"] = seed + (i+1)*processors
-            makeWorkingControlFile(TEMPLETIZED_CONTROLFILENAME, tmpControlFilename%(i+1), peleControlFileDictionary) 
+            peleControlFileDictionary["SEED"] = seed + (i+1)*simulationRunner.parameters.processors
+            makeWorkingControlFile(simulationRunner.parameters.runningControlfilename, tmpControlFilename%(i+1), peleControlFileDictionary) 
 
     #cleanup
     #cleanup(tmpFolder)

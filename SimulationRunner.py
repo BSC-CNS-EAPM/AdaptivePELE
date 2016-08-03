@@ -1,6 +1,7 @@
 import time
 import constants
 import subprocess
+import blockNames
 
 class SIMULATION_TYPE:
     PELE, MD, TEST = range(3)
@@ -9,7 +10,7 @@ class SimulationParameters:
     def __init__(self):
         self.processors = 0
         self.executable = ""
-        self.runningControlFilename = ""
+        self.runningControlfilename = ""
         self.Datafolder = ""
         self.Documentsfolder = ""
 
@@ -28,10 +29,10 @@ class PeleSimulation(SimulationRunner):
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.DOCUMENTS_FOLDER + " Documents")
 
-        def run_simulation(self):
+    def run_simulation(self):
         createSymbolicLinks()
 
-        toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.peleExecutable, self.parameters.runningControlFilename]
+        toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, self.parameters.runningControlfilename]
         toRun = " ".join(toRun)
         print toRun
         startTime = time.time() 
@@ -45,40 +46,27 @@ class PeleSimulation(SimulationRunner):
 
 class TestSimulation(SimulationRunner):
     
-        def run_simulation(self):
-        toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.peleExecutable, self.parameters.runningControlFilename]
-        print toRun
-        print parameters.contolfile
-        print parameters.Documentsfolder
-        print parameters.Datafolder
-
+    def run_simulation(self):
+        pass
 
 class RunnerBuilder:
-    def __init__(self, simulationRunnerBlock):
-        simulationType = simulationRunnerBlock[SIMULATION_TYPE.type]
 
-        paramsBlock = simulationRunnerBlock[SIMULATION_PARAMS.params]
-
+    def build(self, simulationRunnerBlock):
+        simulationType = simulationRunnerBlock[blockNames.SIMULATION_TYPE.type]
+        paramsBlock = simulationRunnerBlock[blockNames.SIMULATION_PARAMS.params]
         params = SimulationParameters()
         if simulationType == blockNames.SIMULATION_TYPE.PELE:
             params.processors = paramsBlock[blockNames.SIMULATION_PARAMS.processors] 
-            params.Datafolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Datafolder, default= constants.DATA_FOLDER) 
-            params.Documentsfolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Documentsfolder, default=constants.DOCUMENTS_FOLDER) 
-            params.executable = paramsBlock.get(blockNames.SIMULATION_PARAMS.executable, default=constants.PELE_EXECUTABLE) 
-            params.contolfile = paramsBlock[blockNames.SIMULATION_PARAMS.runningControlFilename]
+            params.Datafolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Datafolder, constants.DATA_FOLDER) 
+            params.Documentsfolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Documentsfolder, constants.DOCUMENTS_FOLDER) 
+            params.executable = paramsBlock.get(blockNames.SIMULATION_PARAMS.executable, constants.PELE_EXECUTABLE) 
+            params.runningControlfilename = paramsBlock[blockNames.SIMULATION_PARAMS.runningControlfilename]
             SimulationRunner = PeleSimulation(params)
         elif simulationType == blockNames.SIMULATION_TYPE.MD:
             pass
         elif simulationType == blockNames.SIMULATION_TYPE.TEST:
-            params.processors = paramsBlock[blockNames.SIMULATION_PARAMS.processors] 
-            params.Datafolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Datafolder, default= constants.DATA_FOLDER) 
-            params.Documentsfolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Documentsfolder, default=constants.DOCUMENTS_FOLDER) 
-            params.executable = paramsBlock.get(blockNames.SIMULATION_PARAMS.executable, default=constants.PELE_EXECUTABLE) 
-            params.contolfile = paramsBlock[blockNames.SIMULATION_PARAMS.runningControlFilename]
-            SimulationRunner = PeleSimulation(params)
+            SimulationRunner = TestSimulation(params)
         else:
             sys.exit("Unknown simulation type! Choices are: " + str(blockNames.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))
         return SimulationRunner
-
-            
 
