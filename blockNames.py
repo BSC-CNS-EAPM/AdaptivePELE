@@ -27,6 +27,8 @@ class SIMULATION_PARAMS:
     runningControlfilename = "controlFile"
     Datafolder = "data"
     Documentsfolder = "documents"
+    destination = "destination"
+    origin = "origin"
 
 """ MOVE TO CONSTANTS """
 import startingConformationsCalculator
