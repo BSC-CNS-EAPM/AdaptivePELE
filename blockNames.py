@@ -18,13 +18,13 @@ class SIMULATION_TYPE:
     type = "type"
     PELE = "pele"
     MD = "md"
-    TEST  = "testing"
+    TEST  = "test"
 
 class SIMULATION_PARAMS:
     params = "params"
     processors = "processors"
     executable = "executable"
-    runningControlfilename = "controlfile"
+    runningControlfilename = "controlFile"
     Datafolder = "data"
     Documentsfolder = "documents"
 
@@ -33,8 +33,8 @@ import startingConformationsCalculator
 import SimulationRunner
 
 SIMULATION_TYPE_TO_STRING_DICTIONARY = {
-    SimulationRunner.SIMULATION_TYPE.PELE:SIMULATION_TYPE.PELE
-    SimulationRunner.SIMULATION_TYPE.MD:SIMULATION_TYPE.MD
+    SimulationRunner.SIMULATION_TYPE.PELE:SIMULATION_TYPE.PELE,
+    SimulationRunner.SIMULATION_TYPE.MD:SIMULATION_TYPE.MD,
     SimulationRunner.SIMULATION_TYPE.TEST:SIMULATION_TYPE.TEST
     }
 
