@@ -1,0 +1,10 @@
+rot assign res L04 &
+   sidelib FREE10 _N19 _C18 &
+   sidelib FREE10 _C11 _C10 &
+     newgrp &
+   sidelib FREE10 _N29 _C30 &
+   sidelib FREE10 _C30 _C33 &
+   sidelib FREE10 _C33 _C36 &
+   sidelib FREE10 _C36 _O39 &
+     newgrp &
+   sidelib FREE10 _N29 _C41 &

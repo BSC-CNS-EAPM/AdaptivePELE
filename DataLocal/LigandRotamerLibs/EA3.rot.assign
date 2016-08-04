@@ -1,0 +1,9 @@
+rot assign res EA3 &
+   sidelib FREE30 _C9_ _C8_ &
+   sidelib FREE30 _C8_ _N1_ &
+   sidelib FREE30 _C9_ _C10 &
+     newgrp &
+   sidelib FREE30 _C10 _N2_ &
+   sidelib FREE30 _C11 _C12 &
+   sidelib FREE30 _N3_ _C16 &
+   sidelib FREE30 _C16 _C17 &
