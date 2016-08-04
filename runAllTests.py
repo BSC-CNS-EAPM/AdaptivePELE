@@ -1,16 +1,16 @@
 import unittest
 import tests.testStartingConformationsCalculator as tStartConf
-import tests.testatomset as tatomset
+import tests.testAtomset as tAtomset
 import tests.testClustering as tClustering
-import tests.testadaptivesampling as tadaptive
+import tests.testAdaptiveSampling as tAdaptive
 
 def main():
     testSuite = unittest.TestSuite()
 
     testSuite.addTest(unittest.makeSuite(tStartConf.TestStartingConformationsCalculator))
-    testSuite.addTest(unittest.makeSuite(tatomset.atomsetTest))
+    testSuite.addTest(unittest.makeSuite(tAtomset.atomsetTest))
     testSuite.addTest(unittest.makeSuite(tClustering.clusteringTest))
-    testSuite.addTest(unittest.makeSuite(tadaptive.TestadaptiveSampling))
+    testSuite.addTest(unittest.makeSuite(tAdaptive.TestadaptiveSampling))
 
     runner = unittest.TextTestRunner()
     runner.run(testSuite)
