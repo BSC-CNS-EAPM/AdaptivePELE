@@ -2,9 +2,24 @@ import math
 import numpy as np
 import clustering
 import random
+import blockNames
+import spawningTypes
 
-class SPAWNING_TYPES:
-    sameWeight, inverselyProportional, epsilon, simulatedAnnealing, FAST = range(5)
+class StartingConformationBuilder:
+    def buildSpawningCalculator(self, spawningBlock):
+        spawningTypeString = spawningBlock[blockNames.STRING_SPAWNING_TYPES.type]
+        if spawningTypeString == blockNames.STRING_SPAWNING_TYPES.sameWeight:
+            spawningCalculator = SameWeightDegeneracyCalculator()
+        elif spawningTypeString == blockNames.STRING_SPAWNING_TYPES.inverselyProportional:
+            spawningCalculator = InverselyProportionalToPopulationCalculator()
+        elif spawningTypeString == blockNames.STRING_SPAWNING_TYPES.epsilon:
+            spawningCalculator = EpsilonDegeneracyCalculator()
+        elif spawningTypeString == blockNames.STRING_SPAWNING_TYPES.FAST:
+            spawningCalculator = FASTDegeneracyCalculator()
+        else:
+            sys.exit("Unknown spawning type! Choices are: " + str(blockNames.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
+        return spawningCalculator
+
 
 class SpawningParams:
     def __init__(self):
@@ -14,6 +29,15 @@ class SpawningParams:
         self.reportFilename = None
         self.reportCol = None
         self.decrement = None
+
+    def buildSpawningParameters(self,spawningBlock):
+        spawningParamsBlock = spawningBlock[blockNames.SPAWNING_PARAMS.params]
+        spawningType = spawningBlock[blockNames.STRING_SPAWNING_TYPES.type]
+        if spawningType == spawningTypes.SPAWNING_TYPES.epsilon:
+            spawningParams.epsilon = spawningParamsBlock[blockNames.SPAWNING_PARAMS.EPSILON]
+            spawningParams.reportFilename = spawningParamsBlock[blockNames.SPAWNING_PARAMS.REPORT_FILENAME]
+            spawningParams.reportCol = spawningParamsBlock[blockNames.SPAWNING_PARAMS.REPORT_COL]
+            spawningParams.temperature = spawningParamsBlock[blockNames.SPAWNING_PARAMS.TEMPERATURE]
 
 from abc import ABCMeta, abstractmethod
 class StartingConformationsCalculator:
@@ -81,7 +105,7 @@ class StartingConformationsCalculator:
 
 class SameWeightDegeneracyCalculator(StartingConformationsCalculator):
     def __init__(self):
-        self.type = SPAWNING_TYPES.sameWeight
+        self.type = spawningTypes.SPAWNING_TYPES.sameWeight
         self.startingConformationsCalculator = StartingConformationsCalculator()
 
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
@@ -101,7 +125,7 @@ class SameWeightDegeneracyCalculator(StartingConformationsCalculator):
 
 class InverselyProportionalToPopulationCalculator(StartingConformationsCalculator):
     def __init__(self):
-        self.type = SPAWNING_TYPES.inverselyProportional
+        self.type = spawningTypes.SPAWNING_TYPES.inverselyProportional
         self.startingConformationsCalculator = StartingConformationsCalculator()
 
     def log(self):
@@ -117,7 +141,7 @@ class EpsilonDegeneracyCalculator(InverselyProportionalToPopulationCalculator):
         It uses epsilon * numTraj trajectories proportional to their energy and the rest inversely proportional to each cluster's population
     """
     def __init__(self):
-        self.type = SPAWNING_TYPES.epsilon
+        self.type = spawningTypes.SPAWNING_TYPES.epsilon
         self.inverselyProportionalCalculator = InverselyProportionalToPopulationCalculator()
         self.degeneracyInverselyProportional = None
         self.degeneracyMetricProportional = None
@@ -173,7 +197,7 @@ class EpsilonDegeneracyCalculator(InverselyProportionalToPopulationCalculator):
 
 class SimulatedAnnealingCalculator(StartingConformationsCalculator):
     def __init__(self):
-        self.type = SPAWNING_TYPES.simulatedAnnealing
+        self.type = spawningTypes.SPAWNING_TYPES.simulatedAnnealing
         self.startingConformationsCalculator = StartingConformationsCalculator()
 
     def log(self):
@@ -201,7 +225,7 @@ class SimulatedAnnealingCalculator(StartingConformationsCalculator):
 
 class FASTDegeneracyCalculator(StartingConformationsCalculator):
     def __init__(self):
-        self.type = SPAWNING_TYPES.FAST
+        self.type = spawningTypes.SPAWNING_TYPES.FAST
         self.startingConformationsCalculator = StartingConformationsCalculator()
 
     def calculate(self, clusters, trajToDivide, clusteringParams, currentEpoch=None):

@@ -4,9 +4,7 @@ import constants
 import subprocess
 import blockNames
 import shutil
-
-class SIMULATION_TYPE:
-    PELE, MD, TEST = range(3)
+import simulationTypes
 
 class SimulationParameters:
     def __init__(self):
@@ -29,6 +27,8 @@ class SimulationRunner:
         pass
 
 class PeleSimulation(SimulationRunner):
+    def __init__(self):
+        self.type = simulationTypes.SIMULATION_TYPE.PELE
     
     def makeWorkingControlFile(self, templetizedControlFile, workingControlFilename, dictionary):
         inputFile = open(templetizedControlFile, "r")
@@ -65,6 +65,7 @@ class PeleSimulation(SimulationRunner):
 
 class TestSimulation(SimulationRunner):
     def __init__(self, parameters):
+        self.type = simulationTypes.SIMULATION_TYPE.TEST
         self.copied = False
         self.parameters = parameters
 
@@ -103,6 +104,6 @@ class RunnerBuilder:
             params.seed = paramsBlock[blockNames.SIMULATION_PARAMS.seed]
             SimulationRunner = TestSimulation(params)
         else:
-            sys.exit("Unknown simulation type! Choices are: " + str(blockNames.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))
+            sys.exit("Unknown simulation type! Choices are: " + str(simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))
         return SimulationRunner
 

@@ -20,7 +20,8 @@ import atomset
 import multiprocessing
 from functools import partial
 import SimulationRunner
-
+import spawningTypes
+import simulationTypes
 
 def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, iteration):
     for i, name in enumerate(initialStructures):
@@ -204,38 +205,11 @@ def findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT):
         return 0
 
 def spawningBuilder(spawningBlock):
-    spawningTypeString = spawningBlock['type']
-
-    if spawningTypeString == blockNames.STRING_SPAWNING_TYPES.sameWeight:
-        spawningType = startingConformationsCalculator.SPAWNING_TYPES.sameWeight
-    elif spawningTypeString == blockNames.STRING_SPAWNING_TYPES.inverselyProportional:
-        spawningType = startingConformationsCalculator.SPAWNING_TYPES.inverselyProportional
-    elif spawningTypeString == blockNames.STRING_SPAWNING_TYPES.epsilon:
-        spawningType = startingConformationsCalculator.SPAWNING_TYPES.epsilon
-    elif spawningTypeString == blockNames.STRING_SPAWNING_TYPES.FAST:
-        spawningType = startingConformationsCalculator.SPAWNING_TYPES.FAST
-    else:
-        sys.exit("Unknown spawning type! Choices are: " + str(blockNames.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
-
-    spawningCalculator = None
-    if spawningType == startingConformationsCalculator.SPAWNING_TYPES.sameWeight:
-        spawningCalculator = SameWeightDegeneracyCalculator()
-    elif spawningType == startingConformationsCalculator.SPAWNING_TYPES.inverselyProportional:
-        spawningCalculator = startingConformationsCalculator.InverselyProportionalToPopulationCalculator()
-    elif spawningType == startingConformationsCalculator.SPAWNING_TYPES.epsilon:
-        spawningCalculator = startingConformationsCalculator.EpsilonDegeneracyCalculator()
-    elif spawningType == startingConformationsCalculator.SPAWNING_TYPES.FAST:
-        spawningCalculator = startingConformationsCalculator.FASTDegeneracyCalculator()
-
+    spawningCalculatorBuilder = startingConformationsCalculator.StartingConformationBuilder()
+    spawningCalculator = spawningCalculatorBuilder.buildSpawningCalculator(spawningBlock)
 
     spawningParams = startingConformationsCalculator.SpawningParams()
-    if spawningType == startingConformationsCalculator.SPAWNING_TYPES.epsilon:
-        spawningParamsBlock = spawningBlock['params']
-        
-        spawningParams.epsilon = spawningParamsBlock[blockNames.SPAWNING_PARAMS.EPSILON]
-        spawningParams.reportFilename = spawningParamsBlock[blockNames.SPAWNING_PARAMS.REPORT_FILENAME]
-        spawningParams.reportCol = spawningParamsBlock[blockNames.SPAWNING_PARAMS.REPORT_COL]
-        spawningParams.temperature = spawningParamsBlock[blockNames.SPAWNING_PARAMS.TEMPERATURE]
+    spawningParams.buildSpawningParameters(spawningBlock)
 
     return spawningCalculator, spawningParams
     
@@ -370,7 +344,9 @@ def main(jsonParams=None):
 
     print "Iterations: %d, Mpi processors: %d, Pele steps: %d"%(simulationRunner.parameters.iterations, simulationRunner.parameters.processors, simulationRunner.parameters.peleSteps)
 
-    print "SpawningType:", blockNames.SPAWNING_TYPE_TO_STRING_DICTIONARY[startingConformationsCalculator.type]
+    print "SpawningType:", spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[startingConformationsCalculator.type]
+
+    print "SimulationType:", simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY[simulationRunner.type]
 
     print "Output path: ", outputPath
     print "Initial Structures: ", initialStructures
