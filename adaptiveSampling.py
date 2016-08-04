@@ -189,17 +189,18 @@ def makeOwnClusteringClusterRepresentativesInitialStructures(tmpInitialStructure
     print "counts & cluster centers", counts, len(np.where(np.array(degeneracyOfRepresentatives) > 0))
     return counts
 
-def findFirstRun(outputPath):
+def findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT):
     """ Assumes that the outputPath is XXX/%d """
-    #TODO: Check if object.pkl exists to know if last run was finished
 
     folderWithSimulationData = outputPath
     allFolders = os.listdir(folderWithSimulationData)
     epochFolders = [int(epoch) for epoch in allFolders if epoch.isdigit()]
+    epochFolders.sort(reverse=True)
 
-    try: 
-        return max(epochFolders)
-    except ValueError:
+    for epoch in epochFolders:
+        if os.path.exists(CLUSTERING_OUTPUT_OBJECT%epoch):
+            return epoch
+    if epoch <= 0:
         return 0
 
 def spawningBuilder(spawningBlock):
@@ -425,7 +426,7 @@ def main(jsonParams=None):
 
 
     if RESTART:
-        firstRun = findFirstRun(outputPath)
+        firstRun = findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT)
 
         if firstRun != 0:
             """
@@ -444,7 +445,7 @@ def main(jsonParams=None):
             clusteringMethod.cluster(paths, withinClusterThreshold)
             """
 
-            with open(CLUSTERING_OUTPUT_OBJECT%(firstRun-1), 'rb') as f:
+            with open(CLUSTERING_OUTPUT_OBJECT%(firstRun), 'rb') as f:
                 clusteringMethod = pickle.load(f)
 
 
