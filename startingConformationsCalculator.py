@@ -33,11 +33,11 @@ class SpawningParams:
     def buildSpawningParameters(self,spawningBlock):
         spawningParamsBlock = spawningBlock[blockNames.SPAWNING_PARAMS.params]
         spawningType = spawningBlock[blockNames.STRING_SPAWNING_TYPES.type]
-        if spawningType == spawningTypes.SPAWNING_TYPES.epsilon:
-            spawningParams.epsilon = spawningParamsBlock[blockNames.SPAWNING_PARAMS.EPSILON]
-            spawningParams.reportFilename = spawningParamsBlock[blockNames.SPAWNING_PARAMS.REPORT_FILENAME]
-            spawningParams.reportCol = spawningParamsBlock[blockNames.SPAWNING_PARAMS.REPORT_COL]
-            spawningParams.temperature = spawningParamsBlock[blockNames.SPAWNING_PARAMS.TEMPERATURE]
+        if spawningType == blockNames.STRING_SPAWNING_TYPES.epsilon:
+            self.epsilon = spawningParamsBlock[blockNames.SPAWNING_PARAMS.EPSILON]
+            self.reportFilename = spawningParamsBlock[blockNames.SPAWNING_PARAMS.REPORT_FILENAME]
+            self.reportCol = spawningParamsBlock[blockNames.SPAWNING_PARAMS.REPORT_COL]
+            self.temperature = spawningParamsBlock[blockNames.SPAWNING_PARAMS.TEMPERATURE]
 
 from abc import ABCMeta, abstractmethod
 class StartingConformationsCalculator:

@@ -95,9 +95,9 @@ def main():
     if kindOfPrint == "PRINT_RMSD_STEPS":
         printWithLines = True
         column1 = 2 #steps
-        column2 = 7 #rmsd
+        #column2 = 7 #rmsd
 
-        column2 = 5 #rmsd
+        column2 = 8 #rmsd
 
         #PR
         #column2 = 7 #sasa
@@ -110,6 +110,9 @@ def main():
 
         column1 = 5 #rmsd
         column2 = 6 #binding energy
+
+        column1 = 8 #rmsd
+        column2 = 7 #binding energy
 
         #PR
         #column1 = 7 #sasa
@@ -124,7 +127,7 @@ def main():
 
 
     reportName='run_report_'
-    reportName='report_'
+    #reportName='report_'
     """
     gnuplotString = "plot for [i=1:%(runsPerEpoch)d] \"%(epoch)d/%(reportName)s\".i u %(col1)s:%(col2)d lt 6 lc palette frac %(epoch)d/%(numberOfEpochs)d. notitle %(withLines)s"
     generateForLoopString(gnuplotString, reportName, column1, column2, stepsPerRun, printWithLines, totalNumberOfSteps, False)
