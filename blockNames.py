@@ -29,6 +29,9 @@ class SIMULATION_PARAMS:
     Documentsfolder = "documents"
     destination = "destination"
     origin = "origin"
+    seed = "seed"
+    peleSteps = "peleSteps"
+    iterations = "iterations"
 
 """ MOVE TO CONSTANTS """
 import startingConformationsCalculator
