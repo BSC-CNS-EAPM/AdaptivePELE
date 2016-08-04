@@ -460,7 +460,7 @@ def main(jsonParams=None):
     makeFolder(outputDir)
     peleControlFileDictionary["OUTPUT_PATH"] = outputDir
     peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + firstRun*simulationRunner.parameters.processors
-    simulationRunner.makeWorkingControlFile(simulationRunner.parameters.runningControlfilename, tmpControlFilename%firstRun, peleControlFileDictionary) 
+    simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, tmpControlFilename%firstRun, peleControlFileDictionary) 
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
@@ -468,8 +468,7 @@ def main(jsonParams=None):
         print "Production run..."
         if not DEBUG:
             startTime = time.time() 
-           # runPeleSimulations(processors, tmpControlFilename%i, PELE_EXECUTABLE, DATA_FOLDER, DOCUMENTS_FOLDER)
-            simulationRunner.run_simulation()
+            simulationRunner.runSimulation(tmpControlFilename%i)
             endTime = time.time() 
             print "PELE %s sec" % (endTime - startTime)
 
@@ -558,7 +557,7 @@ def main(jsonParams=None):
             makeFolder(outputDir) #PELE does not do it automatically
             peleControlFileDictionary["OUTPUT_PATH"] = outputDir
             peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + (i+1)*simulationRunner.parameters.processors
-            simulationRunner.makeWorkingControlFile(simulationRunner.parameters.runningControlfilename, tmpControlFilename%(i+1), peleControlFileDictionary) 
+            simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, tmpControlFilename%(i+1), peleControlFileDictionary) 
 
     #cleanup
     #cleanup(tmpFolder)

@@ -26,17 +26,11 @@ class SIMULATION_PARAMS:
     params = "params"
     processors = "processors"
     executable = "executable"
-    runningControlfilename = "controlFile"
-    Datafolder = "data"
-    Documentsfolder = "documents"
+    templetizedControlFile = "controlFile"
+    dataFolder = "data"
+    documentsFolder = "documents"
     destination = "destination"
     origin = "origin"
     seed = "seed"
     peleSteps = "peleSteps"
     iterations = "iterations"
-
-""" MOVE TO CONSTANTS """
-import SimulationRunner
-
-
-""" END MOVE TO CONSTANTS """
