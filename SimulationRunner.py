@@ -4,6 +4,7 @@ import constants
 import subprocess
 import blockNames
 import shutil
+import string
 
 class SIMULATION_TYPE:
     PELE, MD, TEST = range(3)
@@ -12,9 +13,9 @@ class SimulationParameters:
     def __init__(self):
         self.processors = 0
         self.executable = ""
-        self.runningControlfilename = ""
-        self.Datafolder = ""
-        self.Documentsfolder = ""
+        self.templetizedControlFile = ""
+        self.dataFolder = ""
+        self.documentsFolder = ""
         self.iterations = 0
         self.peleSteps = 0
         self.seed = 0
@@ -23,8 +24,9 @@ class SimulationRunner:
     def __init__(self, parameters):
         self.parameters = parameters
     
-    def run_simulation(self):
+    def runSimulation(self, runningControlFile = ""):
         pass 
+
     def makeWorkingControlFile(self, templ, work, dictionary):
         pass
 
@@ -44,14 +46,15 @@ class PeleSimulation(SimulationRunner):
 
     def createSymbolicLinks(self):
         if not os.path.islink("Data"):
-            os.system("ln -s " + self.parameters.DATA_FOLDER + " Data")
+            os.system("ln -s " + self.parameters.dataFolder + " Data")
         if not os.path.islink("Documents"):
-            os.system("ln -s " + self.parameters.DOCUMENTS_FOLDER + " Documents")
+            os.system("ln -s " + self.parameters.documentsFolder + " Documents")
 
-    def run_simulation(self):
-        createSymbolicLinks()
 
-        toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, self.parameters.runningControlfilename]
+    def runSimulation(self, runningControlFile = ""):
+        self.createSymbolicLinks()
+
+        toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
         toRun = " ".join(toRun)
         print toRun
         startTime = time.time() 
@@ -68,7 +71,7 @@ class TestSimulation(SimulationRunner):
         self.copied = False
         self.parameters = parameters
 
-    def run_simulation(self):
+    def runSimulation(self, runningControlFile = ""):
         if not self.copied:
             if os.path.exists(self.parameters.destination):
                 shutil.rmtree(self.parameters.destination)
@@ -83,10 +86,10 @@ class RunnerBuilder:
         params = SimulationParameters()
         if simulationType == blockNames.SIMULATION_TYPE.PELE:
             params.processors = paramsBlock[blockNames.SIMULATION_PARAMS.processors]
-            params.Datafolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Datafolder, constants.DATA_FOLDER)
-            params.Documentsfolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Documentsfolder, constants.DOCUMENTS_FOLDER)
+            params.dataFolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.dataFolder, constants.DATA_FOLDER)
+            params.documentsFolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.documentsFolder, constants.DOCUMENTS_FOLDER)
             params.executable = paramsBlock.get(blockNames.SIMULATION_PARAMS.executable, constants.PELE_EXECUTABLE)
-            params.runningControlfilename = paramsBlock[blockNames.SIMULATION_PARAMS.runningControlfilename]
+            params.templetizedControlFile = paramsBlock[blockNames.SIMULATION_PARAMS.templetizedControlFile]
             params.iterations = paramsBlock[blockNames.SIMULATION_PARAMS.iterations]
             params.peleSteps = paramsBlock[blockNames.SIMULATION_PARAMS.peleSteps]
             params.seed = paramsBlock[blockNames.SIMULATION_PARAMS.seed]
