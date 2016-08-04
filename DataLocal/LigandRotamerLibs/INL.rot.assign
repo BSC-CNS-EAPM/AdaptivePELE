@@ -1,0 +1,5 @@
+rot assign res INL &
+   sidelib FREE10 _C15 _C26 &
+   sidelib FREE10 _C26 _C28 &
+     newgrp &
+   sidelib FREE10 _C17 _C20 &

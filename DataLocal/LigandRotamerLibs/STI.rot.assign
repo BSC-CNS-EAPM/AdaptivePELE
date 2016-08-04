@@ -1,0 +1,8 @@
+rot assign res STI &
+   sidelib FREE30 _N21 _C16 &
+   sidelib FREE30 _C14 _N13 &
+   sidelib FREE30 _C7_ _C5_ &
+     newgrp &
+   sidelib FREE30 _C22 _C23 &
+   sidelib FREE30 _C27 _C46 &
+   sidelib FREE30 _C46 _N48 &

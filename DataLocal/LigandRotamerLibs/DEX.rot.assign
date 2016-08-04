@@ -1,0 +1,8 @@
+rot assign res DEX &
+   sidelib FREE30 _C14 _O25 &
+     newgrp &
+   sidelib FREE30 _C16 _C6_ &
+   sidelib FREE30 _C6_ _C22 &
+   sidelib FREE30 _C22 _O27 &
+     newgrp &
+   sidelib FREE30 _C16 _O26 &

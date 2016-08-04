@@ -1,0 +1,4 @@
+rot assign res OPE &
+   sidelib FREE10 _P__ _O4_ &
+   sidelib FREE10 _O4_ _CA_ &
+   sidelib FREE10 _CA_ _CB_ &

@@ -1,0 +1,8 @@
+rot assign res DOG &
+   sidelib FREE10 _C5_ _C4_ &
+     newgrp &
+   sidelib FREE10 _C9_ _O3_ &
+     newgrp &
+   sidelib FREE10 _C10 _O4_ &
+     newgrp &
+   sidelib FREE10 _C21 _O5_ &

@@ -1,0 +1,6 @@
+rot assign res ABS &
+   sidelib FREE10 _N1_ _N2_ &
+     newgrp &
+   sidelib FREE10 _N4_ _C17 &
+     newgrp &
+   sidelib FREE10 _N3_ _C8_ &

@@ -1,0 +1,6 @@
+###################
+###  TODO LIST  ###
+###################
+
+* Move clustering/object.pkl to constants
+* Move other constants (such in control file loading) to constants file
