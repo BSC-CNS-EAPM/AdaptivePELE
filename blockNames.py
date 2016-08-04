@@ -1,28 +1,25 @@
-class STRING_SPAWNING_TYPES:
+class StringSpawningTypes:
     type = 'type'
     sameWeight = "sameWeight"
     inverselyProportional = "inverselyProportional"
     epsilon = "epsilon"
-    FAST = "FAST"
+    fast = "FAST"
     
-class SPAWNING_PARAMS:
+class SpawningParams:
     params = "params"
-    EPSILON = "epsilon"
-    TEMPERATURE = "T"
-    THRESHOLD = "threshold"
-    REPORT_FILENAME = "reportFilename"
-    REPORT_COL = "metricColumnInReport"
+    epsilon = "epsilon"
+    temperature = "T"
+    threshold = "threshold"
+    report_filename = "reportFilename"
+    report_col = "metricColumnInReport"
 
-class SIMULATION_BLOCK:
-    blockname = "simulation"
-
-class SIMULATION_TYPE:
+class SimulationType:
     type = "type"
-    PELE = "pele"
-    MD = "md"
-    TEST  = "test"
+    pele = "pele"
+    md = "md"
+    test  = "test"
 
-class SIMULATION_PARAMS:
+class SimulationParams:
     params = "params"
     processors = "processors"
     executable = "executable"
@@ -34,3 +31,12 @@ class SIMULATION_PARAMS:
     seed = "seed"
     peleSteps = "peleSteps"
     iterations = "iterations"
+
+class ControlFileParams:
+    restart = 'RESTART'
+    spawningBlockname = 'spawning'
+    outputPath = 'outputPath'
+    initialStructures = 'initialStructures'
+    ligandResname = 'ligandResname'
+    debug = 'debug'
+    simulationBlockname = "simulation"

@@ -83,29 +83,29 @@ class TestSimulation(SimulationRunner):
 class RunnerBuilder:
 
     def build(self, simulationRunnerBlock):
-        simulationType = simulationRunnerBlock[blockNames.SIMULATION_TYPE.type]
-        paramsBlock = simulationRunnerBlock[blockNames.SIMULATION_PARAMS.params]
+        simulationType = simulationRunnerBlock[blockNames.SimulationType.type]
+        paramsBlock = simulationRunnerBlock[blockNames.SimulationParams.params]
         params = SimulationParameters()
-        if simulationType == blockNames.SIMULATION_TYPE.PELE:
-            params.processors = paramsBlock[blockNames.SIMULATION_PARAMS.processors]
-            params.dataFolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.dataFolder, constants.DATA_FOLDER)
-            params.documentsFolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.documentsFolder, constants.DOCUMENTS_FOLDER)
-            params.executable = paramsBlock.get(blockNames.SIMULATION_PARAMS.executable, constants.PELE_EXECUTABLE)
-            params.templetizedControlFile = paramsBlock[blockNames.SIMULATION_PARAMS.templetizedControlFile]
-            params.iterations = paramsBlock[blockNames.SIMULATION_PARAMS.iterations]
-            params.peleSteps = paramsBlock[blockNames.SIMULATION_PARAMS.peleSteps]
-            params.seed = paramsBlock[blockNames.SIMULATION_PARAMS.seed]
+        if simulationType == blockNames.SimulationType.pele:
+            params.processors = paramsBlock[blockNames.SimulationParams.processors]
+            params.dataFolder = paramsBlock.get(blockNames.SimulationParams.dataFolder, constants.DATA_FOLDER)
+            params.documentsFolder = paramsBlock.get(blockNames.SimulationParams.documentsFolder, constants.DOCUMENTS_FOLDER)
+            params.executable = paramsBlock.get(blockNames.SimulationParams.executable, constants.PELE_EXECUTABLE)
+            params.templetizedControlFile = paramsBlock[blockNames.SimulationParams.templetizedControlFile]
+            params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
+            params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
+            params.seed = paramsBlock[blockNames.SimulationParams.seed]
 
             SimulationRunner = PeleSimulation(params)
-        elif simulationType == blockNames.SIMULATION_TYPE.MD:
+        elif simulationType == blockNames.SimulationType.md:
             pass
-        elif simulationType == blockNames.SIMULATION_TYPE.TEST:
-            params.processors = paramsBlock[blockNames.SIMULATION_PARAMS.processors]
-            params.destination = paramsBlock[blockNames.SIMULATION_PARAMS.destination]
-            params.origin = paramsBlock[blockNames.SIMULATION_PARAMS.origin]
-            params.iterations = paramsBlock[blockNames.SIMULATION_PARAMS.iterations]
-            params.peleSteps = paramsBlock[blockNames.SIMULATION_PARAMS.peleSteps]
-            params.seed = paramsBlock[blockNames.SIMULATION_PARAMS.seed]
+        elif simulationType == blockNames.SimulationType.test:
+            params.processors = paramsBlock[blockNames.SimulationParams.processors]
+            params.destination = paramsBlock[blockNames.SimulationParams.destination]
+            params.origin = paramsBlock[blockNames.SimulationParams.origin]
+            params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
+            params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
+            params.seed = paramsBlock[blockNames.SimulationParams.seed]
             SimulationRunner = TestSimulation(params)
         else:
             sys.exit("Unknown simulation type! Choices are: " + str(simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))

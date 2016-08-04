@@ -220,10 +220,10 @@ def loadParams(jsonParams):
     jsonFile = open(jsonParams, 'r').read()
     parsedJSON = json.loads(jsonFile)
 
-    return parsedJSON["RESTART"],parsedJSON['spawning'],\
-            parsedJSON['outputPath'], parsedJSON['initialStructures'],\
-            parsedJSON['ligandResname'].upper(), parsedJSON['debug'],\
-            parsedJSON[blockNames.SIMULATION_BLOCK.blockname]
+    return parsedJSON[blockNames.ControlFileParams.restart],parsedJSON[blockNames.ControlFileParams.spawningBlockname],\
+            parsedJSON[blockNames.ControlFileParams.outputPath], parsedJSON[blockNames.ControlFileParams.initialStructures],\
+            parsedJSON[blockNames.ControlFileParams.ligandResname].upper(), parsedJSON[blockNames.ControlFileParams.debug],\
+            parsedJSON[blockNames.ControlFileParams.simulationBlockname]
 
 def saveInitialControlFile(jsonParams, originalControlFile):
     file = open(originalControlFile, 'w')

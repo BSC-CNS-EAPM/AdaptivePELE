@@ -7,14 +7,14 @@ import spawningTypes
 
 class StartingConformationBuilder:
     def buildSpawningCalculator(self, spawningBlock):
-        spawningTypeString = spawningBlock[blockNames.STRING_SPAWNING_TYPES.type]
-        if spawningTypeString == blockNames.STRING_SPAWNING_TYPES.sameWeight:
+        spawningTypeString = spawningBlock[blockNames.StringSpawningTypes.type]
+        if spawningTypeString == blockNames.StringSpawningTypes.sameWeight:
             spawningCalculator = SameWeightDegeneracyCalculator()
-        elif spawningTypeString == blockNames.STRING_SPAWNING_TYPES.inverselyProportional:
+        elif spawningTypeString == blockNames.StringSpawningTypes.inverselyProportional:
             spawningCalculator = InverselyProportionalToPopulationCalculator()
-        elif spawningTypeString == blockNames.STRING_SPAWNING_TYPES.epsilon:
+        elif spawningTypeString == blockNames.StringSpawningTypes.epsilon:
             spawningCalculator = EpsilonDegeneracyCalculator()
-        elif spawningTypeString == blockNames.STRING_SPAWNING_TYPES.FAST:
+        elif spawningTypeString == blockNames.StringSpawningTypes.fast:
             spawningCalculator = FASTDegeneracyCalculator()
         else:
             sys.exit("Unknown spawning type! Choices are: " + str(blockNames.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
@@ -31,13 +31,13 @@ class SpawningParams:
         self.decrement = None
 
     def buildSpawningParameters(self,spawningBlock):
-        spawningParamsBlock = spawningBlock[blockNames.SPAWNING_PARAMS.params]
-        spawningType = spawningBlock[blockNames.STRING_SPAWNING_TYPES.type]
-        if spawningType == blockNames.STRING_SPAWNING_TYPES.epsilon:
-            self.epsilon = spawningParamsBlock[blockNames.SPAWNING_PARAMS.EPSILON]
-            self.reportFilename = spawningParamsBlock[blockNames.SPAWNING_PARAMS.REPORT_FILENAME]
-            self.reportCol = spawningParamsBlock[blockNames.SPAWNING_PARAMS.REPORT_COL]
-            self.temperature = spawningParamsBlock[blockNames.SPAWNING_PARAMS.TEMPERATURE]
+        spawningParamsBlock = spawningBlock[blockNames.SpawningParams.params]
+        spawningType = spawningBlock[blockNames.StringSpawningTypes.type]
+        if spawningType == blockNames.StringSpawningTypes.epsilon:
+            self.epsilon = spawningParamsBlock[blockNames.SpawningParams.epsilon]
+            self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
+            self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
+            self.temperature = spawningParamsBlock[blockNames.SpawningParams.temperature]
 
 from abc import ABCMeta, abstractmethod
 class StartingConformationsCalculator:
