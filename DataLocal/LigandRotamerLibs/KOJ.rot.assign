@@ -1,0 +1,5 @@
+rot assign res KOJ &
+   sidelib FREE30 _C2_ _O2_ &
+     newgrp &
+   sidelib FREE30 _C5_ _C6_ &
+   sidelib FREE30 _C6_ _O6_ &

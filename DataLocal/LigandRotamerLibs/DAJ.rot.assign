@@ -1,0 +1,6 @@
+rot assign res DAJ &
+   sidelib FREE30 _O3_ _C13 &
+     newgrp &
+   sidelib FREE30 _C1_ _C19 &
+   sidelib FREE30 _C19 _C2_ &
+   sidelib FREE30 _C19 _C3_ &
