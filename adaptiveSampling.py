@@ -189,17 +189,18 @@ def makeOwnClusteringClusterRepresentativesInitialStructures(tmpInitialStructure
     print "counts & cluster centers", counts, len(np.where(np.array(degeneracyOfRepresentatives) > 0))
     return counts
 
-def findFirstRun(outputPath):
+def findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT):
     """ Assumes that the outputPath is XXX/%d """
-    #TODO: Check if object.pkl exists to know if last run was finished
 
     folderWithSimulationData = outputPath
     allFolders = os.listdir(folderWithSimulationData)
     epochFolders = [int(epoch) for epoch in allFolders if epoch.isdigit()]
+    epochFolders.sort(reverse=True)
 
-    try: 
-        return max(epochFolders)
-    except ValueError:
+    for epoch in epochFolders:
+        if os.path.exists(CLUSTERING_OUTPUT_OBJECT%epoch):
+            return epoch
+    if epoch <= 0:
         return 0
 
 def spawningBuilder(spawningBlock):
@@ -245,12 +246,10 @@ def loadParams(jsonParams):
     jsonFile = open(jsonParams, 'r').read()
     parsedJSON = json.loads(jsonFile)
 
-    return parsedJSON["RESTART"], parsedJSON['iterations'],\
-            parsedJSON['peleSteps'],\
-            parsedJSON['spawning'],\
+    return parsedJSON["RESTART"],parsedJSON['spawning'],\
             parsedJSON['outputPath'], parsedJSON['initialStructures'],\
-            parsedJSON['seed'],\
-            parsedJSON['ligandResname'].upper(), parsedJSON['debug'], parsedJSON[blockNames.SIMULATION_BLOCK.blockname]
+            parsedJSON['ligandResname'].upper(), parsedJSON['debug'],\
+            parsedJSON[blockNames.SIMULATION_BLOCK.blockname]
 
 def saveInitialControlFile(jsonParams, originalControlFile):
     file = open(originalControlFile, 'w')
@@ -357,7 +356,7 @@ def main(jsonParams=None):
     if jsonParams is None:
         jsonParams = sys.argv[1]
 
-    RESTART, iterations, peleSteps, spawningBlock, outputPath, initialStructures, seed, ligandResname, DEBUG, simulationrunnerBlock = loadParams(jsonParams)
+    RESTART, spawningBlock, outputPath, initialStructures, ligandResname, DEBUG, simulationrunnerBlock = loadParams(jsonParams)
 
     startingConformationsCalculator, spawningParams = spawningBuilder(spawningBlock)
     runnerbuilder = SimulationRunner.RunnerBuilder()
@@ -369,7 +368,7 @@ def main(jsonParams=None):
     print "Restarting simulations", RESTART
     print "Debug:", DEBUG
 
-    print "Iterations: %d, Mpi processors: %d, Pele steps: %d"%(iterations, simulationRunner.parameters.processors, peleSteps)
+    print "Iterations: %d, Mpi processors: %d, Pele steps: %d"%(simulationRunner.parameters.iterations, simulationRunner.parameters.processors, simulationRunner.parameters.peleSteps)
 
     print "SpawningType:", blockNames.SPAWNING_TYPE_TO_STRING_DICTIONARY[startingConformationsCalculator.type]
 
@@ -427,7 +426,7 @@ def main(jsonParams=None):
 
 
     if RESTART:
-        firstRun = findFirstRun(outputPath)
+        firstRun = findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT)
 
         if firstRun != 0:
             """
@@ -446,7 +445,7 @@ def main(jsonParams=None):
             clusteringMethod.cluster(paths, withinClusterThreshold)
             """
 
-            with open(CLUSTERING_OUTPUT_OBJECT%(firstRun-1), 'rb') as f:
+            with open(CLUSTERING_OUTPUT_OBJECT%(firstRun), 'rb') as f:
                 clusteringMethod = pickle.load(f)
 
 
@@ -472,7 +471,7 @@ def main(jsonParams=None):
         initialStructuresAsString = createMultipleComplexesFilenames(len(initialStructures), inputFileTemplate, tmpInitialStructuresTemplate, firstRun)
 
 
-    peleControlFileDictionary = {"COMPLEXES":initialStructuresAsString, "PELE_STEPS":peleSteps}
+    peleControlFileDictionary = {"COMPLEXES":initialStructuresAsString, "PELE_STEPS":simulationRunner.parameters.peleSteps}
     """
     pyproctControlFileDictionary = {"MIN_SEEDING_POINTS":minSeedingPoints, "MAX_SEEDING_POINTS":maxSeedingPoints, "NUMBER_OF_PROCESSORS":processors, "RESNAME": ligandResname}
 
@@ -484,10 +483,10 @@ def main(jsonParams=None):
     outputDir = outputPathTempletized%firstRun
     makeFolder(outputDir)
     peleControlFileDictionary["OUTPUT_PATH"] = outputDir
-    peleControlFileDictionary["SEED"] = seed + firstRun*simulationRunner.parameters.processors
+    peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + firstRun*simulationRunner.parameters.processors
     simulationRunner.makeWorkingControlFile(simulationRunner.parameters.runningControlfilename, tmpControlFilename%firstRun, peleControlFileDictionary) 
 
-    for i in range(firstRun, iterations):
+    for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
         
         print "Production run..."
@@ -575,14 +574,14 @@ def main(jsonParams=None):
         writeClusteringOutput(CLUSTERING_OUTPUT_DIR%i, clusteringMethod, degeneracyOfRepresentatives, CLUSTERING_OUTPUT_OBJECT%i)
 
         #Prepare for next pele iteration
-        if i != iterations-1:
+        if i != simulationRunner.parameters.iterations-1:
             initialStructuresAsString = createMultipleComplexesFilenames(numberOfSeedingPoints, inputFileTemplate, tmpInitialStructuresTemplate, i+1)
             peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
 
             outputDir = outputPathTempletized%(i+1)
             makeFolder(outputDir) #PELE does not do it automatically
             peleControlFileDictionary["OUTPUT_PATH"] = outputDir
-            peleControlFileDictionary["SEED"] = seed + (i+1)*simulationRunner.parameters.processors
+            peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + (i+1)*simulationRunner.parameters.processors
             simulationRunner.makeWorkingControlFile(simulationRunner.parameters.runningControlfilename, tmpControlFilename%(i+1), peleControlFileDictionary) 
 
     #cleanup
