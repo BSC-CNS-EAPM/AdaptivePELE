@@ -15,6 +15,9 @@ class SimulationParameters:
         self.runningControlfilename = ""
         self.Datafolder = ""
         self.Documentsfolder = ""
+        self.iterations = 0
+        self.peleSteps = 0
+        self.seed = 0
 
 class SimulationRunner:
     def __init__(self, parameters):
@@ -84,6 +87,10 @@ class RunnerBuilder:
             params.Documentsfolder = paramsBlock.get(blockNames.SIMULATION_PARAMS.Documentsfolder, constants.DOCUMENTS_FOLDER)
             params.executable = paramsBlock.get(blockNames.SIMULATION_PARAMS.executable, constants.PELE_EXECUTABLE)
             params.runningControlfilename = paramsBlock[blockNames.SIMULATION_PARAMS.runningControlfilename]
+            params.iterations = paramsBlock[blockNames.SIMULATION_PARAMS.iterations]
+            params.peleSteps = paramsBlock[blockNames.SIMULATION_PARAMS.peleSteps]
+            params.seed = paramsBlock[blockNames.SIMULATION_PARAMS.seed]
+
             SimulationRunner = PeleSimulation(params)
         elif simulationType == blockNames.SIMULATION_TYPE.MD:
             pass
@@ -91,6 +98,9 @@ class RunnerBuilder:
             params.processors = paramsBlock[blockNames.SIMULATION_PARAMS.processors]
             params.destination = paramsBlock[blockNames.SIMULATION_PARAMS.destination]
             params.origin = paramsBlock[blockNames.SIMULATION_PARAMS.origin]
+            params.iterations = paramsBlock[blockNames.SIMULATION_PARAMS.iterations]
+            params.peleSteps = paramsBlock[blockNames.SIMULATION_PARAMS.peleSteps]
+            params.seed = paramsBlock[blockNames.SIMULATION_PARAMS.seed]
             SimulationRunner = TestSimulation(params)
         else:
             sys.exit("Unknown simulation type! Choices are: " + str(blockNames.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))
