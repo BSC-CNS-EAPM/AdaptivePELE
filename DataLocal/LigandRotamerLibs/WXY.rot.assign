@@ -1,0 +1,7 @@
+rot assign res WXY &
+   sidelib FREE10 _C13 _C7_ &
+   sidelib FREE10 _C4_ _S1_ &
+     newgrp &
+   sidelib FREE10 _C15 _C10 &
+     newgrp &
+   sidelib FREE10 _C14 _C21 &

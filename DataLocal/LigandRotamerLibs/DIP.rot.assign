@@ -1,0 +1,8 @@
+rot assign res DIP&
+   sidelib FREE30 _C17 _C20 &
+     newgrp &
+   sidelib FREE30 _C15 _C26 &
+   sidelib FREE30 _C26 _C28 &
+   sidelib FREE30 _C28 _O29 &
+     newgrp &
+   sidelib FREE30 _C4_ _O40 &

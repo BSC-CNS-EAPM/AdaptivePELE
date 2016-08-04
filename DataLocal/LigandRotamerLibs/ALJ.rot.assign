@@ -1,0 +1,4 @@
+rot assign res ALJ &
+   sidelib FREE30 _N1_ _C5_ &
+     newgrp &
+   sidelib FREE30 _C16 _O1_ &

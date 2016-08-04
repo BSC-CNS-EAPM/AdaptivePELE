@@ -1,0 +1,4 @@
+rot assign res AI5 &
+   sidelib FREE10 _N1_ _C2_ &
+     newgrp &
+   sidelib FREE10 _N2_ _C8_ &

@@ -1,0 +1,6 @@
+rot assign res DNI &
+   sidelib FREE10 _C4_ _C6_ &
+   sidelib FREE10 _C6_ _C7_ &
+   sidelib FREE10 _C7_ _C8_ &
+     newgrp &
+   sidelib FREE10 _C2_ _C10 &
