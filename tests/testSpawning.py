@@ -3,12 +3,12 @@ import numpy as np
 import spawning
 import clustering
 
-class TestStartingConformationsCalculator(unittest.TestCase):
+class TestSpawningCalculator(unittest.TestCase):
     def testDivideTrajAccordingToWeights(self):
-        startingConfCalculator = spawning.StartingConformationsCalculator() 
+        spawningCalculator = spawning.SpawningCalculator() 
         weights1 = [0.5, 0.2, 0.2, 0.1]
         trajToDistribute1 = 12
-        degeneracy1 = startingConfCalculator.divideTrajAccordingToWeights(weights1, trajToDistribute1)
+        degeneracy1 = spawningCalculator.divideTrajAccordingToWeights(weights1, trajToDistribute1)
 
         golden1 = [6, 2, 3, 1]
         self.assertEqual(degeneracy1, golden1)
@@ -18,10 +18,10 @@ class TestStartingConformationsCalculator(unittest.TestCase):
 
 
     def testDivideInverselyProportionalToArray(self):
-        startingConfCalculator = spawning.StartingConformationsCalculator() 
+        spawningCalculator = spawning.SpawningCalculator() 
         weights2 = np.array([0.5, 0.2, 0.2, 0.1])
         trajToDistribute2 = 12
-        degeneracy2 = startingConfCalculator.divideInverselyProportionalToArray(weights2, trajToDistribute2)
+        degeneracy2 = spawningCalculator.divideInverselyProportionalToArray(weights2, trajToDistribute2)
 
         golden2 = [1, 3, 3, 5]
 
