@@ -119,8 +119,8 @@ class SpawningCalculator:
 
 class SameWeightDegeneracyCalculator(SpawningCalculator):
     def __init__(self):
-        self.type = spawningTypes.SPAWNING_TYPES.sameWeight
         self.spawningCalculator = SpawningCalculator()
+        self.type = spawningTypes.SPAWNING_TYPES.sameWeight
 
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
         """
@@ -139,8 +139,8 @@ class SameWeightDegeneracyCalculator(SpawningCalculator):
 
 class InverselyProportionalToPopulationCalculator(SpawningCalculator):
     def __init__(self):
-        self.type = spawningTypes.SPAWNING_TYPES.inverselyProportional
         self.spawningCalculator = SpawningCalculator()
+        self.type = spawningTypes.SPAWNING_TYPES.inverselyProportional
 
     def log(self):
         pass
@@ -155,8 +155,8 @@ class EpsilonDegeneracyCalculator(InverselyProportionalToPopulationCalculator):
         It uses epsilon * numTraj trajectories proportional to their energy and the rest inversely proportional to each cluster's population
     """
     def __init__(self):
-        self.type = spawningTypes.SPAWNING_TYPES.epsilon
         self.inverselyProportionalCalculator = InverselyProportionalToPopulationCalculator()
+        self.type = spawningTypes.SPAWNING_TYPES.epsilon
         self.degeneracyInverselyProportional = None
         self.degeneracyMetricProportional = None
         self.degeneracyTotal = None
@@ -211,8 +211,8 @@ class EpsilonDegeneracyCalculator(InverselyProportionalToPopulationCalculator):
 
 class SimulatedAnnealingCalculator(SpawningCalculator):
     def __init__(self):
-        self.type = spawningTypes.SPAWNING_TYPES.simulatedAnnealing
         self.spawningCalculator = SpawningCalculator()
+        self.type = spawningTypes.SPAWNING_TYPES.simulatedAnnealing
 
     def log(self):
         pass
