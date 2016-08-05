@@ -13,7 +13,7 @@ import time
 import glob
 import clustering
 import pickle
-import startingConformationsCalculator
+import spawning
 import blockNames
 import atomset
 
@@ -205,10 +205,10 @@ def findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT):
         return 0
 
 def spawningBuilder(spawningBlock):
-    spawningCalculatorBuilder = startingConformationsCalculator.StartingConformationBuilder()
+    spawningCalculatorBuilder = spawning.StartingConformationBuilder()
     spawningCalculator = spawningCalculatorBuilder.buildSpawningCalculator(spawningBlock)
 
-    spawningParams = startingConformationsCalculator.SpawningParams()
+    spawningParams = spawning.SpawningParams()
     spawningParams.buildSpawningParameters(spawningBlock)
 
     return spawningCalculator, spawningParams

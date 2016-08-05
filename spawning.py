@@ -39,6 +39,16 @@ class SpawningParams:
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
             self.temperature = spawningParamsBlock[blockNames.SpawningParams.temperature]
 
+class SpawningAlgorithmBuilder:
+    def build(self, spawningBlock):
+        spawningCalculatorBuilder = StartingConformationBuilder()
+        spawningCalculator = spawningCalculatorBuilder.buildSpawningCalculator(spawningBlock)
+
+        spawningParams = SpawningParams()
+        spawningParams.buildSpawningParameters(spawningBlock)
+
+        return spawningCalculator, spawningParams
+
 from abc import ABCMeta, abstractmethod
 class StartingConformationsCalculator:
     def __init__(self):
