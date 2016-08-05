@@ -4,6 +4,8 @@ class StringSpawningTypes:
     inverselyProportional = "inverselyProportional"
     epsilon = "epsilon"
     fast = "FAST"
+    ### New parameters for variable epsilon(experimental)
+    variableEpsilon = "variableEpsilon"
     
 class SpawningParams:
     params = "params"
@@ -12,6 +14,16 @@ class SpawningParams:
     threshold = "threshold"
     report_filename = "reportFilename"
     report_col = "metricColumnInReport"
+    ### New parameters for variable epsilon(experimental)
+    varEpsilonType = "varEpsilonType"
+    maxEpsilon = "maxEpsilon"
+    minEpsilon = "minEpsilon"
+    variationWindow = "variationWindow" # Last epoch of variable epsilon,if
+    # current epoch > than variation Window, set epsilon to minEpsilon
+    maxEpsilonWindow = "maxEpsilonWindow"
+
+class VariableEpsilonTypes:
+    linearVariation = "linearVariation"
 
 class SimulationType:
     type = "type"
