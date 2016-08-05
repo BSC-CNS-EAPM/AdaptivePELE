@@ -5,7 +5,17 @@ import random
 import blockNames
 import spawningTypes
 
-class StartingConformationBuilder:
+class SpawningAlgorithmBuilder:
+    def build(self, spawningBlock):
+        spawningCalculatorBuilder = SpawningBuilder()
+        spawningCalculator = spawningCalculatorBuilder.buildSpawningCalculator(spawningBlock)
+
+        spawningParams = SpawningParams()
+        spawningParams.buildSpawningParameters(spawningBlock)
+
+        return spawningCalculator, spawningParams
+
+class SpawningBuilder:
     def buildSpawningCalculator(self, spawningBlock):
         spawningTypeString = spawningBlock[blockNames.StringSpawningTypes.type]
         if spawningTypeString == blockNames.StringSpawningTypes.sameWeight:
@@ -39,18 +49,12 @@ class SpawningParams:
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
             self.temperature = spawningParamsBlock[blockNames.SpawningParams.temperature]
 
-class SpawningAlgorithmBuilder:
-    def build(self, spawningBlock):
-        spawningCalculatorBuilder = StartingConformationBuilder()
-        spawningCalculator = spawningCalculatorBuilder.buildSpawningCalculator(spawningBlock)
-
-        spawningParams = SpawningParams()
-        spawningParams.buildSpawningParameters(spawningBlock)
-
-        return spawningCalculator, spawningParams
-
 from abc import ABCMeta, abstractmethod
 class SpawningCalculator:
+    """
+        The purpose of this abstract class is to contain the behaviour of the different strategies for the spawning.
+        Spawning is the way in which we split the different explorers at the begining of each epoch.
+    """
     def __init__(self):
         self.type = "BaseClass" #change for abstract attribute
         pass

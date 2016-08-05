@@ -205,7 +205,7 @@ def findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT):
         return 0
 
 def spawningBuilder(spawningBlock):
-    spawningCalculatorBuilder = spawning.StartingConformationBuilder()
+    spawningCalculatorBuilder = spawning.SpawningBuilder()
     spawningCalculator = spawningCalculatorBuilder.buildSpawningCalculator(spawningBlock)
 
     spawningParams = spawning.SpawningParams()
@@ -332,7 +332,8 @@ def main(jsonParams=None):
 
     RESTART, spawningBlock, outputPath, initialStructures, ligandResname, DEBUG, simulationrunnerBlock = loadParams(jsonParams)
 
-    startingConformationsCalculator, spawningParams = spawningBuilder(spawningBlock)
+    spawningAlgorithmBuilder = spawning.SpawningAlgorithmBuilder()
+    startingConformationsCalculator, spawningParams = spawningAlgorithmBuilder.build(spawningBlock)
     runnerbuilder = SimulationRunner.RunnerBuilder()
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
 
