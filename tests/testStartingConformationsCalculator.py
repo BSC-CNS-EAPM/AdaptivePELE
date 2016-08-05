@@ -1,11 +1,11 @@
 import unittest
 import numpy as np
-import startingConformationsCalculator
+import spawning
 import clustering
 
 class TestStartingConformationsCalculator(unittest.TestCase):
     def testDivideTrajAccordingToWeights(self):
-        startingConfCalculator = startingConformationsCalculator.StartingConformationsCalculator() 
+        startingConfCalculator = spawning.StartingConformationsCalculator() 
         weights1 = [0.5, 0.2, 0.2, 0.1]
         trajToDistribute1 = 12
         degeneracy1 = startingConfCalculator.divideTrajAccordingToWeights(weights1, trajToDistribute1)
@@ -18,7 +18,7 @@ class TestStartingConformationsCalculator(unittest.TestCase):
 
 
     def testDivideInverselyProportionalToArray(self):
-        startingConfCalculator = startingConformationsCalculator.StartingConformationsCalculator() 
+        startingConfCalculator = spawning.StartingConformationsCalculator() 
         weights2 = np.array([0.5, 0.2, 0.2, 0.1])
         trajToDistribute2 = 12
         degeneracy2 = startingConfCalculator.divideInverselyProportionalToArray(weights2, trajToDistribute2)
@@ -40,7 +40,7 @@ class TestStartingConformationsCalculator(unittest.TestCase):
             cluster.elements = size
             clusters.addCluster(cluster)
 
-        inverselyProp = startingConformationsCalculator.InverselyProportionalToPopulationCalculator()
+        inverselyProp = spawning.InverselyProportionalToPopulationCalculator()
         clusteringParams = None
         trajs = 10
         degeneracy3 = inverselyProp.calculate(clusters.clusters, trajs, clusteringParams)
@@ -53,8 +53,8 @@ class TestStartingConformationsCalculator(unittest.TestCase):
 
 
     def testEpsilonCalculator(self):
-        epsilon = startingConformationsCalculator.EpsilonDegeneracyCalculator()
-        params = startingConformationsCalculator.SpawningParams()
+        epsilon = spawning.EpsilonDegeneracyCalculator()
+        params = spawning.SpawningParams()
         params.epsilon = 0.5
 
         clusters = clustering.Clusters()
@@ -73,7 +73,7 @@ class TestStartingConformationsCalculator(unittest.TestCase):
 
         #test 5
     def testSameWeightDegeneracyCalcuulator(self):
-        sameWeightDegCalculator = startingConformationsCalculator.SameWeightDegeneracyCalculator()
+        sameWeightDegCalculator = spawning.SameWeightDegeneracyCalculator()
         params = None
 
         clusters = clustering.Clusters()
