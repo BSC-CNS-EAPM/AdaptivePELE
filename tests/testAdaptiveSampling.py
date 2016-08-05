@@ -93,7 +93,7 @@ class TestadaptiveSampling(unittest.TestCase):
             Simulations are actually run
         """
         controlFile = "tests/data/3ptb_data/integrationTest3.conf"
-        goldenPath="tests/data/3ptb_data/originTest1"
+        goldenPath="tests/data/3ptb_data/originTest3"
         outputPath="tests/data/3ptb_data/Test3"
 
         self.integrationTest(controlFile, goldenPath, outputPath)

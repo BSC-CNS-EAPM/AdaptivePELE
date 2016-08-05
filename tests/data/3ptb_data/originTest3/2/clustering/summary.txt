@@ -1,0 +1,5 @@
+#cluster size degeneracy threshold contacts metric
+0 27 0 4.0 0 0.0
+1 22 0 4.0 0 0.0
+2 21 1 4.0 0 0.0
+3 2 3 4.0 0 0.0

@@ -13,15 +13,14 @@ import time
 import glob
 import clustering
 import pickle
-import spawning.spawning as spawning
 import blockNames
 import atomset
 
 import multiprocessing
 from functools import partial
-import SimulationRunner
-import spawning.spawningTypes as spawningTypes
-import simulationTypes
+
+from spawning import spawning, spawningTypes
+from simulation import simulationrunner, simulationTypes
 
 def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, iteration):
     for i, name in enumerate(initialStructures):
@@ -325,7 +324,7 @@ def main(jsonParams=None):
 
     spawningAlgorithmBuilder = spawning.SpawningAlgorithmBuilder()
     startingConformationsCalculator, spawningParams = spawningAlgorithmBuilder.build(spawningBlock)
-    runnerbuilder = SimulationRunner.RunnerBuilder()
+    runnerbuilder =simulationrunner.RunnerBuilder()
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
 
     print "================================"
