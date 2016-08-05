@@ -13,14 +13,14 @@ import time
 import glob
 import clustering
 import pickle
-import spawning
+import spawning.spawning as spawning
 import blockNames
 import atomset
 
 import multiprocessing
 from functools import partial
 import SimulationRunner
-import spawningTypes
+import spawning.spawningTypes as spawningTypes
 import simulationTypes
 
 def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, iteration):
@@ -204,15 +204,6 @@ def findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT):
     if epoch <= 0:
         return 0
 
-def spawningBuilder(spawningBlock):
-    spawningCalculatorBuilder = spawning.SpawningBuilder()
-    spawningCalculator = spawningCalculatorBuilder.buildSpawningCalculator(spawningBlock)
-
-    spawningParams = spawning.SpawningParams()
-    spawningParams.buildSpawningParameters(spawningBlock)
-
-    return spawningCalculator, spawningParams
-    
 def loadParams(jsonParams):
     """
         TODO: change for variables in a block names file, and work it out a bit more

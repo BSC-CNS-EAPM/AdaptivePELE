@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-import spawning
+import spawning.spawning as spawning
 import clustering
 
 class TestSpawningCalculator(unittest.TestCase):
