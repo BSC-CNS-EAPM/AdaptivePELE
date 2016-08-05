@@ -5,6 +5,16 @@ import random
 import blockNames
 import spawningTypes
 
+
+def return_sign(i, m, n):
+    """ Helper function, creates a three-piece step function"""
+    if i < n/2-m/2:
+        return 1
+    elif i <= n/2+m/2:
+        return 0
+    else:
+        return -1
+
 class SpawningAlgorithmBuilder:
     def build(self, spawningBlock):
         spawningCalculatorBuilder = SpawningBuilder()
@@ -26,8 +36,10 @@ class SpawningBuilder:
             spawningCalculator = EpsilonDegeneracyCalculator()
         elif spawningTypeString == blockNames.StringSpawningTypes.fast:
             spawningCalculator = FASTDegeneracyCalculator()
+        elif spawningTypeString == blockNames.StringSpawningTypes.variableEpsilon:
+            spawningCalculator = VariableEpsilonDegeneracyCalculator()
         else:
-            sys.exit("Unknown spawning type! Choices are: " + str(blockNames.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
+            sys.exit("Unknown spawning type! Choices are: " + str(spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
         return spawningCalculator
 
 
@@ -39,15 +51,28 @@ class SpawningParams:
         self.reportFilename = None
         self.reportCol = None
         self.decrement = None
+        self.varEpsilonType = None
+        self.maxEpsilon = None
+        self.minEpsilon = None
+        self.variationWindow = None
+        self.maxEpsilonWindow = None
 
     def buildSpawningParameters(self,spawningBlock):
         spawningParamsBlock = spawningBlock[blockNames.SpawningParams.params]
         spawningType = spawningBlock[blockNames.StringSpawningTypes.type]
-        if spawningType == blockNames.StringSpawningTypes.epsilon:
+        if spawningType == blockNames.StringSpawningTypes.epsilon or \
+                spawningType == blockNames.StringSpawningTypes.variableEpsilon:
             self.epsilon = spawningParamsBlock[blockNames.SpawningParams.epsilon]
             self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
             self.temperature = spawningParamsBlock[blockNames.SpawningParams.temperature]
+        if spawningType == blockNames.StringSpawningTypes.variableEpsilon:
+            self.varEpsilonType = spawningParamsBlock[blockNames.SpawningParams.varEpsilonType]
+            self.maxEpsilon = spawningParamsBlock[blockNames.SpawningParams.maxEpsilon]
+            self.minEpsilon = spawningParamsBlock[blockNames.SpawningParams.minEpsilon]
+            self.variationWindow = spawningParamsBlock[blockNames.SpawningParams.variationWindow]
+            self.maxEpsilonWindow = spawningParamsBlock[blockNames.SpawningParams.maxEpsilonWindow]
+
 
 from abc import ABCMeta, abstractmethod
 class SpawningCalculator:
@@ -208,6 +233,40 @@ class EpsilonDegeneracyCalculator(InverselyProportionalToPopulationCalculator):
 
 
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
+
+class VariableEpsilonDegeneracyCalculator(EpsilonDegeneracyCalculator):
+
+    def __init__(self):
+        self.inverselyProportionalCalculator = InverselyProportionalToPopulationCalculator()
+        self.type = spawningTypes.SPAWNING_TYPES.variableEpsilon
+        self.degeneracyInverselyProportional = None
+        self.degeneracyMetricProportional = None
+        self.degeneracyTotal = None
+
+    def linearVariation(self, clusteringParams, currentEpoch):
+        if clusteringParams.variationWindow < currentEpoch:
+            clusteringParams.epsilon = clusteringParams.minEpsilon
+            return
+        middleWindow = int(clusteringParams.variationWindow/2)
+        leftWindow = int(clusteringParams.maxEpsilonWindow/2)
+
+        rateEpsilonVariation = (clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(middleWindow-leftWindow-1)
+
+        clusteringParams.epsilon += return_sign(currentEpoch,clusteringParams.maxEpsilonWindow,clusteringParams.variationWindow)*rateEpsilonVariation
+
+    def calculateEpsilonValue(self, clusteringParams, currentEpoch):
+        if currentEpoch is None or currentEpoch == 0:
+            clusteringParams.epsilon = clusteringParams.minEpsilon
+            return
+        if clusteringParams.varEpsilonType == blockNames.VariableEpsilonTypes.linearVariation:
+            self.linearVariation(clusteringParams, currentEpoch)
+        else:
+            sys.exit("Unknown epsilon variation type! Choices are: " +
+                     str(spawningTypes.EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY.values()))
+
+    def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
+        self.calculateEpsilonValue(clusteringParams, currentEpoch)
+        return EpsilonDegeneracyCalculator.calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch)
 
 class SimulatedAnnealingCalculator(SpawningCalculator):
     def __init__(self):

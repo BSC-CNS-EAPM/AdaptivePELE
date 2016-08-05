@@ -92,6 +92,41 @@ class TestSpawningCalculator(unittest.TestCase):
         falseGolden5 = [1, 1, 1, 2]
         self.assertNotEqual(degeneracy5, falseGolden5)
 
+    def testVariableEpsilonCalculator(self):
+        variable_epsilon = spawning.VariableEpsilonDegeneracyCalculator()
+        params = spawning.SpawningParams()
+        params.epsilon = 0.5
+        params.varEpsilonType = "linearVariation"
+        params.maxEpsilon = 0.75
+        params.minEpsilon = 0.5
+        params.variationWindow = 8
+        params.maxEpsilonWindow = 2
+        rateVariation= 0.25/2
+        clusters = clustering.Clusters()
+        sizes = [6,2,3,1]
+        energies = [-4,-2,-2,-1]
+        for size, energy in zip(sizes, energies):
+            cluster = clustering.Cluster(None, None, None, None)
+            cluster.elements = size
+            cluster.metric = energy
+            clusters.addCluster(cluster)
+
+        trajs = 20
+        
+        degeneracy6 = variable_epsilon.calculate(clusters.clusters, trajs, params, 0)
+        golden6 = np.array([7,4,4,5])
+        np.testing.assert_array_equal(degeneracy6, golden6)
+        self.assertAlmostEqual(params.epsilon,params.minEpsilon)
+        degeneracy7 = variable_epsilon.calculate(clusters.clusters, trajs, params, 1)
+        #TODO: check degeneracy after next steps
+        self.assertAlmostEqual(params.epsilon, params.minEpsilon+rateVariation)
+        degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 2)
+        self.assertAlmostEqual(params.epsilon, params.maxEpsilon)
+        degeneracy9 = variable_epsilon.calculate(clusters.clusters, trajs, params, 9)
+        self.assertAlmostEqual(params.epsilon, params.minEpsilon)
+
+
+
 def main():
     return unittest.main(exit=False)
 
