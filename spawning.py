@@ -50,7 +50,7 @@ class SpawningAlgorithmBuilder:
         return spawningCalculator, spawningParams
 
 from abc import ABCMeta, abstractmethod
-class StartingConformationsCalculator:
+class SpawningCalculator:
     def __init__(self):
         self.type = "BaseClass" #change for abstract attribute
         pass
@@ -113,10 +113,10 @@ class StartingConformationsCalculator:
         return sizes
 
 
-class SameWeightDegeneracyCalculator(StartingConformationsCalculator):
+class SameWeightDegeneracyCalculator(SpawningCalculator):
     def __init__(self):
         self.type = spawningTypes.SPAWNING_TYPES.sameWeight
-        self.startingConformationsCalculator = StartingConformationsCalculator()
+        self.spawningCalculator = SpawningCalculator()
 
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
         """
@@ -133,10 +133,10 @@ class SameWeightDegeneracyCalculator(StartingConformationsCalculator):
     def log(self):
         pass
 
-class InverselyProportionalToPopulationCalculator(StartingConformationsCalculator):
+class InverselyProportionalToPopulationCalculator(SpawningCalculator):
     def __init__(self):
         self.type = spawningTypes.SPAWNING_TYPES.inverselyProportional
-        self.startingConformationsCalculator = StartingConformationsCalculator()
+        self.spawningCalculator = SpawningCalculator()
 
     def log(self):
         pass
@@ -205,10 +205,10 @@ class EpsilonDegeneracyCalculator(InverselyProportionalToPopulationCalculator):
 
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
 
-class SimulatedAnnealingCalculator(StartingConformationsCalculator):
+class SimulatedAnnealingCalculator(SpawningCalculator):
     def __init__(self):
         self.type = spawningTypes.SPAWNING_TYPES.simulatedAnnealing
-        self.startingConformationsCalculator = StartingConformationsCalculator()
+        self.spawningCalculator = SpawningCalculator()
 
     def log(self):
         pass
@@ -233,10 +233,10 @@ class SimulatedAnnealingCalculator(StartingConformationsCalculator):
 
         return self.divideProportionalToArray(weights, trajToDistribute)
 
-class FASTDegeneracyCalculator(StartingConformationsCalculator):
+class FASTDegeneracyCalculator(SpawningCalculator):
     def __init__(self):
         self.type = spawningTypes.SPAWNING_TYPES.FAST
-        self.startingConformationsCalculator = StartingConformationsCalculator()
+        self.spawningCalculator = SpawningCalculator()
 
     def calculate(self, clusters, trajToDivide, clusteringParams, currentEpoch=None):
         sizes = self.getSizes(clusters)
