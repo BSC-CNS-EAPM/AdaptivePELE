@@ -155,18 +155,3 @@ def getSnapshots(trajectoryFile, verbose=False):
 def getTrajNum(trajFilename):
     return int(trajFilename.split("_")[-1][:-4])
 
-def main():
-    #path = sys.argv[1]
-    resname  = "AEN"
-
-    paths = ["3ptb_test/0/traj*", "3ptb_test/1/traj*"]
-    clustering = Clustering(resname, "report")
-    clustering.cluster(paths)
-
-    clustering.clusters.printClusters()
-    for i, cluster in enumerate(clustering.clusters.clusters):
-        cluster.writePDB(str(i) + ".pdb")
-    
-
-if __name__ == "__main__":
-    main()
