@@ -33,7 +33,7 @@ class SimulationParams:
     iterations = "iterations"
 
 class ControlFileParams:
-    restart = 'RESTART'
+    restart = 'restart'
     spawningBlockname = 'spawning'
     outputPath = 'outputPath'
     initialStructures = 'initialStructures'
