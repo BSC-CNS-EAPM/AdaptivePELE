@@ -33,7 +33,6 @@ class SimulationRunner:
         inputFileTemplate = string.Template(inputFileContent)
         outputFileContent = inputFileTemplate.substitute(dictionary)
 
-        print "Writing:", workingControlFilename
         outputFile = open(workingControlFilename, "w")
         outputFile.write(outputFileContent)
         outputFile.close()
@@ -42,13 +41,13 @@ class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
         SimulationRunner.__init__(self, parameters)
         self.type = simulationTypes.SIMULATION_TYPE.PELE
+    
 
     def createSymbolicLinks(self):
         if not os.path.islink("Data"):
             os.system("ln -s " + self.parameters.dataFolder + " Data")
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.documentsFolder + " Documents")
-
 
     def runSimulation(self, runningControlFile = ""):
         self.createSymbolicLinks()
@@ -66,6 +65,9 @@ class PeleSimulation(SimulationRunner):
         print "PELE took %.2f sec" % (endTime - startTime)
 
 class TestSimulation(SimulationRunner):
+    """
+        Class used for testing
+    """
     def __init__(self, parameters):
         self.type = simulationTypes.SIMULATION_TYPE.TEST
         self.copied = False
@@ -77,6 +79,9 @@ class TestSimulation(SimulationRunner):
                 shutil.rmtree(self.parameters.destination)
             shutil.copytree(self.parameters.origin, self.parameters.destination)
             self.copied = True
+
+    def makeWorkingControlFile(self, templetizedControlFile, workingControlFilename, dictionary):
+        pass
 
 class RunnerBuilder:
 
