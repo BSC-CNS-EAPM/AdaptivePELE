@@ -72,7 +72,7 @@ class TestSpawningCalculator(unittest.TestCase):
         np.testing.assert_array_equal(degeneracy4, golden4)
 
         #test 5
-    def testSameWeightDegeneracyCalcuulator(self):
+    def testSameWeightDegeneracyCalculator(self):
         sameWeightDegCalculator = spawning.SameWeightDegeneracyCalculator()
         params = None
 
