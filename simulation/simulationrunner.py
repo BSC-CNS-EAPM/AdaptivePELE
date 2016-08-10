@@ -20,14 +20,12 @@ class SimulationParameters:
 
 class SimulationRunner:
     def __init__(self, parameters):
-        print "Called __init__!"
         self.parameters = parameters
     
     def runSimulation(self, runningControlFile = ""):
         pass 
 
     def makeWorkingControlFile(self, templetizedControlFile, workingControlFilename, dictionary):
-        print "Called!"
         inputFile = open(templetizedControlFile, "r")
         inputFileContent = inputFile.read()
         inputFile.close()
@@ -42,7 +40,6 @@ class SimulationRunner:
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
-        print "called this?"
         SimulationRunner.__init__(self, parameters)
         self.type = simulationTypes.SIMULATION_TYPE.PELE
 
