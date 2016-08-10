@@ -20,20 +20,14 @@ class SimulationParameters:
 
 class SimulationRunner:
     def __init__(self, parameters):
+        print "Called __init__!"
         self.parameters = parameters
     
     def runSimulation(self, runningControlFile = ""):
         pass 
 
-    def makeWorkingControlFile(self, templ, work, dictionary):
-        pass
-
-class PeleSimulation(SimulationRunner):
-    def __init__(self, parameters):
-        SimulationRunner.__init__(self, parameters)
-        self.type = simulationTypes.SIMULATION_TYPE.PELE
-    
     def makeWorkingControlFile(self, templetizedControlFile, workingControlFilename, dictionary):
+        print "Called!"
         inputFile = open(templetizedControlFile, "r")
         inputFileContent = inputFile.read()
         inputFile.close()
@@ -41,9 +35,16 @@ class PeleSimulation(SimulationRunner):
         inputFileTemplate = string.Template(inputFileContent)
         outputFileContent = inputFileTemplate.substitute(dictionary)
 
+        print "Writing:", workingControlFilename
         outputFile = open(workingControlFilename, "w")
         outputFile.write(outputFileContent)
         outputFile.close()
+
+class PeleSimulation(SimulationRunner):
+    def __init__(self, parameters):
+        print "called this?"
+        SimulationRunner.__init__(self, parameters)
+        self.type = simulationTypes.SIMULATION_TYPE.PELE
 
     def createSymbolicLinks(self):
         if not os.path.islink("Data"):
