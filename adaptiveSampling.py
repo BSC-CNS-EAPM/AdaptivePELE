@@ -420,7 +420,7 @@ def main(jsonParams=None):
             for cluster in clusteringMethod.clusters.clusters:
                 sizes.append(cluster.elements)
             #degeneracyOfRepresentatives = calculateDegeneracy(sizes, spawning, processors)
-            degeneracyOfRepresentatives = startingConformationsCalculator.calculate(clusteringMethod.clusters.clusters, processors-1, spawningParams, firstRun)
+            degeneracyOfRepresentatives = startingConformationsCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
             startingConformationsCalculator.log()
             print "Degeneracy", degeneracyOfRepresentatives
 
@@ -451,6 +451,7 @@ def main(jsonParams=None):
     makeFolder(outputDir)
     peleControlFileDictionary["OUTPUT_PATH"] = outputDir
     peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + firstRun*simulationRunner.parameters.processors
+    #simulationRunner.parameters needn't be passed to makeWorkingControlFile
     simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, tmpControlFilename%firstRun, peleControlFileDictionary) 
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
@@ -548,6 +549,7 @@ def main(jsonParams=None):
             makeFolder(outputDir) #PELE does not do it automatically
             peleControlFileDictionary["OUTPUT_PATH"] = outputDir
             peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + (i+1)*simulationRunner.parameters.processors
+            #simulationRunner.parameters needn't be passed to makeWorkingControlFile
             simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, tmpControlFilename%(i+1), peleControlFileDictionary) 
 
     #cleanup
