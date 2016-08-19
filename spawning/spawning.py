@@ -72,6 +72,9 @@ class SpawningParams:
             self.minEpsilon = spawningParamsBlock[blockNames.SpawningParams.minEpsilon]
             self.variationWindow = spawningParamsBlock[blockNames.SpawningParams.variationWindow]
             self.maxEpsilonWindow = spawningParamsBlock[blockNames.SpawningParams.maxEpsilonWindow]
+            self.period = spawningParamsBlock.get(blockNames.SpawningParams.period, self.variationWindow) 
+            self.period += np.sign(np.abs(self.variationWindow-self.period))
+            # Add one epoch to the total lenght of the variation in the case of periodic variation to leave a step between variation periods
 
 
 from abc import ABCMeta, abstractmethod
@@ -244,22 +247,25 @@ class VariableEpsilonDegeneracyCalculator(EpsilonDegeneracyCalculator):
         self.degeneracyTotal = None
 
     def linearVariation(self, clusteringParams, currentEpoch):
-        if clusteringParams.variationWindow < currentEpoch:
+        if currentEpoch == 0:
             clusteringParams.epsilon = clusteringParams.minEpsilon
             return
-        middleWindow = int(clusteringParams.variationWindow/2)
+
+        middleWindow = int(clusteringParams.period/2)
         leftWindow = int(clusteringParams.maxEpsilonWindow/2)
+        rightWindow = leftWindow+middleWindow
 
-        rateEpsilonVariation = (clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(middleWindow-leftWindow-1)
+        rateEpsilonVariation = [(clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(middleWindow-leftWindow-1), (clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(clusteringParams.period-rightWindow-1)]
 
-        clusteringParams.epsilon += return_sign(currentEpoch,clusteringParams.maxEpsilonWindow,clusteringParams.variationWindow)*rateEpsilonVariation
+        clusteringParams.epsilon += return_sign(currentEpoch,clusteringParams.maxEpsilonWindow,clusteringParams.period)*rateEpsilonVariation[currentEpoch>middleWindow]
 
     def calculateEpsilonValue(self, clusteringParams, currentEpoch):
-        if currentEpoch is None or currentEpoch == 0:
+        if currentEpoch is None or clusteringParams.variationWindow < currentEpoch:
             clusteringParams.epsilon = clusteringParams.minEpsilon
             return
         if clusteringParams.varEpsilonType == blockNames.VariableEpsilonTypes.linearVariation:
-            self.linearVariation(clusteringParams, currentEpoch)
+            self.linearVariation(clusteringParams,
+                                 (currentEpoch%clusteringParams.period))
         else:
             sys.exit("Unknown epsilon variation type! Choices are: " +
                      str(spawningTypes.EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY.values()))

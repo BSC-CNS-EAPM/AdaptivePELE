@@ -456,6 +456,8 @@ def main(jsonParams=None):
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
+        if not spawningParams.epsilon is None:
+            print "Epsilon value: %f"%(spawningParams.epsilon)
         
         print "Production run..."
         if not DEBUG:

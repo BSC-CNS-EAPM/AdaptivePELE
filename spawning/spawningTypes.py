@@ -14,5 +14,5 @@ class EPSILON_VARIATION_TYPES:
     linearVariation, = range(1)
 
 EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY = {
-    EPSILON_VARIATION_TYPES.linearVariation:blockNames.VariableEpsilonTypes.linearVariation
+    EPSILON_VARIATION_TYPES.linearVariation:blockNames.VariableEpsilonTypes.linearVariation,
 }
