@@ -21,6 +21,7 @@ class SpawningParams:
     variationWindow = "variationWindow" # Last epoch of variable epsilon,if
     # current epoch > than variation Window, set epsilon to minEpsilon
     maxEpsilonWindow = "maxEpsilonWindow"
+    period = "period" # Only useful for periodic epsilon modes
 
 class VariableEpsilonTypes:
     linearVariation = "linearVariation"

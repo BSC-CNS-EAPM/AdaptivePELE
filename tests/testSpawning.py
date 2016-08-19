@@ -5,7 +5,7 @@ import clustering
 
 class TestSpawningCalculator(unittest.TestCase):
     def testDivideTrajAccordingToWeights(self):
-        spawningCalculator = spawning.SpawningCalculator() 
+        spawningCalculator = spawning.SpawningCalculator()
         weights1 = [0.5, 0.2, 0.2, 0.1]
         trajToDistribute1 = 12
         degeneracy1 = spawningCalculator.divideTrajAccordingToWeights(weights1, trajToDistribute1)
@@ -101,6 +101,9 @@ class TestSpawningCalculator(unittest.TestCase):
         params.minEpsilon = 0.5
         params.variationWindow = 8
         params.maxEpsilonWindow = 2
+        params_test = {}
+        params.period = params_test.get("period", params.variationWindow)
+        params.period += np.sign(np.abs(params.variationWindow-params.period))
         rateVariation= 0.25/2
         clusters = clustering.Clusters()
         sizes = [6,2,3,1]
@@ -126,6 +129,47 @@ class TestSpawningCalculator(unittest.TestCase):
         self.assertAlmostEqual(params.epsilon, params.minEpsilon)
 
 
+    def testPeriodicVariableEpsilonCalculator(self):
+        variable_epsilon = spawning.VariableEpsilonDegeneracyCalculator()
+        params = spawning.SpawningParams()
+        params.epsilon = 0.5
+        params.varEpsilonType = "linearVariation"
+        params.maxEpsilon = 0.75
+        params.minEpsilon = 0.5
+        params.variationWindow = 8
+        params.maxEpsilonWindow = 1
+        params_test = { "period" : 4 }
+        params.period = params_test.get("period", params.variationWindow)
+        params.period += np.sign(np.abs(params.variationWindow-params.period))
+        rateVariation= 0.25/1
+        clusters = clustering.Clusters()
+        sizes = [6,2,3,1]
+        energies = [-4,-2,-2,-1]
+        for size, energy in zip(sizes, energies):
+            cluster = clustering.Cluster(None, None, None, None)
+            cluster.elements = size
+            cluster.metric = energy
+            clusters.addCluster(cluster)
+
+        trajs = 20
+        
+        degeneracy6 = variable_epsilon.calculate(clusters.clusters, trajs, params, 0)
+        golden6 = np.array([7,4,4,5])
+        np.testing.assert_array_equal(degeneracy6, golden6)
+        self.assertAlmostEqual(params.epsilon,params.minEpsilon)
+        degeneracy7 = variable_epsilon.calculate(clusters.clusters, trajs, params, 1)
+        #TODO: check degeneracy after next steps
+        self.assertAlmostEqual(params.epsilon, params.minEpsilon+rateVariation)
+        degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 2)
+        self.assertAlmostEqual(params.epsilon, params.maxEpsilon)
+        degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 3)
+        self.assertAlmostEqual(params.epsilon,params.maxEpsilon-rateVariation/2)
+        degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 4)
+        self.assertAlmostEqual(params.epsilon, params.minEpsilon)
+        degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 5)
+        self.assertAlmostEqual(params.epsilon, params.minEpsilon)
+        degeneracy9 = variable_epsilon.calculate(clusters.clusters, trajs, params, 9)
+        self.assertAlmostEqual(params.epsilon, params.minEpsilon)
 
 def main():
     return unittest.main(exit=False)
