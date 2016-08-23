@@ -141,6 +141,9 @@ class PDB:
         self.totalMass = 0
         self.pdb = ""
         self.com = 0
+        # CAlist and ligandList are used to calculate contact maps only
+        self.CAlist = []
+        self.ligandList = []
         
     def __eq__(self, other):
         """ Compare two pdb strings, remark lines should be ignored and only the atoms and its information should be compared"""
@@ -169,15 +172,18 @@ class PDB:
 
               
             atom = Atom(atomLine)
-            
             #Here atom will be not null, empty or not. With "try", we prune empty atoms
             try:
-                if (not heavyAtoms or atom.isHeavyAtom()) and\
-                    (type==self.typeAll or (type==self.typeProtein and atom.isProtein()) or (type==self.typeHetero and atom.isHeteroAtom()) ):
-                    self.atoms.update({atom.id:atom})
+                if (not heavyAtoms or atom.isHeavyAtom()):
+                    if type==self.typeAll or (type==self.typeProtein and atom.isProtein()) or (type==self.typeHetero and atom.isHeteroAtom()):
+                        self.atoms.update({atom.id:atom})
+                        if atom.isProtein():
+                            if atom.name == "CA":
+                                self.CAlist.append(atom)
+                        elif atom.isHeteroAtom():
+                            self.ligandList.append(atom)
             except:
                 pass
-
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
@@ -228,6 +234,21 @@ class PDB:
                     contacts.update([proteinAtomId])
 
         return len(contacts)
+
+    def createContactMap(self, ligandResname, contactThresholdDistance):
+        contactThresholdDistance2 = contactThresholdDistance**2
+
+        ligandPDB = PDB()
+        ligandPDB.initialise(self.pdb, resname=ligandResname, type = self.typeHetero, heavyAtoms=True)
+        # empty contact map, rows are atoms of the ligand, columns are protein
+        # alpha carbons
+        contactMap = np.zeros((len(ligandPDB.ligandList),len(self.CAlist)))
+        for rowind, ligandAtom in enumerate(ligandPDB.ligandList):
+            for colind, proteinAtom in enumerate(self.CAlist):
+                dist2 = ligandAtom.squaredDistance(proteinAtom)
+                if dist2 < contactThresholdDistance2:
+                    contactMap[rowind,colind] += 1
+        return contactMap
 
 def computeRMSD2(PDB1, PDB2, symmetries={}):
     """

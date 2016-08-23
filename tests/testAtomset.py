@@ -6,7 +6,7 @@ class atomsetTest(unittest.TestCase):
     """ For the moment the tests include loading from file and string, resname
     and atomname selection. It uses a toy pdb of only 5 lines located in
     tests/data
-    TODO: heavyAtoms and type selection
+   TODO: heavyAtoms and type selection
     """
     def testPDB_from_file(self):
         #preparation
@@ -241,3 +241,13 @@ END   \n"
         contacts = pdb_native.countContacts("AIN", 8)
         golden_contacts = 19
         self.assertEqual(contacts, golden_contacts)
+
+    def testPDB_contactmap(self):
+        #preparation
+        pdb_native = atomset.PDB()
+        pdb_native.initialise("tests/data/pdb_test_contact.pdb")
+
+        #function to test
+        contact_map = pdb_native.createContactMap("AIN", 8)
+        golden_contact_map = np.array([[1,0,0,0],[0,1,1,1]])
+        np.testing.assert_array_equal(contact_map, golden_contact_map)
