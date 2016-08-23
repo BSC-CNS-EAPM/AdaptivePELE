@@ -191,11 +191,11 @@ class EpsilonDegeneracyCalculator(InverselyProportionalToPopulationCalculator):
 
     #TODO add possibility for different pipes
     def log(self):
-        if self.degeneracyTotal != None:
+        if not self.degeneracyTotal is None:
             print "[SpawningLog] Total: %s" % str(self.degeneracyTotal)
-        if self.degeneracyInverselyProportional != None:
+        if not self.degeneracyInverselyProportional is None:
             print "[SpawningLog] Inversely prop: %s" % str(self.degeneracyInverselyProportional)
-        if self.degeneracyMetricProportional != None:
+        if not self.degeneracyMetricProportional is None:
             print "[SpawningLog] Metric prop:    %s" % str(self.degeneracyMetricProportional)
 
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):

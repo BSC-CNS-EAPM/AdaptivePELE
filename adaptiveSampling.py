@@ -319,7 +319,9 @@ def writeClusteringOutput(outputPath, clustering, degeneracy, outputObject):
 def main(jsonParams=None):
     if jsonParams is None:
         jsonParams = sys.argv[1]
-
+    # Temporary hardcoded string to select clustering method
+    # TODO: Add proper parametrization
+    method = "contactmap"
     RESTART, spawningBlock, outputPath, initialStructures, ligandResname, DEBUG, simulationrunnerBlock = loadParams(jsonParams)
 
     spawningAlgorithmBuilder = spawning.SpawningAlgorithmBuilder()
@@ -520,7 +522,11 @@ def main(jsonParams=None):
         paths = eval(snapshotsJSONSelectionString)
         if len(glob.glob(paths[-1])) == 0: sys.exit("No more trajectories to cluster")
         if i == 0:
-            clusteringMethod = clustering.Clustering(ligandResname, spawningParams.reportFilename, spawningParams.reportCol)
+            clusteringBuilder = clustering.ClusteringBuilder()
+            clusteringMethod = clusteringBuilder.buildClustering(method,
+                                                                 ligandResname,
+                                                                 spawningParams.reportFilename,
+                                                                 spawningParams.reportCol)
         #else:
         #    #CAN'T THIS BE REMOVED????
         #    with open(CLUSTERING_OUTPUT_OBJECT%(i-1), 'rb') as input:
