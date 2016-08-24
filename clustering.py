@@ -182,18 +182,24 @@ class contactMapClustering(Clustering):
             for clusterNum,cluster in enumerate(self.clusters.clusters):
                 contactmaps.append(cluster.contactMap)
                 ids.append("cluster:%d"%clusterNum)
-            cluster_center_indices = clusterContactMaps(np.array(contactmaps))
+            cluster_center_indices, degeneracies, indices = clusterContactMaps(np.array(contactmaps))
             for index in cluster_center_indices:
                 cluster_index = int(ids[index].split(":")[-1])
                 if index > new_snapshot_limit:
-                    #Use arbritrary large number for the metric, since the
-                    #cases inside this block are previously created clusters
-                    self.clusters.clusters[cluster_index].addElement(1e4)
+                    cluster_members, = np.where(indices == index)
+                    cluster_members = cluster_members[cluster_members < new_snapshot_limit]
+                    if metrics.size == 0:
+                        best_metric = metrics[cluster_members].min()
+                    else:
+                        best_metric = 1e4
+                    self.clusters.clusters[cluster_index].addElement(best_metric)
+                    cluster.elements += degeneracies[indices[index]]-1
                 else:
                     pdb = pdb_list[cluster_index]
                     contactMap = contactmaps[cluster_index]
                     metric = metrics[cluster_index]
                     cluster = Cluster (pdb, contactMap=contactMap, metric=metric)
+                    cluster.elements += degeneracies[indices[index]]-1
                     self.clusters.addCluster(cluster)
 
 class ClusteringBuilder:
@@ -208,7 +214,10 @@ def clusterContactMaps(contactmaps):
     contactmaps = contactmaps.reshape((contactmaps.shape[0],-1))
     affinitypropagation = AffinityPropagation().fit(contactmaps)
     cluster_center_indices = affinitypropagation.cluster_centers_indices_
-    return cluster_center_indices
+    labels = affinitypropagation.labels_
+    labels,indices,degeneracies = np.unique(labels, return_counts=True, return_inverse=True)
+    assert degeneracies.shape == cluster_center_indices.shape
+    return cluster_center_indices, degeneracies, indices
 
 def getAllTrajectories(paths):
     files = []
