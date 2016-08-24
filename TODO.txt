@@ -6,4 +6,4 @@
 * Move other constants (such in control file loading) to constants file
 * I didnt use "__" for private methods, maybe use convention
 * Don't redo clustering if it was done in the last iteration when using the "restart" option
-* Add contacts matrix for clustering, library scikit-learn
+* Add proper parametrization for clusterin method
