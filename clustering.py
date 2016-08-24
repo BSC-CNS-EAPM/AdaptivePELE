@@ -171,6 +171,7 @@ class contactMapClustering(Clustering):
             contactmaps = []
             ids = []
             pdb_list = []
+            preferences = np.zeros(len(snapshots)+len(self.clusters.clusters))
             contactThresholdDistance = 8
             for num, snapshot in enumerate(snapshots):
                 pdb = atomset.PDB()
@@ -182,7 +183,8 @@ class contactMapClustering(Clustering):
             for clusterNum,cluster in enumerate(self.clusters.clusters):
                 contactmaps.append(cluster.contactMap)
                 ids.append("cluster:%d"%clusterNum)
-            cluster_center_indices, degeneracies, indices = clusterContactMaps(np.array(contactmaps))
+                preferences[new_snapshot_limit+clusterNum] = cluster.elements
+            cluster_center_indices, degeneracies, indices = clusterContactMaps(np.array(contactmaps), preferences)
             for index in cluster_center_indices:
                 cluster_index = int(ids[index].split(":")[-1])
                 if index > new_snapshot_limit:
@@ -210,9 +212,9 @@ class ClusteringBuilder:
         elif method == "contactmap":
             return contactMapClustering(resname, reportBaseFilename, columnOfReportFile)
 
-def clusterContactMaps(contactmaps):
+def clusterContactMaps(contactmaps, preferences):
     contactmaps = contactmaps.reshape((contactmaps.shape[0],-1))
-    affinitypropagation = AffinityPropagation().fit(contactmaps)
+    affinitypropagation = AffinityPropagation(preference=preferences).fit(contactmaps)
     cluster_center_indices = affinitypropagation.cluster_centers_indices_
     labels = affinitypropagation.labels_
     labels,indices,degeneracies = np.unique(labels, return_counts=True, return_inverse=True)
