@@ -391,6 +391,12 @@ def main(jsonParams=None):
     makeFolder(outputPath)
     makeFolder(tmpFolder)
     saveInitialControlFile(jsonParams, ORIGINAL_CONTROLFILE)
+    
+    #print variable epsilon information
+    if not spawningParams.epsilon is None:
+        epsilon_file = open("epsilon_values.txt","w")
+        epsilon_file.write("Iteration\tEpsilon\n")
+
 
 
 
@@ -459,7 +465,7 @@ def main(jsonParams=None):
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
         if not spawningParams.epsilon is None:
-            print "Epsilon value: %f"%(spawningParams.epsilon)
+            epsilon_file.write("%d\t%f\n"%(i,spawningParams.epsilon))
         
         print "Production run..."
         if not DEBUG:
@@ -562,6 +568,9 @@ def main(jsonParams=None):
 
     #cleanup
     #cleanup(tmpFolder)
+
+    if not spawningParams.epsilon is None:
+        epsilon_file.close()
 
 if __name__ == '__main__':
     main()
