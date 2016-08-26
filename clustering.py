@@ -70,7 +70,7 @@ class Clustering:
             and self.resname == other.resname\
             and self.col == other.col
 
-class contactsClustering(Clustering):
+class ContactsClustering(Clustering):
     def cluster(self, paths):
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
@@ -153,12 +153,11 @@ class contactsClustering(Clustering):
 
 
 
-class contactMapClustering(Clustering):
+class ContactMapClustering(Clustering):
     def cluster(self, paths):
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = getTrajNum(trajectory)
-
             snapshots = getSnapshots(trajectory, True)
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0], self.reportBaseFilename%trajNum)
@@ -183,7 +182,7 @@ class contactMapClustering(Clustering):
             for clusterNum,cluster in enumerate(self.clusters.clusters):
                 contactmaps.append(cluster.contactMap)
                 ids.append("cluster:%d"%clusterNum)
-                preferences[new_snapshot_limit+clusterNum] = cluster.elements
+                preferences[new_snapshot_limit+1+clusterNum] = cluster.elements
             cluster_center_indices, degeneracies, indices = clusterContactMaps(np.array(contactmaps), preferences)
             for index in cluster_center_indices:
                 cluster_index = int(ids[index].split(":")[-1])
@@ -195,7 +194,9 @@ class contactMapClustering(Clustering):
                     else:
                         best_metric = 1e4
                     self.clusters.clusters[cluster_index].addElement(best_metric)
-                    cluster.elements += degeneracies[indices[index]]-1
+                    self.clusters.clusters[cluster_index].elements += degeneracies[indices[index]]-2 
+                    #One of the counts will account for the own cluster and the other
+                    # for the addElement method
                 else:
                     pdb = pdb_list[cluster_index]
                     contactMap = contactmaps[cluster_index]
@@ -208,9 +209,9 @@ class ClusteringBuilder:
     #TODO: add proper parameter handling for the builder(no hardcoded strings)
     def buildClustering(self, method, resname=None, reportBaseFilename=None, columnOfReportFile=None):
         if method == "contacts":
-            return contactsClustering(resname, reportBaseFilename, columnOfReportFile)
+            return ContactsClustering(resname, reportBaseFilename, columnOfReportFile)
         elif method == "contactmap":
-            return contactMapClustering(resname, reportBaseFilename, columnOfReportFile)
+            return ContactMapClustering(resname, reportBaseFilename, columnOfReportFile)
 
 def clusterContactMaps(contactmaps, preferences):
     contactmaps = contactmaps.reshape((contactmaps.shape[0],-1))

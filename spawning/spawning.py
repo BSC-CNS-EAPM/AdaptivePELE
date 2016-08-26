@@ -6,11 +6,11 @@ import blockNames
 import spawningTypes
 
 
-def return_sign(i, m, n):
+def return_sign(i, m, n, r):
     """ Helper function, creates a three-piece step function"""
-    if i < n/2-m/2:
+    if i <= n-m:
         return 1
-    elif i <= n/2+m/2:
+    elif i <= r:
         return 0
     else:
         return -1
@@ -255,9 +255,9 @@ class VariableEpsilonDegeneracyCalculator(EpsilonDegeneracyCalculator):
         leftWindow = int(clusteringParams.maxEpsilonWindow/2)
         rightWindow = leftWindow+middleWindow
 
-        rateEpsilonVariation = [(clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(middleWindow-leftWindow-1), (clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(clusteringParams.period-rightWindow-1)]
+        rateEpsilonVariation = [(clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(middleWindow-leftWindow), (clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(clusteringParams.period-rightWindow-1)]
 
-        clusteringParams.epsilon += return_sign(currentEpoch,clusteringParams.maxEpsilonWindow,clusteringParams.period)*rateEpsilonVariation[currentEpoch>middleWindow]
+        clusteringParams.epsilon += return_sign(currentEpoch,leftWindow,middleWindow, rightWindow)*rateEpsilonVariation[currentEpoch>middleWindow]
 
     def calculateEpsilonValue(self, clusteringParams, currentEpoch):
         if currentEpoch is None or clusteringParams.variationWindow < currentEpoch:

@@ -104,7 +104,7 @@ class TestSpawningCalculator(unittest.TestCase):
         params_test = {}
         params.period = params_test.get("period", params.variationWindow)
         params.period += np.sign(np.abs(params.variationWindow-params.period))
-        rateVariation= 0.25/2
+        rateVariation= 0.25/3
         clusters = clustering.Clusters()
         sizes = [6,2,3,1]
         energies = [-4,-2,-2,-1]
@@ -124,7 +124,7 @@ class TestSpawningCalculator(unittest.TestCase):
         #TODO: check degeneracy after next steps
         self.assertAlmostEqual(params.epsilon, params.minEpsilon+rateVariation)
         degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 2)
-        self.assertAlmostEqual(params.epsilon, params.maxEpsilon)
+        self.assertAlmostEqual(params.epsilon, params.minEpsilon+2*rateVariation)
         degeneracy9 = variable_epsilon.calculate(clusters.clusters, trajs, params, 9)
         self.assertAlmostEqual(params.epsilon, params.minEpsilon)
 
@@ -136,12 +136,12 @@ class TestSpawningCalculator(unittest.TestCase):
         params.varEpsilonType = "linearVariation"
         params.maxEpsilon = 0.75
         params.minEpsilon = 0.5
-        params.variationWindow = 8
+        params.variationWindow = 20
         params.maxEpsilonWindow = 1
-        params_test = { "period" : 4 }
+        params_test = { "period" : 8 }
         params.period = params_test.get("period", params.variationWindow)
         params.period += np.sign(np.abs(params.variationWindow-params.period))
-        rateVariation= 0.25/1
+        rateVariation= (params.maxEpsilon-params.minEpsilon)/3
         clusters = clustering.Clusters()
         sizes = [6,2,3,1]
         energies = [-4,-2,-2,-1]
@@ -157,19 +157,22 @@ class TestSpawningCalculator(unittest.TestCase):
         golden6 = np.array([7,4,4,5])
         np.testing.assert_array_equal(degeneracy6, golden6)
         self.assertAlmostEqual(params.epsilon,params.minEpsilon)
-        degeneracy7 = variable_epsilon.calculate(clusters.clusters, trajs, params, 1)
+        print 0,params.epsilon
+        for i in range(1,params.variationWindow):
+            degeneracy7 = variable_epsilon.calculate(clusters.clusters, trajs, params, i)
+            print i,params.epsilon
         #TODO: check degeneracy after next steps
-        self.assertAlmostEqual(params.epsilon, params.minEpsilon+rateVariation)
-        degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 2)
-        self.assertAlmostEqual(params.epsilon, params.maxEpsilon)
-        degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 3)
-        self.assertAlmostEqual(params.epsilon,params.maxEpsilon-rateVariation/2)
-        degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 4)
-        self.assertAlmostEqual(params.epsilon, params.minEpsilon)
-        degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 5)
-        self.assertAlmostEqual(params.epsilon, params.minEpsilon)
-        degeneracy9 = variable_epsilon.calculate(clusters.clusters, trajs, params, 9)
-        self.assertAlmostEqual(params.epsilon, params.minEpsilon)
+        # self.assertAlmostEqual(params.epsilon, params.minEpsilon+rateVariation)
+        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 2)
+        # self.assertAlmostEqual(params.epsilon, params.maxEpsilon)
+        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 3)
+        # self.assertAlmostEqual(params.epsilon,params.maxEpsilon-rateVariation/2)
+        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 4)
+        # self.assertAlmostEqual(params.epsilon, params.minEpsilon)
+        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 5)
+        # self.assertAlmostEqual(params.epsilon, params.minEpsilon)
+        # degeneracy9 = variable_epsilon.calculate(clusters.clusters, trajs, params, 9)
+        # self.assertAlmostEqual(params.epsilon, params.minEpsilon)
 
 def main():
     return unittest.main(exit=False)
