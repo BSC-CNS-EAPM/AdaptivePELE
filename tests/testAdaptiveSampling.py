@@ -11,7 +11,7 @@ class TestadaptiveSampling(unittest.TestCase):
     def checkClusteringObjects(self, goldenPath, outputPath):
         goldenPathObject = os.path.join(goldenPath, "%d/clustering/object.pkl")
         outputPathObject = os.path.join(outputPath, "%d/clustering/object.pkl")
-        for i in range(3):
+        for i in range(2,3):
             with open(goldenPathObject%i,'rb') as f:
                 goldenCluster = pickle.load(f)
             with open(outputPathObject%i,'rb') as f2:

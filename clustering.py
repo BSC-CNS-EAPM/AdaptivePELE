@@ -3,6 +3,7 @@ import atomset
 import glob
 import numpy as np
 import os
+import blockNames
 from sklearn.cluster import AffinityPropagation
 
 class Clusters:
@@ -170,7 +171,7 @@ class ContactMapClustering(Clustering):
             contactmaps = []
             ids = []
             pdb_list = []
-            preferences = np.zeros(len(snapshots)+len(self.clusters.clusters))
+            # preferences = np.zeros(len(snapshots)+len(self.clusters.clusters))
             contactThresholdDistance = 8
             for num, snapshot in enumerate(snapshots):
                 pdb = atomset.PDB()
@@ -182,8 +183,8 @@ class ContactMapClustering(Clustering):
             for clusterNum,cluster in enumerate(self.clusters.clusters):
                 contactmaps.append(cluster.contactMap)
                 ids.append("cluster:%d"%clusterNum)
-                preferences[new_snapshot_limit+1+clusterNum] = cluster.elements
-            cluster_center_indices, degeneracies, indices = clusterContactMaps(np.array(contactmaps), preferences)
+                # preferences[new_snapshot_limit+1+clusterNum] = cluster.elements
+            cluster_center_indices, degeneracies, indices = clusterContactMaps(np.array(contactmaps))
             for index in cluster_center_indices:
                 cluster_index = int(ids[index].split(":")[-1])
                 if index > new_snapshot_limit:
@@ -208,14 +209,17 @@ class ContactMapClustering(Clustering):
 class ClusteringBuilder:
     #TODO: add proper parameter handling for the builder(no hardcoded strings)
     def buildClustering(self, method, resname=None, reportBaseFilename=None, columnOfReportFile=None):
-        if method == "contacts":
+        if method == blockNames.ClusteringTypes.contacts:
             return ContactsClustering(resname, reportBaseFilename, columnOfReportFile)
-        elif method == "contactmap":
+        elif method == blockNames.ClusteringTypes.contactMap:
             return ContactMapClustering(resname, reportBaseFilename, columnOfReportFile)
+        else:
+            sys.exit("Unknown clustering method! Choices are: " +
+                     str(blockNames.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))
 
-def clusterContactMaps(contactmaps, preferences):
+def clusterContactMaps(contactmaps, preferences=None):
     contactmaps = contactmaps.reshape((contactmaps.shape[0],-1))
-    affinitypropagation = AffinityPropagation(preference=preferences).fit(contactmaps)
+    affinitypropagation = AffinityPropagation(damping=0.9,preference=preferences,verbose=False).fit(contactmaps)
     cluster_center_indices = affinitypropagation.cluster_centers_indices_
     labels = affinitypropagation.labels_
     labels,indices,degeneracies = np.unique(labels, return_counts=True, return_inverse=True)

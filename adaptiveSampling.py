@@ -315,19 +315,17 @@ def writeClusteringOutput(outputPath, clustering, degeneracy, outputObject):
         pickle.dump(clustering, f, pickle.HIGHEST_PROTOCOL)
 
 
-
 def main(jsonParams=None):
     if jsonParams is None:
         jsonParams = sys.argv[1]
-    # Temporary hardcoded string to select clustering method
-    # TODO: Add proper parametrization
-    method = "contactmap"
+
     RESTART, spawningBlock, outputPath, initialStructures, ligandResname, DEBUG, simulationrunnerBlock = loadParams(jsonParams)
 
     spawningAlgorithmBuilder = spawning.SpawningAlgorithmBuilder()
     startingConformationsCalculator, spawningParams = spawningAlgorithmBuilder.build(spawningBlock)
     runnerbuilder =simulationrunner.RunnerBuilder()
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
+    clustering_method = simulationRunner.parameters.clustering
 
     print "================================"
     print "            PARAMS              "
@@ -340,6 +338,7 @@ def main(jsonParams=None):
     print "SpawningType:", spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[startingConformationsCalculator.type]
 
     print "SimulationType:", simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY[simulationRunner.type]
+    print "Clustering method:", clustering_method
 
     print "Output path: ", outputPath
     print "Initial Structures: ", initialStructures
@@ -396,6 +395,7 @@ def main(jsonParams=None):
     if not spawningParams.epsilon is None:
         epsilon_file = open("epsilon_values.txt","w")
         epsilon_file.write("Iteration\tEpsilon\n")
+        epsilon_file.close()
 
 
 
@@ -465,7 +465,9 @@ def main(jsonParams=None):
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
         if not spawningParams.epsilon is None:
+            epsilon_file = open("epsilon_values.txt","a")
             epsilon_file.write("%d\t%f\n"%(i,spawningParams.epsilon))
+            epsilon_file.close()
         
         print "Production run..."
         if not DEBUG:
@@ -529,7 +531,7 @@ def main(jsonParams=None):
         if len(glob.glob(paths[-1])) == 0: sys.exit("No more trajectories to cluster")
         if i == 0:
             clusteringBuilder = clustering.ClusteringBuilder()
-            clusteringMethod = clusteringBuilder.buildClustering(method,
+            clusteringMethod = clusteringBuilder.buildClustering(clustering_method,
                                                                  ligandResname,
                                                                  spawningParams.reportFilename,
                                                                  spawningParams.reportCol)
@@ -553,6 +555,9 @@ def main(jsonParams=None):
         numberOfSeedingPoints = makeOwnClusteringClusterRepresentativesInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, i+1)
 
         writeClusteringOutput(CLUSTERING_OUTPUT_DIR%i, clusteringMethod, degeneracyOfRepresentatives, CLUSTERING_OUTPUT_OBJECT%i)
+        if i > 0:
+            # Remove old clustering object, since we already have a newer one
+            os.remove(CLUSTERING_OUTPUT_OBJECT%(i-1))
 
         #Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:
@@ -568,9 +573,6 @@ def main(jsonParams=None):
 
     #cleanup
     #cleanup(tmpFolder)
-
-    if not spawningParams.epsilon is None:
-        epsilon_file.close()
 
 if __name__ == '__main__':
     main()
