@@ -1,3 +1,11 @@
+class ClusteringTypes:
+    contacts = 'contacts'
+    contactMap = 'contactMap'
+
+CLUSTERING_TYPE_TO_STRING_DICTIONARY = {
+    'contacts' : 'contacts',
+    'contactMap' : 'contactMap'
+    }
 class StringSpawningTypes:
     type = 'type'
     sameWeight = "sameWeight"
@@ -44,6 +52,7 @@ class SimulationParams:
     seed = "seed"
     peleSteps = "peleSteps"
     iterations = "iterations"
+    clustering = "clustering"
 
 class ControlFileParams:
     restart = 'restart'
