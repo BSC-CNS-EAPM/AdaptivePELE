@@ -159,10 +159,12 @@ class ContactMapClustering(Clustering):
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = getTrajNum(trajectory)
+            print trajNum
             snapshots = getSnapshots(trajectory, True)
+            metrics = np.zeros(len(snapshots)+len(self.clusters.clusters))
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0], self.reportBaseFilename%trajNum)
-                metrics = np.loadtxt(reportFilename, usecols=(self.col,))
+                metrics[:len(snapshots)] = np.loadtxt(reportFilename, usecols=(self.col,))
                 if metrics.shape == ():
                     metrics = np.array([metrics])
             else:
@@ -183,17 +185,16 @@ class ContactMapClustering(Clustering):
             for clusterNum,cluster in enumerate(self.clusters.clusters):
                 contactmaps.append(cluster.contactMap)
                 ids.append("cluster:%d"%clusterNum)
+                metrics[clusterNum+new_snapshot_limit+1] = cluster.metric
                 # preferences[new_snapshot_limit+1+clusterNum] = cluster.elements
             cluster_center_indices, degeneracies, indices = clusterContactMaps(np.array(contactmaps))
+            center_ind = 0
             for index in cluster_center_indices:
                 cluster_index = int(ids[index].split(":")[-1])
+                cluster_members, = np.where(indices == center_ind)
+                best_metric = metrics[cluster_members].min()
                 if index > new_snapshot_limit:
-                    cluster_members, = np.where(indices == index)
-                    cluster_members = cluster_members[cluster_members < new_snapshot_limit]
-                    if metrics.size == 0:
-                        best_metric = metrics[cluster_members].min()
-                    else:
-                        best_metric = 1e4
+                    # cluster_members = cluster_members[cluster_members < new_snapshot_limit]
                     self.clusters.clusters[cluster_index].addElement(best_metric)
                     self.clusters.clusters[cluster_index].elements += degeneracies[indices[index]]-2 
                     #One of the counts will account for the own cluster and the other
@@ -201,10 +202,10 @@ class ContactMapClustering(Clustering):
                 else:
                     pdb = pdb_list[cluster_index]
                     contactMap = contactmaps[cluster_index]
-                    metric = metrics[cluster_index]
-                    cluster = Cluster (pdb, contactMap=contactMap, metric=metric)
+                    cluster = Cluster (pdb, contactMap=contactMap, metric=best_metric)
                     cluster.elements += degeneracies[indices[index]]-1
                     self.clusters.addCluster(cluster)
+                center_ind += 1
 
 class ClusteringBuilder:
     #TODO: add proper parameter handling for the builder(no hardcoded strings)
