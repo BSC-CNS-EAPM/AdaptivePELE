@@ -184,46 +184,37 @@ class ContactMapClustering(Clustering):
             for clusterNum,cluster in enumerate(self.clusters.clusters):
                 contactmaps.append(cluster.contactMap)
                 ids.append("cluster:%d"%clusterNum)
+                pdb_list.append(cluster.pdb)
                 metrics[clusterNum+new_snapshot_limit+1] = cluster.metric
                 # preferences[new_snapshot_limit+1+clusterNum] = cluster.elements
-            cluster_center_indices, degeneracies, indices = clusterContactMaps(np.array(contactmaps))
+            cluster_center_indices, indices = clusterContactMaps(np.array(contactmaps))
             center_ind = 0
-            clusters_to_pop=[]
             for index in cluster_center_indices:
                 cluster_index = int(ids[index].split(":")[-1])
-                cluster_members, = np.where(indices == center_ind)
-                best_metric_ind = metrics[cluster_members].argmin()
-                if best_metric_ind > new_snapshot_limit:
-                    cluster_best_ind = int(ids[best_metric_ind].split(":")[-1])
-                    cluster_best = self.clusters.clusters[cluster_best_ind]
-                    if best_metric_ind != index:
-                        clusters_to_pop.append(cluster_best_ind)
-                    best_metric = cluster_best.metric
-                    best_pdb = cluster_best.pdb
-                    best_contactMap = cluster_best.contactMap
-                    best_elements = cluster_best.elements
-                else:
+                cluster_members, = np.where(indices[:new_snapshot_limit+1] == center_ind)
+                elements_in_cluster = cluster_members.size
+                if elements_in_cluster != 0:
+                    best_metric_ind = metrics[cluster_members].argmin()
                     # snapshot identified as exemplar by the algortihm
-                    best_metric = metrics[best_metric_ind]
                     best_pdb = pdb_list[best_metric_ind]
+                    best_metric = metrics[best_metric_ind]
                     best_contactMap = contactmaps[best_metric_ind]
-                    best_elements = 0 
+                else:
+                    best_pdb = pdb_list[index]
+                    best_metric = metrics[index]
+                    best_contactMap = contactmaps[index]
+
                 if index > new_snapshot_limit:
                     cluster = self.clusters.clusters[cluster_index]
-                    cluster.addElement(best_metric)
-                    cluster.elements += best_elements+degeneracies[indices[index]]-2
                     cluster.pdb = best_pdb
+                    cluster.metric = best_metric
                     cluster.contactMap = best_contactMap
-                    #One of the counts will account for the own cluster and the other
-                    # for the addElement method
+                    cluster.elements += elements_in_cluster
                 else:
                     cluster = Cluster(best_pdb, contactMap=best_contactMap, metric=best_metric)
-                    cluster.elements += best_elements+degeneracies[indices[index]]-1
                     self.clusters.addCluster(cluster)
+                    cluster.elements += elements_in_cluster-1
                 center_ind += 1
-            #delete clusters that have been merged
-            for pop_index in sorted(clusters_to_pop, reverse=True):
-                del self.clusters.clusters[pop_index]
 
 class ClusteringBuilder:
     def buildClustering(self, method, resname=None, reportBaseFilename=None, columnOfReportFile=None):
@@ -240,9 +231,7 @@ def clusterContactMaps(contactmaps, preferences=None):
     affinitypropagation = AffinityPropagation(damping=0.9,preference=preferences,verbose=False).fit(contactmaps)
     cluster_center_indices = affinitypropagation.cluster_centers_indices_
     labels = affinitypropagation.labels_
-    labels,indices,degeneracies = np.unique(labels, return_counts=True, return_inverse=True)
-    assert degeneracies.shape == cluster_center_indices.shape
-    return cluster_center_indices, degeneracies, indices
+    return cluster_center_indices, np.array(labels)
 
 def getAllTrajectories(paths):
     files = []
