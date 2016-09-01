@@ -156,6 +156,14 @@ class ContactsClustering(Clustering):
 
 class ContactMapClustering(Clustering):
     def cluster(self, paths):
+        """Clusters the snapshots of the trajectories provided using the
+        affinity propagation algorithm and the contactMaps similarity.
+
+        The snapshots are clustered together with the previous found clusters.
+        If and old cluster is found connected to a new one (with the new one
+        being the exemplar) it is ignored and only the new snapshots are
+        counted as members of the cluster. The minimum metric is used as the
+        metric of the cluster"""
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = getTrajNum(trajectory)
@@ -194,7 +202,7 @@ class ContactMapClustering(Clustering):
                 cluster_members, = np.where(indices[:new_snapshot_limit+1] == center_ind)
                 elements_in_cluster = cluster_members.size
                 if elements_in_cluster != 0:
-                    best_metric_ind = metrics[cluster_members].argmin()
+                    best_metric_ind = cluster_members[metrics[cluster_members].argmin()]
                     # snapshot identified as exemplar by the algortihm
                     best_pdb = pdb_list[best_metric_ind]
                     best_metric = metrics[best_metric_ind]
@@ -203,7 +211,6 @@ class ContactMapClustering(Clustering):
                     best_pdb = pdb_list[index]
                     best_metric = metrics[index]
                     best_contactMap = contactmaps[index]
-
                 if index > new_snapshot_limit:
                     cluster = self.clusters.clusters[cluster_index]
                     cluster.pdb = best_pdb
