@@ -40,7 +40,7 @@ class Cluster:
         if self.threshold != 0:
             print "Radius threshold: ", self.threshold
         if not self.contactMap is None:
-            print "Number of contacts in contact map", np.sum(self.contactMap) 
+            print "Number of contacts in contact map", np.sum(self.contactMap)
 
     def writePDB(self, path):
         self.pdb.writePDB(path)
@@ -159,7 +159,6 @@ class ContactMapClustering(Clustering):
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = getTrajNum(trajectory)
-            print trajNum
             snapshots = getSnapshots(trajectory, True)
             metrics = np.zeros(len(snapshots)+len(self.clusters.clusters))
             if self.reportBaseFilename:
@@ -189,26 +188,44 @@ class ContactMapClustering(Clustering):
                 # preferences[new_snapshot_limit+1+clusterNum] = cluster.elements
             cluster_center_indices, degeneracies, indices = clusterContactMaps(np.array(contactmaps))
             center_ind = 0
+            clusters_to_pop=[]
             for index in cluster_center_indices:
                 cluster_index = int(ids[index].split(":")[-1])
                 cluster_members, = np.where(indices == center_ind)
-                best_metric = metrics[cluster_members].min()
+                best_metric_ind = metrics[cluster_members].argmin()
+                if best_metric_ind > new_snapshot_limit:
+                    cluster_best_ind = int(ids[best_metric_ind].split(":")[-1])
+                    cluster_best = self.clusters.clusters[cluster_best_ind]
+                    if best_metric_ind != index:
+                        clusters_to_pop.append(cluster_best_ind)
+                    best_metric = cluster_best.metric
+                    best_pdb = cluster_best.pdb
+                    best_contactMap = cluster_best.contactMap
+                    best_elements = cluster_best.elements
+                else:
+                    # snapshot identified as exemplar by the algortihm
+                    best_metric = metrics[best_metric_ind]
+                    best_pdb = pdb_list[best_metric_ind]
+                    best_contactMap = contactmaps[best_metric_ind]
+                    best_elements = 0 
                 if index > new_snapshot_limit:
-                    # cluster_members = cluster_members[cluster_members < new_snapshot_limit]
-                    self.clusters.clusters[cluster_index].addElement(best_metric)
-                    self.clusters.clusters[cluster_index].elements += degeneracies[indices[index]]-2 
+                    cluster = self.clusters.clusters[cluster_index]
+                    cluster.addElement(best_metric)
+                    cluster.elements += best_elements+degeneracies[indices[index]]-2
+                    cluster.pdb = best_pdb
+                    cluster.contactMap = best_contactMap
                     #One of the counts will account for the own cluster and the other
                     # for the addElement method
                 else:
-                    pdb = pdb_list[cluster_index]
-                    contactMap = contactmaps[cluster_index]
-                    cluster = Cluster (pdb, contactMap=contactMap, metric=best_metric)
-                    cluster.elements += degeneracies[indices[index]]-1
+                    cluster = Cluster(best_pdb, contactMap=best_contactMap, metric=best_metric)
+                    cluster.elements += best_elements+degeneracies[indices[index]]-1
                     self.clusters.addCluster(cluster)
                 center_ind += 1
+            #delete clusters that have been merged
+            for pop_index in sorted(clusters_to_pop, reverse=True):
+                del self.clusters.clusters[pop_index]
 
 class ClusteringBuilder:
-    #TODO: add proper parameter handling for the builder(no hardcoded strings)
     def buildClustering(self, method, resname=None, reportBaseFilename=None, columnOfReportFile=None):
         if method == blockNames.ClusteringTypes.contacts:
             return ContactsClustering(resname, reportBaseFilename, columnOfReportFile)
