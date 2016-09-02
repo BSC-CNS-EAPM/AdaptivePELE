@@ -1,2 +1,6 @@
 *.pyc
 *.sw[op]
+pyemma/discretized
+pyemma/*.log
+pyemma/*.txt
+pyemma/*.png
