@@ -40,7 +40,7 @@ class Cluster:
         if self.threshold != 0:
             print "Radius threshold: ", self.threshold
         if not self.contactMap is None:
-            print "Number of contacts in contact map", np.sum(self.contactMap) 
+            print "Number of contacts in contact map", np.sum(self.contactMap)
 
     def writePDB(self, path):
         self.pdb.writePDB(path)
@@ -156,10 +156,17 @@ class ContactsClustering(Clustering):
 
 class ContactMapClustering(Clustering):
     def cluster(self, paths):
+        """Clusters the snapshots of the trajectories provided using the
+        affinity propagation algorithm and the contactMaps similarity.
+
+        The snapshots are clustered together with the previous found clusters.
+        If and old cluster is found connected to a new one (with the new one
+        being the exemplar) it is ignored and only the new snapshots are
+        counted as members of the cluster. The minimum metric is used as the
+        metric of the cluster"""
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = getTrajNum(trajectory)
-            print trajNum
             snapshots = getSnapshots(trajectory, True)
             metrics = np.zeros(len(snapshots)+len(self.clusters.clusters))
             if self.reportBaseFilename:
@@ -185,30 +192,38 @@ class ContactMapClustering(Clustering):
             for clusterNum,cluster in enumerate(self.clusters.clusters):
                 contactmaps.append(cluster.contactMap)
                 ids.append("cluster:%d"%clusterNum)
+                pdb_list.append(cluster.pdb)
                 metrics[clusterNum+new_snapshot_limit+1] = cluster.metric
                 # preferences[new_snapshot_limit+1+clusterNum] = cluster.elements
-            cluster_center_indices, degeneracies, indices = clusterContactMaps(np.array(contactmaps))
+            cluster_center_indices, indices = clusterContactMaps(np.array(contactmaps))
             center_ind = 0
             for index in cluster_center_indices:
                 cluster_index = int(ids[index].split(":")[-1])
-                cluster_members, = np.where(indices == center_ind)
-                best_metric = metrics[cluster_members].min()
-                if index > new_snapshot_limit:
-                    # cluster_members = cluster_members[cluster_members < new_snapshot_limit]
-                    self.clusters.clusters[cluster_index].addElement(best_metric)
-                    self.clusters.clusters[cluster_index].elements += degeneracies[indices[index]]-2 
-                    #One of the counts will account for the own cluster and the other
-                    # for the addElement method
+                cluster_members, = np.where(indices[:new_snapshot_limit+1] == center_ind)
+                elements_in_cluster = cluster_members.size
+                if elements_in_cluster != 0:
+                    best_metric_ind = cluster_members[metrics[cluster_members].argmin()]
+                    # snapshot identified as exemplar by the algortihm
+                    best_pdb = pdb_list[best_metric_ind]
+                    best_metric = metrics[best_metric_ind]
+                    best_contactMap = contactmaps[best_metric_ind]
                 else:
-                    pdb = pdb_list[cluster_index]
-                    contactMap = contactmaps[cluster_index]
-                    cluster = Cluster (pdb, contactMap=contactMap, metric=best_metric)
-                    cluster.elements += degeneracies[indices[index]]-1
+                    best_pdb = pdb_list[index]
+                    best_metric = metrics[index]
+                    best_contactMap = contactmaps[index]
+                if index > new_snapshot_limit:
+                    cluster = self.clusters.clusters[cluster_index]
+                    cluster.pdb = best_pdb
+                    cluster.metric = best_metric
+                    cluster.contactMap = best_contactMap
+                    cluster.elements += elements_in_cluster
+                else:
+                    cluster = Cluster(best_pdb, contactMap=best_contactMap, metric=best_metric)
                     self.clusters.addCluster(cluster)
+                    cluster.elements += elements_in_cluster-1
                 center_ind += 1
 
 class ClusteringBuilder:
-    #TODO: add proper parameter handling for the builder(no hardcoded strings)
     def buildClustering(self, method, resname=None, reportBaseFilename=None, columnOfReportFile=None):
         if method == blockNames.ClusteringTypes.contacts:
             return ContactsClustering(resname, reportBaseFilename, columnOfReportFile)
@@ -223,9 +238,7 @@ def clusterContactMaps(contactmaps, preferences=None):
     affinitypropagation = AffinityPropagation(damping=0.9,preference=preferences,verbose=False).fit(contactmaps)
     cluster_center_indices = affinitypropagation.cluster_centers_indices_
     labels = affinitypropagation.labels_
-    labels,indices,degeneracies = np.unique(labels, return_counts=True, return_inverse=True)
-    assert degeneracies.shape == cluster_center_indices.shape
-    return cluster_center_indices, degeneracies, indices
+    return cluster_center_indices, np.array(labels)
 
 def getAllTrajectories(paths):
     files = []
