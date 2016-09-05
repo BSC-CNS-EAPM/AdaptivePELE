@@ -1,10 +1,11 @@
-import trajectories
+import os
+import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import pyemma.plots as plots
+import trajectories
 import msm
-import os
-import numpy as np
+import tpt
 
 
 def writeClusterCenters(cl, outputFilename):
@@ -16,7 +17,6 @@ def makeFolder(outputDir):
 
 def main():
     #TODO: Define blocks with tasks to make the program more modular
-    #TODO: Add lines saying what the program is doing
 
     ### parameters
     trajectoryFolder = "test/MSM2" 
@@ -31,7 +31,11 @@ def main():
     nsetsCK = 2
     error_estimationCK=False
     membershipsCK=None
-    numPCCA = 7
+    numPCCA = 4
+    state_labels = 'auto' # default value of the labels in the flux diagram of
+    # the TPT
+    outfile_fluxTPT = None # file to store the flux diagram of the TPT, default
+    # not saving it(None)
 
     ### constants
     discretizedFolder = "discretized"
@@ -40,12 +44,15 @@ def main():
 
     #program
 
+    print "Loading trajectories..."
     x = trajectories.loadCOMFiles(trajectoryFolder, trajectoryBasename)
 
     #cluster & assign
+    print "Clustering data..."
     cl = trajectories.clusterTrajectories(x, numClusters)
 
     #write output
+    print "Writing clustering data..."
     makeFolder(discretizedFolder)
     writeClusterCenters(cl, clusterCentersFile)
 
@@ -60,6 +67,8 @@ def main():
     plot_its = None #just a placeholder so it doesn't go out of scope
     is_converged = False
     #its
+    print ("Calculating implied time-scales, when it's done will prompt for "
+            "confirmation on the validity of the lagtimes...")
     while not is_converged:
         
         its_object = msm.calculateITS(cl.dtrajs, lagtimes, itsErrors)
@@ -92,9 +101,11 @@ def main():
                 lagtimes = map(int,lag_list.split(" "))
             lagtimes.sort()
     #estimation
+    print "Estimating MSM with lagtime %d..."%lagtime
     MSM_object = msm.estimateMSM(cl.dtrajs, lagtime)
 
     #connectivity
+    print "Checking connectivity of the MSM..."
     if msm.is_connected(MSM_object):
         print "The MSM estimated is fully connected"
     else:
@@ -105,10 +116,12 @@ def main():
             print "Set %d has %d elements" % (index, uncon_set.size)
 
     #PCCA
+    print "Calculating PCCA cluster with %d sets..."%numPCCA
     MSM_object = msm.calculatePCCA(MSM_object, numPCCA)
 
     #Chapman-Kolgomorov validation
-    #TODO: add decision-making loop for validity of CK test
+    print ("Performing Chapman-Kolmogorov validation with the %d sets from the "
+           "PCCA, when it's done will prompt for the validity of the model...")%numPCCA
     nsetsCK = len(MSM_object.metastable_sets)
     membershipsCK = MSM_object.metastable_memberships
     CKObject = msm.ChapmanKolmogorovTest(MSM_object,
@@ -117,7 +130,24 @@ def main():
     msm.plotChapmanKolmogorovTest(CKObject)
     plt.show()
 
-    #TODO: TPT block
+    #Identify relevant sets for TPT
+    print ("Plotting PCCA sets, identify the sets that will serve as source and sink "
+        "for TPT...")
+    msm.plot_PCCA_clusters(cl, MSM_object)
+    plt.show()
+    SetA_index = int(raw_input("Please input index of Set A(source):"))
+    SetB_index = int(raw_input("Please input index of Set B(sink):"))
+    SetA, SetB = tpt.selectTPTSets(MSM_object, SetA_index, SetB_index)
+    print "Creating TPT object..."
+    TPT_object = tpt.createTPT(MSM_object, SetA, SetB)
+    print "Coarsing TPT for visulization..."
+    coarseTPTobject = tpt.coarseTPT(TPT_object, MSM_object)
+    print "Plotting TPT flux diagram..."
+    flux_figure = tpt.plotTPT(coarseTPT, state_labels=state_labels,
+                              outfile=outfile)
+
+    #Free energy estimation
+    print "Calculating free energies..."
     kbt = 0.0019872041*300
     pi = MSM_object.stationary_distribution
 
