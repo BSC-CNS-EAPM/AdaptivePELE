@@ -6,14 +6,7 @@ import pyemma.plots as plots
 import trajectories
 import msm
 import tpt
-
-
-def writeClusterCenters(cl, outputFilename):
-    np.savetxt(outputFilename, cl.clustercenters)
-
-def makeFolder(outputDir):
-    if not os.path.exists(outputDir):
-        os.makedirs(outputDir)
+import helper
 
 def main():
     #TODO: Define blocks with tasks to make the program more modular
@@ -53,8 +46,8 @@ def main():
 
     #write output
     print "Writing clustering data..."
-    makeFolder(discretizedFolder)
-    writeClusterCenters(cl, clusterCentersFile)
+    helper.makeFolder(discretizedFolder)
+    helper.writeClusterCenters(cl, clusterCentersFile)
 
     """
     fig = plt.figure()
@@ -119,6 +112,9 @@ def main():
     print "Calculating PCCA cluster with %d sets..."%numPCCA
     MSM_object = msm.calculatePCCA(MSM_object, numPCCA)
 
+    print "Saving MSM and clustering objects..."
+    helper.saveMSM(MSM_object, cl)
+
     #Chapman-Kolgomorov validation
     print ("Performing Chapman-Kolmogorov validation with the %d sets from the "
            "PCCA, when it's done will prompt for the validity of the model...")%numPCCA
@@ -141,10 +137,13 @@ def main():
     print "Creating TPT object..."
     TPT_object = tpt.createTPT(MSM_object, SetA, SetB)
     print "Coarsing TPT for visulization..."
-    coarseTPTobject = tpt.coarseTPT(TPT_object, MSM_object)
+    coarseTPT_object = tpt.coarseTPT(TPT_object, MSM_object)
     print "Plotting TPT flux diagram..."
-    flux_figure = tpt.plotTPT(coarseTPT, state_labels=state_labels,
-                              outfile=outfile)
+    flux_figure = tpt.plotTPT(coarseTPT_object, state_labels=state_labels,
+                              outfile=outfile_fluxTPT)
+    plt.show()
+    print "Writing the main properties of the TPT in the tpt/ folder..."
+    tpt.writeTPTOutput(coarseTPT_object)
 
     #Free energy estimation
     print "Calculating free energies..."

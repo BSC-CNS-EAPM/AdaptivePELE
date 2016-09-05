@@ -1,6 +1,7 @@
 import pyemma.msm as msm
 import pyemma.plots as mplt
 import matplotlib.pyplot as plt
+import cPickle
 
 def calculateITS(trajectories, lagtimes, errors = None):
     """ Calulate the implied time-scales at the given lagtimes"""
@@ -58,4 +59,4 @@ def plot_PCCA_clusters(cluster_object, MSM_object):
     axes[0][1].set_xlabel('z')
     return fig
 
-#def plotMSM()
+

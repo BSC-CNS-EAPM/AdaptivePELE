@@ -6,18 +6,13 @@ import pyemma.plots as plots
 import trajectories
 import msm
 import tpt
+import helper
 """
 ############# This script is a copy of the buildMSM.py script, this is intended
 to executed inside a python terminal to dump all variables in memory and debug
 or test different pyemma methods
 #############
 """
-def writeClusterCenters(cl, outputFilename):
-    np.savetxt(outputFilename, cl.clustercenters)
-
-def makeFolder(outputDir):
-    if not os.path.exists(outputDir):
-        os.makedirs(outputDir)
 
     #TODO: Define blocks with tasks to make the program more modular
 
@@ -47,81 +42,87 @@ discTraj = os.path.join(discretizedFolder, "%s.disctraj")
 
 #program
 
-print "Loading trajectories..."
-x = trajectories.loadCOMFiles(trajectoryFolder, trajectoryBasename)
-
-#cluster & assign
-print "Clustering data..."
-cl = trajectories.clusterTrajectories(x, numClusters)
-
-#write output
-print "Writing clustering data..."
-makeFolder(discretizedFolder)
-writeClusterCenters(cl, clusterCentersFile)
-
-"""
-fig = plt.figure()
-#ax = fig.add_subplot(111, projection='3d')
-ax = Axes3D(fig)
-ax.scatter(clX, clY, clZ)
-plt.show()
-"""
-
-plot_its = None #just a placeholder so it doesn't go out of scope
-is_converged = False
-#its
-print ("Calculating implied time-scales, when it's done will prompt for "
-        "confirmation on the validity of the lagtimes...")
-while not is_converged:
-
-    its_object = msm.calculateITS(cl.dtrajs, lagtimes, itsErrors)
-    plot_its = msm.plotITS(its_object, itsOutput, numberOfITS)
-    plt.show()
-    while True:
-        convergence_answer = raw_input("Has the ITS plot converged?[y/n] ")
-        convergence_answer.rstrip()
-        convergence_answer = convergence_answer or "y" #Making yes the default
-        #answer
-        if convergence_answer.lower() == "y" or convergence_answer.lower() == "yes":
-            is_converged = True
-            lagtime_str = raw_input("Please input the lagtime to construct the MSM: ")
-            lagtime = int(lagtime_str.rstrip())
-            break
-        elif convergence_answer.lower() == "n" or convergence_answer.lower() == "no":
-            break
-        else:
-            print "Answer not valid. Please answer yes or no"
-        if not is_converged:
-            new_lagtimes = raw_input("Do you want to define new lagtimes or add to the previous?[add(a)/new(n)] ")
-            new_lagtimes.rstrip()
-            if new_lagtimes.lower() == "add" or new_lagtimes.lower() == "a":
-                lag_list = raw_input("Please input the lagtimes you want to add separated by a space: ")
-                lag_list.rstrip()
-                lagtimes.extend(map(int,lag_list.split(" ")))
-            elif new_lagtimes.lower() == "new" or new_lagtimes.lower() == "n":
-                lag_list = raw_input("Please input the new lagtimes separated by a space: ")
-                lag_list.rstrip()
-                lagtimes = map(int,lag_list.split(" "))
-                lagtimes.sort()
-
-#estimation
-print "Estimating MSM with lagtime %d..."%lagtime
-MSM_object = msm.estimateMSM(cl.dtrajs, lagtime)
-
-#connectivity
-print "Checking connectivity of the MSM..."
-if msm.is_connected(MSM_object):
-    print "The MSM estimated is fully connected"
+if os.path.exists("MSM_object.pkl") and os.path.exists("clustering_object.pkl"):
+    MSM_object, cl = helper.loadMSM()
 else:
-    print "The MSM estimated is not fully connected"
-    unconnected_sets = get_connected_sets(MSM_object)
-    print "The MSM estimated has %d connected sets with sizes:" % len(unconnected_sets)
-    for index, uncon_set in enumerate(unconnected_sets):
-        print "Set %d has %d elements" % (index, uncon_set.size)
+    print "Loading trajectories..."
+    x = trajectories.loadCOMFiles(trajectoryFolder, trajectoryBasename)
 
-#PCCA
-print "Calculating PCCA cluster with %d sets..."%numPCCA
-MSM_object = msm.calculatePCCA(MSM_object, numPCCA)
+    #cluster & assign
+    print "Clustering data..."
+    cl = trajectories.clusterTrajectories(x, numClusters)
+
+    #write output
+    print "Writing clustering data..."
+    helper.makeFolder(discretizedFolder)
+    helper.writeClusterCenters(cl, clusterCentersFile)
+
+    """
+    fig = plt.figure()
+    #ax = fig.add_subplot(111, projection='3d')
+    ax = Axes3D(fig)
+    ax.scatter(clX, clY, clZ)
+    plt.show()
+    """
+
+    plot_its = None #just a placeholder so it doesn't go out of scope
+    is_converged = False
+    #its
+    print ("Calculating implied time-scales, when it's done will prompt for "
+            "confirmation on the validity of the lagtimes...")
+    while not is_converged:
+
+        its_object = msm.calculateITS(cl.dtrajs, lagtimes, itsErrors)
+        plot_its = msm.plotITS(its_object, itsOutput, numberOfITS)
+        plt.show()
+        while True:
+            convergence_answer = raw_input("Has the ITS plot converged?[y/n] ")
+            convergence_answer.rstrip()
+            convergence_answer = convergence_answer or "y" #Making yes the default
+            #answer
+            if convergence_answer.lower() == "y" or convergence_answer.lower() == "yes":
+                is_converged = True
+                lagtime_str = raw_input("Please input the lagtime to construct the MSM: ")
+                lagtime = int(lagtime_str.rstrip())
+                break
+            elif convergence_answer.lower() == "n" or convergence_answer.lower() == "no":
+                break
+            else:
+                print "Answer not valid. Please answer yes or no"
+            if not is_converged:
+                new_lagtimes = raw_input("Do you want to define new lagtimes or add to the previous?[add(a)/new(n)] ")
+                new_lagtimes.rstrip()
+                if new_lagtimes.lower() == "add" or new_lagtimes.lower() == "a":
+                    lag_list = raw_input("Please input the lagtimes you want to add separated by a space: ")
+                    lag_list.rstrip()
+                    lagtimes.extend(map(int,lag_list.split(" ")))
+                elif new_lagtimes.lower() == "new" or new_lagtimes.lower() == "n":
+                    lag_list = raw_input("Please input the new lagtimes separated by a space: ")
+                    lag_list.rstrip()
+                    lagtimes = map(int,lag_list.split(" "))
+                    lagtimes.sort()
+
+    #estimation
+    print "Estimating MSM with lagtime %d..."%lagtime
+    MSM_object = msm.estimateMSM(cl.dtrajs, lagtime)
+
+    #connectivity
+    print "Checking connectivity of the MSM..."
+    if msm.is_connected(MSM_object):
+        print "The MSM estimated is fully connected"
+    else:
+        print "The MSM estimated is not fully connected"
+        unconnected_sets = get_connected_sets(MSM_object)
+        print "The MSM estimated has %d connected sets with sizes:" % len(unconnected_sets)
+        for index, uncon_set in enumerate(unconnected_sets):
+            print "Set %d has %d elements" % (index, uncon_set.size)
+
+    #PCCA
+    print "Calculating PCCA cluster with %d sets..."%numPCCA
+    MSM_object = msm.calculatePCCA(MSM_object, numPCCA)
+
+    print "Saving MSM and clustering objects..."
+    helper.saveMSM(MSM_object, cl)
 
 #Chapman-Kolgomorov validation
 print ("Performing Chapman-Kolmogorov validation with the %d sets from the "
@@ -135,7 +136,7 @@ msm.plotChapmanKolmogorovTest(CKObject)
 plt.show()
 
 #Identify relevant sets for TPT
-print ("Plotting PCCA sets, identify the sets that will serve as source and sink ",
+print ("Plotting PCCA sets, identify the sets that will serve as source and sink "
        "for TPT...")
 msm.plot_PCCA_clusters(cl, MSM_object)
 plt.show()
@@ -145,9 +146,13 @@ SetA, SetB = tpt.selectTPTSets(MSM_object, SetA_index, SetB_index)
 print "Creating TPT object..."
 TPT_object = tpt.createTPT(MSM_object, SetA, SetB)
 print "Coarsing TPT for visulization..."
-coarseTPTobject = tpt.coarseTPT(TPT_object, MSM_object)
+coarseTPT_object = tpt.coarseTPT(TPT_object, MSM_object)
 print "Plotting TPT flux diagram..."
-flux_figure = tpt.plotTPT(coarseTPT, state_labels=state_labels, outfile=outfile)
+flux_figure = tpt.plotTPT(coarseTPT_object, state_labels=state_labels,
+                          outfile=outfile_fluxTPT)
+plt.show()
+print "Writing the main properties of the TPT in the tpt/ folder..."
+tpt.writeTPTOutput(coarseTPT_object)
 
 #Free energy estimation
 print "Calculating free energies..."
