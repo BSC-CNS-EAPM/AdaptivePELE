@@ -4,3 +4,5 @@ pyemma/discretized
 pyemma/*.log
 pyemma/*.txt
 pyemma/*.png
+pyemma/*.pkl
+pyemma/tpt
