@@ -20,13 +20,12 @@ def main(control_file):
         state_labels = 'auto' #json returns string as
     #unicode, and this breaks some code in pyemma 
     outfile_fluxTPT = params["outfile_fluxTPT"]
-    print state_labels
 
     #program
 
     prepareMSM = MSMblocks.PrepareMSM(numClusters, trajectoryFolder, trajectoryBasename)
     cl = prepareMSM.getClusteringObject()
-    calculateMSM = MSMblocks.MSM(cl, lagtimes,itsOutput,numberOfITS,itsErrors,
+    calculateMSM = MSMblocks.MSM(cl, lagtimes, numPCCA, itsOutput,numberOfITS,itsErrors,
                        error_estimationCK)
     MSM_object = calculateMSM.getMSM_object()
     TPTinstance = MSMblocks.TPT(MSM_object, cl, outfile_fluxTPT, state_labels)

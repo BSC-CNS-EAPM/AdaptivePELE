@@ -16,11 +16,13 @@ class PrepareMSM:
         if os.path.exists(self.clusteringFile):
             self.cl = helper.loadClustering(self.clusteringFile)
         else:
-            self.loadTrajectories(numClusters)
+            self.loadTrajectories(numClusters, trajectoryFolder,
+                                  trajectoryBasename)
 
-    def loadTrajectories(self, numClusters):
+    def loadTrajectories(self, numClusters, trajectoryFolder,
+                         trajectoryBasename):
         print "Loading trajectories..."
-        self.x = trajectories.loadCOMFiles(self.trajectoryFolder, self.trajectoryBasename)
+        self.x = trajectories.loadCOMFiles(trajectoryFolder, trajectoryBasename)
 
         #cluster & assign
         print "Clustering data..."
@@ -29,24 +31,25 @@ class PrepareMSM:
         print "Writing clustering data..."
         helper.makeFolder(self.discretizedFolder)
         helper.writeClusterCenters(self.cl, self.clusterCentersFile)
+        print "Saving clustering object..."
         helper.saveClustering(self.cl, self.clusteringFile)
 
     def getClusteringObject(self):
         return self.cl
 
 class MSM:
-    def __init__(self, cl, lagtimes,itsOutput=None, numberOfITS=-1,
-                 itsErros=None, error_estimationCK=None):
+    def __init__(self, cl, lagtimes, numPCCA, itsOutput=None, numberOfITS=-1,
+                 itsErrors=None, error_estimationCK=None):
         self.MSMFile = "MSM_object.pkl"
         if os.path.exists(self.MSMFile):
             self.MSM_object = helper.loadMSM(self.MSMFile)
         else:
-            lagtime = self.calculateITS(cl,lagtimes,)
-            self.MSM_object = self.createMSM(lagtime)
+            lagtime = self.calculateITS(cl,lagtimes,itsOutput, numberOfITS, itsErrors)
+            self.createMSM(cl, lagtime)
             self.check_connectivity()
-            self.PCCCA(numPCCA)
-            print "Saving MSM and clustering objects..."
-            helper.saveMSM(MSM_object, cl)
+            self.PCCA(numPCCA)
+            print "Saving MSM object..."
+            helper.saveMSM(self.MSM_object)
             self.performCPTest(error_estimationCK)
     
     def getMSM_object(self):
@@ -82,12 +85,13 @@ class MSM:
                 print "Set %d has %d elements" % (index, uncon_set.size)
 
 
-    def createMSM(self, lagtime):
+    def createMSM(self, cl, lagtime):
         #estimation
         print "Estimating MSM with lagtime %d..."%lagtime
-        MSM_object = msm.estimateMSM(cl.dtrajs, lagtime)
+        self.MSM_object = msm.estimateMSM(cl.dtrajs, lagtime)
 
-    def calculateITS(self, cl, lagtimes,itsOutput=None, numberOfITS=-1, itsErros=None):
+    def calculateITS(self, cl, lagtimes,itsOutput=None, numberOfITS=-1,
+                     itsErrors=None):
         is_converged = False
         #its
         print ("Calculating implied time-scales, when it's done will prompt for "
