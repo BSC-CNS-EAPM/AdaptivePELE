@@ -9,17 +9,24 @@ def makeFolder(outputDir):
     if not os.path.exists(outputDir):
         os.makedirs(outputDir)
 
-def saveMSM(MSM_object, clustering_object):
-    """Save the MSM object and clustering objects to avoid having to run again
+def saveMSM(MSM_object):
+    """Save the MSM object to avoid having to run again
     the more computationally expensive part"""
     with open("MSM_object.pkl","w") as MSMfile:
         cPickle.dump(MSM_object, MSMfile, -1)
-    with open("clustering_object.pkl","w") as clustering_file:
+
+def saveClustering(clustering_object, clusteringFile):
+    """Save the clustering object to avoid having to run again
+    the more computationally expensive part"""
+    with open(clusteringFile,"w") as clustering_file:
         cPickle.dump(clustering_object, clustering_file, -1)
 
-def loadMSM():
-    with open("MSM_object.pkl","r") as MSMfile:
+def loadMSM(MSMFile):
+    with open(MSMFile) as MSMfile:
         MSM_object = cPickle.load(MSMfile)
-    with open("clustering_object.pkl","r") as clustering_file:
+    return MSM_object
+
+def loadClustering(clusteringFile):
+    with open(clusteringFile,"r") as clustering_file:
         cl = cPickle.load(clustering_file)
-    return MSM_object,cl
+    return cl
