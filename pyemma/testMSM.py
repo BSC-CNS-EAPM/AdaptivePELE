@@ -39,11 +39,14 @@ outfile_fluxTPT = None # file to store the flux diagram of the TPT, default
 discretizedFolder = "discretized"
 clusterCentersFile = os.path.join(discretizedFolder, "clusterCenters.dat")
 discTraj = os.path.join(discretizedFolder, "%s.disctraj")
+clusteringFile="clustering_object.pkl"
+MSMFile="MSM_object.pkl"
 
 #program
 
-if os.path.exists("MSM_object.pkl") and os.path.exists("clustering_object.pkl"):
-    MSM_object, cl = helper.loadMSM()
+if os.path.exists(MSMFile) and os.path.exists(clusteringFile):
+    MSM_object = helper.loadMSM(MSMFile)
+    cl = helper.loadClustering(clusteringFile)
 else:
     print "Loading trajectories..."
     x = trajectories.loadCOMFiles(trajectoryFolder, trajectoryBasename)
