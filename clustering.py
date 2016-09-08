@@ -192,7 +192,7 @@ class ContactMapClustering(Clustering):
             for clusterNum,cluster in enumerate(self.clusters.clusters):
                 contactmaps.append(cluster.contactMap)
                 ids.append("cluster:%d"%clusterNum)
-                pdb_list.append(cluster.pdb)
+                #pdb_list.append(cluster.pdb)
                 metrics[clusterNum+new_snapshot_limit+1] = cluster.metric
                 # preferences[new_snapshot_limit+1+clusterNum] = cluster.elements
             cluster_center_indices, indices = clusterContactMaps(np.array(contactmaps))
@@ -204,21 +204,23 @@ class ContactMapClustering(Clustering):
                 if elements_in_cluster != 0:
                     best_metric_ind = cluster_members[metrics[cluster_members].argmin()]
                     # snapshot identified as exemplar by the algortihm
-                    best_pdb = pdb_list[best_metric_ind]
+                    #best_pdb = pdb_list[best_metric_ind]
+                    # Not update center pdb structure of old clusters
                     best_metric = metrics[best_metric_ind]
-                    best_contactMap = contactmaps[best_metric_ind]
+                    #best_contactMap = contactmaps[best_metric_ind]
                 else:
-                    best_pdb = pdb_list[index]
+                    #best_pdb = pdb_list[index]
                     best_metric = metrics[index]
                     best_contactMap = contactmaps[index]
                 if index > new_snapshot_limit:
                     cluster = self.clusters.clusters[cluster_index]
-                    cluster.pdb = best_pdb
+                    #cluster.pdb = best_pdb
                     cluster.metric = best_metric
-                    cluster.contactMap = best_contactMap
+                    #cluster.contactMap = best_contactMap
                     cluster.elements += elements_in_cluster
                 else:
-                    cluster = Cluster(best_pdb, contactMap=best_contactMap, metric=best_metric)
+                    cluster = Cluster(pdb_list[index],
+                                      contactMap=contactmaps[index], metric=best_metric)
                     self.clusters.addCluster(cluster)
                     cluster.elements += elements_in_cluster-1
                 center_ind += 1
