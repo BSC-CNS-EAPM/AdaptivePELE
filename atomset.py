@@ -220,7 +220,7 @@ class PDB:
         contactThresholdDistance2 = contactThresholdDistance**2
 
         ligandPDB = PDB()
-        ligandPDB.initialise(self.pdb, resname=ligandResname, heavyAtoms=True)
+        ligandPDB.initialise(self.pdb, resname=ligandResname, heavyAtoms=False)
         
         alphaCarbonsPDB = PDB()
         alphaCarbonsPDB.initialise(self.pdb, type = self.typeProtein, atomname = "CA")
@@ -239,7 +239,7 @@ class PDB:
         contactThresholdDistance2 = contactThresholdDistance**2
 
         ligandPDB = PDB()
-        ligandPDB.initialise(self.pdb, resname=ligandResname, type = self.typeHetero, heavyAtoms=True)
+        ligandPDB.initialise(self.pdb, resname=ligandResname, type = self.typeHetero, heavyAtoms=False)
         # empty contact map, rows are atoms of the ligand, columns are protein
         # alpha carbons
         contactMap = np.zeros((len(ligandPDB.ligandList),len(self.CAlist)))
