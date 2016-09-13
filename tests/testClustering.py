@@ -29,7 +29,7 @@ class clusteringTest(unittest.TestCase):
     def test_cluster_sklearn(self):
          #preparation
          clusteringBuilder = clustering.ClusteringBuilder()
-         clusteringInstance = clusteringBuilder.buildClustering("contactmap","AIN", "ain_report", 3)
+         clusteringInstance = clusteringBuilder.buildClustering("contactMap","AIN", "ain_report", 3)
 
          trajNames = ["tests/data/aspirin_data/traj*"]
 

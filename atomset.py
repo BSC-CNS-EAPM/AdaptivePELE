@@ -174,11 +174,10 @@ class PDB:
             atom = Atom(atomLine)
             #Here atom will be not null, empty or not. With "try", we prune empty atoms
             try:
-                if (not heavyAtoms or atom.isHeavyAtom()):
-                    if type==self.typeAll or (type==self.typeProtein and atom.isProtein()) or (type==self.typeHetero and atom.isHeteroAtom()):
+                if (not heavyAtoms or atom.isHeavyAtom()) and\
+                    (type==self.typeAll or (type==self.typeProtein and atom.isProtein()) or (type==self.typeHetero and atom.isHeteroAtom())):
                         self.atoms.update({atom.id:atom})
-                        if atom.isProtein():
-                            if atom.name == "CA":
+                        if atom.isProtein() and atom.name == "CA":
                                 self.CAlist.append(atom)
                         elif atom.isHeteroAtom():
                             self.ligandList.append(atom)
@@ -220,7 +219,7 @@ class PDB:
         contactThresholdDistance2 = contactThresholdDistance**2
 
         ligandPDB = PDB()
-        ligandPDB.initialise(self.pdb, resname=ligandResname, heavyAtoms=False)
+        ligandPDB.initialise(self.pdb, resname=ligandResname, heavyAtoms=True)
         
         alphaCarbonsPDB = PDB()
         alphaCarbonsPDB.initialise(self.pdb, type = self.typeProtein, atomname = "CA")
