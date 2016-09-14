@@ -98,19 +98,19 @@ class ContactsClustering(Clustering):
                 return
 
         #if made it here, the snapshot was not added into any cluster
-        threshold, contacts = self.thresholdCalculator(pdb, self.resname)
+        contactThresholdDistance = 8
+        contacts = pdb.countContacts(self.resname, contactThresholdDistance)
+
+        threshold = self.thresholdCalculator(contacts)
         cluster = Cluster (pdb, thresholdRadius = threshold, contacts=contacts, metric=metric)
         self.clusters.addCluster(cluster)
         return len(self.clusters.clusters)-1
 
-    def thresholdCalculator(self, pdb, ligandResname):
-        contactThresholdDistance = 8
+    def thresholdCalculator(self, contacts):
 
         numberOfContactsThresholdCompletelyBuried = 15
         numberOfContactsThresholdSemiBuried = 10
         numberOfContactsThresholdBulk = 1
-
-        contacts = pdb.countContacts(ligandResname, contactThresholdDistance)
 
         """
         if contacts > numberOfContactsThresholdCompletelyBuried:
@@ -142,16 +142,15 @@ class ContactsClustering(Clustering):
             return 8, contacts
         """
 
-        #return 2, contacts
+        #return 2
         if contacts > numberOfContactsThresholdCompletelyBuried:
-            return 2, contacts
+            return 2
         elif contacts > numberOfContactsThresholdSemiBuried:
-            return 3, contacts
+            return 3
         elif contacts > numberOfContactsThresholdBulk:
-            return 4, contacts
+            return 4
         else:
-            return 4, contacts
-
+            return 4
 
 
 class ContactMapClustering(Clustering):
