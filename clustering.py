@@ -165,65 +165,93 @@ class ContactMapClustering(Clustering):
         counted as members of the cluster. The minimum metric is used as the
         metric of the cluster"""
         trajectories = getAllTrajectories(paths)
+        pdb_list = []
+        metrics = []
+        contactmaps = []
+        preferences = []
+        ids = []
         for trajectory in trajectories:
             trajNum = getTrajNum(trajectory)
             snapshots = getSnapshots(trajectory, True)
-            metrics = np.zeros(len(snapshots)+len(self.clusters.clusters))
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0], self.reportBaseFilename%trajNum)
-                metrics[:len(snapshots)] = np.loadtxt(reportFilename, usecols=(self.col,))
-                if metrics.shape == ():
-                    metrics = np.array([metrics])
+                metricstraj = np.loadtxt(reportFilename, usecols=(self.col,))
+                if metricstraj.shape == ():
+                    metricstraj = np.array([metricstraj])
             else:
-                metrics = np.zeros(len(snapshots))
+                metricstraj = np.zeros(len(snapshots))
             #Prepare data for clustering
-            contactmaps = []
-            ids = []
-            pdb_list = []
-            # preferences = np.zeros(len(snapshots)+len(self.clusters.clusters))
+            metrics.extend(metricstraj.tolist())
             contactThresholdDistance = 8
-            for num, snapshot in enumerate(snapshots):
+            for snapshot in snapshots:
                 pdb = atomset.PDB()
                 pdb.initialise(snapshot)
                 pdb_list.append(pdb)
-                contactmaps.append(pdb.createContactMap(self.resname,                    contactThresholdDistance))
-                ids.append("snapshot:%d"%num)
-            new_snapshot_limit = num
+                contactMap = pdb.createContactMap(self.resname,                    contactThresholdDistance)
+                contactmaps.append(contactMap)
+                preferences.append(contactMap.sum())
+
+        preferences = float((min(preferences)-max(preferences))/2)
+        cluster_center_indices, indices = clusterContactMaps(np.array(contactmaps),
+                           preferences=preferences)
+        center_ind = 0
+        new_clusters = Clusters()
+        new_ids = []
+        new_contactmaps = []
+        new_metrics = []
+        elements = []
+        for index in cluster_center_indices:
+            cluster_members, = np.where(indices == center_ind)
+            elements_in_cluster = cluster_members.size
+            best_metric_ind = cluster_members[np.array(metrics)[cluster_members].argmin()]
+            best_metric = metrics[best_metric_ind]
+            cluster = Cluster(pdb_list[index],
+                                    contactMap=contactmaps[index], metric=best_metric)
+            new_clusters.addCluster(cluster)
+            cluster.elements += elements_in_cluster-1
+            new_ids.append('new:%d'%center_ind)
+            new_contactmaps.append(cluster.contactMap)
+            new_metrics.append(cluster.metric)
+            elements.append(cluster.elements)
+            center_ind += 1
+        if len(self.clusters.clusters) > 0:
+            new_clusters_lim = center_ind-1
             for clusterNum,cluster in enumerate(self.clusters.clusters):
-                contactmaps.append(cluster.contactMap)
-                ids.append("cluster:%d"%clusterNum)
-                #pdb_list.append(cluster.pdb)
-                metrics[clusterNum+new_snapshot_limit+1] = cluster.metric
-                # preferences[new_snapshot_limit+1+clusterNum] = cluster.elements
-            cluster_center_indices, indices = clusterContactMaps(np.array(contactmaps))
+                new_contactmaps.append(cluster.contactMap)
+                new_ids.append("old:%d"%clusterNum)
+                new_metrics.append(cluster.metric)
+                elements.append(cluster.elements)
+
+            preferences = -np.array(elements)
+            cluster_center_indices, indices = clusterContactMaps(np.array(new_contactmaps),
+                            preferences=preferences)
             center_ind = 0
+            final_clusters = Clusters()
+#            if cluster_center_indices is None:
+                # if there are no contacts between ligand and protein the
+                # clustering returns NaNs, it should not happen in a normal
+                # run
+#                import pdb as debug
+#                debug.set_trace()
             for index in cluster_center_indices:
-                cluster_index = int(ids[index].split(":")[-1])
-                cluster_members, = np.where(indices[:new_snapshot_limit+1] == center_ind)
-                elements_in_cluster = cluster_members.size
-                if elements_in_cluster != 0:
-                    best_metric_ind = cluster_members[metrics[cluster_members].argmin()]
-                    # snapshot identified as exemplar by the algortihm
-                    #best_pdb = pdb_list[best_metric_ind]
-                    # Not update center pdb structure of old clusters
-                    best_metric = metrics[best_metric_ind]
-                    #best_contactMap = contactmaps[best_metric_ind]
+                cluster_index = int(new_ids[index].split(":")[-1])
+                cluster_members, = np.where(indices == center_ind)
+                elements_in_cluster = np.array(elements)[cluster_members].sum()
+                best_metric_ind = cluster_members[np.array(new_metrics)[cluster_members].argmin()]
+                # snapshot identified as exemplar by the algortihm
+                # Not update center pdb structure of old clusters
+                best_metric = new_metrics[best_metric_ind]
+                if index <= new_clusters_lim:
+                    cluster = new_clusters.clusters[cluster_index]
                 else:
-                    #best_pdb = pdb_list[index]
-                    best_metric = metrics[index]
-                    best_contactMap = contactmaps[index]
-                if index > new_snapshot_limit:
                     cluster = self.clusters.clusters[cluster_index]
-                    #cluster.pdb = best_pdb
-                    cluster.metric = best_metric
-                    #cluster.contactMap = best_contactMap
-                    cluster.elements += elements_in_cluster
-                else:
-                    cluster = Cluster(pdb_list[index],
-                                      contactMap=contactmaps[index], metric=best_metric)
-                    self.clusters.addCluster(cluster)
-                    cluster.elements += elements_in_cluster-1
+                cluster.metric = best_metric
+                cluster.elements += (elements_in_cluster-cluster.elements)
+                final_clusters.addCluster(cluster)
                 center_ind += 1
+            self.clusters = final_clusters
+        else:
+            self.clusters = new_clusters
 
 class ClusteringBuilder:
     def buildClustering(self, method, resname=None, reportBaseFilename=None, columnOfReportFile=None):
