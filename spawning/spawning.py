@@ -60,12 +60,14 @@ class SpawningParams:
     def buildSpawningParameters(self,spawningBlock):
         spawningParamsBlock = spawningBlock[blockNames.SpawningParams.params]
         spawningType = spawningBlock[blockNames.StringSpawningTypes.type]
+        #Params general to all
+        self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
+        self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
+        self.temperature = spawningParamsBlock[blockNames.SpawningParams.temperature]
+        #Params specific to epsilon related spawning
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon:
             self.epsilon = spawningParamsBlock[blockNames.SpawningParams.epsilon]
-            self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
-            self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
-            self.temperature = spawningParamsBlock[blockNames.SpawningParams.temperature]
         if spawningType == blockNames.StringSpawningTypes.variableEpsilon:
             self.varEpsilonType = spawningParamsBlock[blockNames.SpawningParams.varEpsilonType]
             self.maxEpsilon = spawningParamsBlock[blockNames.SpawningParams.maxEpsilon]
