@@ -1,13 +1,14 @@
 class ClusteringTypes:
-    contacts = 'contacts'
-    contactMap = 'contactMap'
+    type = "type"
+    contacts = "contacts"
+    contactMap = "contactMap"
 
 CLUSTERING_TYPE_TO_STRING_DICTIONARY = {
-    'contacts' : 'contacts',
-    'contactMap' : 'contactMap'
+    "contacts" : "contacts",
+    "contactMap" : "contactMap"
     }
 class StringSpawningTypes:
-    type = 'type'
+    type = "type"
     sameWeight = "sameWeight"
     inverselyProportional = "inverselyProportional"
     epsilon = "epsilon"
@@ -55,10 +56,10 @@ class SimulationParams:
     clustering = "clustering"
 
 class ControlFileParams:
-    restart = 'restart'
-    spawningBlockname = 'spawning'
-    outputPath = 'outputPath'
-    initialStructures = 'initialStructures'
-    ligandResname = 'ligandResname'
-    debug = 'debug'
+    restart = "restart"
+    spawningBlockname = "spawning"
+    outputPath = "outputPath"
+    initialStructures = "initialStructures"
+    ligandResname = "ligandResname"
+    debug = "debug"
     simulationBlockname = "simulation"
