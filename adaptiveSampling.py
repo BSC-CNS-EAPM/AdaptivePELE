@@ -11,7 +11,6 @@ import atexit
 import argparse
 import time
 import glob
-import clustering
 import pickle
 import blockNames
 import atomset
@@ -21,6 +20,7 @@ from functools import partial
 
 from spawning import spawning, spawningTypes
 from simulation import simulationrunner, simulationTypes
+from clustering import clustering
 
 def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, iteration):
     for i, name in enumerate(initialStructures):

@@ -1,6 +1,6 @@
 import math
 import numpy as np
-import clustering
+from clustering import clustering
 import random
 import blockNames
 import spawningTypes

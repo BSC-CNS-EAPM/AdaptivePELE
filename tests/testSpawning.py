@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import spawning.spawning as spawning
-import clustering
+from clustering import clustering
 
 class TestSpawningCalculator(unittest.TestCase):
     def testDivideTrajAccordingToWeights(self):
