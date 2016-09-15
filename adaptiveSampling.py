@@ -325,7 +325,7 @@ def main(jsonParams=None):
     startingConformationsCalculator, spawningParams = spawningAlgorithmBuilder.build(spawningBlock)
     runnerbuilder = simulationrunner.RunnerBuilder()
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
-    clusteringMethod = clusteringBlock[blockNames.ClusteringTypes.type]
+    clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
 
     print "================================"
     print "            PARAMS              "
@@ -338,7 +338,7 @@ def main(jsonParams=None):
     print "SpawningType:", spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[startingConformationsCalculator.type]
 
     print "SimulationType:", simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY[simulationRunner.type]
-    print "Clustering method:", clusteringMethod
+    print "Clustering method:", clusteringType
 
     print "Output path: ", outputPath
     print "Initial Structures: ", initialStructures
@@ -531,7 +531,7 @@ def main(jsonParams=None):
         if len(glob.glob(paths[-1])) == 0: sys.exit("No more trajectories to cluster")
         if i == 0:
             clusteringBuilder = clustering.ClusteringBuilder()
-            clusteringMethod = clusteringBuilder.buildClustering(clusteringMethod,
+            clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
                                                                  ligandResname,
                                                                  spawningParams.reportFilename,
                                                                  spawningParams.reportCol)

@@ -4,6 +4,7 @@ import glob
 import numpy as np
 import os
 import blockNames
+import clusteringTypes
 from sklearn.cluster import AffinityPropagation
 
 class Clusters:
@@ -222,10 +223,13 @@ class ContactMapClustering(Clustering):
                 center_ind += 1
 
 class ClusteringBuilder:
-    def buildClustering(self, method, resname=None, reportBaseFilename=None, columnOfReportFile=None):
-        if method == blockNames.ClusteringTypes.contacts:
+    def buildClustering(self, clusteringBlock, resname=None, reportBaseFilename=None, columnOfReportFile=None):
+        print clusteringBlock
+        clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
+        print clusteringType
+        if clusteringType == blockNames.ClusteringTypes.contacts:
             return ContactsClustering(resname, reportBaseFilename, columnOfReportFile)
-        elif method == blockNames.ClusteringTypes.contactMap:
+        elif clusteringType == blockNames.ClusteringTypes.contactMap:
             return ContactMapClustering(resname, reportBaseFilename, columnOfReportFile)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
