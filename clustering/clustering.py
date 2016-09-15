@@ -66,18 +66,16 @@ class ThresholdCalculator():
         pass
 
 class ThresholdCalculatorConstant(ThresholdCalculator):
-    def __init__(self, value):
-        self.thresholdCalculator = ThresholdCalculator()
-        self.type = "Constant"
-        self.value
+    def __init__(self, value = 2):
+        self.type = clusteringTypes.THRESHOLD_CALCULATOR_TYPES.constant
+        self.value = value
 
     def caclulate(self, contacts):
         return self.value
 
 class ThresholdCalculatorHeaviside(ThresholdCalculator):
     def __init__(self, conditions=[15,10], values=[2,3,4]):
-        self.thresholdCalculator = ThresholdCalculator()
-        self.type = "Constant"
+        self.type = clusteringTypes.THRESHOLD_CALCULATOR_TYPES.heaviside
     
         if len(values) != len(conditions) and len(values) != len(conditions) + 1:
             raise ValueError('The number of values must be equal or one more, than the number of conditions')
@@ -111,9 +109,9 @@ class Clustering:
 
 
 class ContactsClustering(Clustering):
-    def __init__(self, resname=None, reportBaseFilename=None, columnOfReportFile=None):
+    def __init__(self, thresholdCalculator, resname=None, reportBaseFilename=None, columnOfReportFile=None):
         Clustering.__init__(self, resname, reportBaseFilename, columnOfReportFile)
-        self.thresholdCalculator = ThresholdCalculatorHeaviside()
+        self.thresholdCalculator = thresholdCalculator
 
     def cluster(self, paths):
         trajectories = getAllTrajectories(paths)
@@ -150,7 +148,7 @@ class ContactsClustering(Clustering):
         return len(self.clusters.clusters)-1
 
 
-
+#TODO: refactor
 class ContactMapClustering(Clustering):
     def cluster(self, paths):
         """Clusters the snapshots of the trajectories provided using the
@@ -222,19 +220,56 @@ class ContactMapClustering(Clustering):
                     cluster.elements += elements_in_cluster-1
                 center_ind += 1
 
+#To be moved to a different file & need to make test
+class ThresholdCalculatorBuilder():
+    def build(self, clusteringBlock):
+        try:
+            thresholdCalculatorBlock = clusteringBlock[blockNames.ClusteringTypes.thresholdCalculator]
+            try:
+                type = thresholdCalculatorBlock[blockNames.ThresholdCalculator.type]
+
+                thresholdCalculator = None
+                if type == blockNames.ThresholdCalculator.constant:
+                    try:
+                        value = thresholdCalculatorBlock[blockNames.ThresholdCalculator.value]
+                        thresholdCalculator = ThresholdCalculatorConstant(value)
+                    except:
+                        thresholdCalculator = ThresholdCalculatorConstant()
+                elif type == blockNames.ThresholdCalculator.heaviside:
+                    try:
+                        values = thresholdCalculatorBlock[blockNames.ThresholdCalculator.values]
+                        conditions = thresholdCalculatorBlock[blockNames.ThresholdCalculator.conditions]
+                        thresholdCalculator = ThresholdCalculatorHeaviside(conditions, values)
+                    except KeyError:
+                        print "Using default parameters for Heaviside threshold calculator"
+                        thresholdCalculator = ThresholdCalculatorHeaviside()
+                else:
+                    sys.exit("Unknown threshold calculator type! Choices are: " + str(clusteringTypes.THRESHOLD_CALCULATOR_TYPE_TO_STRING_DICTIONARY.values()))
+
+
+            except KeyError: 
+                sys.exit("Threshold calculator must have a type")
+
+        except KeyError:
+            #Default value
+            thresholdCalculator = ThresholdCalculatorHeaviside()
+
+        return thresholdCalculator
+
 class ClusteringBuilder:
     def buildClustering(self, clusteringBlock, resname=None, reportBaseFilename=None, columnOfReportFile=None):
-        print clusteringBlock
         clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
-        print clusteringType
         if clusteringType == blockNames.ClusteringTypes.contacts:
-            return ContactsClustering(resname, reportBaseFilename, columnOfReportFile)
+            thresholdCalculatorBuilder = ThresholdCalculatorBuilder()
+            thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
+            return ContactsClustering(thresholdCalculator, resname, reportBaseFilename, columnOfReportFile)
         elif clusteringType == blockNames.ClusteringTypes.contactMap:
             return ContactMapClustering(resname, reportBaseFilename, columnOfReportFile)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))
 
+#TODO: should it be a class method?
 def clusterContactMaps(contactmaps, preferences=None):
     contactmaps = contactmaps.reshape((contactmaps.shape[0],-1))
     affinitypropagation = AffinityPropagation(damping=0.9,preference=preferences,verbose=False).fit(contactmaps)

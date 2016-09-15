@@ -2,14 +2,28 @@ class ClusteringTypes:
     type = "type"
     contacts = "contacts"
     contactMap = "contactMap"
+    thresholdCalculator = "thresholdCalculator"
 
-class ClusteringParams:
-    params = "params"
-    function = "function"
-    heavyside = "heaviside"
+class ThresholdCalculator:
+    type = "type"
+    heaviside = "heaviside"
+    constant = "constant"
     conditions = "conditions"
     values = "values"
-    constant = "constant"
+    value = "value"
+
+
+"""
+clustering : {
+    type : contacts,
+    thresholdCalculator : {
+        type: heavyside,
+        conditions : [15, 10],
+        values : [2, 3, 4]
+    }
+   
+}
+"""
 
 class StringSpawningTypes:
     type = "type"
