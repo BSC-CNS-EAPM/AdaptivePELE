@@ -1,4 +1,4 @@
-import clustering
+from clustering import clustering
 import unittest
 
 class clusteringTest(unittest.TestCase):
@@ -26,7 +26,7 @@ class clusteringTest(unittest.TestCase):
         self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
         self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
 
-    def test_cluster_sklearn(self):
+    def _test_cluster_sklearn(self):
          #preparation
          clusteringBuilder = clustering.ClusteringBuilder()
          clusteringInstance = clusteringBuilder.buildClustering("contactMap","AIN", "ain_report", 3)
