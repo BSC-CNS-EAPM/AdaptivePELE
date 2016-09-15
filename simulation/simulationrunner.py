@@ -17,7 +17,6 @@ class SimulationParameters:
         self.iterations = 0
         self.peleSteps = 0
         self.seed = 0
-        self.clustering = ""
 
 class SimulationRunner:
     def __init__(self, parameters):
@@ -99,7 +98,6 @@ class RunnerBuilder:
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
-            params.clustering = paramsBlock[blockNames.SimulationParams.clustering]
 
             SimulationRunner = PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
@@ -111,7 +109,6 @@ class RunnerBuilder:
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
-            params.clustering = paramsBlock[blockNames.SimulationParams.clustering]
             SimulationRunner = TestSimulation(params)
         else:
             sys.exit("Unknown simulation type! Choices are: " + str(simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))

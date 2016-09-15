@@ -3,6 +3,14 @@ class ClusteringTypes:
     contacts = "contacts"
     contactMap = "contactMap"
 
+class ClusteringParams:
+    params = "params"
+    function = "function"
+    heavyside = "heaviside"
+    conditions = "conditions"
+    values = "values"
+    constant = "constant"
+
 class StringSpawningTypes:
     type = "type"
     sameWeight = "sameWeight"
@@ -49,13 +57,13 @@ class SimulationParams:
     seed = "seed"
     peleSteps = "peleSteps"
     iterations = "iterations"
-    clustering = "clustering"
 
 class ControlFileParams:
     restart = "restart"
-    spawningBlockname = "spawning"
     outputPath = "outputPath"
     initialStructures = "initialStructures"
     ligandResname = "ligandResname"
     debug = "debug"
+    spawningBlockname = "spawning"
     simulationBlockname = "simulation"
+    clusteringBlockname = "clustering"

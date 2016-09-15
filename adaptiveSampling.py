@@ -213,7 +213,7 @@ def loadParams(jsonParams):
     return parsedJSON[blockNames.ControlFileParams.restart],parsedJSON[blockNames.ControlFileParams.spawningBlockname],\
             parsedJSON[blockNames.ControlFileParams.outputPath], parsedJSON[blockNames.ControlFileParams.initialStructures],\
             parsedJSON[blockNames.ControlFileParams.ligandResname].upper(), parsedJSON[blockNames.ControlFileParams.debug],\
-            parsedJSON[blockNames.ControlFileParams.simulationBlockname]
+            parsedJSON[blockNames.ControlFileParams.simulationBlockname], parsedJSON[blockNames.ControlFileParams.clusteringBlockname]
 
 def saveInitialControlFile(jsonParams, originalControlFile):
     file = open(originalControlFile, 'w')
@@ -319,13 +319,13 @@ def main(jsonParams=None):
     if jsonParams is None:
         jsonParams = sys.argv[1]
 
-    RESTART, spawningBlock, outputPath, initialStructures, ligandResname, DEBUG, simulationrunnerBlock = loadParams(jsonParams)
+    RESTART, spawningBlock, outputPath, initialStructures, ligandResname, DEBUG, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
 
     spawningAlgorithmBuilder = spawning.SpawningAlgorithmBuilder()
     startingConformationsCalculator, spawningParams = spawningAlgorithmBuilder.build(spawningBlock)
-    runnerbuilder =simulationrunner.RunnerBuilder()
+    runnerbuilder = simulationrunner.RunnerBuilder()
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
-    clustering_method = simulationRunner.parameters.clustering
+    clusteringMethod = clusteringBlock[blockNames.ClusteringTypes.type]
 
     print "================================"
     print "            PARAMS              "
@@ -338,7 +338,7 @@ def main(jsonParams=None):
     print "SpawningType:", spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[startingConformationsCalculator.type]
 
     print "SimulationType:", simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY[simulationRunner.type]
-    print "Clustering method:", clustering_method
+    print "Clustering method:", clusteringMethod
 
     print "Output path: ", outputPath
     print "Initial Structures: ", initialStructures
@@ -531,7 +531,7 @@ def main(jsonParams=None):
         if len(glob.glob(paths[-1])) == 0: sys.exit("No more trajectories to cluster")
         if i == 0:
             clusteringBuilder = clustering.ClusteringBuilder()
-            clusteringMethod = clusteringBuilder.buildClustering(clustering_method,
+            clusteringMethod = clusteringBuilder.buildClustering(clusteringMethod,
                                                                  ligandResname,
                                                                  spawningParams.reportFilename,
                                                                  spawningParams.reportCol)
