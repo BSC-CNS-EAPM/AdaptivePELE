@@ -5,8 +5,8 @@ class clusteringTest(unittest.TestCase):
     def testCluster(self):
         #preparation
         clusteringBuilder = clustering.ClusteringBuilder()
-        clusteringDictionary = {"type" : "contacts"}
-        clusteringInstance = clusteringBuilder.buildClustering(clusteringDictionary,"AIN", "ain_report", 3)
+        clusteringDictionary = {"type" : "contacts", "ligandResname": "AIN"}
+        clusteringInstance = clusteringBuilder.buildClustering(clusteringDictionary,"ain_report", 3)
 
         trajNames = ["tests/data/aspirin_data/traj*"]
 

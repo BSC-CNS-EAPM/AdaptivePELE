@@ -228,8 +228,14 @@ class ContactMapClustering(Clustering):
 
 
 class ClusteringBuilder:
-    def buildClustering(self, clusteringBlock, resname=None, reportBaseFilename=None, columnOfReportFile=None):
-        clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
+    def buildClustering(self, clusteringBlock, reportBaseFilename=None, columnOfReportFile=None):
+        try:
+            resname = clusteringBlock[blockNames.ClusteringTypes.ligandResname].upper()
+            clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
+        except KeyError as err:
+            err.message=err.message + ": Need to provide mandatory parameter in clustering block"
+            raise KeyError(err.message)
+
         if clusteringType == blockNames.ClusteringTypes.contacts:
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)

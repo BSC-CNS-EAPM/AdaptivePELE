@@ -204,7 +204,7 @@ def loadParams(jsonParams):
 
     return parsedJSON[blockNames.ControlFileParams.restart],parsedJSON[blockNames.ControlFileParams.spawningBlockname],\
             parsedJSON[blockNames.ControlFileParams.outputPath], parsedJSON[blockNames.ControlFileParams.initialStructures],\
-            parsedJSON[blockNames.ControlFileParams.ligandResname].upper(), parsedJSON[blockNames.ControlFileParams.debug],\
+            parsedJSON[blockNames.ControlFileParams.debug],\
             parsedJSON[blockNames.ControlFileParams.simulationBlockname], parsedJSON[blockNames.ControlFileParams.clusteringBlockname]
 
 def saveInitialControlFile(jsonParams, originalControlFile):
@@ -279,7 +279,7 @@ def main(jsonParams=None):
     if jsonParams is None:
         jsonParams = sys.argv[1]
 
-    RESTART, spawningBlock, outputPath, initialStructures, ligandResname, DEBUG, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
+    RESTART, spawningBlock, outputPath, initialStructures, DEBUG, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
 
     spawningAlgorithmBuilder = spawning.SpawningAlgorithmBuilder()
     startingConformationsCalculator, spawningParams = spawningAlgorithmBuilder.build(spawningBlock)
@@ -492,7 +492,6 @@ def main(jsonParams=None):
         if i == 0:
             clusteringBuilder = clustering.ClusteringBuilder()
             clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
-                                                                 ligandResname,
                                                                  spawningParams.reportFilename,
                                                                  spawningParams.reportCol)
         #else:
