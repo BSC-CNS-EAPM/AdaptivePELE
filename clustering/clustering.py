@@ -9,6 +9,8 @@ import thresholdcalculator
 import utilities
 import pickle
 from sklearn.cluster import AffinityPropagation
+from sklearn.cluster import AgglomerativeClustering
+from sklearn.cluster import KMeans
 
 class Clusters:
     def __init__(self):
@@ -86,28 +88,19 @@ class Clustering:
         utilities.cleanup(outputPath) 
         utilities.makeFolder(outputPath)
 
-        for i in enumerate(self.clusters.clusters):
-            i = i[0]
-            outputFilename = "cluster_%d.pdb"%i
-            outputFilename = os.path.join(outputPath, outputFilename)
-            self.clusters.clusters[i].writePDB(outputFilename)
-
-        sizes = []
-        thresholds = []
-        contacts = []
-        energies = []
-        for cluster in self.clusters.clusters:
-            sizes.append(cluster.elements)
-            thresholds.append(cluster.threshold)
-            contacts.append(cluster.contacts)
-            energies.append(cluster.getMetric())
-
         summaryFilename = os.path.join(outputPath, "summary.txt")
         summaryFile = open(summaryFilename, 'w')
         summaryFile.write("#cluster size degeneracy threshold contacts metric\n")
-        for i in enumerate(sizes):
-            i = i[0]
-            summaryFile.write("%d %d %d %.1f %d %.1f\n"%(i, sizes[i], degeneracy[i], thresholds[i], contacts[i], energies[i]))
+
+        for i,cluster in enumerate(self.clusters.clusters):
+            outputFilename = "cluster_%d.pdb"%i
+            outputFilename = os.path.join(outputPath, outputFilename)
+            cluster.writePDB(outputFilename)
+            summaryFile.write("%d %d %d %.1f %d %.3f\n"%(i, cluster.elements,
+                                                         degeneracy[i],
+                                                         cluster.threshold,
+                                                         cluster.contacts,
+                                                         cluster.metric))
         summaryFile.close()
 
         with open(outputObject, 'wb') as f:
@@ -227,6 +220,98 @@ class ContactMapClustering(Clustering):
                 center_ind += 1
 
 
+class ContactMapAgglomerativeClustering(Clustering):
+    def __init__(self, nclusters, resname=None, reportBaseFilename=None, columnOfReportFile=None):
+        Clustering.__init__(self, resname, reportBaseFilename, columnOfReportFile)
+        self.nclusters = nclusters
+
+    def cluster(self, paths):
+        """Clusters the snapshots of the trajectories provided using 
+         a hierarchical clustering algorithm and the contactMaps similarity.
+
+        The snapshots are clustered together with the previous found clusters.
+        If and old cluster is found connected to a new one (with the new one
+        being the exemplar) it is ignored and only the new snapshots are
+        counted as members of the cluster. The minimum metric is used as the
+        metric of the cluster"""
+        trajectories = getAllTrajectories(paths)
+        pdb_list = []
+        metrics = []
+        contactmaps = []
+        for trajectory in trajectories:
+            trajNum = getTrajNum(trajectory)
+            snapshots = getSnapshots(trajectory, True)
+            if self.reportBaseFilename:
+                reportFilename = os.path.join(os.path.split(trajectory)[0], self.reportBaseFilename%trajNum)
+                metricstraj = np.loadtxt(reportFilename, usecols=(self.col,))
+                if metricstraj.shape == ():
+                    metricstraj = np.array([metricstraj])
+            else:
+                metricstraj = np.zeros(len(snapshots))
+            #Prepare data for clustering
+            metrics.extend(metricstraj.tolist())
+            contactThresholdDistance = 8
+            for num, snapshot in enumerate(snapshots):
+                pdb = atomset.PDB()
+                pdb.initialise(snapshot, atomname="CA")
+                pdb_list.append(pdb)
+                contactMap = pdb.createContactMap(self.resname,                    contactThresholdDistance)
+                contactmaps.append(contactMap)
+        clusters, labels = clusterAgglomerativeContactMaps(np.array(contactmaps), self.nclusters)
+        new_clusters = Clusters()
+        new_ids = []
+        new_contactmaps = []
+        new_metrics = []
+        elements = []
+        for index in clusters:
+            cluster_members, = np.where(labels == index)
+            elements_in_cluster = cluster_members.size
+            cluster_index = clusterKmeans(np.array(contactmaps)[cluster_members],1)
+            cluster_center = cluster_members[cluster_index]
+            best_metric_ind = cluster_members[np.array(metrics)[cluster_members].argmin()]
+            best_metric = metrics[best_metric_ind]
+            #debug.set_trace()
+            cluster = Cluster(pdb_list[cluster_center],
+                                contactMap=contactmaps[cluster_center], metric=best_metric)
+            new_clusters.addCluster(cluster)
+            cluster.elements += elements_in_cluster-1
+            new_ids.append('new:%d'%index)
+            new_contactmaps.append(cluster.contactMap)
+            new_metrics.append(cluster.metric)
+            elements.append(cluster.elements)
+
+        cluster_limit = clusters.size
+        if len(self.clusters.clusters) > 0:
+            #recluster with previous clusters
+            for clusterNum,cluster in enumerate(self.clusters.clusters):
+                new_contactmaps.append(cluster.contactMap)
+                new_ids.append("cluster:%d"%clusterNum)
+                new_metrics.append(cluster.metric)
+                elements.append(cluster.elements)
+
+            final_clusters = Clusters()
+            clusters, labels = clusterAgglomerativeContactMaps(np.array(new_contactmaps), self.nclusters)
+            for index in clusters:
+                cluster_members, = np.where(labels == index)
+                elements_in_cluster = np.array(elements)[cluster_members].sum()
+                print cluster_members
+                cluster_index = clusterKmeans(np.array(new_contactmaps)[cluster_members],1)
+                cluster_center = cluster_members[cluster_index]
+                best_metric_ind = cluster_members[np.array(new_metrics)[cluster_members].argmin()]
+                best_metric = new_metrics[best_metric_ind]
+                cluster_index = int(new_ids[cluster_center].split(":")[-1])
+                if cluster_center < cluster_limit:
+                    cluster = new_clusters.clusters[cluster_index]
+                else:
+                    cluster = self.clusters.clusters[cluster_index]
+                cluster.metric = best_metric
+                cluster.elements += (elements_in_cluster-cluster.elements)
+                final_clusters.addCluster(cluster)
+                #debug.set_trace()
+            self.clusters = final_clusters
+        else:
+            self.clusters = new_clusters
+
 class ClusteringBuilder:
     def buildClustering(self, clusteringBlock, reportBaseFilename=None, columnOfReportFile=None):
         try:
@@ -242,6 +327,9 @@ class ClusteringBuilder:
             return ContactsClustering(thresholdCalculator, resname, reportBaseFilename, columnOfReportFile)
         elif clusteringType == blockNames.ClusteringTypes.contactMap:
             return ContactMapClustering(resname, reportBaseFilename, columnOfReportFile)
+        elif clusteringType == blockNames.ClusteringTypes.agglomerative:
+            nclusters = clusteringBlock[blockNames.ClusteringTypes.nclusters]
+            return  ContactMapAgglomerativeClustering(nclusters, resname, reportBaseFilename, columnOfReportFile)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))
@@ -253,6 +341,23 @@ def clusterContactMaps(contactmaps, preferences=None):
     cluster_center_indices = affinitypropagation.cluster_centers_indices_
     labels = affinitypropagation.labels_
     return cluster_center_indices, np.array(labels)
+
+def clusterAgglomerativeContactMaps(contactmaps, n_clusters):
+    contactmaps = contactmaps.reshape((contactmaps.shape[0],-1))
+    agglomerative = AgglomerativeClustering(n_clusters=n_clusters,
+                                            linkage='complete').fit(contactmaps)
+    labels = agglomerative.labels_
+    clusters = np.unique(labels)
+    return clusters, labels
+
+def clusterKmeans(contactmaps, n_clusters):
+    contactmaps = contactmaps.reshape((contactmaps.shape[0],-1))
+    kmeans = KMeans(n_clusters=n_clusters).fit(contactmaps)
+    center = kmeans.cluster_centers_[0]
+    contactmaps -= center
+    distances = contactmaps.sum(axis=1)
+    cluster_center = abs(distances).argmin()
+    return cluster_center
 
 def getAllTrajectories(paths):
     files = []
