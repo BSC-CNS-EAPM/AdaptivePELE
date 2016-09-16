@@ -14,7 +14,7 @@ import glob
 import pickle
 import blockNames
 import atomset
-
+import utilities
 import multiprocessing
 from functools import partial
 
@@ -32,14 +32,6 @@ def createMultipleComplexesFilenames(numberOfSnapshots, inputFileTemplate, tmpIn
         jsonString += inputFileTemplate%(tmpInitialStructuresTemplate%(iteration,i)) + ",\n"
     jsonString += inputFileTemplate%(tmpInitialStructuresTemplate%(iteration,numberOfSnapshots-1))
     return jsonString
-
-def cleanup(tmpFolder):
-    if os.path.exists(tmpFolder):
-        shutil.rmtree(tmpFolder)
-
-def makeFolder(outputDir):
-    if not os.path.exists(outputDir):
-        os.makedirs(outputDir)
 
 def generateFilteredListSnapshotSelectionString(currentEpoch, compressionPath):
     selectionString = ""
@@ -283,38 +275,6 @@ def grepLigand(processors, epoch, ligandResname, outputPathTempletized, trajecto
         print count
 """
 
-def writeClusteringOutput(outputPath, clustering, degeneracy, outputObject):
-    cleanup(outputPath) 
-    makeFolder(outputPath)
-
-    for i in enumerate(clustering.clusters.clusters):
-        i = i[0]
-        outputFilename = "cluster_%d.pdb"%i
-        outputFilename = os.path.join(outputPath, outputFilename)
-        clustering.clusters.clusters[i].writePDB(outputFilename)
-
-    sizes = []
-    thresholds = []
-    contacts = []
-    energies = []
-    for cluster in clustering.clusters.clusters:
-        sizes.append(cluster.elements)
-        thresholds.append(cluster.threshold)
-        contacts.append(cluster.contacts)
-        energies.append(cluster.getMetric())
-
-    summaryFilename = os.path.join(outputPath, "summary.txt")
-    summaryFile = open(summaryFilename, 'w')
-    summaryFile.write("#cluster size degeneracy threshold contacts metric\n")
-    for i in enumerate(sizes):
-        i = i[0]
-        summaryFile.write("%d %d %d %.1f %d %.1f\n"%(i, sizes[i], degeneracy[i], thresholds[i], contacts[i], energies[i]))
-    summaryFile.close()
-
-    with open(outputObject, 'wb') as f:
-        pickle.dump(clustering, f, pickle.HIGHEST_PROTOCOL)
-
-
 def main(jsonParams=None):
     if jsonParams is None:
         jsonParams = sys.argv[1]
@@ -385,10 +345,10 @@ def main(jsonParams=None):
     #END PRIVATE CONSTANTS
 
 
-    #if not DEBUG: atexit.register(cleanup, tmpFolder)
+    #if not DEBUG: atexit.register(utilities.cleanup, tmpFolder)
 
-    makeFolder(outputPath)
-    makeFolder(tmpFolder)
+    utilities.makeFolder(outputPath)
+    utilities.makeFolder(tmpFolder)
     saveInitialControlFile(jsonParams, ORIGINAL_CONTROLFILE)
     
     #print variable epsilon information
@@ -439,7 +399,7 @@ def main(jsonParams=None):
     if not RESTART or firstRun == 0: # if RESTART and firstRun = 0, it must check into the initial structures
         #Choose initial structures
         if not DEBUG: shutil.rmtree(outputPath)
-        makeFolder(outputPath)
+        utilities.makeFolder(outputPath)
         firstRun = 0
         saveInitialControlFile(jsonParams, ORIGINAL_CONTROLFILE)
         copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, firstRun)
@@ -456,7 +416,7 @@ def main(jsonParams=None):
 
     #Make control file
     outputDir = outputPathTempletized%firstRun
-    makeFolder(outputDir)
+    utilities.makeFolder(outputDir)
     peleControlFileDictionary["OUTPUT_PATH"] = outputDir
     peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + firstRun*simulationRunner.parameters.processors
     #simulationRunner.parameters needn't be passed to makeWorkingControlFile
@@ -554,7 +514,7 @@ def main(jsonParams=None):
 
         numberOfSeedingPoints = makeOwnClusteringClusterRepresentativesInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, i+1)
 
-        writeClusteringOutput(CLUSTERING_OUTPUT_DIR%i, clusteringMethod, degeneracyOfRepresentatives, CLUSTERING_OUTPUT_OBJECT%i)
+        clusteringMethod.writeOutput(CLUSTERING_OUTPUT_DIR%i, degeneracyOfRepresentatives, CLUSTERING_OUTPUT_OBJECT%i)
         if i > 0:
             # Remove old clustering object, since we already have a newer one
             os.remove(CLUSTERING_OUTPUT_OBJECT%(i-1))
@@ -565,14 +525,14 @@ def main(jsonParams=None):
             peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
 
             outputDir = outputPathTempletized%(i+1)
-            makeFolder(outputDir) #PELE does not do it automatically
+            utilities.makeFolder(outputDir) #PELE does not do it automatically
             peleControlFileDictionary["OUTPUT_PATH"] = outputDir
             peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + (i+1)*simulationRunner.parameters.processors
             #simulationRunner.parameters needn't be passed to makeWorkingControlFile
             simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, tmpControlFilename%(i+1), peleControlFileDictionary) 
 
-    #cleanup
-    #cleanup(tmpFolder)
+    #utilities.cleanup
+    #utilities.cleanup(tmpFolder)
 
 if __name__ == '__main__':
     main()
