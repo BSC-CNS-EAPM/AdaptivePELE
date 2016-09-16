@@ -3,6 +3,7 @@ class ClusteringTypes:
     contacts = "contacts"
     contactMap = "contactMap"
     thresholdCalculator = "thresholdCalculator"
+    ligandResname = "ligandResname"
 
 class ThresholdCalculator:
     type = "type"
@@ -11,19 +12,6 @@ class ThresholdCalculator:
     conditions = "conditions"
     values = "values"
     value = "value"
-
-
-"""
-clustering : {
-    type : contacts,
-    thresholdCalculator : {
-        type: heavyside,
-        conditions : [15, 10],
-        values : [2, 3, 4]
-    }
-   
-}
-"""
 
 class StringSpawningTypes:
     type = "type"
@@ -76,7 +64,6 @@ class ControlFileParams:
     restart = "restart"
     outputPath = "outputPath"
     initialStructures = "initialStructures"
-    ligandResname = "ligandResname"
     debug = "debug"
     spawningBlockname = "spawning"
     simulationBlockname = "simulation"
