@@ -223,7 +223,7 @@ class EpsilonDegeneracyCalculator(InverselyProportionalToPopulationCalculator):
         shiftedMetrics = np.subtract(metrics, maximumValue)
 
         #all shiftedMetrics <= 0, sum(shiftedMetrics) < 0 => weights >= 0
-        if shiftedMetrics.sum() < 1e-8:
+        if abs(shiftedMetrics.sum()) < 1e-8:
             weights = np.ones(len(metrics))/len(metrics)
         else:
             weights = (1.*shiftedMetrics)/sum(shiftedMetrics)
