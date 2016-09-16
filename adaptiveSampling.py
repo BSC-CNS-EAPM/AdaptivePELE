@@ -202,9 +202,7 @@ def loadParams(jsonParams):
     jsonFile = open(jsonParams, 'r').read()
     parsedJSON = json.loads(jsonFile)
 
-    return parsedJSON[blockNames.ControlFileParams.restart],parsedJSON[blockNames.ControlFileParams.spawningBlockname],\
-            parsedJSON[blockNames.ControlFileParams.outputPath], parsedJSON[blockNames.ControlFileParams.initialStructures],\
-            parsedJSON[blockNames.ControlFileParams.debug],\
+    return parsedJSON[blockNames.ControlFileParams.generalParams], parsedJSON[blockNames.ControlFileParams.spawningBlockname],\
             parsedJSON[blockNames.ControlFileParams.simulationBlockname], parsedJSON[blockNames.ControlFileParams.clusteringBlockname]
 
 def saveInitialControlFile(jsonParams, originalControlFile):
@@ -279,19 +277,26 @@ def main(jsonParams=None):
     if jsonParams is None:
         jsonParams = sys.argv[1]
 
-    RESTART, spawningBlock, outputPath, initialStructures, DEBUG, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
+    generalParams, spawningBlock, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
 
     spawningAlgorithmBuilder = spawning.SpawningAlgorithmBuilder()
     startingConformationsCalculator, spawningParams = spawningAlgorithmBuilder.build(spawningBlock)
+
     runnerbuilder = simulationrunner.RunnerBuilder()
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
+
     clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
+
+    restart = generalParams[blockNames.GeneralParams.restart]
+    debug = generalParams[blockNames.GeneralParams.debug]
+    outputPath = generalParams[blockNames.GeneralParams.outputPath]
+    initialStructures = generalParams[blockNames.GeneralParams.initialStructures]
 
     print "================================"
     print "            PARAMS              "
     print "================================"
-    print "Restarting simulations", RESTART
-    print "Debug:", DEBUG
+    print "Restarting simulations", generalParams[blockNames.GeneralParams.restart]
+    print "Debug:", generalParams[blockNames.GeneralParams.debug]
 
     print "Iterations: %d, Mpi processors: %d, Pele steps: %d"%(simulationRunner.parameters.iterations, simulationRunner.parameters.processors, simulationRunner.parameters.peleSteps)
 
@@ -345,7 +350,7 @@ def main(jsonParams=None):
     #END PRIVATE CONSTANTS
 
 
-    #if not DEBUG: atexit.register(utilities.cleanup, tmpFolder)
+    #if not debug: atexit.register(utilities.cleanup, tmpFolder)
 
     utilities.makeFolder(outputPath)
     utilities.makeFolder(tmpFolder)
@@ -360,7 +365,7 @@ def main(jsonParams=None):
 
 
 
-    if RESTART:
+    if restart:
         firstRun = findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT)
 
         if firstRun != 0:
@@ -396,9 +401,9 @@ def main(jsonParams=None):
 
             initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, inputFileTemplate, tmpInitialStructuresTemplate, firstRun)
             
-    if not RESTART or firstRun == 0: # if RESTART and firstRun = 0, it must check into the initial structures
+    if not restart or firstRun == 0: # if restart and firstRun = 0, it must check into the initial structures
         #Choose initial structures
-        if not DEBUG: shutil.rmtree(outputPath)
+        if not debug: shutil.rmtree(outputPath)
         utilities.makeFolder(outputPath)
         firstRun = 0
         saveInitialControlFile(jsonParams, ORIGINAL_CONTROLFILE)
@@ -410,7 +415,7 @@ def main(jsonParams=None):
     """
     pyproctControlFileDictionary = {"MIN_SEEDING_POINTS":minSeedingPoints, "MAX_SEEDING_POINTS":maxSeedingPoints, "NUMBER_OF_PROCESSORS":processors, "RESNAME": ligandResname}
 
-    if DEBUG:
+    if debug:
         pyproctControlFileDictionary["NUMBER_OF_PROCESSORS"] = 8
     """
 
@@ -430,7 +435,7 @@ def main(jsonParams=None):
             epsilon_file.close()
         
         print "Production run..."
-        if not DEBUG:
+        if not debug:
             startTime = time.time() 
             simulationRunner.runSimulation(tmpControlFilename%i)
             endTime = time.time() 
