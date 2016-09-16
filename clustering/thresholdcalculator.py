@@ -67,5 +67,6 @@ class ThresholdCalculatorHeaviside(ThresholdCalculator):
             #change, so that whole condition is in array
             if contacts > self.conditions[i]:
                 return self.values[i]
+        #the way it's built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the "else" value
         return self.values[-1]
 
