@@ -6,6 +6,8 @@ import os
 import blockNames
 import clusteringTypes
 import thresholdcalculator
+import utilities
+import pickle
 from sklearn.cluster import AffinityPropagation
 
 class Clusters:
@@ -72,6 +74,44 @@ class Clustering:
             and self.reportBaseFilename == other.reportBaseFilename\
             and self.resname == other.resname\
             and self.col == other.col
+
+    def writeOutput(self, outputPath, degeneracy, outputObject):
+        """
+            Writes all the clustering information in outputPath
+
+            outputPath [In] Folder that will contain all the clustering information
+            degeneracy [In] Degeneracy of each cluster. It must be in the same order as in the self.clusters list
+            outputObject [In] Output name for the pickle object
+        """
+        utilities.cleanup(outputPath) 
+        utilities.makeFolder(outputPath)
+
+        for i in enumerate(self.clusters.clusters):
+            i = i[0]
+            outputFilename = "cluster_%d.pdb"%i
+            outputFilename = os.path.join(outputPath, outputFilename)
+            self.clusters.clusters[i].writePDB(outputFilename)
+
+        sizes = []
+        thresholds = []
+        contacts = []
+        energies = []
+        for cluster in self.clusters.clusters:
+            sizes.append(cluster.elements)
+            thresholds.append(cluster.threshold)
+            contacts.append(cluster.contacts)
+            energies.append(cluster.getMetric())
+
+        summaryFilename = os.path.join(outputPath, "summary.txt")
+        summaryFile = open(summaryFilename, 'w')
+        summaryFile.write("#cluster size degeneracy threshold contacts metric\n")
+        for i in enumerate(sizes):
+            i = i[0]
+            summaryFile.write("%d %d %d %.1f %d %.1f\n"%(i, sizes[i], degeneracy[i], thresholds[i], contacts[i], energies[i]))
+        summaryFile.close()
+
+        with open(outputObject, 'wb') as f:
+            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
 
 class ContactsClustering(Clustering):
