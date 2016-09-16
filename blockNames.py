@@ -61,10 +61,13 @@ class SimulationParams:
     iterations = "iterations"
 
 class ControlFileParams:
+    generalParams = "generalParams"
+    spawningBlockname = "spawning"
+    simulationBlockname = "simulation"
+    clusteringBlockname = "clustering"
+
+class GeneralParams:
     restart = "restart"
     outputPath = "outputPath"
     initialStructures = "initialStructures"
     debug = "debug"
-    spawningBlockname = "spawning"
-    simulationBlockname = "simulation"
-    clusteringBlockname = "clustering"
