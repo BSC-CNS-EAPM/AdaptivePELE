@@ -134,7 +134,7 @@ class SpawningCalculator:
         """
             Divides "trajToDistribute" inversely proportional to the values in "array"
         """
-        if isinstance(array, list): array = np.array(array) #it should always be true
+        if isinstance(array, list): array = np.array(array)
         weights = 1./array
         weights /= sum(weights)
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
@@ -202,7 +202,8 @@ class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
         densities = self.calculateDensities(clusters)
 
         weights = sizes/densities
-        return self.divideInverselyProportionalToArray(sizes, trajToDistribute)
+
+        return self.divideInverselyProportionalToArray(weights, trajToDistribute)
 
 class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
     """
@@ -226,11 +227,11 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
             print "[SpawningLog] Metric prop:    %s" % str(self.degeneracyMetricProportional)
 
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
-        trajToEnergyProportional = int(clusteringParams.epsilon * trajToDistribute)
-        trajToInverselyProportional = trajToDistribute - trajToEnergyProportional
+        trajToMetricProportional = int(clusteringParams.epsilon * trajToDistribute)
+        trajToInverselyProportional = trajToDistribute - trajToMetricProportional
 
         self.degeneracyInverselyProportional = self.inverselyProportionalCalculator.calculate(clusters, trajToInverselyProportional, clusteringParams)
-        self.degeneracyMetricProportional = self.divideProcessorsMetricProportional(clusters, trajToEnergyProportional, clusteringParams.temperature)
+        self.degeneracyMetricProportional = self.divideProcessorsMetricProportional(clusters, trajToMetricProportional, clusteringParams.temperature)
 
         self.degeneracyTotal = np.array(self.degeneracyInverselyProportional) + np.array(self.degeneracyMetricProportional)
         return self.degeneracyTotal
