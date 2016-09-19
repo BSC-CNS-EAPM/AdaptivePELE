@@ -4,6 +4,7 @@ from clustering import clustering
 import random
 import blockNames
 import spawningTypes
+import densitycalculator
 
 
 def return_sign(i, m, n, r):
@@ -27,17 +28,21 @@ class SpawningAlgorithmBuilder:
 
 class SpawningBuilder:
     def buildSpawningCalculator(self, spawningBlock):
+
+        densityBuilder = densitycalculator.DensityBuilder()
+        densityCalculator = densityBuilder.build(spawningBlock)
+
         spawningTypeString = spawningBlock[blockNames.StringSpawningTypes.type]
         if spawningTypeString == blockNames.StringSpawningTypes.sameWeight:
             spawningCalculator = SameWeightDegeneracyCalculator()
         elif spawningTypeString == blockNames.StringSpawningTypes.inverselyProportional:
-            spawningCalculator = InverselyProportionalToPopulationCalculator()
+            spawningCalculator = InverselyProportionalToPopulationCalculator(densityCalculator)
         elif spawningTypeString == blockNames.StringSpawningTypes.epsilon:
-            spawningCalculator = EpsilonDegeneracyCalculator()
+            spawningCalculator = EpsilonDegeneracyCalculator(densityCalculator)
         elif spawningTypeString == blockNames.StringSpawningTypes.fast:
-            spawningCalculator = FASTDegeneracyCalculator()
+            spawningCalculator = FASTDegeneracyCalculator(densityCalculator)
         elif spawningTypeString == blockNames.StringSpawningTypes.variableEpsilon:
-            spawningCalculator = VariableEpsilonDegeneracyCalculator()
+            spawningCalculator = VariableEpsilonDegeneracyCalculator(densityCalculator)
         else:
             sys.exit("Unknown spawning type! Choices are: " + str(spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
         return spawningCalculator
@@ -135,23 +140,40 @@ class SpawningCalculator:
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
 
     def getMetrics(self, clusters):
-        metrics = []
-        for cluster in clusters:
-            metrics.append(cluster.getMetric())
+        metrics = np.zeros(len(clusters))
+        for i,cluster in enumerate(clusters):
+            metrics[i] = cluster.getMetric()
         return metrics
 
     def getSizes(self, clusters):
-        sizes = []
-        for cluster in clusters:
-            sizes.append(cluster.elements)
+        sizes = np.zeros(len(clusters))
+        for i,cluster in enumerate(clusters):
+            sizes[i] = cluster.elements
         return sizes
 
+from abc import ABCMeta, abstractmethod
+class DensitySpawningCalculator(SpawningCalculator):
+    """
+        Subclass of Spawning calculator, that ensures the definition of a density calculator.
+    """
+    def __init__(self, densityCalculator = densitycalculator.NullDensityCalculator()):
+        SpawningCalculator.__init__(self)
+        self.type = "BaseDensityClass" #change for abstract attribute
+        self.densityCalculator = densityCalculator
+
+    def calculateDensities(self, clusters):
+        densities = np.zeros(len(clusters))
+        for i,cluster in enumerate(clusters):
+            contacts = cluster.getContacts()
+            densities[i] = self.densityCalculator.calculate(contacts)
+        return densities
 
 class SameWeightDegeneracyCalculator(SpawningCalculator):
     def __init__(self):
-        self.spawningCalculator = SpawningCalculator()
+        SpawningCalculator.__init__(self)
         self.type = spawningTypes.SPAWNING_TYPES.sameWeight
 
+    #TODO: Don't back on pele, so that density calculator can be used
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
         """
             We back on PELE to split equal trajectories
@@ -167,9 +189,9 @@ class SameWeightDegeneracyCalculator(SpawningCalculator):
     def log(self):
         pass
 
-class InverselyProportionalToPopulationCalculator(SpawningCalculator):
-    def __init__(self):
-        self.spawningCalculator = SpawningCalculator()
+class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
+    def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
+        DensitySpawningCalculator.__init__(self, densityCalculator)
         self.type = spawningTypes.SPAWNING_TYPES.inverselyProportional
 
     def log(self):
@@ -177,15 +199,18 @@ class InverselyProportionalToPopulationCalculator(SpawningCalculator):
 
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
         sizes = self.getSizes(clusters)
+        densities = self.calculateDensities(clusters)
+
+        weights = sizes/densities
         return self.divideInverselyProportionalToArray(sizes, trajToDistribute)
 
-
-class EpsilonDegeneracyCalculator(InverselyProportionalToPopulationCalculator):
+class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
     """
         It uses epsilon * numTraj trajectories proportional to their energy and the rest inversely proportional to each cluster's population
     """
-    def __init__(self):
-        self.inverselyProportionalCalculator = InverselyProportionalToPopulationCalculator()
+    def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
+        DensitySpawningCalculator.__init__(self, densityCalculator)
+        self.inverselyProportionalCalculator = InverselyProportionalToPopulationCalculator(densityCalculator)
         self.type = spawningTypes.SPAWNING_TYPES.epsilon
         self.degeneracyInverselyProportional = None
         self.degeneracyMetricProportional = None
@@ -237,14 +262,14 @@ class EpsilonDegeneracyCalculator(InverselyProportionalToPopulationCalculator):
         weights /= sum(weights)
         """
 
-
-
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
 
+#TODO: change for composition rather than for inheritance
 class VariableEpsilonDegeneracyCalculator(EpsilonDegeneracyCalculator):
 
-    def __init__(self):
-        self.inverselyProportionalCalculator = InverselyProportionalToPopulationCalculator()
+    def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
+        #TODO: Not needed, since it is inheriting from EpsilonDegeneracyCalculator
+        self.inverselyProportionalCalculator = InverselyProportionalToPopulationCalculator(densityCalculator)
         self.type = spawningTypes.SPAWNING_TYPES.variableEpsilon
         self.degeneracyInverselyProportional = None
         self.degeneracyMetricProportional = None
@@ -280,7 +305,7 @@ class VariableEpsilonDegeneracyCalculator(EpsilonDegeneracyCalculator):
 
 class SimulatedAnnealingCalculator(SpawningCalculator):
     def __init__(self):
-        self.spawningCalculator = SpawningCalculator()
+        SpawningCalculator.__init__(self)
         self.type = spawningTypes.SPAWNING_TYPES.simulatedAnnealing
 
     def log(self):
@@ -306,28 +331,41 @@ class SimulatedAnnealingCalculator(SpawningCalculator):
 
         return self.divideProportionalToArray(weights, trajToDistribute)
 
-class FASTDegeneracyCalculator(SpawningCalculator):
-    def __init__(self):
+class FASTDegeneracyCalculator(DensitySpawningCalculator):
+    def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
+        DensitySpawningCalculator.__init__(self, densityCalculator)
         self.type = spawningTypes.SPAWNING_TYPES.FAST
-        self.spawningCalculator = SpawningCalculator()
+        self.densityCalculator = densityCalculator
+
+    def normaliseArray(self, array):
+        maxValue = float(np.max(array))
+        minValue = float(np.min(array))
+
+        if maxValue-minValue > 1e-5:
+            normalisedArray = np.subtract(maxValue, array)/(maxValue - minValue)
+        else:
+            #all elements are equal
+            n = len(array)
+            normalisedSizes = np.ones(n)/float(n)
+        return normalisedArray
+
+    def calculateNormalisedSizes(self, clusters):
+        sizes = self.getSizes(clusters)
+
+        densities = self.calculateDensities(clusters)
+        weightedSizes = sizes/densities
+
+        return self.normaliseArray(weightedSizes)
+
+    def calculateNormalisedMetrics(self, clusters):
+        metrics = self.getMetrics(clusters)
+        return self.normaliseArray(metrics)
 
     def calculate(self, clusters, trajToDivide, clusteringParams, currentEpoch=None):
-        sizes = self.getSizes(clusters)
-        maximumValue = float(np.max(sizes))
-        minimumValue = float(np.min(sizes))
-        normalisedSizes = np.subtract(maximumValue,sizes)
-        if maximumValue-minimumValue > 1e-5:
-            normalisedSizes /= (maximumValue - minimumValue)
+        normalisedSizes = self.calculateNormalisedSizes(clusters)
+        normalisedMetrics = self.calculateNormalisedMetrics(clusters)
 
-        metrics = self.getMetrics(clusters)
-        if isinstance(metrics, list): metrics = np.array(metrics)
-        maximumValue = float(np.max(metrics))
-        minimumValue = float(np.min(metrics))
-        normalisedMetrics = np.subtract(maximumValue,metrics)
-        if maximumValue-minimumValue > 1e-5:
-            normalisedMetrics /= (maximumValue - minimumValue)
-
-        weight = normalisedSizes + 4.*normalisedMetrics
+        weight = normalisedSizes + 1.*normalisedMetrics
 
         return self.divideProportionalToArray(weight, trajToDivide)
 

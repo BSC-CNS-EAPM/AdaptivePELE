@@ -52,6 +52,8 @@ class Cluster:
         self.pdb.writePDB(path)
     def getMetric(self):
         return self.metric
+    def getContacts(self):
+        return self.contacts
 
     def __eq__(self, other):
         return self.pdb == other.pdb\
