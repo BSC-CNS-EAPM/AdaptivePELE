@@ -39,6 +39,11 @@ class SpawningParams:
     # current epoch > than variation Window, set epsilon to minEpsilon
     maxEpsilonWindow = "maxEpsilonWindow"
     period = "period" # Only useful for periodic epsilon modes
+    density = "density"
+
+class SpawningDensity:
+    values = "values"
+    conditions = "conditions"
 
 class VariableEpsilonTypes:
     linearVariation = "linearVariation"
