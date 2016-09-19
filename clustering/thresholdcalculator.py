@@ -38,7 +38,6 @@ from abc import ABCMeta, abstractmethod
 class ThresholdCalculator():
     def __init__(self):
         self.type = "BaseClass" #change for abstract attribute
-        pass
 
     @abstractmethod
     def calculate(self, contacts):
