@@ -167,7 +167,6 @@ class DensitySpawningCalculator(SpawningCalculator):
             if not cluster.density:
                 contacts = cluster.getContacts()
                 cluster.density = self.densityCalculator.calculate(contacts)
-            print "DENSITY", i, cluster.density
             densities[i] = cluster.density
         return densities
 
