@@ -51,7 +51,7 @@ def makeClusterRepresentativesInitialStructures(tmpInitialStructuresTemplate, de
 
             counts += 1
 
-    print "counts & cluster centers", counts, len(np.where(np.array(degeneracyOfRepresentatives) > 0))
+    print "counts & cluster centers", counts, np.where(np.array(degeneracyOfRepresentatives) > 0)[0].size
     return counts
 
 def findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT):
