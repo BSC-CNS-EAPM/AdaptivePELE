@@ -15,6 +15,14 @@ class ThresholdCalculator:
     values = "values"
     value = "value"
 
+class DensityCalculator:
+    type = "type"
+    heaviside = "heaviside"
+    null = "null"
+    constant = "constant"
+    conditions = "conditions"
+    values = "values"
+
 class StringSpawningTypes:
     type = "type"
     sameWeight = "sameWeight"

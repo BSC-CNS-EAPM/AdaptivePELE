@@ -2,37 +2,29 @@ import unittest
 import numpy as np
 import spawning.spawning as spawning
 from clustering import clustering
+from spawning import densitycalculator
 
 class TestSpawningCalculator(unittest.TestCase):
     def testDivideTrajAccordingToWeights(self):
         spawningCalculator = spawning.SpawningCalculator()
-        weights1 = [0.5, 0.2, 0.2, 0.1]
+        weights = [0.5, 0.2, 0.2, 0.1]
         trajToDistribute1 = 12
-        degeneracy1 = spawningCalculator.divideTrajAccordingToWeights(weights1, trajToDistribute1)
+        degeneracy = spawningCalculator.divideTrajAccordingToWeights(weights, trajToDistribute1)
 
-        golden1 = [6, 2, 3, 1]
-        self.assertEqual(degeneracy1, golden1)
-
-        falsegolden1 = [6, 2, 3, 2]
-        self.assertNotEqual(degeneracy1, falsegolden1)
-
+        golden = [6, 2, 3, 1]
+        self.assertEqual(degeneracy, golden)
 
     def testDivideInverselyProportionalToArray(self):
         spawningCalculator = spawning.SpawningCalculator() 
-        weights2 = np.array([0.5, 0.2, 0.2, 0.1])
-        trajToDistribute2 = 12
-        degeneracy2 = spawningCalculator.divideInverselyProportionalToArray(weights2, trajToDistribute2)
+        weights = np.array([0.5, 0.2, 0.2, 0.1])
+        trajToDistribute = 12
+        degeneracy = spawningCalculator.divideInverselyProportionalToArray(weights, trajToDistribute)
 
-        golden2 = [1, 3, 3, 5]
+        golden = [1, 3, 3, 5]
 
-        test2Passed = True
-        self.assertEqual(degeneracy2, golden2)
-
-        falsegolden2 = [1, 3, 3, 6]
-        self.assertNotEqual(degeneracy2, falsegolden2)
+        self.assertEqual(degeneracy, golden)
 
     def testInverselyProportionalToPopulationCalculator(self):
-        #test 3
         clusters = clustering.Clusters()
         sizes = [6,2,3,1]
         for size in sizes:
@@ -43,14 +35,57 @@ class TestSpawningCalculator(unittest.TestCase):
         inverselyProp = spawning.InverselyProportionalToPopulationCalculator()
         clusteringParams = None
         trajs = 10
-        degeneracy3 = inverselyProp.calculate(clusters.clusters, trajs, clusteringParams)
-        golden3 = [1,2,2,5]
+        degeneracy = inverselyProp.calculate(clusters.clusters, trajs, clusteringParams)
+        golden = [1,2,2,5]
 
-        self.assertEqual(degeneracy3, golden3)
+        self.assertEqual(degeneracy, golden)
 
-        falsegolden3 = [1,2,2,6]
-        self.assertNotEqual(degeneracy3, falsegolden3)
+    def testInverselyProportionalToPopulationCalculatorWithNullDensity(self):
+        clusters = clustering.Clusters()
+        sizes = [6,2,3,1]
+        for size in sizes:
+            cluster = clustering.Cluster(None, None, None, None)
+            cluster.elements = size
+            clusters.addCluster(cluster)
 
+        densityCalculator = densitycalculator.NullDensityCalculator()
+
+        inverselyProp = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
+        clusteringParams = None
+        trajs = 10
+        degeneracy = inverselyProp.calculate(clusters.clusters, trajs, clusteringParams)
+        golden = [1,2,2,5]
+
+        self.assertEqual(degeneracy, golden)
+
+    def testInverselyProportionalToPopulationCalculatorWithDensity(self):
+        #test 3
+        clusters = clustering.Clusters()
+        sizes = [6,2,3,1]
+        contacts = [4,3,2,1]
+        for size, ncontacts in zip(sizes, contacts):
+            cluster = clustering.Cluster(None, None, None, None)
+            cluster.elements = size
+            cluster.contacts = ncontacts
+            clusters.addCluster(cluster)
+
+        clusteringBlock = {
+            "density" : {
+                "type" : "heaviside",
+                "values" : [6,2,3,1],
+                "conditions" : [3,2,1]
+            }
+        }
+        densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
+        densityCalculator = densityCalculatorBuilder.build(clusteringBlock)
+
+        inverselyProp = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
+        clusteringParams = None
+        trajs = 8
+        degeneracy = inverselyProp.calculate(clusters.clusters, trajs, clusteringParams)
+        golden = [2,2,2,2]
+
+        self.assertEqual(degeneracy, golden)
 
     def testEpsilonCalculator(self):
         epsilon = spawning.EpsilonDegeneracyCalculator()
@@ -67,11 +102,41 @@ class TestSpawningCalculator(unittest.TestCase):
             clusters.addCluster(cluster)
 
         trajs = 20
-        degeneracy4 = epsilon.calculate(clusters.clusters, trajs, params)
-        golden4 = np.array([7,4,4,5])
-        np.testing.assert_array_equal(degeneracy4, golden4)
+        degeneracy = epsilon.calculate(clusters.clusters, trajs, params)
+        golden = np.array([7,4,4,5])
+        np.testing.assert_array_equal(degeneracy, golden)
 
-        #test 5
+    def testEpsilonCalculatorWithDensity(self):
+        params = spawning.SpawningParams()
+        params.epsilon = 0.5
+
+        clusters = clustering.Clusters()
+        sizes = [6,2,3,1]
+        energies = [-4,-2,-2,0]
+        contacts = [4,3,2,1]
+        for size, energy, ncontacts in zip(sizes, energies, contacts):
+            cluster = clustering.Cluster(None, None, None, None)
+            cluster.elements = size
+            cluster.metric = energy
+            cluster.contacts = ncontacts
+            clusters.addCluster(cluster)
+
+        clusteringBlock = {
+            "density" : {
+                "type" : "heaviside",
+                "values" : [6,2,3,1],
+                "conditions" : [3,2,1]
+            }
+        }
+        densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
+        densityCalculator = densityCalculatorBuilder.build(clusteringBlock)
+
+        epsilon = spawning.EpsilonDegeneracyCalculator(densityCalculator)
+        trajs = 16
+        degeneracy = epsilon.calculate(clusters.clusters, trajs, params)
+        golden = np.array([6,4,4,2])
+        np.testing.assert_array_equal(degeneracy, golden)
+
     def testSameWeightDegeneracyCalculator(self):
         sameWeightDegCalculator = spawning.SameWeightDegeneracyCalculator()
         params = None
@@ -84,13 +149,10 @@ class TestSpawningCalculator(unittest.TestCase):
             clusters.addCluster(cluster)
 
         trajs = 10
-        degeneracy5 = sameWeightDegCalculator.calculate(clusters.clusters, trajs, params)
-        golden5 = [1, 1, 1, 1]
+        degeneracy = sameWeightDegCalculator.calculate(clusters.clusters, trajs, params)
+        golden = [1, 1, 1, 1]
 
-        self.assertEqual(degeneracy5, golden5)
-
-        falseGolden5 = [1, 1, 1, 2]
-        self.assertNotEqual(degeneracy5, falseGolden5)
+        self.assertEqual(degeneracy, golden)
 
     def testVariableEpsilonCalculator(self):
         variable_epsilon = spawning.VariableEpsilonDegeneracyCalculator()
@@ -157,10 +219,8 @@ class TestSpawningCalculator(unittest.TestCase):
         golden6 = np.array([7,4,4,5])
         np.testing.assert_array_equal(degeneracy6, golden6)
         self.assertAlmostEqual(params.epsilon,params.minEpsilon)
-        print 0,params.epsilon
         for i in range(1,params.variationWindow):
             degeneracy7 = variable_epsilon.calculate(clusters.clusters, trajs, params, i)
-            print i,params.epsilon
         #TODO: check degeneracy after next steps
         # self.assertAlmostEqual(params.epsilon, params.minEpsilon+rateVariation)
         # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 2)
