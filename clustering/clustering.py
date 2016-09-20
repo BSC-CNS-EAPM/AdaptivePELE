@@ -168,6 +168,7 @@ class ContactMapClustering(Clustering):
         preferences = map(np.sum,contactmaps)
 
         preferences = float((min(preferences)-max(preferences))/2)
+        preferences = None
         self.firstClusteringParams = clusteringResultsParameters(pdb_list=pdb_list,
                                                             metrics=metrics,
                                                             contactmaps=contactmaps)
@@ -176,7 +177,7 @@ class ContactMapClustering(Clustering):
         cluster_center_indices, indices = clusterContactMaps(contactmapsArray, preferences=preferences)
 
         self.processClusterResults("first", cluster_center_indices, indices)
-
+        #print "Number of clusters after first clustering", len(self.firstClusteringParams.newClusters.clusters)
         if len(self.clusters.clusters) > 0:
             for clusterNum,cluster in enumerate(self.clusters.clusters):
                 self.secondClusteringParams.contactmaps.append(cluster.contactMap)
@@ -185,12 +186,13 @@ class ContactMapClustering(Clustering):
                 self.secondClusteringParams.elements.append(cluster.elements)
 
             preferences = float((min(self.secondClusteringParams.elements)-max(self.secondClusteringParams.elements))/2)
+            preferences = 0.5
 #            preferences = -np.array(self.secondClusteringParams.elements)
             #prefereneces = None
             secondcontactmapsArray = np.array(self.secondClusteringParams.contactmaps)
             cluster_center_indices, indices = clusterContactMaps(secondcontactmapsArray, preferences=preferences)
-            debug.set_trace()
             self.processClusterResults("second", cluster_center_indices, indices)
+            #print "Number of clusters after second clustering", len(self.secondClusteringParams.newClusters.clusters)
             self.clusters = self.secondClusteringParams.newClusters
         else:
             self.clusters = self.firstClusteringParams.newClusters
@@ -259,67 +261,81 @@ class ContactMapAgglomerativeClustering(Clustering):
         pdb_list, metrics, contactmaps = processSnapshots(trajectories, self.reportBaseFilename,
                          self.col, contactThresholdDistance, self.resname)
 
+
+        self.firstClusteringParams = clusteringResultsParameters(pdb_list=pdb_list,
+                                                            metrics=metrics,
+                                                            contactmaps=contactmaps)
+        self.secondClusteringParams = clusteringResultsParameters(contactmaps=[])
         clusters, labels = clusterAgglomerativeContactMaps(np.array(contactmaps), self.nclusters)
-        new_clusters = Clusters()
-        new_ids = []
-        new_contactmaps = []
-        new_metrics = []
-        elements = []
+        self.processClusterResults("first", clusters, labels)
+
+        if len(self.clusters.clusters) > 0:
+            for clusterNum,cluster in enumerate(self.clusters.clusters):
+                self.secondClusteringParams.contactmaps.append(cluster.contactMap)
+                self.secondClusteringParams.ids.append("old:%d"%clusterNum)
+                self.secondClusteringParams.metrics.append(cluster.metric)
+                self.secondClusteringParams.elements.append(cluster.elements)
+
+            new_contactmaps = np.array(self.secondClusteringParams.contactmaps)
+            clusters, labels = clusterAgglomerativeContactMaps(new_contactmaps, self.nclusters)
+            self.processClusterResults("second", clusters, labels)
+            self.clusters = self.secondClusteringParams.newClusters
+        else:
+            self.clusters = self.firstClusteringParams.newClusters
+
+    def processClusterResults(self, process, clusters, labels):
+        """ Analyse the results obtained from the affinity propagation
+        algorithm.
+        
+        Process [In] String to decide wether it is the results of the first or
+        second clustering
+        clusters [In] Numpy array with the indexes the clusters
+        Labels [In] Numpy array with the cluster each snapshot belongs to"""
         for index in clusters:
             cluster_members, = np.where(labels == index)
-            elements_in_cluster = cluster_members.size
-            #cluster_index = clusterKmeans(np.array(contactmaps)[cluster_members],1)
-            # Instead of using Kmeans to obtain a "center" or representative
-            # cluster, select one of the members randomly
-            cluster_index = np.random.randint(0, elements_in_cluster)
-            cluster_center = cluster_members[cluster_index]
-            best_metric_ind = cluster_members[np.array(metrics)[cluster_members].argmin()]
-            best_metric = metrics[best_metric_ind]
-            #debug.set_trace()
-            cluster = Cluster(pdb_list[cluster_center],
-                                contactMap=contactmaps[cluster_center], metric=best_metric)
-            #cluster = Cluster(pdb_list[best_metric_ind],
-            #                    contactMap=contactmaps[best_metric_ind], metric=best_metric)
-            new_clusters.addCluster(cluster)
-            cluster.elements += elements_in_cluster-1
-            new_ids.append('new:%d'%index)
-            new_contactmaps.append(cluster.contactMap)
-            new_metrics.append(cluster.metric)
-            elements.append(cluster.elements)
 
-        cluster_limit = clusters.size
-        if len(self.clusters.clusters) > 0:
-            #recluster with previous clusters
-            for clusterNum,cluster in enumerate(self.clusters.clusters):
-                new_contactmaps.append(cluster.contactMap)
-                new_ids.append("cluster:%d"%clusterNum)
-                new_metrics.append(cluster.metric)
-                elements.append(cluster.elements)
+            if process == "first":
+                elements_in_cluster = cluster_members.size
+                #contactmapsArray = np.array(self.firstClusteringParams.contactmaps)
+                #cluster_index = clusterKmeans(contactmapsArray[cluster_members],1)
+                # Instead of using Kmeans to obtain a "center" or representative
+                # cluster, select one of the members randomly
+                cluster_index = np.random.randint(0, elements_in_cluster)
+                cluster_center = cluster_members[cluster_index]
+                metricsArray = np.array(self.firstClusteringParams.metrics)
+                best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
+                best_metric = self.firstClusteringParams.metrics[best_metric_ind]
 
-            final_clusters = Clusters()
-            clusters, labels = clusterAgglomerativeContactMaps(np.array(new_contactmaps), self.nclusters)
-            for index in clusters:
-                cluster_members, = np.where(labels == index)
-                elements_in_cluster = np.array(elements)[cluster_members].sum()
-                #cluster_index = clusterKmeans(np.array(new_contactmaps)[cluster_members],1)
+                cluster = Cluster(self.firstClusteringParams.pdb_list[best_metric_ind],
+                                        contactMap=self.firstClusteringParams.contactmaps[best_metric_ind], metric=best_metric)
+                #cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_center],
+                #                   contactMap=self.firstClusteringParams.contactmaps[cluster_center], metric=best_metric)
+                cluster.elements += elements_in_cluster-1
+                self.secondClusteringParams.ids.append('new:%d'%index)
+                self.secondClusteringParams.contactmaps.append(cluster.contactMap)
+                self.secondClusteringParams.metrics.append(cluster.metric)
+                self.secondClusteringParams.elements.append(cluster.elements)
+                self.firstClusteringParams.newClusters.addCluster(cluster)
+            else:
+                elementsArray = np.array(self.secondClusteringParams.elements)
+                metricsArray = np.array(self.secondClusteringParams.metrics)
+                elements_in_cluster = elementsArray[cluster_members].sum()
+                best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
+                best_metric = self.secondClusteringParams.metrics[best_metric_ind]
+                #contactmapsArray = np.array(self.firstClusteringParams.contactmaps)
+                #cluster_index = clusterKmeans(contactmapsArray[cluster_members],1)
                 # Instead of using Kmeans to obtain a "center" or representative
                 # cluster, select one of the members randomly
                 cluster_index = np.random.randint(0, cluster_members.size)
                 cluster_center = cluster_members[cluster_index]
-                best_metric_ind = cluster_members[np.array(new_metrics)[cluster_members].argmin()]
-                best_metric = new_metrics[best_metric_ind]
-                cluster_index = int(new_ids[cluster_center].split(":")[-1])
-                if cluster_center < cluster_limit:
-                    cluster = new_clusters.clusters[cluster_index]
+                cluster_index = int(self.secondClusteringParams.ids[cluster_center].split(":")[-1])
+                if cluster_center < self.nclusters:
+                    cluster = self.firstClusteringParams.newClusters.clusters[cluster_index]
                 else:
                     cluster = self.clusters.clusters[cluster_index]
                 cluster.metric = best_metric
                 cluster.elements += (elements_in_cluster-cluster.elements)
-                final_clusters.addCluster(cluster)
-                #debug.set_trace()
-            self.clusters = final_clusters
-        else:
-            self.clusters = new_clusters
+                self.secondClusteringParams.newClusters.addCluster(cluster)
 
 class ClusteringBuilder:
     def buildClustering(self, clusteringBlock, reportBaseFilename=None, columnOfReportFile=None):
@@ -358,7 +374,6 @@ def clusterContactMaps(contactmaps, preferences=None):
     affinitypropagation = AffinityPropagation(damping=0.9,preference=preferences,verbose=False).fit(contactmaps)
     cluster_center_indices = affinitypropagation.cluster_centers_indices_
     labels = affinitypropagation.labels_
-    debug.set_trace()
     return cluster_center_indices, np.array(labels)
 
 def clusterAgglomerativeContactMaps(contactmaps, n_clusters):
