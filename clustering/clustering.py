@@ -28,10 +28,11 @@ class Clusters:
         return self.clusters == other.clusters
 
 class Cluster:
-    def __init__(self, pdb, thresholdRadius=0, contactMap=None, contacts=0, metric=0):
+    def __init__(self, pdb, thresholdRadius=0, contactMap=None, contacts=0, metric=0, density=None):
         self.pdb = pdb
         self.elements = 1
         self.threshold = thresholdRadius
+        self.density = density
         self.contacts = contacts
         self.contactMap = contactMap
         self.metric = metric
@@ -92,17 +93,27 @@ class Clustering:
 
         summaryFilename = os.path.join(outputPath, "summary.txt")
         summaryFile = open(summaryFilename, 'w')
-        summaryFile.write("#cluster size degeneracy threshold contacts metric\n")
+        summaryFile.write("#cluster size degeneracy contacts threshold density metric\n")
 
         for i,cluster in enumerate(self.clusters.clusters):
             outputFilename = "cluster_%d.pdb"%i
             outputFilename = os.path.join(outputPath, outputFilename)
             cluster.writePDB(outputFilename)
-            summaryFile.write("%d %d %d %.1f %d %.3f\n"%(i, cluster.elements,
+
+            if cluster.metric:
+                writeString = "%d %d %d %d %.1f %.1f %.3f\n"%(i, cluster.elements,
                                                          degeneracy[i],
-                                                         cluster.threshold,
                                                          cluster.contacts,
-                                                         cluster.metric))
+                                                         cluster.threshold,
+                                                         cluster.density,
+                                                         cluster.metric)
+            else:
+                writeString = "%d %d %d %d %.1f %.1f -\n"%(i, cluster.elements,
+                                                         degeneracy[i],
+                                                         cluster.contacts,
+                                                         cluster.threshold,
+                                                         cluster.density)
+            summaryFile.write(writeString)
         summaryFile.close()
 
         with open(outputObject, 'wb') as f:
