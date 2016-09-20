@@ -209,6 +209,7 @@ def main(jsonParams=None):
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
+        #TODO: this should go in an algorithm logger function
         if not spawningParams.epsilon is None:
             epsilon_file = open("epsilon_values.txt","a")
             epsilon_file.write("%d\t%f\n"%(i,spawningParams.epsilon))
@@ -223,12 +224,14 @@ def main(jsonParams=None):
 
 
         print "Clustering..."
+        #TODO: refactor to function
         startTime = time.time() 
-        #snapshotsJSONSelectionString = generateSnapshotSelectionString(i, outputPathTempletized, trajectoryBasename)
         snapshotsJSONSelectionString = generateSnapshotSelectionStringLastRound(i, outputPathTempletized, trajectoryBasename)
         snapshotsJSONSelectionString = "[" + snapshotsJSONSelectionString + "]"
         paths = eval(snapshotsJSONSelectionString)
-        if len(glob.glob(paths[-1])) == 0: sys.exit("No more trajectories to cluster")
+        print paths
+        if len(glob.glob(paths[-1])) == 0: sys.exit("No trajectories to cluster")
+        #TODO: move this out of the loop to increase readability
         if i == 0:
             clusteringBuilder = clustering.ClusteringBuilder()
             clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
