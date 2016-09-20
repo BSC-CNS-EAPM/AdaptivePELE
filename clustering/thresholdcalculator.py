@@ -48,7 +48,7 @@ class ThresholdCalculatorConstant(ThresholdCalculator):
         self.type = thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.constant
         self.value = value
 
-    def caclulate(self, contacts):
+    def calculate(self, contacts):
         return self.value
 
 class ThresholdCalculatorHeaviside(ThresholdCalculator):
