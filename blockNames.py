@@ -1,5 +1,6 @@
 class ClusteringTypes:
     type = "type"
+    params = "params"
     contacts = "contacts"
     contactMapAffinity = "contactMapAffinity"
     contactMapAgglomerative = "contactMapAgglomerative"
