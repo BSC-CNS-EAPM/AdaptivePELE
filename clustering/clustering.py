@@ -67,7 +67,8 @@ class Cluster:
 
 
 class Clustering:
-    def __init__(self, resname=None, reportBaseFilename=None, columnOfReportFile=None):
+    def __init__(self, resname=None, reportBaseFilename=None,
+                 columnOfReportFile=None, contactThresholdDistance=8):
         self.clusters = Clusters()
         if reportBaseFilename:
             self.reportBaseFilename = reportBaseFilename + "_%d"
@@ -75,6 +76,7 @@ class Clustering:
             self.reportBaseFilename = None
         self.resname = resname
         self.col = columnOfReportFile
+        self.contactThresholdDistance = contactThresholdDistance
 
     def __eq__(self, other):
         return self.clusters == other.clusters\
@@ -123,8 +125,11 @@ class Clustering:
 
 
 class ContactsClustering(Clustering):
-    def __init__(self, thresholdCalculator, resname=None, reportBaseFilename=None, columnOfReportFile=None):
-        Clustering.__init__(self, resname, reportBaseFilename, columnOfReportFile)
+    def __init__(self, thresholdCalculator, resname=None,
+                 reportBaseFilename=None, columnOfReportFile=None,
+                 contactThresholdDistance=8):
+        Clustering.__init__(self, resname, reportBaseFilename,
+                            columnOfReportFile,contactThresholdDistance)
         self.thresholdCalculator = thresholdCalculator
 
     def cluster(self, paths):
@@ -153,8 +158,7 @@ class ContactsClustering(Clustering):
                 return
 
         #if made it here, the snapshot was not added into any cluster
-        contactThresholdDistance = 8
-        contacts = pdb.countContacts(self.resname, contactThresholdDistance)
+        contacts = pdb.countContacts(self.resname, self.contactThresholdDistance)
 
         threshold = self.thresholdCalculator.calculate(contacts)
         cluster = Cluster (pdb, thresholdRadius = threshold, contacts=contacts, metric=metric)
@@ -173,10 +177,9 @@ class ContactMapClustering(Clustering):
         
         Paths [in] list with the path to the trajectories to cluster"""
         trajectories = getAllTrajectories(paths)
-        contactThresholdDistance = 8
 
         pdb_list, metrics, contactmaps = processSnapshots(trajectories, self.reportBaseFilename,
-                         self.col, contactThresholdDistance, self.resname)
+                         self.col, self.contactThresholdDistance, self.resname)
         preferences = map(np.sum,contactmaps)
 
         preferences = float((min(preferences)-max(preferences))/2)
@@ -254,8 +257,10 @@ class ContactMapClustering(Clustering):
             center_ind += 1
 
 class ContactMapAgglomerativeClustering(Clustering):
-    def __init__(self, nclusters, resname=None, reportBaseFilename=None, columnOfReportFile=None):
-        Clustering.__init__(self, resname, reportBaseFilename, columnOfReportFile)
+    def __init__(self, nclusters, resname=None, reportBaseFilename=None,
+                 columnOfReportFile=None, contactThresholdDistance=8):
+        Clustering.__init__(self, resname, reportBaseFilename,
+                            columnOfReportFile, contactThresholdDistance)
         self.nclusters = nclusters
 
     def cluster(self, paths):
@@ -268,10 +273,9 @@ class ContactMapAgglomerativeClustering(Clustering):
         counted as members of the cluster. The minimum metric is used as the
         metric of the cluster"""
         trajectories = getAllTrajectories(paths)
-        contactThresholdDistance = 8
 
         pdb_list, metrics, contactmaps = processSnapshots(trajectories, self.reportBaseFilename,
-                         self.col, contactThresholdDistance, self.resname)
+                         self.col, self.contactThresholdDistance, self.resname)
 
 
         self.firstClusteringParams = clusteringResultsParameters(pdb_list=pdb_list,
@@ -354,6 +358,7 @@ class ClusteringBuilder:
         try:
             resname = clusteringBlock[blockNames.ClusteringTypes.ligandResname].upper()
             clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
+            contactThresholdDistance = clusteringBlock[blockNames.ClusteringTypes.contactThresholdDistance]
         except KeyError as err:
             err.message=err.message + ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
@@ -362,11 +367,16 @@ class ClusteringBuilder:
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
             return ContactsClustering(thresholdCalculator, resname, reportBaseFilename, columnOfReportFile)
-        elif clusteringType == blockNames.ClusteringTypes.contactMap:
-            return ContactMapClustering(resname, reportBaseFilename, columnOfReportFile)
-        elif clusteringType == blockNames.ClusteringTypes.agglomerative:
+        elif clusteringType == blockNames.ClusteringTypes.contactMapAffinity:
+            return ContactMapClustering(resname, reportBaseFilename,
+                                        columnOfReportFile,
+                                        contactThresholdDistance)
+        elif clusteringType == blockNames.ClusteringTypes.contactMapAgglomerative:
             nclusters = clusteringBlock[blockNames.ClusteringTypes.nclusters]
-            return  ContactMapAgglomerativeClustering(nclusters, resname, reportBaseFilename, columnOfReportFile)
+            return  ContactMapAgglomerativeClustering(nclusters, resname,
+                                                      reportBaseFilename,
+                                                      columnOfReportFile,
+                                                      contactThresholdDistance)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))

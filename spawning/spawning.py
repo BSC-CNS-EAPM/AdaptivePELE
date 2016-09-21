@@ -69,6 +69,8 @@ class SpawningParams:
         #Params specific to epsilon related spawning
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon:
+            #TODO: FAST and simulatedAnnealing spawning should read
+            #reportFilename and reportCol?
             self.epsilon = spawningParamsBlock[blockNames.SpawningParams.epsilon]
             self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
