@@ -355,10 +355,11 @@ class ContactMapAgglomerativeClustering(Clustering):
 
 class ClusteringBuilder:
     def buildClustering(self, clusteringBlock, reportBaseFilename=None, columnOfReportFile=None):
+        paramsBlock = clusteringBlock[blockNames.ClusteringTypes.params]
         try:
-            resname = clusteringBlock[blockNames.ClusteringTypes.ligandResname].upper()
+            resname = paramsBlock[blockNames.ClusteringTypes.ligandResname].upper()
             clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
-            contactThresholdDistance = clusteringBlock[blockNames.ClusteringTypes.contactThresholdDistance]
+            contactThresholdDistance = paramsBlock[blockNames.ClusteringTypes.contactThresholdDistance]
         except KeyError as err:
             err.message=err.message + ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
@@ -372,7 +373,7 @@ class ClusteringBuilder:
                                         columnOfReportFile,
                                         contactThresholdDistance)
         elif clusteringType == blockNames.ClusteringTypes.contactMapAgglomerative:
-            nclusters = clusteringBlock[blockNames.ClusteringTypes.nclusters]
+            nclusters = paramsBlock[blockNames.ClusteringTypes.nclusters]
             return  ContactMapAgglomerativeClustering(nclusters, resname,
                                                       reportBaseFilename,
                                                       columnOfReportFile,

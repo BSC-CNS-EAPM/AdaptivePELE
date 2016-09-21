@@ -5,7 +5,9 @@ class clusteringTest(unittest.TestCase):
     def testCluster(self):
         #preparation
         clusteringBuilder = clustering.ClusteringBuilder()
-        clusteringDictionary = {"type" : "contacts", "ligandResname": "AIN"}
+        clusteringDictionary = {"type" : "contacts", 
+                                "params" : {"ligandResname": "AIN","contactThresholdDistance":
+                                                             8}}
         clusteringInstance = clusteringBuilder.buildClustering(clusteringDictionary,"ain_report", 3)
 
         trajNames = ["tests/data/aspirin_data/traj*"]
@@ -30,7 +32,7 @@ class clusteringTest(unittest.TestCase):
     def _test_cluster_sklearn(self):
          #preparation
          clusteringBuilder = clustering.ClusteringBuilder()
-         clusteringInstance = clusteringBuilder.buildClustering("contactMap","AIN", "ain_report", 3)
+         clusteringInstance = clusteringBuilder.buildClustering("contactMapAffinity","AIN", "ain_report", 3)
 
          trajNames = ["tests/data/aspirin_data/traj*"]
 
