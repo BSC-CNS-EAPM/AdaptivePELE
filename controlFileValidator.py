@@ -33,7 +33,7 @@ def validateBlock(blockName, controlFileBlock):
     # check for mandatory parameters
     for mandatory,value in blockName.types[blockType].iteritems():
         try:
-            assert isinstance(controlFileBlock['params'][mandatory],eval(value)),"Type for %s should be %s and instead is %s"%(mandatory, value, type(controlFileBlock[mandatory]).__name__)
+            assert isinstance(controlFileBlock['params'][mandatory],eval(value)),"Type for %s should be %s and instead is %s"%(mandatory, value, type(controlFileBlock['params'][mandatory]).__name__)
         except KeyError as err:
             raise KeyError("%s missing: Mandatory parameter %s in %s not found."%(err.message,mandatory,blockName.__name__)) 
     # check rest of parameters specified

@@ -17,7 +17,7 @@ import atomset
 import utilities
 import multiprocessing
 from functools import partial
-
+import  controlFileValidator as validator
 from spawning import spawning, spawningTypes
 from simulation import simulationrunner, simulationTypes
 from clustering import clustering
@@ -87,6 +87,7 @@ def main(jsonParams=None):
     if jsonParams is None:
         jsonParams = sys.argv[1]
 
+    validator.validate(jsonParams)
     generalParams, spawningBlock, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
 
     spawningAlgorithmBuilder = spawning.SpawningAlgorithmBuilder()
