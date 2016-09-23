@@ -1,36 +1,38 @@
 import numpy as np
 import sys
-import string
 import shutil
 import os
-import subprocess
 import json
-#from pyproct.clustering.clustering import Clustering
-import math
-import atexit
-import argparse
+# import string
+# import subprocess
+# from pyproct.clustering.clustering import Clustering
+# import math
+# import atexit
+# import argparse
+# import atomset
 import time
 import glob
 import pickle
 import blockNames
-import atomset
 import utilities
-import multiprocessing
-from functools import partial
-import  controlFileValidator as validator
+# import multiprocessing
+# from functools import partial
+import controlFileValidator as validator
 from spawning import spawning, spawningTypes
 from simulation import simulationrunner, simulationTypes
 from clustering import clustering
 
+
 def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, iteration):
     for i, name in enumerate(initialStructures):
-        shutil.copyfile(name, tmpInitialStructuresTemplate%(iteration,i))
+        shutil.copyfile(name, tmpInitialStructuresTemplate % (iteration, i))
+
 
 def createMultipleComplexesFilenames(numberOfSnapshots, inputFileTemplate, tmpInitialStructuresTemplate, iteration):
     jsonString = "\n"
     for i in range(numberOfSnapshots-1):
-        jsonString += inputFileTemplate%(tmpInitialStructuresTemplate%(iteration,i)) + ",\n"
-    jsonString += inputFileTemplate%(tmpInitialStructuresTemplate%(iteration,numberOfSnapshots-1))
+        jsonString += inputFileTemplate % (tmpInitialStructuresTemplate % (iteration, i)) + ",\n"
+    jsonString += inputFileTemplate % (tmpInitialStructuresTemplate % (iteration, numberOfSnapshots-1))
     return jsonString
 
 def generateSnapshotSelectionStringLastRound(currentEpoch, outputPathTempletized, trajectoryWildcard):
@@ -67,6 +69,7 @@ def findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT):
             return epoch
     if epoch <= 0:
         return 0
+
 
 def loadParams(jsonParams):
     """
