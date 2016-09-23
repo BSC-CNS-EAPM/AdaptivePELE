@@ -231,8 +231,10 @@ class ContactMapClustering(Clustering):
                 metricsArray = np.array(self.firstClusteringParams.metrics)
                 best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
                 best_metric = self.firstClusteringParams.metrics[best_metric_ind]
-                cluster = Cluster(self.firstClusteringParams.pdb_list[best_metric_ind],
-                                        contactMap=self.firstClusteringParams.contactmaps[best_metric_ind], metric=best_metric)
+                cluster_index = selectRandomCenter(cluster_members,
+                                                   metricsArray[cluster_members])
+                cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_index],
+                                  contactMap=self.firstClusteringParams.contactmaps[cluster_index], metric=best_metric)
                 cluster.elements += elements_in_cluster-1
                 self.secondClusteringParams.ids.append('new:%d'%center_ind)
                 self.secondClusteringParams.contactmaps.append(cluster.contactMap)
@@ -240,10 +242,12 @@ class ContactMapClustering(Clustering):
                 self.secondClusteringParams.elements.append(cluster.elements)
                 self.firstClusteringParams.newClusters.addCluster(cluster)
             else:
-                cluster_index = int(self.secondClusteringParams.ids[index].split(":")[-1])
                 elementsArray = np.array(self.secondClusteringParams.elements)
                 metricsArray = np.array(self.secondClusteringParams.metrics)
                 elements_in_cluster = elementsArray[cluster_members].sum()
+                index = selectRandomCenter(cluster_members,
+                                                   metricsArray[cluster_members])
+                cluster_index = int(self.secondClusteringParams.ids[index].split(":")[-1])
                 best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
                 best_metric = self.secondClusteringParams.metrics[best_metric_ind]
                 if index < len(self.firstClusteringParams.newClusters.clusters):
@@ -316,16 +320,15 @@ class ContactMapAgglomerativeClustering(Clustering):
                 #cluster_index = clusterKmeans(contactmapsArray[cluster_members],1)
                 # Instead of using Kmeans to obtain a "center" or representative
                 # cluster, select one of the members randomly
-                cluster_index = np.random.randint(0, elements_in_cluster)
-                cluster_center = cluster_members[cluster_index]
                 metricsArray = np.array(self.firstClusteringParams.metrics)
                 best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
                 best_metric = self.firstClusteringParams.metrics[best_metric_ind]
-
-                cluster = Cluster(self.firstClusteringParams.pdb_list[best_metric_ind],
-                                        contactMap=self.firstClusteringParams.contactmaps[best_metric_ind], metric=best_metric)
-                #cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_center],
-                #                   contactMap=self.firstClusteringParams.contactmaps[cluster_center], metric=best_metric)
+                cluster_center = selectRandomCenter(cluster_members,
+                                                   metricsArray[cluster_members])
+                #cluster = Cluster(self.firstClusteringParams.pdb_list[best_metric_ind],
+                #                        contactMap=self.firstClusteringParams.contactmaps[best_metric_ind], metric=best_metric)
+                cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_center],
+                                   contactMap=self.firstClusteringParams.contactmaps[cluster_center], metric=best_metric)
                 cluster.elements += elements_in_cluster-1
                 self.secondClusteringParams.ids.append('new:%d'%index)
                 self.secondClusteringParams.contactmaps.append(cluster.contactMap)
@@ -342,8 +345,8 @@ class ContactMapAgglomerativeClustering(Clustering):
                 #cluster_index = clusterKmeans(contactmapsArray[cluster_members],1)
                 # Instead of using Kmeans to obtain a "center" or representative
                 # cluster, select one of the members randomly
-                cluster_index = np.random.randint(0, cluster_members.size)
-                cluster_center = cluster_members[cluster_index]
+                cluster_center = selectRandomCenter(cluster_members,
+                                                   metricsArray[cluster_members])
                 cluster_index = int(self.secondClusteringParams.ids[cluster_center].split(":")[-1])
                 if cluster_center < self.nclusters:
                     cluster = self.firstClusteringParams.newClusters.clusters[cluster_index]
@@ -427,6 +430,16 @@ def getSnapshots(trajectoryFile, verbose=False):
 
 def getTrajNum(trajFilename):
     return int(trajFilename.split("_")[-1][:-4])
+
+def selectRandomCenter(cluster_members, metrics_weights):
+    metrics_weights -= metrics_weights.max()
+    if abs(metrics_weights.sum()) < 1e-8:
+        metrics_weights = None
+    else:
+        metrics_weights /= metrics_weights.sum()
+    cluster_index = np.random.choice(cluster_members,
+                                        p=metrics_weights)
+    return cluster_index
 
 def processSnapshots(trajectories, reportBaseFilename, col, contactThresholdDistance, resname):
     pdb_list = []

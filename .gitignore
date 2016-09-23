@@ -7,3 +7,4 @@ pyemma/*.png
 pyemma/*.pkl
 pyemma/tpt
 epsilon_values.txt
+.ropeproject/
