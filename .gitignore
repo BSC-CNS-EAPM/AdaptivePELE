@@ -8,3 +8,6 @@ pyemma/*.pkl
 pyemma/tpt
 epsilon_values.txt
 .ropeproject/
+os
+setuptools
+sys
