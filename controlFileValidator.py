@@ -31,9 +31,9 @@ def validate(control_file):
                 warnings.warn("Block %s not found in control file!" % controlfile_obj)
                 isCorrect = False
     if isCorrect:
-        print "Congratulations! No errors found!"
+        print "Congratulations! No errors found in your control file!"
     else:
-        raise ValueError("There are errors in your control file")
+        raise ValueError("There are errors in your control file!!!")
     return True
 
 
