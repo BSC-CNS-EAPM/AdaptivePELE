@@ -166,7 +166,7 @@ def main(jsonParams=None):
     utilities.makeFolder(outputPath)
     utilities.makeFolder(tmpFolder)
     saveInitialControlFile(jsonParams, ORIGINAL_CONTROLFILE)
-    
+
     #print variable epsilon information
     if not spawningParams.epsilon is None:
         epsilon_file = open("epsilon_values.txt","w")
@@ -187,7 +187,7 @@ def main(jsonParams=None):
             seedingPoints = makeClusterRepresentativesInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, firstRun)
 
             initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, inputFileTemplate, tmpInitialStructuresTemplate, firstRun)
-            
+
     if not restart or firstRun == 0: # if restart and firstRun = 0, it must check into the initial structures
         #Choose initial structures
         if not debug: shutil.rmtree(outputPath)
@@ -206,7 +206,7 @@ def main(jsonParams=None):
     peleControlFileDictionary["OUTPUT_PATH"] = outputDir
     peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + firstRun*simulationRunner.parameters.processors
     #simulationRunner.parameters needn't be passed to makeWorkingControlFile
-    simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, tmpControlFilename%firstRun, peleControlFileDictionary) 
+    simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, tmpControlFilename%firstRun, peleControlFileDictionary)
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
@@ -214,17 +214,17 @@ def main(jsonParams=None):
             epsilon_file = open("epsilon_values.txt","a")
             epsilon_file.write("%d\t%f\n"%(i,spawningParams.epsilon))
             epsilon_file.close()
-        
+
         print "Production run..."
         if not debug:
-            startTime = time.time() 
+            startTime = time.time()
             simulationRunner.runSimulation(tmpControlFilename%i)
-            endTime = time.time() 
+            endTime = time.time()
             print "PELE %s sec" % (endTime - startTime)
 
 
         print "Clustering..."
-        startTime = time.time() 
+        startTime = time.time()
         #snapshotsJSONSelectionString = generateSnapshotSelectionString(i, outputPathTempletized, trajectoryBasename)
         snapshotsJSONSelectionString = generateSnapshotSelectionStringLastRound(i, outputPathTempletized, trajectoryBasename)
         snapshotsJSONSelectionString = "[" + snapshotsJSONSelectionString + "]"
@@ -240,7 +240,7 @@ def main(jsonParams=None):
         #    with open(CLUSTERING_OUTPUT_OBJECT%(i-1), 'rb') as input:
         #        clusteringMethod = pickle.load(input)
         clusteringMethod.cluster(paths)
-        endTime = time.time() 
+        endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
 
@@ -265,7 +265,7 @@ def main(jsonParams=None):
             peleControlFileDictionary["OUTPUT_PATH"] = outputDir
             peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + (i+1)*simulationRunner.parameters.processors
             #simulationRunner.parameters needn't be passed to makeWorkingControlFile
-            simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, tmpControlFilename%(i+1), peleControlFileDictionary) 
+            simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, tmpControlFilename%(i+1), peleControlFileDictionary)
 
     #utilities.cleanup
     #utilities.cleanup(tmpFolder)
