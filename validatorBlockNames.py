@@ -131,6 +131,7 @@ class clusteringTypes:
         "params" : {
             "conditions" : "list",
             "values" : "list",
+            "value" : "float",
             "heaviside": "unicode",
             "constant" : "unicode"
         }

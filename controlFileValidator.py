@@ -74,8 +74,8 @@ def validateBlock(blockName, controlFileBlock):
             try:
                 blockType = controlFileBlock[block]["type"]
                 try:
-                    if not isinstance(blockType, str):
-                        warnings.warn("Type for %s should be %s and instead is %s" % (blockType, 'str', type(blockType).__name__))
+                    if not isinstance(blockType, unicode):
+                        warnings.warn("Type for %s should be %s and instead is %s" % (blockType, 'unicode', type(blockType).__name__))
                         isCorrect = False
                     typecheck = types_dict[blockType]
                 except KeyError:
@@ -85,8 +85,11 @@ def validateBlock(blockName, controlFileBlock):
                 for param, value in controlFileBlock[block].iteritems():
                     try:
                         if not isinstance(value, eval(params_dict[param])):
-                            warnings.warn("Type for %s should be %s and instead is %s" % (param, params_dict[param], type(value).__name__))
-                            isCorrect = False
+                            if isinstance(value, int) and float ==  eval(params_dict[param]):
+                                pass
+                            else:
+                                warnings.warn("Type for %s should be %s and instead is %s" % (param, params_dict[param], type(value).__name__))
+                                isCorrect = False
                     except KeyError:
                         warnings.warn("Parameter %s not recognized." % param)
                         isCorrect = False
