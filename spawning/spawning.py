@@ -69,12 +69,14 @@ class SpawningParams:
         #Params specific to epsilon related spawning
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon:
-            #TODO: FAST and simulatedAnnealing spawning should read
-            #reportFilename and reportCol?
             self.epsilon = spawningParamsBlock[blockNames.SpawningParams.epsilon]
+            self.temperature = spawningParamsBlock[blockNames.SpawningParams.temperature]
+        if spawningType == blockNames.StringSpawningTypes.epsilon or \
+                spawningType == blockNames.StringSpawningTypes.variableEpsilon or\
+                spawningType == blockNames.StringSpawningTypes.fast or \
+                spawningType == blockNames.StringSpawningTypes.simulatedAnnealing:
             self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
-            self.temperature = spawningParamsBlock[blockNames.SpawningParams.temperature]
         if spawningType == blockNames.StringSpawningTypes.variableEpsilon:
             self.varEpsilonType = spawningParamsBlock[blockNames.SpawningParams.varEpsilonType]
             self.maxEpsilon = spawningParamsBlock[blockNames.SpawningParams.maxEpsilon]
