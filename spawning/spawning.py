@@ -1,4 +1,5 @@
 import math
+import sys
 import numpy as np
 from clustering import clustering
 import random
@@ -16,6 +17,7 @@ def return_sign(i, m, n, r):
     else:
         return -1
 
+
 class SpawningAlgorithmBuilder:
     def build(self, spawningBlock):
         spawningCalculatorBuilder = SpawningBuilder()
@@ -25,6 +27,7 @@ class SpawningAlgorithmBuilder:
         spawningParams.buildSpawningParameters(spawningBlock)
 
         return spawningCalculator, spawningParams
+
 
 class SpawningBuilder:
     def buildSpawningCalculator(self, spawningBlock):
@@ -65,8 +68,8 @@ class SpawningParams:
     def buildSpawningParameters(self,spawningBlock):
         spawningParamsBlock = spawningBlock[blockNames.SpawningParams.params]
         spawningType = spawningBlock[blockNames.StringSpawningTypes.type]
-        #Params general to all
-        #Params specific to epsilon related spawning
+        # Params general to all
+        # Params specific to epsilon related spawning
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon:
             self.epsilon = spawningParamsBlock[blockNames.SpawningParams.epsilon]
@@ -83,7 +86,7 @@ class SpawningParams:
             self.minEpsilon = spawningParamsBlock[blockNames.SpawningParams.minEpsilon]
             self.variationWindow = spawningParamsBlock[blockNames.SpawningParams.variationWindow]
             self.maxEpsilonWindow = spawningParamsBlock[blockNames.SpawningParams.maxEpsilonWindow]
-            self.period = spawningParamsBlock.get(blockNames.SpawningParams.period, self.variationWindow) 
+            self.period = spawningParamsBlock.get(blockNames.SpawningParams.period, self.variationWindow)
             self.period += np.sign(np.abs(self.variationWindow-self.period))
             # Add one epoch to the total lenght of the variation in the case of periodic variation to leave a step between variation periods
 
@@ -112,7 +115,7 @@ class SpawningCalculator:
         """
         degeneracy = []
         for i, weight in enumerate(weights):
-            degeneracy.append(int(weight*trajToDistribute)) 
+            degeneracy.append(int(weight*trajToDistribute))
 
         #divide remaining traj to distribute according to decimal part
         decimalPart = []
@@ -145,7 +148,7 @@ class SpawningCalculator:
 
     def getMetrics(self, clusters):
         metrics = np.zeros(len(clusters))
-        for i,cluster in enumerate(clusters):
+        for i, cluster in enumerate(clusters):
             metrics[i] = cluster.getMetric()
         return metrics
 
@@ -189,7 +192,7 @@ class SameWeightDegeneracyCalculator(SpawningCalculator):
         samples = random.sample(range(numClusters), trajToDistribute)
         degeneracy = [0] * len(clusters)
         for sample in samples:
-            degeneracy[sample] = 1 
+            degeneracy[sample] = 1
         return degeneracy
 
     def log(self):
@@ -254,6 +257,7 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         maximumValue = np.max(metrics)
         shiftedMetrics = np.subtract(metrics, maximumValue)
 
+        """
         #all shiftedMetrics <= 0, sum(shiftedMetrics) < 0 => weights >= 0
         if abs(shiftedMetrics.sum()) < 1e-8:
             weights = np.ones(len(metrics))/len(metrics)
@@ -269,11 +273,9 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
             weights = np.exp(-shiftedMetrics/kbT)
             weights /= sum(weights)
 
-        """
-
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
 
-#TODO: change for composition rather than for inheritance
+
 class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
 
     def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
@@ -295,7 +297,8 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
 
         rateEpsilonVariation = [(clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(middleWindow-leftWindow), (clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(clusteringParams.period-rightWindow-1)]
 
-        clusteringParams.epsilon += return_sign(currentEpoch,leftWindow,middleWindow, rightWindow)*rateEpsilonVariation[currentEpoch>middleWindow]
+        clusteringParams.epsilon += return_sign(currentEpoch, leftWindow,
+                                                middleWindow, rightWindow) * rateEpsilonVariation[currentEpoch > middleWindow]
 
     def calculateEpsilonValue(self, clusteringParams, currentEpoch):
         if currentEpoch is None or clusteringParams.variationWindow < currentEpoch:
@@ -311,6 +314,7 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
         self.calculateEpsilonValue(clusteringParams, currentEpoch)
         return self.epsilonDegeneracyCalculator.calculate(clusters, trajToDistribute, clusteringParams, currentEpoch)
+
 
 class SimulatedAnnealingCalculator(SpawningCalculator):
     def __init__(self):
@@ -328,12 +332,12 @@ class SimulatedAnnealingCalculator(SpawningCalculator):
             return T
 
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch):
-        metrics = getMetric()
+        metrics = self.getMetrics(clusters)
 
         minimumValue = np.min(metrics)
         shiftedMetrics = np.subtract(metrics, minimumValue)
 
-        T = computeTemperature(clusteringParams, currentEpoch)
+        T = self.computeTemperature(clusteringParams, currentEpoch)
         kbT = 0.001987*T
         weights = np.exp(-shiftedMetrics/kbT)
         weights /= sum(weights)
@@ -353,9 +357,9 @@ class FASTDegeneracyCalculator(DensitySpawningCalculator):
         if maxValue-minValue > 1e-5:
             normalisedArray = np.subtract(maxValue, array)/(maxValue - minValue)
         else:
-            #all elements are equal
+            # all elements are equal
             n = len(array)
-            normalisedSizes = np.ones(n)/float(n)
+            normalisedArray = np.ones(n)/float(n)
         return normalisedArray
 
     def calculateNormalisedSizes(self, clusters):
@@ -380,4 +384,3 @@ class FASTDegeneracyCalculator(DensitySpawningCalculator):
 
     def log(self):
         pass
-
