@@ -31,6 +31,7 @@ class StringSpawningTypes:
     inverselyProportional = "inverselyProportional"
     epsilon = "epsilon"
     fast = "FAST"
+    simulatedAnnealing = "simulatedAnnealing"
     ### New parameters for variable epsilon(experimental)
     variableEpsilon = "variableEpsilon"
     

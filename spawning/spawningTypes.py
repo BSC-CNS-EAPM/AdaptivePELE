@@ -9,6 +9,7 @@ SPAWNING_TYPE_TO_STRING_DICTIONARY = {
     SPAWNING_TYPES.epsilon:blockNames.StringSpawningTypes.epsilon,
     SPAWNING_TYPES.FAST:blockNames.StringSpawningTypes.fast,
     SPAWNING_TYPES.variableEpsilon:blockNames.StringSpawningTypes.variableEpsilon
+    SPAWNING_TYPES.simulatedAnnealing:blockNames.StringSpawningTypes.simulatedAnnealing,
 }
 class EPSILON_VARIATION_TYPES:
     linearVariation, = range(1)
