@@ -259,12 +259,14 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
             weights = (1.*shiftedMetrics)/sum(shiftedMetrics)
 
         """
-        minimumValue = np.min(metrics)
-        shiftedMetrics = np.subtract(metrics, minimumValue)
 
         kbT = 0.001987*T
-        weights = np.exp(-shiftedMetrics/kbT)
-        weights /= sum(weights)
+        if abs(shiftedMetrics.sum()) < 1e-8:
+            weights = np.ones(len(metrics))/len(metrics)
+        else:
+            weights = np.exp(-shiftedMetrics/kbT)
+            weights /= sum(weights)
+
         """
 
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
