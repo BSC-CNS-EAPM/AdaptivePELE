@@ -13,7 +13,8 @@ class GeneralParams:
         "restart": "bool",
         "outputPath": "unicode",
         "initialStructures": "list",
-        "debug": "bool"
+        "debug": "bool",
+        "writeAllClustering": "bool"
     }
 
 
