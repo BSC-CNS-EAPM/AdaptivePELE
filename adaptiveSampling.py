@@ -64,18 +64,21 @@ def findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT):
 
 def loadParams(jsonParams):
     """
-        TODO: change for variables in a block names file, and work it out a bit more
+        TODO: change for variables in a block names file,
+        and work it out a bit more
     """
     jsonFile = open(jsonParams, 'r').read()
     parsedJSON = json.loads(jsonFile)
 
     return parsedJSON[blockNames.ControlFileParams.generalParams], parsedJSON[blockNames.ControlFileParams.spawningBlockname],\
-            parsedJSON[blockNames.ControlFileParams.simulationBlockname], parsedJSON[blockNames.ControlFileParams.clusteringBlockname]
+        parsedJSON[blockNames.ControlFileParams.simulationBlockname], parsedJSON[blockNames.ControlFileParams.clusteringBlockname]
+
 
 def saveInitialControlFile(jsonParams, originalControlFile):
     file = open(originalControlFile, 'w')
     jsonFile = open(jsonParams, 'r').read()
     file.write(jsonFile)
+
 
 def main(jsonParams=None):
     if jsonParams is None:
@@ -96,6 +99,7 @@ def main(jsonParams=None):
     debug = generalParams[blockNames.GeneralParams.debug]
     outputPath = generalParams[blockNames.GeneralParams.outputPath]
     initialStructures = generalParams[blockNames.GeneralParams.initialStructures]
+    writeAll = generalParams[blockNames.GeneralParams.writeAllClustering]
 
     print "================================"
     print "            PARAMS              "
@@ -103,7 +107,7 @@ def main(jsonParams=None):
     print "Restarting simulations", generalParams[blockNames.GeneralParams.restart]
     print "Debug:", generalParams[blockNames.GeneralParams.debug]
 
-    print "Iterations: %d, Mpi processors: %d, Pele steps: %d"%(simulationRunner.parameters.iterations, simulationRunner.parameters.processors, simulationRunner.parameters.peleSteps)
+    print "Iterations: %d, Mpi processors: %d, Pele steps: %d" % (simulationRunner.parameters.iterations, simulationRunner.parameters.processors, simulationRunner.parameters.peleSteps)
 
     print "SpawningType:", spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[startingConformationsCalculator.type]
 
@@ -221,10 +225,14 @@ def main(jsonParams=None):
 
         clusteringMethod.writeOutput(CLUSTERING_OUTPUT_DIR % i,
                                      degeneracyOfRepresentatives,
-                                     CLUSTERING_OUTPUT_OBJECT % i)
+                                     CLUSTERING_OUTPUT_OBJECT % i, writeAll)
         if i > 0:
             # Remove old clustering object, since we already have a newer one
-            os.remove(CLUSTERING_OUTPUT_OBJECT % (i-1))
+            try:
+                os.remove(CLUSTERING_OUTPUT_OBJECT % (i-1))
+            except OSError:
+                # Old clustering object was not saved correctly
+                pass
 
         # Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:

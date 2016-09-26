@@ -94,7 +94,7 @@ class Clustering:
             and self.resname == other.resname\
             and self.col == other.col
 
-    def writeOutput(self, outputPath, degeneracy, outputObject):
+    def writeOutput(self, outputPath, degeneracy, outputObject, writeAll):
         """
             Writes all the clustering information in outputPath
 
@@ -102,6 +102,8 @@ class Clustering:
             degeneracy [In] Degeneracy of each cluster. It must be in the same order
             as in the self.clusters list
             outputObject [In] Output name for the pickle object
+            writeAll [In] Boolean, wether to write pdb files for all cluster in addition
+            of the summary
         """
         utilities.cleanup(outputPath)
         utilities.makeFolder(outputPath)
@@ -111,9 +113,10 @@ class Clustering:
         summaryFile.write("#cluster size degeneracy contacts threshold density metric\n")
 
         for i, cluster in enumerate(self.clusters.clusters):
-            outputFilename = "cluster_%d.pdb" % i
-            outputFilename = os.path.join(outputPath, outputFilename)
-            cluster.writePDB(outputFilename)
+            if writeAll:
+                outputFilename = "cluster_%d.pdb" % i
+                outputFilename = os.path.join(outputPath, outputFilename)
+                cluster.writePDB(outputFilename)
 
             if cluster.metric:
                 writeString = "%d %d %d %d %.1f %.1f %.3f\n" % (i, cluster.elements,

@@ -123,9 +123,9 @@ def validateBlock(blockName, controlFileBlock):
 
 def validateGeneralBlock(blockName, controlFileBlock):
     isCorrect = True
-    for key, value in controlFileBlock.iteritems():
+    for key, value in blockName.params.iteritems():
         try:
-            if not isinstance(controlFileBlock[key], eval(blockName.params[key])):
+            if not isinstance(controlFileBlock[key], eval(value)):
                 warnings.warn("Type for %s should be %s and instead is %s" %
                               (key, value, type(controlFileBlock[key]).__name__))
                 isCorrect = False
