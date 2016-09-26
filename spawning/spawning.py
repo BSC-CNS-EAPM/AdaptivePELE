@@ -1,7 +1,6 @@
 import math
 import sys
 import numpy as np
-from clustering import clustering
 import random
 import blockNames
 import spawningTypes
@@ -19,6 +18,7 @@ def return_sign(i, m, n, r):
 
 
 class SpawningAlgorithmBuilder:
+
     def build(self, spawningBlock):
         spawningCalculatorBuilder = SpawningBuilder()
         spawningCalculator = spawningCalculatorBuilder.buildSpawningCalculator(spawningBlock)
@@ -30,6 +30,7 @@ class SpawningAlgorithmBuilder:
 
 
 class SpawningBuilder:
+
     def buildSpawningCalculator(self, spawningBlock):
 
         densityBuilder = densitycalculator.DensityCalculatorBuilder()
@@ -52,6 +53,7 @@ class SpawningBuilder:
 
 
 class SpawningParams:
+
     def __init__(self):
         self.epsilon = None
         self.temperature = None
@@ -64,8 +66,9 @@ class SpawningParams:
         self.minEpsilon = None
         self.variationWindow = None
         self.maxEpsilonWindow = None
+        self.metricWeights = None
 
-    def buildSpawningParameters(self,spawningBlock):
+    def buildSpawningParameters(self, spawningBlock):
         spawningParamsBlock = spawningBlock[blockNames.SpawningParams.params]
         spawningType = spawningBlock[blockNames.StringSpawningTypes.type]
         # Params general to all
@@ -74,6 +77,8 @@ class SpawningParams:
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon:
             self.epsilon = spawningParamsBlock[blockNames.SpawningParams.epsilon]
             self.temperature = spawningParamsBlock[blockNames.SpawningParams.temperature]
+            self.metricWeights = spawningParamsBlock.get(blockNames.SpawningParams.metricWeights,
+                                                         blockNames.SpawningParams.linear)
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon or\
                 spawningType == blockNames.StringSpawningTypes.fast or \
@@ -97,6 +102,7 @@ class SpawningCalculator:
         The purpose of this abstract class is to contain the behaviour of the different strategies for the spawning.
         Spawning is the way in which we split the different explorers at the begining of each epoch.
     """
+
     def __init__(self):
         self.type = "BaseClass" #change for abstract attribute
         pass
@@ -117,11 +123,11 @@ class SpawningCalculator:
         for i, weight in enumerate(weights):
             degeneracy.append(int(weight*trajToDistribute))
 
-        #divide remaining traj to distribute according to decimal part
+        # divide remaining traj to distribute according to decimal part
         decimalPart = []
         decimalPart = [math.modf(weight*trajToDistribute)[0] for weight in weights]
         sortedDecimals = np.argsort(decimalPart)
-        sortedDecimals = sortedDecimals[::-1] #flip list
+        sortedDecimals = sortedDecimals[::-1]  # flip list
 
         leftProcessors = trajToDistribute-sum(degeneracy)
         for i in range(leftProcessors):
@@ -154,7 +160,7 @@ class SpawningCalculator:
 
     def getSizes(self, clusters):
         sizes = np.zeros(len(clusters))
-        for i,cluster in enumerate(clusters):
+        for i, cluster in enumerate(clusters):
             sizes[i] = cluster.elements
         return sizes
 
@@ -163,27 +169,31 @@ class DensitySpawningCalculator(SpawningCalculator):
     """
         Subclass of Spawning calculator, that ensures the definition of a density calculator.
     """
-    def __init__(self, densityCalculator = densitycalculator.NullDensityCalculator()):
+
+    def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
         SpawningCalculator.__init__(self)
-        self.type = "BaseDensityClass" #change for abstract attribute
+        self.type = "BaseDensityClass"  # change for abstract attribute
         self.densityCalculator = densityCalculator
 
     def calculateDensities(self, clusters):
         densities = np.zeros(len(clusters))
-        for i,cluster in enumerate(clusters):
+        for i, cluster in enumerate(clusters):
             if not cluster.density:
                 contacts = cluster.getContacts()
                 cluster.density = self.densityCalculator.calculate(contacts)
             densities[i] = cluster.density
         return densities
 
+
 class SameWeightDegeneracyCalculator(SpawningCalculator):
+
     def __init__(self):
         SpawningCalculator.__init__(self)
         self.type = spawningTypes.SPAWNING_TYPES.sameWeight
 
-    #TODO: Don't back on pele, so that density calculator can be used
-    def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
+    # TODO: Don't back on pele, so that density calculator can be used
+    def calculate(self, clusters, trajToDistribute, clusteringParams,
+                  currentEpoch=None):
         """
             We back on PELE to split equal trajectories
         """
@@ -198,7 +208,9 @@ class SameWeightDegeneracyCalculator(SpawningCalculator):
     def log(self):
         pass
 
+
 class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
+
     def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
         DensitySpawningCalculator.__init__(self, densityCalculator)
         self.type = spawningTypes.SPAWNING_TYPES.inverselyProportional
@@ -214,10 +226,12 @@ class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
 
         return self.divideInverselyProportionalToArray(weights, trajToDistribute)
 
+
 class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
     """
         It uses epsilon * numTraj trajectories proportional to their energy and the rest inversely proportional to each cluster's population
     """
+
     def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
         DensitySpawningCalculator.__init__(self, densityCalculator)
         self.inverselyProportionalCalculator = InverselyProportionalToPopulationCalculator(densityCalculator)
@@ -226,13 +240,13 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         self.degeneracyMetricProportional = None
         self.degeneracyTotal = None
 
-    #TODO add possibility for different pipes
+    # TODO add possibility for different pipes
     def log(self):
-        if not self.degeneracyTotal is None:
+        if self.degeneracyTotal is not None:
             print "[SpawningLog] Total: %s" % str(self.degeneracyTotal)
-        if not self.degeneracyInverselyProportional is None:
+        if self.degeneracyInverselyProportional is not None:
             print "[SpawningLog] Inversely prop: %s" % str(self.degeneracyInverselyProportional)
-        if not self.degeneracyMetricProportional is None:
+        if self.degeneracyMetricProportional is not None:
             print "[SpawningLog] Metric prop:    %s" % str(self.degeneracyMetricProportional)
 
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
@@ -240,12 +254,13 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         trajToInverselyProportional = trajToDistribute - trajToMetricProportional
 
         self.degeneracyInverselyProportional = self.inverselyProportionalCalculator.calculate(clusters, trajToInverselyProportional, clusteringParams)
-        self.degeneracyMetricProportional = self.divideProcessorsMetricProportional(clusters, trajToMetricProportional, clusteringParams.temperature)
+        self.degeneracyMetricProportional = self.divideProcessorsMetricProportional(clusters, trajToMetricProportional, clusteringParams.temperature, clusteringParams.metricWeights)
 
         self.degeneracyTotal = np.array(self.degeneracyInverselyProportional) + np.array(self.degeneracyMetricProportional)
         return self.degeneracyTotal
 
-    def divideProcessorsMetricProportional(self, clusters, trajToDistribute, T):
+    def divideProcessorsMetricProportional(self, clusters, trajToDistribute, T,
+                                           metricWeights):
         metrics = self.getMetrics(clusters)
         if isinstance(metrics, list): metrics = np.array(metrics)
 
@@ -257,21 +272,25 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         maximumValue = np.max(metrics)
         shiftedMetrics = np.subtract(metrics, maximumValue)
 
-        """
-        #all shiftedMetrics <= 0, sum(shiftedMetrics) < 0 => weights >= 0
-        if abs(shiftedMetrics.sum()) < 1e-8:
-            weights = np.ones(len(metrics))/len(metrics)
-        else:
-            weights = (1.*shiftedMetrics)/sum(shiftedMetrics)
+        if metricWeights == blockNames.SpawningParams.linear:
 
-        """
+            # all shiftedMetrics <= 0, sum(shiftedMetrics) < 0 => weights >= 0
+            if abs(shiftedMetrics.sum()) < 1e-8:
+                weights = np.ones(len(metrics))/len(metrics)
+            else:
+                weights = (1.*shiftedMetrics)/sum(shiftedMetrics)
 
-        kbT = 0.001987*T
-        if abs(shiftedMetrics.sum()) < 1e-8:
-            weights = np.ones(len(metrics))/len(metrics)
+        elif metricWeights == blockNames.SpawningParams.boltzmann:
+            kbT = 0.001987*T
+            if abs(shiftedMetrics.sum()) < 1e-8:
+                weights = np.ones(len(metrics))/len(metrics)
+            else:
+                weights = np.exp(-shiftedMetrics/kbT)
+                weights /= sum(weights)
         else:
-            weights = np.exp(-shiftedMetrics/kbT)
-            weights /= sum(weights)
+            raise ValueError("No appropiate value for the metricWeights "
+                             "was found, please specify a correct value. The "
+                             "default value of the metrics weighting is linear")
 
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
 
@@ -306,7 +325,7 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
             return
         if clusteringParams.varEpsilonType == blockNames.VariableEpsilonTypes.linearVariation:
             self.linearVariation(clusteringParams,
-                                 (currentEpoch%clusteringParams.period))
+                                 (currentEpoch % clusteringParams.period))
         else:
             sys.exit("Unknown epsilon variation type! Choices are: " +
                      str(spawningTypes.EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY.values()))
@@ -317,6 +336,7 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
 
 
 class SimulatedAnnealingCalculator(SpawningCalculator):
+
     def __init__(self):
         SpawningCalculator.__init__(self)
         self.type = spawningTypes.SPAWNING_TYPES.simulatedAnnealing
@@ -331,7 +351,9 @@ class SimulatedAnnealingCalculator(SpawningCalculator):
         else:
             return T
 
-    def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch):
+    def calculate(self, clusters, trajToDistribute, clusteringParams,
+                  currentEpoch):
+
         metrics = self.getMetrics(clusters)
 
         minimumValue = np.min(metrics)
@@ -344,7 +366,9 @@ class SimulatedAnnealingCalculator(SpawningCalculator):
 
         return self.divideProportionalToArray(weights, trajToDistribute)
 
+
 class FASTDegeneracyCalculator(DensitySpawningCalculator):
+
     def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
         DensitySpawningCalculator.__init__(self, densityCalculator)
         self.type = spawningTypes.SPAWNING_TYPES.FAST

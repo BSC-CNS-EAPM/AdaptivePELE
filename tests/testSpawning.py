@@ -92,7 +92,7 @@ class TestSpawningCalculator(unittest.TestCase):
         epsilon = spawning.EpsilonDegeneracyCalculator()
         params = spawning.SpawningParams()
         params.epsilon = 0.5
-        params.temperature = 1000
+        params.metricWeights = "linear"
 
         clusters = clustering.Clusters()
         sizes = [6, 2, 3, 1]
@@ -111,7 +111,7 @@ class TestSpawningCalculator(unittest.TestCase):
     def testEpsilonCalculatorWithDensity(self):
         params = spawning.SpawningParams()
         params.epsilon = 0.5
-        params.temperature = 1000
+        params.metricWeights = "linear"
 
         clusters = clustering.Clusters()
         sizes = [6, 2, 3, 1]
@@ -166,7 +166,7 @@ class TestSpawningCalculator(unittest.TestCase):
         params.minEpsilon = 0.5
         params.variationWindow = 8
         params.maxEpsilonWindow = 2
-        params.temperature = 1000
+        params.metricWeights = "linear"
         params_test = {}
         params.period = params_test.get("period", params.variationWindow)
         params.period += np.sign(np.abs(params.variationWindow-params.period))
@@ -203,7 +203,7 @@ class TestSpawningCalculator(unittest.TestCase):
         params.minEpsilon = 0.5
         params.variationWindow = 20
         params.maxEpsilonWindow = 1
-        params.temperature = 1000
+        params.metricWeights = "linear"
         params_test = {"period": 8}
         params.period = params_test.get("period", params.variationWindow)
         params.period += np.sign(np.abs(params.variationWindow-params.period))
