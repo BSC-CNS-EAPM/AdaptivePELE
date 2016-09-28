@@ -63,6 +63,10 @@ class SpawningParams:
     maxEpsilonWindow = "maxEpsilonWindow"
     period = "period"  # Only useful for periodic epsilon modes
     density = "density"
+    metricWeights = "metricWeights"
+    linear = "linear"
+    boltzmann = "boltzmann"
+
 
 
 class SpawningDensity:
@@ -107,3 +111,4 @@ class GeneralParams:
     outputPath = "outputPath"
     initialStructures = "initialStructures"
     debug = "debug"
+    writeAllClustering = "writeAllClustering"

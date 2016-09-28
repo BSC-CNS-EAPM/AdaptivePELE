@@ -1,138 +1,146 @@
+import numbers
+
+
 class ControlFileParams:
     generalParams = "GeneralParams"
     spawningBlockname = "SpawningParams"
     simulationBlockname = "SimulationParams"
     clusteringBlockname = "clusteringTypes"
 
+
 class GeneralParams:
     params = {
-        "restart" : "bool",
-        "outputPath" : "unicode",
-        "initialStructures" : "list",
-        "debug" : "bool"
+        "restart": "bool",
+        "outputPath": "unicode",
+        "initialStructures": "list",
+        "debug": "bool",
+        "writeAllClustering": "bool"
     }
+
 
 class SpawningParams:
     params = {
-        "epsilon" : "float",
-        "T" : "int",
-        "reportFilename" : "unicode",
-        "metricColumnInReport" : "int",
-        "varEpsilonType" : "unicode",
-        "maxEpsilon" : "float",
-        "minEpsilon": "float",
-        "variationWindow" : "int",
-        "maxEpsilonWindow" : "int",
-        "period" : "int",
+        "epsilon": "numbers.Real",
+        "T": "numbers.Real",
+        "reportFilename": "unicode",
+        "metricColumnInReport": "numbers.Real",
+        "varEpsilonType": "unicode",
+        "maxEpsilon": "numbers.Real",
+        "minEpsilon": "numbers.Real",
+        "variationWindow": "numbers.Real",
+        "maxEpsilonWindow": "numbers.Real",
+        "period": "numbers.Real",
+        "metricWeights": "unicode"
     }
     types = {
-        "sameWeight" : {},
-        "inverselyProportional" : {},
-        "epsilon" : {
-            "epsilon" : "float",
-            "T" : "int",
-            "reportFilename" : "unicode",
-            "metricColumnInReport" : "int",
+        "sameWeight": {},
+        "inverselyProportional": {},
+        "epsilon": {
+            "epsilon": "numbers.Real",
+            "T": "numbers.Real",
+            "reportFilename": "unicode",
+            "metricColumnInReport": "numbers.Real",
         },
-        "FAST" : {
-            "epsilon" : "float",
-            "T" : "int",
-            "reportFilename" : "unicode",
-            "metricColumnInReport" : "int",
+        "FAST": {
+            "epsilon": "numbers.Real",
+            "T": "numbers.Real",
+            "reportFilename": "unicode",
+            "metricColumnInReport": "numbers.Real",
         },
-        "variableEpsilon" : {
-            "epsilon" : "float",
-            "T" : "int",
-            "reportFilename" : "unicode",
-            "metricColumnInReport" : "int",
-            "varEpsilonType" : "unicode",
-            "maxEpsilon" : "float",
-            "minEpsilon": "float",
-            "variationWindow" : "int",
-            "maxEpsilonWindow" : "int",
-            "period" : "int",
+        "variableEpsilon": {
+            "epsilon": "numbers.Real",
+            "T": "numbers.Real",
+            "reportFilename": "unicode",
+            "metricColumnInReport": "numbers.Real",
+            "varEpsilonType": "unicode",
+            "maxEpsilon": "numbers.Real",
+            "minEpsilon": "numbers.Real",
+            "variationWindow": "numbers.Real",
+            "maxEpsilonWindow": "numbers.Real",
+            "period": "numbers.Real",
         }
     }
     density = {
-        "types" : {
-            "heaviside" : "unicode",
+        "types": {
+            "heaviside": "unicode",
             "null": "unicode",
-            "constant" : "unicode"
+            "constant": "unicode"
         },
-        "params" : {
-            "heaviside" : "unicode",
+        "params": {
+            "heaviside": "unicode",
             "null": "unicode",
-            "constant" : "unicode",
+            "constant": "unicode",
             "values": "list",
-            "conditions" : "list"
+            "conditions": "list"
         }
     }
 
+
 class SimulationParams:
-    types = {"pele":{
-                "processors" : "int",
-                "controlFile" : "unicode",
-                "seed" : "int",
-                "peleSteps" : "int",
-                "iterations" : "int"
+    types = {"pele": {
+                "processors": "numbers.Real",
+                "controlFile": "unicode",
+                "seed": "numbers.Real",
+                "peleSteps": "numbers.Real",
+                "iterations": "numbers.Real"
     },
-             "test":{
-                "destination" : "unicode",
-                "origin" :"unicode",
-                "processors" : "int",
-                "seed" : "int",
-                "peleSteps" : "int",
-                "iterations" : "int"
+             "test": {
+                "destination": "unicode",
+                "origin": "unicode",
+                "processors": "numbers.Real",
+                "seed": "numbers.Real",
+                "peleSteps": "numbers.Real",
+                "iterations": "numbers.Real"
              },
-             "md":{}}
+             "md": {}}
     params = {
         "executable": "unicode",
-        "data":"unicode",
+        "data": "unicode",
         "documents": "unicode",
-        "destination" : "unicode",
-        "origin" :"unicode",
-        "processors" : "int",
-        "controlFile" : "unicode",
-        "seed" : "int",
-        "peleSteps" : "int",
-        "iterations" : "int"
+        "destination": "unicode",
+        "origin": "unicode",
+        "processors": "numbers.Real",
+        "controlFile": "unicode",
+        "seed": "numbers.Real",
+        "peleSteps": "numbers.Real",
+        "iterations": "numbers.Real"
     }
 
 
 class clusteringTypes:
     types = {
-        "contacts" : {
-            "ligandResname" : "unicode",
-            "contactThresholdDistance" : "int",
+        "contacts": {
+            "ligandResname": "unicode",
+            "contactThresholdDistance": "numbers.Real",
         },
-        "contactMapAffinity" : {
-            "ligandResname" : "unicode",
-            "contactThresholdDistance" : "int",
+        "contactMapAffinity": {
+            "ligandResname": "unicode",
+            "contactThresholdDistance": "numbers.Real",
         },
-        "contactMapAgglomerative" : {
-            "ligandResname" : "unicode",
-            "contactThresholdDistance" : "int",
-            "nclusters" : "int"
+        "contactMapAgglomerative": {
+            "ligandResname": "unicode",
+            "contactThresholdDistance": "numbers.Real",
+            "nclusters": "numbers.Real"
         }
     }
     params = {
-        "contacts" : "unicode",
-        "contactMapAffinity" : "unicode",
-        "contactMapAgglomerative" : "unicode",
-        "ligandResname" : "unicode",
-        "contactThresholdDistance" : "int",
-        "nclusters" : "int"
+        "contacts": "unicode",
+        "contactMapAffinity": "unicode",
+        "contactMapAgglomerative": "unicode",
+        "ligandResname": "unicode",
+        "contactThresholdDistance": "numbers.Real",
+        "nclusters": "numbers.Real"
     }
     thresholdCalculator = {
-        "types" : {
+        "types": {
             "heaviside": "unicode",
-            "constant" : "unicode"
+            "constant": "unicode"
         },
-        "params" : {
-            "conditions" : "list",
-            "values" : "list",
-            "value" : "float",
+        "params": {
+            "conditions": "list",
+            "values": "list",
+            "value": "numbers.Real",
             "heaviside": "unicode",
-            "constant" : "unicode"
+            "constant": "unicode"
         }
     }
