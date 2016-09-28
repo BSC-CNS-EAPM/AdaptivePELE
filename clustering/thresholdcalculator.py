@@ -1,5 +1,6 @@
 import blockNames
 import thresholdcalculatortypes
+import sys
 
 #make test
 class ThresholdCalculatorBuilder():
@@ -12,20 +13,22 @@ class ThresholdCalculatorBuilder():
 
         try:
             type = thresholdCalculatorBlock[blockNames.ThresholdCalculator.type]
-        except KeyError: 
+        except KeyError:
             sys.exit("Threshold calculator must have a type")
 
         if type == blockNames.ThresholdCalculator.constant:
             try:
-                value = thresholdCalculatorBlock[blockNames.ThresholdCalculator.value]
+                paramsBlock = thresholdCalculatorBlock[blockNames.ThresholdCalculator.params]
+                value = paramsBlock[blockNames.ThresholdCalculatorParams.value]
                 return ThresholdCalculatorConstant(value)
             except KeyError:
                 print "Using default parameters for constant threshold calculator"
                 return ThresholdCalculatorConstant()
         elif type == blockNames.ThresholdCalculator.heaviside:
             try:
-                values = thresholdCalculatorBlock[blockNames.ThresholdCalculator.values]
-                conditions = thresholdCalculatorBlock[blockNames.ThresholdCalculator.conditions]
+                paramsBlock = thresholdCalculatorBlock[blockNames.ThresholdCalculator.params]
+                values = paramsBlock[blockNames.ThresholdCalculatorParams.values]
+                conditions = paramsBlock[blockNames.ThresholdCalculatorParams.conditions]
                 return ThresholdCalculatorHeaviside(conditions, values)
             except KeyError:
                 print "Using default parameters for Heaviside threshold calculator"
@@ -54,7 +57,7 @@ class ThresholdCalculatorConstant(ThresholdCalculator):
 class ThresholdCalculatorHeaviside(ThresholdCalculator):
     def __init__(self, conditions=[15,10], values=[2,3,4]):
         self.type = thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.heaviside
-    
+
         if len(values) != len(conditions) and len(values) != len(conditions) + 1:
             raise ValueError('The number of values must be equal or one more, than the number of conditions')
 

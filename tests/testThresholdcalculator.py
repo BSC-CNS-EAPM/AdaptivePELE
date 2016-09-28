@@ -25,7 +25,9 @@ class thresholdCalculatorTest(unittest.TestCase):
             "type" : "irrelevant",
             "thresholdCalculator" : {
                 "type" : "constant",
-                "value" : 3
+                "params" : {
+                    "value" : 3
+                }
             }
         }
 
@@ -77,8 +79,10 @@ class thresholdCalculatorTest(unittest.TestCase):
             "type" : "irrelevant",
             "thresholdCalculator" : {
                 "type" : "heaviside",
-                "values" : [2,5,10],
-                "conditions" : [3,10]
+                "params" : {
+                    "values" : [2,5,10],
+                    "conditions" : [3,10]
+                }
             }
         }
 
