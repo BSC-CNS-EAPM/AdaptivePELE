@@ -82,7 +82,7 @@ def validateBlock(blockName, controlFileBlock):
                     warnings.warn("Type %s in %s not found." % (blockType, blockName.__name__))
                     isCorrect = False
             # check rest of parameters specified
-                for param, value in controlFileBlock[block].iteritems():
+                for param, value in controlFileBlock[block]['params'].iteritems():
                     try:
                         if not isinstance(value, eval(params_dict[param])):
                             if isinstance(value, int) and float ==  eval(params_dict[param]):
