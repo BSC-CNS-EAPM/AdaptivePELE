@@ -14,7 +14,7 @@ class GeneralParams:
         "outputPath": "unicode",
         "initialStructures": "list",
         "debug": "bool",
-        "writeAllClustering": "bool"
+        "writeAllClusteringStructures": "bool"
     }
 
 

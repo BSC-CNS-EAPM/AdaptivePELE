@@ -111,4 +111,4 @@ class GeneralParams:
     outputPath = "outputPath"
     initialStructures = "initialStructures"
     debug = "debug"
-    writeAllClustering = "writeAllClustering"
+    writeAllClustering = "writeAllClusteringStructures"
