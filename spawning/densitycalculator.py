@@ -1,5 +1,6 @@
 import blockNames
 import densitycalculatortypes
+import sys
 
 class DensityCalculatorBuilder():
     def build(self, spawningBlock):
@@ -11,7 +12,7 @@ class DensityCalculatorBuilder():
 
         try:
             type = densityBlock[blockNames.DensityCalculator.type]
-        except KeyError: 
+        except KeyError:
             sys.exit("Density calculator must have a type")
 
         if type == blockNames.DensityCalculator.null or type == blockNames.DensityCalculator.constant:
@@ -19,8 +20,9 @@ class DensityCalculatorBuilder():
             return NullDensityCalculator()
         elif type == blockNames.DensityCalculator.heaviside:
             try:
-                values = densityBlock[blockNames.DensityCalculator.values]
-                conditions = densityBlock[blockNames.DensityCalculator.conditions]
+                paramsBlock = densityBlock[blockNames.DensityCalculator.params]
+                values = paramsBlock[blockNames.DensityCalculatorParams.values]
+                conditions = paramsBlock[blockNames.DensityCalculatorParams.conditions]
                 return DensityCalculatorHeaviside(conditions, values)
             except KeyError:
                 print "Using default parameters for Heaviside density calculator"

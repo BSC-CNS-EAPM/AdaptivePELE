@@ -73,8 +73,10 @@ class TestSpawningCalculator(unittest.TestCase):
         clusteringBlock = {
             "density": {
                 "type": "heaviside",
-                "values": [6, 2, 3, 1],
-                "conditions": [3, 2, 1]
+                "params" : {
+                    "values": [6, 2, 3, 1],
+                    "conditions": [3, 2, 1]
+                }
             }
         }
         densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
@@ -127,8 +129,10 @@ class TestSpawningCalculator(unittest.TestCase):
         clusteringBlock = {
             "density": {
                 "type": "heaviside",
-                "values": [6, 2, 3 , 1],
-                "conditions": [3, 2, 1]
+                "params" : {
+                    "values": [6, 2, 3 , 1],
+                    "conditions": [3, 2, 1]
+                }
             }
         }
         densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()

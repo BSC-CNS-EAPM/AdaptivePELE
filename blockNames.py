@@ -9,21 +9,32 @@ class ClusteringTypes:
     contactThresholdDistance = "contactThresholdDistance"
     nclusters = "nclusters"
 
+
 class ThresholdCalculator:
     type = "type"
+    params = "params"
     heaviside = "heaviside"
     constant = "constant"
+
+
+class ThresholdCalculatorParams:
     conditions = "conditions"
     values = "values"
     value = "value"
 
+
 class DensityCalculator:
     type = "type"
+    params = "params"
     heaviside = "heaviside"
     null = "null"
     constant = "constant"
+
+
+class DensityCalculatorParams:
     conditions = "conditions"
     values = "values"
+
 
 class StringSpawningTypes:
     type = "type"
@@ -32,9 +43,10 @@ class StringSpawningTypes:
     epsilon = "epsilon"
     fast = "FAST"
     simulatedAnnealing = "simulatedAnnealing"
-    ### New parameters for variable epsilon(experimental)
+    # New parameters for variable epsilon(experimental)
     variableEpsilon = "variableEpsilon"
-    
+
+
 class SpawningParams:
     params = "params"
     epsilon = "epsilon"
@@ -42,28 +54,32 @@ class SpawningParams:
     threshold = "threshold"
     report_filename = "reportFilename"
     report_col = "metricColumnInReport"
-    ### New parameters for variable epsilon(experimental)
+    # New parameters for variable epsilon(experimental)
     varEpsilonType = "varEpsilonType"
     maxEpsilon = "maxEpsilon"
     minEpsilon = "minEpsilon"
-    variationWindow = "variationWindow" # Last epoch of variable epsilon,if
+    variationWindow = "variationWindow"  # Last epoch of variable epsilon,if
     # current epoch > than variation Window, set epsilon to minEpsilon
     maxEpsilonWindow = "maxEpsilonWindow"
-    period = "period" # Only useful for periodic epsilon modes
+    period = "period"  # Only useful for periodic epsilon modes
     density = "density"
+
 
 class SpawningDensity:
     values = "values"
     conditions = "conditions"
 
+
 class VariableEpsilonTypes:
     linearVariation = "linearVariation"
+
 
 class SimulationType:
     type = "type"
     pele = "pele"
     md = "md"
-    test  = "test"
+    test = "test"
+
 
 class SimulationParams:
     params = "params"
@@ -78,11 +94,13 @@ class SimulationParams:
     peleSteps = "peleSteps"
     iterations = "iterations"
 
+
 class ControlFileParams:
     generalParams = "generalParams"
     spawningBlockname = "spawning"
     simulationBlockname = "simulation"
     clusteringBlockname = "clustering"
+
 
 class GeneralParams:
     restart = "restart"
