@@ -256,7 +256,10 @@ def main(jsonParams=None):
         clusteringMethod.writeOutput(CLUSTERING_OUTPUT_DIR%i, degeneracyOfRepresentatives, CLUSTERING_OUTPUT_OBJECT%i)
         if i > 0:
             # Remove old clustering object, since we already have a newer one
-            os.remove(CLUSTERING_OUTPUT_OBJECT%(i-1))
+            try:
+                os.remove(CLUSTERING_OUTPUT_OBJECT%(i-1))
+            except OSError:
+                pass
 
         #Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:
