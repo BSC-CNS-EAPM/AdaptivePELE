@@ -1,7 +1,6 @@
 import math
 import sys
 import numpy as np
-from clustering import clustering
 import random
 import blockNames
 import spawningTypes
@@ -143,7 +142,16 @@ class SpawningCalculator:
         """
         if isinstance(array, list): array = np.array(array)
         weights = 1./array
-        weights /= sum(weights)
+
+        #Handle Nan cases
+        weights[weights == np.inf] = 0
+
+        #Handle all Nan cases
+        if weights.all() == 0:
+            weights[:] = 1./weights.shape[0]
+        else:
+            weights /= sum(weights)
+
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
 
     def getMetrics(self, clusters):
@@ -257,7 +265,6 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         maximumValue = np.max(metrics)
         shiftedMetrics = np.subtract(metrics, maximumValue)
 
-        """
         #all shiftedMetrics <= 0, sum(shiftedMetrics) < 0 => weights >= 0
         if abs(shiftedMetrics.sum()) < 1e-8:
             weights = np.ones(len(metrics))/len(metrics)
@@ -272,6 +279,7 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         else:
             weights = np.exp(-shiftedMetrics/kbT)
             weights /= sum(weights)
+        """
 
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
 
