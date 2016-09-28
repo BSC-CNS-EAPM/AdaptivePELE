@@ -195,6 +195,9 @@ class PDB:
         for atom in self.atoms.values():
             print atom #atom.printAtom()
 
+    def getNumberOfAtoms(self):
+        return len(self.atoms)
+
     def getAtom(self, atomId):
         return self.atoms[atomId]
 

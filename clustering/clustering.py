@@ -37,6 +37,9 @@ class Clusters:
 class Cluster:
     def __init__(self, pdb, thresholdRadius=0, contactMap=None, contacts=0,
                  metric=0, density=None):
+        """
+            contacts stands for contacts/ligandAtom
+        """
         self.pdb = pdb
         self.elements = 1
         self.threshold = thresholdRadius
@@ -174,9 +177,11 @@ class ContactsClustering(Clustering):
 
         # if made it here, the snapshot was not added into any cluster
         contacts = pdb.countContacts(self.resname, self.contactThresholdDistance)
+        numberOfLigandAtoms = pdb.getNumberOfAtoms()
+        contactsPerAtom = float(contacts)/numberOfLigandAtoms
 
-        threshold = self.thresholdCalculator.calculate(contacts)
-        cluster = Cluster(pdb, thresholdRadius=threshold, contacts=contacts,
+        threshold = self.thresholdCalculator.calculate(contactsPerAtom)
+        cluster = Cluster(pdb, thresholdRadius=threshold, contacts=contactsPerAtom,
                           metric=metric)
         self.clusters.addCluster(cluster)
         return len(self.clusters.clusters)-1
