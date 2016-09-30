@@ -9,7 +9,12 @@ def validate(control_file):
     isCorrect = True
     with open(control_file, 'r') as f:
         jsonFile = f.read()
-    parsedJSON = json.loads(jsonFile)
+    try:
+        print jsonFile
+        parsedJSON = json.loads(jsonFile)
+    except ValueError:
+        raise ValueError("Invalid JSON file!")
+
     for block in dir(validatorBlockNames.ControlFileParams):
         if block.startswith('__'):
             continue
