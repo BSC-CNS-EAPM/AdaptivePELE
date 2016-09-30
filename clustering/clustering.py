@@ -122,14 +122,14 @@ class Clustering:
                 cluster.writePDB(outputFilename)
 
             if cluster.metric:
-                writeString = "%d %d %d %d %.1f %.1f %.3f\n" % (i, cluster.elements,
+                writeString = "%d %d %d %.2f %.1f %.1f %.3f\n" % (i, cluster.elements,
                                                                 degeneracy[i],
                                                                 cluster.contacts,
                                                                 cluster.threshold,
                                                                 cluster.density,
                                                                 cluster.metric)
             else:
-                writeString = "%d %d %d %d %.1f %.1f -\n" % (i, cluster.elements,
+                writeString = "%d %d %d %.2f %.1f %.1f -\n" % (i, cluster.elements,
                                                              degeneracy[i],
                                                              cluster.contacts,
                                                              cluster.threshold,
