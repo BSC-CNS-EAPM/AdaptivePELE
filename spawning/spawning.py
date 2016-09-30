@@ -154,10 +154,10 @@ class SpawningCalculator:
         weights[weights == np.inf] = 0
 
         #Handle all Nan cases
-        if weights.all() == 0:
-            weights[:] = 1./weights.shape[0]
-        else:
+        if weights.any():
             weights /= sum(weights)
+        else:
+            weights[:] = 1./weights.shape[0]
 
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
 
@@ -231,9 +231,15 @@ class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
         sizes = self.getSizes(clusters)
         densities = self.calculateDensities(clusters)
 
-        weights = sizes/densities
+        if densities.any():
+            weights = sizes/densities
+        else:
+            weights = sizes
 
-        return self.divideInverselyProportionalToArray(weights, trajToDistribute)
+        argweights = weights.argsort()
+        weights_trimmed = np.zeros(len(sizes)) + 1e6
+        weights_trimmed[argweights[:trajToDistribute]] = weights[argweights[:trajToDistribute]]
+        return self.divideInverselyProportionalToArray(weights_trimmed, trajToDistribute)
 
 
 class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
