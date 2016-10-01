@@ -10,7 +10,14 @@ def automateSimulation(args):
     nSteps = args.nSteps
     simulationName = args.simulationName
     simulationRunner = simulationrunner.SimulationRunner({})
-    for i in range(1, numSimulations+1):
+    epochs = args.epochs
+    if epochs:
+        rangeOfEpochs = epochs
+    else:
+        rangeOfEpochs = range(1,numSimulations+1)
+    print "rangeOfEpochs", rangeOfEpochs
+
+    for i in rangeOfEpochs:
         controlFileDictionary = {"SEED": "%d%d%d", "OUTPUTPATH": "%s_%d"}
         SEED_i = int(controlFileDictionary["SEED"] % (i, nProcessors, nSteps))
         controlFileDictionary["SEED"] = SEED_i
@@ -31,6 +38,7 @@ def parseArguments():
     parser.add_argument('nProcessors', type=int)
     parser.add_argument('nSteps', type=int)
     parser.add_argument('simulationName', type=str)
+    parser.add_argument("-e", "--epochs", nargs='*', type=int, help="Epochs to run") 
     args = parser.parse_args()
     return args
 
