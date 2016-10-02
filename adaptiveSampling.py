@@ -149,7 +149,7 @@ def main(jsonParams=None):
     if restart:
         firstRun = findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT)
 
-        if firstRun != 0:
+        if firstRun and firstRun != 0:
             with open(CLUSTERING_OUTPUT_OBJECT % (firstRun), 'rb') as f:
                 clusteringMethod = pickle.load(f)
 
@@ -161,7 +161,7 @@ def main(jsonParams=None):
 
             initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, inputFileTemplate, tmpInitialStructuresTemplate, firstRun)
 
-    if not restart or firstRun == 0:
+    if not restart or not firstRun or firstRun == 0:
         # if restart and firstRun = 0, it must check into the initial structures
         # Choose initial structures
         if not debug:
