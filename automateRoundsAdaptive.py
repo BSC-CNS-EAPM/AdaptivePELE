@@ -1,7 +1,7 @@
 from simulation import simulationrunner
 import adaptiveSampling
 import argparse
-
+import os 
 
 def automateSimulation(args):
     controlFile = args.controlFile
@@ -23,7 +23,8 @@ def automateSimulation(args):
         controlFileDictionary["SEED"] = SEED_i
         outputPath_i = controlFileDictionary["OUTPUTPATH"] % (simulationName, i)
         controlFileDictionary["OUTPUTPATH"] = outputPath_i
-        controlFileName = "controlfile_%s_%d.conf" % (simulationName, i)
+        controlFileName = "tmp_%s_controlfile_%s_%d.conf" % (os.path.splitext(controlFile)[0],simulationName, i)
+        controlFileName.replace("/","_")
         simulationRunner.makeWorkingControlFile(controlFile, controlFileName,
                                                 controlFileDictionary)
         print "Starting simulation %d" % i
