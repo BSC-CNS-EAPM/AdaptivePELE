@@ -252,10 +252,20 @@ class ContactMapClustering(Clustering):
                 metricsArray = np.array(self.firstClusteringParams.metrics)
                 best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
                 best_metric = self.firstClusteringParams.metrics[best_metric_ind]
+
                 cluster_index = selectRandomCenter(cluster_members,
                                                    metricsArray[cluster_members])
+
+                contacts = self.firstClusteringParams.pdb_list[cluster_index].countContacts(self.resname,
+                                                                 self.contactThresholdDistance)
+
+                numberOfLigandAtoms = self.firstClusteringParams.pdb_list[cluster_index].getNumberOfAtoms()
+                contactsPerAtom = float(contacts)/numberOfLigandAtoms
+
                 cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_index],
-                                  contactMap=self.firstClusteringParams.contactmaps[cluster_index], metric=best_metric)
+                                  contactMap=self.firstClusteringParams.contactmaps[cluster_index],
+                                  contacts=contactsPerAtom, metric=best_metric)
+
                 cluster.elements += elements_in_cluster-1
                 self.secondClusteringParams.ids.append('new:%d' % center_ind)
                 self.secondClusteringParams.contactmaps.append(cluster.contactMap)
@@ -345,12 +355,22 @@ class ContactMapAgglomerativeClustering(Clustering):
                 metricsArray = np.array(self.firstClusteringParams.metrics)
                 best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
                 best_metric = self.firstClusteringParams.metrics[best_metric_ind]
+
                 cluster_center = selectRandomCenter(cluster_members,
                                                     metricsArray[cluster_members])
                 # cluster = Cluster(self.firstClusteringParams.pdb_list[best_metric_ind],
                 #                   contactMap=self.firstClusteringParams.contactmaps[best_metric_ind], metric=best_metric)
+
+                contacts = self.firstClusteringParams.pdb_list[cluster_center].countContacts(self.resname,
+                                                                 self.contactThresholdDistance)
+
+                numberOfLigandAtoms = self.firstClusteringParams.pdb_list[cluster_center].getNumberOfAtoms()
+                contactsPerAtom = float(contacts)/numberOfLigandAtoms
+
                 cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_center],
-                                  contactMap=self.firstClusteringParams.contactmaps[cluster_center], metric=best_metric)
+                                  contactMap=self.firstClusteringParams.contactmaps[cluster_center],
+                                  contacts=contactsPerAtom, metric=best_metric)
+
                 cluster.elements += elements_in_cluster-1
                 self.secondClusteringParams.ids.append('new:%d' % index)
                 self.secondClusteringParams.contactmaps.append(cluster.contactMap)
@@ -499,7 +519,7 @@ def processSnapshots(trajectories, reportBaseFilename, col,
         metrics.extend(metricstraj.tolist())
         for num, snapshot in enumerate(snapshots):
             pdb = atomset.PDB()
-            pdb.initialise(snapshot, atomname="CA")
+            pdb.initialise(snapshot, resname=resname)
             pdb_list.append(pdb)
             contactMap = pdb.createContactMap(resname, contactThresholdDistance)
             contactmaps.append(contactMap)
