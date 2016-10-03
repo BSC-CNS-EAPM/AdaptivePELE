@@ -4,10 +4,12 @@ class ClusteringTypes:
     contacts = "contacts"
     contactMapAffinity = "contactMapAffinity"
     contactMapAgglomerative = "contactMapAgglomerative"
+    contactMapAccumulative = "contactMapAccumulative"
     thresholdCalculator = "thresholdCalculator"
     ligandResname = "ligandResname"
     contactThresholdDistance = "contactThresholdDistance"
     nclusters = "nclusters"
+
 
 
 class ThresholdCalculator:

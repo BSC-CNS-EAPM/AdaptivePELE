@@ -121,12 +121,17 @@ class clusteringTypes:
             "ligandResname": "unicode",
             "contactThresholdDistance": "numbers.Real",
             "nclusters": "numbers.Real"
-        }
+        },
+        "contactMapAccumulative": {
+            "ligandResname": "unicode",
+            "contactThresholdDistance": "numbers.Real",
+        },
     }
     params = {
         "contacts": "unicode",
         "contactMapAffinity": "unicode",
         "contactMapAgglomerative": "unicode",
+        "contactMapAccumaltive": "unicode",
         "ligandResname": "unicode",
         "contactThresholdDistance": "numbers.Real",
         "nclusters": "numbers.Real"
