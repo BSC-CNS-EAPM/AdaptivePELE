@@ -1,21 +1,31 @@
 from clustering import clustering, thresholdcalculator
 import time
-import pickle
-import pdb as debug
+# import pickle
+# import pdb as debug
+import os
 from spawning import spawning, densitycalculator
 
-ntrajs = 63
+ntrajs = 31
 nclusters = 80
 thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
-#thresholdCalculator = thresholdCalculatorBuilder.build({
-#        "thresholdCalculator" : {
-#            "type" : "constant",
-#            "params" : {
-#                "value" : 2
-#            }
-#        }
-#})
+# thresholdCalculator = thresholdCalculatorBuilder.build({
+#         "thresholdCalculator" : {
+#             "type" : "constant",
+#             "params" : {
+#                 "value" : 2
+#             }
+#         }
+# })
 thresholdCalculator = thresholdCalculatorBuilder.build({})
+thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
+    "thresholdCalculator": {
+        "type" : "heaviside",
+        "params" : {
+            "conditions" : [1.2,1.0,0.5,0.0],
+            "values" : [0.2,0.4,0.5,0.8]
+        }
+    }
+})
 densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
 densityCalculator = densityCalculatorBuilder.build({
        "density" : {
@@ -41,6 +51,10 @@ ClCont = clustering.ContactsClustering(thresholdCalculator, resname="ALJ",
                                        reportBaseFilename="report",
                                        columnOfReportFile=5,
                                        contactThresholdDistance=contactThresholdDistance)
+ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc, resname="ALJ",
+                                                    reportBaseFilename="report",
+                                                    columnOfReportFile=5,
+                                                    contactThresholdDistance=contactThresholdDistance)
 spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 
 for i in range(1):
@@ -63,29 +77,34 @@ for i in range(1):
     print "Total time of clustering contacts, epoch %d: %.6f"%(i,endTimeCont-startTimeCont)
     print "Number of clusters contacts epoch %d: %d"%(i,len(ClCont.clusters.clusters))
     degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs, {})
-    ClCont.writeOutput("results",degeneraciesCont,"bla.pkl", False)
+    ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
+    os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
     # for index in range(len(degeneracies)):
-    #     #print index, ClCont.clusters.clusters[index].elements, degeneracies[index]
+    #     print index, ClCont.clusters.clusters[index].elements, degeneracies[index]
     #     ClCont.clusters.clusters[index].metric = degeneracies[index]
-    #startTimeDouble = time.time()
-    #ClDouble.cluster(path)
-    #endTimeDouble = time.time()
-    #print "Total time of clustering double, epoch %d: %.6f" % (i, endTimeDouble-startTimeDouble)
-    #print "Number of clusters double epoch %d: %d" % (i, len(ClDouble.clusters.clusters))
-    startTimeAgg = time.time()
-    ClAgg.cluster(path)
-    endTimeAgg = time.time()
-    print "Total time of clustering agglomerative, epoch %d: %.6f"%(i,endTimeAgg-startTimeAgg)
-    print "Number of clusters agglomerative epoch %d: %d"%(i,len(ClAgg.clusters.clusters))
+    # startTimeDouble = time.time()
+    # ClDouble.cluster(path)
+    # endTimeDouble = time.time()
+    # print "Total time of clustering double, epoch %d: %.6f" % (i, endTimeDouble-startTimeDouble)
+    # print "Number of clusters double epoch %d: %d" % (i, len(ClDouble.clusters.clusters))
+    # degeneraciesDouble = spawningObject.calculate(ClDouble.clusters.clusters, ntrajs, {})
+    # ClDouble.writeOutput("results",degeneraciesDouble,"ClDouble.pkl", False)
+    # os.rename("results/summary.txt", "results/summmary_ClDouble.txt")
+    # startTimeAgg = time.time()
+    # ClAgg.cluster(path)
+    # endTimeAgg = time.time()
+    # print "Total time of clustering agglomerative, epoch %d: %.6f"%(i,endTimeAgg-startTimeAgg)
+    # print "Number of clusters agglomerative epoch %d: %d"%(i,len(ClAgg.clusters.clusters))
+    # print ""
+    # degeneraciesAgg = spawningObject.calculate(ClAgg.clusters.clusters, ntrajs, {})
+    # ClAgg.writeOutput("clsummary",degeneraciesAgg,"ClAgg.pkl", False)
+    # os.rename("clsummary/summary.txt", "results/summary_ClAgg.txt")
+    startTimeAcc = time.time()
+    ClAcc.cluster(path)
+    endTimeAcc = time.time()
+    print "Total time of clustering accumulative, epoch %d: %.6f"%(i,endTimeAcc-startTimeAcc)
+    print "Number of clusters accumulative epoch %d: %d"%(i,len(ClAcc.clusters.clusters))
     print ""
-    degeneraciesAgg = spawningObject.calculate(ClAgg.clusters.clusters, ntrajs, {})
-    ClAgg.writeOutput("results",degeneraciesAgg,"bla.pkl", False)
-
-with open("ClCont.pkl", "w") as f:
-    pickle.dump(ClCont.clusters, f, -1)
-
-#with open("ClDouble.pkl", "w") as f:
-#    pickle.dump(ClDouble.clusters, f, -1)
-
-with open("ClAgg.pkl", "w") as f:
-    pickle.dump(ClAgg.clusters, f, -1)
+    degeneraciesAcc = spawningObject.calculate(ClAcc.clusters.clusters, ntrajs, {})
+    ClAcc.writeOutput("clsummary",degeneraciesAcc,"ClAcc.pkl", False)
+    os.rename("clsummary/summary.txt", "results/summary_ClAcc.txt")

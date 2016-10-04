@@ -12,7 +12,7 @@ from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import KMeans
 # TODO: to be removed when not used
-# import pdb as debug
+import pdb as debug
 
 
 class Clusters:
@@ -416,7 +416,7 @@ class ContactMapAccumulativeClustering(Clustering):
         pdb.initialise(snapshot, resname=self.resname)
         contactMap = pdb.createContactMap(self.resname, self.contactThresholdDistance)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
-            if np.abs(contactMap, cluster.contactMap).sum() < cluster.threshold:
+            if np.abs(contactMap-cluster.contactMap).sum()/contactMap.sum()< cluster.threshold:
                 cluster.addElement(metric)
                 return
 
@@ -425,7 +425,7 @@ class ContactMapAccumulativeClustering(Clustering):
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
         contactsPerAtom = float(contacts)/numberOfLigandAtoms
 
-        threshold = self.thresholdCalculator.calculte(contactsPerAtom)
+        threshold = self.thresholdCalculator.calculate(contactsPerAtom)
         cluster = Cluster(pdb, thresholdRadius=threshold, metric=metric,
                           contacts=contactsPerAtom, contactMap=contactMap)
         self.clusters.addCluster(cluster)
@@ -458,7 +458,7 @@ class ClusteringBuilder:
                                                      reportBaseFilename,
                                                      columnOfReportFile,
                                                      contactThresholdDistance)
-        elif clusteringTypes == blockNames.ClusteringTypes.contactMapAccumulative:
+        elif clusteringType == blockNames.ClusteringTypes.contactMapAccumulative:
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
             return ContactMapAccumulativeClustering(thresholdCalculator, resname,
