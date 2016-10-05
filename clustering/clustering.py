@@ -12,7 +12,7 @@ from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import KMeans
 # TODO: to be removed when not used
-# import pdb as debug
+import pdb as debug
 
 
 class Clusters:
@@ -97,6 +97,27 @@ class Clustering:
             and self.resname == other.resname\
             and self.col == other.col
 
+    # Move the cluster methods of contactsClustering to the Clustering
+    # superclass in order to make accessible to contactMapAccumaltiveClustering
+    # and avoid duplicate code
+    def cluster(self, paths):
+        trajectories = getAllTrajectories(paths)
+        for trajectory in trajectories:
+            trajNum = getTrajNum(trajectory)
+
+            snapshots = getSnapshots(trajectory, True)
+            if self.reportBaseFilename:
+                reportFilename = os.path.join(os.path.split(trajectory)[0],
+                                              self.reportBaseFilename % trajNum)
+                metrics = np.loadtxt(reportFilename, usecols=(self.col,))
+                if metrics.shape == ():
+                    metrics = np.array([metrics])
+            else:
+                metrics = np.zeros(len(snapshots))
+
+            for num, snapshot in enumerate(snapshots):
+                self.addSnapshotToCluster(snapshot, metrics[num])
+
     def writeOutput(self, outputPath, degeneracy, outputObject, writeAll):
         """
             Writes all the clustering information in outputPath
@@ -149,23 +170,6 @@ class ContactsClustering(Clustering):
                             columnOfReportFile, contactThresholdDistance)
         self.thresholdCalculator = thresholdCalculator
 
-    def cluster(self, paths):
-        trajectories = getAllTrajectories(paths)
-        for trajectory in trajectories:
-            trajNum = getTrajNum(trajectory)
-
-            snapshots = getSnapshots(trajectory, True)
-            if self.reportBaseFilename:
-                reportFilename = os.path.join(os.path.split(trajectory)[0],
-                                              self.reportBaseFilename % trajNum)
-                metrics = np.loadtxt(reportFilename, usecols=(self.col,))
-                if metrics.shape == ():
-                    metrics = np.array([metrics])
-            else:
-                metrics = np.zeros(len(snapshots))
-
-            for num, snapshot in enumerate(snapshots):
-                self.addSnapshotToCluster(snapshot, metrics[num])
 
     def addSnapshotToCluster(self, snapshot, metric=0):
         pdb = atomset.PDB()
@@ -252,10 +256,20 @@ class ContactMapClustering(Clustering):
                 metricsArray = np.array(self.firstClusteringParams.metrics)
                 best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
                 best_metric = self.firstClusteringParams.metrics[best_metric_ind]
+
                 cluster_index = selectRandomCenter(cluster_members,
                                                    metricsArray[cluster_members])
+
+                contacts = self.firstClusteringParams.pdb_list[cluster_index].countContacts(self.resname,
+                                                                 self.contactThresholdDistance)
+
+                numberOfLigandAtoms = self.firstClusteringParams.pdb_list[cluster_index].getNumberOfAtoms()
+                contactsPerAtom = float(contacts)/numberOfLigandAtoms
+
                 cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_index],
-                                  contactMap=self.firstClusteringParams.contactmaps[cluster_index], metric=best_metric)
+                                  contactMap=self.firstClusteringParams.contactmaps[cluster_index],
+                                  contacts=contactsPerAtom, metric=best_metric)
+
                 cluster.elements += elements_in_cluster-1
                 self.secondClusteringParams.ids.append('new:%d' % center_ind)
                 self.secondClusteringParams.contactmaps.append(cluster.contactMap)
@@ -345,12 +359,22 @@ class ContactMapAgglomerativeClustering(Clustering):
                 metricsArray = np.array(self.firstClusteringParams.metrics)
                 best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
                 best_metric = self.firstClusteringParams.metrics[best_metric_ind]
+
                 cluster_center = selectRandomCenter(cluster_members,
                                                     metricsArray[cluster_members])
                 # cluster = Cluster(self.firstClusteringParams.pdb_list[best_metric_ind],
                 #                   contactMap=self.firstClusteringParams.contactmaps[best_metric_ind], metric=best_metric)
+
+                contacts = self.firstClusteringParams.pdb_list[cluster_center].countContacts(self.resname,
+                                                                 self.contactThresholdDistance)
+
+                numberOfLigandAtoms = self.firstClusteringParams.pdb_list[cluster_center].getNumberOfAtoms()
+                contactsPerAtom = float(contacts)/numberOfLigandAtoms
+
                 cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_center],
-                                  contactMap=self.firstClusteringParams.contactmaps[cluster_center], metric=best_metric)
+                                  contactMap=self.firstClusteringParams.contactmaps[cluster_center],
+                                  contacts=contactsPerAtom, metric=best_metric)
+
                 cluster.elements += elements_in_cluster-1
                 self.secondClusteringParams.ids.append('new:%d' % index)
                 self.secondClusteringParams.contactmaps.append(cluster.contactMap)
@@ -379,6 +403,35 @@ class ContactMapAgglomerativeClustering(Clustering):
                 self.secondClusteringParams.newClusters.addCluster(cluster)
 
 
+class ContactMapAccumulativeClustering(Clustering):
+    def __init__(self, thresholdCalculator, resname=None,
+                 reportBaseFilename=None, columnOfReportFile=None,
+                 contactThresholdDistance=8):
+        Clustering.__init__(self, resname, reportBaseFilename,
+                            columnOfReportFile, contactThresholdDistance)
+        self.thresholdCalculator = thresholdCalculator
+
+    def addSnapshotToCluster(self, snapshot, metric=0):
+        pdb = atomset.PDB()
+        pdb.initialise(snapshot, resname=self.resname)
+        contactMap = pdb.createContactMap(self.resname, self.contactThresholdDistance)
+        for clusterNum, cluster in enumerate(self.clusters.clusters):
+            if np.abs(contactMap-cluster.contactMap).sum()/contactMap.sum()< cluster.threshold:
+                cluster.addElement(metric)
+                return
+
+        # if made it here, the snapshot was not added into any cluster
+        contacts = pdb.countContacts(self.resname, self.contactThresholdDistance)
+        numberOfLigandAtoms = pdb.getNumberOfAtoms()
+        contactsPerAtom = float(contacts)/numberOfLigandAtoms
+
+        threshold = self.thresholdCalculator.calculate(contactsPerAtom)
+        cluster = Cluster(pdb, thresholdRadius=threshold, metric=metric,
+                          contacts=contactsPerAtom, contactMap=contactMap)
+        self.clusters.addCluster(cluster)
+        return len(self.clusters.clusters)-1
+
+
 class ClusteringBuilder:
     def buildClustering(self, clusteringBlock, reportBaseFilename=None, columnOfReportFile=None):
         paramsBlock = clusteringBlock[blockNames.ClusteringTypes.params]
@@ -387,7 +440,7 @@ class ClusteringBuilder:
             clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
             contactThresholdDistance = paramsBlock[blockNames.ClusteringTypes.contactThresholdDistance]
         except KeyError as err:
-            err.message = err.message + ": Need to provide mandatory parameter in clustering block"
+            err.message += ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
 
         if clusteringType == blockNames.ClusteringTypes.contacts:
@@ -405,6 +458,11 @@ class ClusteringBuilder:
                                                      reportBaseFilename,
                                                      columnOfReportFile,
                                                      contactThresholdDistance)
+        elif clusteringType == blockNames.ClusteringTypes.contactMapAccumulative:
+            thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
+            thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
+            return ContactMapAccumulativeClustering(thresholdCalculator, resname,
+                                      reportBaseFilename, columnOfReportFile)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))
@@ -499,7 +557,7 @@ def processSnapshots(trajectories, reportBaseFilename, col,
         metrics.extend(metricstraj.tolist())
         for num, snapshot in enumerate(snapshots):
             pdb = atomset.PDB()
-            pdb.initialise(snapshot, atomname="CA")
+            pdb.initialise(snapshot, resname=resname)
             pdb_list.append(pdb)
             contactMap = pdb.createContactMap(resname, contactThresholdDistance)
             contactmaps.append(contactMap)

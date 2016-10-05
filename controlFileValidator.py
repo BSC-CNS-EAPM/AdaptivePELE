@@ -3,6 +3,7 @@ import blockNames
 import json
 import warnings
 import numbers
+import sys
 
 
 def validate(control_file):
@@ -141,7 +142,11 @@ def validateGeneralBlock(blockName, controlFileBlock):
     return isCorrect
 
 if __name__ == "__main__":
-    controlFiles = ["tests/data/3ptb_data/integrationTest%i.conf" % i for i in range(1, 4)]
-    for contfile in controlFiles:
-        print "Validating control file %s" % contfile
-        validate(contfile)
+
+    if len(sys.argv) > 1:
+        validate(sys.argv[1])
+    else:
+        controlFiles = ["tests/data/3ptb_data/integrationTest%i.conf" % i for i in range(1, 4)]
+        for contfile in controlFiles:
+            print "Validating control file %s" % contfile
+            validate(contfile)
