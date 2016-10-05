@@ -12,14 +12,16 @@ def extractCOMMatrix(clusters, resname):
     metrics = np.zeros(n)
     population = np.zeros(n)
     total_elements = 0
+    contacts = np.zeros(n)
     for index, cluster in enumerate(clusters):
         metrics[index] = cluster.metric
+        contacts[index] = cluster.contacts
         ligandPDB = atomset.PDB()
         ligandPDB.initialise(cluster.pdb.pdb, resname=resname)
         cluster_matrix[index, :] = ligandPDB.extractCOM()
         population[index] = cluster.elements
         total_elements += cluster.elements
-    return cluster_matrix, metrics, total_elements, population
+    return cluster_matrix, metrics, total_elements, population, contacts
 
 
 def plotClusters2D(cluster_matrix, metrics, title):
@@ -61,6 +63,23 @@ def plotClusters(cluster_matrix, metrics, title):
     ax.set_xlabel('x')
     return fig
 
+def plotClusteringData(pklObjectFilename, resname, metricPlotFilename="", populationPlotFilename="", contactsPlotFilename=""):
+    with open(pklObjectFilename, "r") as f:
+        clObject = pickle.load(f)
+
+    comCoord, metrics, totalElements, population, contacts = extractCOMMatrix(clObject.clusters.clusters, resname)
+
+    plot = plotClusters(comCoord, metrics, 'Clusters Contacts')
+    if metricPlotFilename: plot.savefig(metricPlotFilename)
+
+    plotContpop = plotClusters(comCoord, population, 'Clusters Contacts')
+    if populationPlotFilename: plotContpop.savefig(populationPlotFilename)
+
+    plotContpop = plotClusters(comCoord, contacts, 'Clusters Contacts')
+    if contactsPlotFilename: plotContpop.savefig(contactsPlotFilename)
+
+    print "Number of elements", totalElements
+
 if __name__ == "__main__":
     resname = "ALJ"
 
@@ -89,6 +108,16 @@ if __name__ == "__main__":
     # plotAggpop = plotClusters(matrixAgg, popAgg, 'Clusters ContactMap Agg')
     # plotAgg.savefig('results/contactmapAggpop.png')
     # print "Number of elements", totalElementsAgg
+
+    pklObjectFilename = "17/clustering/object.pkl"
+    resname = "K5Y"
+    metricPlotFilename = ""#"results/contactClusters.png"
+    populationPlotFilename = ""#"results/contactClusterspop.png"
+    contactsPlotFilename = ""#"results/contactClustersContacts.png"
+
+    plotClusteringData(pklObjectFilename, resname, metricPlotFilename, populationPlotFilename, contactsPlotFilename)
+    plt.show()
+    sys.exit()
 
 
     with open("ClCont.pkl", "r") as f:
