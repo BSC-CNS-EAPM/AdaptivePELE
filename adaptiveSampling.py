@@ -57,9 +57,8 @@ def findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT):
 
     for epoch in epochFolders:
         if os.path.exists(CLUSTERING_OUTPUT_OBJECT % epoch):
-            return epoch
-    if epoch <= 0:
-        return 0
+            return epoch + 1
+    return 0
 
 
 def loadParams(jsonParams):
@@ -149,8 +148,9 @@ def main(jsonParams=None):
     if restart:
         firstRun = findFirstRun(outputPath, CLUSTERING_OUTPUT_OBJECT)
 
-        if firstRun and firstRun != 0:
-            with open(CLUSTERING_OUTPUT_OBJECT % (firstRun), 'rb') as f:
+        if firstRun != 0:
+            lastClusteringEpoch = firstRun - 1
+            with open(CLUSTERING_OUTPUT_OBJECT % (lastClusteringEpoch), 'rb') as f:
                 clusteringMethod = pickle.load(f)
 
             degeneracyOfRepresentatives = startingConformationsCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
@@ -161,7 +161,7 @@ def main(jsonParams=None):
 
             initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, inputFileTemplate, tmpInitialStructuresTemplate, firstRun)
 
-    if not restart or not firstRun or firstRun == 0:
+    if not restart or firstRun == 0:
         # if restart and firstRun = 0, it must check into the initial structures
         # Choose initial structures
         if not debug:
