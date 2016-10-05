@@ -6,7 +6,7 @@ import os
 import blockNames
 import clusteringTypes
 import thresholdcalculator
-import utilities
+from utilities import utilities
 import pickle
 from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import AgglomerativeClustering
@@ -416,7 +416,9 @@ class ContactMapAccumulativeClustering(Clustering):
         pdb.initialise(snapshot, resname=self.resname)
         contactMap = pdb.createContactMap(self.resname, self.contactThresholdDistance)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
-            if np.abs(contactMap-cluster.contactMap).sum()/contactMap.sum()< cluster.threshold:
+            averageContacts = (0.5*(contactMap.sum()+cluster.contactMap.sum()))
+            differenceContactMaps = np.abs(contactMap-cluster.contactMap).sum()
+            if differenceContactMaps == 0 or differenceContactMaps/averageContacts < cluster.threshold:
                 cluster.addElement(metric)
                 return
 

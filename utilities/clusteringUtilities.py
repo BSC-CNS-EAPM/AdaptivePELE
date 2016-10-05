@@ -1,15 +1,5 @@
 import os
-import shutil
 import pickle
-from clustering import clustering
-
-def cleanup(tmpFolder):
-    if os.path.exists(tmpFolder):
-        shutil.rmtree(tmpFolder)
-
-def makeFolder(outputDir):
-    if not os.path.exists(outputDir):
-        os.makedirs(outputDir)
 
 def writeStructures(clusteringObject, listStructures, outputPath="cluster.pdb"):
     with open(clusteringObject, "rb") as f:

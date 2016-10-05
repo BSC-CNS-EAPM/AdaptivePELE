@@ -7,7 +7,7 @@ import time
 import glob
 import pickle
 import blockNames
-import utilities
+from utilities import utilities
 import controlFileValidator as validator
 from spawning import spawning, spawningTypes
 from simulation import simulationrunner, simulationTypes
