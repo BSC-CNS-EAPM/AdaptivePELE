@@ -257,12 +257,12 @@ class PDB:
         # empty contact map, rows are atoms of the ligand, columns are protein
         # alpha carbons
         contactMap = np.zeros((len(ligandPDB.atomList),
-                               len(alphaCarbonsPDB.atomList)))
+                               len(alphaCarbonsPDB.atomList)),dtype=bool)
         for rowind, ligandAtom in enumerate(ligandPDB.atomList):
             for colind, proteinAtom in enumerate(alphaCarbonsPDB.atomList):
                 dist2 = ligandPDB.atoms[ligandAtom].squaredDistance(alphaCarbonsPDB.atoms[proteinAtom])
                 if dist2 < contactThresholdDistance2:
-                    contactMap[rowind, colind] += 1
+                    contactMap[rowind, colind] = True
         return contactMap
 
 
