@@ -8,64 +8,114 @@ import numpy as np
 import os
 import collections
 
-clusteringFileSizeColumn = 5
-#clusteringFileSizeColumn = 4
-clusteringFolder = "clustering"
-summaryFile = "summary.txt"
-clusteringSummaryFile = os.path.join(clusteringFolder, summaryFile)
-templetizedClusteringSummaryFile = os.path.join("%d", clusteringSummaryFile)
-
 
 def getClusteringSummaryContent(file):
-    if os.path.isfile(file): 
+    if os.path.isfile(file):
         return np.genfromtxt(file)
     else: return []
 
 
-allFolders = os.listdir('.')
-epochFolders = [epoch for epoch in allFolders if epoch.isdigit()]
-numberOfEpochs=int(len(epochFolders))
+def getTotalNumberOfClustersPerEpoch(templetizedClusteringSummaryFile, folder):
+    allFolders = os.listdir(folder)
+    numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit()])
 
+    totalNumberOfClustersPerEpoch = []
+    for epoch in range(numberOfEpochs):
+        clusteringSummary = getClusteringSummaryContent(templetizedClusteringSummaryFile%epoch)
 
-numberOfClusters = []
-clustersPerEpoch = [{}]
-for epoch in range(numberOfEpochs):
-    clusteringSummary = getClusteringSummaryContent(templetizedClusteringSummaryFile%epoch)
+        if clusteringSummary != []:
+            totalNumberOfClustersPerEpoch.append(len(clusteringSummary))
 
+    return totalNumberOfClustersPerEpoch
+
+def findDifferentClustersInEpoch(column, summaryFile):
+    """
+        Returns a dictionary with the set of different elements in column and the number of elements in this epoch
+    """
+    clusteringSummary = getClusteringSummaryContent(summaryFile)
+
+    epochDictionary = {}
     if clusteringSummary != []:
-        numberOfClusters.append(len(clusteringSummary))
-        epochDictionary = {}
         for line in clusteringSummary:
-            size = line[clusteringFileSizeColumn]
-            if not size in epochDictionary:
-                epochDictionary[size] = len(np.argwhere(clusteringSummary[:,clusteringFileSizeColumn] == size))
+            value = line[column]
+            if not value in epochDictionary:
+                epochDictionary[value] = len(np.argwhere(clusteringSummary[:,column] == value))
+    return epochDictionary
+
+def findDifferentClustersForAllEpochs(column, templetizedClusteringSummaryFile, numberOfEpochs):
+    """
+        Returns a list with dictionaries for all epochs. The dictionary has the set of different values (according to column) and their number
+    """
+    clustersPerEpoch = []
+    for epoch in range(numberOfEpochs):
+        summaryFile = templetizedClusteringSummaryFile%epoch
+        epochDictionary = findDifferentClustersInEpoch(column, summaryFile)
+
         clustersPerEpoch.append(epochDictionary)
+    return clustersPerEpoch
 
-"""
-for epochSummary in clustersPerEpoch:
-    for size, numClusters in epochSummary.iteritems():
-        if not size in clustersPerSize:
-            clustersPerSize[size] = [numClusters]
-        else:
-            clustersPerSize[size].append(numClusters)
-"""
-clustersPerSize = collections.defaultdict(list)
-for epochSummary in clustersPerEpoch:
-    for size, numClusters in epochSummary.iteritems():
-            clustersPerSize[size].append(numClusters)
+def buildClustersPerValue(clustersPerEpoch, numberOfEpochs):
+    """
+        Returns dictionary with lists for the different values. The length of the list is equal to the number of "clustering/summary.txt" files found
+    """
+    clustersPerValue = collections.defaultdict(list)
+    for epochSummary in clustersPerEpoch:
+        for value, numClusters in epochSummary.iteritems():
+                clustersPerValue[value].append(numClusters)
 
-for size, numClusters in clustersPerSize.iteritems():
-    thisSizeClusters = clustersPerSize[size]
-    withPaddedValues  = np.lib.pad(thisSizeClusters, (numberOfEpochs-1-len(thisSizeClusters),0), 'constant', constant_values=(0,)) #-1 because it assumes that in the last epoch, no clustering was done
-    clustersPerSize[size] = withPaddedValues
+    #Pad with leading 0's for values that where not found until "numberOfEpochs - len(numClusters" epoch
+    for value, numClusters in clustersPerValue.iteritems():
+        withPaddedValues  = np.lib.pad(numClusters, (numberOfEpochs-len(numClusters),0), 'constant', constant_values=(0,))
+        clustersPerValue[value] = withPaddedValues
+
+    return clustersPerValue
+
+def getNumberOfClustersPerEpochForGivenColumn(column, templetizedClusteringSummaryFile, folder):
+    allFolders = os.listdir(folder)
+    numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit() and os.path.isfile(templetizedClusteringSummaryFile%int(epoch))])
+
+    clustersPerEpoch = findDifferentClustersForAllEpochs(column, templetizedClusteringSummaryFile, numberOfEpochs)
+
+    return buildClustersPerValue(clustersPerEpoch, numberOfEpochs)
 
 
-sizes = clustersPerSize.keys()
-sortedSizes = np.sort(sizes)
-plt.plot(numberOfClusters, label="All clusters")
-for size in sortedSizes:
-    plt.plot(clustersPerSize[size], label=str(size))
-plt.legend(loc=2)
-#plt.title("n=64, same threshold, variable density")
-#plt.savefig("../3ptb_4_64_numberOfClusters_6.png")
-plt.show()
+def plotClustersPerValue(clustersPerValue):
+    values = clustersPerValue.keys()
+    sortedValues = np.sort(values)
+    for value in sortedValues:
+        plt.plot(clustersPerValue[value], label=str(value))
+
+def main():
+    #Params
+    clusteringFileDensityColumn = 5
+    clusteringFileThresholdColumn = 4
+    clusteringFolder = "clustering"
+    summaryFile = "summary.txt"
+    folder = "."
+    #end params
+
+    clusteringSummaryFile = os.path.join(clusteringFolder, summaryFile)
+    templetizedClusteringSummaryFile = os.path.join("%d", clusteringSummaryFile)
+
+
+    totalNumberOfClustersPerEpoch = getTotalNumberOfClustersPerEpoch(templetizedClusteringSummaryFile, folder)
+    clustersPerDensityValue = getNumberOfClustersPerEpochForGivenColumn(clusteringFileDensityColumn, templetizedClusteringSummaryFile, folder)
+    clustersPerThresholdValue = getNumberOfClustersPerEpochForGivenColumn(clusteringFileThresholdColumn, templetizedClusteringSummaryFile, folder)
+
+    plt.figure(1)
+    plt.plot(totalNumberOfClustersPerEpoch, label="All clusters")
+
+    plotClustersPerValue(clustersPerDensityValue)
+    plt.legend(loc=2)
+    #plt.title("n=64, same threshold, variable density")
+    #plt.savefig("../3ptb_4_64_numberOfClusters_6.png")
+
+    plt.figure(2)
+    plt.plot(totalNumberOfClustersPerEpoch, label="All clusters")
+    plotClustersPerValue(clustersPerThresholdValue)
+    plt.legend(loc=2)
+
+    plt.show()
+
+if __name__ == "__main__":
+    main()
