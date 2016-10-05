@@ -103,9 +103,9 @@ class Clustering:
     def cluster(self, paths):
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
-            trajNum = getTrajNum(trajectory)
+            trajNum = utilities.getTrajNum(trajectory)
 
-            snapshots = getSnapshots(trajectory, True)
+            snapshots = utilities.getSnapshots(trajectory, True)
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
@@ -517,14 +517,6 @@ def getAllTrajectories(paths):
     return files
 
 
-def getSnapshots(trajectoryFile, verbose=False):
-    return atomset.getPDBSnapshots(trajectoryFile, verbose)
-
-
-def getTrajNum(trajFilename):
-    return int(trajFilename.split("_")[-1][:-4])
-
-
 def selectRandomCenter(cluster_members, metrics_weights):
     metrics_weights -= metrics_weights.max()
     if abs(metrics_weights.sum()) < 1e-8:
@@ -545,8 +537,8 @@ def processSnapshots(trajectories, reportBaseFilename, col,
     metrics = []
     contactmaps = []
     for trajectory in trajectories:
-        trajNum = getTrajNum(trajectory)
-        snapshots = getSnapshots(trajectory, True)
+        trajNum = utilities.getTrajNum(trajectory)
+        snapshots = utilities.getSnapshots(trajectory, True)
         if reportBaseFilename:
             reportFilename = os.path.join(os.path.split(trajectory)[0],
                                           reportBaseFilename % trajNum)

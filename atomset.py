@@ -309,22 +309,8 @@ def computeCOMDifference(PDB1, PDB2):
     return np.linalg.norm(COM1 - COM2)
 
 
-def getPDBSnapshots(file, verbose=False):
-    inputFile = open(file, "r")
-    inputFileContent = inputFile.read()
-
-    snapshots = inputFileContent.split("ENDMDL")[:-1]
-    if not verbose:
-        return snapshots
-
-    remarkInfo = "REMARK 000 File created using PELE++\nREMARK source            : %s\nREMARK original model nr : %d\nREMARK First snapshot is 1, not 0 (as opposed to report)\n"
-    snapshotsWithInfo  = [remarkInfo % (file, i+1)+snapshot for i, snapshot in enumerate(snapshots)]
-    return snapshotsWithInfo
-
-
 def readPDB(pdbfile):
-        # Finish more robust PDB initialization
-
+    # Finish more robust PDB initialization
     try:
         return open(pdbfile, "r").read()
     except IOError:
