@@ -17,7 +17,7 @@ def getClusteringSummaryContent(file):
 
 def getTotalNumberOfClustersPerEpoch(templetizedClusteringSummaryFile, folder):
     allFolders = os.listdir(folder)
-    numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit()])
+    numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit() and os.path.isfile(templetizedClusteringSummaryFile%int(epoch))])
 
     totalNumberOfClustersPerEpoch = []
     for epoch in range(numberOfEpochs):
@@ -85,6 +85,15 @@ def plotClustersPerValue(clustersPerValue):
     for value in sortedValues:
         plt.plot(clustersPerValue[value], label=str(value))
 
+
+def plotContactsHistogram(folder, templetizedClusteringSummaryFile):
+    allFolders = os.listdir(folder)
+    lastEpoch = len([epoch for epoch in allFolders if epoch.isdigit() and os.path.isfile(templetizedClusteringSummaryFile%int(epoch))]) - 1
+    lastSummary = templetizedClusteringSummaryFile%lastEpoch
+    contactsColumn = 3
+    allContacts = np.loadtxt(lastSummary, usecols=(contactsColumn,), ndmin=1)
+    plt.hist(allContacts)
+
 def main():
     #Params
     clusteringFileDensityColumn = 5
@@ -114,6 +123,10 @@ def main():
     plt.plot(totalNumberOfClustersPerEpoch, label="All clusters")
     plotClustersPerValue(clustersPerThresholdValue)
     plt.legend(loc=2)
+
+
+    plt.figure(3)
+    plotContactsHistogram(folder)
 
     plt.show()
 
