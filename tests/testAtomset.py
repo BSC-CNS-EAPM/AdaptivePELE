@@ -249,6 +249,8 @@ END   \n"
         pdb_native.initialise("tests/data/pdb_test_contact.pdb")
 
         # function to test
-        contact_map = pdb_native.createContactMap("AIN", 8)
+        contact_map, contacts = pdb_native.createContactMap("AIN", 8)
         golden_contact_map = np.array([[1, 0, 0, 0], [0, 1, 1, 1]])
+        golden_contacts = pdb_native.countContacts("AIN", 8)
         np.testing.assert_array_equal(contact_map, golden_contact_map)
+        self.assertEqual(golden_contacts, contacts)

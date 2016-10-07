@@ -264,7 +264,7 @@ class PDB:
                 dist2 = ligandPDB.atoms[ligandAtom].squaredDistance(alphaCarbonsPDB.atoms[proteinAtom])
                 if dist2 < contactThresholdDistance2:
                     contactMap[rowind, colind] = True
-                    contacts.update(proteinAtom)
+                    contacts.update([proteinAtom])
         return contactMap, len(contacts)
 
 
