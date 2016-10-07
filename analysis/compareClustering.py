@@ -17,12 +17,31 @@ thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
 #         }
 # })
 thresholdCalculator = thresholdCalculatorBuilder.build({})
+# Distance index
 thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
     "thresholdCalculator": {
         "type" : "heaviside",
         "params" : {
             "conditions" : [1.2,1.0,0.5,0.0],
             "values" : [0.2,0.4,0.5,0.8]
+        }
+    }
+})
+# Jaccard index
+#thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
+#    "thresholdCalculator": {
+#        "type" : "constant",
+#        "params" : {
+#            "value" : 0.015
+#        }
+#    }
+#})
+# correlation
+thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
+    "thresholdCalculator": {
+        "type" : "constant",
+        "params" : {
+            "value" : 0.15
         }
     }
 })
@@ -65,23 +84,20 @@ for i in range(1):
     path=["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/traj*"%i]
     paths_report=["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/report*"%i]
     trajs=clustering.getAllTrajectories(paths_report)
-    total_snapshots = 0
-    for traj in trajs:
-        for line in open(traj, "r"):
-            total_snapshots += 1
-        total_snapshots -= 1
-    print "Total snapsthots for epoch %d: %d" % (i, total_snapshots)
-    startTimeCont = time.time()
-    ClCont.cluster(path)
-    endTimeCont = time.time()
-    print "Total time of clustering contacts, epoch %d: %.6f"%(i,endTimeCont-startTimeCont)
-    print "Number of clusters contacts epoch %d: %d"%(i,len(ClCont.clusters.clusters))
-    degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs, {})
-    ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
-    os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
-    # for index in range(len(degeneracies)):
-    #     print index, ClCont.clusters.clusters[index].elements, degeneracies[index]
-    #     ClCont.clusters.clusters[index].metric = degeneracies[index]
+    # total_snapshots = 0
+    # for traj in trajs:
+    #     for line in open(traj, "r"):
+    #         total_snapshots += 1
+    #     total_snapshots -= 1
+    # print "Total snapsthots for epoch %d: %d" % (i, total_snapshots)
+    #startTimeCont = time.time()
+    # ClCont.cluster(path)
+    # endTimeCont = time.time()
+    # print "Total time of clustering contacts, epoch %d: %.6f"%(i,endTimeCont-startTimeCont)
+    # print "Number of clusters contacts epoch %d: %d"%(i,len(ClCont.clusters.clusters))
+    # degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs, {})
+    # ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
+    # os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
     # startTimeDouble = time.time()
     # ClDouble.cluster(path)
     # endTimeDouble = time.time()
@@ -99,12 +115,12 @@ for i in range(1):
     # degeneraciesAgg = spawningObject.calculate(ClAgg.clusters.clusters, ntrajs, {})
     # ClAgg.writeOutput("clsummary",degeneraciesAgg,"ClAgg.pkl", False)
     # os.rename("clsummary/summary.txt", "results/summary_ClAgg.txt")
-    startTimeAcc = time.time()
+    # startTimeAcc = time.time()
     ClAcc.cluster(path)
-    endTimeAcc = time.time()
-    print "Total time of clustering accumulative, epoch %d: %.6f"%(i,endTimeAcc-startTimeAcc)
-    print "Number of clusters accumulative epoch %d: %d"%(i,len(ClAcc.clusters.clusters))
-    print ""
-    degeneraciesAcc = spawningObject.calculate(ClAcc.clusters.clusters, ntrajs, {})
-    ClAcc.writeOutput("clsummary",degeneraciesAcc,"ClAcc.pkl", False)
-    os.rename("clsummary/summary.txt", "results/summary_ClAcc.txt")
+    # endTimeAcc = time.time()
+    # print "Total time of clustering accumulative, epoch %d: %.6f"%(i,endTimeAcc-startTimeAcc)
+    # print "Number of clusters accumulative epoch %d: %d"%(i,len(ClAcc.clusters.clusters))
+    # print ""
+    # degeneraciesAcc = spawningObject.calculate(ClAcc.clusters.clusters, ntrajs, {})
+    # ClAcc.writeOutput("clsummary",degeneraciesAcc,"ClAcc.pkl", False)
+    # os.rename("clsummary/summary.txt", "results/summary_ClAcc.txt")
