@@ -258,12 +258,14 @@ class PDB:
         # alpha carbons
         contactMap = np.zeros((len(ligandPDB.atomList),
                                len(alphaCarbonsPDB.atomList)),dtype=bool)
+        contacts = set([])
         for rowind, ligandAtom in enumerate(ligandPDB.atomList):
             for colind, proteinAtom in enumerate(alphaCarbonsPDB.atomList):
                 dist2 = ligandPDB.atoms[ligandAtom].squaredDistance(alphaCarbonsPDB.atoms[proteinAtom])
                 if dist2 < contactThresholdDistance2:
                     contactMap[rowind, colind] = True
-        return contactMap
+                    contacts.update(proteinAtom)
+        return contactMap, len(contacts)
 
 
 def computeRMSD2(PDB1, PDB2, symmetries={}):
