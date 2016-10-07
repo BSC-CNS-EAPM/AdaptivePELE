@@ -1,6 +1,3 @@
-import numbers
-
-
 class ControlFileParams:
     generalParams = "GeneralParams"
     spawningBlockname = "SpawningParams"
@@ -125,6 +122,7 @@ class clusteringTypes:
         "contactMapAccumulative": {
             "ligandResname": "unicode",
             "contactThresholdDistance": "numbers.Real",
+            "similarityEvaluator": "unicode"
         },
     }
     params = {
@@ -134,6 +132,7 @@ class clusteringTypes:
         "contactMapAccumaltive": "unicode",
         "ligandResname": "unicode",
         "contactThresholdDistance": "numbers.Real",
+        "similarityEvaluator": "unicode",
         "nclusters": "numbers.Real"
     }
     thresholdCalculator = {

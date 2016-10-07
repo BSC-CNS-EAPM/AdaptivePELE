@@ -9,7 +9,10 @@ class ClusteringTypes:
     ligandResname = "ligandResname"
     contactThresholdDistance = "contactThresholdDistance"
     nclusters = "nclusters"
-
+    similarityEvaluator = "similarityEvaluator"
+    differenceDistance = "differenceDistance"
+    Jaccard = "Jaccard"
+    correlation = "correlation"
 
 
 class ThresholdCalculator:
@@ -68,7 +71,6 @@ class SpawningParams:
     metricWeights = "metricWeights"
     linear = "linear"
     boltzmann = "boltzmann"
-
 
 
 class SpawningDensity:
