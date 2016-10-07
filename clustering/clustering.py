@@ -414,16 +414,29 @@ class ContactMapAccumulativeClustering(Clustering):
     def addSnapshotToCluster(self, snapshot, metric=0):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
-        contactMap = pdb.createContactMap(self.resname, self.contactThresholdDistance)
+        contactMap, contacts = pdb.createContactMap(self.resname, self.contactThresholdDistance)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
-            averageContacts = (0.5*(contactMap.sum()+cluster.contactMap.sum()))
-            differenceContactMaps = np.abs(contactMap-cluster.contactMap).sum()
-            if differenceContactMaps == 0 or differenceContactMaps/averageContacts < cluster.threshold:
+            # correlation
+            similarity = calculateCorrelationContactMaps(contactMap, cluster.contactMap)
+            similarity += 1  # Necessary to omit negative correlations
+            similarity /= 2.0  # Correlation values need to be higher now
+            distance = 1-similarity
+
+            # Jaccard index
+            # intersectContactMaps = (contactMap == cluster.contactMap).sum()
+            # averageContacts = contactMap.size + cluster.contactMap.size - intersectContactMaps
+            # similarity = float(intersectContactMaps)/averageContacts
+            # distance = 1-similarity
+
+            # simple index
+            # differenceContactMaps = np.abs(contactMap-cluster.contactMap).sum()
+            # averageContacts = (0.5*(contactMap.sum()+cluster.contactMap.sum()))
+            # distance = differenceContactMaps/averageContacts
+            if distance == 0 or distance < cluster.threshold:
                 cluster.addElement(metric)
                 return
 
         # if made it here, the snapshot was not added into any cluster
-        contacts = pdb.countContacts(self.resname, self.contactThresholdDistance)
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
         contactsPerAtom = float(contacts)/numberOfLigandAtoms
 
@@ -531,6 +544,12 @@ def selectRandomCenter(cluster_members, metrics_weights):
     return cluster_index
 
 
+def calculateCorrelationContactMaps(contactMap, clusterContactMap):
+    contactMap1 = contactMap.reshape((1, -1))
+    contactMap2 = clusterContactMap.reshape((1, -1))
+    return np.corrcoef(contactMap1, contactMap2)[0, 1]
+
+
 def processSnapshots(trajectories, reportBaseFilename, col,
                      contactThresholdDistance, resname):
     pdb_list = []
@@ -553,6 +572,6 @@ def processSnapshots(trajectories, reportBaseFilename, col,
             pdb = atomset.PDB()
             pdb.initialise(snapshot, resname=resname)
             pdb_list.append(pdb)
-            contactMap = pdb.createContactMap(resname, contactThresholdDistance)
+            contactMap, contacts = pdb.createContactMap(resname, contactThresholdDistance)
             contactmaps.append(contactMap)
     return pdb_list, metrics, contactmaps
