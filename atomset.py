@@ -271,6 +271,7 @@ def computeRMSD2(PDB1, PDB2, symmetries={}):
         Uses atom.id to match atoms from different pdbs
 
         Symmetries: Dictionary with elements atomId:symmetricalAtomId
+        Warning! It should contate the symmetry in both ways (i.e atom1Id:atom2Id, and atom2Id:atom1Id)
     """
     rmsd = 0
     for atom1Id, atom1 in PDB1.atoms.iteritems():
