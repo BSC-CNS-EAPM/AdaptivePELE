@@ -97,7 +97,7 @@ class Clustering:
             and self.resname == other.resname\
             and self.col == other.col
 
-    # Move the cluster methods of contactsClustering to the Clustering
+    # Moved the cluster methods of contactsClustering to the Clustering
     # superclass in order to make accessible to contactMapAccumaltiveClustering
     # and avoid duplicate code
     def cluster(self, paths):
@@ -143,14 +143,14 @@ class Clustering:
                 cluster.writePDB(outputFilename)
 
             if cluster.metric:
-                writeString = "%d %d %d %.2f %.1f %.1f %.3f\n" % (i, cluster.elements,
+                writeString = "%d %d %d %.2f %.2f %.1f %.3f\n" % (i, cluster.elements,
                                                                 degeneracy[i],
                                                                 cluster.contacts,
                                                                 cluster.threshold,
                                                                 cluster.density,
                                                                 cluster.metric)
             else:
-                writeString = "%d %d %d %.2f %.1f %.1f -\n" % (i, cluster.elements,
+                writeString = "%d %d %d %.2f %.2f %.1f -\n" % (i, cluster.elements,
                                                              degeneracy[i],
                                                              cluster.contacts,
                                                              cluster.threshold,
@@ -203,7 +203,7 @@ class ContactMapClustering(Clustering):
         Paths [in] list with the path to the trajectories to cluster"""
         trajectories = getAllTrajectories(paths)
 
-        pdb_list, metrics, contactmaps = processSnapshots(trajectories, self.reportBaseFilename,
+        pdb_list, metrics, contactmaps, contacts = processSnapshots(trajectories, self.reportBaseFilename,
                          self.col, self.contactThresholdDistance, self.resname)
         preferences = map(np.sum,contactmaps)
 
@@ -211,7 +211,7 @@ class ContactMapClustering(Clustering):
         preferences = None
         self.firstClusteringParams = clusteringResultsParameters(pdb_list=pdb_list,
                                                             metrics=metrics,
-                                                            contactmaps=contactmaps)
+                                                            contactmaps=contactmaps,contacts=contacts)
         self.secondClusteringParams = clusteringResultsParameters(contactmaps=[])
         contactmapsArray = np.array(self.firstClusteringParams.contactmaps)
         cluster_center_indices, indices = clusterContactMaps(contactmapsArray, preferences=preferences)
@@ -260,9 +260,7 @@ class ContactMapClustering(Clustering):
                 cluster_index = selectRandomCenter(cluster_members,
                                                    metricsArray[cluster_members])
 
-                contacts = self.firstClusteringParams.pdb_list[cluster_index].countContacts(self.resname,
-                                                                 self.contactThresholdDistance)
-
+                contacts = self.firstClusteringParams.contacts[cluster_index]
                 numberOfLigandAtoms = self.firstClusteringParams.pdb_list[cluster_index].getNumberOfAtoms()
                 contactsPerAtom = float(contacts)/numberOfLigandAtoms
 
@@ -314,12 +312,12 @@ class ContactMapAgglomerativeClustering(Clustering):
         metric of the cluster"""
         trajectories = getAllTrajectories(paths)
 
-        pdb_list, metrics, contactmaps = processSnapshots(trajectories, self.reportBaseFilename,
+        pdb_list, metrics, contactmaps, contacts = processSnapshots(trajectories, self.reportBaseFilename,
                          self.col, self.contactThresholdDistance, self.resname)
 
 
         self.firstClusteringParams = clusteringResultsParameters(pdb_list=pdb_list,
-                                     metrics=metrics, contactmaps=contactmaps)
+                                     metrics=metrics, contactmaps=contactmaps, contacts=contacts)
         self.secondClusteringParams = clusteringResultsParameters(contactmaps=[])
         clusters, labels = clusterAgglomerativeContactMaps(np.array(contactmaps), self.nclusters)
         self.processClusterResults("first", clusters, labels)
@@ -365,9 +363,7 @@ class ContactMapAgglomerativeClustering(Clustering):
                 # cluster = Cluster(self.firstClusteringParams.pdb_list[best_metric_ind],
                 #                   contactMap=self.firstClusteringParams.contactmaps[best_metric_ind], metric=best_metric)
 
-                contacts = self.firstClusteringParams.pdb_list[cluster_center].countContacts(self.resname,
-                                                                 self.contactThresholdDistance)
-
+                contacts = self.firstClusteringParams.contacts[cluster_center]
                 numberOfLigandAtoms = self.firstClusteringParams.pdb_list[cluster_center].getNumberOfAtoms()
                 contactsPerAtom = float(contacts)/numberOfLigandAtoms
 
@@ -475,13 +471,14 @@ class ClusteringBuilder:
 
 
 class clusteringResultsParameters:
-    def __init__(self, pdb_list=[], metrics=[], contactmaps=[]):
+    def __init__(self, pdb_list=[], metrics=[], contactmaps=[], contacts=[]):
             self.pdb_list = pdb_list
             self.metrics = metrics
             self.contactmaps = contactmaps
             self.elements = []
             self.ids = []
             self.newClusters = Clusters()
+            self.contacts = contacts
 
 
 class similarityEvaluatorBuilder:
@@ -589,6 +586,7 @@ def processSnapshots(trajectories, reportBaseFilename, col,
     pdb_list = []
     metrics = []
     contactmaps = []
+    contacts = []
     for trajectory in trajectories:
         trajNum = utilities.getTrajNum(trajectory)
         snapshots = utilities.getSnapshots(trajectory, True)
@@ -606,6 +604,7 @@ def processSnapshots(trajectories, reportBaseFilename, col,
             pdb = atomset.PDB()
             pdb.initialise(snapshot, resname=resname)
             pdb_list.append(pdb)
-            contactMap, contacts = pdb.createContactMap(resname, contactThresholdDistance)
+            contactMap, contactnum = pdb.createContactMap(resname, contactThresholdDistance)
             contactmaps.append(contactMap)
-    return pdb_list, metrics, contactmaps
+            contacts.append(contactnum)
+    return pdb_list, metrics, contactmaps, contacts
