@@ -63,94 +63,57 @@ def plotClusters(cluster_matrix, metrics, title):
     ax.set_xlabel('x')
     return fig
 
-def plotClusteringData(pklObjectFilename, resname, metricPlotFilename="", populationPlotFilename="", contactsPlotFilename=""):
+
+def plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
+                       titlecontacts, metricPlotFilename="",
+                       populationPlotFilename="", contactsPlotFilename=""):
+
     with open(pklObjectFilename, "r") as f:
         clObject = pickle.load(f)
 
     comCoord, metrics, totalElements, population, contacts = extractCOMMatrix(clObject.clusters.clusters, resname)
 
-    plot = plotClusters(comCoord, metrics, 'Clusters Contacts')
-    if metricPlotFilename: plot.savefig(metricPlotFilename)
+    plot = plotClusters(comCoord, metrics, titlemetric)
+    if metricPlotFilename:
+        plot.savefig(metricPlotFilename)
 
-    plotContpop = plotClusters(comCoord, population, 'Clusters Contacts')
-    if populationPlotFilename: plotContpop.savefig(populationPlotFilename)
+    plotContpop = plotClusters(comCoord, population, titlepopulation)
+    if populationPlotFilename:
+        plotContpop.savefig(populationPlotFilename)
 
-    plotContpop = plotClusters(comCoord, contacts, 'Clusters Contacts')
-    if contactsPlotFilename: plotContpop.savefig(contactsPlotFilename)
+    plotContcont = plotClusters(comCoord, contacts, titlecontacts)
+    if contactsPlotFilename:
+        plotContcont.savefig(contactsPlotFilename)
 
     print "Number of elements", totalElements
 
 if __name__ == "__main__":
     resname = "ALJ"
 
-    # with open("ClDouble.pkl","r") as f:
-    #    ClDouble = pickle.load(f)
-    # matrixDouble, metricsDouble,totalElementsDouble, popDouble = extractCOMMatrix(ClDouble.clusters.clusters,resname)
-    # plotDouble = plotClusters(matrixDouble, metricsDouble, 'Clusters ContactMap Double')
-    # plotDouble.savefig('results/contactmapDouble.png')
-    # plotDoublepop = plotClusters(matrixDouble, popDouble, 'Clusters ContactMap Double')
-    # plotDouble.savefig('results/contactmapDoublepop.png')
-    # print "Number of elements", totalElementsDouble
+    # Cont
+    pklObjectFilename = "ClCont.pkl"
+    metricPlotFilename = ""  # "results/contactClusters.png"
+    populationPlotFilename = ""  # "results/contactClusterspop.png"
+    contactsPlotFilename = ""  # "results/contactClustersContacts.png"
+    titlemetric = "Metrics Contacts"
+    titlepopulation = "Population Contacts"
+    titlecontacts = "Number of contacts Contacts"
 
-    # with open("ClAgg.pkl", "r") as f:
-    #     ClAgg = pickle.load(f)
-    # contactsAgg = []
-    # for cluster in ClAgg.clusters.clusters:
-    #         contactsAgg.append(cluster.contacts)
-    # fig = plt.figure()
-    # fig.suptitle("Contacts of Agglomerative clustering")
-    # plt.hist(np.array(contactsAgg))
-    # fig.savefig('results/aggContacts.png')
+    plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
+                       titlecontacts, metricPlotFilename,
+                       populationPlotFilename, contactsPlotFilename)
 
-    # matrixAgg, metricsAgg,totalElementsAgg, popAgg = extractCOMMatrix(ClAgg.clusters.clusters, resname)
-    # plotAgg = plotClusters(matrixAgg, metricsAgg, 'Clusters ContactMap Agg')
-    # plotAgg.savefig('results/contactmapAgg.png')
-    # plotAggpop = plotClusters(matrixAgg, popAgg, 'Clusters ContactMap Agg')
-    # plotAgg.savefig('results/contactmapAggpop.png')
-    # print "Number of elements", totalElementsAgg
+    # Acc
+    pklObjectFilename = "ClAcc.pkl"
+    metricPlotFilename = "results/metricplotAcc_correlation.png"
+    populationPlotFilename = "results/populationAcc_correlation.png"
+    contactsPlotFilename = "results/contactsplotAcc_correlation.png"
+    titlemetric = "Metrics Accumulative"
+    titlepopulation = "Population Accumulative"
+    titlecontacts = "Number of contacts Accumulative"
 
-    pklObjectFilename = "17/clustering/object.pkl"
-    resname = "K5Y"
-    metricPlotFilename = ""#"results/contactClusters.png"
-    populationPlotFilename = ""#"results/contactClusterspop.png"
-    contactsPlotFilename = ""#"results/contactClustersContacts.png"
+    plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
+                       titlecontacts, metricPlotFilename,
+                       populationPlotFilename, contactsPlotFilename)
 
-    plotClusteringData(pklObjectFilename, resname, metricPlotFilename, populationPlotFilename, contactsPlotFilename)
-    plt.show()
-    sys.exit()
-
-
-    with open("ClCont.pkl", "r") as f:
-        ClCont = pickle.load(f)
-    contactsCont = []
-    for cluster in ClCont.clusters.clusters:
-            contactsCont.append(cluster.contacts)
-    fig = plt.figure()
-    fig.suptitle("Contacts of Contacts clustering")
-    plt.hist(np.array(contactsCont))
-    fig.savefig('results/contContacts.png')
-    matrixCont, metricsCont, totalElementsCont, popCont = extractCOMMatrix(ClCont.clusters.clusters,resname)
-    plotCont = plotClusters(matrixCont, metricsCont, 'Clusters Contacts')
-    plotCont.savefig('results/contactClusters.png')
-    plotContpop = plotClusters(matrixCont, popCont, 'Clusters Contacts')
-    plotContpop.savefig('results/contactClusterspop.png')
-    print "Number of elements", totalElementsCont
-
-    with open("ClAcc.pkl", "r") as f:
-        ClAcc = pickle.load(f)
-    contactsAcc = []
-    for cluster in ClAcc.clusters.clusters:
-            contactsAcc.append(cluster.contacts)
-    fig = plt.figure()
-    fig.suptitle("Contacts of Accumulative clustering")
-    plt.hist(np.array(contactsAcc))
-    fig.savefig('results/accContacts.png')
-    matrixAcc, metricsAcc, totalElementsAcc, popAcc = extractCOMMatrix(ClAcc.clusters.clusters, resname)
-    plotAcc = plotClusters(matrixAcc, metricsAcc, 'Clusters Accumulative')
-    plotAcc.savefig('results/accClusters.png')
-    plotAccpop = plotClusters(matrixAcc, popAcc, 'Clusters Accumulative')
-    plotAccpop.savefig('results/accClusterspop.png')
-    print "Number of elements", totalElementsAcc
-
-    # debug.set_trace()
     plt.show()
