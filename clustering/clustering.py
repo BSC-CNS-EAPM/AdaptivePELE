@@ -404,35 +404,20 @@ class ContactMapAgglomerativeClustering(Clustering):
 
 
 class ContactMapAccumulativeClustering(Clustering):
-    def __init__(self, thresholdCalculator, resname=None,
+    def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
         self.thresholdCalculator = thresholdCalculator
+        self.similarityEvaluator = similarityEvaluator
 
     def addSnapshotToCluster(self, snapshot, metric=0):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         contactMap, contacts = pdb.createContactMap(self.resname, self.contactThresholdDistance)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
-            # correlation
-            similarity = calculateCorrelationContactMaps(contactMap, cluster.contactMap)
-            similarity += 1  # Necessary to omit negative correlations
-            similarity /= 2.0  # Correlation values need to be higher now
-            distance = 1-similarity
-
-            # Jaccard index
-            # intersectContactMaps = (contactMap == cluster.contactMap).sum()
-            # averageContacts = contactMap.size + cluster.contactMap.size - intersectContactMaps
-            # similarity = float(intersectContactMaps)/averageContacts
-            # distance = 1-similarity
-
-            # simple index
-            # differenceContactMaps = np.abs(contactMap-cluster.contactMap).sum()
-            # averageContacts = (0.5*(contactMap.sum()+cluster.contactMap.sum()))
-            # distance = differenceContactMaps/averageContacts
-            if distance == 0 or distance < cluster.threshold:
+            if self.similarityEvaluator.isSimilarCluster(contactMap, cluster):
                 cluster.addElement(metric)
                 return
 
@@ -476,7 +461,13 @@ class ClusteringBuilder:
         elif clusteringType == blockNames.ClusteringTypes.contactMapAccumulative:
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
-            return ContactMapAccumulativeClustering(thresholdCalculator, resname,
+            try:
+                similarityEvaluatorType = paramsBlock[blockNames.ClusteringTypes.similarityEvaluator]
+            except KeyError:
+                raise ValueError("No similarity Evaluator specified!!")
+            similarityBuilder = similarityEvaluatorBuilder()
+            similarityEvaluator = similarityBuilder.build(similarityEvaluatorType)
+            return ContactMapAccumulativeClustering(thresholdCalculator, similarityEvaluator, resname,
                                       reportBaseFilename, columnOfReportFile)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
@@ -491,6 +482,49 @@ class clusteringResultsParameters:
             self.elements = []
             self.ids = []
             self.newClusters = Clusters()
+
+
+class similarityEvaluatorBuilder:
+    def build(self, similarityEvaluatorType):
+        if similarityEvaluatorType == blockNames.ClusteringTypes.differenceDistance:
+            return differenceDistanceEvaluator()
+        elif similarityEvaluatorType == blockNames.ClusteringTypes.Jaccard:
+            return JaccardEvaluator()
+        elif similarityEvaluatorType == blockNames.ClusteringTypes.correlation:
+            return correlationEvaluator()
+        else:
+            sys.exit("Unknown threshold calculator type! Choices are: " + str(clusteringTypes.SIMILARITY_TYPES_TO_STRING_DICTIONARY.values()))
+
+
+class differenceDistanceEvaluator:
+    def isSimilarCluster(self, contactMap, cluster):
+        differenceContactMaps = np.abs(contactMap-cluster.contactMap).sum()
+        averageContacts = (0.5*(contactMap.sum()+cluster.contactMap.sum()))
+        if not averageContacts:
+            distance = differenceContactMaps/averageContacts
+            return distance < cluster.threshold
+        else:
+            # The only way the denominator can be 0 is if both contactMaps are
+            # all zeros, thus being equal and belonging to the same cluster
+            return True
+
+
+class JaccardEvaluator:
+    def isSimilarCluster(self, contactMap, cluster):
+        intersectContactMaps = (contactMap == cluster.contactMap).sum()
+        unionContactMaps = contactMap.size + cluster.contactMap.size - intersectContactMaps
+        similarity = float(intersectContactMaps)/unionContactMaps
+        distance = 1-similarity
+        return distance < cluster.threshold
+
+
+class correlationEvaluator:
+    def isSimilarCluster(self, contactMap, cluster):
+        similarity = calculateCorrelationContactMaps(contactMap, cluster.contactMap)
+        similarity += 1  # Necessary to omit negative correlations
+        similarity /= 2.0  # Correlation values need to be higher now
+        distance = 1-similarity
+        return distance < cluster.threshold
 
 
 # TODO: should it be a class method?
