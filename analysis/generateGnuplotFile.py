@@ -46,7 +46,6 @@ def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRu
     elif type(column1) == types.LambdaType:
         dictionary['col1'] = "(" + str(column1(i)) + ")"
 
-    print gnuplotString % dictionary + "\n"
     return gnuplotString % dictionary + "\n"
 
 
@@ -88,7 +87,7 @@ def generateForLoopString(gnuplotString, reportName, column1, column2, stepsPerR
 
 
 
-def main(stepsPerRun, xcol, ycol, reportName, kindOfPrint):
+def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint):
 
     if kindOfPrint == "PRINT_RMSD_STEPS":
         printWithLines = True
@@ -111,4 +110,4 @@ if __name__ == "__main__":
     elif rmsd:
         kindOfPrint = "PRINT_RMSD_STEPS"
 
-    main(stepsPerRun, xcol, ycol, filename, kindOfPrint)
+    print generatePrintString(stepsPerRun, xcol, ycol, filename, kindOfPrint)
