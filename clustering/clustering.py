@@ -498,12 +498,13 @@ class differenceDistanceEvaluator:
         differenceContactMaps = np.abs(contactMap-cluster.contactMap).sum()
         averageContacts = (0.5*(contactMap.sum()+cluster.contactMap.sum()))
         if not averageContacts:
-            distance = differenceContactMaps/averageContacts
-            return distance < cluster.threshold
-        else:
             # The only way the denominator can be 0 is if both contactMaps are
             # all zeros, thus being equal and belonging to the same cluster
             return True
+        else:
+            distance = differenceContactMaps/averageContacts
+            return distance < cluster.threshold
+
 
 
 class JaccardEvaluator:
