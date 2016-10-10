@@ -27,6 +27,8 @@ class DensityCalculatorBuilder():
             except KeyError:
                 print "Using default parameters for Heaviside density calculator"
                 return DensityCalculatorHeaviside()
+        elif type == blockNames.DensityCalculator.quadratic:
+            return QuadraticDensityCalculator()
         else:
             sys.exit("Unknown density calculator type! Choices are: " + str(densitycalculatortypes.DENSITY_CALCULATOR_TYPE_TO_STRING_DICTIONARY.values()))
 
@@ -66,3 +68,14 @@ class NullDensityCalculator(DensityCalculator):
 
     def calculate(self, contacts):
         return 1.
+
+class QuadraticDensityCalculator(DensityCalculator):
+    def __init__(self):
+        DensityCalculator.__init__(self)
+        self.type = densitycalculatortypes.DENSITY_CALCULATOR_TYPES.quadratic
+
+    def calculate(self, contacts):
+        if contacts > 2.0:
+            return 32
+        else:
+            return 8.76571*contacts**2-2.44857*contacts+0.28829
