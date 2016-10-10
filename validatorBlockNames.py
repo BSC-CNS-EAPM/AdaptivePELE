@@ -61,14 +61,16 @@ class SpawningParams:
         "types": {
             "heaviside": "unicode",
             "null": "unicode",
-            "constant": "unicode"
+            "constant": "unicode",
+            "quadratic": "unicode"
         },
         "params": {
             "heaviside": "unicode",
             "null": "unicode",
             "constant": "unicode",
             "values": "list",
-            "conditions": "list"
+            "conditions": "list",
+            "quadratic": "unicode"
         }
     }
 

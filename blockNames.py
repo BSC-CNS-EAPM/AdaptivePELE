@@ -34,6 +34,7 @@ class DensityCalculator:
     heaviside = "heaviside"
     null = "null"
     constant = "constant"
+    quadratic = "quadratic"
 
 
 class DensityCalculatorParams:
