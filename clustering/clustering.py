@@ -109,9 +109,7 @@ class Clustering:
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
-                metrics = np.loadtxt(reportFilename, usecols=(self.col,))
-                if metrics.shape == ():
-                    metrics = np.array([metrics])
+                metrics = np.loadtxt(reportFilename, usecols=(self.col,), ndmin=1)
             else:
                 metrics = np.zeros(len(snapshots))
 
