@@ -26,8 +26,8 @@ class clusteringTest(unittest.TestCase):
         goldenElementsCluster2 = 1
 
         self.assertEqual(len(allClusters), goldenNumberOfClusters)
-        self.assertAlmostEqual(allClusters[0].metric, goldenEnergyCluster1, 2)
-        self.assertAlmostEqual(allClusters[1].metric, goldenEnergyCluster2, 2)
+        self.assertAlmostEqual(allClusters[0].getMetric(), goldenEnergyCluster1, 2)
+        self.assertAlmostEqual(allClusters[1].getMetric(), goldenEnergyCluster2, 2)
         self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
         self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
 
@@ -132,9 +132,9 @@ class clusteringTest(unittest.TestCase):
         goldenElementsCluster3 = 1
 
         self.assertEqual(len(allClusters), goldenNumberOfClusters)
-        self.assertAlmostEqual(allClusters[0].metric, goldenEnergyCluster1, 2)
-        self.assertAlmostEqual(allClusters[1].metric, goldenEnergyCluster2, 2)
-        self.assertAlmostEqual(allClusters[2].metric, goldenEnergyCluster3, 2)
+        self.assertAlmostEqual(allClusters[0].getMetric(), goldenEnergyCluster1, 2)
+        self.assertAlmostEqual(allClusters[1].getMetric(), goldenEnergyCluster2, 2)
+        self.assertAlmostEqual(allClusters[2].getMetric(), goldenEnergyCluster3, 2)
         self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
         self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
         self.assertEqual(allClusters[2].elements, goldenElementsCluster3)
