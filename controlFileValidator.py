@@ -114,7 +114,9 @@ def validateBlock(blockName, controlFileBlock):
                               (blockType, 'unicode', type(blockType).__name__))
                 isCorrect = False
             # check rest of parameters specified
-            for param, value in controlFileBlock[block]["params"].iteritems():
+            # Do a get on the "params" block and return an empty list if not found
+            paramsControlFile = controlFileBlock[block].get("params", {})
+            for param, value in paramsControlFile.iteritems():
                 try:
                     if not isinstance(value, eval(params_dict[param])):
                         warnings.warn("Type for %s should be %s and instead is %s" %
