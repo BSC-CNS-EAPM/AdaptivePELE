@@ -37,8 +37,9 @@ class clusteringTest(unittest.TestCase):
                             "params": {"ligandResname": "AIN",
                                        "contactThresholdDistance": 8}}
         clusteringBuilder = clustering.ClusteringBuilder()
+        reportCol = 3
         clusteringInstance = clusteringBuilder.buildClustering(clusteringParams,
-                                                               "ain_report", 3)
+                                                               "ain_report", reportCol)
 
         trajNames = ["tests/data/aspirin_data/traj*"]
 
@@ -57,8 +58,8 @@ class clusteringTest(unittest.TestCase):
         goldenElementsCluster2 = 1
 
         self.assertEqual(len(allClusters), goldenNumberOfClusters)
-        self.assertAlmostEqual(allClusters[0].metric, goldenEnergyCluster1, 2)
-        self.assertAlmostEqual(allClusters[1].metric, goldenEnergyCluster2, 2)
+        self.assertAlmostEqual(allClusters[0].metrics[reportCol], goldenEnergyCluster1, 2)
+        self.assertAlmostEqual(allClusters[1].metrics[reportCol], goldenEnergyCluster2, 2)
         self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
         self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
 
@@ -70,8 +71,9 @@ class clusteringTest(unittest.TestCase):
                                        "contactThresholdDistance": 8,
                                        "nclusters": nclusters}}
         clusteringBuilder = clustering.ClusteringBuilder()
+        reportCol = 3
         clusteringInstance = clusteringBuilder.buildClustering(clusteringParams,
-                                                               "ain_report", 3)
+                                                               "ain_report", reportCol)
 
         trajNames = ["tests/data/aspirin_data/traj*"]
 
@@ -90,8 +92,8 @@ class clusteringTest(unittest.TestCase):
         goldenElementsCluster2 = 1
 
         self.assertEqual(len(allClusters), goldenNumberOfClusters)
-        self.assertAlmostEqual(allClusters[0].metric, goldenEnergyCluster1, 2)
-        self.assertAlmostEqual(allClusters[1].metric, goldenEnergyCluster2, 2)
+        self.assertAlmostEqual(allClusters[0].metrics[reportCol], goldenEnergyCluster1, 2)
+        self.assertAlmostEqual(allClusters[1].metrics[reportCol], goldenEnergyCluster2, 2)
         self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
         self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
 

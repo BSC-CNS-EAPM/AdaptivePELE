@@ -100,9 +100,9 @@ class TestSpawningCalculator(unittest.TestCase):
         sizes = [6, 2, 3, 1]
         energies = [-4, -2, -2, -1]
         for size, energy in zip(sizes, energies):
-            cluster = clustering.Cluster(None, None, None, None)
+            cluster = clustering.Cluster(None, None, None, None, metricCol=0)
             cluster.elements = size
-            cluster.metric = energy
+            cluster.metrics = [energy]
             clusters.addCluster(cluster)
 
         trajs = 20
@@ -120,9 +120,9 @@ class TestSpawningCalculator(unittest.TestCase):
         energies = [-4, -2, -2, 0]
         contacts = [4, 3, 2, 1]
         for size, energy, ncontacts in zip(sizes, energies, contacts):
-            cluster = clustering.Cluster(None, None, None, None)
+            cluster = clustering.Cluster(None, None, None, None, metricCol=0)
             cluster.elements = size
-            cluster.metric = energy
+            cluster.metrics = [energy]
             cluster.contacts = ncontacts
             clusters.addCluster(cluster)
 
@@ -179,9 +179,9 @@ class TestSpawningCalculator(unittest.TestCase):
         sizes = [6, 2, 3, 1]
         energies = [-4, -2, -2, -1]
         for size, energy in zip(sizes, energies):
-            cluster = clustering.Cluster(None, None, None, None)
+            cluster = clustering.Cluster(None, None, None, None, metricCol=0)
             cluster.elements = size
-            cluster.metric = energy
+            cluster.metrics = [energy]
             clusters.addCluster(cluster)
 
         trajs = 20
@@ -216,9 +216,9 @@ class TestSpawningCalculator(unittest.TestCase):
         sizes = [6, 2, 3, 1]
         energies = [-4, -2, -2, -1]
         for size, energy in zip(sizes, energies):
-            cluster = clustering.Cluster(None, None, None, None)
+            cluster = clustering.Cluster(None, None, None, None, metricCol=0)
             cluster.elements = size
-            cluster.metric = energy
+            cluster.metrics = [energy]
             clusters.addCluster(cluster)
 
         trajs = 20

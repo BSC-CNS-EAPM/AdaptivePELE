@@ -38,7 +38,7 @@ class Cluster:
     """A cluster contains a representative structure(pdb), the number of elements,
     its density, threhold, number of contacts, a contactMap(sometimes) and a metric"""
     def __init__(self, pdb, thresholdRadius=0, contactMap=None, contacts=0,
-                 metric=0, density=None):
+                 metric=None, metrics=[], metricCol=None , density=None):
         """
             contacts stands for contacts/ligandAtom
         """
@@ -49,26 +49,29 @@ class Cluster:
         self.contacts = contacts
         self.contactMap = contactMap
         self.metric = metric
+        self.metrics = metrics
+        self.metricCol = metricCol
 
-    def addElement(self, metric):
+    def addElement(self, metrics):
         self.elements += 1
-        self.metric = min(metric, self.metric)  # this for the moment
+        if len(metrics) and len(self.metrics) and metrics[self.metricCol] < self.metrics[self.metricCol]:
+            self.metric = metrics[self.metricCol]
+            self.metrics = metrics
 
     def printCluster(self, verbose=False):
         if verbose:
             print self.pdb.printAtoms()
         print "Elements: ", self.elements
-        print "Min energy: ", self.metric
+        print "Metrics: ", self.metrics
         if self.threshold != 0:
             print "Radius threshold: ", self.threshold
-        if self.contactMap is not None:
-            print "Number of contacts in contact map", np.sum(self.contactMap)
+        print "Number of contacts: ", self.contacts
 
     def writePDB(self, path):
         self.pdb.writePDB(path)
 
     def getMetric(self):
-        return self.metric
+        return self.metrics[self.metricCol]
 
     def getContacts(self):
         return self.contacts
@@ -121,13 +124,13 @@ class Clustering:
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
-                metrics = np.loadtxt(reportFilename, usecols=(self.col,), ndmin=1)
-            else:
-                # If no reportFile was specified, all metrics are set to 0
-                metrics = np.zeros(len(snapshots))
+                metrics = np.loadtxt(reportFilename, ndmin=2)
 
-            for num, snapshot in enumerate(snapshots):
-                self.addSnapshotToCluster(snapshot, metrics[num])
+                for num, snapshot in enumerate(snapshots):
+                    self.addSnapshotToCluster(snapshot, metrics[num][self.col], metrics[num], self.col)
+            else:
+                for num, snapshot in enumerate(snapshots):
+                    self.addSnapshotToCluster(snapshot)
 
     def writeOutput(self, outputPath, degeneracy, outputObject, writeAll):
         """
@@ -194,12 +197,12 @@ class ContactsClustering(Clustering):
         self.thresholdCalculator = thresholdCalculator
 
 
-    def addSnapshotToCluster(self, snapshot, metric=0):
+    def addSnapshotToCluster(self, snapshot, metric=0, metrics=[], col=0):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
             if atomset.computeRMSD(cluster.pdb, pdb) < cluster.threshold:
-                cluster.addElement(metric)
+                cluster.addElement(metrics)
                 return
 
         # if made it here, the snapshot was not added into any cluster
@@ -209,9 +212,8 @@ class ContactsClustering(Clustering):
 
         threshold = self.thresholdCalculator.calculate(contactsPerAtom)
         cluster = Cluster(pdb, thresholdRadius=threshold, contacts=contactsPerAtom,
-                          metric=metric)
+                          metric=metric, metrics=metrics, metricCol=col)
         self.clusters.addCluster(cluster)
-        return len(self.clusters.clusters)-1
 
 
 class ContactMapClustering(Clustering):
@@ -245,7 +247,7 @@ class ContactMapClustering(Clustering):
             for clusterNum, cluster in enumerate(self.clusters.clusters):
                 self.secondClusteringParams.contactmaps.append(cluster.contactMap)
                 self.secondClusteringParams.ids.append("old:%d" % clusterNum)
-                self.secondClusteringParams.metrics.append(cluster.metric)
+                self.secondClusteringParams.metrics.append(cluster.metrics)
                 self.secondClusteringParams.elements.append(cluster.elements)
 
             preferences = float((min(self.secondClusteringParams.elements)-max(self.secondClusteringParams.elements))/2)
@@ -277,11 +279,11 @@ class ContactMapClustering(Clustering):
             if process == "first":
                 elements_in_cluster = cluster_members.size
                 metricsArray = np.array(self.firstClusteringParams.metrics)
-                best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
-                best_metric = self.firstClusteringParams.metrics[best_metric_ind]
+                best_metric_ind = cluster_members[metricsArray[cluster_members, self.col].argmin()]
+                best_metrics = self.firstClusteringParams.metrics[best_metric_ind]
 
                 cluster_index = selectRandomCenter(cluster_members,
-                                                   metricsArray[cluster_members])
+                                                   metricsArray[cluster_members, self.col])
 
                 contacts = self.firstClusteringParams.contacts[cluster_index]
                 numberOfLigandAtoms = self.firstClusteringParams.pdb_list[cluster_index].getNumberOfAtoms()
@@ -289,12 +291,12 @@ class ContactMapClustering(Clustering):
 
                 cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_index],
                                   contactMap=self.firstClusteringParams.contactmaps[cluster_index],
-                                  contacts=contactsPerAtom, metric=best_metric)
+                                  contacts=contactsPerAtom, metrics=best_metrics, metricCol=self.col)
 
                 cluster.elements += elements_in_cluster-1
                 self.secondClusteringParams.ids.append('new:%d' % center_ind)
                 self.secondClusteringParams.contactmaps.append(cluster.contactMap)
-                self.secondClusteringParams.metrics.append(cluster.metric)
+                self.secondClusteringParams.metrics.append(cluster.metrics)
                 self.secondClusteringParams.elements.append(cluster.elements)
                 self.firstClusteringParams.newClusters.addCluster(cluster)
             else:
@@ -302,15 +304,15 @@ class ContactMapClustering(Clustering):
                 metricsArray = np.array(self.secondClusteringParams.metrics)
                 elements_in_cluster = elementsArray[cluster_members].sum()
                 index = selectRandomCenter(cluster_members,
-                                           metricsArray[cluster_members])
+                                           metricsArray[cluster_members, self.col])
                 cluster_index = int(self.secondClusteringParams.ids[index].split(":")[-1])
-                best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
-                best_metric = self.secondClusteringParams.metrics[best_metric_ind]
+                best_metric_ind = cluster_members[metricsArray[cluster_members, self.col].argmin()]
+                best_metrics = self.secondClusteringParams.metrics[best_metric_ind]
                 if index < len(self.firstClusteringParams.newClusters.clusters):
                     cluster = self.firstClusteringParams.newClusters.clusters[cluster_index]
                 else:
                     cluster = self.clusters.clusters[cluster_index]
-                cluster.metric = best_metric
+                cluster.metrics = best_metrics
                 cluster.elements += (elements_in_cluster-cluster.elements)
                 self.secondClusteringParams.newClusters.addCluster(cluster)
 
@@ -356,7 +358,7 @@ class ContactMapAgglomerativeClustering(Clustering):
             for clusterNum, cluster in enumerate(self.clusters.clusters):
                 self.secondClusteringParams.contactmaps.append(cluster.contactMap)
                 self.secondClusteringParams.ids.append("old:%d" % clusterNum)
-                self.secondClusteringParams.metrics.append(cluster.metric)
+                self.secondClusteringParams.metrics.append(cluster.metrics)
                 self.secondClusteringParams.elements.append(cluster.elements)
 
             new_contactmaps = np.array(self.secondClusteringParams.contactmaps)
@@ -385,11 +387,11 @@ class ContactMapAgglomerativeClustering(Clustering):
                 # Instead of using Kmeans to obtain a "center" or representative
                 # cluster, select one of the members randomly
                 metricsArray = np.array(self.firstClusteringParams.metrics)
-                best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
-                best_metric = self.firstClusteringParams.metrics[best_metric_ind]
+                best_metric_ind = cluster_members[metricsArray[cluster_members, self.col].argmin()]
+                best_metrics = self.firstClusteringParams.metrics[best_metric_ind]
 
                 cluster_center = selectRandomCenter(cluster_members,
-                                                    metricsArray[cluster_members])
+                                                    metricsArray[cluster_members, self.col])
                 # cluster = Cluster(self.firstClusteringParams.pdb_list[best_metric_ind],
                 #                   contactMap=self.firstClusteringParams.contactmaps[best_metric_ind], metric=best_metric)
 
@@ -399,32 +401,32 @@ class ContactMapAgglomerativeClustering(Clustering):
 
                 cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_center],
                                   contactMap=self.firstClusteringParams.contactmaps[cluster_center],
-                                  contacts=contactsPerAtom, metric=best_metric)
+                                  contacts=contactsPerAtom, metrics=best_metrics, metricCol=self.col)
 
                 cluster.elements += elements_in_cluster-1
                 self.secondClusteringParams.ids.append('new:%d' % index)
                 self.secondClusteringParams.contactmaps.append(cluster.contactMap)
-                self.secondClusteringParams.metrics.append(cluster.metric)
+                self.secondClusteringParams.metrics.append(cluster.metrics)
                 self.secondClusteringParams.elements.append(cluster.elements)
                 self.firstClusteringParams.newClusters.addCluster(cluster)
             else:
                 elementsArray = np.array(self.secondClusteringParams.elements)
                 metricsArray = np.array(self.secondClusteringParams.metrics)
                 elements_in_cluster = elementsArray[cluster_members].sum()
-                best_metric_ind = cluster_members[metricsArray[cluster_members].argmin()]
-                best_metric = self.secondClusteringParams.metrics[best_metric_ind]
+                best_metric_ind = cluster_members[metricsArray[cluster_members, self.col].argmin()]
+                best_metrics = self.secondClusteringParams.metrics[best_metric_ind]
                 # contactmapsArray = np.array(self.firstClusteringParams.contactmaps)
                 # cluster_index = clusterKmeans(contactmapsArray[cluster_members],1)
                 # Instead of using Kmeans to obtain a "center" or representative
                 # cluster, select one of the members randomly
                 cluster_center = selectRandomCenter(cluster_members,
-                                                    metricsArray[cluster_members])
+                                                    metricsArray[cluster_members, self.col])
                 cluster_index = int(self.secondClusteringParams.ids[cluster_center].split(":")[-1])
                 if cluster_center < self.nclusters:
                     cluster = self.firstClusteringParams.newClusters.clusters[cluster_index]
                 else:
                     cluster = self.clusters.clusters[cluster_index]
-                cluster.metric = best_metric
+                cluster.metrics = best_metrics
                 cluster.elements += (elements_in_cluster-cluster.elements)
                 self.secondClusteringParams.newClusters.addCluster(cluster)
 
@@ -450,13 +452,14 @@ class ContactMapAccumulativeClustering(Clustering):
         self.thresholdCalculator = thresholdCalculator
         self.similarityEvaluator = similarityEvaluator
 
-    def addSnapshotToCluster(self, snapshot, metric=0):
+    #TODO: refactor --> move to parent class and keep here contactMap creation
+    def addSnapshotToCluster(self, snapshot, metric=0, metrics=[], metricCol=None):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         contactMap, contacts = pdb.createContactMap(self.resname, self.contactThresholdDistance)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
             if self.similarityEvaluator.isSimilarCluster(contactMap, cluster):
-                cluster.addElement(metric)
+                cluster.addElement(metrics)
                 return
 
         # if made it here, the snapshot was not added into any cluster
@@ -465,9 +468,9 @@ class ContactMapAccumulativeClustering(Clustering):
 
         threshold = self.thresholdCalculator.calculate(contactsPerAtom)
         cluster = Cluster(pdb, thresholdRadius=threshold, metric=metric,
-                          contacts=contactsPerAtom, contactMap=contactMap)
+                          contacts=contactsPerAtom, contactMap=contactMap,
+                          metrics=metrics, metricCol=metricCol)
         self.clusters.addCluster(cluster)
-        return len(self.clusters.clusters)-1
 
 
 class ClusteringBuilder:
@@ -666,7 +669,7 @@ def processSnapshots(trajectories, reportBaseFilename, col,
         if reportBaseFilename:
             reportFilename = os.path.join(os.path.split(trajectory)[0],
                                           reportBaseFilename % trajNum)
-            metricstraj = np.loadtxt(reportFilename, usecols=(col,), ndmin=1)
+            metricstraj = np.loadtxt(reportFilename, ndmin=2)
         else:
             metricstraj = np.zeros(len(snapshots))
         # Prepare data for clustering
