@@ -35,6 +35,8 @@ class Clusters:
 
 
 class Cluster:
+    """A cluster contains a representative structure(pdb), the number of elements,
+    its density, threhold, number of contacts, a contactMap(sometimes) and a metric"""
     def __init__(self, pdb, thresholdRadius=0, contactMap=None, contacts=0,
                  metric=0, density=None):
         """
@@ -80,6 +82,14 @@ class Cluster:
 
 
 class Clustering:
+    """ Base class for clustering methods, it defines a cluster method that
+    contacts and accumulative inherit and use
+    Parameters:
+        resname [In] String containing the three letter name of the ligan in the pdb
+        reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
+        columnOfReportFile [In] Column of the report file that contain the metric of interest
+        contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
+        considered in contact(default 8)"""
     def __init__(self, resname=None, reportBaseFilename=None,
                  columnOfReportFile=None, contactThresholdDistance=8):
         self.clusters = Clusters()
@@ -101,6 +111,8 @@ class Clustering:
     # superclass in order to make accessible to contactMapAccumaltiveClustering
     # and avoid duplicate code
     def cluster(self, paths):
+        """ Cluster the snaptshots contained in the pahts folder
+            paths [In] List of folders with the snapshots """
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
@@ -113,6 +125,7 @@ class Clustering:
                 if metrics.shape == ():
                     metrics = np.array([metrics])
             else:
+                # If no reportFile was specified, all metrics are set to 0
                 metrics = np.zeros(len(snapshots))
 
             for num, snapshot in enumerate(snapshots):
@@ -163,6 +176,18 @@ class Clustering:
 
 
 class ContactsClustering(Clustering):
+    """ Cluster together all snapshots that are closer to the cluster center than
+    certain threshold. This threshold is assigned according to the ratio of
+    number of contacts over the number of heavy atoms of the ligand
+
+    thresholdCalculator [In] ThresholdCalculator object that calculate the threshold
+    according to the contacts ratio
+    resname [In] String containing the three letter name of the ligan in the pdb
+    reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
+    columnOfReportFile [In] Column of the report file that contain the metric of interest
+    contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
+    considered in contact(default 8)
+    """
     def __init__(self, thresholdCalculator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8):
@@ -295,6 +320,13 @@ class ContactMapClustering(Clustering):
 
 
 class ContactMapAgglomerativeClustering(Clustering):
+    """nclusters[In] Number of the cluster to generate with the hierarchical clustering algorithm
+        resname [In] String containing the three letter name of the ligan in the pdb
+        reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
+        columnOfReportFile [In] Column of the report file that contain the metric of interest
+        contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
+        considered in contact(default 8)
+    """
     def __init__(self, nclusters, resname=None, reportBaseFilename=None,
                  columnOfReportFile=None, contactThresholdDistance=8):
         Clustering.__init__(self, resname, reportBaseFilename,
@@ -400,6 +432,18 @@ class ContactMapAgglomerativeClustering(Clustering):
 
 
 class ContactMapAccumulativeClustering(Clustering):
+    """ Cluster together all snapshots that have similar enough contactMaps.
+    This similarity can be calculated with different methods (see similariyEvaluator documentation)
+
+    thresholdCalculator [In] ThresholdCalculator object that calculate the threshold
+    similarityEvaluator [In] SimilarityEvaluator object that will determine wether two snapshots
+    are similar enough to belong to the same cluster
+    resname [In] String containing the three letter name of the ligan in the pdb
+    reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
+    columnOfReportFile [In] Column of the report file that contain the metric of interest
+    contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
+    considered in contact(default 8)
+    """
     def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8):
@@ -471,6 +515,7 @@ class ClusteringBuilder:
 
 
 class clusteringResultsParameters:
+    """ Helper object to pass parameters in the ContactMap affinity and agglomerative clustering"""
     def __init__(self, pdb_list=[], metrics=[], contactmaps=[], contacts=[]):
             self.pdb_list = pdb_list
             self.metrics = metrics
@@ -494,7 +539,11 @@ class similarityEvaluatorBuilder:
 
 
 class differenceDistanceEvaluator:
+    """ Evaluate the similarity of two contactMaps by calculating the ratio of the
+    number of differences over the average of elements in the contacts maps"""
     def isSimilarCluster(self, contactMap, cluster):
+        """ Evaluate if two contactMaps are similar or not, return True if yes,
+        False otherwise"""
         differenceContactMaps = np.abs(contactMap-cluster.contactMap).sum()
         averageContacts = (0.5*(contactMap.sum()+cluster.contactMap.sum()))
         if not averageContacts:
@@ -508,7 +557,12 @@ class differenceDistanceEvaluator:
 
 
 class JaccardEvaluator:
+    """ Evaluate the similarity of two contactMaps by calculating the Jaccard
+    index, that is, the ratio between the intersection of the two contact maps and their
+    union"""
     def isSimilarCluster(self, contactMap, cluster):
+        """ Evaluate if two contactMaps are similar or not, return True if yes,
+        False otherwise"""
         intersectContactMaps = (contactMap == cluster.contactMap).sum()
         unionContactMaps = contactMap.size + cluster.contactMap.size - intersectContactMaps
         similarity = float(intersectContactMaps)/unionContactMaps
@@ -517,7 +571,10 @@ class JaccardEvaluator:
 
 
 class correlationEvaluator:
+    """ Evaluate the similarity of two contact maps by calculating thir correlation"""
     def isSimilarCluster(self, contactMap, cluster):
+        """ Evaluate if two contactMaps are similar or not, return True if yes,
+        False otherwise"""
         similarity = calculateCorrelationContactMaps(contactMap, cluster.contactMap)
         similarity += 1  # Necessary to omit negative correlations
         similarity /= 2.0  # Correlation values need to be higher now
@@ -527,6 +584,10 @@ class correlationEvaluator:
 
 # TODO: should it be a class method?
 def clusterContactMaps(contactmaps, preferences=None):
+    """ Cluster multiple contact maps with the affinity propagation algorithm
+    contactmaps [In] Array of contact maps
+    preferences [In] Input value to the affinity propagation algorithm, it
+    affects the number of clusters that will be generated"""
     contactmaps = contactmaps.reshape((contactmaps.shape[0], -1))
     affinitypropagation = AffinityPropagation(damping=0.9,
                                               preference=preferences,
@@ -537,6 +598,9 @@ def clusterContactMaps(contactmaps, preferences=None):
 
 
 def clusterAgglomerativeContactMaps(contactmaps, n_clusters):
+    """ Cluster multiple contact maps with the hierarchical clustering algorithm
+    contactmaps [In] Array of contact maps
+    n_clusters [In] Number of clusters that the clustering should generate"""
     contactmaps = contactmaps.reshape((contactmaps.shape[0], -1))
     agglomerative = AgglomerativeClustering(n_clusters=n_clusters,
                                             linkage='complete').fit(contactmaps)
@@ -546,6 +610,9 @@ def clusterAgglomerativeContactMaps(contactmaps, n_clusters):
 
 
 def clusterKmeans(contactmaps, n_clusters):
+    """ Cluster  multiple contact maps with the kmeans clustering algorithm
+    contactmaps [In] Array of contact maps
+    n_clusters [In] Number of clusters that the clustering should generate"""
     contactmaps = contactmaps.reshape((contactmaps.shape[0], -1))
     kmeans = KMeans(n_clusters=n_clusters).fit(contactmaps)
     center = kmeans.cluster_centers_[0]
@@ -556,6 +623,7 @@ def clusterKmeans(contactmaps, n_clusters):
 
 
 def getAllTrajectories(paths):
+    """ Find all the trajectory files in the paths specified"""
     files = []
     for path in paths:
         files += glob.glob(path)
@@ -563,6 +631,8 @@ def getAllTrajectories(paths):
 
 
 def selectRandomCenter(cluster_members, metrics_weights):
+    """ Extract a center randomly from a cluster, weighted according to their
+    metrics"""
     metrics_weights -= metrics_weights.max()
     if abs(metrics_weights.sum()) < 1e-8:
         metrics_weights = None
@@ -577,13 +647,17 @@ def selectRandomCenter(cluster_members, metrics_weights):
 
 
 def calculateCorrelationContactMaps(contactMap, clusterContactMap):
+    """ Calculate the correlation of two contactMaps"""
     contactMap1 = contactMap.reshape((1, -1))
+    # Reshape the matrix into a 1D array to use the numpy corrcoef function
     contactMap2 = clusterContactMap.reshape((1, -1))
     return np.corrcoef(contactMap1, contactMap2)[0, 1]
 
 
 def processSnapshots(trajectories, reportBaseFilename, col,
                      contactThresholdDistance, resname):
+    """ Create list of pdb, contactMaps, metrics and contacts from a series of
+    snapshots"""
     pdb_list = []
     metrics = []
     contactmaps = []
