@@ -38,7 +38,7 @@ class Cluster:
     """A cluster contains a representative structure(pdb), the number of elements,
     its density, threhold, number of contacts, a contactMap(sometimes) and a metric"""
     def __init__(self, pdb, thresholdRadius=0, contactMap=None, contacts=0,
-                 metric=None, metrics=[], metricCol=None , density=None):
+                 metrics=[], metricCol=None , density=None):
         """
             contacts stands for contacts/ligandAtom
         """
@@ -48,14 +48,18 @@ class Cluster:
         self.density = density
         self.contacts = contacts
         self.contactMap = contactMap
-        self.metric = metric
         self.metrics = metrics
         self.metricCol = metricCol
+
+    def getMetric(self):
+        if len(self.metrics):
+            return self.metrics[self.metricCol]
+        else:
+            return None
 
     def addElement(self, metrics):
         self.elements += 1
         if len(metrics) and len(self.metrics) and metrics[self.metricCol] < self.metrics[self.metricCol]:
-            self.metric = metrics[self.metricCol]
             self.metrics = metrics
 
     def printCluster(self, verbose=False):
@@ -70,9 +74,6 @@ class Cluster:
     def writePDB(self, path):
         self.pdb.writePDB(path)
 
-    def getMetric(self):
-        return self.metrics[self.metricCol]
-
     def getContacts(self):
         return self.contacts
 
@@ -81,7 +82,7 @@ class Cluster:
              and self.elements == other.elements\
              and self.threshold == other.threshold\
              and self.contacts == other.contacts\
-             and abs(self.metric-other.metric) < 1e-7
+             and np.allclose(self.metrics, other.metrics)
 
 
 class Clustering:
@@ -127,7 +128,7 @@ class Clustering:
                 metrics = np.loadtxt(reportFilename, ndmin=2)
 
                 for num, snapshot in enumerate(snapshots):
-                    self.addSnapshotToCluster(snapshot, metrics[num][self.col], metrics[num], self.col)
+                    self.addSnapshotToCluster(snapshot, metrics[num], self.col)
             else:
                 for num, snapshot in enumerate(snapshots):
                     self.addSnapshotToCluster(snapshot)
@@ -156,13 +157,14 @@ class Clustering:
                 outputFilename = os.path.join(outputPath, outputFilename)
                 cluster.writePDB(outputFilename)
 
-            if cluster.metric:
+            metric = cluster.getMetric()
+            if metric:
                 writeString = "%d %d %d %.2f %.2f %.1f %.3f\n" % (i, cluster.elements,
                                                                 degeneracy[i],
                                                                 cluster.contacts,
                                                                 cluster.threshold,
                                                                 cluster.density,
-                                                                cluster.metric)
+                                                                metric)
             else:
                 writeString = "%d %d %d %.2f %.2f %.1f -\n" % (i, cluster.elements,
                                                              degeneracy[i],
@@ -197,7 +199,7 @@ class ContactsClustering(Clustering):
         self.thresholdCalculator = thresholdCalculator
 
 
-    def addSnapshotToCluster(self, snapshot, metric=0, metrics=[], col=0):
+    def addSnapshotToCluster(self, snapshot, metrics=[], col=0):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
@@ -212,7 +214,7 @@ class ContactsClustering(Clustering):
 
         threshold = self.thresholdCalculator.calculate(contactsPerAtom)
         cluster = Cluster(pdb, thresholdRadius=threshold, contacts=contactsPerAtom,
-                          metric=metric, metrics=metrics, metricCol=col)
+                          metrics=metrics, metricCol=col)
         self.clusters.addCluster(cluster)
 
 
@@ -453,7 +455,7 @@ class ContactMapAccumulativeClustering(Clustering):
         self.similarityEvaluator = similarityEvaluator
 
     #TODO: refactor --> move to parent class and keep here contactMap creation
-    def addSnapshotToCluster(self, snapshot, metric=0, metrics=[], metricCol=None):
+    def addSnapshotToCluster(self, snapshot, metrics=[], metricCol=None):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         contactMap, contacts = pdb.createContactMap(self.resname, self.contactThresholdDistance)
@@ -467,7 +469,7 @@ class ContactMapAccumulativeClustering(Clustering):
         contactsPerAtom = float(contacts)/numberOfLigandAtoms
 
         threshold = self.thresholdCalculator.calculate(contactsPerAtom)
-        cluster = Cluster(pdb, thresholdRadius=threshold, metric=metric,
+        cluster = Cluster(pdb, thresholdRadius=threshold,
                           contacts=contactsPerAtom, contactMap=contactMap,
                           metrics=metrics, metricCol=metricCol)
         self.clusters.addCluster(cluster)
