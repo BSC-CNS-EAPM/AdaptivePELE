@@ -1,6 +1,7 @@
 import blockNames
 import thresholdcalculatortypes
 import sys
+import numpy as np
 
 #make test
 class ThresholdCalculatorBuilder():
@@ -46,6 +47,13 @@ class ThresholdCalculator():
     def calculate(self, contacts):
         pass
 
+    @abstractmethod
+    def __eq__(self, other):
+        pass
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 class ThresholdCalculatorConstant(ThresholdCalculator):
     def __init__(self, value = 2):
         self.type = thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.constant
@@ -53,6 +61,9 @@ class ThresholdCalculatorConstant(ThresholdCalculator):
 
     def calculate(self, contacts):
         return self.value
+
+    def __eq__(self, other):
+        return self.type == other.type and self.value == other.value
 
 class ThresholdCalculatorHeaviside(ThresholdCalculator):
     def __init__(self, conditions=[1.2,1.0,0.0], values=[2,2.5,3,4]):
@@ -72,3 +83,7 @@ class ThresholdCalculatorHeaviside(ThresholdCalculator):
         #the way it's built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the "else" value
         return self.values[-1]
 
+    def __eq__(self, other):
+        return self.type == other.type and\
+            np.allclose(self.conditions, other.conditions) and\
+            np.allclose(self.values, other.values)
