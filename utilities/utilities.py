@@ -49,3 +49,5 @@ def generateReciprocalAtoms(pairsDictionary):
 def assertSymmetriesDict(pairsDictionary, PDB):
     for key in pairsDictionary:
         assert key in PDB.atoms, "Symmetry atom %s not found in initial structure" % key
+    if pairsDictionary:
+        print "Symmetry dictionary correctly defined!"
