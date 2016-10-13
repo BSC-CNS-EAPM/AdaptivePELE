@@ -38,3 +38,14 @@ def calculateContactMapEigen(contactMap):
     assert (extendedCM == extendedCM.T).all(), "Extended ContactMap not symmetric"
     eiv, eic = np.linalg.eigh(extendedCM)
     return eiv, eic
+
+
+def generateReciprocalAtoms(pairsDictionary):
+    tmpDict = {}
+    for key,val in pairsDictionary.iteritems():
+        tmpDict[val] = key
+    return pairsDictionary.update(tmpDict)
+
+def assertSymmetriesDict(pairsDictionary, PDB):
+    for key in pairsDictionary:
+        assert key in PDB.atoms, "Symmetry atom %s not found in initial structure" % key

@@ -135,6 +135,7 @@ class clusteringTypes:
         "ligandResname": "unicode",
         "contactThresholdDistance": "numbers.Real",
         "similarityEvaluator": "unicode",
+        "symmetries": "dict",
         "nclusters": "numbers.Real"
     }
     thresholdCalculator = {
