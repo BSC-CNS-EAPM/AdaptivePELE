@@ -33,8 +33,11 @@ def main(folders, column, threshold, stepsPerEpoch, sequential):
 
         os.chdir(cwd)
 
-    print firstBE
-    analyse.analyseData(firstBE)
+    if len(firstBE) > 1:
+        print firstBE
+        analyse.analyseData(firstBE)
+    else:
+        print firstBE[0]
 
 
 if __name__ == "__main__":

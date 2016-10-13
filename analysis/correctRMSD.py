@@ -3,7 +3,8 @@ import os
 import glob
 import numpy as np
 from utilities import utilities
-
+import argparse
+import json
 
 def getRMSD(traj, nativePDB, resname, symmetries):
     snapshots = utilities.getSnapshots(traj)
@@ -19,33 +20,58 @@ def getRMSD(traj, nativePDB, resname, symmetries):
     return rmsds
 
 
-
-
 def extendReportWithRmsd(reportFile, rmsds):
     newShape = reportFile.shape
     newShape[1] += 1
     fixedReport = np.zeros(newShape)
     fixedReport[:,:-1] = reportFile
     fixedReport[:,-1] = rmsds
-    return fixedReport
 
+def parseArguments():
+    desc = "Program that fixes RMSD symmetries of a PELE report file."\
+            "Control file is a JSON file that contains \"resname\", \"native\", "\
+            "symmetries, and, optionally, the column to substitute in report. "\
+            "Example of content:"\
+            "{"\
+            "\"resname\" : \"K5Y\","\
+            "\"native\" : \"native.pdb\","\
+            "\"symmetries\" : {\"4122:C12:K5Y\":\"4123:C13:K5Y\", \"4120:C10:K5Y\":\"4127:C17:K5Y\"},"\
+            "\"column\" = 5"\
+            "}"
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("controlFile", type=str, help="Control File name")
+    args = parser.parse_args()
 
-def main():
+    return  args.controlFile, args.column, args.threshold, args.stepsPerEpoch, args.seq
+
+def readControlFile(controlFile):
+    jsonFile = open(controlFile, 'r').read()
+    parsedJSON = json.loads(jsonFile)
+    resname = parsedJSON["resname"]
+    nativeFilename = parsedJSON["native"]
+    symmetries = parsedJSON["symmetries"]
+    rmsdColInReport = parsedJSON.get("column")
+    if not rmsdColInReport:
+        #append to the end
+        rmsdColInReport = -1
+
+    return resname, nativeFilename, symmetries, rmsdColInReport
+
+def main(controlFile):
+    #Constants
     folder = "."
     outputFilename = "fixedReport_%d"
     trajName = "*traj*.pdb"
     reportName = "*report_%d"
-    resname = "K5Y"
-    nativeFilename = "/gpfs/scratch/bsc72/bsc72755/adaptiveSampling/data/4K5Y/4K5Y_native.pdb"
-    symmetries = {"C12:K5Y":"C13:K5Y", "C10:K5Y":"C17:K5Y", "C14:K5Y":"C16:K5Y", "C19:K5Y":"C20:K5Y", "C18:K5Y":"C21:K5Y"}
-    rmsdColInReport = 5
+    #end constants
+
+    resname, nativeFilename, symmetries, rmsdColInReport = readControlFile(controlFile)
 
 
     nativePDB = atomset.PDB()
     nativePDB.initialise(nativeFilename, resname=resname)
 
     utilities.generateReciprocalAtoms(symmetries)
-
 
     allFolders = os.listdir(folder)
     epochs = [epoch for epoch in allFolders if epoch.isdigit()]
@@ -64,7 +90,7 @@ def main():
 
             reportFile = np.loadtxt(reportFilename, ndmin=2)
 
-            if rmsdColInReport < reportFile.shape[1]:
+            if rmsdColInReport > 0 and rmsdColInReport < reportFile.shape[1]:
                 reportFile[:,rmsdColInReport] = rmsds
                 fixedReport = reportFile
             else:
@@ -75,4 +101,5 @@ def main():
         os.chdir("..")
 
 if __name__ == "__main__":
+    controlFile = parseArguments()
     main()
