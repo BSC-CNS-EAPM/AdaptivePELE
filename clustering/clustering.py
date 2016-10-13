@@ -11,9 +11,6 @@ import pickle
 from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import KMeans
-# TODO: to be removed when not used
-import pdb as debug
-
 
 class Clusters:
     def __init__(self):
@@ -96,6 +93,8 @@ class Clustering:
         considered in contact(default 8)"""
     def __init__(self, resname=None, reportBaseFilename=None,
                  columnOfReportFile=None, contactThresholdDistance=8):
+        self.type = "BaseClass"
+
         self.clusters = Clusters()
         if reportBaseFilename:
             self.reportBaseFilename = reportBaseFilename + "_%d"
@@ -104,6 +103,12 @@ class Clustering:
         self.resname = resname
         self.col = columnOfReportFile
         self.contactThresholdDistance = contactThresholdDistance
+
+    def setCol(self, col):
+        self.col = col
+
+        for cluster in self.clusters.clusters:
+            cluster.metricCol = col
 
     def __eq__(self, other):
         return self.clusters == other.clusters\
@@ -196,6 +201,7 @@ class ContactsClustering(Clustering):
                  contactThresholdDistance=8, symmetries={}):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
+        self.type = clusteringTypes.CLUSTERING_TYPES.contacts
         self.thresholdCalculator = thresholdCalculator
         self.symmetries = symmetries
 
@@ -220,6 +226,12 @@ class ContactsClustering(Clustering):
 
 
 class ContactMapClustering(Clustering):
+    def __init__(self, resname=None, reportBaseFilename=None,
+                 columnOfReportFile=None, contactThresholdDistance=8):
+        Clustering.__init__(self, resname, reportBaseFilename,
+                            columnOfReportFile, contactThresholdDistance)
+        self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAffinity
+
     def cluster(self, paths):
         """Cluster the snapshots of the trajectories provided using the
         affinity propagation algorithm and the contactMaps similarity.
@@ -334,6 +346,7 @@ class ContactMapAgglomerativeClustering(Clustering):
                  columnOfReportFile=None, contactThresholdDistance=8):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
+        self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAgglomerative
         self.nclusters = nclusters
 
     def cluster(self, paths):
@@ -452,10 +465,11 @@ class ContactMapAccumulativeClustering(Clustering):
                  contactThresholdDistance=8):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
+        self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative
         self.thresholdCalculator = thresholdCalculator
         self.similarityEvaluator = similarityEvaluator
 
-    #TODO: refactor --> move to parent class and keep here contactMap creation
+    #TODO: refactor --> move to parent class and only keep here contactMap creation
     def addSnapshotToCluster(self, snapshot, metrics=[], metricCol=None):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
