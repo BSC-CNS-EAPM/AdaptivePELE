@@ -13,6 +13,7 @@ class ClusteringTypes:
     differenceDistance = "differenceDistance"
     Jaccard = "Jaccard"
     correlation = "correlation"
+    symmetries = "symmetries"
 
 
 class ThresholdCalculator:

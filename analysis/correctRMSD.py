@@ -18,11 +18,7 @@ def getRMSD(traj, nativePDB, resname, symmetries):
 
     return rmsds
 
-def generateReciprocalAtoms(pairsDictionary):
-    tmpDict = {}
-    for key,val in pairsDictionary.iteritems():
-        tmpDict[val] = key
-    return pairsDictionary.update(tmpDict)
+
 
 
 def extendReportWithRmsd(reportFile, rmsds):
@@ -48,7 +44,7 @@ def main():
     nativePDB = atomset.PDB()
     nativePDB.initialise(nativeFilename, resname=resname)
 
-    generateReciprocalAtoms(symmetries)
+    utilities.generateReciprocalAtoms(symmetries)
 
 
     allFolders = os.listdir(folder)

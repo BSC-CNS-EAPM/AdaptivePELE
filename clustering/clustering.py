@@ -193,17 +193,18 @@ class ContactsClustering(Clustering):
     """
     def __init__(self, thresholdCalculator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8):
+                 contactThresholdDistance=8, symmetries={}):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
         self.thresholdCalculator = thresholdCalculator
+        self.symmetries = symmetries
 
 
     def addSnapshotToCluster(self, snapshot, metrics=[], col=0):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
-            if atomset.computeRMSD(cluster.pdb, pdb) < cluster.threshold:
+            if atomset.computeRMSD(cluster.pdb, pdb, self.symmetries) < cluster.threshold:
                 cluster.addElement(metrics)
                 return
 
@@ -485,12 +486,14 @@ class ClusteringBuilder:
         except KeyError as err:
             err.message += ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
-
         if clusteringType == blockNames.ClusteringTypes.contacts:
+            symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries,{})
+
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
             return ContactsClustering(thresholdCalculator, resname,
-                                      reportBaseFilename, columnOfReportFile)
+                                      reportBaseFilename, columnOfReportFile,
+                                      contactThresholdDistance, symmetries)
         elif clusteringType == blockNames.ClusteringTypes.contactMapAffinity:
             return ContactMapClustering(resname, reportBaseFilename,
                                         columnOfReportFile,

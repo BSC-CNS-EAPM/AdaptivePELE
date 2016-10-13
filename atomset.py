@@ -281,7 +281,6 @@ def computeRMSD2(PDB1, PDB2, symmetries={}):
         # HANDLE THE CASE WHEN ATOM2 IS NOT FOUND
         atom2 = PDB2.getAtom(atom1Id)
         d2 = atom1.squaredDistance(atom2)
-
         if symmetries:
             symAtom2Id = symmetries.get(atom1Id)
             if symAtom2Id:
