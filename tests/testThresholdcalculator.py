@@ -1,5 +1,6 @@
 from clustering import thresholdcalculator
 import unittest
+import numpy as np
 
 class thresholdCalculatorTest(unittest.TestCase):
     def testConstantDefaultParams(self):
@@ -25,7 +26,9 @@ class thresholdCalculatorTest(unittest.TestCase):
             "type" : "irrelevant",
             "thresholdCalculator" : {
                 "type" : "constant",
-                "value" : 3
+                "params" : {
+                    "value" : 3
+                }
             }
         }
 
@@ -46,10 +49,10 @@ class thresholdCalculatorTest(unittest.TestCase):
         values = thresholdCalculator.values
         conditions = thresholdCalculator.conditions
 
-        goldenValues = [2.,3.,4.]
-        goldenConditions = [15.,10.]
-        self.assertAlmostEqual(values, goldenValues, 10)
-        self.assertAlmostEqual(conditions, goldenConditions, 10)
+        goldenValues = [2.,2.5,3,4.]
+        goldenConditions = [1.2,1.0,0.0]
+        np.testing.assert_almost_equal(np.array(values), np.array(goldenValues), 10)
+        np.testing.assert_almost_equal(np.array(conditions), np.array(goldenConditions), 10)
 
     def testHeavisideDefaultParams(self):
         thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
@@ -65,10 +68,10 @@ class thresholdCalculatorTest(unittest.TestCase):
         values = thresholdCalculator.values
         conditions = thresholdCalculator.conditions
 
-        goldenValues = [2.,3.,4.]
-        goldenConditions = [15.,10.]
-        self.assertAlmostEqual(values, goldenValues, 10)
-        self.assertAlmostEqual(conditions, goldenConditions, 10)
+        goldenValues = [2.,2.5,3,4.]
+        goldenConditions = [1.2,1.0,0.0]
+        np.testing.assert_almost_equal(np.array(values), np.array(goldenValues) , 10)
+        np.testing.assert_almost_equal(np.array(conditions),np.array(goldenConditions), 10)
 
     def testHeavisideParams(self):
         thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
@@ -77,8 +80,10 @@ class thresholdCalculatorTest(unittest.TestCase):
             "type" : "irrelevant",
             "thresholdCalculator" : {
                 "type" : "heaviside",
-                "values" : [2,5,10],
-                "conditions" : [3,10]
+                "params" : {
+                    "values" : [2,5,10],
+                    "conditions" : [3,10]
+                }
             }
         }
 
