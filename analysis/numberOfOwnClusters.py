@@ -54,19 +54,29 @@ def findDifferentClustersForAllEpochs(column, templetizedClusteringSummaryFile, 
         clustersPerEpoch.append(epochDictionary)
     return clustersPerEpoch
 
+def getAllDifferentValues(clustersPerEpoch):
+    allValues = set()
+    for epochSummary in clustersPerEpoch:
+        for value, numClusters in epochSummary.iteritems():
+            allValues.update([value])
+    return allValues
+
 def buildClustersPerValue(clustersPerEpoch, numberOfEpochs):
     """
         Returns dictionary with lists for the different values. The length of the list is equal to the number of "clustering/summary.txt" files found
     """
     clustersPerValue = collections.defaultdict(list)
-    for epochSummary in clustersPerEpoch:
-        for value, numClusters in epochSummary.iteritems():
-                clustersPerValue[value].append(numClusters)
 
-    #Pad with leading 0's for values that where not found until "numberOfEpochs - len(numClusters" epoch
-    for value, numClusters in clustersPerValue.iteritems():
-        withPaddedValues  = np.lib.pad(numClusters, (numberOfEpochs-len(numClusters),0), 'constant', constant_values=(0,))
-        clustersPerValue[value] = withPaddedValues
+    allValues = getAllDifferentValues(clustersPerEpoch)
+
+    for epochSummary in clustersPerEpoch:
+        foundValues = set()
+        for value, numClusters in epochSummary.iteritems():
+            clustersPerValue[value].append(numClusters)
+            foundValues.update([value])
+
+        for value in allValues - foundValues:
+            clustersPerValue[value].append(0)
 
     return clustersPerValue
 
