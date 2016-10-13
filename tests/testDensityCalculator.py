@@ -10,7 +10,7 @@ class densityCalculatorTest(unittest.TestCase):
         self.assertEqual(densityCalculator.type, densitycalculatortypes.DENSITY_CALCULATOR_TYPES.null)
 
     def testDensityCalculatorNullCalculator(self):
-        spawningBlock = { 
+        spawningBlock = {
             type: "irrelevant",
             "density" : {
                 "type" : "null"
@@ -21,7 +21,7 @@ class densityCalculatorTest(unittest.TestCase):
         self.assertEqual(densityCalculator.type, densitycalculatortypes.DENSITY_CALCULATOR_TYPES.null)
 
     def testDensityCalculatorHeavisideNoParams(self):
-        spawningBlock = { 
+        spawningBlock = {
             type: "irrelevant",
             "density" : {
                 "type" : "heaviside"
@@ -39,12 +39,14 @@ class densityCalculatorTest(unittest.TestCase):
         self.assertEqual(densityCalculator.conditions, goldenConditions)
 
     def testDensityCalculatorHeavisideParams(self):
-        spawningBlock = { 
+        spawningBlock = {
             type: "irrelevant",
             "density" : {
                 "type" : "heaviside",
-                "conditions" : [1,2],
-                "values" : [1,2]
+                "params" : {
+                    "conditions" : [1,2],
+                    "values" : [1,2]
+                }
             }
         }
         densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()

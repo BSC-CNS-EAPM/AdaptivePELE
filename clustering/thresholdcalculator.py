@@ -1,5 +1,7 @@
 import blockNames
 import thresholdcalculatortypes
+import sys
+import numpy as np
 
 #make test
 class ThresholdCalculatorBuilder():
@@ -12,20 +14,22 @@ class ThresholdCalculatorBuilder():
 
         try:
             type = thresholdCalculatorBlock[blockNames.ThresholdCalculator.type]
-        except KeyError: 
+        except KeyError:
             sys.exit("Threshold calculator must have a type")
 
         if type == blockNames.ThresholdCalculator.constant:
             try:
-                value = thresholdCalculatorBlock[blockNames.ThresholdCalculator.value]
+                paramsBlock = thresholdCalculatorBlock[blockNames.ThresholdCalculator.params]
+                value = paramsBlock[blockNames.ThresholdCalculatorParams.value]
                 return ThresholdCalculatorConstant(value)
             except KeyError:
                 print "Using default parameters for constant threshold calculator"
                 return ThresholdCalculatorConstant()
         elif type == blockNames.ThresholdCalculator.heaviside:
             try:
-                values = thresholdCalculatorBlock[blockNames.ThresholdCalculator.values]
-                conditions = thresholdCalculatorBlock[blockNames.ThresholdCalculator.conditions]
+                paramsBlock = thresholdCalculatorBlock[blockNames.ThresholdCalculator.params]
+                values = paramsBlock[blockNames.ThresholdCalculatorParams.values]
+                conditions = paramsBlock[blockNames.ThresholdCalculatorParams.conditions]
                 return ThresholdCalculatorHeaviside(conditions, values)
             except KeyError:
                 print "Using default parameters for Heaviside threshold calculator"
@@ -43,6 +47,13 @@ class ThresholdCalculator():
     def calculate(self, contacts):
         pass
 
+    @abstractmethod
+    def __eq__(self, other):
+        pass
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 class ThresholdCalculatorConstant(ThresholdCalculator):
     def __init__(self, value = 2):
         self.type = thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.constant
@@ -51,10 +62,13 @@ class ThresholdCalculatorConstant(ThresholdCalculator):
     def calculate(self, contacts):
         return self.value
 
+    def __eq__(self, other):
+        return self.type == other.type and self.value == other.value
+
 class ThresholdCalculatorHeaviside(ThresholdCalculator):
-    def __init__(self, conditions=[15,10], values=[2,3,4]):
+    def __init__(self, conditions=[1.2,1.0,0.0], values=[2,2.5,3,4]):
         self.type = thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.heaviside
-    
+
         if len(values) != len(conditions) and len(values) != len(conditions) + 1:
             raise ValueError('The number of values must be equal or one more, than the number of conditions')
 
@@ -69,3 +83,7 @@ class ThresholdCalculatorHeaviside(ThresholdCalculator):
         #the way it's built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the "else" value
         return self.values[-1]
 
+    def __eq__(self, other):
+        return self.type == other.type and\
+            np.allclose(self.conditions, other.conditions) and\
+            np.allclose(self.values, other.values)

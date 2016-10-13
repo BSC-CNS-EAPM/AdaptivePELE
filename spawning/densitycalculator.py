@@ -1,5 +1,6 @@
 import blockNames
 import densitycalculatortypes
+import sys
 
 class DensityCalculatorBuilder():
     def build(self, spawningBlock):
@@ -11,7 +12,7 @@ class DensityCalculatorBuilder():
 
         try:
             type = densityBlock[blockNames.DensityCalculator.type]
-        except KeyError: 
+        except KeyError:
             sys.exit("Density calculator must have a type")
 
         if type == blockNames.DensityCalculator.null or type == blockNames.DensityCalculator.constant:
@@ -19,12 +20,15 @@ class DensityCalculatorBuilder():
             return NullDensityCalculator()
         elif type == blockNames.DensityCalculator.heaviside:
             try:
-                values = densityBlock[blockNames.DensityCalculator.values]
-                conditions = densityBlock[blockNames.DensityCalculator.conditions]
+                paramsBlock = densityBlock[blockNames.DensityCalculator.params]
+                values = paramsBlock[blockNames.DensityCalculatorParams.values]
+                conditions = paramsBlock[blockNames.DensityCalculatorParams.conditions]
                 return DensityCalculatorHeaviside(conditions, values)
             except KeyError:
                 print "Using default parameters for Heaviside density calculator"
                 return DensityCalculatorHeaviside()
+        elif type == blockNames.DensityCalculator.quadratic:
+            return QuadraticDensityCalculator()
         else:
             sys.exit("Unknown density calculator type! Choices are: " + str(densitycalculatortypes.DENSITY_CALCULATOR_TYPE_TO_STRING_DICTIONARY.values()))
 
@@ -64,3 +68,14 @@ class NullDensityCalculator(DensityCalculator):
 
     def calculate(self, contacts):
         return 1.
+
+class QuadraticDensityCalculator(DensityCalculator):
+    def __init__(self):
+        DensityCalculator.__init__(self)
+        self.type = densitycalculatortypes.DENSITY_CALCULATOR_TYPES.quadratic
+
+    def calculate(self, contacts):
+        if contacts > 2.0:
+            return 32
+        else:
+            return 8.76571*contacts**2-2.44857*contacts+0.28829
