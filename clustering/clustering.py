@@ -103,6 +103,7 @@ class Clustering:
         self.resname = resname
         self.col = columnOfReportFile
         self.contactThresholdDistance = contactThresholdDistance
+        self.symmetries = {}
 
     def setCol(self, col):
         self.col = col
