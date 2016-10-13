@@ -6,12 +6,20 @@ class ControlFileParams:
 
 
 class GeneralParams:
-    params = {
+    mandatory = {
         "restart": "bool",
         "outputPath": "unicode",
         "initialStructures": "list",
         "debug": "bool",
         "writeAllClusteringStructures": "bool"
+    }
+    params = {
+        "restart": "bool",
+        "outputPath": "unicode",
+        "initialStructures": "list",
+        "debug": "bool",
+        "writeAllClusteringStructures": "bool",
+        "nativeStructure": "unicode"
     }
 
 

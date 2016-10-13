@@ -1,6 +1,7 @@
 import os
 import shutil
 import numpy as np
+import atomset
 
 
 def cleanup(tmpFolder):
@@ -51,3 +52,16 @@ def assertSymmetriesDict(pairsDictionary, PDB):
         assert key in PDB.atoms, "Symmetry atom %s not found in initial structure" % key
     if pairsDictionary:
         print "Symmetry dictionary correctly defined!"
+
+
+def getRMSD(traj, nativePDB, resname, symmetries):
+    snapshots = getSnapshots(traj)
+    rmsds = np.zeros(len(snapshots))
+
+    for i, snapshot in enumerate(snapshots):
+        snapshotPDB = atomset.PDB()
+        snapshotPDB.initialise(snapshot, resname=resname)
+
+        rmsds[i] = atomset.computeRMSD(nativePDB, snapshotPDB, symmetries)
+
+    return rmsds
