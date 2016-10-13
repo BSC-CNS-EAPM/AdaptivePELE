@@ -6,20 +6,6 @@ from utilities import utilities
 import argparse
 import json
 
-def getRMSD(traj, nativePDB, resname, symmetries):
-    snapshots = utilities.getSnapshots(traj)
-
-    rmsds = np.zeros(len(snapshots))
-
-    for i, snapshot in enumerate(snapshots):
-        snapshotPDB = atomset.PDB()
-        snapshotPDB.initialise(snapshot, resname=resname)
-
-        rmsds[i] = atomset.computeRMSD(nativePDB, snapshotPDB, symmetries)
-
-    return rmsds
-
-
 def extendReportWithRmsd(reportFile, rmsds):
     newShape = reportFile.shape
     newShape[1] += 1
@@ -81,7 +67,7 @@ def main(controlFile):
         allTrajs = glob.glob(trajName)
 
         for traj in allTrajs:
-            rmsds = getRMSD(traj, nativePDB, resname, symmetries)
+            rmsds = utilities.getRMSD(traj, nativePDB, resname, symmetries)
             trajNum = utilities.getTrajNum(traj)
             try:
                 reportFilename = glob.glob(reportName%trajNum)[0]

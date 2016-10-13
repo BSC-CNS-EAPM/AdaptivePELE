@@ -131,14 +131,25 @@ def validateBlock(blockName, controlFileBlock):
 
 def validateGeneralBlock(blockName, controlFileBlock):
     isCorrect = True
-    for key, value in controlFileBlock.iteritems():
+    for key,value in blockName.mandatory.iteritems():
         try:
-            if not isinstance(controlFileBlock[key], eval(blockName.params[key])):
+            if not isinstance(controlFileBlock[key], eval(value)):
                 warnings.warn("Type for %s should be %s and instead is %s" %
                               (key, value, type(controlFileBlock[key]).__name__))
                 isCorrect = False
         except KeyError:
             warnings.warn("Mandatory parameter %s in GeneralParams not found." %
+                          key)
+            isCorrect = False
+
+    for key, value in controlFileBlock.iteritems():
+        try:
+            if not isinstance(value, eval(blockName.params[key])):
+                warnings.warn("Type for %s should be %s and instead is %s" %
+                              (key, value, type(blockName.params[key]).__name__))
+                isCorrect = False
+        except KeyError:
+            warnings.warn("Parameter %s in GeneralParams not recognized." %
                           key)
             isCorrect = False
     return isCorrect

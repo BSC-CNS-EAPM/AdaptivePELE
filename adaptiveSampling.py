@@ -15,14 +15,36 @@ from simulation import simulationrunner, simulationTypes
 from clustering import clustering, clusteringTypes
 
 
-def checkSymmetryDict(clusteringBlock, initialStructures):
-    utilities.generateReciprocalAtoms(clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.symmetries])
-    symmetries = clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.symmetries]
-    resname = clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.ligandResname]
+def checkSymmetryDict(clusteringBlock, initialStructures, resname):
+    utilities.generateReciprocalAtoms(clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.symmetries, {}))
+    symmetries = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.symmetries, {})
     for structure in initialStructures:
         PDB = atomset.PDB()
         PDB.initialise(structure, resname=resname)
-        utilities.assertSymmetriesDict(symmetries,PDB)
+        utilities.assertSymmetriesDict(symmetries, PDB)
+
+
+def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries):
+    outputFilename = "fixedReport_%d"
+    trajName = "*traj*.pdb"
+    reportName = "*report_%d"
+    trajs = glob.glob(os.path.join(outputPath, trajName))
+    nativePDB = atomset.PDB()
+    nativePDB.initialise(nativeStructure, resname=resname)
+    for traj in trajs:
+        trajNum = utilities.getTrajNum(traj)
+        rmsd = list(utilities.getRMSD(traj, nativePDB, resname, symmetries))
+        try:
+            reportFilename = glob.glob(os.path.join(outputPath, reportName) % trajNum)[0]
+        except IndexError:
+            raise IndexError("File %s not found in folder %s" % (reportName % trajNum, outputPath))
+        rmsd.insert(0, "\tCorrected RMSD")
+        with open(reportFilename, "r") as f:
+            report = f.readlines()
+        outfile = open(os.path.join(outputPath, outputFilename % trajNum), "w")
+        for line, value in zip(report, rmsd):
+            outfile.write(line.rstrip("\n")+str(value)+"\n")
+        outfile.close()
 
 
 def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, iteration):
@@ -137,6 +159,9 @@ def main(jsonParams=None):
     outputPath = generalParams[blockNames.GeneralParams.outputPath]
     initialStructures = generalParams[blockNames.GeneralParams.initialStructures]
     writeAll = generalParams[blockNames.GeneralParams.writeAllClustering]
+    nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
+    resname = clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.ligandResname]
+
 
     print "================================"
     print "            PARAMS              "
@@ -155,7 +180,7 @@ def main(jsonParams=None):
     print "Initial Structures: ", initialStructures
     print "================================\n\n"
 
-    checkSymmetryDict(clusteringBlock, initialStructures)
+    checkSymmetryDict(clusteringBlock, initialStructures, resname)
 
     # PRIVATE CONSTANTS
     ORIGINAL_CONTROLFILE = os.path.join(outputPath, "originalControlFile.conf")
@@ -291,6 +316,9 @@ def main(jsonParams=None):
             # simulationRunner.parameters needn't be passed to makeWorkingControlFile
             simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, tmpControlFilename % (i+1), peleControlFileDictionary)
 
+        if clusteringMethod.symmetries and nativeStructure:
+            fixReportsSymmetry(outputPathTempletized % i, resname,
+                               nativeStructure, clusteringMethod.symmetries)
     # utilities.cleanup
     # utilities.cleanup(tmpFolder)
 
