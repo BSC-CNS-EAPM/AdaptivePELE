@@ -118,3 +118,4 @@ class GeneralParams:
     initialStructures = "initialStructures"
     debug = "debug"
     writeAllClustering = "writeAllClusteringStructures"
+    nativeStructure = "nativeStructure"
