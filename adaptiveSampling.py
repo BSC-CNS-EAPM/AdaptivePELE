@@ -11,7 +11,7 @@ from utilities import utilities
 import controlFileValidator as validator
 from spawning import spawning, spawningTypes
 from simulation import simulationrunner, simulationTypes
-from clustering import clustering
+from clustering import clustering, clusteringTypes
 
 
 def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, iteration):
@@ -77,6 +77,33 @@ def saveInitialControlFile(jsonParams, originalControlFile):
     file = open(originalControlFile, 'w')
     jsonFile = open(jsonParams, 'r').read()
     file.write(jsonFile)
+
+def needToRecluster(oldClusteringMethod, newClusteringMethod):
+    #Check 1: change of type
+    if oldClusteringMethod.type != newClusteringMethod.type:
+        return True
+
+    #Check 2: Change of thresholdCalculator and thresholdDistance
+    if  oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contacts or\
+        oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative:
+            return oldClusteringMethod.thresholdCalculator != newClusteringMethod.thresholdCalculator or\
+                abs(oldClusteringMethod.contactThresholdDistance - newClusteringMethod.contactThresholdDistance) > 1e-7
+
+    #Check 3: Change of nClusters in contactMapAgglomerative
+    if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMapAgglomerative:
+        return oldClusteringMethod.nclusters != newClusteringMethod.nclusters
+
+def clusterEpochTrajs(clusteringMethod, epoch, outputPathTempletized, trajectoryBasename):
+    snapshotsJSONSelectionString = generateSnapshotSelectionStringLastRound(epoch, outputPathTempletized, trajectoryBasename)
+    snapshotsJSONSelectionString = "[" + snapshotsJSONSelectionString + "]"
+    paths = eval(snapshotsJSONSelectionString)
+    if len(glob.glob(paths[-1])) == 0:
+        sys.exit("No more trajectories to cluster")
+    clusteringMethod.cluster(paths)
+
+def clusterPreviousEpochs(clusteringMethod, finalEpoch, outputPathTempletized, trajectoryBasename):
+    for i in range(finalEpoch):
+        clusterEpochTrajs(clusteringMethod, i, outputPathTempletized, trajectoryBasename)
 
 
 def main(jsonParams=None):
@@ -151,7 +178,22 @@ def main(jsonParams=None):
         if firstRun != 0:
             lastClusteringEpoch = firstRun - 1
             with open(CLUSTERING_OUTPUT_OBJECT % (lastClusteringEpoch), 'rb') as f:
-                clusteringMethod = pickle.load(f)
+                oldClusteringMethod = pickle.load(f)
+
+            clusteringBuilder = clustering.ClusteringBuilder()
+            clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
+                                                                 spawningParams.reportFilename,
+                                                                 spawningParams.reportCol)
+
+            if needToRecluster(oldClusteringMethod, clusteringMethod):
+                print "Reclustering!"
+                startTime = time.time()
+                clusterPreviousEpochs(clusteringMethod, firstRun, outputPathTempletized, trajectoryBasename)
+                endTime = time.time()
+                print "Reclustering took %s sec" % (endTime - startTime)
+            else:
+                clusteringMethod = oldClusteringMethod
+                clusteringMethod.setCol(spawningParams.reportCol)
 
             degeneracyOfRepresentatives = startingConformationsCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
             startingConformationsCalculator.log()
@@ -171,6 +213,11 @@ def main(jsonParams=None):
         saveInitialControlFile(jsonParams, ORIGINAL_CONTROLFILE)
         copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, firstRun)
         initialStructuresAsString = createMultipleComplexesFilenames(len(initialStructures), inputFileTemplate, tmpInitialStructuresTemplate, firstRun)
+
+        clusteringBuilder = clustering.ClusteringBuilder()
+        clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
+                                                             spawningParams.reportFilename,
+                                                             spawningParams.reportCol)
 
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
 
@@ -198,22 +245,7 @@ def main(jsonParams=None):
 
         print "Clustering..."
         startTime = time.time()
-        # snapshotsJSONSelectionString = generateSnapshotSelectionString(i, outputPathTempletized, trajectoryBasename)
-        snapshotsJSONSelectionString = generateSnapshotSelectionStringLastRound(i, outputPathTempletized, trajectoryBasename)
-        snapshotsJSONSelectionString = "[" + snapshotsJSONSelectionString + "]"
-        paths = eval(snapshotsJSONSelectionString)
-        if len(glob.glob(paths[-1])) == 0:
-            sys.exit("No more trajectories to cluster")
-        if i == 0:
-            clusteringBuilder = clustering.ClusteringBuilder()
-            clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
-                                                                 spawningParams.reportFilename,
-                                                                 spawningParams.reportCol)
-        # else:
-        #     #CAN'T THIS BE REMOVED????
-        #     with open(CLUSTERING_OUTPUT_OBJECT%(i-1), 'rb') as input:
-        #         clusteringMethod = pickle.load(input)
-        clusteringMethod.cluster(paths)
+        clusterEpochTrajs(clusteringMethod, i, outputPathTempletized, trajectoryBasename)
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
