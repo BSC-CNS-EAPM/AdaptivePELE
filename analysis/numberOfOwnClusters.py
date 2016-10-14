@@ -126,15 +126,15 @@ def main():
 
     plotClustersPerValue(clustersPerDensityValue)
     plt.legend(loc=2)
-    #plt.title("n=64, different thresholds, variable density")
-    #plt.savefig("../4k5y_8_64_numberOfClusters_density_2bis2.png")
+    plt.title("n=64, different thresholds, variable density")
+    plt.savefig("../3ptb_4_64_numberOfClusters_density_corner.png")
 
     plt.figure(2)
     plt.plot(totalNumberOfClustersPerEpoch, label="All clusters")
     plotClustersPerValue(clustersPerThresholdValue)
     plt.legend(loc=2)
-    #plt.title("n=64, different thresholds, variable density")
-    #plt.savefig("../4k5y_8_64_numberOfClusters_threshold_2bis2.png")
+    plt.title("n=64, different thresholds, variable density")
+    plt.savefig("../3ptb_4_64_numberOfClusters_threshold_corner.png")
 
 
     plt.figure(3)

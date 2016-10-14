@@ -1,8 +1,8 @@
 import time
 import os
-import constants
+from constants import constants
 import subprocess
-import blockNames
+from constants import blockNames
 import shutil
 import simulationTypes
 import string

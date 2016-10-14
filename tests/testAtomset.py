@@ -1,4 +1,4 @@
-import atomset
+from atomset import atomset
 import unittest
 import numpy as np
 

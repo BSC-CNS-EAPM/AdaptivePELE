@@ -2,7 +2,7 @@ import math
 import sys
 import numpy as np
 import random
-import blockNames
+from constants import blockNames
 import spawningTypes
 import densitycalculator
 

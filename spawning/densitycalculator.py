@@ -1,4 +1,4 @@
-import blockNames
+from constants import blockNames
 import densitycalculatortypes
 import sys
 
