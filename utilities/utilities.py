@@ -65,3 +65,7 @@ def getRMSD(traj, nativePDB, resname, symmetries):
         rmsds[i] = atomset.computeRMSD(nativePDB, snapshotPDB, symmetries)
 
     return rmsds
+
+def readClusteringObject(clusteringObjectPath):
+    with open(clusteringObjectPath, 'rb') as f:
+        return pickle.load(f)
