@@ -82,7 +82,7 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
                                                     contactThresholdDistance=contactThresholdDistance)
 spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 
-for i in range(20):
+for i in range(1):
     # path=["trajs/%d/run_traj*"%i]
     # paths_report=["trajs/%d/run_report*"%i]
     # path=["../3ptb_4_64_inversely_1/%d/traj*" % i]
@@ -104,8 +104,8 @@ for i in range(20):
     print "Total time of clustering contacts, epoch %d: %.6f"%(i,endTimeCont-startTimeCont)
     print "Number of clusters contacts epoch %d: %d"%(i,len(ClCont.clusters.clusters))
     degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs, {})
-    ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
-    os.rename("clsummary/summary.txt", "results/summary_ClCont_3PTB.txt")
+    ClCont.writeOutput("clsummary",degeneraciesCont,"object.pkl", False)
+    os.rename("clsummary/summary.txt", "results/summary.txt")
     # startTimeDouble = time.time()
     # ClDouble.cluster(path)
     # endTimeDouble = time.time()
