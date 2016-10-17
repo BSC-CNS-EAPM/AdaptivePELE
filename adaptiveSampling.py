@@ -60,8 +60,8 @@ def createMultipleComplexesFilenames(numberOfSnapshots, tmpInitialStructuresTemp
     return jsonString
 
 
-def generateSnapshotSelectionStringLastRound(currentEpoch, outputPathTempletized):
-    return " \"" + os.path.join(outputPathTempletized % currentEpoch, constants.trajectoryBasename) + "\""
+def generateSnapshotSelectionStringLastRound(currentEpoch, epochOutputPathTempletized):
+    return " \"" + os.path.join(epochOutputPathTempletized % currentEpoch, constants.trajectoryBasename) + "\""
 
 
 def writeSpawningInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clustering, iteration):
@@ -125,17 +125,17 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
     if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMapAgglomerative:
         return oldClusteringMethod.nclusters != newClusteringMethod.nclusters
 
-def clusterEpochTrajs(clusteringMethod, epoch, outputPathTempletized):
-    snapshotsJSONSelectionString = generateSnapshotSelectionStringLastRound(epoch, outputPathTempletized)
+def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
+    snapshotsJSONSelectionString = generateSnapshotSelectionStringLastRound(epoch, epochOutputPathTempletized)
     snapshotsJSONSelectionString = "[" + snapshotsJSONSelectionString + "]"
     paths = eval(snapshotsJSONSelectionString)
     if len(glob.glob(paths[-1])) == 0:
         sys.exit("No more trajectories to cluster")
     clusteringMethod.cluster(paths)
 
-def clusterPreviousEpochs(clusteringMethod, finalEpoch, outputPathTempletized):
+def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized):
     for i in range(finalEpoch):
-        clusterEpochTrajs(clusteringMethod, i, outputPathTempletized)
+        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized)
 
 def getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, spawningParams):
     """
@@ -162,7 +162,7 @@ def getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, s
     if needToRecluster(oldClusteringMethod, clusteringMethod):
         print "Reclustering!"
         startTime = time.time()
-        clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.outputPathTempletized)
+        clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.epochOutputPathTempletized)
         endTime = time.time()
         print "Reclustering took %s sec" % (endTime - startTime)
     else:
@@ -171,7 +171,7 @@ def getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, s
 
     return clusteringMethod
 
-def buildNewClusteringAndWriteInitialStructuresForRestart(firstRun, outputPathConstants, clusteringBlock,
+def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock,
         spawningParams, spawningCalculator, simulationRunner):
     """
         It reads the previous clustering method, and, if there are changes,
@@ -200,7 +200,7 @@ def buildNewClusteringAndWriteInitialStructuresForRestart(firstRun, outputPathCo
 
     return clusteringMethod, initialStructuresAsString
 
-def buildNewClusteringAndWriteInitialStructuresForNewSimulation(debug, outputPath, controlFile, outputPathConstants, clusteringBlock, spawningParams, initialStructures):
+def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, controlFile, outputPathConstants, clusteringBlock, spawningParams, initialStructures):
     """
         It build the clustering object and copies initial structures from control file.
         Returns the clustering object to use and the initial structures filenames as string
@@ -231,6 +231,13 @@ def buildNewClusteringAndWriteInitialStructuresForNewSimulation(debug, outputPat
                                                          spawningParams.reportCol)
 
     return clusteringMethod, initialStructuresAsString
+
+def preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControlFileDictionary):
+    outputDir = outputPathConstants.epochOutputPathTempletized % i
+    utilities.makeFolder(outputDir)
+    peleControlFileDictionary["OUTPUT_PATH"] = outputDir
+    peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + i*simulationRunner.parameters.processors
+    simulationRunner.makeWorkingControlFile(outputPathConstants.tmpControlFilename % i, peleControlFileDictionary)
 
 def main(jsonParams=None):
     if jsonParams is None:
@@ -292,20 +299,12 @@ def main(jsonParams=None):
     firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject)
 
     if restart and firstRun != 0:
-        clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresForRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner)
+        clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner)
     else:
         firstRun = 0 #if restart false, but there were previous simulations
-        clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresForNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
+        clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
 
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
-
-    # Make control file
-    outputDir = outputPathConstants.outputPathTempletized % firstRun
-    utilities.makeFolder(outputDir)
-    peleControlFileDictionary["OUTPUT_PATH"] = outputDir
-    peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + firstRun*simulationRunner.parameters.processors
-    # simulationRunner.parameters needn't be passed to makeWorkingControlFile
-    simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, outputPathConstants.tmpControlFilename % firstRun, peleControlFileDictionary)
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
@@ -313,6 +312,9 @@ def main(jsonParams=None):
             epsilon_file = open("epsilon_values.txt", "a")
             epsilon_file.write("%d\t%f\n" % (i, spawningParams.epsilon))
             epsilon_file.close()
+
+        print "Preparing control file..."
+        preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControlFileDictionary)
 
         print "Production run..."
         if not debug:
@@ -323,7 +325,7 @@ def main(jsonParams=None):
 
         print "Clustering..."
         startTime = time.time()
-        clusterEpochTrajs(clusteringMethod, i, outputPathConstants.outputPathTempletized)
+        clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized)
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
@@ -331,7 +333,6 @@ def main(jsonParams=None):
         spawningCalculator.log()
         print "Degeneracy", degeneracyOfRepresentatives
 
-        numberOfSeedingPoints = writeSpawningInitialStructures(outputPathConstants.tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, i+1)
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
@@ -346,18 +347,13 @@ def main(jsonParams=None):
 
         # Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:
+            numberOfSeedingPoints = writeSpawningInitialStructures(outputPathConstants.tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, i+1)
             initialStructuresAsString = createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
             peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
 
-            outputDir = outputPathConstants.outputPathTempletized % (i+1)
-            utilities.makeFolder(outputDir)  # PELE does not do it automatically
-            peleControlFileDictionary["OUTPUT_PATH"] = outputDir
-            peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + (i+1)*simulationRunner.parameters.processors
-            # simulationRunner.parameters needn't be passed to makeWorkingControlFile
-            simulationRunner.makeWorkingControlFile(simulationRunner.parameters.templetizedControlFile, outputPathConstants.tmpControlFilename % (i+1), peleControlFileDictionary)
 
         if clusteringMethod.symmetries and nativeStructure:
-            fixReportsSymmetry(outputPathConstants.outputPathTempletized % i, resname,
+            fixReportsSymmetry(outputPathConstants.epochOutputPathTempletized % i, resname,
                                nativeStructure, clusteringMethod.symmetries)
     # utilities.cleanup
     # utilities.cleanup(outputPathConstants.tmpFolder)

@@ -25,8 +25,8 @@ class SimulationRunner:
     def runSimulation(self, runningControlFile = ""):
         pass 
 
-    def makeWorkingControlFile(self, templetizedControlFile, workingControlFilename, dictionary):
-        inputFile = open(templetizedControlFile, "r")
+    def makeWorkingControlFile(self, workingControlFilename, dictionary):
+        inputFile = open(self.parameters.templetizedControlFile, "r")
         inputFileContent = inputFile.read()
         inputFile.close()
 
@@ -80,7 +80,7 @@ class TestSimulation(SimulationRunner):
             shutil.copytree(self.parameters.origin, self.parameters.destination)
             self.copied = True
 
-    def makeWorkingControlFile(self, templetizedControlFile, workingControlFilename, dictionary):
+    def makeWorkingControlFile(self, workingControlFilename, dictionary):
         pass
 
 class RunnerBuilder:

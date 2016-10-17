@@ -21,6 +21,16 @@ class OutputPathConstants():
         Class with constants that depend on the outputPath
     """
     def __init__(self, outputPath):
+        self.originalControlFile = ""
+        self.epochOutputPathTempletized = ""
+        self.clusteringOutputDir = ""
+        self.clusteringOutputObject = ""
+        self.tmpInitialStructuresTemplate = ""
+        self.tmpControlFilename = ""
+
+        self.buildConstants(outputPath)
+
+    def buildConstants(self, outputPath):
         self.buildOutputPathConstants(outputPath)
 
         self.tmpFolder = "tmp_" + outputPath.replace("/", "_")
@@ -29,8 +39,8 @@ class OutputPathConstants():
 
     def buildOutputPathConstants(self, outputPath):
         self.originalControlFile = os.path.join(outputPath, "originalControlFile.conf")
-        self.outputPathTempletized = os.path.join(outputPath, "%d")
-        self.clusteringOutputDir = os.path.join(self.outputPathTempletized, "clustering")
+        self.epochOutputPathTempletized = os.path.join(outputPath, "%d")
+        self.clusteringOutputDir = os.path.join(self.epochOutputPathTempletized, "clustering")
         self.clusteringOutputObject = os.path.join(self.clusteringOutputDir, "object.pkl")
 
     def buildTmpFolderConstants(self, tmpFolder):
