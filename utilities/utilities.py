@@ -23,7 +23,7 @@ def getSnapshots(trajectoryFile, verbose=False):
         return snapshots
 
     remarkInfo = "REMARK 000 File created using PELE++\nREMARK source            : %s\nREMARK original model nr : %d\nREMARK First snapshot is 1, not 0 (as opposed to report)\n"
-    snapshotsWithInfo = [remarkInfo % (file, i+1)+snapshot for i, snapshot in enumerate(snapshots)]
+    snapshotsWithInfo = [remarkInfo % (trajectoryFile, i+1)+snapshot for i, snapshot in enumerate(snapshots)]
     return snapshotsWithInfo
 
 
