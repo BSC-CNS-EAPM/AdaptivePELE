@@ -1,13 +1,13 @@
 import sys
-import atomset
 import glob
 import numpy as np
 import os
-import blockNames
+import pickle
 import clusteringTypes
 import thresholdcalculator
+from constants import blockNames
+from atomset import atomset
 from utilities import utilities
-import pickle
 from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import KMeans

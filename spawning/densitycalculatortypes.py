@@ -1,4 +1,4 @@
-import blockNames
+from constants import blockNames
 
 class DENSITY_CALCULATOR_TYPES:
     null, heaviside, quadratic = range(3)

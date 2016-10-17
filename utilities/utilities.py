@@ -1,7 +1,7 @@
 import os
 import shutil
 import numpy as np
-import atomset
+from atomset import atomset
 
 
 def cleanup(tmpFolder):
@@ -65,3 +65,7 @@ def getRMSD(traj, nativePDB, resname, symmetries):
         rmsds[i] = atomset.computeRMSD(nativePDB, snapshotPDB, symmetries)
 
     return rmsds
+
+def readClusteringObject(clusteringObjectPath):
+    with open(clusteringObjectPath, 'rb') as f:
+        return pickle.load(f)
