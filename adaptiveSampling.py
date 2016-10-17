@@ -64,7 +64,7 @@ def generateSnapshotSelectionStringLastRound(currentEpoch, outputPathTempletized
     return " \"" + os.path.join(outputPathTempletized % currentEpoch, constants.trajectoryBasename) + "\""
 
 
-def writeInitialStructuresAccordingToDegeneracy(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clustering, iteration):
+def writeSpawningInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clustering, iteration):
 
     counts = 0
     for i, cluster in enumerate(clustering.clusters.clusters):
@@ -137,6 +137,100 @@ def clusterPreviousEpochs(clusteringMethod, finalEpoch, outputPathTempletized):
     for i in range(finalEpoch):
         clusterEpochTrajs(clusteringMethod, i, outputPathTempletized)
 
+def getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, spawningParams):
+    """
+        It reads the previous clustering method, and, if there are changes,
+        it reclusters the previous trajectories. Returns the clustering object to use
+
+        firstRun [In] New epoch to run
+        outputPathConstants [In] Contains outputPath-related constants
+        clusteringBlock [In] Contains the new clustering block
+        spawningParams [In] Contains spawning params, to know what reportFile and column to read
+
+        returns clusteringMethod, the clustering method to use in the adaptive sampling simulation
+    """
+
+    lastClusteringEpoch = firstRun - 1
+    clusteringObjectPath = outputPathConstants.clusteringOutputObject % (lastClusteringEpoch)
+    oldClusteringMethod = utilities.readClusteringObject(clusteringObjectPath)
+
+    clusteringBuilder = clustering.ClusteringBuilder()
+    clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
+                                                         spawningParams.reportFilename,
+                                                         spawningParams.reportCol)
+
+    if needToRecluster(oldClusteringMethod, clusteringMethod):
+        print "Reclustering!"
+        startTime = time.time()
+        clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.outputPathTempletized)
+        endTime = time.time()
+        print "Reclustering took %s sec" % (endTime - startTime)
+    else:
+        clusteringMethod = oldClusteringMethod
+        clusteringMethod.setCol(spawningParams.reportCol)
+
+    return clusteringMethod
+
+def buildNewClusteringAndWriteInitialStructuresForRestart(firstRun, outputPathConstants, clusteringBlock,
+        spawningParams, spawningCalculator, simulationRunner):
+    """
+        It reads the previous clustering method, and, if there are changes,
+        it reclusters the previous trajectories. Returns the clustering object to use,
+        and the initial structure filenames as strings
+
+        firstRun [In] New epoch to run
+        outputPathConstants [In] Contains outputPath-related constants
+        clusteringBlock [In] Contains the new clustering block
+        spawningParams [In] Spawning params
+        spawningCalculator [In] Spawning calculator object
+        simulationRunner [In] Simulation runner object
+
+        returns clusteringMethod, the clustering method to use in the adaptive sampling simulation
+        returns initialStructuresAsString, the initial structures filenames in a string
+    """
+    clusteringMethod = getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, spawningParams)
+
+    degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
+    spawningCalculator.log()
+    print "Degeneracy", degeneracyOfRepresentatives
+
+    seedingPoints = writeSpawningInitialStructures(outputPathConstants.tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, firstRun)
+
+    initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
+
+    return clusteringMethod, initialStructuresAsString
+
+def buildNewClusteringAndWriteInitialStructuresForNewSimulation(debug, outputPath, controlFile, outputPathConstants, clusteringBlock, spawningParams, initialStructures):
+    """
+        It build the clustering object and copies initial structures from control file.
+        Returns the clustering object to use and the initial structures filenames as string
+
+        debug [In] Whether to delete or not the previous simulation
+        outputPath [In] Simulation output path
+        controlFile [In] Adaptive sampling control file
+        outputPathConstants [In] Contains outputPath-related constants
+        clusteringBlock [In] Contains the new clustering block
+        spawningParams [In] Spawning params
+        initialStructures [In] Control file initial structures
+
+        returns clusteringMethod, the clustering method to use in the adaptive sampling simulation
+        returns initialStructuresAsString, the initial structures filenames in a string
+    """
+    if not debug:
+        shutil.rmtree(outputPath)
+    utilities.makeFolder(outputPath)
+    saveInitialControlFile(controlFile, outputPathConstants.originalControlFile)
+
+    firstRun = 0
+    copyInitialStructures(initialStructures, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
+    initialStructuresAsString = createMultipleComplexesFilenames(len(initialStructures), outputPathConstants.tmpInitialStructuresTemplate, firstRun)
+
+    clusteringBuilder = clustering.ClusteringBuilder()
+    clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
+                                                         spawningParams.reportFilename,
+                                                         spawningParams.reportCol)
+
+    return clusteringMethod, initialStructuresAsString
 
 def main(jsonParams=None):
     if jsonParams is None:
@@ -195,52 +289,13 @@ def main(jsonParams=None):
         epsilon_file.write("Iteration\tEpsilon\n")
         epsilon_file.close()
 
-    if restart:
-        firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject)
+    firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject)
 
-        if firstRun != 0:
-            lastClusteringEpoch = firstRun - 1
-            clusteringObjectPath = outputPathConstants.clusteringOutputObject % (lastClusteringEpoch)
-            oldClusteringMethod = utilities.readClusteringObject(clusteringObjectPath)
-
-            clusteringBuilder = clustering.ClusteringBuilder()
-            clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
-                                                                 spawningParams.reportFilename,
-                                                                 spawningParams.reportCol)
-
-            if needToRecluster(oldClusteringMethod, clusteringMethod):
-                print "Reclustering!"
-                startTime = time.time()
-                clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.outputPathTempletized)
-                endTime = time.time()
-                print "Reclustering took %s sec" % (endTime - startTime)
-            else:
-                clusteringMethod = oldClusteringMethod
-                clusteringMethod.setCol(spawningParams.reportCol)
-
-            degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
-            spawningCalculator.log()
-            print "Degeneracy", degeneracyOfRepresentatives
-
-            seedingPoints = writeInitialStructuresAccordingToDegeneracy(outputPathConstants.tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, firstRun)
-
-            initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
-
-    if not restart or firstRun == 0:
-        # if restart and firstRun = 0, it must check into the initial structures
-        # Choose initial structures
-        if not debug:
-            shutil.rmtree(outputPath)
-        utilities.makeFolder(outputPath)
-        firstRun = 0
-        saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
-        copyInitialStructures(initialStructures, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
-        initialStructuresAsString = createMultipleComplexesFilenames(len(initialStructures), outputPathConstants.tmpInitialStructuresTemplate, firstRun)
-
-        clusteringBuilder = clustering.ClusteringBuilder()
-        clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
-                                                             spawningParams.reportFilename,
-                                                             spawningParams.reportCol)
+    if restart and firstRun != 0:
+        clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresForRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner)
+    else:
+        firstRun = 0 #if restart false, but there were previous simulations
+        clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresForNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
 
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
 
@@ -276,7 +331,7 @@ def main(jsonParams=None):
         spawningCalculator.log()
         print "Degeneracy", degeneracyOfRepresentatives
 
-        numberOfSeedingPoints = writeInitialStructuresAccordingToDegeneracy(outputPathConstants.tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, i+1)
+        numberOfSeedingPoints = writeSpawningInitialStructures(outputPathConstants.tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, i+1)
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
