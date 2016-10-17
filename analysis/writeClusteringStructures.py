@@ -8,7 +8,7 @@ def parseArgs():
     parser.add_argument('clObject', type=str)
     parser.add_argument('outputPath', type=str,
                         help="Path where to write the structures, including "
-                        "name of the files, i.e output/paht/cluster.pdb")
+                        "name of the files, i.e output/path/cluster.pdb")
     parser.add_argument("structures", nargs='*', type=int,
                         help="Structures to write")
     args = parser.parse_args()
