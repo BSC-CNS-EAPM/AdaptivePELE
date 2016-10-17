@@ -9,7 +9,9 @@ def automateSimulation(args):
     nProcessors = args.nProcessors
     nSteps = args.nSteps
     simulationName = args.simulationName
-    simulationRunner = simulationrunner.SimulationRunner({})
+    simulationParameters = simulationrunner.SimulationParameters()
+    simulationParameters.templetizedControlFile = controlFile
+    simulationRunner = simulationrunner.SimulationRunner(simulationParameters)
     epochs = args.epochs
     if epochs:
         rangeOfEpochs = epochs
@@ -25,8 +27,7 @@ def automateSimulation(args):
         controlFileDictionary["OUTPUTPATH"] = outputPath_i
         controlFileName = "tmp_%s_controlfile_%s_%d.conf" % (os.path.splitext(controlFile)[0],simulationName, i)
         controlFileName.replace("/","_")
-        simulationRunner.makeWorkingControlFile(controlFile, controlFileName,
-                                                controlFileDictionary)
+        simulationRunner.makeWorkingControlFile(controlFileName, controlFileDictionary)
         print "Starting simulation %d" % i
         adaptiveSampling.main(controlFileName)
 
