@@ -7,7 +7,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import collections
+import argparse
 
+
+def printHelp():
+    desc = "Program that prints the number of clusters throughout an adaptive sampling simulation. "\
+            "It must be run in the root folder. "
+    parser = argparse.ArgumentParser(description=desc)
+    args = parser.parse_args()
+    return
 
 def getClusteringSummaryContent(file):
     if os.path.isfile(file):
@@ -105,6 +113,8 @@ def plotContactsHistogram(folder, templetizedClusteringSummaryFile):
     plt.hist(allContacts)
 
 def main():
+    printHelp()
+
     #Params
     clusteringFileDensityColumn = 5
     clusteringFileThresholdColumn = 4
@@ -127,14 +137,14 @@ def main():
     plotClustersPerValue(clustersPerDensityValue)
     plt.legend(loc=2)
     #plt.title("n=64, different thresholds, variable density")
-    #plt.savefig("../4k5y_8_64_numberOfClusters_density_2bis2.png")
+    #plt.savefig("../3ptb_4_64_numberOfClusters_density_corner.png")
 
     plt.figure(2)
     plt.plot(totalNumberOfClustersPerEpoch, label="All clusters")
     plotClustersPerValue(clustersPerThresholdValue)
     plt.legend(loc=2)
     #plt.title("n=64, different thresholds, variable density")
-    #plt.savefig("../4k5y_8_64_numberOfClusters_threshold_2bis2.png")
+    #plt.savefig("../3ptb_4_64_numberOfClusters_threshold_corner.png")
 
 
     plt.figure(3)

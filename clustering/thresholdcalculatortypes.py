@@ -1,4 +1,4 @@
-import blockNames
+from constants import blockNames
 
 class THRESHOLD_CALCULATOR_TYPES:
     heaviside, constant = range(2)

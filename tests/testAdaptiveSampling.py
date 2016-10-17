@@ -2,7 +2,7 @@ import adaptiveSampling
 import unittest
 import glob
 import pickle
-import atomset
+from atomset import atomset
 import shutil
 import os
 

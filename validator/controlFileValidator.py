@@ -1,5 +1,5 @@
 import validatorBlockNames
-import blockNames
+from constants import blockNames
 import json
 import warnings
 import numbers
