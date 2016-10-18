@@ -4,6 +4,7 @@ import StringIO
 
 
 class Atom:
+    chargePattern = re.compile("[0-9]|\+|\-")
     ATOM_WEIGHTS = {"H": 1.00794,
                     "D": 2.01410178,  # deuterium
                     "HE": 4.00,
@@ -74,6 +75,10 @@ class Atom:
                     "U": 238.03}
 
     def __init__(self, atomContent):
+        """ Create an atom from a pdb line
+
+            atomContent [In] Line of the pdb from which the atom will be created
+        """
         # atomContent = atomContent.split()
         if len(atomContent) > 6 and (atomContent[:4] == 'ATOM' or atomContent[:6] == 'HETATM'):
             self.atomSerial = atomContent[6:11].strip()
@@ -85,8 +90,7 @@ class Atom:
             self.y = float(atomContent[38:46])
             self.z = float(atomContent[46:54])
 
-            chargePattern = re.compile("[0-9]|\+|\-")
-            self.type = re.sub(chargePattern, "", atomContent[76:80]).strip().upper()
+            self.type = re.sub(self.chargePattern, "", atomContent[76:80]).strip().upper()
             self.mass = self.ATOM_WEIGHTS[self.type]
 
             if atomContent.startswith('ATOM'):
@@ -129,6 +133,7 @@ class Atom:
         """
         d = (self.x - atom2.x)**2 + (self.y - atom2.y)**2 + (self.z - atom2.z)**2
         return d
+
 
 class PDB:
     """
@@ -183,7 +188,7 @@ class PDB:
             # With "try", we prune empty atoms
             try:
                 if (not heavyAtoms or atom.isHeavyAtom()) and\
-                    (type == self.typeAll or (type == self.typeProtein and atom.isProtein()) or (type == self.typeHetero and atom.isHeteroAtom())):
+                   (type == self.typeAll or (type == self.typeProtein and atom.isProtein()) or (type == self.typeHetero and atom.isHeteroAtom())):
                         self.atoms.update({atom.id: atom})
                         self.atomList.append(atom.id)
             except:
@@ -257,7 +262,7 @@ class PDB:
         # empty contact map, rows are atoms of the ligand, columns are protein
         # alpha carbons
         contactMap = np.zeros((len(ligandPDB.atomList),
-                               len(alphaCarbonsPDB.atomList)),dtype=bool)
+                               len(alphaCarbonsPDB.atomList)), dtype=bool)
         contacts = set([])
         for rowind, ligandAtom in enumerate(ligandPDB.atomList):
             for colind, proteinAtom in enumerate(alphaCarbonsPDB.atomList):
