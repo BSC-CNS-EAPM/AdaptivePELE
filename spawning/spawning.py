@@ -318,6 +318,10 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         self.degeneracyInverselyProportional = None
         self.degeneracyMetricProportional = None
         self.degeneracyTotal = None
+        # print variable epsilon information
+        epsilon_file = open("epsilon_values.txt", "w")
+        epsilon_file.write("Iteration\tEpsilon\n")
+        epsilon_file.close()
 
     def linearVariation(self, clusteringParams, currentEpoch):
         if currentEpoch == 0:
@@ -344,8 +348,14 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
             sys.exit("Unknown epsilon variation type! Choices are: " +
                      str(spawningTypes.EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY.values()))
 
+    def log(self, epsilon, epoch):
+        epsilon_file = open("epsilon_values.txt", "a")
+        epsilon_file.write("%d\t%f\n" % (epoch, epsilon))
+        epsilon_file.close()
+
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
         self.calculateEpsilonValue(clusteringParams, currentEpoch)
+        self.log(clusteringParams.epsilon, currentEpoch)
         return self.epsilonDegeneracyCalculator.calculate(clusters, trajToDistribute, clusteringParams, currentEpoch)
 
 

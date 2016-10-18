@@ -5,7 +5,6 @@ import os
 import json
 import time
 import glob
-import pickle
 from constants import blockNames, constants
 from atomset import atomset
 from utilities import utilities
@@ -290,12 +289,6 @@ def main(jsonParams=None):
     utilities.makeFolder(outputPathConstants.tmpFolder)
     saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
 
-    # print variable epsilon information
-    if spawningParams.epsilon is not None:
-        epsilon_file = open("epsilon_values.txt", "w")
-        epsilon_file.write("Iteration\tEpsilon\n")
-        epsilon_file.close()
-
     firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject)
 
     if restart and firstRun != 0:
@@ -308,10 +301,6 @@ def main(jsonParams=None):
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
-        if spawningParams.epsilon is not None:
-            epsilon_file = open("epsilon_values.txt", "a")
-            epsilon_file.write("%d\t%f\n" % (i, spawningParams.epsilon))
-            epsilon_file.close()
 
         print "Preparing control file..."
         preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControlFileDictionary)
