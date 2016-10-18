@@ -7,6 +7,12 @@ import pdb as debug
 
 
 def extractCOMMatrix(clusters, resname):
+    """ Extract a matrix contaning the coordinates of the center of mass of
+    the ligand for each cluster structure
+
+        clusters [In] List of clusters
+        resname [In] Residue name of the ligand in the pdb
+    """
     n = len(clusters)
     cluster_matrix = np.zeros((n, 3))
     metrics = np.zeros(n)
@@ -25,6 +31,16 @@ def extractCOMMatrix(clusters, resname):
 
 
 def plotClusters2D(cluster_matrix, metrics, title):
+    """ Create all combination of xyz projections in 2D of the scatter plot
+    of the center of mass of the ligand with a colormap given by a certain
+    quantity (usually a metric or the clusters population)
+
+        cluster_matrix [In] matrix contaning the coordinates of the center of
+        mass of the ligand for each cluster structure
+        metrics [In] Array with the quantity that will be used to create the
+        colormap
+        title [In] Title for the plot figure
+    """
     ccx = cluster_matrix[:, 0]
     ccy = cluster_matrix[:, 1]
     ccz = cluster_matrix[:, 2]
@@ -48,6 +64,16 @@ def plotClusters2D(cluster_matrix, metrics, title):
 
 
 def plotClusters(cluster_matrix, metrics, title):
+    """ Create a 3D scatter plot of the center of mass of the ligand with a
+    colormap given by a certain quantity
+    (usually a metric or the clusters population)
+
+        cluster_matrix [In] matrix contaning the coordinates of the center of
+        mass of the ligand for each cluster structure
+        metrics [In] Array with the quantity that will be used to create the
+        colormap
+        title [In] Title for the plot figure
+    """
     fig = plt.figure()
     ax = Axes3D(fig)
     ccx = cluster_matrix[:, 0]
