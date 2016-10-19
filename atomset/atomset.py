@@ -4,8 +4,8 @@ import StringIO
 
 
 class Atom:
-    chargePattern = re.compile("[0-9]|\+|\-")
-    ATOM_WEIGHTS = {"H": 1.00794,
+    _chargePattern = re.compile("[0-9]|\+|\-")
+    _ATOM_WEIGHTS = {"H": 1.00794,
                     "D": 2.01410178,  # deuterium
                     "HE": 4.00,
                     "LI": 6.941,
@@ -77,7 +77,8 @@ class Atom:
     def __init__(self, atomContent):
         """ Create an atom from a pdb line
 
-            atomContent [In] Line of the pdb from which the atom will be created
+            :param atomContent: Line of the pdb from which the atom will be created
+            :type atomContent: str
         """
         # atomContent = atomContent.split()
         if len(atomContent) > 6 and (atomContent[:4] == 'ATOM' or atomContent[:6] == 'HETATM'):
@@ -90,8 +91,8 @@ class Atom:
             self.y = float(atomContent[38:46])
             self.z = float(atomContent[46:54])
 
-            self.type = re.sub(self.chargePattern, "", atomContent[76:80]).strip().upper()
-            self.mass = self.ATOM_WEIGHTS[self.type]
+            self.type = re.sub(self._chargePattern, "", atomContent[76:80]).strip().upper()
+            self.mass = self._ATOM_WEIGHTS[self.type]
 
             if atomContent.startswith('ATOM'):
                 self.protein = True
@@ -102,15 +103,33 @@ class Atom:
             # self.id = self.atomSerial
 
     def isHeavyAtom(self):
+        """
+            Check if Atom is a heavy atom
+
+            :returns: bool -- True if Atom is heavy atom, false otherwise
+        """
         return self.type != 'H'
 
     def isProtein(self):
+        """
+            Check if Atom is a protein atom
+
+            :returns: bool -- True if Atom is a protein atom, false otherwise
+        """
         return self.protein
 
     def isHeteroAtom(self):
+        """
+            Check if Atom is an hetero atom
+
+            :returns: bool -- True if Atom is an hetero atom, false otherwise
+        """
         return not self.protein
 
     def printAtom(self):
+        """
+            Print Atom information
+        """
         print self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.x, self.y, self.z, self.type, self.mass
         # print self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.r, self.type, self.mass
 
@@ -129,24 +148,29 @@ class Atom:
 
     def squaredDistance(self, atom2):
         """
-            Distance between two atoms
+            Calculate the distance between two atoms
+
+            :param atom2: Second Atom to whom the distance will be calculated
+            :type atom2: Atom
+            :returns: float -- The distance between the atoms
         """
         d = (self.x - atom2.x)**2 + (self.y - atom2.y)**2 + (self.z - atom2.z)**2
         return d
 
 
 class PDB:
-    """
-        Dictionary with atoms
-        {atomId: atom, ...}
-        Where atomId := atomName:resName
-    """
-    typeProtein = "PROTEIN"
-    typeHetero = "HETERO"
-    typeAll = "ALL"
+    _typeProtein = "PROTEIN"
+    _typeHetero = "HETERO"
+    _typeAll = "ALL"
 
     def __init__(self):
+        """
+            Object that will contain the information of a PDB file. Has to call
+            the initialise method to load the file
+        """
         self.atoms = {}
+        # {atomId: atom, ...}
+        # Where atomId := serail:atomName:resName
         self.totalMass = 0
         self.pdb = ""
         self.com = 0
@@ -160,11 +184,22 @@ class PDB:
         pdb2 = [element.strip() for element in other.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
         return pdb1 == pdb2
 
-    def initialise(self, PDBstr, heavyAtoms=True, resname="", atomname="", type=typeAll):
+    def initialise(self, PDBstr, heavyAtoms=True, resname="", atomname="", type="ALL"):
         """
-            heavyAtoms=True --> just consider heavy atoms
-            PDBstr may be a path to the PDB file or a string with
-            the contents of the PDB
+            Load the information from a PDB file or a string with the PDB
+            contents
+
+            :param PDBstr: may be a path to the PDB file or a string with the contents of the PDB
+            :type PDBstr: str
+            :param heavyAtoms: wether to consider only heavy atoms (True if onl y heavy atoms have to be considered)
+            :type heavyAtoms: bool
+            :param resname: Residue name to select from the pdb (will only select the residues with that name)
+            :type resname: str
+            :param resname: Residue name to select from the pdb (will only select the residues with that name)
+            :type resname: str
+            :param type: type of atoms to select: may be ALL, PROTEIN or HETERO
+            :type type: str
+            :raises: ValueError if the pdb contained no atoms
         """
         PDBContent = StringIO.StringIO(readPDB(PDBstr))  # Using StringIO
         # creates a buffer that can handle a pdb file or a string containing
@@ -188,7 +223,7 @@ class PDB:
             # With "try", we prune empty atoms
             try:
                 if (not heavyAtoms or atom.isHeavyAtom()) and\
-                   (type == self.typeAll or (type == self.typeProtein and atom.isProtein()) or (type == self.typeHetero and atom.isHeteroAtom())):
+                   (type == self._typeAll or (type == self._typeProtein and atom.isProtein()) or (type == self._typeHetero and atom.isHeteroAtom())):
                         self.atoms.update({atom.id: atom})
                         self.atomList.append(atom.id)
             except:
@@ -197,22 +232,47 @@ class PDB:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
     def computeTotalMass(self):
+        """
+            Calculate the total mass of the PDB
+        """
         self.totalMass = 0
         for atomId, atom in self.atoms.items():
             self.totalMass += atom.mass
 
     def printAtoms(self):
+        """
+            Print Atom information for all the atoms in the PDB
+        """
         for atom in self.atoms.values():
             print atom  # atom.printAtom()
 
     def getNumberOfAtoms(self):
+        """
+            Get the number of Atoms in the PDB
+
+            :returns: int -- Number of atoms in the PDB
+        """
         return len(self.atoms)
 
     def getAtom(self, atomId):
+        """
+            Get an Atom in the PDB by its id
+
+            :param atomId: Id of the Atom (in the format "atomserial:atomName:resname")
+            :type atomId: str
+            :returns: int -- Number of atoms in the PDB
+            :raises: KeyError if the id is not in the PDB
+        """
         return self.atoms[atomId]
 
     def extractCOM(self):
-        self.computeTotalMass()
+        """
+            Calculate the center of mass of the PDB
+
+            :returns: numpy.Array -- Array with the coordinates of the center of mass
+        """
+        if not self.totalMass:
+            self.computeTotalMass()
         COM = np.array([0., 0., 0.])
         for atomId, atom in self.atoms.items():
             COM += atom.mass * np.array([atom.x, atom.y, atom.z])
@@ -221,21 +281,43 @@ class PDB:
         return COM
 
     def getCOM(self):
+        """
+            Get the center of mass of the PDB
+
+            :returns: numpy.Array -- Array with the coordinates of the center of mass
+        """
         return self.com
 
     def writePDB(self, path):
+        """
+            Write the pdb contents of the file from wich the PDB object was
+            created
+
+            :param path: Path of the file where to write the pdb
+            :type path: str
+        """
         file = open(path, 'w')
         file.write(self.pdb)
         file.close()
 
     def countContacts(self, ligandResname, contactThresholdDistance):
+        """
+            Count the number of alpha carbons that are in contact with the
+            protein (i.e. less than contactThresholdDistance Amstrogms away)
+
+            :param ligandResname: Residue name of the ligand in the PDB
+            :type ligandResname: str
+            :param contactThresholdDistance: Maximum distance at which two atoms are considered in contanct (in Angstroms)
+            :type contactThresholdDistance: int
+            :returns: int -- The number of alpha carbons in contact with the ligand
+        """
         contactThresholdDistance2 = contactThresholdDistance**2
 
         ligandPDB = PDB()
         ligandPDB.initialise(self.pdb, resname=ligandResname, heavyAtoms=True)
 
         alphaCarbonsPDB = PDB()
-        alphaCarbonsPDB.initialise(self.pdb, type=self.typeProtein,
+        alphaCarbonsPDB.initialise(self.pdb, type=self._typeProtein,
                                    atomname="CA")
 
         # count contacts
@@ -250,13 +332,27 @@ class PDB:
         return len(contacts)
 
     def createContactMap(self, ligandResname, contactThresholdDistance):
+        """
+            Create the contact map of the protein and ligand. The contact map is
+            a boolean matrix that has as many rows as the number of ligand heavy
+            atoms and as many columns as the number of alpha carbons. The
+            value is one if the ligand atom and the alpha carbons are less than
+            contactThresholdDistance Amstrongs away
+
+            :param ligandResname: Residue name of the ligand in the PDB
+            :type ligandResname: str
+            :param contactThresholdDistance: Maximum distance at which two atoms are considered in contanct (in Angstroms)
+            :type contactThresholdDistance: int
+            :returns: numpy.Array -- The contact map of the ligand and the protein
+            :returns: int -- The number of alpha carbons in contact with the ligand
+        """
         contactThresholdDistance2 = contactThresholdDistance**2
 
         ligandPDB = PDB()
         ligandPDB.initialise(self.pdb, resname=ligandResname, heavyAtoms=True)
 
         alphaCarbonsPDB = PDB()
-        alphaCarbonsPDB.initialise(self.pdb, type=self.typeProtein,
+        alphaCarbonsPDB.initialise(self.pdb, type=self._typeProtein,
                                    atomname="CA")
 
         # empty contact map, rows are atoms of the ligand, columns are protein
@@ -275,10 +371,15 @@ class PDB:
 
 def computeRMSD2(PDB1, PDB2, symmetries={}):
     """
-        Uses atom.id to match atoms from different pdbs
+        Compute the squared RMSD between two PDB
 
-        Symmetries: Dictionary with elements atomId:symmetricalAtomId
-        Warning! It should contate the symmetry in both ways (i.e atom1Id:atom2Id, and atom2Id:atom1Id)
+        :param PDB1: First PDB with which the RMSD will be calculated
+        :type PDB1: PDB
+        :param PDB2: First PDB with which the RMSD will be calculated
+        :type PDB2: PDB
+        :param symmetries: Dictionary with elements atomId:symmetricalAtomId corresponding with the symmetrical atoms
+        :type symmetries: dict
+        :returns: float -- The squared RMSD between two PDB
     """
     rmsd = 0
     for atom1Id, atom1 in PDB1.atoms.iteritems():
@@ -303,21 +404,42 @@ def computeRMSD2(PDB1, PDB2, symmetries={}):
 
 def computeRMSD(PDB1, PDB2, symmetries={}):
     """
-        Uses atom.id to match atoms from different pdbs
+        Compute the RMSD between two PDB
 
-        Symmetries: Dictionary with elements atomId:symmetricalAtomId
+        :param PDB1: First PDB with which the RMSD will be calculated
+        :type PDB1: PDB
+        :param PDB2: First PDB with which the RMSD will be calculated
+        :type PDB2: PDB
+        :param symmetries: Dictionary with elements atomId:symmetricalAtomId corresponding with the symmetrical atoms
+        :type symmetries: dict
+        :returns: float -- The squared RMSD between two PDB
     """
     return np.sqrt(computeRMSD2(PDB1, PDB2, symmetries))
 
 
 def computeCOMDifference(PDB1, PDB2):
+    """
+        Compute the differences between the center of mass of two PDB
+
+        :param PDB1: First PDB with which the RMSD will be calculated
+        :type PDB1: PDB
+        :param PDB2: First PDB with which the RMSD will be calculated
+        :type PDB2: PDB
+        :returns: numpy.Array -- The difference in the center of mass between two PDB
+    """
     COM1 = PDB1.extractCOM()
     COM2 = PDB2.extractCOM()
     return np.linalg.norm(COM1 - COM2)
 
 
 def readPDB(pdbfile):
-    # Finish more robust PDB initialization
+    """
+        Helper function, parses a string with PDB content or the path of a pdb file into a string
+
+        :param pdbfile: A string with PDB content or the path of a pdb file
+        :type pdbfile: str
+        :returns: str -- A string with PDB content
+    """
     try:
         return open(pdbfile, "r").read()
     except IOError:

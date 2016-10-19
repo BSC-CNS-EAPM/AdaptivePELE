@@ -104,7 +104,7 @@ ATOM      5  CB  CYS A   1       8.108  20.445  11.030  1.00 16.53           C  
 
         # function to test
         pdb.initialise("tests/data/pdb_test_ligand.pdb",
-                       type=atomset.PDB.typeProtein)
+                       type="PROTEIN")
 
         # assertion
         pdbContent = "MODEL        1\n\
@@ -129,7 +129,7 @@ END   \n"
         pdb = atomset.PDB()
 
         # function to test
-        pdb.initialise("tests/data/pdb_test_ligand.pdb", type=atomset.PDB.typeHetero)
+        pdb.initialise("tests/data/pdb_test_ligand.pdb", type="HETERO")
 
         # assertion
         pdbContent = "MODEL        1\n\
