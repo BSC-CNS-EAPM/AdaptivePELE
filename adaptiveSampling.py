@@ -12,6 +12,17 @@ from validator import controlFileValidator
 from spawning import spawning, spawningTypes
 from simulation import simulationrunner, simulationTypes
 from clustering import clustering, clusteringTypes
+import argparse
+
+
+def parseArgs():
+    parser = argparse.ArgumentParser(description="Perform several iterations of"
+                                     " simulations using adaptive sampling to "
+                                     "distribute the processors in order "
+                                     "to optimize sampling")
+    parser.add_argument('controlFile', type=str)
+    args = parser.parse_args()
+    return args
 
 
 def checkSymmetryDict(clusteringBlock, initialStructures, resname):
@@ -331,12 +342,13 @@ def preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControl
     simulationRunner.makeWorkingControlFile(outputPathConstants.tmpControlFilename % i, peleControlFileDictionary)
 
 
-def main(jsonParams=None):
-    """ Main body of the adaptive sampling program.
-        jsonParams[In] A string with the name of the control file to use"""
+def main(jsonParams):
+    """
+        Main body of the adaptive sampling program.
 
-    if jsonParams is None:
-        jsonParams = sys.argv[1]
+        :params jsonParams: A string with the name of the control file to use
+        :type jsonParams: str
+    """
 
     controlFileValidator.validate(jsonParams)
     generalParams, spawningBlock, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
@@ -444,4 +456,5 @@ def main(jsonParams=None):
     # utilities.cleanup(outputPathConstants.tmpFolder)
 
 if __name__ == '__main__':
-    main()
+    args = parseArgs()
+    main(args.controlFile)
