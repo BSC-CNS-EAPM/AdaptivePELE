@@ -1,6 +1,7 @@
 import numpy as np
 import re
 import StringIO
+from scipy import sparse
 
 
 class Atom:
@@ -146,9 +147,17 @@ class Atom:
                                                     self.type, self.mass)
         # return "%s: %s %s %s [%f, %f, %f] %s %f"%(self.id, self.atomSerial, self.resChain, self.resnum, self.r[0], self.r[1], self.r[2], self.type, self.mass)
 
+    def getAtomCoords(self):
+        """
+            Get the coordinates of the atom
+
+            :returns: numpy.Array -- Array with the coordinate of the atom
+        """
+        return np.array([self.x, self.y, self.z])
+
     def squaredDistance(self, atom2):
         """
-            Calculate the distance between two atoms
+            Calculate the squared distance between two atoms
 
             :param atom2: Second Atom to whom the distance will be calculated
             :type atom2: Atom
@@ -368,6 +377,35 @@ class PDB:
                     contacts.update([proteinAtom])
         return contactMap, len(contacts)
 
+    def contactMapnew(self,ligandResname, contactThresholdDistance):
+        contactThresholdDistance2 = contactThresholdDistance**2
+
+        ligandPDB = PDB()
+        ligandPDB.initialise(self.pdb, resname=ligandResname, heavyAtoms=True)
+
+        alphaCarbonsPDB = PDB()
+        alphaCarbonsPDB.initialise(self.pdb, type=self._typeProtein,
+                                   atomname="CA")
+        nLigand = len(ligandPDB.atomList)
+        nAlpha = len(alphaCarbonsPDB.atomList)
+
+        alphaCarbonCoords = map(lambda x: alphaCarbonsPDB.atoms[x].getAtomCoords(), alphaCarbonsPDB.atomList)
+        alphaCarbonCoords = np.array(alphaCarbonCoords)
+        ligandPositions = []
+        alphaPositions = []
+        for rowind, ligandAtomId in enumerate(ligandPDB.atomList):
+            ligandAtom = ligandPDB.atoms[ligandAtomId]
+            distanceCoords = (alphaCarbonCoords - ligandAtom.getAtomCoords())**2
+            distanceCoords = distanceCoords.sum(axis=1)
+            alphaPosCurrent = np.where(distanceCoords < contactThresholdDistance2)[0]
+            alphaPositions.extend(alphaPosCurrent)
+            ligandPositions.extend(np.zeros_like(alphaPosCurrent)+rowind)
+        data = np.ones_like(alphaPositions, dtype=bool)
+        Coo_matrix = sparse.coo_matrix((data, (ligandPositions, alphaPositions)),
+                                       shape=(nLigand, nAlpha), dtype=bool)
+        contactMap = Coo_matrix.todense()
+        nContacts = len(np.where(contactMap.sum(axis=0))[0])
+        return contactMap, Coo_matrix
 
 def computeRMSD2(PDB1, PDB2, symmetries={}):
     """
