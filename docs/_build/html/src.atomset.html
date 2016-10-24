@@ -171,6 +171,20 @@
 </tbody>
 </table>
 <dl class="method">
+<dt id="src.atomset.atomset.Atom.getAtomCoords">
+<tt class="descname">getAtomCoords</tt><big>(</big><big>)</big><a class="headerlink" href="#src.atomset.atomset.Atom.getAtomCoords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the coordinates of the atom</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy.Array &#8211; Array with the coordinate of the atom</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="src.atomset.atomset.Atom.isHeavyAtom">
 <tt class="descname">isHeavyAtom</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/atomset/atomset.html#Atom.isHeavyAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.Atom.isHeavyAtom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if Atom is a heavy atom</p>
@@ -221,7 +235,7 @@
 <dl class="method">
 <dt id="src.atomset.atomset.Atom.squaredDistance">
 <tt class="descname">squaredDistance</tt><big>(</big><em>atom2</em><big>)</big><a class="reference internal" href="_modules/src/atomset/atomset.html#Atom.squaredDistance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.Atom.squaredDistance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the distance between two atoms</p>
+<dd><p>Calculate the squared distance between two atoms</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -246,6 +260,11 @@ the initialise method to load the file</p>
 <tt class="descname">computeTotalMass</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.computeTotalMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.computeTotalMass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the total mass of the PDB</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.contactMapnew">
+<tt class="descname">contactMapnew</tt><big>(</big><em>ligandResname</em>, <em>contactThresholdDistance</em><big>)</big><a class="headerlink" href="#src.atomset.atomset.PDB.contactMapnew" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="src.atomset.atomset.PDB.countContacts">
