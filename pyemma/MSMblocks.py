@@ -43,14 +43,24 @@ class MSM:
         self.MSMFile = "MSM_object.pkl"
         if os.path.exists(self.MSMFile):
             self.MSM_object = helper.loadMSM(self.MSMFile)
-        else:
-            lagtime = self.calculateITS(cl,lagtimes,itsOutput, numberOfITS, itsErrors)
-            self.createMSM(cl, lagtime)
-            self.check_connectivity()
-            self.PCCA(numPCCA)
-            print "Saving MSM object..."
-            helper.saveMSM(self.MSM_object)
-            self.performCPTest(error_estimationCK)
+
+        self.cl = cl
+        self.lagtimes = lagtimes
+        self.numPCCA = numPCCA
+        self.itsOutput = itsOutput
+        self.numberOfITS = numberOfITS
+        self.itsErrors = itsErrors
+        self.error_estimationCK = error_estimationCK
+        self.MSM_object = None
+
+    def estimate(self):
+        lagtime = self.calculateITS()
+        self.createMSM(lagtime)
+        self.check_connectivity()
+        self.PCCA(self.numPCCA)
+        print "Saving MSM object..."
+        helper.saveMSM(self.MSM_object)
+        self.performCPTest(self.error_estimationCK)
     
     def getMSM_object(self):
         return self.MSM_object
@@ -85,20 +95,19 @@ class MSM:
                 print "Set %d has %d elements" % (index, uncon_set.size)
 
 
-    def createMSM(self, cl, lagtime):
+    def createMSM(self, lagtime):
         #estimation
         print "Estimating MSM with lagtime %d..."%lagtime
-        self.MSM_object = msm.estimateMSM(cl.dtrajs, lagtime)
+        self.MSM_object = msm.estimateMSM(self.cl.dtrajs, lagtime)
 
-    def calculateITS(self, cl, lagtimes,itsOutput=None, numberOfITS=-1,
-                     itsErrors=None):
+    def calculateITS(self):
         is_converged = False
         #its
         print ("Calculating implied time-scales, when it's done will prompt for "
                 "confirmation on the validity of the lagtimes...")
         while not is_converged:
-            its_object = msm.calculateITS(cl.dtrajs, lagtimes, itsErrors)
-            plot_its = msm.plotITS(its_object, itsOutput, numberOfITS)
+            its_object = msm.calculateITS(self.cl.dtrajs, self.lagtimes, self.itsErrors)
+            plot_its = msm.plotITS(its_object, self.itsOutput, self.numberOfITS)
             plt.show()
             while True:
                 convergence_answer = raw_input("Has the ITS plot converged?[y/n] ")
