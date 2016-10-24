@@ -1,0 +1,673 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>clustering Package &mdash; Adaptive Sampling  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Adaptive Sampling  documentation" href="index.html"/>
+        <link rel="up" title="AdaptiveSampling Package" href="AdaptiveSampling.html"/>
+        <link rel="next" title="simulation Package" href="src.simulation.html"/>
+        <link rel="prev" title="atomset Package" href="src.atomset.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Adaptive Sampling
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptiveSampling.html">AdaptiveSampling Package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="AdaptiveSampling.html#module-src.adaptiveSampling"><tt class="docutils literal"><span class="pre">adaptiveSampling</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptiveSampling.html#module-src.automateRoundsAdaptive"><tt class="docutils literal"><span class="pre">automateRoundsAdaptive</span></tt> Module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="AdaptiveSampling.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="src.analysis.html">analysis Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.atomset.html">atomset Package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">clustering Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.clustering.clustering"><tt class="docutils literal"><span class="pre">clustering</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.clustering.clusteringTypes"><tt class="docutils literal"><span class="pre">clusteringTypes</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.clustering.thresholdcalculator"><tt class="docutils literal"><span class="pre">thresholdcalculator</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.clustering.thresholdcalculatortypes"><tt class="docutils literal"><span class="pre">thresholdcalculatortypes</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.simulation.html">simulation Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.spawning.html">spawning Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.utilities.html">utilities Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.validator.html">validator Package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Blalbalbke</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Adaptive Sampling</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+        <li><a href="AdaptiveSampling.html">AdaptiveSampling Package</a> &raquo;</li>
+      
+    <li>clustering Package</li>
+    <li class="wy-breadcrumbs-aside">
+      
+          
+          <a href="_sources/src.clustering.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="clustering-package">
+<h1>clustering Package<a class="headerlink" href="#clustering-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-src.clustering.clustering">
+<span id="clustering-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">clustering</span></tt> Module<a class="headerlink" href="#module-src.clustering.clustering" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.clustering.clustering.Cluster">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">Cluster</tt><big>(</big><em>pdb</em>, <em>thresholdRadius=0</em>, <em>contactMap=None</em>, <em>contacts=0</em>, <em>metrics=</em><span class="optional">[</span><span class="optional">]</span>, <em>metricCol=None</em>, <em>density=None</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cluster contains a representative structure(pdb), the number of
+elements, its density, threhold, number of contacts,
+a contactMap(sometimes) and a metric</p>
+<p>contacts stands for contacts/ligandAtom</p>
+<dl class="method">
+<dt id="src.clustering.clustering.Cluster.addElement">
+<tt class="descname">addElement</tt><big>(</big><em>metrics</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster.addElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster.addElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Cluster.getContacts">
+<tt class="descname">getContacts</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster.getContacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster.getContacts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Cluster.getMetric">
+<tt class="descname">getMetric</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster.getMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster.getMetric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Cluster.printCluster">
+<tt class="descname">printCluster</tt><big>(</big><em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster.printCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster.printCluster" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Cluster.writePDB">
+<tt class="descname">writePDB</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster.writePDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster.writePDB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.Clustering">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">Clustering</tt><big>(</big><em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Clustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clustering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for clustering methods, it defines a cluster method that
+contacts and accumulative inherit and use</p>
+<p>resname [In] String containing the three letter name of the ligan in the pdb
+reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
+columnOfReportFile [In] Column of the report file that contain the metric of interest
+contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
+considered in contact(default 8)</p>
+<dl class="method">
+<dt id="src.clustering.clustering.Clustering.cluster">
+<tt class="descname">cluster</tt><big>(</big><em>paths</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Clustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clustering.cluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster the snaptshots contained in the pahts folder
+paths [In] List of folders with the snapshots</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Clustering.setCol">
+<tt class="descname">setCol</tt><big>(</big><em>col</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Clustering.setCol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clustering.setCol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Clustering.writeOutput">
+<tt class="descname">writeOutput</tt><big>(</big><em>outputPath</em>, <em>degeneracy</em>, <em>outputObject</em>, <em>writeAll</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Clustering.writeOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clustering.writeOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes all the clustering information in outputPath</p>
+<p>outputPath [In] Folder that will contain all the clustering information
+degeneracy [In] Degeneracy of each cluster. It must be in the same order
+as in the self.clusters list
+outputObject [In] Output name for the pickle object
+writeAll [In] Boolean, wether to write pdb files for all cluster in addition
+of the summary</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.ClusteringBuilder">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">ClusteringBuilder</tt><a class="reference internal" href="_modules/src/clustering/clustering.html#ClusteringBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ClusteringBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.clustering.clustering.ClusteringBuilder.buildClustering">
+<tt class="descname">buildClustering</tt><big>(</big><em>clusteringBlock</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ClusteringBuilder.buildClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ClusteringBuilder.buildClustering" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.Clusters">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">Clusters</tt><a class="reference internal" href="_modules/src/clustering/clustering.html#Clusters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clusters" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.clustering.clustering.Clusters.addCluster">
+<tt class="descname">addCluster</tt><big>(</big><em>cluster</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Clusters.addCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clusters.addCluster" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Clusters.printClusters">
+<tt class="descname">printClusters</tt><big>(</big><em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Clusters.printClusters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clusters.printClusters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.ContactMapAccumulativeClustering">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">ContactMapAccumulativeClustering</tt><big>(</big><em>thresholdCalculator</em>, <em>similarityEvaluator</em>, <em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapAccumulativeClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapAccumulativeClustering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.clustering.clustering.Clustering" title="src.clustering.clustering.Clustering"><tt class="xref py py-class docutils literal"><span class="pre">src.clustering.clustering.Clustering</span></tt></a></p>
+<p>Cluster together all snapshots that have similar enough contactMaps.
+This similarity can be calculated with different methods (see similariyEvaluator documentation)</p>
+<p>thresholdCalculator [In] ThresholdCalculator object that calculate the threshold
+similarityEvaluator [In] SimilarityEvaluator object that will determine wether two snapshots
+are similar enough to belong to the same cluster
+resname [In] String containing the three letter name of the ligan in the pdb
+reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
+columnOfReportFile [In] Column of the report file that contain the metric of interest
+contactThresholdDistance [In] Distance at wich a ligand atom and a protein
+atom are considered in contact(default 8)</p>
+<dl class="method">
+<dt id="src.clustering.clustering.ContactMapAccumulativeClustering.addSnapshotToCluster">
+<tt class="descname">addSnapshotToCluster</tt><big>(</big><em>snapshot</em>, <em>metrics=</em><span class="optional">[</span><span class="optional">]</span>, <em>metricCol=None</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapAccumulativeClustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapAccumulativeClustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.ContactMapAgglomerativeClustering">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">ContactMapAgglomerativeClustering</tt><big>(</big><em>nclusters</em>, <em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapAgglomerativeClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapAgglomerativeClustering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.clustering.clustering.Clustering" title="src.clustering.clustering.Clustering"><tt class="xref py py-class docutils literal"><span class="pre">src.clustering.clustering.Clustering</span></tt></a></p>
+<p>nclusters[In] Number of the cluster to generate with the hierarchical clustering algorithm
+resname [In] String containing the three letter name of the ligan in the pdb
+reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
+columnOfReportFile [In] Column of the report file that contain the metric of interest
+contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
+considered in contact(default 8)</p>
+<dl class="method">
+<dt id="src.clustering.clustering.ContactMapAgglomerativeClustering.cluster">
+<tt class="descname">cluster</tt><big>(</big><em>paths</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapAgglomerativeClustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapAgglomerativeClustering.cluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clusters the snapshots of the trajectories provided using
+a hierarchical clustering algorithm and the contactMaps similarity.</p>
+<p>The snapshots are clustered together with the previous found clusters.
+If and old cluster is found connected to a new one (with the new one
+being the exemplar) it is ignored and only the new snapshots are
+counted as members of the cluster. The minimum metric is used as the
+metric of the cluster</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.ContactMapAgglomerativeClustering.processClusterResults">
+<tt class="descname">processClusterResults</tt><big>(</big><em>process</em>, <em>clusters</em>, <em>labels</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapAgglomerativeClustering.processClusterResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapAgglomerativeClustering.processClusterResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Analyse the results obtained from the affinity propagation
+algorithm.</p>
+<p>Process [In] String to decide wether it is the results of the first or
+second clustering
+clusters [In] Numpy array with the indexes the clusters
+Labels [In] Numpy array with the cluster each snapshot belongs to</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.ContactMapClustering">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">ContactMapClustering</tt><big>(</big><em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapClustering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.clustering.clustering.Clustering" title="src.clustering.clustering.Clustering"><tt class="xref py py-class docutils literal"><span class="pre">src.clustering.clustering.Clustering</span></tt></a></p>
+<dl class="method">
+<dt id="src.clustering.clustering.ContactMapClustering.cluster">
+<tt class="descname">cluster</tt><big>(</big><em>paths</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapClustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapClustering.cluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster the snapshots of the trajectories provided using the
+affinity propagation algorithm and the contactMaps similarity.</p>
+<p>A double clustering process is going on. First, all snapshots from an
+epoch are clustered together, and then these clusters are clustered
+together with the previous clusters, if any</p>
+<p>Paths [in] list with the path to the trajectories to cluster</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.ContactMapClustering.processClusterResults">
+<tt class="descname">processClusterResults</tt><big>(</big><em>process</em>, <em>cluster_center_indices</em>, <em>indices</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapClustering.processClusterResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapClustering.processClusterResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Analyse the results obtained from the affinity propagation
+algorithm.</p>
+<p>Process [In] String to decide wether it is the results of the first or
+second clustering
+cluster_center_indices [In] Numpy array with the snapshots taht are
+cluster centers
+Indices [In] Numpy array with the cluster each snapshot belongs to</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.ContactsClustering">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">ContactsClustering</tt><big>(</big><em>thresholdCalculator</em>, <em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>symmetries={}</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClustering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.clustering.clustering.Clustering" title="src.clustering.clustering.Clustering"><tt class="xref py py-class docutils literal"><span class="pre">src.clustering.clustering.Clustering</span></tt></a></p>
+<p>Cluster together all snapshots that are closer to the cluster center
+than certain threshold. This threshold is assigned according to the
+ratio of number of contacts over the number of heavy atoms of the ligand</p>
+<p>thresholdCalculator [In] ThresholdCalculator object that calculate the
+threshold according to the contacts ratio
+resname [In] String containing the three letter name of the ligand
+in the pdb
+reportBaseFilename [In] Name of the file that contains the metrics of
+the snapshots to cluster
+columnOfReportFile [In] Column of the report file that contain the
+metric of interest
+contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
+considered in contact(default 8)</p>
+<dl class="method">
+<dt id="src.clustering.clustering.ContactsClustering.addSnapshotToCluster">
+<tt class="descname">addSnapshotToCluster</tt><big>(</big><em>snapshot</em>, <em>metrics=</em><span class="optional">[</span><span class="optional">]</span>, <em>col=0</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.JaccardEvaluator">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">JaccardEvaluator</tt><a class="reference internal" href="_modules/src/clustering/clustering.html#JaccardEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.JaccardEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the similarity of two contactMaps by calculating the Jaccard
+index, that is, the ratio between the intersection of the two contact maps and their
+union</p>
+<dl class="method">
+<dt id="src.clustering.clustering.JaccardEvaluator.isSimilarCluster">
+<tt class="descname">isSimilarCluster</tt><big>(</big><em>contactMap</em>, <em>cluster</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#JaccardEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.JaccardEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate if two contactMaps are similar or not, return True if yes,
+False otherwise</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.clustering.clustering.calculateCorrelationContactMaps">
+<tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">calculateCorrelationContactMaps</tt><big>(</big><em>contactMap</em>, <em>clusterContactMap</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#calculateCorrelationContactMaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.calculateCorrelationContactMaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the correlation of two contactMaps</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.clustering.clustering.clusterAgglomerativeContactMaps">
+<tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">clusterAgglomerativeContactMaps</tt><big>(</big><em>contactmaps</em>, <em>n_clusters</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#clusterAgglomerativeContactMaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.clusterAgglomerativeContactMaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster multiple contact maps with the hierarchical clustering algorithm
+contactmaps [In] Array of contact maps
+n_clusters [In] Number of clusters that the clustering should generate</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.clustering.clustering.clusterContactMaps">
+<tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">clusterContactMaps</tt><big>(</big><em>contactmaps</em>, <em>preferences=None</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#clusterContactMaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.clusterContactMaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster multiple contact maps with the affinity propagation algorithm
+contactmaps [In] Array of contact maps
+preferences [In] Input value to the affinity propagation algorithm, it
+affects the number of clusters that will be generated</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.clustering.clustering.clusterKmeans">
+<tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">clusterKmeans</tt><big>(</big><em>contactmaps</em>, <em>n_clusters</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#clusterKmeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.clusterKmeans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster  multiple contact maps with the kmeans clustering algorithm
+contactmaps [In] Array of contact maps
+n_clusters [In] Number of clusters that the clustering should generate</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.clusteringResultsParameters">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">clusteringResultsParameters</tt><big>(</big><em>pdb_list=</em><span class="optional">[</span><span class="optional">]</span>, <em>metrics=</em><span class="optional">[</span><span class="optional">]</span>, <em>contactmaps=</em><span class="optional">[</span><span class="optional">]</span>, <em>contacts=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#clusteringResultsParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.clusteringResultsParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper object to pass parameters in the ContactMap affinity and agglomerative clustering</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.correlationEvaluator">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">correlationEvaluator</tt><a class="reference internal" href="_modules/src/clustering/clustering.html#correlationEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.correlationEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the similarity of two contact maps by calculating thir correlation</p>
+<dl class="method">
+<dt id="src.clustering.clustering.correlationEvaluator.isSimilarCluster">
+<tt class="descname">isSimilarCluster</tt><big>(</big><em>contactMap</em>, <em>cluster</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#correlationEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.correlationEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate if two contactMaps are similar or not, return True if yes,
+False otherwise</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.differenceDistanceEvaluator">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">differenceDistanceEvaluator</tt><a class="reference internal" href="_modules/src/clustering/clustering.html#differenceDistanceEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.differenceDistanceEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the similarity of two contactMaps by calculating the ratio of
+the number of differences over the average of elements in the contacts maps</p>
+<dl class="method">
+<dt id="src.clustering.clustering.differenceDistanceEvaluator.isSimilarCluster">
+<tt class="descname">isSimilarCluster</tt><big>(</big><em>contactMap</em>, <em>cluster</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#differenceDistanceEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.differenceDistanceEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate if two contactMaps are similar or not, return True if yes,
+False otherwise</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.clustering.clustering.getAllTrajectories">
+<tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">getAllTrajectories</tt><big>(</big><em>paths</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#getAllTrajectories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.getAllTrajectories" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find all the trajectory files in the paths specified</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>str</em>) &#8211; The path where to find the trajectories</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; A list with the names of all th trajectories in paths</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.clustering.clustering.processSnapshots">
+<tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">processSnapshots</tt><big>(</big><em>trajectories</em>, <em>reportBaseFilename</em>, <em>col</em>, <em>contactThresholdDistance</em>, <em>resname</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#processSnapshots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.processSnapshots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create list of pdb, contactMaps, metrics and contacts from a series of
+snapshots</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.clustering.clustering.selectRandomCenter">
+<tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">selectRandomCenter</tt><big>(</big><em>cluster_members</em>, <em>metrics_weights</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#selectRandomCenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.selectRandomCenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a center randomly from a cluster, weighted according to their
+metrics</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.similarityEvaluatorBuilder">
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">similarityEvaluatorBuilder</tt><a class="reference internal" href="_modules/src/clustering/clustering.html#similarityEvaluatorBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.similarityEvaluatorBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.clustering.clustering.similarityEvaluatorBuilder.build">
+<tt class="descname">build</tt><big>(</big><em>similarityEvaluatorType</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#similarityEvaluatorBuilder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.similarityEvaluatorBuilder.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.clustering.clusteringTypes">
+<span id="clusteringtypes-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">clusteringTypes</span></tt> Module<a class="headerlink" href="#module-src.clustering.clusteringTypes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.clustering.clusteringTypes.CLUSTERING_TYPES">
+<em class="property">class </em><tt class="descclassname">src.clustering.clusteringTypes.</tt><tt class="descname">CLUSTERING_TYPES</tt><a class="reference internal" href="_modules/src/clustering/clusteringTypes.html#CLUSTERING_TYPES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clusteringTypes.CLUSTERING_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="src.clustering.clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative">
+<tt class="descname">contactMapAccumulative</tt><em class="property"> = 3</em><a class="headerlink" href="#src.clustering.clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.clustering.clusteringTypes.CLUSTERING_TYPES.contactMapAffinity">
+<tt class="descname">contactMapAffinity</tt><em class="property"> = 1</em><a class="headerlink" href="#src.clustering.clusteringTypes.CLUSTERING_TYPES.contactMapAffinity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.clustering.clusteringTypes.CLUSTERING_TYPES.contactMapAgglomerative">
+<tt class="descname">contactMapAgglomerative</tt><em class="property"> = 2</em><a class="headerlink" href="#src.clustering.clusteringTypes.CLUSTERING_TYPES.contactMapAgglomerative" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.clustering.clusteringTypes.CLUSTERING_TYPES.contacts">
+<tt class="descname">contacts</tt><em class="property"> = 0</em><a class="headerlink" href="#src.clustering.clusteringTypes.CLUSTERING_TYPES.contacts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clusteringTypes.SIMILARITY_TYPES">
+<em class="property">class </em><tt class="descclassname">src.clustering.clusteringTypes.</tt><tt class="descname">SIMILARITY_TYPES</tt><a class="reference internal" href="_modules/src/clustering/clusteringTypes.html#SIMILARITY_TYPES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clusteringTypes.SIMILARITY_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="src.clustering.clusteringTypes.SIMILARITY_TYPES.Jaccard">
+<tt class="descname">Jaccard</tt><em class="property"> = 1</em><a class="headerlink" href="#src.clustering.clusteringTypes.SIMILARITY_TYPES.Jaccard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.clustering.clusteringTypes.SIMILARITY_TYPES.correlation">
+<tt class="descname">correlation</tt><em class="property"> = 2</em><a class="headerlink" href="#src.clustering.clusteringTypes.SIMILARITY_TYPES.correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.clustering.clusteringTypes.SIMILARITY_TYPES.differenceDistance">
+<tt class="descname">differenceDistance</tt><em class="property"> = 0</em><a class="headerlink" href="#src.clustering.clusteringTypes.SIMILARITY_TYPES.differenceDistance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.clustering.thresholdcalculator">
+<span id="thresholdcalculator-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">thresholdcalculator</span></tt> Module<a class="headerlink" href="#module-src.clustering.thresholdcalculator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.clustering.thresholdcalculator.ThresholdCalculator">
+<em class="property">class </em><tt class="descclassname">src.clustering.thresholdcalculator.</tt><tt class="descname">ThresholdCalculator</tt><a class="reference internal" href="_modules/src/clustering/thresholdcalculator.html#ThresholdCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.clustering.thresholdcalculator.ThresholdCalculator.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>contacts</em><big>)</big><a class="reference internal" href="_modules/src/clustering/thresholdcalculator.html#ThresholdCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.thresholdcalculator.ThresholdCalculatorBuilder">
+<em class="property">class </em><tt class="descclassname">src.clustering.thresholdcalculator.</tt><tt class="descname">ThresholdCalculatorBuilder</tt><a class="reference internal" href="_modules/src/clustering/thresholdcalculator.html#ThresholdCalculatorBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculatorBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.clustering.thresholdcalculator.ThresholdCalculatorBuilder.build">
+<tt class="descname">build</tt><big>(</big><em>clusteringBlock</em><big>)</big><a class="reference internal" href="_modules/src/clustering/thresholdcalculator.html#ThresholdCalculatorBuilder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculatorBuilder.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.thresholdcalculator.ThresholdCalculatorConstant">
+<em class="property">class </em><tt class="descclassname">src.clustering.thresholdcalculator.</tt><tt class="descname">ThresholdCalculatorConstant</tt><big>(</big><em>value=2</em><big>)</big><a class="reference internal" href="_modules/src/clustering/thresholdcalculator.html#ThresholdCalculatorConstant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculatorConstant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.clustering.thresholdcalculator.ThresholdCalculator" title="src.clustering.thresholdcalculator.ThresholdCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.clustering.thresholdcalculator.ThresholdCalculator</span></tt></a></p>
+<dl class="method">
+<dt id="src.clustering.thresholdcalculator.ThresholdCalculatorConstant.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>contacts</em><big>)</big><a class="reference internal" href="_modules/src/clustering/thresholdcalculator.html#ThresholdCalculatorConstant.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculatorConstant.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside">
+<em class="property">class </em><tt class="descclassname">src.clustering.thresholdcalculator.</tt><tt class="descname">ThresholdCalculatorHeaviside</tt><big>(</big><em>conditions=[1.2, 1.0, 0.0], values=[2, 2.5, 3, 4]</em><big>)</big><a class="reference internal" href="_modules/src/clustering/thresholdcalculator.html#ThresholdCalculatorHeaviside"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.clustering.thresholdcalculator.ThresholdCalculator" title="src.clustering.thresholdcalculator.ThresholdCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.clustering.thresholdcalculator.ThresholdCalculator</span></tt></a></p>
+<dl class="method">
+<dt id="src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>contacts</em><big>)</big><a class="reference internal" href="_modules/src/clustering/thresholdcalculator.html#ThresholdCalculatorHeaviside.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.clustering.thresholdcalculatortypes">
+<span id="thresholdcalculatortypes-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">thresholdcalculatortypes</span></tt> Module<a class="headerlink" href="#module-src.clustering.thresholdcalculatortypes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.clustering.thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES">
+<em class="property">class </em><tt class="descclassname">src.clustering.thresholdcalculatortypes.</tt><tt class="descname">THRESHOLD_CALCULATOR_TYPES</tt><a class="reference internal" href="_modules/src/clustering/thresholdcalculatortypes.html#THRESHOLD_CALCULATOR_TYPES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="src.clustering.thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.constant">
+<tt class="descname">constant</tt><em class="property"> = 1</em><a class="headerlink" href="#src.clustering.thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.constant" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.clustering.thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.heaviside">
+<tt class="descname">heaviside</tt><em class="property"> = 0</em><a class="headerlink" href="#src.clustering.thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.heaviside" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="src.simulation.html" class="btn btn-neutral float-right" title="simulation Package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="src.atomset.html" class="btn btn-neutral" title="atomset Package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Daniel Lecina, Joan Francesc Gilabert.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

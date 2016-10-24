@@ -1,0 +1,592 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>spawning Package &mdash; Adaptive Sampling  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Adaptive Sampling  documentation" href="index.html"/>
+        <link rel="up" title="AdaptiveSampling Package" href="AdaptiveSampling.html"/>
+        <link rel="next" title="utilities Package" href="src.utilities.html"/>
+        <link rel="prev" title="simulation Package" href="src.simulation.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Adaptive Sampling
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptiveSampling.html">AdaptiveSampling Package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="AdaptiveSampling.html#module-src.adaptiveSampling"><tt class="docutils literal"><span class="pre">adaptiveSampling</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptiveSampling.html#module-src.automateRoundsAdaptive"><tt class="docutils literal"><span class="pre">automateRoundsAdaptive</span></tt> Module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="AdaptiveSampling.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="src.analysis.html">analysis Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.atomset.html">atomset Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.clustering.html">clustering Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.simulation.html">simulation Package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">spawning Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.spawning.densitycalculator"><tt class="docutils literal"><span class="pre">densitycalculator</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.spawning.densitycalculatortypes"><tt class="docutils literal"><span class="pre">densitycalculatortypes</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.spawning.spawning"><tt class="docutils literal"><span class="pre">spawning</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.spawning.spawningTypes"><tt class="docutils literal"><span class="pre">spawningTypes</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.utilities.html">utilities Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.validator.html">validator Package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Blalbalbke</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Adaptive Sampling</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+        <li><a href="AdaptiveSampling.html">AdaptiveSampling Package</a> &raquo;</li>
+      
+    <li>spawning Package</li>
+    <li class="wy-breadcrumbs-aside">
+      
+          
+          <a href="_sources/src.spawning.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="spawning-package">
+<h1>spawning Package<a class="headerlink" href="#spawning-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-src.spawning.densitycalculator">
+<span id="densitycalculator-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">densitycalculator</span></tt> Module<a class="headerlink" href="#module-src.spawning.densitycalculator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.spawning.densitycalculator.DensityCalculator">
+<em class="property">class </em><tt class="descclassname">src.spawning.densitycalculator.</tt><tt class="descname">DensityCalculator</tt><a class="reference internal" href="_modules/src/spawning/densitycalculator.html#DensityCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.densitycalculator.DensityCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.spawning.densitycalculator.DensityCalculator.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>contacts</em><big>)</big><a class="reference internal" href="_modules/src/spawning/densitycalculator.html#DensityCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.densitycalculator.DensityCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.densitycalculator.DensityCalculatorBuilder">
+<em class="property">class </em><tt class="descclassname">src.spawning.densitycalculator.</tt><tt class="descname">DensityCalculatorBuilder</tt><a class="reference internal" href="_modules/src/spawning/densitycalculator.html#DensityCalculatorBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.densitycalculator.DensityCalculatorBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.spawning.densitycalculator.DensityCalculatorBuilder.build">
+<tt class="descname">build</tt><big>(</big><em>spawningBlock</em><big>)</big><a class="reference internal" href="_modules/src/spawning/densitycalculator.html#DensityCalculatorBuilder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.densitycalculator.DensityCalculatorBuilder.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.densitycalculator.DensityCalculatorHeaviside">
+<em class="property">class </em><tt class="descclassname">src.spawning.densitycalculator.</tt><tt class="descname">DensityCalculatorHeaviside</tt><big>(</big><em>conditions=[], values=[1.0]</em><big>)</big><a class="reference internal" href="_modules/src/spawning/densitycalculator.html#DensityCalculatorHeaviside"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.densitycalculator.DensityCalculatorHeaviside" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.spawning.densitycalculator.DensityCalculator" title="src.spawning.densitycalculator.DensityCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.spawning.densitycalculator.DensityCalculator</span></tt></a></p>
+<dl class="method">
+<dt id="src.spawning.densitycalculator.DensityCalculatorHeaviside.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>contacts</em><big>)</big><a class="reference internal" href="_modules/src/spawning/densitycalculator.html#DensityCalculatorHeaviside.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.densitycalculator.DensityCalculatorHeaviside.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.densitycalculator.NullDensityCalculator">
+<em class="property">class </em><tt class="descclassname">src.spawning.densitycalculator.</tt><tt class="descname">NullDensityCalculator</tt><a class="reference internal" href="_modules/src/spawning/densitycalculator.html#NullDensityCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.densitycalculator.NullDensityCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.spawning.densitycalculator.DensityCalculator" title="src.spawning.densitycalculator.DensityCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.spawning.densitycalculator.DensityCalculator</span></tt></a></p>
+<dl class="method">
+<dt id="src.spawning.densitycalculator.NullDensityCalculator.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>contacts</em><big>)</big><a class="reference internal" href="_modules/src/spawning/densitycalculator.html#NullDensityCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.densitycalculator.NullDensityCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.densitycalculator.QuadraticDensityCalculator">
+<em class="property">class </em><tt class="descclassname">src.spawning.densitycalculator.</tt><tt class="descname">QuadraticDensityCalculator</tt><a class="reference internal" href="_modules/src/spawning/densitycalculator.html#QuadraticDensityCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.densitycalculator.QuadraticDensityCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.spawning.densitycalculator.DensityCalculator" title="src.spawning.densitycalculator.DensityCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.spawning.densitycalculator.DensityCalculator</span></tt></a></p>
+<dl class="method">
+<dt id="src.spawning.densitycalculator.QuadraticDensityCalculator.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>contacts</em><big>)</big><a class="reference internal" href="_modules/src/spawning/densitycalculator.html#QuadraticDensityCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.densitycalculator.QuadraticDensityCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.spawning.densitycalculatortypes">
+<span id="densitycalculatortypes-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">densitycalculatortypes</span></tt> Module<a class="headerlink" href="#module-src.spawning.densitycalculatortypes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES">
+<em class="property">class </em><tt class="descclassname">src.spawning.densitycalculatortypes.</tt><tt class="descname">DENSITY_CALCULATOR_TYPES</tt><a class="reference internal" href="_modules/src/spawning/densitycalculatortypes.html#DENSITY_CALCULATOR_TYPES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES.heaviside">
+<tt class="descname">heaviside</tt><em class="property"> = 1</em><a class="headerlink" href="#src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES.heaviside" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES.null">
+<tt class="descname">null</tt><em class="property"> = 0</em><a class="headerlink" href="#src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES.null" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES.quadratic">
+<tt class="descname">quadratic</tt><em class="property"> = 2</em><a class="headerlink" href="#src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES.quadratic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.spawning.spawning">
+<span id="spawning-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">spawning</span></tt> Module<a class="headerlink" href="#module-src.spawning.spawning" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.spawning.spawning.DensitySpawningCalculator">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">DensitySpawningCalculator</tt><big>(</big><em>densityCalculator=&lt;src.spawning.densitycalculator.NullDensityCalculator instance at 0x2479170&gt;</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#DensitySpawningCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.DensitySpawningCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.spawning.spawning.SpawningCalculator" title="src.spawning.spawning.SpawningCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.spawning.spawning.SpawningCalculator</span></tt></a></p>
+<p>Subclass of Spawning calculator, that ensures the definition of a density calculator.</p>
+<dl class="method">
+<dt id="src.spawning.spawning.DensitySpawningCalculator.calculateDensities">
+<tt class="descname">calculateDensities</tt><big>(</big><em>clusters</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#DensitySpawningCalculator.calculateDensities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.DensitySpawningCalculator.calculateDensities" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.spawning.EpsilonDegeneracyCalculator">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">EpsilonDegeneracyCalculator</tt><big>(</big><em>densityCalculator=&lt;src.spawning.densitycalculator.NullDensityCalculator instance at 0x2479680&gt;</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#EpsilonDegeneracyCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.EpsilonDegeneracyCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.spawning.spawning.DensitySpawningCalculator" title="src.spawning.spawning.DensitySpawningCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.spawning.spawning.DensitySpawningCalculator</span></tt></a></p>
+<p>It uses epsilon * numTraj trajectories proportional to their energy and the rest inversely proportional to each cluster&#8217;s population</p>
+<dl class="method">
+<dt id="src.spawning.spawning.EpsilonDegeneracyCalculator.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>clusters</em>, <em>trajToDistribute</em>, <em>clusteringParams</em>, <em>currentEpoch=None</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#EpsilonDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.EpsilonDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.EpsilonDegeneracyCalculator.divideProcessorsMetricProportional">
+<tt class="descname">divideProcessorsMetricProportional</tt><big>(</big><em>clusters</em>, <em>trajToDistribute</em>, <em>T</em>, <em>metricWeights</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#EpsilonDegeneracyCalculator.divideProcessorsMetricProportional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.EpsilonDegeneracyCalculator.divideProcessorsMetricProportional" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.EpsilonDegeneracyCalculator.log">
+<tt class="descname">log</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#EpsilonDegeneracyCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.EpsilonDegeneracyCalculator.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.spawning.FASTDegeneracyCalculator">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">FASTDegeneracyCalculator</tt><big>(</big><em>densityCalculator=&lt;src.spawning.densitycalculator.NullDensityCalculator instance at 0x2479710&gt;</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#FASTDegeneracyCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.FASTDegeneracyCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.spawning.spawning.DensitySpawningCalculator" title="src.spawning.spawning.DensitySpawningCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.spawning.spawning.DensitySpawningCalculator</span></tt></a></p>
+<dl class="method">
+<dt id="src.spawning.spawning.FASTDegeneracyCalculator.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>clusters</em>, <em>trajToDivide</em>, <em>clusteringParams</em>, <em>currentEpoch=None</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#FASTDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.FASTDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.FASTDegeneracyCalculator.calculateNormalisedMetrics">
+<tt class="descname">calculateNormalisedMetrics</tt><big>(</big><em>clusters</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#FASTDegeneracyCalculator.calculateNormalisedMetrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.FASTDegeneracyCalculator.calculateNormalisedMetrics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.FASTDegeneracyCalculator.calculateNormalisedSizes">
+<tt class="descname">calculateNormalisedSizes</tt><big>(</big><em>clusters</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#FASTDegeneracyCalculator.calculateNormalisedSizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.FASTDegeneracyCalculator.calculateNormalisedSizes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.FASTDegeneracyCalculator.log">
+<tt class="descname">log</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#FASTDegeneracyCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.FASTDegeneracyCalculator.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.FASTDegeneracyCalculator.normaliseArray">
+<tt class="descname">normaliseArray</tt><big>(</big><em>array</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#FASTDegeneracyCalculator.normaliseArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.FASTDegeneracyCalculator.normaliseArray" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.spawning.InverselyProportionalToPopulationCalculator">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">InverselyProportionalToPopulationCalculator</tt><big>(</big><em>densityCalculator=&lt;src.spawning.densitycalculator.NullDensityCalculator instance at 0x2479290&gt;</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#InverselyProportionalToPopulationCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.InverselyProportionalToPopulationCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.spawning.spawning.DensitySpawningCalculator" title="src.spawning.spawning.DensitySpawningCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.spawning.spawning.DensitySpawningCalculator</span></tt></a></p>
+<dl class="method">
+<dt id="src.spawning.spawning.InverselyProportionalToPopulationCalculator.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>clusters</em>, <em>trajToDistribute</em>, <em>clusteringParams</em>, <em>currentEpoch=None</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#InverselyProportionalToPopulationCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.InverselyProportionalToPopulationCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.InverselyProportionalToPopulationCalculator.log">
+<tt class="descname">log</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#InverselyProportionalToPopulationCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.InverselyProportionalToPopulationCalculator.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.spawning.SameWeightDegeneracyCalculator">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">SameWeightDegeneracyCalculator</tt><a class="reference internal" href="_modules/src/spawning/spawning.html#SameWeightDegeneracyCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SameWeightDegeneracyCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.spawning.spawning.SpawningCalculator" title="src.spawning.spawning.SpawningCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.spawning.spawning.SpawningCalculator</span></tt></a></p>
+<dl class="method">
+<dt id="src.spawning.spawning.SameWeightDegeneracyCalculator.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>clusters</em>, <em>trajToDistribute</em>, <em>clusteringParams</em>, <em>currentEpoch=None</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SameWeightDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SameWeightDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd><p>We back on PELE to split equal trajectories</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.SameWeightDegeneracyCalculator.log">
+<tt class="descname">log</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SameWeightDegeneracyCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SameWeightDegeneracyCalculator.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.spawning.SimulatedAnnealingCalculator">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">SimulatedAnnealingCalculator</tt><a class="reference internal" href="_modules/src/spawning/spawning.html#SimulatedAnnealingCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SimulatedAnnealingCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.spawning.spawning.SpawningCalculator" title="src.spawning.spawning.SpawningCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.spawning.spawning.SpawningCalculator</span></tt></a></p>
+<dl class="method">
+<dt id="src.spawning.spawning.SimulatedAnnealingCalculator.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>clusters</em>, <em>trajToDistribute</em>, <em>clusteringParams</em>, <em>currentEpoch</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SimulatedAnnealingCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SimulatedAnnealingCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.SimulatedAnnealingCalculator.computeTemperature">
+<tt class="descname">computeTemperature</tt><big>(</big><em>params</em>, <em>epoch</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SimulatedAnnealingCalculator.computeTemperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SimulatedAnnealingCalculator.computeTemperature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.SimulatedAnnealingCalculator.log">
+<tt class="descname">log</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SimulatedAnnealingCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SimulatedAnnealingCalculator.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.spawning.SpawningAlgorithmBuilder">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">SpawningAlgorithmBuilder</tt><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningAlgorithmBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningAlgorithmBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.spawning.spawning.SpawningAlgorithmBuilder.build">
+<tt class="descname">build</tt><big>(</big><em>spawningBlock</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningAlgorithmBuilder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningAlgorithmBuilder.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.spawning.SpawningBuilder">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">SpawningBuilder</tt><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.spawning.spawning.SpawningBuilder.buildSpawningCalculator">
+<tt class="descname">buildSpawningCalculator</tt><big>(</big><em>spawningBlock</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningBuilder.buildSpawningCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningBuilder.buildSpawningCalculator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.spawning.SpawningCalculator">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">SpawningCalculator</tt><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>The purpose of this abstract class is to contain the behaviour of the different strategies for the spawning.
+Spawning is the way in which we split the different explorers at the begining of each epoch.</p>
+<dl class="method">
+<dt id="src.spawning.spawning.SpawningCalculator.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>clusters</em>, <em>trajToDivide</em>, <em>clusteringParams</em>, <em>currentEpoch=None</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.SpawningCalculator.divideInverselyProportionalToArray">
+<tt class="descname">divideInverselyProportionalToArray</tt><big>(</big><em>array</em>, <em>trajToDistribute</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningCalculator.divideInverselyProportionalToArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningCalculator.divideInverselyProportionalToArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divides &#8220;trajToDistribute&#8221; inversely proportional to the values in &#8220;array&#8221;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.SpawningCalculator.divideProportionalToArray">
+<tt class="descname">divideProportionalToArray</tt><big>(</big><em>array</em>, <em>trajToDistribute</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningCalculator.divideProportionalToArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningCalculator.divideProportionalToArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divides &#8220;trajToDistribute&#8221; proportionally to the values in &#8220;array&#8221;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.SpawningCalculator.divideTrajAccordingToWeights">
+<tt class="descname">divideTrajAccordingToWeights</tt><big>(</big><em>weights</em>, <em>trajToDistribute</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningCalculator.divideTrajAccordingToWeights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningCalculator.divideTrajAccordingToWeights" title="Permalink to this definition">¶</a></dt>
+<dd><p>weights must be normalized (i.e. sum(weights) = 1)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.SpawningCalculator.getMetrics">
+<tt class="descname">getMetrics</tt><big>(</big><em>clusters</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningCalculator.getMetrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningCalculator.getMetrics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.SpawningCalculator.getSizes">
+<tt class="descname">getSizes</tt><big>(</big><em>clusters</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningCalculator.getSizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningCalculator.getSizes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.SpawningCalculator.log">
+<tt class="descname">log</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningCalculator.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.spawning.SpawningParams">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">SpawningParams</tt><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningParams" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.spawning.spawning.SpawningParams.buildSpawningParameters">
+<tt class="descname">buildSpawningParameters</tt><big>(</big><em>spawningBlock</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningParams.buildSpawningParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningParams.buildSpawningParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.spawning.VariableEpsilonDegeneracyCalculator">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">VariableEpsilonDegeneracyCalculator</tt><big>(</big><em>densityCalculator=&lt;src.spawning.densitycalculator.NullDensityCalculator instance at 0x24796c8&gt;</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#VariableEpsilonDegeneracyCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.VariableEpsilonDegeneracyCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.spawning.spawning.DensitySpawningCalculator" title="src.spawning.spawning.DensitySpawningCalculator"><tt class="xref py py-class docutils literal"><span class="pre">src.spawning.spawning.DensitySpawningCalculator</span></tt></a></p>
+<dl class="method">
+<dt id="src.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculate">
+<tt class="descname">calculate</tt><big>(</big><em>clusters</em>, <em>trajToDistribute</em>, <em>clusteringParams</em>, <em>currentEpoch=None</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#VariableEpsilonDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculateEpsilonValue">
+<tt class="descname">calculateEpsilonValue</tt><big>(</big><em>clusteringParams</em>, <em>currentEpoch</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#VariableEpsilonDegeneracyCalculator.calculateEpsilonValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculateEpsilonValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.VariableEpsilonDegeneracyCalculator.linearVariation">
+<tt class="descname">linearVariation</tt><big>(</big><em>clusteringParams</em>, <em>currentEpoch</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#VariableEpsilonDegeneracyCalculator.linearVariation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.VariableEpsilonDegeneracyCalculator.linearVariation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.VariableEpsilonDegeneracyCalculator.log">
+<tt class="descname">log</tt><big>(</big><em>epsilon</em>, <em>epoch</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#VariableEpsilonDegeneracyCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.VariableEpsilonDegeneracyCalculator.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.spawning.spawning.return_sign">
+<tt class="descclassname">src.spawning.spawning.</tt><tt class="descname">return_sign</tt><big>(</big><em>i</em>, <em>m</em>, <em>n</em>, <em>r</em><big>)</big><a class="reference internal" href="_modules/src/spawning/spawning.html#return_sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.return_sign" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function, creates a three-piece step function</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.spawning.spawningTypes">
+<span id="spawningtypes-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">spawningTypes</span></tt> Module<a class="headerlink" href="#module-src.spawning.spawningTypes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.spawning.spawningTypes.EPSILON_VARIATION_TYPES">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawningTypes.</tt><tt class="descname">EPSILON_VARIATION_TYPES</tt><a class="reference internal" href="_modules/src/spawning/spawningTypes.html#EPSILON_VARIATION_TYPES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawningTypes.EPSILON_VARIATION_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="src.spawning.spawningTypes.EPSILON_VARIATION_TYPES.linearVariation">
+<tt class="descname">linearVariation</tt><em class="property"> = 0</em><a class="headerlink" href="#src.spawning.spawningTypes.EPSILON_VARIATION_TYPES.linearVariation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.spawning.spawningTypes.SPAWNING_TYPES">
+<em class="property">class </em><tt class="descclassname">src.spawning.spawningTypes.</tt><tt class="descname">SPAWNING_TYPES</tt><a class="reference internal" href="_modules/src/spawning/spawningTypes.html#SPAWNING_TYPES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="src.spawning.spawningTypes.SPAWNING_TYPES.FAST">
+<tt class="descname">FAST</tt><em class="property"> = 4</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.FAST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.spawning.spawningTypes.SPAWNING_TYPES.epsilon">
+<tt class="descname">epsilon</tt><em class="property"> = 2</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.epsilon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.spawning.spawningTypes.SPAWNING_TYPES.inverselyProportional">
+<tt class="descname">inverselyProportional</tt><em class="property"> = 1</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.inverselyProportional" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.spawning.spawningTypes.SPAWNING_TYPES.sameWeight">
+<tt class="descname">sameWeight</tt><em class="property"> = 0</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.sameWeight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.spawning.spawningTypes.SPAWNING_TYPES.simulatedAnnealing">
+<tt class="descname">simulatedAnnealing</tt><em class="property"> = 3</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.simulatedAnnealing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.spawning.spawningTypes.SPAWNING_TYPES.variableEpsilon">
+<tt class="descname">variableEpsilon</tt><em class="property"> = 5</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.variableEpsilon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="src.utilities.html" class="btn btn-neutral float-right" title="utilities Package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="src.simulation.html" class="btn btn-neutral" title="simulation Package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Daniel Lecina, Joan Francesc Gilabert.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
