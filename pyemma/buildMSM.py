@@ -2,9 +2,7 @@ import os
 import MSMblocks
 import numpy as np
 
-def main(control_file):
-
-    ### parameters
+def readParams(control_file):
     params = MSMblocks.readParams(control_file)
     trajectoryFolder = params["trajectoryFolder"]
     trajectoryBasename = params["trajectoryBasename"]
@@ -20,13 +18,19 @@ def main(control_file):
         state_labels = 'auto' #json returns string as
     #unicode, and this breaks some code in pyemma 
     outfile_fluxTPT = params["outfile_fluxTPT"]
+    return trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT
+
+def main(control_file):
+
+    ### parameters
+    trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT = readParams(control_file)
 
     #program
-
     prepareMSM = MSMblocks.PrepareMSM(numClusters, trajectoryFolder, trajectoryBasename)
     cl = prepareMSM.getClusteringObject()
     calculateMSM = MSMblocks.MSM(cl, lagtimes, numPCCA, itsOutput,numberOfITS,itsErrors,
                        error_estimationCK)
+    calculateMSM.estimate()
     MSM_object = calculateMSM.getMSM_object()
     TPTinstance = MSMblocks.TPT(MSM_object, cl, outfile_fluxTPT, state_labels)
     TPT_Object = TPTinstance.getTPTObject()
