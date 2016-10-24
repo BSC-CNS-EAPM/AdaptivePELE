@@ -1,7 +1,6 @@
 import pyemma.msm as msm
 import pyemma.plots as mplt
 import matplotlib.pyplot as plt
-import cPickle
 
 def calculateITS(trajectories, lagtimes, errors = None):
     """ Calulate the implied time-scales at the given lagtimes"""
@@ -20,7 +19,7 @@ def estimateMSM(trajectories,lagtime):
     return MSM_object
 
 def calculatePCCA(MSM_object, numPCCA):
-    """ Coarse-cluster the MSM usin numPCCA clusters. 
+    """ Coarse-cluster the MSM usin numPCCA clusters.
     Return a PCCA object"""
     MSM_object.pcca(numPCCA)
     return MSM_object
