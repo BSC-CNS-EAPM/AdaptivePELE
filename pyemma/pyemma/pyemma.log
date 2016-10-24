@@ -1,0 +1,2 @@
+06-09-16 16:15:49 pyemma.coordinates.clustering.kmeans.KmeansClustering[0] INFO     Algorithm did not reach convergence criterion of 1e-05 in 20 iterations. Consider increasing max_iter.
+06-09-16 16:29:29 pyemma.msm.estimators.lagged_model_validators.ChapmanKolmogorovValidator[0] WARNING  Changed mlags as some mlags exceeded maximum trajectory length.
