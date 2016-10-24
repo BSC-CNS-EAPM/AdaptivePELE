@@ -7,6 +7,12 @@ import pdb as debug
 
 
 def extractCOMMatrix(clusters, resname):
+    """ Extract a matrix contaning the coordinates of the center of mass of
+    the ligand for each cluster structure
+
+        clusters [In] List of clusters
+        resname [In] Residue name of the ligand in the pdb
+    """
     n = len(clusters)
     cluster_matrix = np.zeros((n, 3))
     metrics = np.zeros(n)
@@ -14,7 +20,7 @@ def extractCOMMatrix(clusters, resname):
     total_elements = 0
     contacts = np.zeros(n)
     for index, cluster in enumerate(clusters):
-        metrics[index] = cluster.metric
+        metrics[index] = cluster.metrics[cluster.metricCol]
         contacts[index] = cluster.contacts
         ligandPDB = atomset.PDB()
         ligandPDB.initialise(cluster.pdb.pdb, resname=resname)
@@ -25,6 +31,16 @@ def extractCOMMatrix(clusters, resname):
 
 
 def plotClusters2D(cluster_matrix, metrics, title):
+    """ Create all combination of xyz projections in 2D of the scatter plot
+    of the center of mass of the ligand with a colormap given by a certain
+    quantity (usually a metric or the clusters population)
+
+        cluster_matrix [In] matrix contaning the coordinates of the center of
+        mass of the ligand for each cluster structure
+        metrics [In] Array with the quantity that will be used to create the
+        colormap
+        title [In] Title for the plot figure
+    """
     ccx = cluster_matrix[:, 0]
     ccy = cluster_matrix[:, 1]
     ccz = cluster_matrix[:, 2]
@@ -48,6 +64,16 @@ def plotClusters2D(cluster_matrix, metrics, title):
 
 
 def plotClusters(cluster_matrix, metrics, title):
+    """ Create a 3D scatter plot of the center of mass of the ligand with a
+    colormap given by a certain quantity
+    (usually a metric or the clusters population)
+
+        cluster_matrix [In] matrix contaning the coordinates of the center of
+        mass of the ligand for each cluster structure
+        metrics [In] Array with the quantity that will be used to create the
+        colormap
+        title [In] Title for the plot figure
+    """
     fig = plt.figure()
     ax = Axes3D(fig)
     ccx = cluster_matrix[:, 0]
@@ -88,26 +114,27 @@ def plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
     print "Number of elements", totalElements
 
 if __name__ == "__main__":
-    resname = "ALJ"
+    # resname = "ALJ"
+    resname = "STR"
 
-    # Cont
-    pklObjectFilename = "ClCont.pkl"
-    metricPlotFilename = ""  # "results/contactClusters.png"
-    populationPlotFilename = ""  # "results/contactClusterspop.png"
-    contactsPlotFilename = ""  # "results/contactClustersContacts.png"
-    titlemetric = "Metrics Contacts"
-    titlepopulation = "Population Contacts"
-    titlecontacts = "Number of contacts Contacts"
+    # # Cont
+    # pklObjectFilename = "ClCont.pkl"
+    # metricPlotFilename = ""  # "results/contactClusters.png"
+    # populationPlotFilename = ""  # "results/contactClusterspop.png"
+    # contactsPlotFilename = ""  # "results/contactClustersContacts.png"
+    # titlemetric = "Metrics Contacts"
+    # titlepopulation = "Population Contacts"
+    # titlecontacts = "Number of contacts Contacts"
 
-    plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
-                       titlecontacts, metricPlotFilename,
-                       populationPlotFilename, contactsPlotFilename)
+    # plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
+    #                    titlecontacts, metricPlotFilename,
+    #                    populationPlotFilename, contactsPlotFilename)
 
     # Acc
-    pklObjectFilename = "ClAcc.pkl"
-    metricPlotFilename = "results/metricplotAcc_correlation.png"
-    populationPlotFilename = "results/populationAcc_correlation.png"
-    contactsPlotFilename = "results/contactsplotAcc_correlation.png"
+    pklObjectFilename = "ClAcc_PR_heav.pkl"
+    metricPlotFilename = "results/metricplotAcc_acc_PR_heav.png"
+    populationPlotFilename = "results/populationAcc_acc_PR_heav.png"
+    contactsPlotFilename = "results/contactsplotAcc_acc_PR_heav.png"
     titlemetric = "Metrics Accumulative"
     titlepopulation = "Population Accumulative"
     titlecontacts = "Number of contacts Accumulative"

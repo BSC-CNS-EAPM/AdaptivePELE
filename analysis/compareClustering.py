@@ -5,7 +5,8 @@ import time
 import os
 from spawning import spawning, densitycalculator
 
-ntrajs = 31
+# ntrajs = 31
+ntrajs = 127
 nclusters = 80
 thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
 # thresholdCalculator = thresholdCalculatorBuilder.build({
@@ -34,7 +35,16 @@ thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
     "thresholdCalculator": {
         "type" : "constant",
         "params" : {
-            "value" : 0.00000000000001
+            "value" : 0.015
+        }
+    }
+})
+thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
+    "thresholdCalculator": {
+        "type" : "heaviside",
+        "params" : {
+            "conditions" : [0.75],
+            "values" : [0.03,0.015]
         }
     }
 })
@@ -69,28 +79,28 @@ ClAgg = clustering.ContactMapAgglomerativeClustering(nclusters, resname="ALJ",
                                                      reportBaseFilename="report",
                                                      columnOfReportFile=5,
                                                      contactThresholdDistance=contactThresholdDistance)
-ClCont = clustering.ContactsClustering(thresholdCalculator, resname="AEN",
-                                       reportBaseFilename="report",
-                                       columnOfReportFile=4,
+ClCont = clustering.ContactsClustering(thresholdCalculator, resname="STR",
+                                       reportBaseFilename="run_report",
+                                       columnOfReportFile=7,
                                        contactThresholdDistance=contactThresholdDistance,
                                        symmetries={})
 ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
                                                     similarityEvaluator,
-                                                    resname="AEN",
+                                                    resname="STR",
                                                     reportBaseFilename="report",
-                                                    columnOfReportFile=5,
+                                                    columnOfReportFile=4,
                                                     contactThresholdDistance=contactThresholdDistance)
 spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 
-for i in range(1):
+for i in range(81):
     # path=["trajs/%d/run_traj*"%i]
     # paths_report=["trajs/%d/run_report*"%i]
     # path=["../3ptb_4_64_inversely_1/%d/traj*" % i]
     # paths_report=["../3ptb_4_64_inversely_1/%d/report*" % i]
     # path=["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/traj*"%i]
     # paths_report=["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/report*"%i]
-    path=["/gpfs/scratch/bsc72/bsc72755/adaptiveSampling/simulation/3ptb_4_64/epsilon_025_1/%d/traj*"%i]
-    paths_report=["/gpfs/scratch/bsc72/bsc72755/adaptiveSampling/simulation/3ptb_4_64/epsilon_025_1/%d/report*"%i]
+    path=["/gpfs/scratch/bsc72/bsc72021/simulation/PRprog_4_128_acc/%d/traj*"%i]
+    paths_report=["/gpfs/scratch/bsc72/bsc72021/simulation/PRprog_4_128_acc/%d/report*"%i]
     trajs=clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:
@@ -98,14 +108,14 @@ for i in range(1):
             total_snapshots += 1
         total_snapshots -= 1
     print "Total snapsthots for epoch %d: %d" % (i, total_snapshots)
-    startTimeCont = time.time()
-    ClCont.cluster(path)
-    endTimeCont = time.time()
-    print "Total time of clustering contacts, epoch %d: %.6f"%(i,endTimeCont-startTimeCont)
-    print "Number of clusters contacts epoch %d: %d"%(i,len(ClCont.clusters.clusters))
-    degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs, {})
-    ClCont.writeOutput("clsummary",degeneraciesCont,"object.pkl", False)
-    os.rename("clsummary/summary.txt", "results/summary.txt")
+    # startTimeCont = time.time()
+    # ClCont.cluster(path)
+    # endTimeCont = time.time()
+    # print "Total time of clustering contacts, epoch %d: %.6f"%(i,endTimeCont-startTimeCont)
+    # print "Number of clusters contacts epoch %d: %d"%(i,len(ClCont.clusters.clusters))
+    # degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs, {})
+    # ClCont.writeOutput("clsummary",degeneraciesCont,"object.pkl", False)
+    # os.rename("clsummary/summary.txt", "results/summary_ClCont_PR.txt")
     # startTimeDouble = time.time()
     # ClDouble.cluster(path)
     # endTimeDouble = time.time()
@@ -123,12 +133,12 @@ for i in range(1):
     # degeneraciesAgg = spawningObject.calculate(ClAgg.clusters.clusters, ntrajs, {})
     # ClAgg.writeOutput("clsummary",degeneraciesAgg,"ClAgg.pkl", False)
     # os.rename("clsummary/summary.txt", "results/summary_ClAgg.txt")
-    # startTimeAcc = time.time()
-    # ClAcc.cluster(path)
-    # endTimeAcc = time.time()
-    # print "Total time of clustering accumulative, epoch %d: %.6f"%(i,endTimeAcc-startTimeAcc)
-    # print "Number of clusters accumulative epoch %d: %d"%(i,len(ClAcc.clusters.clusters))
-    # print ""
-    # degeneraciesAcc = spawningObject.calculate(ClAcc.clusters.clusters, ntrajs, {})
-    # ClAcc.writeOutput("clsummary",degeneraciesAcc,"ClAcc_3PTB.pkl", False)
-    # os.rename("clsummary/summary.txt", "results/summary_ClAcc_3PTB.txt")
+    startTimeAcc = time.time()
+    ClAcc.cluster(path)
+    endTimeAcc = time.time()
+    print "Total time of clustering accumulative, epoch %d: %.6f"%(i,endTimeAcc-startTimeAcc)
+    print "Number of clusters accumulative epoch %d: %d"%(i,len(ClAcc.clusters.clusters))
+    print ""
+    degeneraciesAcc = spawningObject.calculate(ClAcc.clusters.clusters, ntrajs, {})
+    ClAcc.writeOutput("clsummary",degeneraciesAcc,"ClAcc_PR_heav.pkl", False)
+    os.rename("clsummary/summary.txt", "results/summary_ClAcc_PR_heav.txt")
