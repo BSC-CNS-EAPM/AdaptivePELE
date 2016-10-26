@@ -714,6 +714,13 @@ def calculateCorrelationContactMaps(contactMap, clusterContactMap):
     contactMap1 = contactMap.reshape((1, -1))
     # Reshape the matrix into a 1D array to use the numpy corrcoef function
     contactMap2 = clusterContactMap.reshape((1, -1))
+    total1 = contactMap1.sum()
+    total2 = contactMap2.sum()
+    if not total1 or not total2:
+        # if any array is all zeros the correlation will be NaN
+        # if both are zero, correlation is perfect (i.e 1) else it is different
+        # and will be in different clusters
+        return total1 == total2
     return np.corrcoef(contactMap1, contactMap2)[0, 1]
 
 

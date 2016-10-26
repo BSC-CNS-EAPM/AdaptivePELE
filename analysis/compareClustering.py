@@ -30,34 +30,34 @@ thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
     }
 })
 # Jaccard index
-similarityEvaluator = clustering.JaccardEvaluator()
-thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
-    "thresholdCalculator": {
-        "type" : "constant",
-        "params" : {
-            "value" : 0.015
-        }
-    }
-})
-thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
-    "thresholdCalculator": {
-        "type" : "heaviside",
-        "params" : {
-            "conditions" : [0.75],
-            "values" : [0.03,0.015]
-        }
-    }
-})
-# correlation
-# similarityEvaluator = clustering.correlationEvaluator()
+# similarityEvaluator = clustering.JaccardEvaluator()
 # thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
 #     "thresholdCalculator": {
 #         "type" : "constant",
 #         "params" : {
-#             "value" : 0.15
+#             "value" : 0.015
 #         }
 #     }
 # })
+# thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
+#     "thresholdCalculator": {
+#         "type" : "heaviside",
+#         "params" : {
+#             "conditions" : [0.75, 0.25],
+#             "values" : [0.03,0.015,0.001]
+#         }
+#     }
+# })
+# correlation
+similarityEvaluator = clustering.correlationEvaluator()
+thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
+    "thresholdCalculator": {
+        "type" : "constant",
+        "params" : {
+            "value" : 0.15
+        }
+    }
+})
 densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
 densityCalculator = densityCalculatorBuilder.build({
        "density" : {
@@ -86,21 +86,21 @@ ClCont = clustering.ContactsClustering(thresholdCalculator, resname="STR",
                                        symmetries={})
 ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
                                                     similarityEvaluator,
-                                                    resname="STR",
+                                                    resname="AEN",
                                                     reportBaseFilename="report",
                                                     columnOfReportFile=4,
                                                     contactThresholdDistance=contactThresholdDistance)
 spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 
-for i in range(81):
+for i in range(4):
     # path=["trajs/%d/run_traj*"%i]
     # paths_report=["trajs/%d/run_report*"%i]
     # path=["../3ptb_4_64_inversely_1/%d/traj*" % i]
     # paths_report=["../3ptb_4_64_inversely_1/%d/report*" % i]
     # path=["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/traj*"%i]
     # paths_report=["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/report*"%i]
-    path=["/gpfs/scratch/bsc72/bsc72021/simulation/PRprog_4_128_acc/%d/traj*"%i]
-    paths_report=["/gpfs/scratch/bsc72/bsc72021/simulation/PRprog_4_128_acc/%d/report*"%i]
+    path=["/gpfs/scratch/bsc72/bsc72021/simulation/3ptb_16_64_corr/inversely_acc_1/%d/traj*"%i]
+    paths_report=["/gpfs/scratch/bsc72/bsc72021/simulation/3ptb_16_64_corr/inversely_acc_1/%d/report*"%i]
     trajs=clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:
@@ -141,4 +141,4 @@ for i in range(81):
     print ""
     degeneraciesAcc = spawningObject.calculate(ClAcc.clusters.clusters, ntrajs, {})
     ClAcc.writeOutput("clsummary",degeneraciesAcc,"ClAcc_PR_heav.pkl", False)
-    os.rename("clsummary/summary.txt", "results/summary_ClAcc_PR_heav.txt")
+    os.rename("clsummary/summary.txt", "results/summary_ClAcc_corr_3PTB_const.txt")
