@@ -15,12 +15,22 @@ def printHelp():
             "It must be run in the root folder. "
     parser = argparse.ArgumentParser(description=desc)
     args = parser.parse_args()
-    return
+    return args
+
 
 def getClusteringSummaryContent(file):
     if os.path.isfile(file):
-        return np.genfromtxt(file)
-    else: return []
+        summaryContent = np.genfromtxt(file)
+        if summaryContent.ndim > 1:
+            return summaryContent
+        elif summaryContent.ndim == 1:
+            # file has only one line
+            return np.array([summaryContent])
+        else:
+            # file existed but was empty
+            return []
+    else:
+        return []
 
 
 def getTotalNumberOfClustersPerEpoch(templetizedClusteringSummaryFile, folder):
@@ -29,7 +39,7 @@ def getTotalNumberOfClustersPerEpoch(templetizedClusteringSummaryFile, folder):
 
     totalNumberOfClustersPerEpoch = []
     for epoch in range(numberOfEpochs):
-        clusteringSummary = getClusteringSummaryContent(templetizedClusteringSummaryFile%epoch)
+        clusteringSummary = getClusteringSummaryContent(templetizedClusteringSummaryFile % epoch)
 
         if clusteringSummary != []:
             totalNumberOfClustersPerEpoch.append(len(clusteringSummary))
