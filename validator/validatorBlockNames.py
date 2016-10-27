@@ -70,7 +70,7 @@ class SpawningParams:
             "heaviside": "unicode",
             "null": "unicode",
             "constant": "unicode",
-            "quadratic": "unicode"
+            "continuous": "unicode"
         },
         "params": {
             "heaviside": "unicode",
@@ -78,7 +78,7 @@ class SpawningParams:
             "constant": "unicode",
             "values": "list",
             "conditions": "list",
-            "quadratic": "unicode"
+            "continuous": "unicode"
         }
     }
 

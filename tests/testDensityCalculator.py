@@ -59,3 +59,17 @@ class densityCalculatorTest(unittest.TestCase):
         self.assertEqual(densityCalculator.type, densitycalculatortypes.DENSITY_CALCULATOR_TYPES.heaviside)
         self.assertEqual(densityCalculator.values, goldenValues)
         self.assertEqual(densityCalculator.conditions, goldenConditions)
+
+    def testDensityCalculatorContinuousParams(self):
+        spawningBlock = {
+            type: "irrelevant",
+            "density" : {
+                "type" : "continuous"
+            }
+        }
+        densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
+        densityCalculator = densityCalculatorBuilder.build(spawningBlock)
+
+
+        self.assertAlmostEqual(densityCalculator.calculate(0.5), 1)
+        self.assertAlmostEqual(densityCalculator.calculate(1.5), 8)

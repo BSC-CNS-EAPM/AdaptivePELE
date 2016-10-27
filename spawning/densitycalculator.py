@@ -2,6 +2,7 @@ from constants import blockNames
 import densitycalculatortypes
 import sys
 
+
 class DensityCalculatorBuilder():
     def build(self, spawningBlock):
         try:
@@ -27,8 +28,8 @@ class DensityCalculatorBuilder():
             except KeyError:
                 print "Using default parameters for Heaviside density calculator"
                 return DensityCalculatorHeaviside()
-        elif type == blockNames.DensityCalculator.quadratic:
-            return QuadraticDensityCalculator()
+        elif type == blockNames.DensityCalculator.continuous:
+            return ContinuousDensityCalculator()
         else:
             sys.exit("Unknown density calculator type! Choices are: " + str(densitycalculatortypes.DENSITY_CALCULATOR_TYPE_TO_STRING_DICTIONARY.values()))
 
@@ -41,8 +42,9 @@ class DensityCalculator():
     def calculate(self, contacts):
         pass
 
+
 class DensityCalculatorHeaviside(DensityCalculator):
-    #Mostly duplicated code with threshold calculator
+    # Mostly duplicated code with threshold calculator
     def __init__(self, conditions=[], values=[1.]):
         DensityCalculator.__init__(self)
         self.type = densitycalculatortypes.DENSITY_CALCULATOR_TYPES.heaviside
@@ -61,6 +63,7 @@ class DensityCalculatorHeaviside(DensityCalculator):
         #the way it's built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the "else" value
         return self.values[-1]
 
+
 class NullDensityCalculator(DensityCalculator):
     def __init__(self):
         DensityCalculator.__init__(self)
@@ -69,13 +72,18 @@ class NullDensityCalculator(DensityCalculator):
     def calculate(self, contacts):
         return 1.
 
-class QuadraticDensityCalculator(DensityCalculator):
+
+class ContinuousDensityCalculator(DensityCalculator):
     def __init__(self):
         DensityCalculator.__init__(self)
-        self.type = densitycalculatortypes.DENSITY_CALCULATOR_TYPES.quadratic
+        self.type = densitycalculatortypes.DENSITY_CALCULATOR_TYPES.continuous
 
     def calculate(self, contacts):
-        if contacts > 2.0:
-            return 32
+        # if contacts > 2.0:
+        #     return 32
+        # else:
+        #     return 8.76571*contacts**2-2.44857*contacts+0.28829
+        if contacts > 1.0:
+            return 8
         else:
-            return 8.76571*contacts**2-2.44857*contacts+0.28829
+            return 64.0/(-4*contacts+6)**3
