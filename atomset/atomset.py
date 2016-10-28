@@ -282,10 +282,16 @@ class PDB:
         """
         if not self.totalMass:
             self.computeTotalMass()
-        COM = np.array([0., 0., 0.])
+        COM = [0., 0., 0.]
         for atomId, atom in self.atoms.items():
             COM += atom.mass * np.array([atom.x, atom.y, atom.z])
-        COM /= self.totalMass
+            COM[0] += atom.mass * atom.x
+            COM[1] += atom.mass * atom.y
+            COM[2] += atom.mass * atom.z
+
+        COM[0] /= self.totalMass
+        COM[1] /= self.totalMass
+        COM[2] /= self.totalMass
         self.com = COM
         return COM
 
@@ -295,10 +301,10 @@ class PDB:
 
             :returns: numpy.Array -- Array with the coordinates of the center of mass
         """
-        if type(self.com) == np.ndarray:
-            return self.com
-        else:
+        if self.com is None or self.com is 0:
             return self.extractCOM()
+        else:
+            return self.com
 
     def writePDB(self, path):
         """
@@ -460,17 +466,34 @@ def computeRMSD(PDB1, PDB2, symmetries={}):
 
 def computeCOMDifference(PDB1, PDB2):
     """
-        Compute the differences between the center of mass of two PDB
+        Compute the difference between the center of mass of two PDB
 
         :param PDB1: First PDB with which the RMSD will be calculated
         :type PDB1: PDB
         :param PDB2: First PDB with which the RMSD will be calculated
         :type PDB2: PDB
-        :returns: numpy.Array -- The difference in the center of mass between two PDB
+        :returns: float -- The distance between the centers of mass between two PDB
+    """
+    return computeCOMDifference(PDB1, PDB2)
+
+def computeCOMSquaredDifference(PDB1, PDB2):
+    """
+        Compute the squared difference between the center of mass of two PDB
+
+        :param PDB1: First PDB with which the RMSD will be calculated
+        :type PDB1: PDB
+        :param PDB2: First PDB with which the RMSD will be calculated
+        :type PDB2: PDB
+        :returns: float -- The squared distance between the centers of mass between two PDB
     """
     COM1 = PDB1.getCOM()
     COM2 = PDB2.getCOM()
-    return np.linalg.norm(COM1 - COM2)
+
+    dx =  COM1[0] - COM2[0]
+    dy =  COM1[1] - COM2[1]
+    dz =  COM1[2] - COM2[2]
+
+    return dx*dx + dy*dy + dz*dz
 
 
 def readPDB(pdbfile):
