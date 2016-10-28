@@ -123,9 +123,6 @@ class Clustering:
             and self.resname == other.resname\
             and self.col == other.col
 
-    # Moved the cluster methods of contactsClustering to the Clustering
-    # superclass in order to make accessible to contactMapAccumaltiveClustering
-    # and avoid duplicate code
     def cluster(self, paths):
         """
             Cluster the snaptshots contained in the pahts folder
@@ -219,7 +216,7 @@ class ContactsClustering(Clustering):
         self.symmetries = symmetries
 
 
-    def addSnapshotToCluster(self, snapshot, metrics=[], col=0):
+    def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
