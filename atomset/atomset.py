@@ -182,7 +182,7 @@ class PDB:
         # Where atomId := serail:atomName:resName
         self.totalMass = 0
         self.pdb = ""
-        self.com = 0
+        self.com = None
         # Necessary for contactMaps
         self.atomList = []
 
@@ -295,7 +295,10 @@ class PDB:
 
             :returns: numpy.Array -- Array with the coordinates of the center of mass
         """
-        return self.com
+        if type(self.com) == np.ndarray:
+            return self.com
+        else:
+            return self.extractCOM()
 
     def writePDB(self, path):
         """
@@ -465,8 +468,8 @@ def computeCOMDifference(PDB1, PDB2):
         :type PDB2: PDB
         :returns: numpy.Array -- The difference in the center of mass between two PDB
     """
-    COM1 = PDB1.extractCOM()
-    COM2 = PDB2.extractCOM()
+    COM1 = PDB1.getCOM()
+    COM2 = PDB2.getCOM()
     return np.linalg.norm(COM1 - COM2)
 
 
