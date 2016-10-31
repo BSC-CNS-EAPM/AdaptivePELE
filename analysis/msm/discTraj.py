@@ -45,8 +45,8 @@ def findBelongingCluster(snapshot, clusteringObject):
 
     distances = []
     for i, cluster in enumerate(clusters):
-        #COM distance is a minimum bound for RMSD distance
-        if atomset.computeCOMSquaredDifference(cluster.pdb, pdb) > minRmsd2:
+        #centroid distance is a minimum bound for RMSD distance
+        if atomset.computeSquaredCentroidDifference(cluster.pdb, pdb) > minRmsd2:
             continue
 
         rmsd = atomset.computeRMSD(cluster.pdb, pdb, clusteringObject.symmetries)
