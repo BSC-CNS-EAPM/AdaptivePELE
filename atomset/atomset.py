@@ -183,6 +183,8 @@ class PDB:
         self.totalMass = 0
         self.pdb = ""
         self.com = None
+        self.centroid = None
+
         # Necessary for contactMaps
         self.atomList = []
 
@@ -276,15 +278,14 @@ class PDB:
 
     def extractCOM(self):
         """
-            Calculate the center of mass of the PDB
+            Calculate the PDB's center of mass
 
-            :returns: numpy.Array -- Array with the coordinates of the center of mass
+            :returns: list -- List with the center of mass coordinates
         """
         if not self.totalMass:
             self.computeTotalMass()
         COM = [0., 0., 0.]
         for atomId, atom in self.atoms.items():
-            COM += atom.mass * np.array([atom.x, atom.y, atom.z])
             COM[0] += atom.mass * atom.x
             COM[1] += atom.mass * atom.y
             COM[2] += atom.mass * atom.z
@@ -297,14 +298,44 @@ class PDB:
 
     def getCOM(self):
         """
-            Get the center of mass of the PDB
+            Get the PDB's center of mass
 
-            :returns: numpy.Array -- Array with the coordinates of the center of mass
+            :returns: list -- List with the center of mass coordinates
         """
-        if self.com is None or self.com is 0:
+        if self.com is None:
             return self.extractCOM()
         else:
             return self.com
+
+    def extractCentroid(self):
+        """
+            Calculate the PDB centroid
+
+            :returns: List -- List with the centroid coordinates
+        """
+        centroid = [0., 0., 0.]
+        for atomId, atom in self.atoms.items():
+            centroid[0] += atom.x
+            centroid[1] += atom.y
+            centroid[2] += atom.z
+
+        n = float(len(self.atoms))
+        centroid[0] /= n
+        centroid[1] /= n
+        centroid[2] /= n
+        self.centroid = centroid
+        return centroid
+
+    def getCentroid(self):
+        """
+            Get the PDB's centroid
+
+            :returns: list -- List with the centroid coordinates
+        """
+        if self.centroid is None:
+            return self.extractCentroid()
+        else:
+            return self.centroid
 
     def writePDB(self, path):
         """
@@ -495,6 +526,24 @@ def computeCOMSquaredDifference(PDB1, PDB2):
 
     return dx*dx + dy*dy + dz*dz
 
+def computeSquaredCentroidDifference(PDB1, PDB2):
+    """
+        Compute the centroid squared difference between two PDBs
+
+        :param PDB1: First PDB
+        :type PDB1: PDB
+        :param PDB2: Second PDB
+        :type PDB2: PDB
+        :returns: float -- The squared centroid distance between two PDB
+    """
+    centroid1 = PDB1.getCentroid()
+    centroid2 = PDB2.getCentroid()
+
+    dx =  centroid1[0] - centroid2[0]
+    dy =  centroid1[1] - centroid2[1]
+    dz =  centroid1[2] - centroid2[2]
+
+    return dx*dx + dy*dy + dz*dz
 
 def readPDB(pdbfile):
     """
