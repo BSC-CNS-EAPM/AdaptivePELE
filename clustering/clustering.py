@@ -38,7 +38,7 @@ class Cluster:
         elements, its density, threhold, number of contacts,
         a contactMap(sometimes) and a metric
     """
-    def __init__(self, pdb, thresholdRadius=0, contactMap=None, contacts=0,
+    def __init__(self, pdb, thresholdRadius=None, contactMap=None, contacts=None,
                  metrics=[], metricCol=None, density=None):
         """
             contacts stands for contacts/ligandAtom
@@ -51,6 +51,11 @@ class Cluster:
         self.contactMap = contactMap
         self.metrics = metrics
         self.metricCol = metricCol
+
+        if self.threshold is None:
+            self.threshold2 = None
+        else:
+            self.threshold2 = thresholdRadius*thresholdRadius
 
     def getMetric(self):
         if len(self.metrics):
@@ -220,6 +225,33 @@ class ContactsClustering(Clustering):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
+            #########################################
+            # OPTIMISATION: 
+            # We use centroid distance as a lower bound for RMSD
+            #
+            # Proof:
+            # Superscript ^1 and ^2 stands for PDB1 and PDB2 respectively
+            # Exponentiation is referred as ** to avoid misunderstandings
+            # Sumation is performed over atoms
+            #
+            # RMSD**2 = sum_i ||r^1_i - r^2_i||**2 / N := sum_i d_i**2 / N
+            # dc := centroid difference
+            # dc = ||sum_i r^1_i - r^2_i|| / N := sum_i d_i / N
+            # where d_i := r^1_i - r^2_i
+            #
+            # In the end, it is a matter of showing that the square of avg. is
+            # smaller or equal to the avg. of squares:
+            # (sum_i d_i / N)**2 <= sum_i d_i**2 / N
+            #
+            # Remembering Cauchy-Schward inequality:
+            # |<u*v>| <= ||<u>||*||<v>||
+            # Setting u_i = d_i/N and v_i = 1 for all i, in an n-dim euclidean space
+            # (sum d_i / N)**2 <= sum (d_i/N)**2 * 1
+            #########################################
+            scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
+            if scd > cluster.threshold2:
+                continue
+
             if atomset.computeRMSD(cluster.pdb, pdb, self.symmetries) < cluster.threshold:
                 cluster.addElement(metrics)
                 return
