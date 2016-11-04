@@ -65,6 +65,11 @@ class ThresholdCalculatorConstant(ThresholdCalculator):
     def __eq__(self, other):
         return self.type == other.type and self.value == other.value
 
+    def getMaxThreshold(self):
+        """ Method that returns the maximum treshold possible, required for new
+            distance-ordered clustering(in early development)"""
+        return self.value
+
 class ThresholdCalculatorHeaviside(ThresholdCalculator):
     def __init__(self, conditions=[1.2,1.0,0.0], values=[2,2.5,3,4]):
         self.type = thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.heaviside
@@ -82,6 +87,11 @@ class ThresholdCalculatorHeaviside(ThresholdCalculator):
                 return self.values[i]
         #the way it's built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the "else" value
         return self.values[-1]
+
+    def getMaxThreshold(self):
+        """ Method that returns the maximum treshold possible, required for new
+            distance-ordered clustering(in early development)"""
+        return max(self.values)
 
     def __eq__(self, other):
         return self.type == other.type and\

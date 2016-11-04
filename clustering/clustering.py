@@ -20,6 +20,13 @@ class Clusters:
     def addCluster(self, cluster):
         self.clusters.append(cluster)
 
+    def insertCluster(self, index, cluster):
+        """ Insert a cluster in a specified index"""
+        self.clusters.insert(index, cluster)
+
+    def getNumberClusters(self):
+        return len(self.clusters)
+
     def printClusters(self, verbose=False):
         for i, cluster in enumerate(self.clusters):
             print "--------------"
@@ -75,7 +82,7 @@ class Cluster:
         print "Metrics: ", self.metrics
         if self.threshold != 0:
             print "Radius threshold: ", self.threshold
-        print "Number of contacts: ", self.contacts
+        print "Number of contacts: %.2f" % self.contacts
 
     def writePDB(self, path):
         self.pdb.writePDB(path)
@@ -226,7 +233,7 @@ class ContactsClustering(Clustering):
         pdb.initialise(snapshot, resname=self.resname)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
             #########################################
-            # OPTIMISATION: 
+            # OPTIMISATION:
             # We use centroid distance as a lower bound for RMSD
             #
             # Proof:
