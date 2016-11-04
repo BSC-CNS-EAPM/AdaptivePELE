@@ -10,10 +10,10 @@ ntrajs = 127
 nclusters = 80
 thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
 # thresholdCalculator = thresholdCalculatorBuilder.build({
-#         "thresholdCalculator" : {
-#             "type" : "constant",
-#             "params" : {
-#                 "value" : 2
+#         "thresholdCalculator": {
+#             "type": "constant",
+#             "params": {
+#                 "value": 2
 #             }
 #         }
 # })
@@ -22,10 +22,10 @@ thresholdCalculator = thresholdCalculatorBuilder.build({})
 similarityEvaluator = clustering.differenceDistanceEvaluator()
 thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
     "thresholdCalculator": {
-        "type" : "heaviside",
-        "params" : {
-            "conditions" : [1.2,1.0,0.5,0.0],
-            "values" : [0.2,0.4,0.5,0.8]
+        "type": "heaviside",
+        "params": {
+            "conditions": [1.2, 1.0, 0.5, 0.0],
+            "values": [0.2, 0.4, 0.5, 0.8]
         }
     }
 })
@@ -52,19 +52,19 @@ thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
 similarityEvaluator = clustering.correlationEvaluator()
 thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
     "thresholdCalculator": {
-        "type" : "constant",
-        "params" : {
-            "value" : 0.15
+        "type": "constant",
+        "params": {
+            "value": 0.15
         }
     }
 })
 densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
 densityCalculator = densityCalculatorBuilder.build({
-       "density" : {
-            "type" : "heaviside",
-            "params" : {
-                 "conditions" : [1.5, 1.0, 0.0],
-                 "values" : [8.0, 2.37, 1.0, 0.5]
+       "density": {
+            "type": "heaviside",
+            "params": {
+                 "conditions": [1.5, 1.0, 0.0],
+                 "values": [8.0, 2.37, 1.0, 0.5]
              }
         }
    }
@@ -93,15 +93,15 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
 spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 
 for i in range(4):
-    # path=["trajs/%d/run_traj*"%i]
-    # paths_report=["trajs/%d/run_report*"%i]
-    # path=["../3ptb_4_64_inversely_1/%d/traj*" % i]
-    # paths_report=["../3ptb_4_64_inversely_1/%d/report*" % i]
-    # path=["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/traj*"%i]
-    # paths_report=["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/report*"%i]
-    path=["/gpfs/scratch/bsc72/bsc72021/simulation/3ptb_16_64_corr/inversely_acc_1/%d/traj*"%i]
-    paths_report=["/gpfs/scratch/bsc72/bsc72021/simulation/3ptb_16_64_corr/inversely_acc_1/%d/report*"%i]
-    trajs=clustering.getAllTrajectories(paths_report)
+    # path =["trajs/%d/run_traj*"%i]
+    # paths_report = ["trajs/%d/run_report*"%i]
+    # path = ["../3ptb_4_64_inversely_1/%d/traj*" % i]
+    # paths_report = ["../3ptb_4_64_inversely_1/%d/report*" % i]
+    # path = ["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/traj*"%i]
+    # paths_report = ["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/report*"%i]
+    path = ["/gpfs/scratch/bsc72/bsc72021/simulation/3ptb_16_64_corr/inversely_acc_1/%d/traj*"%i]
+    paths_report = ["/gpfs/scratch/bsc72/bsc72021/simulation/3ptb_16_64_corr/inversely_acc_1/%d/report*"%i]
+    trajs = clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:
         for line in open(traj, "r"):
