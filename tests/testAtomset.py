@@ -233,6 +233,29 @@ END   \n"
         golden_RMSD = 3.860743
         self.assertAlmostEqual(RMSD, golden_RMSD, 5)
 
+    def test_combination_symmetries(self):
+        # preparation
+        pdb_0= atomset.PDB()
+        pdb_0.initialise("tests/data/symmetries/cluster_0.pdb",resname='AEN')
+        pdb_1= atomset.PDB()
+        pdb_1.initialise("tests/data/symmetries/cluster_1.pdb",resname='AEN')
+        pdb_2= atomset.PDB()
+        pdb_2.initialise("tests/data/symmetries/cluster_2.pdb",resname='AEN')
+        symmetries3PTB = {"3225:C3:AEN": "3227:C5:AEN", "3224:C2:AEN": "3228:C6:AEN",
+                          "3230:N1:AEN": "3231:N2:AEN"}
+
+        # funtion to test
+        RMSD02 = atomset.computeRMSD(pdb_0, pdb_2, symmetries3PTB)
+        RMSD20 = atomset.computeRMSD(pdb_2, pdb_0, symmetries3PTB)
+        RMSD01 = atomset.computeRMSD(pdb_0, pdb_1, symmetries3PTB)
+        RMSD10 = atomset.computeRMSD(pdb_1, pdb_0, symmetries3PTB)
+        RMSD21 = atomset.computeRMSD(pdb_2, pdb_1, symmetries3PTB)
+        RMSD12 = atomset.computeRMSD(pdb_1, pdb_2, symmetries3PTB)
+        self.assertEqual(RMSD01, RMSD10)  # Seems to work fine
+        # The other two fail
+        self.assertEqual(RMSD02, RMSD20)
+        self.assertEqual(RMSD21, RMSD12)
+
     def testPDB_contacts(self):
         # preparation
         pdb_native = atomset.PDB()

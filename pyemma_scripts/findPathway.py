@@ -168,7 +168,8 @@ for rowind, clusterInit in enumerate(ClOrd.clusters.clusters):
     cluster_distance = ClOrd.distancesList[rowind]
     if rowind == final_cluster:
         continue
-    minimumCloseCluster = rowind+1
+    # minimumCloseCluster = rowind+1
+    minimumCloseCluster = 0
     for distance_initial in ClOrd.distancesList:
         if (abs(distance_initial-cluster_distance) < distanceThreshold):
             break
@@ -182,10 +183,13 @@ for rowind, clusterInit in enumerate(ClOrd.clusters.clusters):
         clusterRMSD = atomset.computeRMSD(cluster.pdb, clusterInit.pdb,
                                           ClOrd.symmetries)
         distMatrix[rowind, minimumCloseCluster] = clusterRMSD
-        distMatrix[minimumCloseCluster, rowind] = -clusterRMSD
+        # distMatrix[minimumCloseCluster, rowind] = -clusterRMSD
         minimumCloseCluster += 1
 np.save("distMatrix.npy", distMatrix)
-plt.imshow(distMatrix)
-plt.colorbar()
-plt.savefig("connectivityMatrix.png")
+ClOrd.clusters.clusters[0].writePDB("cluster_0.pdb")
+ClOrd.clusters.clusters[1].writePDB("cluster_1.pdb")
+ClOrd.clusters.clusters[2].writePDB("cluster_2.pdb")
+# plt.imshow(distMatrix)
+# plt.colorbar()
+# plt.savefig("connectivityMatrix.png")
 # use graph algorithm to establish a path
