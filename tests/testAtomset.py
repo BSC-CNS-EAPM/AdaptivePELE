@@ -1,6 +1,7 @@
 from atomset import atomset
 import unittest
 import numpy as np
+from utilities import utilities
 
 
 class atomsetTest(unittest.TestCase):
@@ -227,23 +228,33 @@ END   \n"
         pdb_native.initialise("tests/data/ain_native_fixed.pdb", resname='AIN')
         pdb_traj = atomset.PDB()
         pdb_traj.initialise("tests/data/ain_trajectory.pdb", resname='AIN')
-
+        symDict = {"1733:O1:AIN": "1735:O2:AIN"}
+        symDict2 = {"1733:O1:AIN": "1735:O2:AIN", "1735:O2:AIN": "1733:O1:AIN"}
         # function to test
-        RMSD = atomset.computeRMSD(pdb_native, pdb_traj, {"1733:O1:AIN":"1735:O2:AIN", "1735:O2:AIN":"1733:O1:AIN"})
+        RMSD = atomset.computeRMSD(pdb_native, pdb_traj, symDict)
+        oldRMSD = atomset.old_computeRMSD(pdb_native, pdb_traj, symDict2)
+        reverseoldRMSD = atomset.old_computeRMSD(pdb_traj, pdb_native, symDict2)
+        reverseRMSD = atomset.computeRMSD(pdb_traj, pdb_native, symDict)
+        print ""
+        print RMSD,oldRMSD
+        print reverseRMSD, reverseoldRMSD
         golden_RMSD = 3.860743
+        self.assertEqual(RMSD, reverseRMSD)
         self.assertAlmostEqual(RMSD, golden_RMSD, 5)
 
     def test_combination_symmetries(self):
         # preparation
-        pdb_0= atomset.PDB()
-        pdb_0.initialise("tests/data/symmetries/cluster_0.pdb",resname='AEN')
-        pdb_1= atomset.PDB()
-        pdb_1.initialise("tests/data/symmetries/cluster_1.pdb",resname='AEN')
-        pdb_2= atomset.PDB()
-        pdb_2.initialise("tests/data/symmetries/cluster_2.pdb",resname='AEN')
+        pdb_0 = atomset.PDB()
+        pdb_0.initialise("tests/data/symmetries/cluster_0.pdb", resname='AEN')
+        pdb_1 = atomset.PDB()
+        pdb_1.initialise("tests/data/symmetries/cluster_1.pdb", resname='AEN')
+        pdb_2 = atomset.PDB()
+        pdb_2.initialise("tests/data/symmetries/cluster_2.pdb", resname='AEN')
         symmetries3PTB = {"3225:C3:AEN": "3227:C5:AEN", "3224:C2:AEN": "3228:C6:AEN",
                           "3230:N1:AEN": "3231:N2:AEN"}
-
+        symmetries3PTBold = {"3225:C3:AEN": "3227:C5:AEN", "3224:C2:AEN": "3228:C6:AEN",
+                          "3230:N1:AEN": "3231:N2:AEN"}
+        utilities.generateReciprocalAtoms(symmetries3PTBold)
         # funtion to test
         RMSD02 = atomset.computeRMSD(pdb_0, pdb_2, symmetries3PTB)
         RMSD20 = atomset.computeRMSD(pdb_2, pdb_0, symmetries3PTB)
@@ -251,6 +262,11 @@ END   \n"
         RMSD10 = atomset.computeRMSD(pdb_1, pdb_0, symmetries3PTB)
         RMSD21 = atomset.computeRMSD(pdb_2, pdb_1, symmetries3PTB)
         RMSD12 = atomset.computeRMSD(pdb_1, pdb_2, symmetries3PTB)
+        RMSD02_old = atomset.old_computeRMSD(pdb_0, pdb_2, symmetries3PTBold)
+        RMSD20_old = atomset.old_computeRMSD(pdb_2, pdb_0, symmetries3PTBold)
+        print ""
+        print RMSD02, RMSD02_old
+        print RMSD20, RMSD20_old
         self.assertEqual(RMSD01, RMSD10)  # Seems to work fine
         # The other two fail
         self.assertEqual(RMSD02, RMSD20)

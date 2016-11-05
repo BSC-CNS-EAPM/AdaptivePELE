@@ -460,9 +460,49 @@ def computeRMSD2(PDB1, PDB2, symmetries={}):
         :returns: float -- The squared RMSD between two PDB
     """
     rmsd = 0
+    symmetriesSet = set(symmetries.keys())
+    allAtomsSet = set(PDB1.atoms.keys())
+    allAtomsSet = allAtomsSet-symmetriesSet
+    for atom1Id in symmetriesSet:
+        d2 = 0
+        d2sm = 0
+        atom2Id = symmetries[atom1Id]
+        try:
+            atom11 = PDB1.getAtom(atom1Id)
+            atom12 = PDB1.getAtom(atom2Id)
+            atom21 = PDB2.getAtom(atom1Id)
+            atom22 = PDB2.getAtom(atom2Id)
+        except KeyError as err:
+            raise KeyError("Atom %d not found in PDB" % err.message)
+        d2 += atom11.squaredDistance(atom21) + atom12.squaredDistance(atom22)
+        d2sm += atom12.squaredDistance(atom21) + atom11.squaredDistance(atom22)
+        rmsd += min(d2, d2sm)
+    for atomId in allAtomsSet:
+        try:
+            atom1 = PDB1.getAtom(atomId)
+            atom2 = PDB2.getAtom(atomId)
+        except KeyError as err:
+            raise KeyError("Atom %d not found in PDB" % err.message)
+        rmsd += atom1.squaredDistance(atom2)
+    n = len(PDB1.atoms.items())
+    return rmsd/n
+
+
+def old_computeRMSD2(PDB1, PDB2, symmetries={}):
+    """
+   Compute the squared RMSD between two PDB
+
+    :param PDB1: First PDB with which the RMSD will be calculated
+    :type PDB1: PDB
+    :param PDB2: First PDB with which the RMSD will be calculated
+    :type PDB2: PDB
+    :param symmetries: Dictionary with elements atomId:symmetricalAtomId corresponding with the symmetrical atoms
+    :type symmetries: dict
+    :returns: float -- The squared RMSD between two PDB
+    """
+    rmsd = 0
     for atom1Id, atom1 in PDB1.atoms.iteritems():
         d2 = []
-        # HANDLE THE CASE WHEN ATOM2 IS NOT FOUND
         atom2 = PDB2.getAtom(atom1Id)
         d2 = atom1.squaredDistance(atom2)
         if symmetries:
@@ -474,10 +514,24 @@ def computeRMSD2(PDB1, PDB2, symmetries={}):
                 d2sym = d2
         else:
             d2sym = d2
-
         rmsd += min(d2, d2sym)
     n = len(PDB1.atoms.items())
     return rmsd/n
+
+
+def old_computeRMSD(PDB1, PDB2, symmetries={}):
+    """
+        Compute the RMSD between two PDB
+
+        :param PDB1: First PDB with which the RMSD will be calculated
+        :type PDB1: PDB
+        :param PDB2: First PDB with which the RMSD will be calculated
+        :type PDB2: PDB
+        :param symmetries: Dictionary with elements atomId:symmetricalAtomId corresponding with the symmetrical atoms
+        :type symmetries: dict
+        :returns: float -- The squared RMSD between two PDB
+    """
+    return np.sqrt(old_computeRMSD2(PDB1, PDB2, symmetries))
 
 
 def computeRMSD(PDB1, PDB2, symmetries={}):
@@ -507,6 +561,7 @@ def computeCOMDifference(PDB1, PDB2):
     """
     return computeCOMDifference(PDB1, PDB2)
 
+
 def computeCOMSquaredDifference(PDB1, PDB2):
     """
         Compute the squared difference between the center of mass of two PDB
@@ -517,14 +572,16 @@ def computeCOMSquaredDifference(PDB1, PDB2):
         :type PDB2: PDB
         :returns: float -- The squared distance between the centers of mass between two PDB
     """
+
     COM1 = PDB1.getCOM()
     COM2 = PDB2.getCOM()
 
-    dx =  COM1[0] - COM2[0]
-    dy =  COM1[1] - COM2[1]
-    dz =  COM1[2] - COM2[2]
+    dx = COM1[0] - COM2[0]
+    dy = COM1[1] - COM2[1]
+    dz = COM1[2] - COM2[2]
 
     return dx*dx + dy*dy + dz*dz
+
 
 def computeSquaredCentroidDifference(PDB1, PDB2):
     """
@@ -539,11 +596,12 @@ def computeSquaredCentroidDifference(PDB1, PDB2):
     centroid1 = PDB1.getCentroid()
     centroid2 = PDB2.getCentroid()
 
-    dx =  centroid1[0] - centroid2[0]
-    dy =  centroid1[1] - centroid2[1]
-    dz =  centroid1[2] - centroid2[2]
+    dx = centroid1[0] - centroid2[0]
+    dy = centroid1[1] - centroid2[1]
+    dz = centroid1[2] - centroid2[2]
 
     return dx*dx + dy*dy + dz*dz
+
 
 def readPDB(pdbfile):
     """
