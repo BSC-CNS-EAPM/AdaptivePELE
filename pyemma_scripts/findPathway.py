@@ -1,7 +1,7 @@
 # import MSMblocks
 # import helper
 # import runMarkovChainModel as markov
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 import time
 import os
@@ -70,7 +70,8 @@ class OrderedContactsClustering(clustering.Clustering):
                 snapshotPosition = minimumCloseCluster
             if (abs(distance-initial_scd) > threshold2):
                 break
-            clusterRMSD = atomset.computeRMSD(cluster.pdb, pdb, self.symmetries)
+            clusterRMSD = atomset.computeRMSD(cluster.pdb, pdb,
+                                              self.symmetries)
             if (clusterRMSD < closerClusterRMSD):
                 closerClusterRMSD = clusterRMSD
                 closerClusterInd = minimumCloseCluster
@@ -97,6 +98,48 @@ class OrderedContactsClustering(clustering.Clustering):
         else:
             self.clusters.addCluster(cluster)
             self.distancesList.append(initial_scd)
+
+
+def printNumberSnapshotsEpoch(paths_report, i):
+    trajs = clustering.getAllTrajectories(paths_report)
+    total_snapshots = 0
+    for traj in trajs:
+        for line in open(traj, "r"):
+            total_snapshots += 1
+        total_snapshots -= 1
+    print "Total snapsthots for epoch %d: %d" % (i, total_snapshots)
+
+
+def clusterSnapshotsEpoch(path, i, ntrajs):
+    startTimeOrd = time.time()
+    ClOrd.cluster(path)
+    endTimeOrd = time.time()
+    print "Total time of clustering ordered contacts, epoch %d: %.6f" % (i, endTimeOrd-startTimeOrd)
+    print "Number of clusters ordered contacts epoch %d: %d" % (i, len(ClOrd.clusters.clusters))
+    degeneraciesOrd = spawningObject.calculate(ClOrd.clusters.clusters, ntrajs, {})
+    ClOrd.writeOutput("clsummary", degeneraciesOrd, "ClOrd_3PTB.pkl", False)
+    os.rename("clsummary/summary.txt", "results/summary_ClOrd_3PTB.txt")
+
+
+def writePathwayTrajectory(ClOrd, pathway, filename):
+    pathwayFile = open(filename, "w")
+    pathwayFile.write("REMARK 000 File created using PELE++\n")
+    pathwayFile.write("REMARK 000 Pathway trajectory created using findPathway program\n")
+    pathwayFile.write("REMARK 000 List of cluster belonging to the pathway %s\n" % ' '.join(map(str,pathway)))
+    for i, step_cluster in enumerate(pathway):
+        cluster = ClOrd.clusters.clusters[step_cluster]
+        pathwayFile.write("MODEL %d\n" % (i+1))
+        pdbStr = cluster.pdb.pdb
+        pdbList = pdbStr.split("\n")
+        for line in pdbList:
+            line = line.strip()
+            # Avoid writing previous REMARK block
+            if line.startswith("REMARK ") or line.startswith("MODEL "):
+                continue
+            elif line:
+                pathwayFile.write(line+"\n")
+        pathwayFile.write("ENDMDL\n")
+    pathwayFile.close()
 
 
 ntrajs = 63
@@ -134,62 +177,48 @@ else:
     for i in range(24):
         path = ["/gpfs/scratch/bsc72/bsc72021/simulation/3ptb_4_64/automate_inv_4/%d/traj*" % i]
         paths_report = ["/gpfs/scratch/bsc72/bsc72021/simulation/3ptb_4_64/automate_inv_4/%d/report*" % i]
-        trajs = clustering.getAllTrajectories(paths_report)
-        total_snapshots = 0
-        for traj in trajs:
-            for line in open(traj, "r"):
-                total_snapshots += 1
-            total_snapshots -= 1
-        print "Total snapsthots for epoch %d: %d" % (i, total_snapshots)
-        # startTimeCont = time.time()
-        # ClCont.cluster(path)
-        # endTimeCont = time.time()
-        # print "Total time of clustering contacts, epoch %d: %.6f" % (i, endTimeCont-startTimeCont)
-        # print "Number of clusters contacts epoch %d: %d" % (i, len(ClCont.clusters.clusters))
-        # degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs, {})
-        # ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont_3PTB.pkl", False)
-        # os.rename("clsummary/summary.txt", "results/summary_ClCont_3PTB.txt")
-        startTimeOrd = time.time()
-        ClOrd.cluster(path)
-        endTimeOrd = time.time()
-        print "Total time of clustering ordered contacts, epoch %d: %.6f" % (i, endTimeOrd-startTimeOrd)
-        print "Number of clusters ordered contacts epoch %d: %d" % (i, len(ClOrd.clusters.clusters))
-        degeneraciesOrd = spawningObject.calculate(ClOrd.clusters.clusters, ntrajs, {})
-        ClOrd.writeOutput("clsummary",degeneraciesOrd,"ClOrd_3PTB.pkl", False)
-        os.rename("clsummary/summary.txt", "results/summary_ClOrd_3PTB.txt")
+        printNumberSnapshotsEpoch(paths_report, i)
+        clusterSnapshotsEpoch(path, i, ntrajs)
 
 # obtain a connectivity matrix from microstates
+# use graph algorithm to establish a path
 distanceThreshold = 10
 initial_cluster = 0
 final_cluster = ClOrd.getOptimalMetric()
 nclusters = ClOrd.clusters.getNumberClusters()
-distMatrix = np.zeros((nclusters, nclusters)) + 100
-for rowind, clusterInit in enumerate(ClOrd.clusters.clusters):
+# distMatrix = np.zeros((nclusters, nclusters)) + 100
+pathway = [initial_cluster]
+rowind = final_cluster
+while (rowind > 0):
+    pathway.insert(1, rowind)
+    clusterInit = ClOrd.clusters.clusters[rowind]
     cluster_distance = ClOrd.distancesList[rowind]
-    if rowind == final_cluster:
-        continue
-    # minimumCloseCluster = rowind+1
-    minimumCloseCluster = 0
-    for distance_initial in ClOrd.distancesList:
+    minimumCloseCluster = rowind-1
+    while (minimumCloseCluster > 0):
+        distance_initial = ClOrd.distancesList[minimumCloseCluster]
         if (abs(distance_initial-cluster_distance) < distanceThreshold):
             break
-        minimumCloseCluster += 1
+        minimumCloseCluster -= 1
 
-    while (minimumCloseCluster < nclusters):
+    minimumRMSD = 1000
+    closerCluster = rowind-1
+    while (minimumCloseCluster > 0):
         cluster = ClOrd.clusters.clusters[minimumCloseCluster]
         distance = ClOrd.distancesList[minimumCloseCluster]
         if (abs(distance-cluster_distance) > distanceThreshold):
             break
         clusterRMSD = atomset.computeRMSD(cluster.pdb, clusterInit.pdb,
                                           ClOrd.symmetries)
-        distMatrix[rowind, minimumCloseCluster] = clusterRMSD
+        if (clusterRMSD < minimumRMSD):
+            minimumRMSD = clusterRMSD
+            closerCluster = minimumCloseCluster
+        # distMatrix[rowind, minimumCloseCluster] = clusterRMSD
         # distMatrix[minimumCloseCluster, rowind] = -clusterRMSD
-        minimumCloseCluster += 1
-np.save("distMatrix.npy", distMatrix)
-ClOrd.clusters.clusters[0].writePDB("cluster_0.pdb")
-ClOrd.clusters.clusters[1].writePDB("cluster_1.pdb")
-ClOrd.clusters.clusters[2].writePDB("cluster_2.pdb")
-# plt.imshow(distMatrix)
-# plt.colorbar()
-# plt.savefig("connectivityMatrix.png")
-# use graph algorithm to establish a path
+        minimumCloseCluster -= 1
+    rowind = closerCluster
+
+# write pathway into a single trajectory
+filename = "pathway3PTB.pdb"
+writePathwayTrajectory(ClOrd, pathway, filename)
+
+# spawning along the trajectory
