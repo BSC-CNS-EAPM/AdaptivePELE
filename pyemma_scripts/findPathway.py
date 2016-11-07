@@ -4,6 +4,7 @@ import pickle
 from atomset import atomset, RMSDCalculator
 from clustering import clustering, clusteringTypes, thresholdcalculator
 from spawning import spawning, densitycalculator
+from analysis import analyseClustering
 
 
 class OrderedContactsClustering(clustering.Clustering):
@@ -45,33 +46,9 @@ class OrderedContactsClustering(clustering.Clustering):
         threshold2 = threshold**2
         threshold2 = 10
 
-        minimumCloseCluster = 0
-        nclusters = len(self.clusters.clusters)
         initial_scd = atomset.computeSquaredCentroidDifference(self.initialPDB,
                                                                pdb)
-        snapshotPosition = None
-        for distance_initial in self.distancesList:
-            if (snapshotPosition is None and distance_initial > initial_scd):
-                snapshotPosition = minimumCloseCluster
-            if (abs(distance_initial-initial_scd) < threshold2):
-                break
-            minimumCloseCluster += 1
-        closerClusterInd = None
-        closerClusterRMSD = 100
-
-        while (minimumCloseCluster < nclusters):
-            cluster = self.clusters.clusters[minimumCloseCluster]
-            distance = self.distancesList[minimumCloseCluster]
-            if (snapshotPosition is None and distance > initial_scd):
-                snapshotPosition = minimumCloseCluster
-            if (abs(distance-initial_scd) > threshold2):
-                break
-            clusterRMSD = self.RMSDCalculator.computeRMSD(cluster.pdb, pdb)
-            if (clusterRMSD < closerClusterRMSD):
-                closerClusterRMSD = clusterRMSD
-                closerClusterInd = minimumCloseCluster
-            minimumCloseCluster += 1
-
+        snapshotPosition, closerClusterInd, closerClusterRMSD = self.getCloserCluster(initial_scd, threshold2, pdb)
         try:
             clusterToAssign = self.clusters.clusters[closerClusterInd]
             if closerClusterRMSD < clusterToAssign.threshold:
@@ -94,6 +71,33 @@ class OrderedContactsClustering(clustering.Clustering):
             self.clusters.addCluster(cluster)
             self.distancesList.append(initial_scd)
 
+    def getCloserCluster(self, initial_scd, threshold2, pdb):
+        minimumCloseCluster = 0
+        nclusters = len(self.clusters.clusters)
+        snapshotPosition = None
+        for distance_initial in self.distancesList:
+            if (snapshotPosition is None and distance_initial > initial_scd):
+                snapshotPosition = minimumCloseCluster
+            if (abs(distance_initial-initial_scd) < threshold2):
+                break
+            minimumCloseCluster += 1
+        closerClusterInd = None
+        closerClusterRMSD = 100
+
+        while (minimumCloseCluster < nclusters):
+            cluster = self.clusters.clusters[minimumCloseCluster]
+            distance = self.distancesList[minimumCloseCluster]
+            if (snapshotPosition is None and distance > initial_scd):
+                snapshotPosition = minimumCloseCluster
+            if (abs(distance-initial_scd) > threshold2):
+                break
+            clusterRMSD = self.RMSDCalculator.computeRMSD(cluster.pdb, pdb)
+            if (clusterRMSD < closerClusterRMSD):
+                closerClusterRMSD = clusterRMSD
+                closerClusterInd = minimumCloseCluster
+            minimumCloseCluster += 1
+        return snapshotPosition, closerClusterInd, closerClusterRMSD
+
 
 def printNumberSnapshotsEpoch(paths_report, i):
     trajs = clustering.getAllTrajectories(paths_report)
@@ -105,22 +109,53 @@ def printNumberSnapshotsEpoch(paths_report, i):
     print "Total snapsthots for epoch %d: %d" % (i, total_snapshots)
 
 
-def clusterSnapshotsEpoch(path, i, ntrajs):
+def clusterSnapshotsEpoch(path, i, ntrajs, clusteringObject):
     startTimeOrd = time.time()
     ClOrd.cluster(path)
     endTimeOrd = time.time()
     print "Total time of clustering ordered contacts, epoch %d: %.6f" % (i, endTimeOrd-startTimeOrd)
     print "Number of clusters ordered contacts epoch %d: %d" % (i, len(ClOrd.clusters.clusters))
     degeneraciesOrd = spawningObject.calculate(ClOrd.clusters.clusters, ntrajs, {})
-    ClOrd.writeOutput("clsummary", degeneraciesOrd, "ClOrd_3PTB.pkl", False)
-    os.rename("clsummary/summary.txt", "results/summary_ClOrd_3PTB.txt")
+    ClOrd.writeOutput("clsummary", degeneraciesOrd, clusteringObject, False)
+    os.remove("clsummary/summary.txt")
+
+
+def createPathway(initial_cluster, final_cluster, ClOrd):
+    pathway = [initial_cluster]
+    rowind = final_cluster
+    while (rowind > 0):
+        pathway.insert(1, rowind)
+        clusterInit = ClOrd.clusters.clusters[rowind]
+        cluster_distance = ClOrd.distancesList[rowind]
+        minimumCloseCluster = rowind-1
+        while (minimumCloseCluster > 0):
+            distance_initial = ClOrd.distancesList[minimumCloseCluster]
+            if (abs(distance_initial-cluster_distance) < distanceThreshold):
+                break
+            minimumCloseCluster -= 1
+
+        minimumRMSD = 1000
+        closerCluster = rowind-1
+        while (minimumCloseCluster > 0):
+            cluster = ClOrd.clusters.clusters[minimumCloseCluster]
+            distance = ClOrd.distancesList[minimumCloseCluster]
+            if (abs(distance-cluster_distance) > distanceThreshold):
+                break
+            clusterRMSD = ClOrd.RMSDCalculator.computeRMSD(cluster.pdb,
+                                                           clusterInit.pdb)
+            if (clusterRMSD < minimumRMSD):
+                minimumRMSD = clusterRMSD
+                closerCluster = minimumCloseCluster
+            minimumCloseCluster -= 1
+        rowind = closerCluster
+    return pathway
 
 
 def writePathwayTrajectory(ClOrd, pathway, filename):
     pathwayFile = open(filename, "w")
     pathwayFile.write("REMARK 000 File created using PELE++\n")
     pathwayFile.write("REMARK 000 Pathway trajectory created using findPathway program\n")
-    pathwayFile.write("REMARK 000 List of cluster belonging to the pathway %s\n" % ' '.join(map(str,pathway)))
+    pathwayFile.write("REMARK 000 List of cluster belonging to the pathway %s\n" % ' '.join(map(str, pathway)))
     for i, step_cluster in enumerate(pathway):
         cluster = ClOrd.clusters.clusters[step_cluster]
         pathwayFile.write("MODEL %d\n" % (i+1))
@@ -158,22 +193,28 @@ densityCalculator = densityCalculatorBuilder.build({
         }
    }
 )
-symmetries = [{"3225:C3:AEN": "3227:C5:AEN", "3224:C2:AEN": "3228:C6:AEN"},
-              {"3230:N1:AEN": "3231:N2:AEN"}]
-ClOrd = OrderedContactsClustering(thresholdCalculator, resname="AEN",
+# symmetries = [{"3225:C3:AEN": "3227:C5:AEN", "3224:C2:AEN": "3228:C6:AEN"},
+#               {"3230:N1:AEN": "3231:N2:AEN"}]
+symmetries = {}
+resname = "DAJ"
+ClOrd = OrderedContactsClustering(thresholdCalculator, resname=resname,
                                   reportBaseFilename="report",
                                   columnOfReportFile=4, symmetries=symmetries)
 
 spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
-if os.path.exists("ClOrd_3PTB.pkl"):
-    with open("ClOrd_3PTB.pkl", "r") as f:
+trajFolder = "/gpfs/scratch/bsc72/bsc72755/adaptiveSampling/simulations/4DAJ_4_64_epsilon"
+clusteringObject = "ClOrd_4DAJ.pkl"
+if os.path.exists(clusteringObject):
+    with open(clusteringObject, "r") as f:
         ClOrd = pickle.load(f)
 else:
-    for i in range(24):
-        path = ["/gpfs/scratch/bsc72/bsc72021/simulation/3ptb_4_64/automate_inv_4/%d/traj*" % i]
-        paths_report = ["/gpfs/scratch/bsc72/bsc72021/simulation/3ptb_4_64/automate_inv_4/%d/report*" % i]
+    allFolders = os.listdir(trajFolder)
+    Epochs = [epoch for epoch in allFolders if epoch.isdigit()]
+    for i in range(len(Epochs)):
+        path = [trajFolder+"/%d/traj*" % i]
+        paths_report = [trajFolder+"/%d/report*" % i]
         printNumberSnapshotsEpoch(paths_report, i)
-        clusterSnapshotsEpoch(path, i, ntrajs)
+        clusterSnapshotsEpoch(path, i, ntrajs, clusteringObject)
 
 # obtain a connectivity matrix from microstates
 # use graph algorithm to establish a path
@@ -181,35 +222,31 @@ distanceThreshold = 10
 initial_cluster = 0
 final_cluster = ClOrd.getOptimalMetric()
 nclusters = ClOrd.clusters.getNumberClusters()
-pathway = [initial_cluster]
-rowind = final_cluster
-while (rowind > 0):
-    pathway.insert(1, rowind)
-    clusterInit = ClOrd.clusters.clusters[rowind]
-    cluster_distance = ClOrd.distancesList[rowind]
-    minimumCloseCluster = rowind-1
-    while (minimumCloseCluster > 0):
-        distance_initial = ClOrd.distancesList[minimumCloseCluster]
-        if (abs(distance_initial-cluster_distance) < distanceThreshold):
-            break
-        minimumCloseCluster -= 1
-
-    minimumRMSD = 1000
-    closerCluster = rowind-1
-    while (minimumCloseCluster > 0):
-        cluster = ClOrd.clusters.clusters[minimumCloseCluster]
-        distance = ClOrd.distancesList[minimumCloseCluster]
-        if (abs(distance-cluster_distance) > distanceThreshold):
-            break
-        clusterRMSD = ClOrd.RMSDCalculator.computeRMSD(cluster.pdb, clusterInit.pdb)
-        if (clusterRMSD < minimumRMSD):
-            minimumRMSD = clusterRMSD
-            closerCluster = minimumCloseCluster
-        minimumCloseCluster -= 1
-    rowind = closerCluster
+pathway = createPathway(initial_cluster, final_cluster, ClOrd)
 
 # write pathway into a single trajectory
-filename = "pathway3PTB.pdb"
+filename = "pathway4DAJ.pdb"
 writePathwayTrajectory(ClOrd, pathway, filename)
+# create clustering object with only the pathway clusters
+ClPath = OrderedContactsClustering(thresholdCalculator, resname=resname,
+                                   reportBaseFilename="report",
+                                   columnOfReportFile=4, symmetries=symmetries)
+ClPath.clusters.clusters = map(lambda x: ClOrd.clusters.clusters[x], pathway)
 
 # spawning along the trajectory
+spawningParams = spawning.SpawningParams()
+spawningParams.epsilon = 0.25
+spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
+spawningPathway = spawning.EpsilonDegeneracyCalculator()
+# TODO:Try different spawining params
+densityCalculator = densityCalculatorBuilder.build({})
+degeneracies = spawningObject.calculate(ClPath.clusters.clusters, ntrajs, {})
+
+title = "Degeneracies along pathway"
+title2 = "Metrics along pathway"
+comCoord, metrics = analyseClustering.extractCOMMatrix(ClPath.clusters.clusters,
+                                                       resname)[:2]
+analyseClustering.plotClusters(comCoord, degeneracies, title)
+analyseClustering.plotClusters(comCoord, metrics, title2)
+import matplotlib.pyplot as plt
+plt.show()
