@@ -101,9 +101,9 @@ def printMatrix(matrix):
             print "%e"%element,
         print ""
 
-def estimateTransitionMatrix(trajectories, n, tau):
+def estimateTransitionMatrix(trajectories, n, tau, symm=True):
     C = estimateCountMatrix(trajectories, n, tau)
-    C = C+C.T #symmetrize
+    if symm: C = C+C.T #symmetrize
     return buildTransitionMatrix(C)
 
 def getSortedEigen(tau, trajs, n):
