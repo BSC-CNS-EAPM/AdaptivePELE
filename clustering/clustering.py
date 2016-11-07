@@ -6,7 +6,7 @@ import pickle
 import clusteringTypes
 import thresholdcalculator
 from constants import blockNames
-from atomset import atomset
+from atomset import atomset, RMSDCalculator
 from utilities import utilities
 from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import AgglomerativeClustering
@@ -121,7 +121,8 @@ class Clustering:
         self.resname = resname
         self.col = columnOfReportFile
         self.contactThresholdDistance = contactThresholdDistance
-        self.symmetries = {}
+        self.symmetries = []
+
 
     def setCol(self, col):
         self.col = col
@@ -220,12 +221,13 @@ class ContactsClustering(Clustering):
     """
     def __init__(self, thresholdCalculator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8, symmetries={}):
+                 contactThresholdDistance=8, symmetries=[]):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
         self.type = clusteringTypes.CLUSTERING_TYPES.contacts
         self.thresholdCalculator = thresholdCalculator
         self.symmetries = symmetries
+        self.RMSDCalculator = RMSDCalculator.RMSDCalculator(symmetries)
 
 
     def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
@@ -259,7 +261,7 @@ class ContactsClustering(Clustering):
             if scd > cluster.threshold2:
                 continue
 
-            if atomset.computeRMSD(cluster.pdb, pdb, self.symmetries) < cluster.threshold:
+            if self.RMSDCalculator.computeRMSD(cluster.pdb, pdb) < cluster.threshold:
                 cluster.addElement(metrics)
                 return
 
@@ -518,7 +520,8 @@ class ContactMapAccumulativeClustering(Clustering):
         self.thresholdCalculator = thresholdCalculator
         self.similarityEvaluator = similarityEvaluator
 
-    #TODO: refactor --> move to parent class and only keep here contactMap creation
+    # TODO: refactor --> move to parent class and only keep here contactMap creation
+    # TODO symmetries for contactMap
     def addSnapshotToCluster(self, snapshot, metrics=[], metricCol=None):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
@@ -550,7 +553,7 @@ class ClusteringBuilder:
             err.message += ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
         if clusteringType == blockNames.ClusteringTypes.contacts:
-            symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries,{})
+            symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries,[])
 
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)

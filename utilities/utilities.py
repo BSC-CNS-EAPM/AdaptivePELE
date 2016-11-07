@@ -2,7 +2,7 @@ import os
 import shutil
 import numpy as np
 import pickle
-from atomset import atomset
+from atomset import atomset, RMSDCalculator
 
 
 def cleanup(tmpFolder):
@@ -42,30 +42,26 @@ def calculateContactMapEigen(contactMap):
     return eiv, eic
 
 
-def generateReciprocalAtoms(pairsDictionary):
-    tmpDict = {}
-    for key,val in pairsDictionary.iteritems():
-        tmpDict[val] = key
-    return pairsDictionary.update(tmpDict)
-
-def assertSymmetriesDict(pairsDictionary, PDB):
-    for key in pairsDictionary:
-        assert key in PDB.atoms, "Symmetry atom %s not found in initial structure" % key
-    if pairsDictionary:
+def assertSymmetriesDict(symmetries, PDB):
+    for group in symmetries:
+        for key in group:
+            assert key in PDB.atoms, "Symmetry atom %s not found in initial structure" % key
+    if symmetries:
         print "Symmetry dictionary correctly defined!"
 
 
 def getRMSD(traj, nativePDB, resname, symmetries):
     snapshots = getSnapshots(traj)
     rmsds = np.zeros(len(snapshots))
-
+    RMSDCalc = RMSDCalculator.RMSDCalculator(symmetries)
     for i, snapshot in enumerate(snapshots):
         snapshotPDB = atomset.PDB()
         snapshotPDB.initialise(snapshot, resname=resname)
 
-        rmsds[i] = atomset.computeRMSD(nativePDB, snapshotPDB, symmetries)
+        rmsds[i] = RMSDCalc.computeRMSD(nativePDB, snapshotPDB)
 
     return rmsds
+
 
 def readClusteringObject(clusteringObjectPath):
     with open(clusteringObjectPath, 'rb') as f:

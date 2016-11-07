@@ -5,6 +5,7 @@ pyemma_scripts/*.log
 pyemma_scripts/*.txt
 pyemma_scripts/*.png
 pyemma_scripts/*.pkl
+pyemma_scripts/*.pdb
 pyemma_scripts/tpt
 pyemma_scripts/clsummary
 pyemma_scripts/results
