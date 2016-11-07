@@ -32,7 +32,6 @@ def checkSymmetryDict(clusteringBlock, initialStructures, resname):
         initialStructures [In] List of the initial structures
         resname [In] Residue name of the ligand in the system pdb
      """
-    utilities.generateReciprocalAtoms(clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.symmetries, {}))
     symmetries = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.symmetries, {})
     for structure in initialStructures:
         PDB = atomset.PDB()

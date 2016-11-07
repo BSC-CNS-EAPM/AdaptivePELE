@@ -57,8 +57,6 @@ def main(controlFile):
     nativePDB = atomset.PDB()
     nativePDB.initialise(nativeFilename, resname=resname)
 
-    utilities.generateReciprocalAtoms(symmetries)
-
     allFolders = os.listdir(folder)
     epochs = [epoch for epoch in allFolders if epoch.isdigit()]
 

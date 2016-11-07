@@ -1,12 +1,7 @@
-# import MSMblocks
-# import helper
-# import runMarkovChainModel as markov
-# import matplotlib.pyplot as plt
-import numpy as np
 import time
 import os
 import pickle
-from atomset import atomset
+from atomset import atomset, RMSDCalculator
 from clustering import clustering, clusteringTypes, thresholdcalculator
 from spawning import spawning, densitycalculator
 
@@ -14,7 +9,7 @@ from spawning import spawning, densitycalculator
 class OrderedContactsClustering(clustering.Clustering):
     def __init__(self, thresholdCalculator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8, symmetries={}):
+                 contactThresholdDistance=8, symmetries=[]):
         clustering.Clustering.__init__(self, resname, reportBaseFilename,
                                        columnOfReportFile,
                                        contactThresholdDistance)
@@ -24,6 +19,7 @@ class OrderedContactsClustering(clustering.Clustering):
         self.initialPDB = None
         self.maxThreshold = self.thresholdCalculator.getMaxThreshold()
         self.distancesList = []
+        self.RMSDCalculator = RMSDCalculator.RMSDCalculator(symmetries)
 
     def getOptimalMetric(self):
         optimalMetric = 100
@@ -70,8 +66,7 @@ class OrderedContactsClustering(clustering.Clustering):
                 snapshotPosition = minimumCloseCluster
             if (abs(distance-initial_scd) > threshold2):
                 break
-            clusterRMSD = atomset.computeRMSD(cluster.pdb, pdb,
-                                              self.symmetries)
+            clusterRMSD = self.RMSDCalculator.computeRMSD(cluster.pdb, pdb)
             if (clusterRMSD < closerClusterRMSD):
                 closerClusterRMSD = clusterRMSD
                 closerClusterInd = minimumCloseCluster
@@ -163,8 +158,8 @@ densityCalculator = densityCalculatorBuilder.build({
         }
    }
 )
-symmetries = {"3225:C3:AEN": "3227:C5:AEN", "3224:C2:AEN": "3228:C6:AEN",
-              "3230:N1:AEN": "3231:N2:AEN"}
+symmetries = [{"3225:C3:AEN": "3227:C5:AEN", "3224:C2:AEN": "3228:C6:AEN"},
+              {"3230:N1:AEN": "3231:N2:AEN"}]
 ClOrd = OrderedContactsClustering(thresholdCalculator, resname="AEN",
                                   reportBaseFilename="report",
                                   columnOfReportFile=4, symmetries=symmetries)
@@ -186,7 +181,6 @@ distanceThreshold = 10
 initial_cluster = 0
 final_cluster = ClOrd.getOptimalMetric()
 nclusters = ClOrd.clusters.getNumberClusters()
-# distMatrix = np.zeros((nclusters, nclusters)) + 100
 pathway = [initial_cluster]
 rowind = final_cluster
 while (rowind > 0):
@@ -207,13 +201,10 @@ while (rowind > 0):
         distance = ClOrd.distancesList[minimumCloseCluster]
         if (abs(distance-cluster_distance) > distanceThreshold):
             break
-        clusterRMSD = atomset.computeRMSD(cluster.pdb, clusterInit.pdb,
-                                          ClOrd.symmetries)
+        clusterRMSD = ClOrd.RMSDCalculator.computeRMSD(cluster.pdb, clusterInit.pdb)
         if (clusterRMSD < minimumRMSD):
             minimumRMSD = clusterRMSD
             closerCluster = minimumCloseCluster
-        # distMatrix[rowind, minimumCloseCluster] = clusterRMSD
-        # distMatrix[minimumCloseCluster, rowind] = -clusterRMSD
         minimumCloseCluster -= 1
     rowind = closerCluster
 
