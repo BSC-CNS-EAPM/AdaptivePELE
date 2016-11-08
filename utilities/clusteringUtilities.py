@@ -13,5 +13,10 @@ def writeStructures(clusteringObject, listStructures, outputPath="cluster.pdb"):
     if path[0]:
         utilities.makeFolder(path[0])
         pathToWrite = os.path.join(path[0], path[1])
+
+    if listStructures is None or len(listStructures) == 0: #If no listStructures, write all
+        listStructures = range(len(clObject.clusters.clusters))
+
     for element in listStructures:
+        print pathToWrite, pathToWrite%element
         clObject.clusters.clusters[element].writePDB(pathToWrite % element)
