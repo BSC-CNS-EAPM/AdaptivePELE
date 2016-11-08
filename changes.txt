@@ -1,0 +1,3 @@
+Behavior changes from previous version:
+    *) Changed quadratic function for continuous
+    *) Changed symmetry dictionary for list of dictionaries, with symmetry groups
