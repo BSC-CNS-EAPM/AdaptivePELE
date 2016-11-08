@@ -6,6 +6,8 @@ from constants import blockNames
 import shutil
 import simulationTypes
 import string
+import sys
+
 
 class SimulationParameters:
     def __init__(self):
@@ -18,12 +20,13 @@ class SimulationParameters:
         self.peleSteps = 0
         self.seed = 0
 
+
 class SimulationRunner:
     def __init__(self, parameters):
         self.parameters = parameters
-    
-    def runSimulation(self, runningControlFile = ""):
-        pass 
+
+    def runSimulation(self, runningControlFile=""):
+        pass
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary):
         inputFile = open(self.parameters.templetizedControlFile, "r")
@@ -34,14 +37,15 @@ class SimulationRunner:
         outputFileContent = inputFileTemplate.substitute(dictionary)
 
         outputFile = open(workingControlFilename, "w")
+        outputFileContent = outputFileContent.replace("'", '"')
         outputFile.write(outputFileContent)
         outputFile.close()
+
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
         SimulationRunner.__init__(self, parameters)
         self.type = simulationTypes.SIMULATION_TYPE.PELE
-    
 
     def createSymbolicLinks(self):
         if not os.path.islink("Data"):
@@ -49,20 +53,22 @@ class PeleSimulation(SimulationRunner):
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.documentsFolder + " Documents")
 
-    def runSimulation(self, runningControlFile = ""):
+    def runSimulation(self, runningControlFile=""):
         self.createSymbolicLinks()
 
         toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
         toRun = " ".join(toRun)
         print toRun
-        startTime = time.time() 
+        startTime = time.time()
         proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True)
         (out, err) = proc.communicate()
         print out
-        if err: print err
+        if err:
+            print err
 
-        endTime = time.time() 
+        endTime = time.time()
         print "PELE took %.2f sec" % (endTime - startTime)
+
 
 class TestSimulation(SimulationRunner):
     """
@@ -73,7 +79,7 @@ class TestSimulation(SimulationRunner):
         self.copied = False
         self.parameters = parameters
 
-    def runSimulation(self, runningControlFile = ""):
+    def runSimulation(self, runningControlFile=""):
         if not self.copied:
             if os.path.exists(self.parameters.destination):
                 shutil.rmtree(self.parameters.destination)
@@ -82,6 +88,7 @@ class TestSimulation(SimulationRunner):
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary):
         pass
+
 
 class RunnerBuilder:
 
@@ -113,4 +120,3 @@ class RunnerBuilder:
         else:
             sys.exit("Unknown simulation type! Choices are: " + str(simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))
         return SimulationRunner
-
