@@ -1,10 +1,24 @@
 import time
 import os
 import pickle
+import argparse
+import json
 from atomset import atomset, RMSDCalculator
 from clustering import clustering, clusteringTypes, thresholdcalculator
 from spawning import spawning, densitycalculator
 from analysis import analyseClustering
+from simulation import simulationrunner
+import adaptiveSampling
+
+
+def parseArgs():
+    parser = argparse.ArgumentParser(description="Perform two runs of adaptive"
+                                     "sampling ")
+    parser.add_argument('controlFile', type=str)
+    args = parser.parse_args()
+    jsonFile = open(args.controlFile, "r").read()
+    parsedJSON = json.loads(jsonFile)
+    return parsedJSON
 
 
 class OrderedContactsClustering(clustering.Clustering):
@@ -109,18 +123,19 @@ def printNumberSnapshotsEpoch(paths_report, i):
     print "Total snapsthots for epoch %d: %d" % (i, total_snapshots)
 
 
-def clusterSnapshotsEpoch(path, i, ntrajs, clusteringObject):
+def clusterSnapshotsEpoch(ClOrd, path, i, ntrajs, clusteringObject):
     startTimeOrd = time.time()
     ClOrd.cluster(path)
     endTimeOrd = time.time()
     print "Total time of clustering ordered contacts, epoch %d: %.6f" % (i, endTimeOrd-startTimeOrd)
     print "Number of clusters ordered contacts epoch %d: %d" % (i, len(ClOrd.clusters.clusters))
-    degeneraciesOrd = spawningObject.calculate(ClOrd.clusters.clusters, ntrajs, {})
+    # degeneraciesOrd = spawningObject.calculate(ClOrd.clusters.clusters, ntrajs, {})
+    degeneraciesOrd = [0] * len(ClOrd.clusters.clusters)
     ClOrd.writeOutput("clsummary", degeneraciesOrd, clusteringObject, False)
     os.remove("clsummary/summary.txt")
 
 
-def createPathway(initial_cluster, final_cluster, ClOrd):
+def createPathway(initial_cluster, final_cluster, ClOrd, distanceThreshold):
     pathway = [initial_cluster]
     rowind = final_cluster
     while (rowind > 0):
@@ -172,81 +187,123 @@ def writePathwayTrajectory(ClOrd, pathway, filename):
     pathwayFile.close()
 
 
-ntrajs = 63
-thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
-thresholdCalculator = thresholdCalculatorBuilder.build({
-        "thresholdCalculator": {
-            "type": "constant",
-            "params": {
-                "value": 2
+def plotMetricsDegeneracy(ClPath, resname, degeneracies):
+    title = "Degeneracies along pathway"
+    title2 = "Metrics along pathway"
+    comCoord, metrics = analyseClustering.extractCOMMatrix(ClPath.clusters.clusters,
+                                                           resname)[:2]
+    analyseClustering.plotClusters(comCoord, degeneracies, title)
+    analyseClustering.plotClusters(comCoord, metrics, title2)
+    import matplotlib.pyplot as plt
+    plt.show()
+
+
+def clusterTrajectories(resname, trajFolder, clusteringObject,
+                        reportBaseFilename="report", symmetries=[]):
+    thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
+    thresholdCalculator = thresholdCalculatorBuilder.build({
+            "thresholdCalculator": {
+                "type": "constant",
+                "params": {
+                    "value": 2
+                }
             }
-        }
-})
-densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
-densityCalculator = densityCalculatorBuilder.build({
-       "density": {
-            "type": "heaviside",
-            "params": {
-                 "conditions": [1.5, 1.0, 0.0],
-                 "values": [8.0, 2.37, 1.0, 0.5]
-             }
-        }
-   }
-)
-# symmetries = [{"3225:C3:AEN": "3227:C5:AEN", "3224:C2:AEN": "3228:C6:AEN"},
-#               {"3230:N1:AEN": "3231:N2:AEN"}]
-symmetries = {}
-resname = "DAJ"
-ClOrd = OrderedContactsClustering(thresholdCalculator, resname=resname,
-                                  reportBaseFilename="report",
-                                  columnOfReportFile=4, symmetries=symmetries)
+    })
+    ClOrd = OrderedContactsClustering(thresholdCalculator, resname=resname,
+                                      reportBaseFilename=reportBaseFilename,
+                                      columnOfReportFile=4,
+                                      symmetries=symmetries)
 
-spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
-trajFolder = "/gpfs/scratch/bsc72/bsc72755/adaptiveSampling/simulations/4DAJ_4_64_epsilon"
-clusteringObject = "ClOrd_4DAJ.pkl"
-if os.path.exists(clusteringObject):
-    with open(clusteringObject, "r") as f:
-        ClOrd = pickle.load(f)
-else:
-    allFolders = os.listdir(trajFolder)
-    Epochs = [epoch for epoch in allFolders if epoch.isdigit()]
-    for i in range(len(Epochs)):
-        path = [trajFolder+"/%d/traj*" % i]
-        paths_report = [trajFolder+"/%d/report*" % i]
-        printNumberSnapshotsEpoch(paths_report, i)
-        clusterSnapshotsEpoch(path, i, ntrajs, clusteringObject)
+    if os.path.exists(clusteringObject):
+        with open(clusteringObject, "r") as f:
+            ClOrd = pickle.load(f)
+    else:
+        allFolders = os.listdir(trajFolder)
+        Epochs = [epoch for epoch in allFolders if epoch.isdigit()]
+        for i in range(len(Epochs)):
+            path = [trajFolder+"/%d/traj*" % i]
+            paths_report = [trajFolder+"/%d/report*" % i]
+            printNumberSnapshotsEpoch(paths_report, i)
+            clusterSnapshotsEpoch(ClOrd, path, i, 100, clusteringObject)
+    return ClOrd, thresholdCalculator
 
-# obtain a connectivity matrix from microstates
-# use graph algorithm to establish a path
-distanceThreshold = 10
-initial_cluster = 0
-final_cluster = ClOrd.getOptimalMetric()
-nclusters = ClOrd.clusters.getNumberClusters()
-pathway = createPathway(initial_cluster, final_cluster, ClOrd)
 
-# write pathway into a single trajectory
-filename = "pathway4DAJ.pdb"
-writePathwayTrajectory(ClOrd, pathway, filename)
-# create clustering object with only the pathway clusters
-ClPath = OrderedContactsClustering(thresholdCalculator, resname=resname,
-                                   reportBaseFilename="report",
-                                   columnOfReportFile=4, symmetries=symmetries)
-ClPath.clusters.clusters = map(lambda x: ClOrd.clusters.clusters[x], pathway)
+def makeNewControlFile(degeneracies, ClPath, templetizedInitialName,
+                       secondControlFileTemp, secondControlFile):
+    initialConfList = []
+    for j, nproc in enumerate(degeneracies):
+        if nproc:
+            for i in range(nproc):
+                nameInitialStructure = templetizedInitialName % (j, i)
+                ClPath.clusters.clusters[j].writePDB(nameInitialStructure)
+                initialConfList.append(nameInitialStructure)
+    controlFileDict = {"INITIAL": initialConfList}
+    simulationParameters = simulationrunner.SimulationParameters()
+    simulationParameters.templetizedControlFile = secondControlFileTemp
+    simulationRunner = simulationrunner.SimulationRunner(simulationParameters)
+    simulationRunner.makeWorkingControlFile(secondControlFile, controlFileDict)
 
-# spawning along the trajectory
-spawningParams = spawning.SpawningParams()
-spawningParams.epsilon = 0.25
-spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
-spawningPathway = spawning.EpsilonDegeneracyCalculator()
-# TODO:Try different spawining params
-densityCalculator = densityCalculatorBuilder.build({})
-degeneracies = spawningObject.calculate(ClPath.clusters.clusters, ntrajs, {})
 
-title = "Degeneracies along pathway"
-title2 = "Metrics along pathway"
-comCoord, metrics = analyseClustering.extractCOMMatrix(ClPath.clusters.clusters,
-                                                       resname)[:2]
-analyseClustering.plotClusters(comCoord, degeneracies, title)
-analyseClustering.plotClusters(comCoord, metrics, title2)
-import matplotlib.pyplot as plt
-plt.show()
+def main(jsonBlock):
+    # Parameters
+    firstControlFile = jsonBlock["firstControlFile"]
+    ntrajs = jsonBlock["ntrajs"]
+    resname = jsonBlock["resname"]
+    symmetries = jsonBlock["symmetries"]
+    trajFolder = jsonBlock["trajFolder"]
+    clusteringObject = jsonBlock["clusteringObject"]
+    pathwayFilename = jsonBlock["pathwayFilename"]
+    templetizedInitialName = jsonBlock["templetizedInitialName"].encode()
+    secondControlFileTemp = jsonBlock["secondControlFileTemp"]
+    secondControlFile = jsonBlock["secondControlFile"]
+    distanceThreshold = jsonBlock["distanceThreshold"]
+
+    if firstControlFile:
+        # Run first adaptive
+        adaptiveSampling.main(firstControlFile)
+
+    # Cluster trajectories
+
+    ClOrd, thresholdCalculator = clusterTrajectories(resname, trajFolder,
+                                                     clusteringObject,
+                                                     symmetries=symmetries)
+
+    # use graph algorithm to establish a path
+    initial_cluster = 0
+    final_cluster = ClOrd.getOptimalMetric()
+    pathway = createPathway(initial_cluster, final_cluster, ClOrd,
+                            distanceThreshold)
+
+    # write pathway into a single trajectory
+    writePathwayTrajectory(ClOrd, pathway, pathwayFilename)
+
+    # create clustering object with only the pathway clusters
+    ClPath = OrderedContactsClustering(thresholdCalculator, resname=resname,
+                                       reportBaseFilename="report",
+                                       columnOfReportFile=4,
+                                       symmetries=symmetries)
+    ClPath.clusters.clusters = map(lambda x: ClOrd.clusters.clusters[x],
+                                   pathway)
+
+    # spawning along the trajectory
+    spawningParams = spawning.SpawningParams()
+    spawningParams.epsilon = 0.25
+    spawningParams.metricWeights = "linear"
+    densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
+    densityCalculator = densityCalculatorBuilder.build({})
+    spawningPathway = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
+    spawningPathway = spawning.EpsilonDegeneracyCalculator()
+    degeneracies = spawningPathway.calculate(ClPath.clusters.clusters, ntrajs,
+                                             spawningParams)
+    plots = False
+    if plots:
+        plotMetricsDegeneracy(ClPath, resname, degeneracies)
+
+    # Prepare second adaptive
+    makeNewControlFile(degeneracies, ClPath, templetizedInitialName,
+                       secondControlFileTemp, secondControlFile)
+    adaptiveSampling.main(secondControlFile)
+
+if __name__ == "__main__":
+    jsonBlock = parseArgs()
+    main(jsonBlock)
