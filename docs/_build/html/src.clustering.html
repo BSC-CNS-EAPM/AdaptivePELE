@@ -163,7 +163,7 @@
 <span id="clustering-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">clustering</span></tt> Module<a class="headerlink" href="#module-src.clustering.clustering" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="src.clustering.clustering.Cluster">
-<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">Cluster</tt><big>(</big><em>pdb</em>, <em>thresholdRadius=0</em>, <em>contactMap=None</em>, <em>contacts=0</em>, <em>metrics=</em><span class="optional">[</span><span class="optional">]</span>, <em>metricCol=None</em>, <em>density=None</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">Cluster</tt><big>(</big><em>pdb</em>, <em>thresholdRadius=None</em>, <em>contactMap=None</em>, <em>contacts=None</em>, <em>metrics=</em><span class="optional">[</span><span class="optional">]</span>, <em>metricCol=None</em>, <em>density=None</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>A cluster contains a representative structure(pdb), the number of
 elements, its density, threhold, number of contacts,
 a contactMap(sometimes) and a metric</p>
@@ -248,6 +248,17 @@ of the summary</p>
 <dt id="src.clustering.clustering.Clusters.addCluster">
 <tt class="descname">addCluster</tt><big>(</big><em>cluster</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#Clusters.addCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clusters.addCluster" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Clusters.getNumberClusters">
+<tt class="descname">getNumberClusters</tt><big>(</big><big>)</big><a class="headerlink" href="#src.clustering.clustering.Clusters.getNumberClusters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Clusters.insertCluster">
+<tt class="descname">insertCluster</tt><big>(</big><em>index</em>, <em>cluster</em><big>)</big><a class="headerlink" href="#src.clustering.clustering.Clusters.insertCluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a cluster in a specified index</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="src.clustering.clustering.Clusters.printClusters">
@@ -343,7 +354,7 @@ Indices [In] Numpy array with the cluster each snapshot belongs to</p>
 
 <dl class="class">
 <dt id="src.clustering.clustering.ContactsClustering">
-<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">ContactsClustering</tt><big>(</big><em>thresholdCalculator</em>, <em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>symmetries={}</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClustering" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">src.clustering.clustering.</tt><tt class="descname">ContactsClustering</tt><big>(</big><em>thresholdCalculator</em>, <em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>symmetries=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClustering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#src.clustering.clustering.Clustering" title="src.clustering.clustering.Clustering"><tt class="xref py py-class docutils literal"><span class="pre">src.clustering.clustering.Clustering</span></tt></a></p>
 <p>Cluster together all snapshots that are closer to the cluster center
 than certain threshold. This threshold is assigned according to the
@@ -360,7 +371,7 @@ contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom 
 considered in contact(default 8)</p>
 <dl class="method">
 <dt id="src.clustering.clustering.ContactsClustering.addSnapshotToCluster">
-<tt class="descname">addSnapshotToCluster</tt><big>(</big><em>snapshot</em>, <em>metrics=</em><span class="optional">[</span><span class="optional">]</span>, <em>col=0</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">addSnapshotToCluster</tt><big>(</big><em>snapshot</em>, <em>metrics=</em><span class="optional">[</span><span class="optional">]</span>, <em>col=None</em><big>)</big><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -564,6 +575,13 @@ metrics</p>
 <tt class="descname">calculate</tt><big>(</big><em>contacts</em><big>)</big><a class="reference internal" href="_modules/src/clustering/thresholdcalculator.html#ThresholdCalculatorConstant.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculatorConstant.calculate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="src.clustering.thresholdcalculator.ThresholdCalculatorConstant.getMaxThreshold">
+<tt class="descname">getMaxThreshold</tt><big>(</big><big>)</big><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculatorConstant.getMaxThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that returns the maximum treshold possible, required for new
+distance-ordered clustering(in early development)</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -574,6 +592,13 @@ metrics</p>
 <dt id="src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside.calculate">
 <tt class="descname">calculate</tt><big>(</big><em>contacts</em><big>)</big><a class="reference internal" href="_modules/src/clustering/thresholdcalculator.html#ThresholdCalculatorHeaviside.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside.calculate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside.getMaxThreshold">
+<tt class="descname">getMaxThreshold</tt><big>(</big><big>)</big><a class="headerlink" href="#src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside.getMaxThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that returns the maximum treshold possible, required for new
+distance-ordered clustering(in early development)</p>
+</dd></dl>
 
 </dd></dl>
 
