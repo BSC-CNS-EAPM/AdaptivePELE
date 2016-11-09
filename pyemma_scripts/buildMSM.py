@@ -1,6 +1,15 @@
-import os
 import MSMblocks
 import numpy as np
+import argparse
+
+
+def parseArgs():
+    parser = argparse.ArgumentParser(description="Build a MSM using PyEMMA "
+                                     "package")
+    parser.add_argument('controlFile', type=str)
+    args = parser.parse_args()
+    return args
+
 
 def readParams(control_file):
     params = MSMblocks.readParams(control_file)
@@ -9,38 +18,38 @@ def readParams(control_file):
     numClusters = params["numClusters"]
     lagtimes = params["lagtimes"]
     numPCCA = params["numPCCA"]
-    itsOutput = params["itsOutput"] 
+    itsOutput = params["itsOutput"]
     numberOfITS = params["numberOfITS"]
     itsErrors = params["itsErrors"]
     error_estimationCK = params["error_estimationCK"]
     state_labels = params["state_labels"]
     if state_labels is None:
-        state_labels = 'auto' #json returns string as
-    #unicode, and this breaks some code in pyemma 
+        state_labels = 'auto'  # json returns string as
+    # unicode, and this breaks some code in pyemma
     outfile_fluxTPT = params["outfile_fluxTPT"]
     return trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT
 
+
 def main(control_file):
 
-    ### parameters
+    # parameters
     trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT = readParams(control_file)
 
-    #program
+    # program
     prepareMSM = MSMblocks.PrepareMSM(numClusters, trajectoryFolder, trajectoryBasename)
     cl = prepareMSM.getClusteringObject()
-    calculateMSM = MSMblocks.MSM(cl, lagtimes, numPCCA, itsOutput,numberOfITS,itsErrors,
-                       error_estimationCK)
+    calculateMSM = MSMblocks.MSM(cl, lagtimes, numPCCA, itsOutput, numberOfITS,
+                                 itsErrors, error_estimationCK)
     calculateMSM.estimate()
     MSM_object = calculateMSM.getMSM_object()
     TPTinstance = MSMblocks.TPT(MSM_object, cl, outfile_fluxTPT, state_labels)
     TPT_Object = TPTinstance.getTPTObject()
     coarseTPT_Object = TPTinstance.getCoarseTPTObject()
 
-    #Free energy estimation
+    # Free energy estimation
     print "Calculating free energies..."
     kbt = 0.0019872041*300
     pi = MSM_object.stationary_distribution
-
 
     """
     for each cluster
@@ -67,4 +76,5 @@ def main(control_file):
 
 
 if __name__ == "__main__":
-    main("control_MSM.conf")
+    args = parseArgs()
+    main(args.controlFile)
