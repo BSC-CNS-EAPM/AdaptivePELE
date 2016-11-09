@@ -150,7 +150,6 @@
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
- | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
@@ -271,6 +270,10 @@
   </dt>
 
         
+  <dt><a href="src.spawning.html#src.spawning.densitycalculator.ContinuousDensityCalculator.calculate">(src.spawning.densitycalculator.ContinuousDensityCalculator method)</a>
+  </dt>
+
+        
   <dt><a href="src.spawning.html#src.spawning.densitycalculator.DensityCalculator.calculate">(src.spawning.densitycalculator.DensityCalculator method)</a>
   </dt>
 
@@ -280,10 +283,6 @@
 
         
   <dt><a href="src.spawning.html#src.spawning.densitycalculator.NullDensityCalculator.calculate">(src.spawning.densitycalculator.NullDensityCalculator method)</a>
-  </dt>
-
-        
-  <dt><a href="src.spawning.html#src.spawning.densitycalculator.QuadraticDensityCalculator.calculate">(src.spawning.densitycalculator.QuadraticDensityCalculator method)</a>
   </dt>
 
         
@@ -409,14 +408,14 @@
   <dt><a href="src.atomset.html#src.atomset.atomset.computeCOMDifference">computeCOMDifference() (in module src.atomset.atomset)</a>
   </dt>
 
+      
+  <dt><a href="src.atomset.html#src.atomset.atomset.computeCOMSquaredDifference">computeCOMSquaredDifference() (in module src.atomset.atomset)</a>
+  </dt>
+
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="src.atomset.html#src.atomset.atomset.computeRMSD">computeRMSD() (in module src.atomset.atomset)</a>
-  </dt>
-
-      
-  <dt><a href="src.atomset.html#src.atomset.atomset.computeRMSD2">computeRMSD2() (in module src.atomset.atomset)</a>
+  <dt><a href="src.atomset.html#src.atomset.atomset.computeSquaredCentroidDifference">computeSquaredCentroidDifference() (in module src.atomset.atomset)</a>
   </dt>
 
       
@@ -465,6 +464,14 @@
 
       
   <dt><a href="src.clustering.html#src.clustering.clustering.ContactsClustering">ContactsClustering (class in src.clustering.clustering)</a>
+  </dt>
+
+      
+  <dt><a href="src.spawning.html#src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES.continuous">continuous (src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES attribute)</a>
+  </dt>
+
+      
+  <dt><a href="src.spawning.html#src.spawning.densitycalculator.ContinuousDensityCalculator">ContinuousDensityCalculator (class in src.spawning.densitycalculator)</a>
   </dt>
 
       
@@ -572,6 +579,10 @@
   </dt>
 
       
+  <dt><a href="src.atomset.html#src.atomset.atomset.PDB.extractCentroid">extractCentroid() (src.atomset.atomset.PDB method)</a>
+  </dt>
+
+      
   <dt><a href="src.atomset.html#src.atomset.atomset.PDB.extractCOM">extractCOM() (src.atomset.atomset.PDB method)</a>
   </dt>
 
@@ -626,10 +637,6 @@
   </dt>
 
       
-  <dt><a href="src.utilities.html#src.utilities.utilities.generateReciprocalAtoms">generateReciprocalAtoms() (in module src.utilities.utilities)</a>
-  </dt>
-
-      
   <dt><a href="AdaptiveSampling.html#src.adaptiveSampling.generateSnapshotSelectionStringLastRound">generateSnapshotSelectionStringLastRound() (in module src.adaptiveSampling)</a>
   </dt>
 
@@ -650,6 +657,10 @@
   </dt>
 
       
+  <dt><a href="src.atomset.html#src.atomset.atomset.PDB.getCentroid">getCentroid() (src.atomset.atomset.PDB method)</a>
+  </dt>
+
+      
   <dt><a href="src.analysis.html#src.analysis.numberOfOwnClusters.getClusteringSummaryContent">getClusteringSummaryContent() (in module src.analysis.numberOfOwnClusters)</a>
   </dt>
 
@@ -657,18 +668,32 @@
   <dt><a href="src.atomset.html#src.atomset.atomset.PDB.getCOM">getCOM() (src.atomset.atomset.PDB method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.clustering.html#src.clustering.clustering.Cluster.getContacts">getContacts() (src.clustering.clustering.Cluster method)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="src.clustering.html#src.clustering.thresholdcalculator.ThresholdCalculatorConstant.getMaxThreshold">getMaxThreshold() (src.clustering.thresholdcalculator.ThresholdCalculatorConstant method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="src.clustering.html#src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside.getMaxThreshold">(src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="src.clustering.html#src.clustering.clustering.Cluster.getMetric">getMetric() (src.clustering.clustering.Cluster method)</a>
   </dt>
 
       
   <dt><a href="src.spawning.html#src.spawning.spawning.SpawningCalculator.getMetrics">getMetrics() (src.spawning.spawning.SpawningCalculator method)</a>
+  </dt>
+
+      
+  <dt><a href="src.clustering.html#src.clustering.clustering.Clusters.getNumberClusters">getNumberClusters() (src.clustering.clustering.Clusters method)</a>
   </dt>
 
       
@@ -730,6 +755,10 @@
   </dt>
 
       
+  <dt><a href="src.clustering.html#src.clustering.clustering.Clusters.insertCluster">insertCluster() (src.clustering.clustering.Clusters method)</a>
+  </dt>
+
+      
   <dt><a href="src.spawning.html#src.spawning.spawningTypes.SPAWNING_TYPES.inverselyProportional">inverselyProportional (src.spawning.spawningTypes.SPAWNING_TYPES attribute)</a>
   </dt>
 
@@ -737,12 +766,12 @@
   <dt><a href="src.spawning.html#src.spawning.spawning.InverselyProportionalToPopulationCalculator">InverselyProportionalToPopulationCalculator (class in src.spawning.spawning)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.atomset.html#src.atomset.atomset.Atom.isHeavyAtom">isHeavyAtom() (src.atomset.atomset.Atom method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.atomset.html#src.atomset.atomset.Atom.isHeteroAtom">isHeteroAtom() (src.atomset.atomset.Atom method)</a>
   </dt>
@@ -995,22 +1024,6 @@
       </dl></dd>
       
   <dt><a href="src.clustering.html#src.clustering.clustering.processSnapshots">processSnapshots() (in module src.clustering.clustering)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
-<h2 id="Q">Q</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="src.spawning.html#src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES.quadratic">quadratic (src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES attribute)</a>
-  </dt>
-
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="src.spawning.html#src.spawning.densitycalculator.QuadraticDensityCalculator">QuadraticDensityCalculator (class in src.spawning.densitycalculator)</a>
   </dt>
 
   </dl></td>
