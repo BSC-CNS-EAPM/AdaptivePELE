@@ -17,8 +17,12 @@ def loadAllAtomsInPdb(filename):
 def parseArguments():
     desc = "Extracts coordinates in <currentFolder>/extractedCoordinates/coord*"
     parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("folderTraj",
+                        help="Folder where the epochs trajs are stored")
+    parser.add_argument("resname", help="Name of the ligand in the pdb")
     # parser.add_argument("-f", nargs='+', help="Files to get coordinates")
-    parser.parse_args()
+    args = parser.parse_args()
+    return args.folderTraj, args.resname
 
 
 def extractFilenumber(filename):
@@ -33,11 +37,11 @@ def getOutputFilename(directory, filename, baseOutputFilename):
     return os.path.join(directory, baseOutputFilename+"_"+filenumber+".dat")
 
 
-def getPDBCOM(allCoordinates):
+def getPDBCOM(allCoordinates, resname):
     COMs = []
     for coordinates in allCoordinates:
         pdb = atomset.PDB()
-        pdb.initialise(coordinates, heavyAtoms=True)
+        pdb.initialise(coordinates, resname=resname, heavyAtoms=True)
         COMs.append(pdb.extractCOM())
     return COMs
 
@@ -52,24 +56,26 @@ def writeToFile(COMs, outputFilename):
 
 
 def main():
-    parseArguments()
+    folderTrajs, resname = parseArguments()
 
-    allFolders = os.listdir('.')
+    allFolders = os.listdir(folderTrajs)
     Epochs = [epoch for epoch in allFolders if epoch.isdigit()]
     for folder in Epochs:
-        if not os.path.exists(DIRECTORY % folder):
-            os.makedirs(DIRECTORY % folder)
+        pathFolder = os.path.join(folderTrajs, folder)
+        if not os.path.exists(DIRECTORY % pathFolder):
+            os.makedirs(DIRECTORY % pathFolder)
 
-        originalPDBfiles = glob.glob(folder+'/*traj*.pdb')
+        originalPDBfiles = glob.glob(pathFolder+'/*traj*.pdb')
+        print originalPDBfiles
         for filename in originalPDBfiles:
             print filename
             allCoordinates = loadAllAtomsInPdb(filename)
             # because of the way it's split, the last element is empty
-            COMs = getPDBCOM(allCoordinates[:-1])
+            COMs = getPDBCOM(allCoordinates[:-1], resname)
 
             outputFilename = getOutputFilename(DIRECTORY, filename,
                                                BASEOUTPUTFILENAME)
-            writeToFile(COMs, outputFilename % folder)
+            writeToFile(COMs, outputFilename % pathFolder)
 
 
 if __name__ == "__main__":
