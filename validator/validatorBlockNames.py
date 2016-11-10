@@ -143,7 +143,7 @@ class clusteringTypes:
         "ligandResname": "unicode",
         "contactThresholdDistance": "numbers.Real",
         "similarityEvaluator": "unicode",
-        "symmetries": "dict",
+        "symmetries": "list",
         "nclusters": "numbers.Real"
     }
     thresholdCalculator = {
