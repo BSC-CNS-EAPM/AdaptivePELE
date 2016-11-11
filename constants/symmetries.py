@@ -11,3 +11,4 @@ class Symmetries:
              {"4327:C11:DAJ": "4331:C15:DAJ", "4328:C12:DAJ": "4330:C14:DAJ"}]
 
     sprog = []
+    s5alj = [{"5051:C4:ALJ": "5053:C6:ALJ"}]
