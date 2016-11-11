@@ -66,7 +66,6 @@ def main():
             os.makedirs(DIRECTORY % pathFolder)
 
         originalPDBfiles = glob.glob(pathFolder+'/*traj*.pdb')
-        print originalPDBfiles
         for filename in originalPDBfiles:
             print filename
             allCoordinates = loadAllAtomsInPdb(filename)
