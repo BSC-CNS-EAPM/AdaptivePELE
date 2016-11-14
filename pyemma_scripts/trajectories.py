@@ -13,6 +13,8 @@ def loadCOMFiles(trajectoryFolder, trajectory_basename):
     for i, file in enumerate(files):
         currentX = np.loadtxt(file, usecols=(1, 2, 3))
         x[i] = currentX
+    if not x:
+        raise ValueError("Didn't find any trajectory files in the specified path!!!")
     return x
 
 

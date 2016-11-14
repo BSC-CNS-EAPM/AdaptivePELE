@@ -70,9 +70,10 @@ def main(control_file):
 
     Gpmf = -kbt*np.log(pi/np.max(pi))
 
-    Gpmf = np.expand_dims(Gpmf, axis=1)
-    output = np.hstack((cl.clustercenters, Gpmf))
-    np.savetxt("output.txt", output)
+    if Gpmf.size == cl.clustercenters.shape[0]:
+        Gpmf = np.expand_dims(Gpmf, axis=1)
+        output = np.hstack((cl.clustercenters, Gpmf))
+        np.savetxt("output.txt", output)
 
 
 if __name__ == "__main__":
