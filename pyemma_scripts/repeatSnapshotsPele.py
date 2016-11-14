@@ -2,8 +2,18 @@ import os
 import numpy
 import glob
 import re
-import sys
+import argparse
 
+
+def parseArguments():
+    desc = "Extracts coordinates in <currentFolder>/extractedCoordinates/coord*"
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("folderTraj",
+                        help="Folder where the epochs trajs are stored")
+    args = parser.parse_args()
+    return args.folderTraj
+
+folderTraj = parseArguments()
 inputTrajectoryFolder = "extractedCoordinates/"
 baseTrajectoryName = "coord_"
 reportName = '*report_'
