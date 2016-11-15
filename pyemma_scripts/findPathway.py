@@ -287,14 +287,17 @@ def main(jsonBlock):
 
     # spawning along the trajectory
     spawningParams = spawning.SpawningParams()
-    spawningParams.epsilon = 0.25
-    spawningParams.metricWeights = "linear"
     densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
     densityCalculator = densityCalculatorBuilder.build({})
     spawningPathway = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
-    spawningPathway = spawning.EpsilonDegeneracyCalculator()
-    degeneracies = spawningPathway.calculate(ClPath.clusters.clusters, ntrajs,
-                                             spawningParams)
+    # Set a least 1 processors from the extrems of the path
+    degeneracies = spawningPathway.calculate(ClPath.clusters.clusters,
+                                              ntrajs-2, spawningParams)
+    degeneracies[0] += 1
+    degeneracies[-1] += 1
+    print "degeneracies over pathway:"
+    print degeneracies
+    print ""
     plots = False
     if plots:
         plotMetricsDegeneracy(ClPath, resname, degeneracies)
