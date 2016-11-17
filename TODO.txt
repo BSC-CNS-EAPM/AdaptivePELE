@@ -2,8 +2,6 @@
 ###  TODO LIST  ###
 ###################
 
-* Move clustering/object.pkl to constants
-* Move other constants (such in control file loading) to constants file
 * I didnt use "__" for private methods, maybe use convention
-* Don't redo clustering if it was done in the last iteration when using the "restart" option
 * Symmetry consideration for contactMap
+* Add some exit condition (for example stop when a binding event has occurred)
