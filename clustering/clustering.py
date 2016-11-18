@@ -27,6 +27,9 @@ class Clusters:
     def getNumberClusters(self):
         return len(self.clusters)
 
+    def getCluster(self, clusterNum):
+        return self.clusters[clusterNum]
+
     def printClusters(self, verbose=False):
         for i, cluster in enumerate(self.clusters):
             print "--------------"
