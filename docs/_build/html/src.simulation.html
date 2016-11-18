@@ -160,6 +160,21 @@
 <div class="section" id="module-src.simulation.simulationTypes">
 <span id="simulationtypes-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">simulationTypes</span></tt> Module<a class="headerlink" href="#module-src.simulation.simulationTypes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="src.simulation.simulationTypes.EXITCONDITION_TYPE">
+<em class="property">class </em><tt class="descclassname">src.simulation.simulationTypes.</tt><tt class="descname">EXITCONDITION_TYPE</tt><a class="headerlink" href="#src.simulation.simulationTypes.EXITCONDITION_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="src.simulation.simulationTypes.EXITCONDITION_TYPE.METRIC">
+<tt class="descname">METRIC</tt><em class="property"> = 0</em><a class="headerlink" href="#src.simulation.simulationTypes.EXITCONDITION_TYPE.METRIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.simulation.simulationTypes.EXITCONDITION_TYPE.foo">
+<tt class="descname">foo</tt><em class="property"> = 1</em><a class="headerlink" href="#src.simulation.simulationTypes.EXITCONDITION_TYPE.foo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="src.simulation.simulationTypes.SIMULATION_TYPE">
 <em class="property">class </em><tt class="descclassname">src.simulation.simulationTypes.</tt><tt class="descname">SIMULATION_TYPE</tt><a class="reference internal" href="_modules/src/simulation/simulationTypes.html#SIMULATION_TYPE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationTypes.SIMULATION_TYPE" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
@@ -182,6 +197,28 @@
 </div>
 <div class="section" id="module-src.simulation.simulationrunner">
 <span id="simulationrunner-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">simulationrunner</span></tt> Module<a class="headerlink" href="#module-src.simulation.simulationrunner" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.simulation.simulationrunner.ExitConditionBuilder">
+<em class="property">class </em><tt class="descclassname">src.simulation.simulationrunner.</tt><tt class="descname">ExitConditionBuilder</tt><a class="headerlink" href="#src.simulation.simulationrunner.ExitConditionBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.simulation.simulationrunner.ExitConditionBuilder.build">
+<tt class="descname">build</tt><big>(</big><em>exitConditionBlock</em><big>)</big><a class="headerlink" href="#src.simulation.simulationrunner.ExitConditionBuilder.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.simulation.simulationrunner.MetricExitCondition">
+<em class="property">class </em><tt class="descclassname">src.simulation.simulationrunner.</tt><tt class="descname">MetricExitCondition</tt><big>(</big><em>metricCol</em>, <em>metricValue</em>, <em>type</em><big>)</big><a class="headerlink" href="#src.simulation.simulationrunner.MetricExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.simulation.simulationrunner.MetricExitCondition.checkExitCondition">
+<tt class="descname">checkExitCondition</tt><big>(</big><em>clustering</em><big>)</big><a class="headerlink" href="#src.simulation.simulationrunner.MetricExitCondition.checkExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over all unchecked cluster and check if the exit condtion
+is met</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="class">
 <dt id="src.simulation.simulationrunner.PeleSimulation">
 <em class="property">class </em><tt class="descclassname">src.simulation.simulationrunner.</tt><tt class="descname">PeleSimulation</tt><big>(</big><em>parameters</em><big>)</big><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#PeleSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.PeleSimulation" title="Permalink to this definition">¶</a></dt>
@@ -217,6 +254,16 @@
 <dt id="src.simulation.simulationrunner.SimulationRunner">
 <em class="property">class </em><tt class="descclassname">src.simulation.simulationrunner.</tt><tt class="descname">SimulationRunner</tt><big>(</big><em>parameters</em><big>)</big><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#SimulationRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.SimulationRunner" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
+<dt id="src.simulation.simulationrunner.SimulationRunner.checkExitCondition">
+<tt class="descname">checkExitCondition</tt><big>(</big><em>clustering</em><big>)</big><a class="headerlink" href="#src.simulation.simulationrunner.SimulationRunner.checkExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.simulation.simulationrunner.SimulationRunner.hasExitCondition">
+<tt class="descname">hasExitCondition</tt><big>(</big><big>)</big><a class="headerlink" href="#src.simulation.simulationrunner.SimulationRunner.hasExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="src.simulation.simulationrunner.SimulationRunner.makeWorkingControlFile">
 <tt class="descname">makeWorkingControlFile</tt><big>(</big><em>workingControlFilename</em>, <em>dictionary</em><big>)</big><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#SimulationRunner.makeWorkingControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.SimulationRunner.makeWorkingControlFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>

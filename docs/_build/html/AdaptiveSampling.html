@@ -281,9 +281,8 @@ spawningParams [In] Contains spawning params, to know what reportFile and column
 <tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">loadParams</tt><big>(</big><em>jsonParams</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#loadParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.loadParams" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the control file in JSON format and extract the blocks of simulation,
 general parameters, clustering and spawning</p>
-<blockquote>
-<div>jsonParams [In] Control file in JSON format from where the parameters
-will be read</div></blockquote>
+<p>jsonParams [In] Control file in JSON format from where the parameters
+will be read</p>
 </dd></dl>
 
 <dl class="function">
@@ -305,8 +304,8 @@ will be read</div></blockquote>
 <dt id="src.adaptiveSampling.needToRecluster">
 <tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">needToRecluster</tt><big>(</big><em>oldClusteringMethod</em>, <em>newClusteringMethod</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#needToRecluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.needToRecluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the parameters have changed in a restart and we need to redo
-the clustering
-oldClusteringMethod [In] clusteringMethod in the previous simulation
+the clustering</p>
+<p>oldClusteringMethod [In] clusteringMethod in the previous simulation
 newClusteringMethod [In] clusteringMethod specified in the restart simulation</p>
 </dd></dl>
 
@@ -320,13 +319,12 @@ newClusteringMethod [In] clusteringMethod specified in the restart simulation</p
 <tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">preparePeleControlFile</tt><big>(</big><em>i</em>, <em>outputPathConstants</em>, <em>simulationRunner</em>, <em>peleControlFileDictionary</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#preparePeleControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.preparePeleControlFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Substitute the parameters in the pele control file specified with the
 provided in the control file</p>
-<blockquote>
-<div>i [In] Epoch number
+<p>i [In] Epoch number
 outputPathConstants [In] Object that has as attributes constant related
 to the outputPath that will be used to create the working control file
 simulationRunner [In] Simulation runner object
 peleControlFileDictionary [In] Dictonary containing the values of the
-parameters to substitute in the control file</div></blockquote>
+parameters to substitute in the control file</p>
 </dd></dl>
 
 <dl class="function">
