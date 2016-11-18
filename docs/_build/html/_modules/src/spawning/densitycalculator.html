@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="Adaptive Sampling  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -84,7 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptiveSampling.html">AdaptiveSampling Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Adaptive Control File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Adaptive Sampling Overview</a></li>
 </ul>
 
             
@@ -134,25 +136,26 @@
            <div itemprop="articleBody">
             
   <h1>Source code for src.spawning.densitycalculator</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">constants</span> <span class="kn">import</span> <span class="n">blockNames</span>
+<span></span><span class="kn">from</span> <span class="nn">constants</span> <span class="k">import</span> <span class="n">blockNames</span>
 <span class="kn">import</span> <span class="nn">densitycalculatortypes</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+
 
 <div class="viewcode-block" id="DensityCalculatorBuilder"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.DensityCalculatorBuilder">[docs]</a><span class="k">class</span> <span class="nc">DensityCalculatorBuilder</span><span class="p">():</span>
 <div class="viewcode-block" id="DensityCalculatorBuilder.build"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.DensityCalculatorBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spawningBlock</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">densityBlock</span> <span class="o">=</span> <span class="n">spawningBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">density</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s">&quot;Using null density calculator (no preference for any cluster)&quot;</span>
+            <span class="nb">print</span> <span class="s2">&quot;Using null density calculator (no preference for any cluster)&quot;</span>
             <span class="k">return</span> <span class="n">NullDensityCalculator</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="nb">type</span> <span class="o">=</span> <span class="n">densityBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s">&quot;Density calculator must have a type&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Density calculator must have a type&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">null</span> <span class="ow">or</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">constant</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s">&quot;Using constant density&quot;</span>
+            <span class="nb">print</span> <span class="s2">&quot;Using constant density&quot;</span>
             <span class="k">return</span> <span class="n">NullDensityCalculator</span><span class="p">()</span>
         <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">heaviside</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -161,60 +164,67 @@
                 <span class="n">conditions</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculatorParams</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
                 <span class="k">return</span> <span class="n">DensityCalculatorHeaviside</span><span class="p">(</span><span class="n">conditions</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">print</span> <span class="s">&quot;Using default parameters for Heaviside density calculator&quot;</span>
+                <span class="nb">print</span> <span class="s2">&quot;Using default parameters for Heaviside density calculator&quot;</span>
                 <span class="k">return</span> <span class="n">DensityCalculatorHeaviside</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">quadratic</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">QuadraticDensityCalculator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ContinuousDensityCalculator</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s">&quot;Unknown density calculator type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">densitycalculatortypes</span><span class="o">.</span><span class="n">DENSITY_CALCULATOR_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
-</div></div>
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown density calculator type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">densitycalculatortypes</span><span class="o">.</span><span class="n">DENSITY_CALCULATOR_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div></div>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <div class="viewcode-block" id="DensityCalculator"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.DensityCalculator">[docs]</a><span class="k">class</span> <span class="nc">DensityCalculator</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;BaseClass&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;BaseClass&quot;</span>
 
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="DensityCalculator.calculate"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.DensityCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contacts</span><span class="p">):</span>
-        <span class="k">pass</span>
-</div></div>
+        <span class="k">pass</span></div></div>
+
+
 <div class="viewcode-block" id="DensityCalculatorHeaviside"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.DensityCalculatorHeaviside">[docs]</a><span class="k">class</span> <span class="nc">DensityCalculatorHeaviside</span><span class="p">(</span><span class="n">DensityCalculator</span><span class="p">):</span>
-    <span class="c">#Mostly duplicated code with threshold calculator</span>
+    <span class="c1"># Mostly duplicated code with threshold calculator</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conditions</span><span class="o">=</span><span class="p">[],</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">1.</span><span class="p">]):</span>
         <span class="n">DensityCalculator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">densitycalculatortypes</span><span class="o">.</span><span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">heaviside</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditions</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditions</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;The number of values must be equal or one more, than the number of conditions&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The number of values must be equal or one more, than the number of conditions&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span> <span class="o">=</span> <span class="n">conditions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">values</span>
 
 <div class="viewcode-block" id="DensityCalculatorHeaviside.calculate"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.DensityCalculatorHeaviside.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contacts</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">)):</span>
-            <span class="c">#change, so that whole condition is in array</span>
+            <span class="c1">#change, so that whole condition is in array</span>
             <span class="k">if</span> <span class="n">contacts</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="c">#the way it&#39;s built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the &quot;else&quot; value</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-</div></div>
+        <span class="c1">#the way it&#39;s built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the &quot;else&quot; value</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div></div>
+
+
 <div class="viewcode-block" id="NullDensityCalculator"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.NullDensityCalculator">[docs]</a><span class="k">class</span> <span class="nc">NullDensityCalculator</span><span class="p">(</span><span class="n">DensityCalculator</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">DensityCalculator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">densitycalculatortypes</span><span class="o">.</span><span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">null</span>
 
 <div class="viewcode-block" id="NullDensityCalculator.calculate"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.NullDensityCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contacts</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">1.</span>
-</div></div>
-<div class="viewcode-block" id="QuadraticDensityCalculator"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.QuadraticDensityCalculator">[docs]</a><span class="k">class</span> <span class="nc">QuadraticDensityCalculator</span><span class="p">(</span><span class="n">DensityCalculator</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">1.</span></div></div>
+
+
+<div class="viewcode-block" id="ContinuousDensityCalculator"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.ContinuousDensityCalculator">[docs]</a><span class="k">class</span> <span class="nc">ContinuousDensityCalculator</span><span class="p">(</span><span class="n">DensityCalculator</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">DensityCalculator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">densitycalculatortypes</span><span class="o">.</span><span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">quadratic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">densitycalculatortypes</span><span class="o">.</span><span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">continuous</span>
 
-<div class="viewcode-block" id="QuadraticDensityCalculator.calculate"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.QuadraticDensityCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contacts</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">contacts</span> <span class="o">&gt;</span> <span class="mf">2.0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="mi">32</span>
+<div class="viewcode-block" id="ContinuousDensityCalculator.calculate"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.densitycalculator.ContinuousDensityCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contacts</span><span class="p">):</span>
+        <span class="c1"># if contacts &gt; 2.0:</span>
+        <span class="c1">#     return 32</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     return 8.76571*contacts**2-2.44857*contacts+0.28829</span>
+        <span class="k">if</span> <span class="n">contacts</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">8</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="mf">8.76571</span><span class="o">*</span><span class="n">contacts</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mf">2.44857</span><span class="o">*</span><span class="n">contacts</span><span class="o">+</span><span class="mf">0.28829</span></div></div>
+            <span class="k">return</span> <span class="mf">64.0</span><span class="o">/</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">contacts</span><span class="o">+</span><span class="mi">6</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span></div></div>
 </pre></div>
 
            </div>
