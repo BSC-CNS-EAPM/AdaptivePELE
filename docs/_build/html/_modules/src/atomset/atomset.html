@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="Adaptive Sampling  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -84,7 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptiveSampling.html">AdaptiveSampling Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Adaptive Control File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Adaptive Sampling Overview</a></li>
 </ul>
 
             
@@ -134,81 +136,82 @@
            <div itemprop="articleBody">
             
   <h1>Source code for src.atomset.atomset</h1><div class="highlight"><pre>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">StringIO</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">sparse</span>
 
 
 <div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">:</span>
-    <span class="n">_chargePattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;[0-9]|\+|\-&quot;</span><span class="p">)</span>
-    <span class="n">_ATOM_WEIGHTS</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;H&quot;</span><span class="p">:</span> <span class="mf">1.00794</span><span class="p">,</span>
-                    <span class="s">&quot;D&quot;</span><span class="p">:</span> <span class="mf">2.01410178</span><span class="p">,</span>  <span class="c"># deuterium</span>
-                    <span class="s">&quot;HE&quot;</span><span class="p">:</span> <span class="mf">4.00</span><span class="p">,</span>
-                    <span class="s">&quot;LI&quot;</span><span class="p">:</span> <span class="mf">6.941</span><span class="p">,</span>
-                    <span class="s">&quot;BE&quot;</span><span class="p">:</span> <span class="mf">9.01</span><span class="p">,</span>
-                    <span class="s">&quot;B&quot;</span><span class="p">:</span> <span class="mf">10.811</span><span class="p">,</span>
-                    <span class="s">&quot;C&quot;</span><span class="p">:</span> <span class="mf">12.0107</span><span class="p">,</span>
-                    <span class="s">&quot;N&quot;</span><span class="p">:</span> <span class="mf">14.0067</span><span class="p">,</span>
-                    <span class="s">&quot;O&quot;</span><span class="p">:</span> <span class="mf">15.9994</span><span class="p">,</span>
-                    <span class="s">&quot;F&quot;</span><span class="p">:</span> <span class="mf">18.998403</span><span class="p">,</span>
-                    <span class="s">&quot;NE&quot;</span><span class="p">:</span> <span class="mf">20.18</span><span class="p">,</span>
-                    <span class="s">&quot;NA&quot;</span><span class="p">:</span> <span class="mf">22.989769</span><span class="p">,</span>
-                    <span class="s">&quot;MG&quot;</span><span class="p">:</span> <span class="mf">24.305</span><span class="p">,</span>
-                    <span class="s">&quot;AL&quot;</span><span class="p">:</span> <span class="mf">26.98</span><span class="p">,</span>
-                    <span class="s">&quot;SI&quot;</span><span class="p">:</span> <span class="mf">28.09</span><span class="p">,</span>
-                    <span class="s">&quot;P&quot;</span><span class="p">:</span> <span class="mf">30.973762</span><span class="p">,</span>
-                    <span class="s">&quot;S&quot;</span><span class="p">:</span> <span class="mf">32.065</span><span class="p">,</span>
-                    <span class="s">&quot;CL&quot;</span><span class="p">:</span> <span class="mf">35.453</span><span class="p">,</span>
-                    <span class="s">&quot;AR&quot;</span><span class="p">:</span> <span class="mf">39.95</span><span class="p">,</span>
-                    <span class="s">&quot;K&quot;</span><span class="p">:</span> <span class="mf">39.0983</span><span class="p">,</span>
-                    <span class="s">&quot;CA&quot;</span><span class="p">:</span> <span class="mf">40.078</span><span class="p">,</span>
-                    <span class="s">&quot;SC&quot;</span><span class="p">:</span> <span class="mf">44.96</span><span class="p">,</span>
-                    <span class="s">&quot;TI&quot;</span><span class="p">:</span> <span class="mf">47.87</span><span class="p">,</span>
-                    <span class="s">&quot;V&quot;</span><span class="p">:</span> <span class="mf">50.94</span><span class="p">,</span>
-                    <span class="s">&quot;CR&quot;</span><span class="p">:</span> <span class="mf">51.9961</span><span class="p">,</span>
-                    <span class="s">&quot;MN&quot;</span><span class="p">:</span> <span class="mf">54.938045</span><span class="p">,</span>
-                    <span class="s">&quot;FE&quot;</span><span class="p">:</span> <span class="mf">55.845</span><span class="p">,</span>
-                    <span class="s">&quot;CO&quot;</span><span class="p">:</span> <span class="mf">58.93</span><span class="p">,</span>
-                    <span class="s">&quot;NI&quot;</span><span class="p">:</span> <span class="mf">58.6934</span><span class="p">,</span>
-                    <span class="s">&quot;CU&quot;</span><span class="p">:</span> <span class="mf">63.546</span><span class="p">,</span>
-                    <span class="s">&quot;ZN&quot;</span><span class="p">:</span> <span class="mf">65.409</span><span class="p">,</span>
-                    <span class="s">&quot;GA&quot;</span><span class="p">:</span> <span class="mf">69.72</span><span class="p">,</span>
-                    <span class="s">&quot;GE&quot;</span><span class="p">:</span> <span class="mf">72.64</span><span class="p">,</span>
-                    <span class="s">&quot;AS&quot;</span><span class="p">:</span> <span class="mf">74.9216</span><span class="p">,</span>
-                    <span class="s">&quot;SE&quot;</span><span class="p">:</span> <span class="mf">78.96</span><span class="p">,</span>
-                    <span class="s">&quot;BR&quot;</span><span class="p">:</span> <span class="mf">79.90</span><span class="p">,</span>
-                    <span class="s">&quot;KR&quot;</span><span class="p">:</span> <span class="mf">83.80</span><span class="p">,</span>
-                    <span class="s">&quot;RB&quot;</span><span class="p">:</span> <span class="mf">85.47</span><span class="p">,</span>
-                    <span class="s">&quot;SR&quot;</span><span class="p">:</span> <span class="mf">87.62</span><span class="p">,</span>
-                    <span class="s">&quot;Y&quot;</span><span class="p">:</span> <span class="mf">88.91</span><span class="p">,</span>
-                    <span class="s">&quot;ZR&quot;</span><span class="p">:</span> <span class="mf">91.22</span><span class="p">,</span>
-                    <span class="s">&quot;NB&quot;</span><span class="p">:</span> <span class="mf">92.91</span><span class="p">,</span>
-                    <span class="s">&quot;W&quot;</span><span class="p">:</span> <span class="mf">95.94</span><span class="p">,</span>  <span class="c"># Molybdenum?  Not sure why it&#39;s not always MO</span>
-                    <span class="s">&quot;MO&quot;</span><span class="p">:</span> <span class="mf">95.94</span><span class="p">,</span>
-                    <span class="s">&quot;TC&quot;</span><span class="p">:</span> <span class="mf">98.0</span><span class="p">,</span>
-                    <span class="s">&quot;RU&quot;</span><span class="p">:</span> <span class="mf">101.07</span><span class="p">,</span>
-                    <span class="s">&quot;RH&quot;</span><span class="p">:</span> <span class="mf">102.91</span><span class="p">,</span>
-                    <span class="s">&quot;PD&quot;</span><span class="p">:</span> <span class="mf">106.42</span><span class="p">,</span>
-                    <span class="s">&quot;AG&quot;</span><span class="p">:</span> <span class="mf">107.8682</span><span class="p">,</span>
-                    <span class="s">&quot;CD&quot;</span><span class="p">:</span> <span class="mf">112.411</span><span class="p">,</span>
-                    <span class="s">&quot;IN&quot;</span><span class="p">:</span> <span class="mf">114.82</span><span class="p">,</span>
-                    <span class="s">&quot;SN&quot;</span><span class="p">:</span> <span class="mf">118.71</span><span class="p">,</span>
-                    <span class="s">&quot;SB&quot;</span><span class="p">:</span> <span class="mf">121.76</span><span class="p">,</span>
-                    <span class="s">&quot;TE&quot;</span><span class="p">:</span> <span class="mf">127.60</span><span class="p">,</span>
-                    <span class="s">&quot;I&quot;</span><span class="p">:</span> <span class="mf">126.90447</span><span class="p">,</span>
-                    <span class="s">&quot;XE&quot;</span><span class="p">:</span> <span class="mf">131.29</span><span class="p">,</span>
-                    <span class="s">&quot;CS&quot;</span><span class="p">:</span> <span class="mf">132.91</span><span class="p">,</span>
-                    <span class="s">&quot;BA&quot;</span><span class="p">:</span> <span class="mf">137.33</span><span class="p">,</span>
-                    <span class="s">&quot;PR&quot;</span><span class="p">:</span> <span class="mf">140.91</span><span class="p">,</span>
-                    <span class="s">&quot;EU&quot;</span><span class="p">:</span> <span class="mf">151.96</span><span class="p">,</span>
-                    <span class="s">&quot;GD&quot;</span><span class="p">:</span> <span class="mf">157.25</span><span class="p">,</span>
-                    <span class="s">&quot;TB&quot;</span><span class="p">:</span> <span class="mf">158.93</span><span class="p">,</span>
-                    <span class="s">&quot;IR&quot;</span><span class="p">:</span> <span class="mf">192.22</span><span class="p">,</span>
-                    <span class="s">&quot;PT&quot;</span><span class="p">:</span> <span class="mf">195.084</span><span class="p">,</span>
-                    <span class="s">&quot;AU&quot;</span><span class="p">:</span> <span class="mf">196.96657</span><span class="p">,</span>
-                    <span class="s">&quot;HG&quot;</span><span class="p">:</span> <span class="mf">200.59</span><span class="p">,</span>
-                    <span class="s">&quot;PB&quot;</span><span class="p">:</span> <span class="mf">207.2</span><span class="p">,</span>
-                    <span class="s">&quot;U&quot;</span><span class="p">:</span> <span class="mf">238.03</span><span class="p">}</span>
+    <span class="n">_chargePattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[0-9]|\+|\-&quot;</span><span class="p">)</span>
+    <span class="n">_ATOM_WEIGHTS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="mf">1.00794</span><span class="p">,</span>
+                    <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="mf">2.01410178</span><span class="p">,</span>  <span class="c1"># deuterium</span>
+                    <span class="s2">&quot;HE&quot;</span><span class="p">:</span> <span class="mf">4.00</span><span class="p">,</span>
+                    <span class="s2">&quot;LI&quot;</span><span class="p">:</span> <span class="mf">6.941</span><span class="p">,</span>
+                    <span class="s2">&quot;BE&quot;</span><span class="p">:</span> <span class="mf">9.01</span><span class="p">,</span>
+                    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="mf">10.811</span><span class="p">,</span>
+                    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mf">12.0107</span><span class="p">,</span>
+                    <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="mf">14.0067</span><span class="p">,</span>
+                    <span class="s2">&quot;O&quot;</span><span class="p">:</span> <span class="mf">15.9994</span><span class="p">,</span>
+                    <span class="s2">&quot;F&quot;</span><span class="p">:</span> <span class="mf">18.998403</span><span class="p">,</span>
+                    <span class="s2">&quot;NE&quot;</span><span class="p">:</span> <span class="mf">20.18</span><span class="p">,</span>
+                    <span class="s2">&quot;NA&quot;</span><span class="p">:</span> <span class="mf">22.989769</span><span class="p">,</span>
+                    <span class="s2">&quot;MG&quot;</span><span class="p">:</span> <span class="mf">24.305</span><span class="p">,</span>
+                    <span class="s2">&quot;AL&quot;</span><span class="p">:</span> <span class="mf">26.98</span><span class="p">,</span>
+                    <span class="s2">&quot;SI&quot;</span><span class="p">:</span> <span class="mf">28.09</span><span class="p">,</span>
+                    <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="mf">30.973762</span><span class="p">,</span>
+                    <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="mf">32.065</span><span class="p">,</span>
+                    <span class="s2">&quot;CL&quot;</span><span class="p">:</span> <span class="mf">35.453</span><span class="p">,</span>
+                    <span class="s2">&quot;AR&quot;</span><span class="p">:</span> <span class="mf">39.95</span><span class="p">,</span>
+                    <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="mf">39.0983</span><span class="p">,</span>
+                    <span class="s2">&quot;CA&quot;</span><span class="p">:</span> <span class="mf">40.078</span><span class="p">,</span>
+                    <span class="s2">&quot;SC&quot;</span><span class="p">:</span> <span class="mf">44.96</span><span class="p">,</span>
+                    <span class="s2">&quot;TI&quot;</span><span class="p">:</span> <span class="mf">47.87</span><span class="p">,</span>
+                    <span class="s2">&quot;V&quot;</span><span class="p">:</span> <span class="mf">50.94</span><span class="p">,</span>
+                    <span class="s2">&quot;CR&quot;</span><span class="p">:</span> <span class="mf">51.9961</span><span class="p">,</span>
+                    <span class="s2">&quot;MN&quot;</span><span class="p">:</span> <span class="mf">54.938045</span><span class="p">,</span>
+                    <span class="s2">&quot;FE&quot;</span><span class="p">:</span> <span class="mf">55.845</span><span class="p">,</span>
+                    <span class="s2">&quot;CO&quot;</span><span class="p">:</span> <span class="mf">58.93</span><span class="p">,</span>
+                    <span class="s2">&quot;NI&quot;</span><span class="p">:</span> <span class="mf">58.6934</span><span class="p">,</span>
+                    <span class="s2">&quot;CU&quot;</span><span class="p">:</span> <span class="mf">63.546</span><span class="p">,</span>
+                    <span class="s2">&quot;ZN&quot;</span><span class="p">:</span> <span class="mf">65.409</span><span class="p">,</span>
+                    <span class="s2">&quot;GA&quot;</span><span class="p">:</span> <span class="mf">69.72</span><span class="p">,</span>
+                    <span class="s2">&quot;GE&quot;</span><span class="p">:</span> <span class="mf">72.64</span><span class="p">,</span>
+                    <span class="s2">&quot;AS&quot;</span><span class="p">:</span> <span class="mf">74.9216</span><span class="p">,</span>
+                    <span class="s2">&quot;SE&quot;</span><span class="p">:</span> <span class="mf">78.96</span><span class="p">,</span>
+                    <span class="s2">&quot;BR&quot;</span><span class="p">:</span> <span class="mf">79.90</span><span class="p">,</span>
+                    <span class="s2">&quot;KR&quot;</span><span class="p">:</span> <span class="mf">83.80</span><span class="p">,</span>
+                    <span class="s2">&quot;RB&quot;</span><span class="p">:</span> <span class="mf">85.47</span><span class="p">,</span>
+                    <span class="s2">&quot;SR&quot;</span><span class="p">:</span> <span class="mf">87.62</span><span class="p">,</span>
+                    <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="mf">88.91</span><span class="p">,</span>
+                    <span class="s2">&quot;ZR&quot;</span><span class="p">:</span> <span class="mf">91.22</span><span class="p">,</span>
+                    <span class="s2">&quot;NB&quot;</span><span class="p">:</span> <span class="mf">92.91</span><span class="p">,</span>
+                    <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="mf">95.94</span><span class="p">,</span>  <span class="c1"># Molybdenum?  Not sure why it&#39;s not always MO</span>
+                    <span class="s2">&quot;MO&quot;</span><span class="p">:</span> <span class="mf">95.94</span><span class="p">,</span>
+                    <span class="s2">&quot;TC&quot;</span><span class="p">:</span> <span class="mf">98.0</span><span class="p">,</span>
+                    <span class="s2">&quot;RU&quot;</span><span class="p">:</span> <span class="mf">101.07</span><span class="p">,</span>
+                    <span class="s2">&quot;RH&quot;</span><span class="p">:</span> <span class="mf">102.91</span><span class="p">,</span>
+                    <span class="s2">&quot;PD&quot;</span><span class="p">:</span> <span class="mf">106.42</span><span class="p">,</span>
+                    <span class="s2">&quot;AG&quot;</span><span class="p">:</span> <span class="mf">107.8682</span><span class="p">,</span>
+                    <span class="s2">&quot;CD&quot;</span><span class="p">:</span> <span class="mf">112.411</span><span class="p">,</span>
+                    <span class="s2">&quot;IN&quot;</span><span class="p">:</span> <span class="mf">114.82</span><span class="p">,</span>
+                    <span class="s2">&quot;SN&quot;</span><span class="p">:</span> <span class="mf">118.71</span><span class="p">,</span>
+                    <span class="s2">&quot;SB&quot;</span><span class="p">:</span> <span class="mf">121.76</span><span class="p">,</span>
+                    <span class="s2">&quot;TE&quot;</span><span class="p">:</span> <span class="mf">127.60</span><span class="p">,</span>
+                    <span class="s2">&quot;I&quot;</span><span class="p">:</span> <span class="mf">126.90447</span><span class="p">,</span>
+                    <span class="s2">&quot;XE&quot;</span><span class="p">:</span> <span class="mf">131.29</span><span class="p">,</span>
+                    <span class="s2">&quot;CS&quot;</span><span class="p">:</span> <span class="mf">132.91</span><span class="p">,</span>
+                    <span class="s2">&quot;BA&quot;</span><span class="p">:</span> <span class="mf">137.33</span><span class="p">,</span>
+                    <span class="s2">&quot;PR&quot;</span><span class="p">:</span> <span class="mf">140.91</span><span class="p">,</span>
+                    <span class="s2">&quot;EU&quot;</span><span class="p">:</span> <span class="mf">151.96</span><span class="p">,</span>
+                    <span class="s2">&quot;GD&quot;</span><span class="p">:</span> <span class="mf">157.25</span><span class="p">,</span>
+                    <span class="s2">&quot;TB&quot;</span><span class="p">:</span> <span class="mf">158.93</span><span class="p">,</span>
+                    <span class="s2">&quot;IR&quot;</span><span class="p">:</span> <span class="mf">192.22</span><span class="p">,</span>
+                    <span class="s2">&quot;PT&quot;</span><span class="p">:</span> <span class="mf">195.084</span><span class="p">,</span>
+                    <span class="s2">&quot;AU&quot;</span><span class="p">:</span> <span class="mf">196.96657</span><span class="p">,</span>
+                    <span class="s2">&quot;HG&quot;</span><span class="p">:</span> <span class="mf">200.59</span><span class="p">,</span>
+                    <span class="s2">&quot;PB&quot;</span><span class="p">:</span> <span class="mf">207.2</span><span class="p">,</span>
+                    <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="mf">238.03</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomContent</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create an atom from a pdb line</span>
@@ -216,8 +219,8 @@
 <span class="sd">            :param atomContent: Line of the pdb from which the atom will be created</span>
 <span class="sd">            :type atomContent: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># atomContent = atomContent.split()</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">atomContent</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">6</span> <span class="ow">and</span> <span class="p">(</span><span class="n">atomContent</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;ATOM&#39;</span> <span class="ow">or</span> <span class="n">atomContent</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;HETATM&#39;</span><span class="p">):</span>
+        <span class="c1"># atomContent = atomContent.split()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">atomContent</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">6</span> <span class="ow">and</span> <span class="p">(</span><span class="n">atomContent</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ATOM&#39;</span> <span class="ow">or</span> <span class="n">atomContent</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;HETATM&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atomSerial</span> <span class="o">=</span> <span class="n">atomContent</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">11</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">atomContent</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="n">atomContent</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -227,16 +230,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">atomContent</span><span class="p">[</span><span class="mi">38</span><span class="p">:</span><span class="mi">46</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">atomContent</span><span class="p">[</span><span class="mi">46</span><span class="p">:</span><span class="mi">54</span><span class="p">])</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chargePattern</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">atomContent</span><span class="p">[</span><span class="mi">76</span><span class="p">:</span><span class="mi">80</span><span class="p">])</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chargePattern</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">atomContent</span><span class="p">[</span><span class="mi">76</span><span class="p">:</span><span class="mi">80</span><span class="p">])</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ATOM_WEIGHTS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="n">atomContent</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ATOM&#39;</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">protein</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">if</span> <span class="n">atomContent</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ATOM&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">protein</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">protein</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">protein</span> <span class="o">=</span> <span class="kc">False</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomSerial</span> <span class="o">+</span> <span class="s">&quot;:&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&quot;:&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span>
-            <span class="c"># self.id = self.atomSerial</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomSerial</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span>
+            <span class="c1"># self.id = self.atomSerial</span>
 
 <div class="viewcode-block" id="Atom.isHeavyAtom"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.Atom.isHeavyAtom">[docs]</a>    <span class="k">def</span> <span class="nf">isHeavyAtom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -244,31 +247,31 @@
 
 <span class="sd">            :returns: bool -- True if Atom is heavy atom, false otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s">&#39;H&#39;</span>
-</div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s1">&#39;H&#39;</span></div>
+
 <div class="viewcode-block" id="Atom.isProtein"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.Atom.isProtein">[docs]</a>    <span class="k">def</span> <span class="nf">isProtein</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Check if Atom is a protein atom</span>
 
 <span class="sd">            :returns: bool -- True if Atom is a protein atom, false otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">protein</span>
-</div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">protein</span></div>
+
 <div class="viewcode-block" id="Atom.isHeteroAtom"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.Atom.isHeteroAtom">[docs]</a>    <span class="k">def</span> <span class="nf">isHeteroAtom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Check if Atom is an hetero atom</span>
 
 <span class="sd">            :returns: bool -- True if Atom is an hetero atom, false otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">protein</span>
-</div>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">protein</span></div>
+
 <div class="viewcode-block" id="Atom.printAtom"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.Atom.printAtom">[docs]</a>    <span class="k">def</span> <span class="nf">printAtom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Print Atom information</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomSerial</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resChain</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span>
-        <span class="c"># print self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.r, self.type, self.mass</span>
-</div>
+        <span class="nb">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomSerial</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resChain</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span></div>
+        <span class="c1"># print self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.r, self.type, self.mass</span>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom2</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">atom2</span><span class="o">.</span><span class="n">id</span>
 
@@ -276,28 +279,36 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span> <span class="o">&lt;</span> <span class="n">atom2</span><span class="o">.</span><span class="n">serial</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> [</span><span class="si">%f</span><span class="s">, </span><span class="si">%f</span><span class="s">, </span><span class="si">%f</span><span class="s">] </span><span class="si">%s</span><span class="s"> </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomSerial</span><span class="p">,</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> [</span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">] </span><span class="si">%s</span><span class="s2"> </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomSerial</span><span class="p">,</span>
                                                     <span class="bp">self</span><span class="o">.</span><span class="n">resChain</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span>
                                                     <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
                                                     <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
-        <span class="c"># return &quot;%s: %s %s %s [%f, %f, %f] %s %f&quot;%(self.id, self.atomSerial, self.resChain, self.resnum, self.r[0], self.r[1], self.r[2], self.type, self.mass)</span>
+        <span class="c1"># return &quot;%s: %s %s %s [%f, %f, %f] %s %f&quot;%(self.id, self.atomSerial, self.resChain, self.resnum, self.r[0], self.r[1], self.r[2], self.type, self.mass)</span>
+
+<div class="viewcode-block" id="Atom.getAtomCoords"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.Atom.getAtomCoords">[docs]</a>    <span class="k">def</span> <span class="nf">getAtomCoords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get the coordinates of the atom</span>
+
+<span class="sd">            :returns: numpy.Array -- Array with the coordinate of the atom</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="Atom.squaredDistance"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.Atom.squaredDistance">[docs]</a>    <span class="k">def</span> <span class="nf">squaredDistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Calculate the distance between two atoms</span>
+<span class="sd">            Calculate the squared distance between two atoms</span>
 
 <span class="sd">            :param atom2: Second Atom to whom the distance will be calculated</span>
 <span class="sd">            :type atom2: Atom</span>
 <span class="sd">            :returns: float -- The distance between the atoms</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">atom2</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">atom2</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">-</span> <span class="n">atom2</span><span class="o">.</span><span class="n">z</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
-        <span class="k">return</span> <span class="n">d</span>
+        <span class="k">return</span> <span class="n">d</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="PDB"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB">[docs]</a><span class="k">class</span> <span class="nc">PDB</span><span class="p">:</span>
-    <span class="n">_typeProtein</span> <span class="o">=</span> <span class="s">&quot;PROTEIN&quot;</span>
-    <span class="n">_typeHetero</span> <span class="o">=</span> <span class="s">&quot;HETERO&quot;</span>
-    <span class="n">_typeAll</span> <span class="o">=</span> <span class="s">&quot;ALL&quot;</span>
+    <span class="n">_typeProtein</span> <span class="o">=</span> <span class="s2">&quot;PROTEIN&quot;</span>
+    <span class="n">_typeHetero</span> <span class="o">=</span> <span class="s2">&quot;HETERO&quot;</span>
+    <span class="n">_typeAll</span> <span class="o">=</span> <span class="s2">&quot;ALL&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -305,22 +316,24 @@
 <span class="sd">            the initialise method to load the file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="c"># {atomId: atom, ...}</span>
-        <span class="c"># Where atomId := serail:atomName:resName</span>
+        <span class="c1"># {atomId: atom, ...}</span>
+        <span class="c1"># Where atomId := serail:atomName:resName</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">totalMass</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">com</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="c"># Necessary for contactMaps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">com</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Necessary for contactMaps</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atomList</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Compare two pdb strings, remark lines should be ignored and only the</span>
 <span class="sd">        atoms and its information should be compared&quot;&quot;&quot;</span>
-        <span class="n">pdb1</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;ATOM&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">element</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;HETATM&quot;</span><span class="p">)]</span>
-        <span class="n">pdb2</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;ATOM&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">element</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;HETATM&quot;</span><span class="p">)]</span>
+        <span class="n">pdb1</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ATOM&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">element</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;HETATM&quot;</span><span class="p">)]</span>
+        <span class="n">pdb2</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ATOM&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">element</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;HETATM&quot;</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">pdb1</span> <span class="o">==</span> <span class="n">pdb2</span>
 
-<div class="viewcode-block" id="PDB.initialise"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.initialise">[docs]</a>    <span class="k">def</span> <span class="nf">initialise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PDBstr</span><span class="p">,</span> <span class="n">heavyAtoms</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">atomname</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;ALL&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="PDB.initialise"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.initialise">[docs]</a>    <span class="k">def</span> <span class="nf">initialise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PDBstr</span><span class="p">,</span> <span class="n">heavyAtoms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">atomname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Load the information from a PDB file or a string with the PDB</span>
 <span class="sd">            contents</span>
@@ -337,26 +350,26 @@
 <span class="sd">            :type type: str</span>
 <span class="sd">            :raises: ValueError if the pdb contained no atoms</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">PDBContent</span> <span class="o">=</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">readPDB</span><span class="p">(</span><span class="n">PDBstr</span><span class="p">))</span>  <span class="c"># Using StringIO</span>
-        <span class="c"># creates a buffer that can handle a pdb file or a string containing</span>
-        <span class="c"># the PDB</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span> <span class="o">=</span> <span class="n">PDBContent</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>  <span class="c"># in case one wants to write it</span>
+        <span class="n">PDBContent</span> <span class="o">=</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">readPDB</span><span class="p">(</span><span class="n">PDBstr</span><span class="p">))</span>  <span class="c1"># Using StringIO</span>
+        <span class="c1"># creates a buffer that can handle a pdb file or a string containing</span>
+        <span class="c1"># the PDB</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span> <span class="o">=</span> <span class="n">PDBContent</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>  <span class="c1"># in case one wants to write it</span>
 
-        <span class="n">stringWithPDBContent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">stringWithPDBContent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">atomLine</span> <span class="ow">in</span> <span class="n">stringWithPDBContent</span><span class="p">:</span>
 
-            <span class="c"># HUGE optimisation (not to create an atom each time ~ 2e-5 s/atom)</span>
-            <span class="k">if</span> <span class="n">resname</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">atomLine</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">resname</span><span class="p">:</span>
-                <span class="c"># optimisation</span>
+            <span class="c1"># HUGE optimisation (not to create an atom each time ~ 2e-5 s/atom)</span>
+            <span class="k">if</span> <span class="n">resname</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">atomLine</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">resname</span><span class="p">:</span>
+                <span class="c1"># optimisation</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">atomname</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">atomLine</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">atomname</span><span class="p">:</span>
-                <span class="c"># optimisation</span>
+            <span class="k">if</span> <span class="n">atomname</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">atomLine</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">atomname</span><span class="p">:</span>
+                <span class="c1"># optimisation</span>
                 <span class="k">continue</span>
 
             <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">atomLine</span><span class="p">)</span>
-            <span class="c"># Here atom will be not null, empty or not.</span>
-            <span class="c"># With &quot;try&quot;, we prune empty atoms</span>
+            <span class="c1"># Here atom will be not null, empty or not.</span>
+            <span class="c1"># With &quot;try&quot;, we prune empty atoms</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">heavyAtoms</span> <span class="ow">or</span> <span class="n">atom</span><span class="o">.</span><span class="n">isHeavyAtom</span><span class="p">())</span> <span class="ow">and</span>\
                    <span class="p">(</span><span class="nb">type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typeAll</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typeProtein</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">isProtein</span><span class="p">())</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typeHetero</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">isHeteroAtom</span><span class="p">())):</span>
@@ -365,31 +378,31 @@
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">==</span> <span class="p">{}:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;The input pdb file/string was empty, no atoms loaded!&#39;</span><span class="p">)</span>
-</div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The input pdb file/string was empty, no atoms loaded!&#39;</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="PDB.computeTotalMass"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.computeTotalMass">[docs]</a>    <span class="k">def</span> <span class="nf">computeTotalMass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Calculate the total mass of the PDB</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">totalMass</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">atomId</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">totalMass</span> <span class="o">+=</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span>
-</div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">totalMass</span> <span class="o">+=</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span></div>
+
 <div class="viewcode-block" id="PDB.printAtoms"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.printAtoms">[docs]</a>    <span class="k">def</span> <span class="nf">printAtoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Print Atom information for all the atoms in the PDB</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="k">print</span> <span class="n">atom</span>  <span class="c"># atom.printAtom()</span>
-</div>
+            <span class="nb">print</span> <span class="n">atom</span>  <span class="c1"># atom.printAtom()</span></div>
+
 <div class="viewcode-block" id="PDB.getNumberOfAtoms"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.getNumberOfAtoms">[docs]</a>    <span class="k">def</span> <span class="nf">getNumberOfAtoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Get the number of Atoms in the PDB</span>
 
 <span class="sd">            :returns: int -- Number of atoms in the PDB</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="PDB.getAtom"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.getAtom">[docs]</a>    <span class="k">def</span> <span class="nf">getAtom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomId</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Get an Atom in the PDB by its id</span>
@@ -399,31 +412,69 @@
 <span class="sd">            :returns: int -- Number of atoms in the PDB</span>
 <span class="sd">            :raises: KeyError if the id is not in the PDB</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">atomId</span><span class="p">]</span>
-</div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">atomId</span><span class="p">]</span></div>
+
 <div class="viewcode-block" id="PDB.extractCOM"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.extractCOM">[docs]</a>    <span class="k">def</span> <span class="nf">extractCOM</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Calculate the center of mass of the PDB</span>
+<span class="sd">            Calculate the PDB&#39;s center of mass</span>
 
-<span class="sd">            :returns: numpy.Array -- Array with the coordinates of the center of mass</span>
+<span class="sd">            :returns: list -- List with the center of mass coordinates</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">totalMass</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">computeTotalMass</span><span class="p">()</span>
-        <span class="n">COM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
+        <span class="n">COM</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">atomId</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">COM</span> <span class="o">+=</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">z</span><span class="p">])</span>
-        <span class="n">COM</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">totalMass</span>
+            <span class="n">COM</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">*</span> <span class="n">atom</span><span class="o">.</span><span class="n">x</span>
+            <span class="n">COM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">*</span> <span class="n">atom</span><span class="o">.</span><span class="n">y</span>
+            <span class="n">COM</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">*</span> <span class="n">atom</span><span class="o">.</span><span class="n">z</span>
+
+        <span class="n">COM</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">totalMass</span>
+        <span class="n">COM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">totalMass</span>
+        <span class="n">COM</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">totalMass</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">com</span> <span class="o">=</span> <span class="n">COM</span>
-        <span class="k">return</span> <span class="n">COM</span>
-</div>
+        <span class="k">return</span> <span class="n">COM</span></div>
+
 <div class="viewcode-block" id="PDB.getCOM"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.getCOM">[docs]</a>    <span class="k">def</span> <span class="nf">getCOM</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Get the center of mass of the PDB</span>
+<span class="sd">            Get the PDB&#39;s center of mass</span>
 
-<span class="sd">            :returns: numpy.Array -- Array with the coordinates of the center of mass</span>
+<span class="sd">            :returns: list -- List with the center of mass coordinates</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">com</span>
-</div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">com</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractCOM</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">com</span></div>
+
+<div class="viewcode-block" id="PDB.extractCentroid"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.extractCentroid">[docs]</a>    <span class="k">def</span> <span class="nf">extractCentroid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the PDB centroid</span>
+
+<span class="sd">            :returns: List -- List with the centroid coordinates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">centroid</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">atomId</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom</span><span class="o">.</span><span class="n">x</span>
+            <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom</span><span class="o">.</span><span class="n">y</span>
+            <span class="n">centroid</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom</span><span class="o">.</span><span class="n">z</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">))</span>
+        <span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/=</span> <span class="n">n</span>
+        <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="n">n</span>
+        <span class="n">centroid</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span> <span class="o">=</span> <span class="n">centroid</span>
+        <span class="k">return</span> <span class="n">centroid</span></div>
+
+<div class="viewcode-block" id="PDB.getCentroid"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.getCentroid">[docs]</a>    <span class="k">def</span> <span class="nf">getCentroid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get the PDB&#39;s centroid</span>
+
+<span class="sd">            :returns: list -- List with the centroid coordinates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractCentroid</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span></div>
+
 <div class="viewcode-block" id="PDB.writePDB"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.writePDB">[docs]</a>    <span class="k">def</span> <span class="nf">writePDB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Write the pdb contents of the file from wich the PDB object was</span>
@@ -432,10 +483,10 @@
 <span class="sd">            :param path: Path of the file where to write the pdb</span>
 <span class="sd">            :type path: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
-        <span class="nb">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">)</span>
-        <span class="nb">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</div>
+        <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="PDB.countContacts"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.countContacts">[docs]</a>    <span class="k">def</span> <span class="nf">countContacts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ligandResname</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Count the number of alpha carbons that are in contact with the</span>
@@ -450,23 +501,23 @@
         <span class="n">contactThresholdDistance2</span> <span class="o">=</span> <span class="n">contactThresholdDistance</span><span class="o">**</span><span class="mi">2</span>
 
         <span class="n">ligandPDB</span> <span class="o">=</span> <span class="n">PDB</span><span class="p">()</span>
-        <span class="n">ligandPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">ligandResname</span><span class="p">,</span> <span class="n">heavyAtoms</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">ligandPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">ligandResname</span><span class="p">,</span> <span class="n">heavyAtoms</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">alphaCarbonsPDB</span> <span class="o">=</span> <span class="n">PDB</span><span class="p">()</span>
         <span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_typeProtein</span><span class="p">,</span>
-                                   <span class="n">atomname</span><span class="o">=</span><span class="s">&quot;CA&quot;</span><span class="p">)</span>
+                                   <span class="n">atomname</span><span class="o">=</span><span class="s2">&quot;CA&quot;</span><span class="p">)</span>
 
-        <span class="c"># count contacts</span>
+        <span class="c1"># count contacts</span>
         <span class="n">contacts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
         <span class="k">for</span> <span class="n">ligandAtomId</span><span class="p">,</span> <span class="n">ligandAtom</span> <span class="ow">in</span> <span class="n">ligandPDB</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="c"># can be optimised with cell list</span>
+            <span class="c1"># can be optimised with cell list</span>
             <span class="k">for</span> <span class="n">proteinAtomId</span><span class="p">,</span> <span class="n">proteinAtom</span> <span class="ow">in</span> <span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">dist2</span> <span class="o">=</span> <span class="n">ligandAtom</span><span class="o">.</span><span class="n">squaredDistance</span><span class="p">(</span><span class="n">proteinAtom</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">dist2</span> <span class="o">&lt;</span> <span class="n">contactThresholdDistance2</span><span class="p">:</span>
                     <span class="n">contacts</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">proteinAtomId</span><span class="p">])</span>
 
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="PDB.createContactMap"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.createContactMap">[docs]</a>    <span class="k">def</span> <span class="nf">createContactMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ligandResname</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Create the contact map of the protein and ligand. The contact map is</span>
@@ -485,14 +536,14 @@
         <span class="n">contactThresholdDistance2</span> <span class="o">=</span> <span class="n">contactThresholdDistance</span><span class="o">**</span><span class="mi">2</span>
 
         <span class="n">ligandPDB</span> <span class="o">=</span> <span class="n">PDB</span><span class="p">()</span>
-        <span class="n">ligandPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">ligandResname</span><span class="p">,</span> <span class="n">heavyAtoms</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">ligandPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">ligandResname</span><span class="p">,</span> <span class="n">heavyAtoms</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">alphaCarbonsPDB</span> <span class="o">=</span> <span class="n">PDB</span><span class="p">()</span>
         <span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_typeProtein</span><span class="p">,</span>
-                                   <span class="n">atomname</span><span class="o">=</span><span class="s">&quot;CA&quot;</span><span class="p">)</span>
+                                   <span class="n">atomname</span><span class="o">=</span><span class="s2">&quot;CA&quot;</span><span class="p">)</span>
 
-        <span class="c"># empty contact map, rows are atoms of the ligand, columns are protein</span>
-        <span class="c"># alpha carbons</span>
+        <span class="c1"># empty contact map, rows are atoms of the ligand, columns are protein</span>
+        <span class="c1"># alpha carbons</span>
         <span class="n">contactMap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">ligandPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">),</span>
                                <span class="nb">len</span><span class="p">(</span><span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
         <span class="n">contacts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
@@ -500,74 +551,95 @@
             <span class="k">for</span> <span class="n">colind</span><span class="p">,</span> <span class="n">proteinAtom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">):</span>
                 <span class="n">dist2</span> <span class="o">=</span> <span class="n">ligandPDB</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">ligandAtom</span><span class="p">]</span><span class="o">.</span><span class="n">squaredDistance</span><span class="p">(</span><span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">proteinAtom</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">dist2</span> <span class="o">&lt;</span> <span class="n">contactThresholdDistance2</span><span class="p">:</span>
-                    <span class="n">contactMap</span><span class="p">[</span><span class="n">rowind</span><span class="p">,</span> <span class="n">colind</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">contactMap</span><span class="p">[</span><span class="n">rowind</span><span class="p">,</span> <span class="n">colind</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="n">contacts</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">proteinAtom</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">contactMap</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">contactMap</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span></div>
 
-</div></div>
-<div class="viewcode-block" id="computeRMSD2"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.computeRMSD2">[docs]</a><span class="k">def</span> <span class="nf">computeRMSD2</span><span class="p">(</span><span class="n">PDB1</span><span class="p">,</span> <span class="n">PDB2</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="p">{}):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute the squared RMSD between two PDB</span>
+<div class="viewcode-block" id="PDB.contactMapnew"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.contactMapnew">[docs]</a>    <span class="k">def</span> <span class="nf">contactMapnew</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ligandResname</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="p">):</span>
+        <span class="n">contactThresholdDistance2</span> <span class="o">=</span> <span class="n">contactThresholdDistance</span><span class="o">**</span><span class="mi">2</span>
 
-<span class="sd">        :param PDB1: First PDB with which the RMSD will be calculated</span>
-<span class="sd">        :type PDB1: PDB</span>
-<span class="sd">        :param PDB2: First PDB with which the RMSD will be calculated</span>
-<span class="sd">        :type PDB2: PDB</span>
-<span class="sd">        :param symmetries: Dictionary with elements atomId:symmetricalAtomId corresponding with the symmetrical atoms</span>
-<span class="sd">        :type symmetries: dict</span>
-<span class="sd">        :returns: float -- The squared RMSD between two PDB</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">rmsd</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">atom1Id</span><span class="p">,</span> <span class="n">atom1</span> <span class="ow">in</span> <span class="n">PDB1</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-        <span class="n">d2</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="c"># HANDLE THE CASE WHEN ATOM2 IS NOT FOUND</span>
-        <span class="n">atom2</span> <span class="o">=</span> <span class="n">PDB2</span><span class="o">.</span><span class="n">getAtom</span><span class="p">(</span><span class="n">atom1Id</span><span class="p">)</span>
-        <span class="n">d2</span> <span class="o">=</span> <span class="n">atom1</span><span class="o">.</span><span class="n">squaredDistance</span><span class="p">(</span><span class="n">atom2</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">symmetries</span><span class="p">:</span>
-            <span class="n">symAtom2Id</span> <span class="o">=</span> <span class="n">symmetries</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">atom1Id</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">symAtom2Id</span><span class="p">:</span>
-                <span class="n">symAtom2</span> <span class="o">=</span> <span class="n">PDB2</span><span class="o">.</span><span class="n">getAtom</span><span class="p">(</span><span class="n">symAtom2Id</span><span class="p">)</span>
-                <span class="n">d2sym</span> <span class="o">=</span> <span class="n">atom1</span><span class="o">.</span><span class="n">squaredDistance</span><span class="p">(</span><span class="n">symAtom2</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">d2sym</span> <span class="o">=</span> <span class="n">d2</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">d2sym</span> <span class="o">=</span> <span class="n">d2</span>
+        <span class="n">ligandPDB</span> <span class="o">=</span> <span class="n">PDB</span><span class="p">()</span>
+        <span class="n">ligandPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">ligandResname</span><span class="p">,</span> <span class="n">heavyAtoms</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">rmsd</span> <span class="o">+=</span> <span class="nb">min</span><span class="p">(</span><span class="n">d2</span><span class="p">,</span> <span class="n">d2sym</span><span class="p">)</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">PDB1</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">rmsd</span><span class="o">/</span><span class="n">n</span>
+        <span class="n">alphaCarbonsPDB</span> <span class="o">=</span> <span class="n">PDB</span><span class="p">()</span>
+        <span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_typeProtein</span><span class="p">,</span>
+                                   <span class="n">atomname</span><span class="o">=</span><span class="s2">&quot;CA&quot;</span><span class="p">)</span>
+        <span class="n">nLigand</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ligandPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">)</span>
+        <span class="n">nAlpha</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">)</span>
 
-</div>
-<div class="viewcode-block" id="computeRMSD"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.computeRMSD">[docs]</a><span class="k">def</span> <span class="nf">computeRMSD</span><span class="p">(</span><span class="n">PDB1</span><span class="p">,</span> <span class="n">PDB2</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="p">{}):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute the RMSD between two PDB</span>
+        <span class="n">alphaCarbonCoords</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">getAtomCoords</span><span class="p">(),</span> <span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">)</span>
+        <span class="n">alphaCarbonCoords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">alphaCarbonCoords</span><span class="p">)</span>
+        <span class="n">ligandPositions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">alphaPositions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">rowind</span><span class="p">,</span> <span class="n">ligandAtomId</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ligandPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">):</span>
+            <span class="n">ligandAtom</span> <span class="o">=</span> <span class="n">ligandPDB</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">ligandAtomId</span><span class="p">]</span>
+            <span class="n">distanceCoords</span> <span class="o">=</span> <span class="p">(</span><span class="n">alphaCarbonCoords</span> <span class="o">-</span> <span class="n">ligandAtom</span><span class="o">.</span><span class="n">getAtomCoords</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">distanceCoords</span> <span class="o">=</span> <span class="n">distanceCoords</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">alphaPosCurrent</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">distanceCoords</span> <span class="o">&lt;</span> <span class="n">contactThresholdDistance2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">alphaPositions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">alphaPosCurrent</span><span class="p">)</span>
+            <span class="n">ligandPositions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">alphaPosCurrent</span><span class="p">)</span><span class="o">+</span><span class="n">rowind</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">alphaPositions</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="n">Coo_matrix</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">ligandPositions</span><span class="p">,</span> <span class="n">alphaPositions</span><span class="p">)),</span>
+                                       <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nLigand</span><span class="p">,</span> <span class="n">nAlpha</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="n">contactMap</span> <span class="o">=</span> <span class="n">Coo_matrix</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
+        <span class="n">nContacts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">contactMap</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">contactMap</span><span class="p">,</span> <span class="n">Coo_matrix</span></div></div>
 
-<span class="sd">        :param PDB1: First PDB with which the RMSD will be calculated</span>
-<span class="sd">        :type PDB1: PDB</span>
-<span class="sd">        :param PDB2: First PDB with which the RMSD will be calculated</span>
-<span class="sd">        :type PDB2: PDB</span>
-<span class="sd">        :param symmetries: Dictionary with elements atomId:symmetricalAtomId corresponding with the symmetrical atoms</span>
-<span class="sd">        :type symmetries: dict</span>
-<span class="sd">        :returns: float -- The squared RMSD between two PDB</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">computeRMSD2</span><span class="p">(</span><span class="n">PDB1</span><span class="p">,</span> <span class="n">PDB2</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">))</span>
 
-</div>
 <div class="viewcode-block" id="computeCOMDifference"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.computeCOMDifference">[docs]</a><span class="k">def</span> <span class="nf">computeCOMDifference</span><span class="p">(</span><span class="n">PDB1</span><span class="p">,</span> <span class="n">PDB2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute the differences between the center of mass of two PDB</span>
+<span class="sd">        Compute the difference between the center of mass of two PDB</span>
 
 <span class="sd">        :param PDB1: First PDB with which the RMSD will be calculated</span>
 <span class="sd">        :type PDB1: PDB</span>
 <span class="sd">        :param PDB2: First PDB with which the RMSD will be calculated</span>
 <span class="sd">        :type PDB2: PDB</span>
-<span class="sd">        :returns: numpy.Array -- The difference in the center of mass between two PDB</span>
+<span class="sd">        :returns: float -- The distance between the centers of mass between two PDB</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">COM1</span> <span class="o">=</span> <span class="n">PDB1</span><span class="o">.</span><span class="n">extractCOM</span><span class="p">()</span>
-    <span class="n">COM2</span> <span class="o">=</span> <span class="n">PDB2</span><span class="o">.</span><span class="n">extractCOM</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">COM1</span> <span class="o">-</span> <span class="n">COM2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">computeCOMDifference</span><span class="p">(</span><span class="n">PDB1</span><span class="p">,</span> <span class="n">PDB2</span><span class="p">)</span></div>
 
-</div>
+
+<div class="viewcode-block" id="computeCOMSquaredDifference"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.computeCOMSquaredDifference">[docs]</a><span class="k">def</span> <span class="nf">computeCOMSquaredDifference</span><span class="p">(</span><span class="n">PDB1</span><span class="p">,</span> <span class="n">PDB2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the squared difference between the center of mass of two PDB</span>
+
+<span class="sd">        :param PDB1: First PDB with which the RMSD will be calculated</span>
+<span class="sd">        :type PDB1: PDB</span>
+<span class="sd">        :param PDB2: First PDB with which the RMSD will be calculated</span>
+<span class="sd">        :type PDB2: PDB</span>
+<span class="sd">        :returns: float -- The squared distance between the centers of mass between two PDB</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">COM1</span> <span class="o">=</span> <span class="n">PDB1</span><span class="o">.</span><span class="n">getCOM</span><span class="p">()</span>
+    <span class="n">COM2</span> <span class="o">=</span> <span class="n">PDB2</span><span class="o">.</span><span class="n">getCOM</span><span class="p">()</span>
+
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">COM1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">COM2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">COM1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">COM2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dz</span> <span class="o">=</span> <span class="n">COM1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">COM2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">dx</span><span class="o">*</span><span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span><span class="o">*</span><span class="n">dy</span> <span class="o">+</span> <span class="n">dz</span><span class="o">*</span><span class="n">dz</span></div>
+
+
+<div class="viewcode-block" id="computeSquaredCentroidDifference"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.computeSquaredCentroidDifference">[docs]</a><span class="k">def</span> <span class="nf">computeSquaredCentroidDifference</span><span class="p">(</span><span class="n">PDB1</span><span class="p">,</span> <span class="n">PDB2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the centroid squared difference between two PDBs</span>
+
+<span class="sd">        :param PDB1: First PDB</span>
+<span class="sd">        :type PDB1: PDB</span>
+<span class="sd">        :param PDB2: Second PDB</span>
+<span class="sd">        :type PDB2: PDB</span>
+<span class="sd">        :returns: float -- The squared centroid distance between two PDB</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">centroid1</span> <span class="o">=</span> <span class="n">PDB1</span><span class="o">.</span><span class="n">getCentroid</span><span class="p">()</span>
+    <span class="n">centroid2</span> <span class="o">=</span> <span class="n">PDB2</span><span class="o">.</span><span class="n">getCentroid</span><span class="p">()</span>
+
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">centroid1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">centroid2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">centroid1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">centroid2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dz</span> <span class="o">=</span> <span class="n">centroid1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">centroid2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">dx</span><span class="o">*</span><span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span><span class="o">*</span><span class="n">dy</span> <span class="o">+</span> <span class="n">dz</span><span class="o">*</span><span class="n">dz</span></div>
+
+
 <div class="viewcode-block" id="readPDB"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.readPDB">[docs]</a><span class="k">def</span> <span class="nf">readPDB</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function, parses a string with PDB content or the path of a pdb file into a string</span>
@@ -577,7 +649,7 @@
 <span class="sd">        :returns: str -- A string with PDB content</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">pdbfile</span></div>
 </pre></div>

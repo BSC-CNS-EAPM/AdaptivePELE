@@ -4,4 +4,3 @@
 
 * I didnt use "__" for private methods, maybe use convention
 * Symmetry consideration for contactMap
-* Add some exit condition (for example stop when a binding event has occurred)

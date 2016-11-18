@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="Adaptive Sampling  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -84,7 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptiveSampling.html">AdaptiveSampling Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Adaptive Control File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Adaptive Sampling Overview</a></li>
 </ul>
 
             
@@ -134,11 +136,11 @@
            <div itemprop="articleBody">
             
   <h1>Source code for src.analysis.correctRMSD</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">atomset</span> <span class="kn">import</span> <span class="n">atomset</span>
+<span></span><span class="kn">from</span> <span class="nn">atomset</span> <span class="k">import</span> <span class="n">atomset</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">utilities</span> <span class="kn">import</span> <span class="n">utilities</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">utilities</span> <span class="k">import</span> <span class="n">utilities</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">json</span>
 
@@ -147,53 +149,51 @@
     <span class="n">newShape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="n">fixedReport</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">newShape</span><span class="p">)</span>
     <span class="n">fixedReport</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">reportFile</span>
-    <span class="n">fixedReport</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmsds</span>
-</div>
+    <span class="n">fixedReport</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmsds</span></div>
+
 <div class="viewcode-block" id="parseArguments"><a class="viewcode-back" href="../../../src.analysis.html#src.analysis.correctRMSD.parseArguments">[docs]</a><span class="k">def</span> <span class="nf">parseArguments</span><span class="p">():</span>
-    <span class="n">desc</span> <span class="o">=</span> <span class="s">&quot;Program that fixes RMSD symmetries of a PELE report file.&quot;</span>\
-            <span class="s">&quot;Control file is a JSON file that contains </span><span class="se">\&quot;</span><span class="s">resname</span><span class="se">\&quot;</span><span class="s">, </span><span class="se">\&quot;</span><span class="s">native</span><span class="se">\&quot;</span><span class="s">, &quot;</span>\
-            <span class="s">&quot;symmetries, and, optionally, the column to substitute in report. &quot;</span>\
-            <span class="s">&quot;Example of content:&quot;</span>\
-            <span class="s">&quot;{&quot;</span>\
-            <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">resname</span><span class="se">\&quot;</span><span class="s"> : </span><span class="se">\&quot;</span><span class="s">K5Y</span><span class="se">\&quot;</span><span class="s">,&quot;</span>\
-            <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">native</span><span class="se">\&quot;</span><span class="s"> : </span><span class="se">\&quot;</span><span class="s">native.pdb</span><span class="se">\&quot;</span><span class="s">,&quot;</span>\
-            <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">symmetries</span><span class="se">\&quot;</span><span class="s"> : {</span><span class="se">\&quot;</span><span class="s">4122:C12:K5Y</span><span class="se">\&quot;</span><span class="s">:</span><span class="se">\&quot;</span><span class="s">4123:C13:K5Y</span><span class="se">\&quot;</span><span class="s">, </span><span class="se">\&quot;</span><span class="s">4120:C10:K5Y</span><span class="se">\&quot;</span><span class="s">:</span><span class="se">\&quot;</span><span class="s">4127:C17:K5Y</span><span class="se">\&quot;</span><span class="s">},&quot;</span>\
-            <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">column</span><span class="se">\&quot;</span><span class="s"> = 5&quot;</span>\
-            <span class="s">&quot;}&quot;</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="s2">&quot;Program that fixes RMSD symmetries of a PELE report file.&quot;</span>\
+            <span class="s2">&quot;Control file is a JSON file that contains </span><span class="se">\&quot;</span><span class="s2">resname</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="s2">native</span><span class="se">\&quot;</span><span class="s2">, &quot;</span>\
+            <span class="s2">&quot;symmetries, and, optionally, the column to substitute in report. &quot;</span>\
+            <span class="s2">&quot;Example of content:&quot;</span>\
+            <span class="s2">&quot;{&quot;</span>\
+            <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">resname</span><span class="se">\&quot;</span><span class="s2"> : </span><span class="se">\&quot;</span><span class="s2">K5Y</span><span class="se">\&quot;</span><span class="s2">,&quot;</span>\
+            <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">native</span><span class="se">\&quot;</span><span class="s2"> : </span><span class="se">\&quot;</span><span class="s2">native.pdb</span><span class="se">\&quot;</span><span class="s2">,&quot;</span>\
+            <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">symmetries</span><span class="se">\&quot;</span><span class="s2"> : {</span><span class="se">\&quot;</span><span class="s2">4122:C12:K5Y</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">4123:C13:K5Y</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="s2">4120:C10:K5Y</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">4127:C17:K5Y</span><span class="se">\&quot;</span><span class="s2">},&quot;</span>\
+            <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">column</span><span class="se">\&quot;</span><span class="s2"> = 5&quot;</span>\
+            <span class="s2">&quot;}&quot;</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;controlFile&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&quot;Control File name&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;controlFile&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Control File name&quot;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
-    <span class="k">return</span>  <span class="n">args</span><span class="o">.</span><span class="n">controlFile</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">column</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">stepsPerEpoch</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">seq</span>
-</div>
+    <span class="k">return</span>  <span class="n">args</span><span class="o">.</span><span class="n">controlFile</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">column</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">stepsPerEpoch</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">seq</span></div>
+
 <div class="viewcode-block" id="readControlFile"><a class="viewcode-back" href="../../../src.analysis.html#src.analysis.correctRMSD.readControlFile">[docs]</a><span class="k">def</span> <span class="nf">readControlFile</span><span class="p">(</span><span class="n">controlFile</span><span class="p">):</span>
-    <span class="n">jsonFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">controlFile</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">jsonFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">controlFile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="n">parsedJSON</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonFile</span><span class="p">)</span>
-    <span class="n">resname</span> <span class="o">=</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="s">&quot;resname&quot;</span><span class="p">]</span>
-    <span class="n">nativeFilename</span> <span class="o">=</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="s">&quot;native&quot;</span><span class="p">]</span>
-    <span class="n">symmetries</span> <span class="o">=</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="s">&quot;symmetries&quot;</span><span class="p">]</span>
-    <span class="n">rmsdColInReport</span> <span class="o">=</span> <span class="n">parsedJSON</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;column&quot;</span><span class="p">)</span>
+    <span class="n">resname</span> <span class="o">=</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="s2">&quot;resname&quot;</span><span class="p">]</span>
+    <span class="n">nativeFilename</span> <span class="o">=</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="s2">&quot;native&quot;</span><span class="p">]</span>
+    <span class="n">symmetries</span> <span class="o">=</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="s2">&quot;symmetries&quot;</span><span class="p">]</span>
+    <span class="n">rmsdColInReport</span> <span class="o">=</span> <span class="n">parsedJSON</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;column&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">rmsdColInReport</span><span class="p">:</span>
-        <span class="c">#append to the end</span>
+        <span class="c1">#append to the end</span>
         <span class="n">rmsdColInReport</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
-    <span class="k">return</span> <span class="n">resname</span><span class="p">,</span> <span class="n">nativeFilename</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">rmsdColInReport</span>
-</div>
+    <span class="k">return</span> <span class="n">resname</span><span class="p">,</span> <span class="n">nativeFilename</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">rmsdColInReport</span></div>
+
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../src.analysis.html#src.analysis.correctRMSD.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">controlFile</span><span class="p">):</span>
-    <span class="c">#Constants</span>
-    <span class="n">folder</span> <span class="o">=</span> <span class="s">&quot;.&quot;</span>
-    <span class="n">outputFilename</span> <span class="o">=</span> <span class="s">&quot;fixedReport_</span><span class="si">%d</span><span class="s">&quot;</span>
-    <span class="n">trajName</span> <span class="o">=</span> <span class="s">&quot;*traj*.pdb&quot;</span>
-    <span class="n">reportName</span> <span class="o">=</span> <span class="s">&quot;*report_</span><span class="si">%d</span><span class="s">&quot;</span>
-    <span class="c">#end constants</span>
+    <span class="c1">#Constants</span>
+    <span class="n">folder</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>
+    <span class="n">outputFilename</span> <span class="o">=</span> <span class="s2">&quot;fixedReport_</span><span class="si">%d</span><span class="s2">&quot;</span>
+    <span class="n">trajName</span> <span class="o">=</span> <span class="s2">&quot;*traj*.pdb&quot;</span>
+    <span class="n">reportName</span> <span class="o">=</span> <span class="s2">&quot;*report_</span><span class="si">%d</span><span class="s2">&quot;</span>
+    <span class="c1">#end constants</span>
 
     <span class="n">resname</span><span class="p">,</span> <span class="n">nativeFilename</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">rmsdColInReport</span> <span class="o">=</span> <span class="n">readControlFile</span><span class="p">(</span><span class="n">controlFile</span><span class="p">)</span>
 
 
     <span class="n">nativePDB</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
     <span class="n">nativePDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">nativeFilename</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
-
-    <span class="n">utilities</span><span class="o">.</span><span class="n">generateReciprocalAtoms</span><span class="p">(</span><span class="n">symmetries</span><span class="p">)</span>
 
     <span class="n">allFolders</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
     <span class="n">epochs</span> <span class="o">=</span> <span class="p">[</span><span class="n">epoch</span> <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">allFolders</span> <span class="k">if</span> <span class="n">epoch</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
@@ -208,7 +208,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">reportFilename</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">reportName</span><span class="o">%</span><span class="n">trajNum</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&quot;File </span><span class="si">%s</span><span class="s"> not found in folder </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">reportName</span><span class="o">%</span><span class="n">trajNum</span><span class="p">,</span> <span class="n">epoch</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> not found in folder </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">reportName</span><span class="o">%</span><span class="n">trajNum</span><span class="p">,</span> <span class="n">epoch</span><span class="p">))</span>
 
             <span class="n">reportFile</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">reportFilename</span><span class="p">,</span> <span class="n">ndmin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -218,11 +218,11 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">fixedReport</span> <span class="o">=</span> <span class="n">extendReportWithRmsd</span><span class="p">(</span><span class="n">reportFile</span><span class="p">,</span> <span class="n">rmsds</span><span class="p">)</span>
 
-            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">outputFilename</span><span class="o">%</span><span class="n">trajNum</span><span class="p">,</span> <span class="n">fixedReport</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%.4f</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">outputFilename</span><span class="o">%</span><span class="n">trajNum</span><span class="p">,</span> <span class="n">fixedReport</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">)</span>
-</div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">controlFile</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
