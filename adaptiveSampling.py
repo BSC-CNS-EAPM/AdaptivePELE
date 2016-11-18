@@ -54,7 +54,6 @@ def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries):
     reportName = "*report_%d"
     trajs = glob.glob(os.path.join(outputPath, trajName))
     nativePDB = atomset.PDB()
-    lakef.alek
     nativePDB.initialise(nativeStructure, resname=resname)
     for traj in trajs:
         trajNum = utilities.getTrajNum(traj)
@@ -190,9 +189,9 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return True
 
     # Check 2: Change of thresholdCalculator and thresholdDistance
-    if  oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contacts or\
-        oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative:
-            return oldClusteringMethod.thresholdCalculator != newClusteringMethod.thresholdCalculator or\
+    if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contacts or\
+       oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative:
+        return oldClusteringMethod.thresholdCalculator != newClusteringMethod.thresholdCalculator or\
                 abs(oldClusteringMethod.contactThresholdDistance - newClusteringMethod.contactThresholdDistance) > 1e-7
 
     # Check 3: Change of nClusters in contactMapAgglomerative
@@ -381,6 +380,8 @@ def main(jsonParams):
     print "SpawningType:", spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]
 
     print "SimulationType:", simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY[simulationRunner.type]
+    if simulationRunner.hasExitCondition():
+        print "Exit condition:", simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY[simulationRunner.parameters.exitCondition.type]
     print "Clustering method:", clusteringType
 
     print "Output path: ", outputPath
@@ -426,10 +427,6 @@ def main(jsonParams):
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
-        # check exit condition, if defined
-        if simulationRunner.hasExitCondition and simulationRunner.checkExitCondition(clusteringMethod):
-            print "Simulation exit condition met at iteration %d" % i
-            break
 
         degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
         spawningCalculator.log()
@@ -457,6 +454,11 @@ def main(jsonParams):
         if clusteringMethod.symmetries and nativeStructure:
             fixReportsSymmetry(outputPathConstants.epochOutputPathTempletized % i, resname,
                                nativeStructure, clusteringMethod.symmetries)
+
+        # check exit condition, if defined
+        if simulationRunner.hasExitCondition and simulationRunner.checkExitCondition(clusteringMethod):
+            print "Simulation exit condition met at iteration %d" % i
+            break
     # utilities.cleanup
     # utilities.cleanup(outputPathConstants.tmpFolder)
 

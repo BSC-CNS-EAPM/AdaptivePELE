@@ -106,18 +106,20 @@ class ExitConditionBuilder:
         if exitConditionType == blockNames.ExitConditionType.metric:
             metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
             metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
-            return MetricExitCondition(metricCol, metricValue)
+            return MetricExitCondition(metricCol, metricValue,
+                                       exitConditionType)
         else:
             sys.exit("Unknown exit condition type! Choices are: " + str(simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY.values()))
 
 
 class MetricExitCondition:
-    def __init__(self, metricCol, metricValue):
+    def __init__(self, metricCol, metricValue, type):
         self.metricCol = metricCol
         self.metricValue = metricValue
         self.lastCheckedCluster = 0
+        self.type = simulationTypes.EXITCONDITION_TYPE.METRIC
 
-    def checkExitCondition(clustering):
+    def checkExitCondition(self, clustering):
         """ Iterate over all unchecked cluster and check if the exit condtion
             is met
         """
@@ -147,7 +149,7 @@ class RunnerBuilder:
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()
-                params.exitCond = exitConditionBuilder.build(exitConditionBlock)
+                params.exitCondition = exitConditionBuilder.build(exitConditionBlock)
 
             SimulationRunner = PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
