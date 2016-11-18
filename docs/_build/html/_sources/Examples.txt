@@ -8,15 +8,25 @@ parameters and spawning parameters.
 general Params
 --------------
 
-The general parameters block has 4 mandatory fields:
+The general parameters block has five mandatory fields:
 
-* restart: 
+* restart: boolean (true or false) This parameter specifies wether you want to
+  continue a previous simulation or not
 
-* debug:
+* debug: boolean Run adaptive in debug mode, without calling
+  any propagation algorithm
 
-* outputPath:
+* outputPath: string The path where the results of the simulation will be
+  written
 
-* writeAllClusteringStructures:
+* initialStructures: list The path(s) to the intial structure(s)  
 
-* initialStructures:  
+* writeAllClusteringStructures: boolean Wether to write all the structures of
+  the clusters 
+
+Additionaly, it can also have a nativeStructure parameter, a string containing
+the path to the native structure. This structure will only be used to correct
+the RMSD in case of symmetries. The symmetries will also have to be specified
+(see Clustering section)
+
 
