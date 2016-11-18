@@ -143,14 +143,22 @@ contains 4 sections: general parameters, simulation parameters, clustering
 parameters and spawning parameters.</p>
 <div class="section" id="general-params">
 <h2>general Params<a class="headerlink" href="#general-params" title="Permalink to this headline">¶</a></h2>
-<p>The general parameters block has 4 mandatory fields:</p>
+<p>The general parameters block has five mandatory fields:</p>
 <ul class="simple">
-<li>restart:</li>
-<li>debug:</li>
-<li>outputPath:</li>
-<li>writeAllClusteringStructures:</li>
-<li>initialStructures:</li>
+<li>restart: boolean (true or false) This parameter specifies wether you want to
+continue a previous simulation or not</li>
+<li>debug: boolean Run adaptive in debug mode, without calling
+any propagation algorithm</li>
+<li>outputPath: string The path where the results of the simulation will be
+written</li>
+<li>initialStructures: list The path(s) to the intial structure(s)</li>
+<li>writeAllClusteringStructures: boolean Wether to write all the structures of
+the clusters</li>
 </ul>
+<p>Additionaly, it can also have a nativeStructure parameter, a string containing
+the path to the native structure. This structure will only be used to correct
+the RMSD in case of symmetries. The symmetries will also have to be specified
+(see Clustering section)</p>
 </div>
 </div>
 
