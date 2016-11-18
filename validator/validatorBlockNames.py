@@ -110,7 +110,17 @@ class SimulationParams:
         "controlFile": "unicode",
         "seed": "numbers.Real",
         "peleSteps": "numbers.Real",
-        "iterations": "numbers.Real"
+        "iterations": "numbers.Real",
+        "exitCondition": "dict"
+    }
+    exitCondition = {
+        "types": {
+            "metric": "unicode"
+        },
+        "params": {
+            "metricCol": "int",
+            "exitValue": "numbers.Real"
+        }
     }
 
 

@@ -54,6 +54,7 @@ def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries):
     reportName = "*report_%d"
     trajs = glob.glob(os.path.join(outputPath, trajName))
     nativePDB = atomset.PDB()
+    lakef.alek
     nativePDB.initialise(nativeStructure, resname=resname)
     for traj in trajs:
         trajNum = utilities.getTrajNum(traj)
@@ -424,6 +425,11 @@ def main(jsonParams):
         clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized)
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
+
+        # check exit condition, if defined
+        if simulationRunner.hasExitCondition and simulationRunner.checkExitCondition(clusteringMethod):
+            print "Simulation exit condition met at iteration %d" % i
+            break
 
         degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
         spawningCalculator.log()
