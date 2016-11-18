@@ -19,6 +19,7 @@ class SimulationParameters:
         self.iterations = 0
         self.peleSteps = 0
         self.seed = 0
+        self.exitCondition = None
 
 
 class SimulationRunner:
@@ -27,6 +28,14 @@ class SimulationRunner:
 
     def runSimulation(self, runningControlFile=""):
         pass
+
+    def hasExitCondition(self):
+        return self.parameters.exitCondition
+
+    def checkExitCondition(self, clustering):
+        if self.parameters.exitCondition:
+            return self.parameters.exitCondition.checkExitCondition(clustering)
+        return False
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary):
         inputFile = open(self.parameters.templetizedControlFile, "r")
@@ -90,6 +99,36 @@ class TestSimulation(SimulationRunner):
         pass
 
 
+class ExitConditionBuilder:
+    def build(self, exitConditionBlock):
+        exitConditionType = exitConditionBlock[blockNames.ExitConditionType.type]
+        exitConditionParams = exitConditionBlock[blockNames.SimulationParams.params]
+        if exitConditionType == blockNames.ExitConditionType.metric:
+            metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
+            metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
+            return MetricExitCondition(metricCol, metricValue)
+        else:
+            sys.exit("Unknown exit condition type! Choices are: " + str(simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY.values()))
+
+
+class MetricExitCondition:
+    def __init__(self, metricCol, metricValue):
+        self.metricCol = metricCol
+        self.metricValue = metricValue
+        self.lastCheckedCluster = 0
+
+    def checkExitCondition(clustering):
+        """ Iterate over all unchecked cluster and check if the exit condtion
+            is met
+        """
+        for i in range(self.lastCheckedCluster, clustering.clusters.getNumberClusters()):
+            cluster = clustering.clusters.getCluster(i)
+            if cluster.getMetric() < self.metricValue:
+                return True
+            self.lastCheckedCluster = i
+        return False
+
+
 class RunnerBuilder:
 
     def build(self, simulationRunnerBlock):
@@ -105,6 +144,10 @@ class RunnerBuilder:
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
+            exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
+            if exitConditionBlock:
+                exitConditionBuilder = ExitConditionBuilder()
+                params.exitCond = exitConditionBuilder.build(exitConditionBlock)
 
             SimulationRunner = PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
