@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Blalbalbke &mdash; Adaptive Sampling  documentation</title>
+  <title>Adaptive Control File &mdash; Adaptive Sampling  documentation</title>
   
 
   
@@ -84,8 +84,8 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="AdaptiveSampling.html">AdaptiveSampling Package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Blalbalbke</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#example-1">Example 1</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Adaptive Control File</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#general-params">general Params</a></li>
 </ul>
 </li>
 </ul>
@@ -122,7 +122,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Blalbalbke</li>
+    <li>Adaptive Control File</li>
     <li class="wy-breadcrumbs-aside">
       
           
@@ -136,12 +136,20 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="blalbalbke">
-<h1>Blalbalbke<a class="headerlink" href="#blalbalbke" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="example-1">
-<h2>Example 1<a class="headerlink" href="#example-1" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="adaptive-control-file">
+<h1>Adaptive Control File<a class="headerlink" href="#adaptive-control-file" title="Permalink to this headline">¶</a></h1>
+<p>The control file needed to run AdaptiveSampling is a json document that
+contains 4 sections: general parameters, simulation parameters, clustering
+parameters and spawning parameters.</p>
+<div class="section" id="general-params">
+<h2>general Params<a class="headerlink" href="#general-params" title="Permalink to this headline">¶</a></h2>
+<p>The general parameters block has 4 mandatory fields:</p>
 <ul class="simple">
-<li>Prova</li>
+<li>restart:</li>
+<li>debug:</li>
+<li>outputPath:</li>
+<li>writeAllClusteringStructures:</li>
+<li>initialStructures:</li>
 </ul>
 </div>
 </div>
