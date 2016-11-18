@@ -103,7 +103,7 @@ def createMultipleComplexesFilenames(numberOfSnapshots, tmpInitialStructuresTemp
 
 def generateSnapshotSelectionStringLastRound(currentEpoch, epochOutputPathTempletized):
     """ Generate the template for the name of the trajectories in the current
-    epoch
+        epoch
         currentEpoch [In] Epoch number
         epochOutputPathTempletized [In] Template for the path where the
         trajectories of any epoch are stored
@@ -135,8 +135,9 @@ def writeSpawningInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRep
 
 
 def findFirstRun(outputPath, clusteringOutputObject):
-    """ Find the last epoch that was properly simulated and clusterized and
-    and return the first epoch to run in case of restart
+    """
+        Find the last epoch that was properly simulated and clusterized and
+        and return the first epoch to run in case of restart
 
         outputPath [In] Simulation output path
         clusteringOutputObject [In] Templetized name of the clustering object
@@ -156,7 +157,7 @@ def findFirstRun(outputPath, clusteringOutputObject):
 def loadParams(jsonParams):
     """
         Read the control file in JSON format and extract the blocks of simulation,
-    general parameters, clustering and spawning
+        general parameters, clustering and spawning
 
         jsonParams [In] Control file in JSON format from where the parameters
         will be read
@@ -180,7 +181,8 @@ def saveInitialControlFile(jsonParams, originalControlFile):
 
 def needToRecluster(oldClusteringMethod, newClusteringMethod):
     """ Check if the parameters have changed in a restart and we need to redo
-    the clustering
+        the clustering
+
         oldClusteringMethod [In] clusteringMethod in the previous simulation
         newClusteringMethod [In] clusteringMethod specified in the restart simulation
     """
@@ -201,7 +203,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
 
 def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
     """ Cluster the trajecotories of a given epoch into the clusteringMethod
-    object
+        object
         clusteringMethod [In] Object that holds all the clustering-related
         information
         epoch [In] Number of the epoch to cluster
@@ -325,7 +327,7 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
 def preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControlFileDictionary):
     """
         Substitute the parameters in the pele control file specified with the
-    provided in the control file
+        provided in the control file
 
         i [In] Epoch number
         outputPathConstants [In] Object that has as attributes constant related
