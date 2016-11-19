@@ -277,8 +277,33 @@ processors changes over time</li>
 <p>The first two method take no parameters, the last two accept the following
 parameters:</p>
 <ul class="simple">
-<li>reportFilename: <em>string</em></li>
+<li>reportFilename: <em>string</em> Name of the files that contain the metrics of the
+trajectories</li>
+<li>metricColumnInReport: <em>integer</em> Column of the report file that contains the
+metric of interest (zero indexed)</li>
+<li>epsilon: <em>float</em> The fraction of the processors that will be assigned
+according to the metric selected</li>
+<li>metricWeights: <em>string</em> Selects how to distribute the weights of the cluster
+according to its metric, two options: linear(default) or Boltzmann weigths</li>
+<li>T: <em>float</em> Temperature, only used for Boltzmann weights</li>
 </ul>
+<p>The following parameters are mandatory for <em>variableEpsilon</em>:</p>
+<ul class="simple">
+<li>varEpsilonType: <em>string</em> Select the type of variation for the epsilon value.
+At the moment only a linear variation is implemented</li>
+<li>maxEpsilon: <em>float</em> Maximum value for epsilon</li>
+<li>minEpsilon: <em>float</em> Minimum value for epsilon</li>
+<li>variationWindow: <em>integer</em> Last iteration over which to change the epsilon
+value</li>
+<li>maxEpsilonWindow: <em>integer</em> Number of iteration with epsilon=maxEpsilon</li>
+<li>period: <em>integer</em> Perio of the variation (in number of iterations)</li>
+</ul>
+<p>Similarly than with the cluster threshold, a density for each cluster can be
+assigned as a function of the contacts ratio. There are two types of density
+calculators, <em>null</em> and <em>heaviside</em>. The first assigns a constant density of 1
+to all cluster (it is the default option), meanwhile, the second assigns
+different densities using a heaviside function, much like the
+thresholdCalculator.</p>
 <p>To summarize, below there is a screenshot of a simple functional control file:</p>
 <a class="reference internal image-reference" href="_images/shortControlFile.png"><img alt="image trouble" class="align-center" src="_images/shortControlFile.png" style="width: 700px; height: 400px;" /></a>
 <p>A more complete (altough not comprehensible) example would look like (clicking
