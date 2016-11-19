@@ -125,7 +125,8 @@ class MetricExitCondition:
         """
         for i in range(self.lastCheckedCluster, clustering.clusters.getNumberClusters()):
             cluster = clustering.clusters.getCluster(i)
-            if cluster.getMetric() < self.metricValue:
+            metric = cluster.getMetric()
+            if metric is not None and metric < self.metricValue:
                 return True
             self.lastCheckedCluster = i
         return False
