@@ -32,15 +32,15 @@ The general parameters block has five mandatory fields:
 * outputPath: *string* The path where the results of the simulation will be
   written
 
-* initialStructures: *list* The path(s) to the intial structure(s)  
+* initialStructures: *list* The path(s) to the intial structure(s)
 
 * writeAllClusteringStructures: *boolean* Wether to write all the structures of
-  the clusters 
+  the clusters
 
 Additionaly, it can also have a nativeStructure parameter, a string containing
 the path to the native structure. This structure will only be used to correct
 the RMSD in case of symmetries. The symmetries will also have to be specified
-(see `clustering Params`_). 
+(see `clustering Params`_).
 
 simulation Params
 -----------------
@@ -57,7 +57,7 @@ In the PELE type the following parameters are mandatory:
 * seed: *integer* Seed for the random number generator
 * controlFile: *string* Path to the PELE control file templetized for use with
   adaptive
-  
+
 Optionally, you can also use the following parameters:
 
 * data: *string* Path to the Data folder needed for PELE, it is already
@@ -93,7 +93,7 @@ clustering Params
 Currently there are two functional types of clustering, Contacts Clustering and
 ContactMap Accumulative Clustering. Both follow the same strategy, they cluster
 the trajectories generated at the end of every trajectory with the previous
-trajectory. 
+trajectory.
 
 The Contacts Clustering does that by RMSD, that is, if the RMSD
 between two conformations is less than a certain threshold, the conformation is
@@ -101,7 +101,7 @@ added to the cluster. The thresholds are usually assigned as a function of the
 ratio between the number of contacts of the ligand and the number of heavy
 atoms of the ligand. An atom of the ligand is considered to be in contact with
 an atom of the protein if the distance between them is less than a certain
-threshold. Two functions for the threshold calculator are implemented, *constant* 
+threshold. Two functions for the threshold calculator are implemented, *constant*
 which gives a constant value to all clusters and *heaviside* which creates a
 step function with steps at the points specified (See next image for an example
 of use).
@@ -113,7 +113,7 @@ atoms (or a subset of them) as columns and the ligand atoms (usually only the
 heavy atoms) as rows. The entries are only true if the specific ligand and
 receptor atoms are close enough (less than a contactTreshold). Currently there
 are three methods implemented to evaluate the similarity of contactMaps,
-*Jaccard* which calulates the Jaccard Index (`Wikipedia page <https://en.wikipedia.org/wiki/Jaccard_index>`_), 
+*Jaccard* which calulates the Jaccard Index (`Wikipedia page <https://en.wikipedia.org/wiki/Jaccard_index>`_),
 *correlation*, which calculates the correlation between the two matrices and
 *distance*, which evaluates the similarity of two contactMaps by calculating the
 ratio of the number of differences over the average of elements in the contacts
@@ -144,7 +144,7 @@ look like:
 In this exemple, clusters having a contacts ration greater than 1 have a
 treshold of 2, those with contacts ratio between 1 and 0.75 have a treshold of
 3, between 0.75 and 0.5 a threshold of 4 and the rest have a threshold size of
-5. This means that for greater contacts ratio, typically closer to the binding site, 
+5. This means that for greater contacts ratio, typically closer to the binding site,
 the cluster size will be smaller and therefore those regions will be more
 finely discretized.
 
@@ -154,7 +154,7 @@ spawning Params
 
 Finally, Adaptive Sampling distributes the number of processors available over
 the clusters obtained. This process is called spawning. There are several
-strategies for this process, currently four are implemented: 
+strategies for this process, currently four are implemented:
 
 #. *sameWeight*: Distributes the processors uniformly over all clusters
 
@@ -169,7 +169,33 @@ strategies for this process, currently four are implemented:
 The first two method take no parameters, the last two accept the following
 parameters:
 
-* reportFilename: *string*
+* reportFilename: *string* Name of the files that contain the metrics of the
+  trajectories
+* metricColumnInReport: *integer* Column of the report file that contains the
+  metric of interest (zero indexed)
+* epsilon: *float* The fraction of the processors that will be assigned
+  according to the metric selected
+* metricWeights: *string* Selects how to distribute the weights of the cluster
+  according to its metric, two options: linear(default) or Boltzmann weigths
+* T: *float* Temperature, only used for Boltzmann weights
+
+The following parameters are mandatory for *variableEpsilon*:
+
+* varEpsilonType: *string* Select the type of variation for the epsilon value.
+  At the moment only a linear variation is implemented
+* maxEpsilon: *float* Maximum value for epsilon
+* minEpsilon: *float* Minimum value for epsilon
+* variationWindow: *integer* Last iteration over which to change the epsilon
+  value
+* maxEpsilonWindow: *integer* Number of iteration with epsilon=maxEpsilon
+* period: *integer* Perio of the variation (in number of iterations)
+
+Similarly than with the cluster threshold, a density for each cluster can be
+assigned as a function of the contacts ratio. There are two types of density
+calculators, *null* and *heaviside*. The first assigns a constant density of 1
+to all cluster (it is the default option), meanwhile, the second assigns
+different densities using a heaviside function, much like the
+thresholdCalculator.
 
 
 To summarize, below there is a screenshot of a simple functional control file:
