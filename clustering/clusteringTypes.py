@@ -2,13 +2,14 @@ from constants import blockNames
 
 
 class CLUSTERING_TYPES:
-    contacts, contactMapAffinity, contactMapAgglomerative, contactMapAccumulative = range(4)
+    contacts, contactMapAffinity, contactMapAgglomerative, contactMapAccumulative, lastSnapshot = range(5)
 
 CLUSTERING_TYPE_TO_STRING_DICTIONARY = {
     CLUSTERING_TYPES.contacts: blockNames.ClusteringTypes.contacts,
     CLUSTERING_TYPES.contactMapAffinity: blockNames.ClusteringTypes.contactMapAffinity,
     CLUSTERING_TYPES.contactMapAgglomerative: blockNames.ClusteringTypes.contactMapAgglomerative,
-    CLUSTERING_TYPES.contactMapAccumulative: blockNames.ClusteringTypes.contactMapAccumulative
+    CLUSTERING_TYPES.contactMapAccumulative: blockNames.ClusteringTypes.contactMapAccumulative,
+    CLUSTERING_TYPES.lastSnapshot: blockNames.ClusteringTypes.lastSnapshot
 }
 
 
