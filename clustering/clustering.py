@@ -73,6 +73,12 @@ class Cluster:
         else:
             return None
 
+    def getMetricFromColumn(self, numcol):
+        if len(self.metrics):
+            return self.metrics[numcol]
+        else:
+            return None
+
     def addElement(self, metrics):
         self.elements += 1
         if len(metrics) and len(self.metrics) and metrics[self.metricCol] < self.metrics[self.metricCol]:
