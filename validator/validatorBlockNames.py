@@ -144,12 +144,17 @@ class clusteringTypes:
             "contactThresholdDistance": "numbers.Real",
             "similarityEvaluator": "unicode"
         },
+        "lastSnapshot": {
+            "ligandResname": "unicode",
+            "contactThresholdDistance": "numbers.Real",
+        }
     }
     params = {
         "contacts": "unicode",
         "contactMapAffinity": "unicode",
         "contactMapAgglomerative": "unicode",
         "contactMapAccumaltive": "unicode",
+        "lastSnapshot": "unicode",
         "ligandResname": "unicode",
         "contactThresholdDistance": "numbers.Real",
         "similarityEvaluator": "unicode",
