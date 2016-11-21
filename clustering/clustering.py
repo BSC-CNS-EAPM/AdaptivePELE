@@ -48,8 +48,8 @@ class Cluster:
         elements, its density, threhold, number of contacts,
         a contactMap(sometimes) and a metric
     """
-    def __init__(self, pdb, thresholdRadius=None, contactMap=None, contacts=None,
-                 metrics=[], metricCol=None, density=None):
+    def __init__(self, pdb, thresholdRadius=None, contactMap=None,
+                 contacts=None, metrics=[], metricCol=None, density=None):
         """
             contacts stands for contacts/ligandAtom
         """
@@ -132,12 +132,14 @@ class Clustering:
         self.contactThresholdDistance = contactThresholdDistance
         self.symmetries = []
 
-
     def setCol(self, col):
         self.col = col
 
         for cluster in self.clusters.clusters:
             cluster.metricCol = col
+
+    def getCluster(self, clusterNum):
+        return self.clusters.getCluster(clusterNum)
 
     def __eq__(self, other):
         return self.clusters == other.clusters\
@@ -221,6 +223,9 @@ class SequentialLastSnapshotClustering(Clustering):
             Cluster the snaptshots contained in the pahts folder
             paths [In] List of folders with the snapshots
         """
+        # Clean clusters at every step, so we only have the last snapshot of
+        # each trajectory as clusters
+        self.clusters = Clusters()
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
@@ -230,8 +235,12 @@ class SequentialLastSnapshotClustering(Clustering):
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
                 metrics = np.loadtxt(reportFilename, ndmin=2)
+                # Pass as cluster metrics the minimum value for each metric,
+                # thus the metrics are not valid to do any spawning, only to
+                # check the exit condition
+                metrics = metrics.min(axis=0)
 
-                self.addSnapshotToCluster(snapshots[-1], metrics[-1], self.col)
+                self.addSnapshotToCluster(snapshots[-1], metrics, self.col)
             else:
                 self.addSnapshotToCluster(snapshots[-1])
 
@@ -243,8 +252,7 @@ class SequentialLastSnapshotClustering(Clustering):
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
         contactsPerAtom = float(contacts)/numberOfLigandAtoms
 
-        threshold = self.thresholdCalculator.calculate(contactsPerAtom)
-        cluster = Cluster(pdb, thresholdRadius=threshold,
+        cluster = Cluster(pdb, thresholdRadius=0,
                           contacts=contactsPerAtom, metrics=metrics,
                           metricCol=col)
         self.clusters.addCluster(cluster)
