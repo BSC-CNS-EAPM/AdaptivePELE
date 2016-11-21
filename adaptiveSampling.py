@@ -441,7 +441,7 @@ def main(jsonParams):
         if i > 0:
             # Remove old clustering object, since we already have a newer one
             try:
-                os.remove(outputPathConstants.clusteringOutputObject%(i-1))
+                os.remove(outputPathConstants.clusteringOutputObject % (i-1))
             except OSError:
                 # In case of restart
                 pass
@@ -452,13 +452,12 @@ def main(jsonParams):
             initialStructuresAsString = createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
             peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
 
-
         if clusteringMethod.symmetries and nativeStructure:
             fixReportsSymmetry(outputPathConstants.epochOutputPathTempletized % i, resname,
                                nativeStructure, clusteringMethod.symmetries)
 
         # check exit condition, if defined
-        if simulationRunner.hasExitCondition and simulationRunner.checkExitCondition(clusteringMethod):
+        if simulationRunner.hasExitCondition() and simulationRunner.checkExitCondition(clusteringMethod):
             print "Simulation exit condition met at iteration %d" % i
             break
     # utilities.cleanup

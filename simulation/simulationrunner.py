@@ -30,7 +30,7 @@ class SimulationRunner:
         pass
 
     def hasExitCondition(self):
-        return self.parameters.exitCondition
+        return self.parameters.exitCondition is None
 
     def checkExitCondition(self, clustering):
         if self.parameters.exitCondition:
