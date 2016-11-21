@@ -5,6 +5,7 @@ class ClusteringTypes:
     contactMapAffinity = "contactMapAffinity"
     contactMapAgglomerative = "contactMapAgglomerative"
     contactMapAccumulative = "contactMapAccumulative"
+    lastSnapshot = "lastSnapshot"
     thresholdCalculator = "thresholdCalculator"
     ligandResname = "ligandResname"
     contactThresholdDistance = "contactThresholdDistance"
