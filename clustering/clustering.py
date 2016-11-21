@@ -81,8 +81,9 @@ class Cluster:
 
     def addElement(self, metrics):
         self.elements += 1
-        if len(metrics) and len(self.metrics) and metrics[self.metricCol] < self.metrics[self.metricCol]:
-            self.metrics = metrics
+        if len(metrics) and len(self.metrics):
+            # Set all metrics to the minimum value
+            self.metrics = np.minimum(self.metrics, metrics)
 
     def printCluster(self, verbose=False):
         if verbose:
