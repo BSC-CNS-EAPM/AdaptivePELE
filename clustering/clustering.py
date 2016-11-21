@@ -193,22 +193,61 @@ class Clustering:
             metric = cluster.getMetric()
             if metric:
                 writeString = "%d %d %d %.2f %.2f %.1f %.3f\n" % (i, cluster.elements,
-                                                                degeneracy[i],
-                                                                cluster.contacts,
-                                                                cluster.threshold,
-                                                                cluster.density,
-                                                                metric)
+                                                                  degeneracy[i],
+                                                                  cluster.contacts,
+                                                                  cluster.threshold,
+                                                                  cluster.density,
+                                                                  metric)
             else:
                 writeString = "%d %d %d %.2f %.2f %.1f -\n" % (i, cluster.elements,
-                                                             degeneracy[i],
-                                                             cluster.contacts,
-                                                             cluster.threshold,
-                                                             cluster.density)
+                                                               degeneracy[i],
+                                                               cluster.contacts,
+                                                               cluster.threshold,
+                                                               cluster.density)
             summaryFile.write(writeString)
         summaryFile.close()
 
         with open(outputObject, 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+
+
+class SequentialLastSnapshotClustering(Clustering):
+    """
+        Assigned  the last snapshot of the trajectory to a cluster.
+        Only useful for PELE sequential runs
+    """
+    def cluster(self, paths):
+        """
+            Cluster the snaptshots contained in the pahts folder
+            paths [In] List of folders with the snapshots
+        """
+        trajectories = getAllTrajectories(paths)
+        for trajectory in trajectories:
+            trajNum = utilities.getTrajNum(trajectory)
+
+            snapshots = utilities.getSnapshots(trajectory, True)
+            if self.reportBaseFilename:
+                reportFilename = os.path.join(os.path.split(trajectory)[0],
+                                              self.reportBaseFilename % trajNum)
+                metrics = np.loadtxt(reportFilename, ndmin=2)
+
+                self.addSnapshotToCluster(snapshots[-1], metrics[-1], self.col)
+            else:
+                self.addSnapshotToCluster(snapshots[-1])
+
+    def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
+        pdb = atomset.PDB()
+        pdb.initialise(snapshot, resname=self.resname)
+        contacts = pdb.countContacts(self.resname,
+                                     self.contactThresholdDistance)
+        numberOfLigandAtoms = pdb.getNumberOfAtoms()
+        contactsPerAtom = float(contacts)/numberOfLigandAtoms
+
+        threshold = self.thresholdCalculator.calculate(contactsPerAtom)
+        cluster = Cluster(pdb, thresholdRadius=threshold,
+                          contacts=contactsPerAtom, metrics=metrics,
+                          metricCol=col)
+        self.clusters.addCluster(cluster)
 
 
 class ContactsClustering(Clustering):
@@ -569,6 +608,11 @@ class ClusteringBuilder:
             return ContactsClustering(thresholdCalculator, resname,
                                       reportBaseFilename, columnOfReportFile,
                                       contactThresholdDistance, symmetries)
+        elif clusteringType == blockNames.ClusteringTypes.lastSnapshot:
+
+            return SequentialLastSnapshotClustering(resname, reportBaseFilename,
+                                                    columnOfReportFile,
+                                                    contactThresholdDistance)
         elif clusteringType == blockNames.ClusteringTypes.contactMapAffinity:
             return ContactMapClustering(resname, reportBaseFilename,
                                         columnOfReportFile,
