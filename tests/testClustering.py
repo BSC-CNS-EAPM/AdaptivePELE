@@ -50,7 +50,6 @@ class clusteringTest(unittest.TestCase):
         # Testing is diffrent now, previous assertions won't work
         # TODO: create new assertion for the new algorithm
         allClusters = clusteringInstance.clusters.clusters
-        clusteringInstance.clusters.printClusters()
         goldenNumberOfClusters = 2
         goldenEnergyCluster1 = -8424.8
         goldenEnergyCluster2 = -8453.29
@@ -84,7 +83,6 @@ class clusteringTest(unittest.TestCase):
         # Testing is diffrent now, previous assertions won't work
         # TODO: create new assertion for the new algorithm
         allClusters = clusteringInstance.clusters.clusters
-        clusteringInstance.clusters.printClusters()
         goldenNumberOfClusters = nclusters
         goldenEnergyCluster1 = -8424.8
         goldenEnergyCluster2 = -8453.29
@@ -122,7 +120,6 @@ class clusteringTest(unittest.TestCase):
         # Testing is diffrent now, previous assertions won't work
         # TODO: create new assertion for the new algorithm
         allClusters = clusteringInstance.clusters.clusters
-        clusteringInstance.clusters.printClusters()
         goldenNumberOfClusters = 3
         goldenEnergyCluster1 = -8421.5
         goldenEnergyCluster2 = -8424.8
