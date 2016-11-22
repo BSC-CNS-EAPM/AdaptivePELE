@@ -155,6 +155,7 @@ class Clustering:
         """
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
+            print trajectory
             trajNum = utilities.getTrajNum(trajectory)
 
             snapshots = utilities.getSnapshots(trajectory, True)
@@ -787,7 +788,9 @@ def getAllTrajectories(paths):
     files = []
     for path in paths:
         files += glob.glob(path)
-    return files
+    # sort the files obtained by glob by name, so that the results will be the
+    # same on all computers
+    return sorted(files)
 
 
 def selectRandomCenter(cluster_members, metrics_weights):
