@@ -7,6 +7,7 @@ import clusteringTypes
 import thresholdcalculator
 from constants import blockNames
 from atomset import atomset, RMSDCalculator
+from atomset import SymmetryContactMapEvaluator as sym
 from utilities import utilities
 from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import AgglomerativeClustering
@@ -336,10 +337,12 @@ class ContactsClustering(Clustering):
 
 class ContactMapClustering(Clustering):
     def __init__(self, resname=None, reportBaseFilename=None,
-                 columnOfReportFile=None, contactThresholdDistance=8):
+                 columnOfReportFile=None, contactThresholdDistance=8,
+                 symmetries=[]):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAffinity
+        self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
 
     def cluster(self, paths):
         """Cluster the snapshots of the trajectories provided using the
@@ -353,7 +356,7 @@ class ContactMapClustering(Clustering):
         trajectories = getAllTrajectories(paths)
 
         pdb_list, metrics, contactmaps, contacts = processSnapshots(trajectories, self.reportBaseFilename,
-                         self.col, self.contactThresholdDistance, self.resname)
+                         self.col, self.contactThresholdDistance, self.resname, self.symmetryEvaluator)
         preferences = map(np.sum,contactmaps)
 
         preferences = float((min(preferences)-max(preferences))/2)
@@ -452,11 +455,13 @@ class ContactMapAgglomerativeClustering(Clustering):
         considered in contact(default 8)
     """
     def __init__(self, nclusters, resname=None, reportBaseFilename=None,
-                 columnOfReportFile=None, contactThresholdDistance=8):
+                 columnOfReportFile=None, contactThresholdDistance=8,
+                 symmetries=[]):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAgglomerative
         self.nclusters = nclusters
+        self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
 
     def cluster(self, paths):
         """Clusters the snapshots of the trajectories provided using
@@ -470,7 +475,7 @@ class ContactMapAgglomerativeClustering(Clustering):
         trajectories = getAllTrajectories(paths)
 
         pdb_list, metrics, contactmaps, contacts = processSnapshots(trajectories, self.reportBaseFilename,
-                         self.col, self.contactThresholdDistance, self.resname)
+                         self.col, self.contactThresholdDistance, self.resname, self.symmetryEvaluator)
 
 
         self.firstClusteringParams = clusteringResultsParameters(pdb_list=pdb_list,
@@ -571,21 +576,21 @@ class ContactMapAccumulativeClustering(Clustering):
     """
     def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8):
+                 contactThresholdDistance=8, symmetries=[]):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative
         self.thresholdCalculator = thresholdCalculator
         self.similarityEvaluator = similarityEvaluator
+        self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
 
     # TODO: refactor --> move to parent class and only keep here contactMap creation
-    # TODO symmetries for contactMap
     def addSnapshotToCluster(self, snapshot, metrics=[], metricCol=None):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
-        contactMap, contacts = pdb.createContactMap(self.resname, self.contactThresholdDistance)
+        contactMap, contacts = self.symmetryEvaluator.createContactMap(pdb, self.resname, self.contactThresholdDistance)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
-            if self.similarityEvaluator.isSimilarCluster(contactMap, cluster):
+            if self.similarityEvaluator.isSimilarCluster(contactMap, cluster, self.symmetryEvaluator):
                 cluster.addElement(metrics)
                 return
 
@@ -634,6 +639,7 @@ class ClusteringBuilder:
                                                      columnOfReportFile,
                                                      contactThresholdDistance)
         elif clusteringType == blockNames.ClusteringTypes.contactMapAccumulative:
+            symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries,[])
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
             try:
@@ -643,7 +649,8 @@ class ClusteringBuilder:
             similarityBuilder = similarityEvaluatorBuilder()
             similarityEvaluator = similarityBuilder.build(similarityEvaluatorType)
             return ContactMapAccumulativeClustering(thresholdCalculator, similarityEvaluator, resname,
-                                      reportBaseFilename, columnOfReportFile)
+                                                    reportBaseFilename, columnOfReportFile,
+                                                    contactThresholdDistance, symmetries)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))
@@ -678,56 +685,44 @@ class similarityEvaluatorBuilder:
 class differenceDistanceEvaluator:
     """
         Evaluate the similarity of two contactMaps by calculating the ratio of
-        the number of differences over the average of elements in the contacts maps
+        the number of differences over the average of elements in the contacts
+        maps
     """
-    def isSimilarCluster(self, contactMap, cluster):
+    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        differenceContactMaps = np.abs(contactMap-cluster.contactMap).sum()
-        averageContacts = (0.5*(contactMap.sum()+cluster.contactMap.sum()))
-        if not averageContacts:
-            # The only way the denominator can be 0 is if both contactMaps are
-            # all zeros, thus being equal and belonging to the same cluster
-            return True
-        else:
-            distance = differenceContactMaps/averageContacts
-            return distance < cluster.threshold
-
+        distance = symContactMapEvaluator.evaluateDifferenceDistance(contactMap, cluster)
+        return distance < cluster.threshold
 
 
 class JaccardEvaluator:
     """
         Evaluate the similarity of two contactMaps by calculating the Jaccard
-        index, that is, the ratio between the intersection of the two contact maps and their
-        union
+        index, that is, the ratio between the intersection of the two contact
+        maps and their union
     """
-    def isSimilarCluster(self, contactMap, cluster):
+    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        intersectContactMaps = (contactMap == cluster.contactMap).sum()
-        unionContactMaps = contactMap.size + cluster.contactMap.size - intersectContactMaps
-        similarity = float(intersectContactMaps)/unionContactMaps
-        distance = 1-similarity
+        distance = symContactMapEvaluator.evaluateJaccard(contactMap, cluster)
         return distance < cluster.threshold
 
 
 class correlationEvaluator:
     """
-        Evaluate the similarity of two contact maps by calculating thir correlation
+        Evaluate the similarity of two contact maps by calculating their
+        correlation
     """
-    def isSimilarCluster(self, contactMap, cluster):
+    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        similarity = calculateCorrelationContactMaps(contactMap, cluster.contactMap)
-        similarity += 1  # Necessary to omit negative correlations
-        similarity /= 2.0  # Correlation values need to be higher now
-        distance = 1-similarity
+        distance = symContactMapEvaluator.evaluateCorrelation(contactMap, cluster)
         return distance < cluster.threshold
 
 
@@ -811,25 +806,8 @@ def selectRandomCenter(cluster_members, metrics_weights):
     return cluster_index
 
 
-def calculateCorrelationContactMaps(contactMap, clusterContactMap):
-    """
-        Calculate the correlation of two contactMaps
-    """
-    contactMap1 = contactMap.reshape((1, -1))
-    # Reshape the matrix into a 1D array to use the numpy corrcoef function
-    contactMap2 = clusterContactMap.reshape((1, -1))
-    total1 = contactMap1.sum()
-    total2 = contactMap2.sum()
-    if not total1 or not total2:
-        # if any array is all zeros the correlation will be NaN
-        # if both are zero, correlation is perfect (i.e 1) else it is different
-        # and will be in different clusters
-        return total1 == total2
-    return np.corrcoef(contactMap1, contactMap2)[0, 1]
-
-
 def processSnapshots(trajectories, reportBaseFilename, col,
-                     contactThresholdDistance, resname):
+                     contactThresholdDistance, resname, symmetryEvaluator):
     """
         Create list of pdb, contactMaps, metrics and contacts from a series of
         snapshots
@@ -853,7 +831,7 @@ def processSnapshots(trajectories, reportBaseFilename, col,
             pdb = atomset.PDB()
             pdb.initialise(snapshot, resname=resname)
             pdb_list.append(pdb)
-            contactMap, contactnum = pdb.createContactMap(resname, contactThresholdDistance)
+            contactMap, contactnum = symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             contactmaps.append(contactMap)
             contacts.append(contactnum)
     return pdb_list, metrics, contactmaps, contacts
