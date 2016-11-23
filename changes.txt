@@ -1,3 +1,12 @@
 Behavior changes from previous version:
     *) Changed quadratic function for continuous
     *) Changed symmetry dictionary for list of dictionaries, with symmetry groups
+    *) Added support for symmetry with contactMap
+    *) Added lastSnapshot clustering for easy restart of sequential runs
+    *) Added exitCondition on metric
+    *) Added support for changing clustering when clustering method parameter changes, and be able to handle
+    metric column change in spawning
+
+Bug fixes:
+    *) Fixed bug of incorrect atom consideration in symmetries
+    *) Fixed bug of NaN correlation similarity evaluator in contactMap
