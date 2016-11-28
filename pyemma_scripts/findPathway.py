@@ -308,7 +308,7 @@ def main(jsonBlock):
     # Prepare second adaptive
     makeNewControlFile(degeneracies, ClPath, templetizedInitialName,
                        secondControlFileTemp, secondControlFile)
-    # adaptiveSampling.main(secondControlFile)
+    adaptiveSampling.main(secondControlFile)
 
 if __name__ == "__main__":
     jsonBlock = parseArgs()
