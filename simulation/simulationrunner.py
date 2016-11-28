@@ -32,9 +32,9 @@ class SimulationRunner:
     def hasExitCondition(self):
         return self.parameters.exitCondition is not None
 
-    def checkExitCondition(self, clustering):
+    def checkExitCondition(self, clustering, checkAllClusters=False):
         if self.parameters.exitCondition:
-            return self.parameters.exitCondition.checkExitCondition(clustering)
+            return self.parameters.exitCondition.checkExitCondition(clustering, checkAllClusters=False)
         return False
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary):
@@ -106,20 +106,19 @@ class ExitConditionBuilder:
         if exitConditionType == blockNames.ExitConditionType.metric:
             metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
             metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
-            return MetricExitCondition(metricCol, metricValue,
-                                       exitConditionType)
+            return MetricExitCondition(metricCol, metricValue)
         else:
             sys.exit("Unknown exit condition type! Choices are: " + str(simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY.values()))
 
 
 class MetricExitCondition:
-    def __init__(self, metricCol, metricValue, type):
+    def __init__(self, metricCol, metricValue):
         self.metricCol = metricCol
         self.metricValue = metricValue
         self.lastCheckedCluster = 0
         self.type = simulationTypes.EXITCONDITION_TYPE.METRIC
 
-    def checkExitCondition(self, clustering):
+    def checkExitCondition(self, clustering, checkAllClusters=False):
         """ Iterate over all unchecked cluster and check if the exit condtion
             is met
         """
@@ -128,7 +127,8 @@ class MetricExitCondition:
             metric = cluster.getMetricFromColumn(self.metricCol)
             if metric is not None and metric < self.metricValue:
                 return True
-            self.lastCheckedCluster = i
+            if not checkAllClusters:
+                self.lastCheckedCluster = i
         return False
 
 
