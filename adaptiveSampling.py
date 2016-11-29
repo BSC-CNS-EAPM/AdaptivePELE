@@ -361,9 +361,7 @@ def main(jsonParams):
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
 
     clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
-    if clusteringType == blockNames.ClusteringTypes.lastSnapshot:
-        checkAll = True
-
+    checkAll = clusteringType == blockNames.ClusteringTypes.lastSnapshot
     restart = generalParams[blockNames.GeneralParams.restart]
     debug = generalParams[blockNames.GeneralParams.debug]
     outputPath = generalParams[blockNames.GeneralParams.outputPath]
