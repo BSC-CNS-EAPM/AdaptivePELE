@@ -7,12 +7,13 @@ import json
 import matplotlib.pyplot as plt
 
 class PrepareMSM:
-    def __init__(self,numClusters,trajectoryFolder, trajectoryBasename ):
+    def __init__(self,numClusters,trajectoryFolder, trajectoryBasename, stride=1):
 
         self.discretizedFolder = "discretized"
         self.clusterCentersFile = os.path.join(self.discretizedFolder, "clusterCenters.dat")
         self.discTraj = os.path.join(self.discretizedFolder, "%s.disctraj")
         self.clusteringFile = "clustering_object.pkl"
+        self.stride=stride
         if os.path.exists(self.clusteringFile):
             self.cl = helper.loadClustering(self.clusteringFile)
         else:
@@ -26,7 +27,7 @@ class PrepareMSM:
 
         #cluster & assign
         print "Clustering data..."
-        self.cl = trajectories.clusterTrajectories(self.x, numClusters)
+        self.cl = trajectories.clusterTrajectories(self.x, numClusters, stride=self.stride)
         #write output
         print "Writing clustering data..."
         helper.makeFolder(self.discretizedFolder)

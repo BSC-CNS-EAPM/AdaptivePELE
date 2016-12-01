@@ -27,9 +27,9 @@ def loadCoordinates(path, trajectories_basename='*traj*.pdb', topfile = ''):
 
 #More preprocessing staff?
 
-def clusterTrajectories(trajectories, numClusters):
+def clusterTrajectories(trajectories, numClusters, stride=1):
     """ Cluster the trajectories into numClusters clusters using kmeans
     algorithm.
     Returns a KmeansClusteringObject
     """
-    return coor.cluster_kmeans(data=trajectories, k=numClusters, max_iter=20)
+    return coor.cluster_kmeans(data=trajectories, k=numClusters, max_iter=20, stride=stride)
