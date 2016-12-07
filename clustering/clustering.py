@@ -46,7 +46,7 @@ class Clusters:
 class Cluster:
     """
         A cluster contains a representative structure(pdb), the number of
-        elements, its density, threhold, number of contacts,
+        elements, its density, threshold, number of contacts,
         a contactMap(sometimes) and a metric
     """
     def __init__(self, pdb, thresholdRadius=None, contactMap=None,
@@ -588,14 +588,22 @@ class ContactMapAccumulativeClustering(Clustering):
     def addSnapshotToCluster(self, snapshot, metrics=[], metricCol=None):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
-        contactMap, contacts = self.symmetryEvaluator.createContactMap(pdb, self.resname, self.contactThresholdDistance)
+        contactMap = None
+        contacts = None
         for clusterNum, cluster in enumerate(self.clusters.clusters):
+            scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
+            if scd > cluster.threshold2:
+                continue
+            if contactMap is None:
+                contactMap, contacts = self.symmetryEvaluator.createContactMap(pdb, self.resname, self.contactThresholdDistance)
             if self.similarityEvaluator.isSimilarCluster(contactMap, cluster, self.symmetryEvaluator):
                 cluster.addElement(metrics)
                 return
 
         # if made it here, the snapshot was not added into any cluster
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
+        if contacts is None:
+            contacts = pdb.countContacts(self.resname, self.contactThresholdDistance)
         contactsPerAtom = float(contacts)/numberOfLigandAtoms
 
         threshold = self.thresholdCalculator.calculate(contactsPerAtom)
