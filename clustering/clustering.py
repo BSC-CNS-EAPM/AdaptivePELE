@@ -602,8 +602,10 @@ class ContactMapAccumulativeClustering(Clustering):
 
         # if made it here, the snapshot was not added into any cluster
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
-        if contacts is None:
-            contacts = pdb.countContacts(self.resname, self.contactThresholdDistance)
+        if contactMap is None:
+            # When clustering the firs snapshot of the simulation the previous
+            # loop does not execute and therefore the contacMap is never created
+            contactMap, contacts = self.symmetryEvaluator.createContactMap(pdb, self.resname, self.contactThresholdDistance)
         contactsPerAtom = float(contacts)/numberOfLigandAtoms
 
         threshold = self.thresholdCalculator.calculate(contactsPerAtom)
