@@ -17,6 +17,16 @@ def return_sign(i, m, n, r):
         return -1
 
 
+def calculateContactsVar(deltaR, epsMax):
+    """ """
+    if deltaR < 0.1:
+        return 0
+    elif deltaR > 1.0:
+        return epsMax * 0.09
+    else:
+        return epsMax * 0.09 * deltaR
+
+
 class SpawningAlgorithmBuilder:
 
     def build(self, spawningBlock):
@@ -88,7 +98,7 @@ class SpawningParams:
         if spawningType == blockNames.StringSpawningTypes.variableEpsilon:
             self.varEpsilonType = spawningParamsBlock[blockNames.SpawningParams.varEpsilonType]
             self.maxEpsilon = spawningParamsBlock[blockNames.SpawningParams.maxEpsilon]
-            self.minEpsilon = spawningParamsBlock[blockNames.SpawningParams.minEpsilon]
+            self.minEpsilon = spawningParamsBlock.get(blockNames.SpawningParams.minEpsilon,0.0)
             self.variationWindow = spawningParamsBlock[blockNames.SpawningParams.variationWindow]
             self.maxEpsilonWindow = spawningParamsBlock[blockNames.SpawningParams.maxEpsilonWindow]
             self.period = spawningParamsBlock.get(blockNames.SpawningParams.period, self.variationWindow)
@@ -318,6 +328,7 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         self.degeneracyInverselyProportional = None
         self.degeneracyMetricProportional = None
         self.degeneracyTotal = None
+        self.maxContacts = None
         # print variable epsilon information
         epsilon_file = open("epsilon_values.txt", "w")
         epsilon_file.write("Iteration\tEpsilon\n")
@@ -337,6 +348,14 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         clusteringParams.epsilon += return_sign(currentEpoch, leftWindow,
                                                 middleWindow, rightWindow) * rateEpsilonVariation[currentEpoch > middleWindow]
 
+    def contactsVariation(self, clusters, clusteringParams):
+        if self.maxContacts is None:
+            self.maxContacts = reduce(max, [cluster.contacts for cluster in clusters])
+        maxContacts = reduce(max, [cluster.contacts for cluster in clusters])
+        if clusteringParams.epsilon < clusteringParams.maxEpsilon:
+            clusteringParams.epsilon += calculateContactsVar(maxContacts-self.maxContacts, clusteringParams.maxEpsilon)
+        self.maxContacts = maxContacts
+
     def calculateEpsilonValue(self, clusteringParams, currentEpoch):
         if currentEpoch is None or clusteringParams.variationWindow < currentEpoch:
             clusteringParams.epsilon = clusteringParams.minEpsilon
@@ -344,6 +363,8 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         if clusteringParams.varEpsilonType == blockNames.VariableEpsilonTypes.linearVariation:
             self.linearVariation(clusteringParams,
                                  (currentEpoch % clusteringParams.period))
+        elif clusteringParams.varEpsilonType == blockNames.VariableEpsilonTypes.contactsVariation:
+            self.contactsVariation(clusters, clusteringParams)
         else:
             sys.exit("Unknown epsilon variation type! Choices are: " +
                      str(spawningTypes.EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY.values()))

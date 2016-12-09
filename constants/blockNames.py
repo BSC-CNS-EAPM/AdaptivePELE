@@ -83,6 +83,7 @@ class SpawningDensity:
 
 class VariableEpsilonTypes:
     linearVariation = "linearVariation"
+    contactsVariation = "contactsVariation"
 
 
 class SimulationType:
