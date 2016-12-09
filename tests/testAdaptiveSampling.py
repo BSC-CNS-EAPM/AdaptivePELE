@@ -100,5 +100,8 @@ class TestadaptiveSampling(unittest.TestCase):
             self.integrationTest(controlFile, goldenPath, outputPath)
         except SystemExit:
             # Catch error for not having PELE installed
+            print ("Warning! There was a sysExit in test3, this is usually "
+                   "caused by not having PELE installed, so it can be ignored "
+                   "if the test are not running on MareNostrum or life")
             shutil.rmtree(outputPath)
             shutil.rmtree("tmp_tests_data_3ptb_data_Test3/")

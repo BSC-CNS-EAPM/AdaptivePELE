@@ -15,8 +15,9 @@ SPAWNING_TYPE_TO_STRING_DICTIONARY = {
 
 
 class EPSILON_VARIATION_TYPES:
-    linearVariation, = range(1)
+    linearVariation, contactsVariation = range(2)
 
 EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY = {
     EPSILON_VARIATION_TYPES.linearVariation: blockNames.VariableEpsilonTypes.linearVariation,
+    EPSILON_VARIATION_TYPES.contactsVariation: blockNames.VariableEpsilonTypes.contactsVariation,
 }
