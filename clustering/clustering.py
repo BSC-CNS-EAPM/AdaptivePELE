@@ -109,6 +109,72 @@ class Cluster:
              and np.allclose(self.metrics, other.metrics)
 
 
+class Tree:
+    def __init__(self):
+        self.root = None
+
+    def addNode(self, node, parentNode):
+        if self.root is None:
+            self.root = node
+        else:
+            parentNode.addChildren(node)
+
+
+class Node:
+    def __init__(self, cluster, position, parent):
+        self.children = []
+        self.position = position
+        self.parent = parent
+        self.cluster = cluster
+
+    def addChildren(self, node):
+        self.children.append(node)
+
+
+class ContacsClusteringEvaluator:
+    def __init__(self, RMSDCalculator):
+        self.RMSDCalculator = RMSDCalculator
+        self.contacts = None
+        # Only here for compatibility purpose
+        self.contactMap = None
+
+    def isElement(self, pdb, cluster, resname, contactThresholdDistance):
+        return self.RMSDCalculator.computeRMSD(cluster.pdb, pdb) < cluster.threshold
+
+    def cleanContactMap(self):
+        self.contactMap = None
+        self.contacts = None
+
+    def checkAttributes(self, pdb, resname, contactThresholdDistance):
+        if self.contacts is None:
+            self.contacts = pdb.countContacts(resname, contactThresholdDistance)
+
+
+class CMClusteringEvaluator:
+    def __init__(self, similarityEvaluator, symmetryEvaluator):
+        self.similarityEvaluator = similarityEvaluator
+        self.symmetryEvaluator = symmetryEvaluator
+        self.contacts = None
+        self.contactMap = None
+
+    def isElement(self, pdb, cluster, resname, contactThresholdDistance):
+        if self.contactMap is None:
+            self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
+        try:
+            return self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster, self.symmetryEvaluator)
+        except:
+            import pdb as debug
+            debug.set_trace()
+
+    def cleanContactMap(self):
+        self.contactMap = None
+        self.contacts = None
+
+    def checkAttributes(self, pdb, resname, contactThresholdDistance):
+        if self.contactMap is None:
+            self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
+
+
 class Clustering:
     """
         Base class for clustering methods, it defines a cluster method that
@@ -156,7 +222,6 @@ class Clustering:
         """
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
-            print trajectory
             trajNum = utilities.getTrajNum(trajectory)
 
             snapshots = utilities.getSnapshots(trajectory, True)
@@ -216,6 +281,140 @@ class Clustering:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
 
+
+class TreeClustering(Clustering):
+    def __init__(self, resname=None, reportBaseFilename=None,
+                 columnOfReportFile=None, contactThresholdDistance=8,
+                 symmetries=[]):
+        Clustering.__init__(self, resname, reportBaseFilename,
+                            columnOfReportFile, contactThresholdDistance)
+        self.clusteringEvaluator = None
+        self.tree = Tree()
+
+    def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
+        #########################################
+        # OPTIMISATION:
+        # We use centroid distance as a lower bound for RMSD
+        #
+        # Proof:
+        # Superscript ^1 and ^2 stands for PDB1 and PDB2 respectively
+        # Exponentiation is referred as ** to avoid misunderstandings
+        # Sumation is performed over atoms
+        #
+        # RMSD**2 = sum_i ||r^1_i - r^2_i||**2 / N := sum_i d_i**2 / N
+        # dc := centroid difference
+        # dc = ||sum_i r^1_i - r^2_i|| / N := sum_i d_i / N
+        # where d_i := r^1_i - r^2_i
+        #
+        # In the end, it is a matter of showing that the square of avg. is
+        # smaller or equal to the avg. of squares:
+        # (sum_i d_i / N)**2 <= sum_i d_i**2 / N
+        #
+        # Remembering Cauchy-Schward inequality:
+        # |<u*v>| <= ||<u>||*||<v>||
+        # Setting u_i = d_i/N and v_i = 1 for all i, in an n-dim euclidean space
+        # (sum d_i / N)**2 <= sum (d_i/N)**2 * 1
+        #########################################
+        pdb = atomset.PDB()
+        pdb.initialise(snapshot, resname=self.resname)
+        clusterNode = self.tree.root
+        self.clusteringEvaluator.cleanContactMap()
+        minDist = 100
+        minNode = clusterNode
+        while clusterNode and clusterNode.children:
+            localMin = 100
+            localNode = None
+            for node in clusterNode.children:
+                scd = atomset.computeSquaredCentroidDifference(node.cluster.pdb, pdb)
+                if scd > node.cluster.threshold2:
+                    continue
+                else:
+                    if scd < minDist:
+                        minDist = scd
+                        minNode = node
+                    if scd < localMin:
+                        localMin = scd
+                        localNode = node
+            clusterNode = localNode
+        clusterNode = minNode or clusterNode
+
+        if clusterNode is not None and self.clusteringEvaluator.isElement(pdb, clusterNode.cluster,
+                                              self.resname, self.contactThresholdDistance):
+            clusterNode.cluster.addElement(metrics)
+            # self.clusters.clusters[clusterNode.position].addElement(metrics)
+        else:
+            # if made it here, the snapshot was not added into any cluster
+            # Check if contacts and contactMap are set (depending on which kind
+            # of clustering)
+            self.clusteringEvaluator.checkAttributes(pdb, self.resname, self.contactThresholdDistance)
+            contacts = self.clusteringEvaluator.contacts
+            numberOfLigandAtoms = pdb.getNumberOfAtoms()
+            contactsPerAtom = float(contacts)/numberOfLigandAtoms
+
+            threshold = self.thresholdCalculator.calculate(contactsPerAtom)
+            # TODO
+            # Failing because contactMap does not get called for some snapshots
+            cluster = Cluster(pdb, thresholdRadius=threshold,
+                              contacts=contactsPerAtom,
+                              contactMap=self.clusteringEvaluator.contactMap,
+                              metrics=metrics, metricCol=col)
+            self.tree.addNode(Node(cluster, self.clusters.getNumberClusters(), clusterNode), clusterNode)
+            self.clusters.addCluster(cluster)
+
+
+class ContactsClustering(TreeClustering):
+    """
+        Cluster together all snapshots that are closer to the cluster center
+        than certain threshold. This threshold is assigned according to the
+        ratio of number of contacts over the number of heavy atoms of the ligand
+
+        thresholdCalculator [In] ThresholdCalculator object that calculate the
+        threshold according to the contacts ratio
+        resname [In] String containing the three letter name of the ligand
+        in the pdb
+        reportBaseFilename [In] Name of the file that contains the metrics of
+        the snapshots to cluster
+        columnOfReportFile [In] Column of the report file that contain the
+        metric of interest
+        contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
+        considered in contact(default 8)
+    """
+    def __init__(self, thresholdCalculator, resname=None,
+                 reportBaseFilename=None, columnOfReportFile=None,
+                 contactThresholdDistance=8, symmetries=[]):
+        TreeClustering.__init__(self, resname, reportBaseFilename,
+                            columnOfReportFile, contactThresholdDistance)
+        self.type = clusteringTypes.CLUSTERING_TYPES.contacts
+        self.thresholdCalculator = thresholdCalculator
+        self.symmetries = symmetries
+        self.clusteringEvaluator = ContacsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
+
+
+class ContactMapAccumulativeClustering(TreeClustering):
+    """ Cluster together all snapshots that have similar enough contactMaps.
+        This similarity can be calculated with different methods (see similariyEvaluator documentation)
+
+        thresholdCalculator [In] ThresholdCalculator object that calculate the threshold
+        similarityEvaluator [In] SimilarityEvaluator object that will determine wether two snapshots
+        are similar enough to belong to the same cluster
+        resname [In] String containing the three letter name of the ligan in the pdb
+        reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
+        columnOfReportFile [In] Column of the report file that contain the metric of interest
+        contactThresholdDistance [In] Distance at wich a ligand atom and a protein
+        atom are considered in contact(default 8)
+    """
+    def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
+                 reportBaseFilename=None, columnOfReportFile=None,
+                 contactThresholdDistance=8, symmetries=[]):
+        TreeClustering.__init__(self, resname, reportBaseFilename,
+                            columnOfReportFile, contactThresholdDistance)
+        self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative
+        self.thresholdCalculator = thresholdCalculator
+        self.similarityEvaluator = similarityEvaluator
+        self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
+        self.clusteringEvaluator = CMClusteringEvaluator(similarityEvaluator, self.symmetryEvaluator)
+
+
 class SequentialLastSnapshotClustering(Clustering):
     """
         Assigned  the last snapshot of the trajectory to a cluster.
@@ -258,80 +457,6 @@ class SequentialLastSnapshotClustering(Clustering):
         cluster = Cluster(pdb, thresholdRadius=0,
                           contacts=contactsPerAtom, metrics=metrics,
                           metricCol=col)
-        self.clusters.addCluster(cluster)
-
-
-class ContactsClustering(Clustering):
-    """
-        Cluster together all snapshots that are closer to the cluster center
-        than certain threshold. This threshold is assigned according to the
-        ratio of number of contacts over the number of heavy atoms of the ligand
-
-        thresholdCalculator [In] ThresholdCalculator object that calculate the
-        threshold according to the contacts ratio
-        resname [In] String containing the three letter name of the ligand
-        in the pdb
-        reportBaseFilename [In] Name of the file that contains the metrics of
-        the snapshots to cluster
-        columnOfReportFile [In] Column of the report file that contain the
-        metric of interest
-        contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
-        considered in contact(default 8)
-    """
-    def __init__(self, thresholdCalculator, resname=None,
-                 reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8, symmetries=[]):
-        Clustering.__init__(self, resname, reportBaseFilename,
-                            columnOfReportFile, contactThresholdDistance)
-        self.type = clusteringTypes.CLUSTERING_TYPES.contacts
-        self.thresholdCalculator = thresholdCalculator
-        self.symmetries = symmetries
-        self.RMSDCalculator = RMSDCalculator.RMSDCalculator(symmetries)
-
-
-    def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
-        pdb = atomset.PDB()
-        pdb.initialise(snapshot, resname=self.resname)
-        for clusterNum, cluster in enumerate(self.clusters.clusters):
-            #########################################
-            # OPTIMISATION:
-            # We use centroid distance as a lower bound for RMSD
-            #
-            # Proof:
-            # Superscript ^1 and ^2 stands for PDB1 and PDB2 respectively
-            # Exponentiation is referred as ** to avoid misunderstandings
-            # Sumation is performed over atoms
-            #
-            # RMSD**2 = sum_i ||r^1_i - r^2_i||**2 / N := sum_i d_i**2 / N
-            # dc := centroid difference
-            # dc = ||sum_i r^1_i - r^2_i|| / N := sum_i d_i / N
-            # where d_i := r^1_i - r^2_i
-            #
-            # In the end, it is a matter of showing that the square of avg. is
-            # smaller or equal to the avg. of squares:
-            # (sum_i d_i / N)**2 <= sum_i d_i**2 / N
-            #
-            # Remembering Cauchy-Schward inequality:
-            # |<u*v>| <= ||<u>||*||<v>||
-            # Setting u_i = d_i/N and v_i = 1 for all i, in an n-dim euclidean space
-            # (sum d_i / N)**2 <= sum (d_i/N)**2 * 1
-            #########################################
-            scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
-            if scd > cluster.threshold2:
-                continue
-
-            if self.RMSDCalculator.computeRMSD(cluster.pdb, pdb) < cluster.threshold:
-                cluster.addElement(metrics)
-                return
-
-        # if made it here, the snapshot was not added into any cluster
-        contacts = pdb.countContacts(self.resname, self.contactThresholdDistance)
-        numberOfLigandAtoms = pdb.getNumberOfAtoms()
-        contactsPerAtom = float(contacts)/numberOfLigandAtoms
-
-        threshold = self.thresholdCalculator.calculate(contactsPerAtom)
-        cluster = Cluster(pdb, thresholdRadius=threshold, contacts=contactsPerAtom,
-                          metrics=metrics, metricCol=col)
         self.clusters.addCluster(cluster)
 
 
@@ -559,58 +684,6 @@ class ContactMapAgglomerativeClustering(Clustering):
                 cluster.metrics = best_metrics
                 cluster.elements += (elements_in_cluster-cluster.elements)
                 self.secondClusteringParams.newClusters.addCluster(cluster)
-
-
-class ContactMapAccumulativeClustering(Clustering):
-    """ Cluster together all snapshots that have similar enough contactMaps.
-        This similarity can be calculated with different methods (see similariyEvaluator documentation)
-
-        thresholdCalculator [In] ThresholdCalculator object that calculate the threshold
-        similarityEvaluator [In] SimilarityEvaluator object that will determine wether two snapshots
-        are similar enough to belong to the same cluster
-        resname [In] String containing the three letter name of the ligan in the pdb
-        reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
-        columnOfReportFile [In] Column of the report file that contain the metric of interest
-        contactThresholdDistance [In] Distance at wich a ligand atom and a protein
-        atom are considered in contact(default 8)
-    """
-    def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
-                 reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8, symmetries=[]):
-        Clustering.__init__(self, resname, reportBaseFilename,
-                            columnOfReportFile, contactThresholdDistance)
-        self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative
-        self.thresholdCalculator = thresholdCalculator
-        self.similarityEvaluator = similarityEvaluator
-        self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
-
-    # TODO: refactor --> move to parent class and only keep here contactMap creation
-    def addSnapshotToCluster(self, snapshot, metrics=[], metricCol=None):
-        pdb = atomset.PDB()
-        pdb.initialise(snapshot, resname=self.resname)
-        contactMap = None
-        contacts = None
-        for clusterNum, cluster in enumerate(self.clusters.clusters):
-            scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
-            if scd > cluster.threshold2:
-                continue
-            if contactMap is None:
-                contactMap, contacts = self.symmetryEvaluator.createContactMap(pdb, self.resname, self.contactThresholdDistance)
-            if self.similarityEvaluator.isSimilarCluster(contactMap, cluster, self.symmetryEvaluator):
-                cluster.addElement(metrics)
-                return
-
-        # if made it here, the snapshot was not added into any cluster
-        numberOfLigandAtoms = pdb.getNumberOfAtoms()
-        if contacts is None:
-            contacts = pdb.countContacts(self.resname, self.contactThresholdDistance)
-        contactsPerAtom = float(contacts)/numberOfLigandAtoms
-
-        threshold = self.thresholdCalculator.calculate(contactsPerAtom)
-        cluster = Cluster(pdb, thresholdRadius=threshold,
-                          contacts=contactsPerAtom, contactMap=contactMap,
-                          metrics=metrics, metricCol=metricCol)
-        self.clusters.addCluster(cluster)
 
 
 class ClusteringBuilder:

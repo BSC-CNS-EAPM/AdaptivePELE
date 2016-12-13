@@ -9,12 +9,12 @@ import tests.testDensityCalculator as tDensity
 def main():
     testSuite = unittest.TestSuite()
 
-    testSuite.addTest(unittest.makeSuite(tSpawning.TestSpawningCalculator))
     testSuite.addTest(unittest.makeSuite(tAtomset.atomsetTest))
-    testSuite.addTest(unittest.makeSuite(tClustering.clusteringTest))
-    testSuite.addTest(unittest.makeSuite(tAdaptive.TestadaptiveSampling))
+    testSuite.addTest(unittest.makeSuite(tSpawning.TestSpawningCalculator))
     testSuite.addTest(unittest.makeSuite(tThreshold.thresholdCalculatorTest))
     testSuite.addTest(unittest.makeSuite(tDensity.densityCalculatorTest))
+    testSuite.addTest(unittest.makeSuite(tClustering.clusteringTest))
+    testSuite.addTest(unittest.makeSuite(tAdaptive.TestadaptiveSampling))
 
     runner = unittest.TextTestRunner()
     runner.run(testSuite)
