@@ -79,8 +79,6 @@ def plotClusters(cluster_matrix, metrics, title):
     ccx = cluster_matrix[:, 0]
     ccy = cluster_matrix[:, 1]
     ccz = cluster_matrix[:, 2]
-    print title
-    print ccx.size
     fig.suptitle(title)
     scatter1 = ax.scatter(ccx, ccy, zs=ccz, c=metrics)
     fig.colorbar(scatter1)

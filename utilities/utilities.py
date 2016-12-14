@@ -65,4 +65,7 @@ def getRMSD(traj, nativePDB, resname, symmetries):
 
 def readClusteringObject(clusteringObjectPath):
     with open(clusteringObjectPath, 'rb') as f:
-        return pickle.load(f)
+        try:
+            return pickle.load(f)
+        except EOFError:
+            raise EOFError("Empty clustering object!")

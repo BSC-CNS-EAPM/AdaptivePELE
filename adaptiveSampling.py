@@ -103,7 +103,7 @@ def createMultipleComplexesFilenames(numberOfSnapshots, tmpInitialStructuresTemp
 
 def generateSnapshotSelectionStringLastRound(currentEpoch, epochOutputPathTempletized):
     """ Generate the template for the name of the trajectories in the current
-    epoch
+        epoch
         currentEpoch [In] Epoch number
         epochOutputPathTempletized [In] Template for the path where the
         trajectories of any epoch are stored
@@ -135,8 +135,9 @@ def writeSpawningInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRep
 
 
 def findFirstRun(outputPath, clusteringOutputObject):
-    """ Find the last epoch that was properly simulated and clusterized and
-    and return the first epoch to run in case of restart
+    """
+        Find the last epoch that was properly simulated and clusterized and
+        and return the first epoch to run in case of restart
 
         outputPath [In] Simulation output path
         clusteringOutputObject [In] Templetized name of the clustering object
@@ -156,7 +157,7 @@ def findFirstRun(outputPath, clusteringOutputObject):
 def loadParams(jsonParams):
     """
         Read the control file in JSON format and extract the blocks of simulation,
-    general parameters, clustering and spawning
+        general parameters, clustering and spawning
 
         jsonParams [In] Control file in JSON format from where the parameters
         will be read
@@ -180,7 +181,8 @@ def saveInitialControlFile(jsonParams, originalControlFile):
 
 def needToRecluster(oldClusteringMethod, newClusteringMethod):
     """ Check if the parameters have changed in a restart and we need to redo
-    the clustering
+        the clustering
+
         oldClusteringMethod [In] clusteringMethod in the previous simulation
         newClusteringMethod [In] clusteringMethod specified in the restart simulation
     """
@@ -189,9 +191,9 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return True
 
     # Check 2: Change of thresholdCalculator and thresholdDistance
-    if  oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contacts or\
-        oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative:
-            return oldClusteringMethod.thresholdCalculator != newClusteringMethod.thresholdCalculator or\
+    if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contacts or\
+       oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative:
+        return oldClusteringMethod.thresholdCalculator != newClusteringMethod.thresholdCalculator or\
                 abs(oldClusteringMethod.contactThresholdDistance - newClusteringMethod.contactThresholdDistance) > 1e-7
 
     # Check 3: Change of nClusters in contactMapAgglomerative
@@ -201,7 +203,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
 
 def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
     """ Cluster the trajecotories of a given epoch into the clusteringMethod
-    object
+        object
         clusteringMethod [In] Object that holds all the clustering-related
         information
         epoch [In] Number of the epoch to cluster
@@ -325,7 +327,7 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
 def preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControlFileDictionary):
     """
         Substitute the parameters in the pele control file specified with the
-    provided in the control file
+        provided in the control file
 
         i [In] Epoch number
         outputPathConstants [In] Object that has as attributes constant related
@@ -359,7 +361,7 @@ def main(jsonParams):
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
 
     clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
-
+    checkAll = clusteringType == blockNames.ClusteringTypes.lastSnapshot
     restart = generalParams[blockNames.GeneralParams.restart]
     debug = generalParams[blockNames.GeneralParams.debug]
     outputPath = generalParams[blockNames.GeneralParams.outputPath]
@@ -380,6 +382,8 @@ def main(jsonParams):
     print "SpawningType:", spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]
 
     print "SimulationType:", simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY[simulationRunner.type]
+    if simulationRunner.hasExitCondition():
+        print "Exit condition:", simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY[simulationRunner.parameters.exitCondition.type]
     print "Clustering method:", clusteringType
 
     print "Output path: ", outputPath
@@ -425,6 +429,7 @@ def main(jsonParams):
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
+
         degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
         spawningCalculator.log()
         print "Degeneracy", degeneracyOfRepresentatives
@@ -436,7 +441,7 @@ def main(jsonParams):
         if i > 0:
             # Remove old clustering object, since we already have a newer one
             try:
-                os.remove(outputPathConstants.clusteringOutputObject%(i-1))
+                os.remove(outputPathConstants.clusteringOutputObject % (i-1))
             except OSError:
                 # In case of restart
                 pass
@@ -447,10 +452,14 @@ def main(jsonParams):
             initialStructuresAsString = createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
             peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
 
-
         if clusteringMethod.symmetries and nativeStructure:
             fixReportsSymmetry(outputPathConstants.epochOutputPathTempletized % i, resname,
                                nativeStructure, clusteringMethod.symmetries)
+
+        # check exit condition, if defined
+        if simulationRunner.hasExitCondition() and simulationRunner.checkExitCondition(clusteringMethod, checkAll):
+            print "Simulation exit condition met at iteration %d" % i
+            break
     # utilities.cleanup
     # utilities.cleanup(outputPathConstants.tmpFolder)
 
