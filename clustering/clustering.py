@@ -50,7 +50,7 @@ class Cluster:
         a contactMap(sometimes) and a metric
     """
     def __init__(self, pdb, thresholdRadius=None, contactMap=None,
-                 contacts=None, metrics=[], metricCol=None, density=None):
+                 contacts=None, metrics=[], metricCol=None, density=1):
         """
             contacts stands for contacts/ligandAtom
         """
