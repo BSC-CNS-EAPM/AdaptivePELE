@@ -3,7 +3,14 @@ import pickle
 import utilities
 
 
-def writeStructures(clusteringObject, listStructures, outputPath="cluster.pdb"):
+def writeStructures(clusteringObject, listStructures, checker=lambda x: True, outputPath="cluster.pdb"):
+    """
+        Function that prints all clusters in listStructures so that checker evaluates to true
+
+        clusteringObject [In] Clustering object with clusters to print
+        checker [In] Lambda function with the checker that should evaluate to True for intersted structures
+        outputPath [In] Output cluster pdb filename
+    """
     with open(clusteringObject, "rb") as f:
         clObject = pickle.load(f)
     nameStructure = os.path.splitext(outputPath)
@@ -17,6 +24,12 @@ def writeStructures(clusteringObject, listStructures, outputPath="cluster.pdb"):
     if listStructures is None or len(listStructures) == 0: #If no listStructures, write all
         listStructures = range(len(clObject.clusters.clusters))
 
+    output = ""
     for element in listStructures:
-        print pathToWrite, pathToWrite%element
-        clObject.clusters.clusters[element].writePDB(pathToWrite % element)
+        cluster = clObject.clusters.clusters[element]
+        if checker(cluster):
+            print "Writing", pathToWrite%element
+            cluster.pdb.pdb += "\nENDMDL\n"
+            output += cluster.pdb.pdb
+            cluster.writePDB(pathToWrite % element)
+
