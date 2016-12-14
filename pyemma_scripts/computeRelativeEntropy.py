@@ -1,3 +1,4 @@
+import os
 import sys
 import MSMblocks
 import helper
@@ -24,11 +25,12 @@ def readParams(control_file):
     lagtime = params.get("lagtime", 0)
     sampleSize = params.get("sampleSize", None)
     numRuns = params.get("numRuns", 1)
-    return trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, sampleSize, numRuns
+    stride = params.get("stride", 1)
+    return trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, sampleSize, numRuns, stride
 
 
-def getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime):
-    prepareMSM = MSMblocks.PrepareMSM(numClusters, trajectoryFolder, trajectoryBasename)
+def getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride):
+    prepareMSM = MSMblocks.PrepareMSM(numClusters, trajectoryFolder, trajectoryBasename, stride)
     cl = prepareMSM.getClusteringObject()
     calculateMSM = MSMblocks.MSM(cl, lagtimes, 0, itsOutput, numberOfITS, itsErrors, None)
     if not lagtime:
@@ -43,16 +45,16 @@ def getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagti
 
     return transition, MSM_object.stationary_distribution, lagtime
 
-
-def assignNewTrajecories(X, goldenMSMClusterCenters, lagtime, ntrajs=None, length=None):
-
+def makeRandomSampleOfNtrajs(X, ntrajs=None, length=None):
     if ntrajs:
         indices = np.array(np.random.choice(range(len(X)), ntrajs))
     else:
         indices = range(len(X))
 
-    Xsample = map(lambda x: X[x][:length], indices)
+    Xsample = map(lambda x: X[x][:length,:], indices)
+    return Xsample
 
+def assignNewTrajecories(Xsample, goldenMSMClusterCenters, lagtime):
     assign = AssignCenters(goldenMSMClusterCenters)
     dTrajs = assign.assign(Xsample)
     counts = markov.estimateCountMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime)
@@ -64,60 +66,100 @@ def assignNewTrajecories(X, goldenMSMClusterCenters, lagtime, ntrajs=None, lengt
 
 
 def main(controlFile):
-    trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, sampleSize, numRuns = readParams(controlFile)
-    refTransition, refStationaryDist, lagtime = getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime)
-    X = trajectories.loadCOMFiles(trajectoryFolder2, trajectoryBasename)
+    trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, sampleSize, numRuns, stride = readParams(controlFile)
+    refTransition, refStationaryDist, lagtime = getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride)
+
 
     goldenMSMClusterCenters = np.loadtxt("discretized/clusterCenters.dat")
 
     #np.random.seed(250793)
 
+    seq = False
     entropies = []
-    try:
-        numberOfTrajs = range(5,20,5) + range(20, sampleSize, 20)
 
-        #only trying different traj lengths if sampleSize is defined in control file
-        shortestTrajSize = min([len(i) for i in X])
-        lowerLimit = 2*lagtime
-        upperLimit = shortestTrajSize
-        #allTrajLengths = range(lowerLimit, upperLimit, 200)
-        allTrajLengths = range(lowerLimit, 550, 50) + range(750, upperLimit, 250)
-        #allTrajLengths = [None]
-    except TypeError:
-        numberOfTrajs = [None]
-        allTrajLengths = [None]
+    if seq:
+        try:
+            X = trajectories.loadCOMFiles(trajectoryFolder2, trajectoryBasename)
+
+            numberOfTrajs = range(64, 64*4, 64)
+            # numberOfTrajs = range(50, sampleSize, 50)
+
+            #only trying different traj lengths if sampleSize is defined in control file
+            shortestTrajSize = min([len(i) for i in X])
+            lowerLimit = 2*lagtime
+            upperLimit = shortestTrajSize
+            #allTrajLengths = range(lowerLimit, upperLimit, 200)
+            allTrajLengths = range(lowerLimit, 401, 100) 
+            #allTrajLengths = [None]
+        except TypeError:
+            numberOfTrajs = [None]
+            allTrajLengths = [None]
+    else:
+        # epochFolders = [int(i) for i in os.listdir(trajectoryFolder2) if i.isdigit()]
+        epochFolders = range(3)
+        epochFolders.sort()
+        # import pdb as debug
+        # debug.set_trace()
+        lowerLimit = 200+50
+        numberOfTrajs = epochFolders
+        upperLimit = 401
+        allTrajLengths = range(lowerLimit, upperLimit, 50)
+
 
     for length in allTrajLengths:
         if length: print "Working with trajectories of length: %d" % length
         lengthEntropies = []
+        if not seq:
+            X = []
         for ntrajs in numberOfTrajs:
+
+            if not seq:
+                currentEpochFolder = os.path.join(trajectoryFolder2, str(ntrajs))
+                currentX = trajectories.loadCOMFiles(currentEpochFolder, trajectoryBasename)
+                X.extend(currentX) 
+
             if not ntrajs % 25:
                 print "Starting loop for sample of %d trajs" % ntrajs
             relativeEntropy = 0
             for j in range(numRuns):
-                transitionMatrix = assignNewTrajecories(X, goldenMSMClusterCenters, lagtime, ntrajs, length)
+                if seq:
+                    Xsample = makeRandomSampleOfNtrajs(X, ntrajs, length)
+                else:
+                    Xsample = map(lambda x: x[:length,:], X)
+
+                transitionMatrix = assignNewTrajecories(Xsample, goldenMSMClusterCenters, lagtime)
                 try:
                     s = markov.getRelativeEntropy(refStationaryDist, refTransition, transitionMatrix)
+                    print s
                     relativeEntropy += s
                 except ValueError:
                     j -= 1
             lengthEntropies.append(relativeEntropy/float(numRuns))
+            print relativeEntropy, lengthEntropies
         entropies.append(lengthEntropies)
 
-    np.save("matrix_1.npy", entropies)
+    np.save("matrix_adaptive.npy", entropies)
+    #entropies = np.load("matrix_1.npy")
+    entropies = np.log10(entropies)
 
     for i, length in enumerate(allTrajLengths):
         for j, ntrajs  in enumerate(numberOfTrajs):
             print length, ntrajs, entropies[i][j]
         print ""
 
-    if ntrajs and length:
+    if length and ntrajs:
         plt.figure(1)
-        plt.imshow(entropies, interpolation="nearest", origin="lower", aspect="auto", extent=[numberOfTrajs[0], numberOfTrajs[-1], allTrajLengths[0], allTrajLengths[-1]])
+        if seq:
+            plt.imshow(entropies, interpolation="nearest", origin="lower", aspect="auto", extent=[numberOfTrajs[0], numberOfTrajs[-1], allTrajLengths[0], allTrajLengths[-1]])
+        else:
+            plt.imshow(entropies, interpolation="nearest", origin="lower", aspect="auto", extent=[numberOfTrajs[0], numberOfTrajs[-1] + 1, allTrajLengths[0], allTrajLengths[-1]])
         #plt.imshow(entropies, interpolation="nearest", extent=[numberOfTrajs[0], numberOfTrajs[-1], 800, 801])
         plt.colorbar()
         plt.figure(2)
-        plt.imshow(entropies, interpolation="bilinear", origin="lower", aspect="auto",  extent=[numberOfTrajs[0], numberOfTrajs[-1], allTrajLengths[0], allTrajLengths[-1]])
+        if seq:
+            plt.imshow(entropies, interpolation="bilinear", origin="lower", aspect="auto",  extent=[numberOfTrajs[0], numberOfTrajs[-1], allTrajLengths[0], allTrajLengths[-1]])
+        else:
+            plt.imshow(entropies, interpolation="bilinear", origin="lower", aspect="auto",  extent=[numberOfTrajs[0], numberOfTrajs[-1]+1, allTrajLengths[0], allTrajLengths[-1]])
         plt.colorbar()
         plt.show()
     elif ntrajs:
