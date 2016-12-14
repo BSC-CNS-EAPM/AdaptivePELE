@@ -111,13 +111,13 @@ class Cluster:
 
 class Tree:
     def __init__(self):
-        self.root = None
+        """ Rooted tree, the root is an empty Node with all parameters set to
+            None
+        """
+        self.root = Node(None, None, None)
 
     def addNode(self, node, parentNode):
-        if self.root is None:
-            self.root = node
-        else:
-            parentNode.addChildren(node)
+        parentNode.addChildren(node)
 
 
 class Node:
@@ -149,6 +149,9 @@ class ContacsClusteringEvaluator:
         if self.contacts is None:
             self.contacts = pdb.countContacts(resname, contactThresholdDistance)
 
+    def getInnerLimit(self, cluster):
+        return cluster.threshold2
+
 
 class CMClusteringEvaluator:
     def __init__(self, similarityEvaluator, symmetryEvaluator):
@@ -160,11 +163,8 @@ class CMClusteringEvaluator:
     def isElement(self, pdb, cluster, resname, contactThresholdDistance):
         if self.contactMap is None:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
-        try:
-            return self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster, self.symmetryEvaluator)
-        except:
-            import pdb as debug
-            debug.set_trace()
+        return self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster, self.symmetryEvaluator)
+
 
     def cleanContactMap(self):
         self.contactMap = None
@@ -173,6 +173,9 @@ class CMClusteringEvaluator:
     def checkAttributes(self, pdb, resname, contactThresholdDistance):
         if self.contactMap is None:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
+
+    def getInnerLimit(self, cluster):
+        return 12.0
 
 
 class Clustering:
@@ -319,47 +322,38 @@ class TreeClustering(Clustering):
         pdb.initialise(snapshot, resname=self.resname)
         clusterNode = self.tree.root
         self.clusteringEvaluator.cleanContactMap()
-        minDist = 100
-        minNode = clusterNode
-        while clusterNode and clusterNode.children:
-            localMin = 100
-            localNode = None
+        while clusterNode.children:
             for node in clusterNode.children:
                 scd = atomset.computeSquaredCentroidDifference(node.cluster.pdb, pdb)
-                if scd > node.cluster.threshold2:
-                    continue
+                # if scd > node.cluster.threshold2+4:
+                if scd < self.clusteringEvaluator.getInnerLimit(node.cluster):
+                    if self.clusteringEvaluator.isElement(pdb, node.cluster,
+                                                          self.resname, self.contactThresholdDistance):
+                        node.cluster.addElement(metrics)
+                        return
+                    else:
+                        clusterNode = node
                 else:
-                    if scd < minDist:
-                        minDist = scd
-                        minNode = node
-                    if scd < localMin:
-                        localMin = scd
-                        localNode = node
-            clusterNode = localNode
-        clusterNode = minNode or clusterNode
+                    continue
+            # If has compared to all the children and none is within centroid
+            # distance, add a new children node
+            break
 
-        if clusterNode is not None and self.clusteringEvaluator.isElement(pdb, clusterNode.cluster,
-                                              self.resname, self.contactThresholdDistance):
-            clusterNode.cluster.addElement(metrics)
-            # self.clusters.clusters[clusterNode.position].addElement(metrics)
-        else:
-            # if made it here, the snapshot was not added into any cluster
-            # Check if contacts and contactMap are set (depending on which kind
-            # of clustering)
-            self.clusteringEvaluator.checkAttributes(pdb, self.resname, self.contactThresholdDistance)
-            contacts = self.clusteringEvaluator.contacts
-            numberOfLigandAtoms = pdb.getNumberOfAtoms()
-            contactsPerAtom = float(contacts)/numberOfLigandAtoms
+        # if made it here, the snapshot was not added into any cluster
+        # Check if contacts and contactMap are set (depending on which kind
+        # of clustering)
+        self.clusteringEvaluator.checkAttributes(pdb, self.resname, self.contactThresholdDistance)
+        contacts = self.clusteringEvaluator.contacts
+        numberOfLigandAtoms = pdb.getNumberOfAtoms()
+        contactsPerAtom = float(contacts)/numberOfLigandAtoms
 
-            threshold = self.thresholdCalculator.calculate(contactsPerAtom)
-            # TODO
-            # Failing because contactMap does not get called for some snapshots
-            cluster = Cluster(pdb, thresholdRadius=threshold,
-                              contacts=contactsPerAtom,
-                              contactMap=self.clusteringEvaluator.contactMap,
-                              metrics=metrics, metricCol=col)
-            self.tree.addNode(Node(cluster, self.clusters.getNumberClusters(), clusterNode), clusterNode)
-            self.clusters.addCluster(cluster)
+        threshold = self.thresholdCalculator.calculate(contactsPerAtom)
+        cluster = Cluster(pdb, thresholdRadius=threshold,
+                          contacts=contactsPerAtom,
+                          contactMap=self.clusteringEvaluator.contactMap,
+                          metrics=metrics, metricCol=col)
+        self.tree.addNode(Node(cluster, self.clusters.getNumberClusters(), clusterNode), clusterNode)
+        self.clusters.addCluster(cluster)
 
 
 class ContactsClustering(TreeClustering):
