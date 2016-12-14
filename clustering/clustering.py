@@ -127,6 +127,8 @@ class ContacsClusteringEvaluator:
         if self.contacts is None:
             self.contacts = pdb.countContacts(resname, contactThresholdDistance)
 
+    def getInnerLimit(self, cluster):
+        return cluster.threshold2
 
 class CMClusteringEvaluator:
     def __init__(self, similarityEvaluator, symmetryEvaluator):
@@ -147,6 +149,9 @@ class CMClusteringEvaluator:
     def checkAttributes(self, pdb, resname, contactThresholdDistance):
         if self.contactMap is None:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
+
+    def getInnerLimit(self, cluster):
+        return 12.0
 
 
 class Clustering:
@@ -173,6 +178,8 @@ class Clustering:
         self.col = columnOfReportFile
         self.contactThresholdDistance = contactThresholdDistance
         self.symmetries = []
+        #This has to be implemented by each subclass
+        self.clusteringEvaluator = None
 
     def setCol(self, col):
         self.col = col
@@ -284,7 +291,7 @@ class Clustering:
         self.clusteringEvaluator.cleanContactMap()
         for clusterNum, cluster in enumerate(self.clusters.clusters):
             scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
-            if scd > cluster.threshold2:
+            if scd > self.clusteringEvaluator.getInnerLimit(cluster):
                 continue
 
             if self.clusteringEvaluator.isElement(pdb, cluster, self.resname,
