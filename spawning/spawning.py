@@ -274,7 +274,7 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         return self.degeneracyTotal
 
     def divideProcessorsMetricProportional(self, clusters, trajToDistribute, T,
-                                           metricWeights):
+                                           metricWeights=blockNames.SpawningParams.linear):
         metrics = self.getMetrics(clusters)
         if isinstance(metrics, list): metrics = np.array(metrics)
 

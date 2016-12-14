@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="Adaptive Sampling  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -84,7 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptiveSampling.html">AdaptiveSampling Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Blalbalbke</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Adaptive Sampling Overview</a></li>
 </ul>
 
             
@@ -134,11 +136,11 @@
            <div itemprop="articleBody">
             
   <h1>Source code for src.clustering.thresholdcalculatortypes</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">constants</span> <span class="kn">import</span> <span class="n">blockNames</span>
+<span></span><span class="kn">from</span> <span class="nn">constants</span> <span class="k">import</span> <span class="n">blockNames</span>
 
 <div class="viewcode-block" id="THRESHOLD_CALCULATOR_TYPES"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES">[docs]</a><span class="k">class</span> <span class="nc">THRESHOLD_CALCULATOR_TYPES</span><span class="p">:</span>
-    <span class="n">heaviside</span><span class="p">,</span> <span class="n">constant</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</div>
+    <span class="n">heaviside</span><span class="p">,</span> <span class="n">constant</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></div>
+
 <span class="n">THRESHOLD_CALCULATOR_TYPE_TO_STRING_DICTIONARY</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">THRESHOLD_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">heaviside</span> <span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">heaviside</span><span class="p">,</span>
     <span class="n">THRESHOLD_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">constant</span> <span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">constant</span>

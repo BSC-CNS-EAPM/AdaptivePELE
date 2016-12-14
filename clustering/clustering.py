@@ -7,6 +7,7 @@ import clusteringTypes
 import thresholdcalculator
 from constants import blockNames
 from atomset import atomset, RMSDCalculator
+from atomset import SymmetryContactMapEvaluator as sym
 from utilities import utilities
 from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import AgglomerativeClustering
@@ -27,6 +28,9 @@ class Clusters:
     def getNumberClusters(self):
         return len(self.clusters)
 
+    def getCluster(self, clusterNum):
+        return self.clusters[clusterNum]
+
     def printClusters(self, verbose=False):
         for i, cluster in enumerate(self.clusters):
             print "--------------"
@@ -45,8 +49,8 @@ class Cluster:
         elements, its density, threhold, number of contacts,
         a contactMap(sometimes) and a metric
     """
-    def __init__(self, pdb, thresholdRadius=None, contactMap=None, contacts=None,
-                 metrics=[], metricCol=None, density=None):
+    def __init__(self, pdb, thresholdRadius=None, contactMap=None,
+                 contacts=None, metrics=[], metricCol=None, density=None):
         """
             contacts stands for contacts/ligandAtom
         """
@@ -70,10 +74,17 @@ class Cluster:
         else:
             return None
 
+    def getMetricFromColumn(self, numcol):
+        if len(self.metrics):
+            return self.metrics[numcol]
+        else:
+            return None
+
     def addElement(self, metrics):
         self.elements += 1
-        if len(metrics) and len(self.metrics) and metrics[self.metricCol] < self.metrics[self.metricCol]:
-            self.metrics = metrics
+        if len(metrics) and len(self.metrics):
+            # Set all metrics to the minimum value
+            self.metrics = np.minimum(self.metrics, metrics)
 
     def printCluster(self, verbose=False):
         if verbose:
@@ -123,12 +134,14 @@ class Clustering:
         self.contactThresholdDistance = contactThresholdDistance
         self.symmetries = []
 
-
     def setCol(self, col):
         self.col = col
 
         for cluster in self.clusters.clusters:
             cluster.metricCol = col
+
+    def getCluster(self, clusterNum):
+        return self.clusters.getCluster(clusterNum)
 
     def __eq__(self, other):
         return self.clusters == other.clusters\
@@ -143,6 +156,7 @@ class Clustering:
         """
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
+            print trajectory
             trajNum = utilities.getTrajNum(trajectory)
 
             snapshots = utilities.getSnapshots(trajectory, True)
@@ -184,22 +198,67 @@ class Clustering:
             metric = cluster.getMetric()
             if metric:
                 writeString = "%d %d %d %.2f %.2f %.1f %.3f\n" % (i, cluster.elements,
-                                                                degeneracy[i],
-                                                                cluster.contacts,
-                                                                cluster.threshold,
-                                                                cluster.density,
-                                                                metric)
+                                                                  degeneracy[i],
+                                                                  cluster.contacts,
+                                                                  cluster.threshold,
+                                                                  cluster.density,
+                                                                  metric)
             else:
                 writeString = "%d %d %d %.2f %.2f %.1f -\n" % (i, cluster.elements,
-                                                             degeneracy[i],
-                                                             cluster.contacts,
-                                                             cluster.threshold,
-                                                             cluster.density)
+                                                               degeneracy[i],
+                                                               cluster.contacts,
+                                                               cluster.threshold,
+                                                               cluster.density)
             summaryFile.write(writeString)
         summaryFile.close()
 
         with open(outputObject, 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+
+
+class SequentialLastSnapshotClustering(Clustering):
+    """
+        Assigned  the last snapshot of the trajectory to a cluster.
+        Only useful for PELE sequential runs
+    """
+    def cluster(self, paths):
+        """
+            Cluster the snaptshots contained in the pahts folder
+            paths [In] List of folders with the snapshots
+        """
+        # Clean clusters at every step, so we only have the last snapshot of
+        # each trajectory as clusters
+        self.clusters = Clusters()
+        trajectories = getAllTrajectories(paths)
+        for trajectory in trajectories:
+            trajNum = utilities.getTrajNum(trajectory)
+
+            snapshots = utilities.getSnapshots(trajectory, True)
+            if self.reportBaseFilename:
+                reportFilename = os.path.join(os.path.split(trajectory)[0],
+                                              self.reportBaseFilename % trajNum)
+                metrics = np.loadtxt(reportFilename, ndmin=2)
+                # Pass as cluster metrics the minimum value for each metric,
+                # thus the metrics are not valid to do any spawning, only to
+                # check the exit condition
+                metrics = metrics.min(axis=0)
+
+                self.addSnapshotToCluster(snapshots[-1], metrics, self.col)
+            else:
+                self.addSnapshotToCluster(snapshots[-1])
+
+    def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
+        pdb = atomset.PDB()
+        pdb.initialise(snapshot, resname=self.resname)
+        contacts = pdb.countContacts(self.resname,
+                                     self.contactThresholdDistance)
+        numberOfLigandAtoms = pdb.getNumberOfAtoms()
+        contactsPerAtom = float(contacts)/numberOfLigandAtoms
+
+        cluster = Cluster(pdb, thresholdRadius=0,
+                          contacts=contactsPerAtom, metrics=metrics,
+                          metricCol=col)
+        self.clusters.addCluster(cluster)
 
 
 class ContactsClustering(Clustering):
@@ -278,10 +337,12 @@ class ContactsClustering(Clustering):
 
 class ContactMapClustering(Clustering):
     def __init__(self, resname=None, reportBaseFilename=None,
-                 columnOfReportFile=None, contactThresholdDistance=8):
+                 columnOfReportFile=None, contactThresholdDistance=8,
+                 symmetries=[]):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAffinity
+        self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
 
     def cluster(self, paths):
         """Cluster the snapshots of the trajectories provided using the
@@ -295,7 +356,7 @@ class ContactMapClustering(Clustering):
         trajectories = getAllTrajectories(paths)
 
         pdb_list, metrics, contactmaps, contacts = processSnapshots(trajectories, self.reportBaseFilename,
-                         self.col, self.contactThresholdDistance, self.resname)
+                         self.col, self.contactThresholdDistance, self.resname, self.symmetryEvaluator)
         preferences = map(np.sum,contactmaps)
 
         preferences = float((min(preferences)-max(preferences))/2)
@@ -394,11 +455,13 @@ class ContactMapAgglomerativeClustering(Clustering):
         considered in contact(default 8)
     """
     def __init__(self, nclusters, resname=None, reportBaseFilename=None,
-                 columnOfReportFile=None, contactThresholdDistance=8):
+                 columnOfReportFile=None, contactThresholdDistance=8,
+                 symmetries=[]):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAgglomerative
         self.nclusters = nclusters
+        self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
 
     def cluster(self, paths):
         """Clusters the snapshots of the trajectories provided using
@@ -412,7 +475,7 @@ class ContactMapAgglomerativeClustering(Clustering):
         trajectories = getAllTrajectories(paths)
 
         pdb_list, metrics, contactmaps, contacts = processSnapshots(trajectories, self.reportBaseFilename,
-                         self.col, self.contactThresholdDistance, self.resname)
+                         self.col, self.contactThresholdDistance, self.resname, self.symmetryEvaluator)
 
 
         self.firstClusteringParams = clusteringResultsParameters(pdb_list=pdb_list,
@@ -513,21 +576,21 @@ class ContactMapAccumulativeClustering(Clustering):
     """
     def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8):
+                 contactThresholdDistance=8, symmetries=[]):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative
         self.thresholdCalculator = thresholdCalculator
         self.similarityEvaluator = similarityEvaluator
+        self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
 
     # TODO: refactor --> move to parent class and only keep here contactMap creation
-    # TODO symmetries for contactMap
     def addSnapshotToCluster(self, snapshot, metrics=[], metricCol=None):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
-        contactMap, contacts = pdb.createContactMap(self.resname, self.contactThresholdDistance)
+        contactMap, contacts = self.symmetryEvaluator.createContactMap(pdb, self.resname, self.contactThresholdDistance)
         for clusterNum, cluster in enumerate(self.clusters.clusters):
-            if self.similarityEvaluator.isSimilarCluster(contactMap, cluster):
+            if self.similarityEvaluator.isSimilarCluster(contactMap, cluster, self.symmetryEvaluator):
                 cluster.addElement(metrics)
                 return
 
@@ -560,6 +623,11 @@ class ClusteringBuilder:
             return ContactsClustering(thresholdCalculator, resname,
                                       reportBaseFilename, columnOfReportFile,
                                       contactThresholdDistance, symmetries)
+        elif clusteringType == blockNames.ClusteringTypes.lastSnapshot:
+
+            return SequentialLastSnapshotClustering(resname, reportBaseFilename,
+                                                    columnOfReportFile,
+                                                    contactThresholdDistance)
         elif clusteringType == blockNames.ClusteringTypes.contactMapAffinity:
             return ContactMapClustering(resname, reportBaseFilename,
                                         columnOfReportFile,
@@ -571,6 +639,7 @@ class ClusteringBuilder:
                                                      columnOfReportFile,
                                                      contactThresholdDistance)
         elif clusteringType == blockNames.ClusteringTypes.contactMapAccumulative:
+            symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries,[])
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
             try:
@@ -580,7 +649,8 @@ class ClusteringBuilder:
             similarityBuilder = similarityEvaluatorBuilder()
             similarityEvaluator = similarityBuilder.build(similarityEvaluatorType)
             return ContactMapAccumulativeClustering(thresholdCalculator, similarityEvaluator, resname,
-                                      reportBaseFilename, columnOfReportFile)
+                                                    reportBaseFilename, columnOfReportFile,
+                                                    contactThresholdDistance, symmetries)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))
@@ -615,56 +685,44 @@ class similarityEvaluatorBuilder:
 class differenceDistanceEvaluator:
     """
         Evaluate the similarity of two contactMaps by calculating the ratio of
-        the number of differences over the average of elements in the contacts maps
+        the number of differences over the average of elements in the contacts
+        maps
     """
-    def isSimilarCluster(self, contactMap, cluster):
+    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        differenceContactMaps = np.abs(contactMap-cluster.contactMap).sum()
-        averageContacts = (0.5*(contactMap.sum()+cluster.contactMap.sum()))
-        if not averageContacts:
-            # The only way the denominator can be 0 is if both contactMaps are
-            # all zeros, thus being equal and belonging to the same cluster
-            return True
-        else:
-            distance = differenceContactMaps/averageContacts
-            return distance < cluster.threshold
-
+        distance = symContactMapEvaluator.evaluateDifferenceDistance(contactMap, cluster)
+        return distance < cluster.threshold
 
 
 class JaccardEvaluator:
     """
         Evaluate the similarity of two contactMaps by calculating the Jaccard
-        index, that is, the ratio between the intersection of the two contact maps and their
-        union
+        index, that is, the ratio between the intersection of the two contact
+        maps and their union
     """
-    def isSimilarCluster(self, contactMap, cluster):
+    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        intersectContactMaps = (contactMap == cluster.contactMap).sum()
-        unionContactMaps = contactMap.size + cluster.contactMap.size - intersectContactMaps
-        similarity = float(intersectContactMaps)/unionContactMaps
-        distance = 1-similarity
+        distance = symContactMapEvaluator.evaluateJaccard(contactMap, cluster)
         return distance < cluster.threshold
 
 
 class correlationEvaluator:
     """
-        Evaluate the similarity of two contact maps by calculating thir correlation
+        Evaluate the similarity of two contact maps by calculating their
+        correlation
     """
-    def isSimilarCluster(self, contactMap, cluster):
+    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        similarity = calculateCorrelationContactMaps(contactMap, cluster.contactMap)
-        similarity += 1  # Necessary to omit negative correlations
-        similarity /= 2.0  # Correlation values need to be higher now
-        distance = 1-similarity
+        distance = symContactMapEvaluator.evaluateCorrelation(contactMap, cluster)
         return distance < cluster.threshold
 
 
@@ -725,7 +783,9 @@ def getAllTrajectories(paths):
     files = []
     for path in paths:
         files += glob.glob(path)
-    return files
+    # sort the files obtained by glob by name, so that the results will be the
+    # same on all computers
+    return sorted(files)
 
 
 def selectRandomCenter(cluster_members, metrics_weights):
@@ -746,25 +806,8 @@ def selectRandomCenter(cluster_members, metrics_weights):
     return cluster_index
 
 
-def calculateCorrelationContactMaps(contactMap, clusterContactMap):
-    """
-        Calculate the correlation of two contactMaps
-    """
-    contactMap1 = contactMap.reshape((1, -1))
-    # Reshape the matrix into a 1D array to use the numpy corrcoef function
-    contactMap2 = clusterContactMap.reshape((1, -1))
-    total1 = contactMap1.sum()
-    total2 = contactMap2.sum()
-    if not total1 or not total2:
-        # if any array is all zeros the correlation will be NaN
-        # if both are zero, correlation is perfect (i.e 1) else it is different
-        # and will be in different clusters
-        return total1 == total2
-    return np.corrcoef(contactMap1, contactMap2)[0, 1]
-
-
 def processSnapshots(trajectories, reportBaseFilename, col,
-                     contactThresholdDistance, resname):
+                     contactThresholdDistance, resname, symmetryEvaluator):
     """
         Create list of pdb, contactMaps, metrics and contacts from a series of
         snapshots
@@ -788,7 +831,7 @@ def processSnapshots(trajectories, reportBaseFilename, col,
             pdb = atomset.PDB()
             pdb.initialise(snapshot, resname=resname)
             pdb_list.append(pdb)
-            contactMap, contactnum = pdb.createContactMap(resname, contactThresholdDistance)
+            contactMap, contactnum = symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             contactmaps.append(contactMap)
             contacts.append(contactnum)
     return pdb_list, metrics, contactmaps, contacts

@@ -6,6 +6,8 @@ from constants import blockNames
 import shutil
 import simulationTypes
 import string
+import sys
+
 
 class SimulationParameters:
     def __init__(self):
@@ -17,13 +19,23 @@ class SimulationParameters:
         self.iterations = 0
         self.peleSteps = 0
         self.seed = 0
+        self.exitCondition = None
+
 
 class SimulationRunner:
     def __init__(self, parameters):
         self.parameters = parameters
-    
-    def runSimulation(self, runningControlFile = ""):
-        pass 
+
+    def runSimulation(self, runningControlFile=""):
+        pass
+
+    def hasExitCondition(self):
+        return self.parameters.exitCondition is not None
+
+    def checkExitCondition(self, clustering, checkAllClusters=False):
+        if self.parameters.exitCondition:
+            return self.parameters.exitCondition.checkExitCondition(clustering, checkAllClusters=False)
+        return False
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary):
         inputFile = open(self.parameters.templetizedControlFile, "r")
@@ -34,14 +46,15 @@ class SimulationRunner:
         outputFileContent = inputFileTemplate.substitute(dictionary)
 
         outputFile = open(workingControlFilename, "w")
+        outputFileContent = outputFileContent.replace("'", '"')
         outputFile.write(outputFileContent)
         outputFile.close()
+
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
         SimulationRunner.__init__(self, parameters)
         self.type = simulationTypes.SIMULATION_TYPE.PELE
-    
 
     def createSymbolicLinks(self):
         if not os.path.islink("Data"):
@@ -49,20 +62,22 @@ class PeleSimulation(SimulationRunner):
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.documentsFolder + " Documents")
 
-    def runSimulation(self, runningControlFile = ""):
+    def runSimulation(self, runningControlFile=""):
         self.createSymbolicLinks()
 
         toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
         toRun = " ".join(toRun)
         print toRun
-        startTime = time.time() 
+        startTime = time.time()
         proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True)
         (out, err) = proc.communicate()
         print out
-        if err: print err
+        if err:
+            print err
 
-        endTime = time.time() 
+        endTime = time.time()
         print "PELE took %.2f sec" % (endTime - startTime)
+
 
 class TestSimulation(SimulationRunner):
     """
@@ -73,7 +88,7 @@ class TestSimulation(SimulationRunner):
         self.copied = False
         self.parameters = parameters
 
-    def runSimulation(self, runningControlFile = ""):
+    def runSimulation(self, runningControlFile=""):
         if not self.copied:
             if os.path.exists(self.parameters.destination):
                 shutil.rmtree(self.parameters.destination)
@@ -82,6 +97,40 @@ class TestSimulation(SimulationRunner):
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary):
         pass
+
+
+class ExitConditionBuilder:
+    def build(self, exitConditionBlock):
+        exitConditionType = exitConditionBlock[blockNames.ExitConditionType.type]
+        exitConditionParams = exitConditionBlock[blockNames.SimulationParams.params]
+        if exitConditionType == blockNames.ExitConditionType.metric:
+            metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
+            metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
+            return MetricExitCondition(metricCol, metricValue)
+        else:
+            sys.exit("Unknown exit condition type! Choices are: " + str(simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY.values()))
+
+
+class MetricExitCondition:
+    def __init__(self, metricCol, metricValue):
+        self.metricCol = metricCol
+        self.metricValue = metricValue
+        self.lastCheckedCluster = 0
+        self.type = simulationTypes.EXITCONDITION_TYPE.METRIC
+
+    def checkExitCondition(self, clustering, checkAllClusters=False):
+        """ Iterate over all unchecked cluster and check if the exit condtion
+            is met
+        """
+        for i in range(self.lastCheckedCluster, clustering.clusters.getNumberClusters()):
+            cluster = clustering.clusters.getCluster(i)
+            metric = cluster.getMetricFromColumn(self.metricCol)
+            if metric is not None and metric < self.metricValue:
+                return True
+            if not checkAllClusters:
+                self.lastCheckedCluster = i
+        return False
+
 
 class RunnerBuilder:
 
@@ -98,6 +147,10 @@ class RunnerBuilder:
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
+            exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
+            if exitConditionBlock:
+                exitConditionBuilder = ExitConditionBuilder()
+                params.exitCondition = exitConditionBuilder.build(exitConditionBlock)
 
             SimulationRunner = PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
@@ -113,4 +166,3 @@ class RunnerBuilder:
         else:
             sys.exit("Unknown simulation type! Choices are: " + str(simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))
         return SimulationRunner
-

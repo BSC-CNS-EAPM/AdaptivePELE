@@ -5,6 +5,7 @@ class ClusteringTypes:
     contactMapAffinity = "contactMapAffinity"
     contactMapAgglomerative = "contactMapAgglomerative"
     contactMapAccumulative = "contactMapAccumulative"
+    lastSnapshot = "lastSnapshot"
     thresholdCalculator = "thresholdCalculator"
     ligandResname = "ligandResname"
     contactThresholdDistance = "contactThresholdDistance"
@@ -103,6 +104,14 @@ class SimulationParams:
     seed = "seed"
     peleSteps = "peleSteps"
     iterations = "iterations"
+    exitCondition = "exitCondition"
+    metricCol = "metricCol"
+    exitValue = "exitValue"
+
+
+class ExitConditionType:
+    type = "type"
+    metric = "metric"
 
 
 class ControlFileParams:

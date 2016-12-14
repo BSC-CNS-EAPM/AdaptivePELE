@@ -110,7 +110,17 @@ class SimulationParams:
         "controlFile": "unicode",
         "seed": "numbers.Real",
         "peleSteps": "numbers.Real",
-        "iterations": "numbers.Real"
+        "iterations": "numbers.Real",
+        "exitCondition": "dict"
+    }
+    exitCondition = {
+        "types": {
+            "metric": "unicode"
+        },
+        "params": {
+            "metricCol": "int",
+            "exitValue": "numbers.Real"
+        }
     }
 
 
@@ -134,16 +144,21 @@ class clusteringTypes:
             "contactThresholdDistance": "numbers.Real",
             "similarityEvaluator": "unicode"
         },
+        "lastSnapshot": {
+            "ligandResname": "unicode",
+            "contactThresholdDistance": "numbers.Real",
+        }
     }
     params = {
         "contacts": "unicode",
         "contactMapAffinity": "unicode",
         "contactMapAgglomerative": "unicode",
         "contactMapAccumaltive": "unicode",
+        "lastSnapshot": "unicode",
         "ligandResname": "unicode",
         "contactThresholdDistance": "numbers.Real",
         "similarityEvaluator": "unicode",
-        "symmetries": "dict",
+        "symmetries": "list",
         "nclusters": "numbers.Real"
     }
     thresholdCalculator = {
