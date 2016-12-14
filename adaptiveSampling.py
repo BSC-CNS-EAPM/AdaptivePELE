@@ -340,7 +340,6 @@ def main(jsonParams):
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
 
     clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
-    checkAll = clusteringType == blockNames.ClusteringTypes.lastSnapshot
     restart = generalParams[blockNames.GeneralParams.restart]
     debug = generalParams[blockNames.GeneralParams.debug]
     outputPath = generalParams[blockNames.GeneralParams.outputPath]
@@ -436,7 +435,7 @@ def main(jsonParams):
                                nativeStructure, clusteringMethod.symmetries)
 
         # check exit condition, if defined
-        if simulationRunner.hasExitCondition() and simulationRunner.checkExitCondition(clusteringMethod, checkAll):
+        if simulationRunner.hasExitCondition() and simulationRunner.checkExitCondition(clusteringMethod):
             print "Simulation exit condition met at iteration %d" % i
             break
     # utilities.cleanup
