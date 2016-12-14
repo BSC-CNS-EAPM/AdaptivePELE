@@ -111,27 +111,6 @@ def generateSnapshotSelectionStringLastRound(currentEpoch, epochOutputPathTemple
     return " \"" + os.path.join(epochOutputPathTempletized % currentEpoch, constants.trajectoryBasename) + "\""
 
 
-def writeSpawningInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clustering, iteration):
-    """ Write initial structures for the next iteriation
-
-        tmpInitialStructuresTemplate [In] Template of the name of the initial
-        structures
-        degeneracyOfRepresentatives [In] Array with the degeneracy of each
-        cluster (i.e the number of processors that will be assigned to it)
-        clustering [In] clustering object
-        iteration [In] Number of epoch
-    """
-    counts = 0
-    for i, cluster in enumerate(clustering.clusters.clusters):
-        for j in range(int(degeneracyOfRepresentatives[i])):
-            outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
-            print 'Writing to ', outputFilename, 'cluster', i
-            cluster.writePDB(outputFilename)
-
-            counts += 1
-
-    print "counts & cluster centers", counts, np.where(np.array(degeneracyOfRepresentatives) > 0)[0].size
-    return counts
 
 
 def findFirstRun(outputPath, clusteringOutputObject):
@@ -285,7 +264,7 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
     spawningCalculator.log()
     print "Degeneracy", degeneracyOfRepresentatives
 
-    seedingPoints = writeSpawningInitialStructures(outputPathConstants.tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, firstRun)
+    seedingPoints = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun)
 
     initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
 
@@ -448,7 +427,7 @@ def main(jsonParams):
 
         # Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:
-            numberOfSeedingPoints = writeSpawningInitialStructures(outputPathConstants.tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clusteringMethod, i+1)
+            numberOfSeedingPoints = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1)
             initialStructuresAsString = createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
             peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
 
