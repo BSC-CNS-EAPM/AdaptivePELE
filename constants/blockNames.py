@@ -46,6 +46,7 @@ class DensityCalculatorParams:
 
 class StringSpawningTypes:
     type = "type"
+    independent = "independent"
     sameWeight = "sameWeight"
     inverselyProportional = "inverselyProportional"
     epsilon = "epsilon"
