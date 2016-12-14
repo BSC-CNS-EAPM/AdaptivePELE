@@ -96,4 +96,9 @@ class TestadaptiveSampling(unittest.TestCase):
         goldenPath = "tests/data/3ptb_data/originTest3"
         outputPath = "tests/data/3ptb_data/Test3"
 
-        self.integrationTest(controlFile, goldenPath, outputPath)
+        try:
+            self.integrationTest(controlFile, goldenPath, outputPath)
+        except SystemExit:
+            # Catch error for not having PELE installed
+            shutil.rmtree(outputPath)
+            shutil.rmtree("tmp_tests_data_3ptb_data_Test3/")

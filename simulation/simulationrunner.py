@@ -32,9 +32,9 @@ class SimulationRunner:
     def hasExitCondition(self):
         return self.parameters.exitCondition is not None
 
-    def checkExitCondition(self, clustering, checkAllClusters=False):
+    def checkExitCondition(self, clustering):
         if self.parameters.exitCondition:
-            return self.parameters.exitCondition.checkExitCondition(clustering, checkAllClusters=False)
+            return self.parameters.exitCondition.checkExitCondition(clustering)
         return False
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary):
@@ -118,17 +118,14 @@ class MetricExitCondition:
         self.lastCheckedCluster = 0
         self.type = simulationTypes.EXITCONDITION_TYPE.METRIC
 
-    def checkExitCondition(self, clustering, checkAllClusters=False):
+    def checkExitCondition(self, clustering):
         """ Iterate over all unchecked cluster and check if the exit condtion
             is met
         """
-        for i in range(self.lastCheckedCluster, clustering.clusters.getNumberClusters()):
-            cluster = clustering.clusters.getCluster(i)
+        for cluster in clustering.clusters.clusters:
             metric = cluster.getMetricFromColumn(self.metricCol)
             if metric is not None and metric < self.metricValue:
                 return True
-            if not checkAllClusters:
-                self.lastCheckedCluster = i
         return False
 
 
