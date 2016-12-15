@@ -98,12 +98,13 @@ class SpawningParams:
         if spawningType == blockNames.StringSpawningTypes.variableEpsilon:
             self.varEpsilonType = spawningParamsBlock[blockNames.SpawningParams.varEpsilonType]
             self.maxEpsilon = spawningParamsBlock[blockNames.SpawningParams.maxEpsilon]
-            self.minEpsilon = spawningParamsBlock.get(blockNames.SpawningParams.minEpsilon,0.0)
-            self.variationWindow = spawningParamsBlock[blockNames.SpawningParams.variationWindow]
-            self.maxEpsilonWindow = spawningParamsBlock[blockNames.SpawningParams.maxEpsilonWindow]
-            self.period = spawningParamsBlock.get(blockNames.SpawningParams.period, self.variationWindow)
-            self.period += np.sign(np.abs(self.variationWindow-self.period))
-            # Add one epoch to the total lenght of the variation in the case of periodic variation to leave a step between variation periods
+            if self.varEpsilonType == blockNames.VariableEpsilonTypes.linearVariation:
+                self.minEpsilon = spawningParamsBlock.get(blockNames.SpawningParams.minEpsilon, self.epsilon)
+                self.variationWindow = spawningParamsBlock[blockNames.SpawningParams.variationWindow]
+                self.maxEpsilonWindow = spawningParamsBlock[blockNames.SpawningParams.maxEpsilonWindow]
+                self.period = spawningParamsBlock.get(blockNames.SpawningParams.period, self.variationWindow)
+                self.period += np.sign(np.abs(self.variationWindow-self.period))
+                # Add one epoch to the total lenght of the variation in the case of periodic variation to leave a step between variation periods
 
 
 from abc import ABCMeta, abstractmethod
@@ -356,11 +357,11 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
             clusteringParams.epsilon += calculateContactsVar(maxContacts-self.maxContacts, clusteringParams.maxEpsilon)
         self.maxContacts = maxContacts
 
-    def calculateEpsilonValue(self, clusteringParams, currentEpoch):
-        if currentEpoch is None or clusteringParams.variationWindow < currentEpoch:
-            clusteringParams.epsilon = clusteringParams.minEpsilon
-            return
+    def calculateEpsilonValue(self, clusteringParams, currentEpoch, clusters):
         if clusteringParams.varEpsilonType == blockNames.VariableEpsilonTypes.linearVariation:
+            if currentEpoch is None or clusteringParams.variationWindow < currentEpoch:
+                clusteringParams.epsilon = clusteringParams.minEpsilon
+                return
             self.linearVariation(clusteringParams,
                                  (currentEpoch % clusteringParams.period))
         elif clusteringParams.varEpsilonType == blockNames.VariableEpsilonTypes.contactsVariation:
@@ -369,14 +370,14 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
             sys.exit("Unknown epsilon variation type! Choices are: " +
                      str(spawningTypes.EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY.values()))
 
-    def log(self, epsilon, epoch):
+    def logVariableEpsilon(self, epsilon, epoch):
         epsilon_file = open("epsilon_values.txt", "a")
         epsilon_file.write("%d\t%f\n" % (epoch, epsilon))
         epsilon_file.close()
 
     def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
-        self.calculateEpsilonValue(clusteringParams, currentEpoch)
-        self.log(clusteringParams.epsilon, currentEpoch)
+        self.calculateEpsilonValue(clusteringParams, currentEpoch, clusters)
+        self.logVariableEpsilon(clusteringParams.epsilon, currentEpoch)
         return self.epsilonDegeneracyCalculator.calculate(clusters, trajToDistribute, clusteringParams, currentEpoch)
 
 
