@@ -322,6 +322,7 @@ class TreeClustering(Clustering):
         pdb.initialise(snapshot, resname=self.resname)
         clusterNode = self.tree.root
         self.clusteringEvaluator.cleanContactMap()
+        minDist = 100
         while clusterNode.children:
             for node in clusterNode.children:
                 scd = atomset.computeSquaredCentroidDifference(node.cluster.pdb, pdb)
@@ -332,7 +333,9 @@ class TreeClustering(Clustering):
                         node.cluster.addElement(metrics)
                         return
                     else:
-                        clusterNode = node
+                        if scd < minDist:
+                            minDist = scd
+                            clusterNode = node
                 else:
                     continue
             # If has compared to all the children and none is within centroid
