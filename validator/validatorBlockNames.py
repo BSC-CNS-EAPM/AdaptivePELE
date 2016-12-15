@@ -58,11 +58,7 @@ class SpawningParams:
             "reportFilename": "unicode",
             "metricColumnInReport": "numbers.Real",
             "varEpsilonType": "unicode",
-            "maxEpsilon": "numbers.Real",
-            "minEpsilon": "numbers.Real",
-            "variationWindow": "numbers.Real",
-            "maxEpsilonWindow": "numbers.Real",
-            "period": "numbers.Real",
+            "maxEpsilon": "numbers.Real"
         }
     }
     density = {
