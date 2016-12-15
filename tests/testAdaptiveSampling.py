@@ -16,7 +16,9 @@ class TestadaptiveSampling(unittest.TestCase):
                 goldenCluster = pickle.load(f)
             with open(outputPathObject % i, 'rb') as f2:
                 outputCluster = pickle.load(f2)
-                self.assertEqual(outputCluster, goldenCluster)
+            goldenCluster.clusters.printClusters()
+            outputCluster.clusters.printClusters()
+            self.assertEqual(outputCluster, goldenCluster)
 
     def checkStartingConformations(self, goldenPath, outputPath):
         goldenPathInitial = os.path.join(goldenPath, "%d/initial_%d.pdb")
