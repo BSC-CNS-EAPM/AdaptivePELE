@@ -151,7 +151,11 @@ class CMClusteringEvaluator:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
 
     def getInnerLimit(self, cluster):
-        return 12.0
+        if cluster.contacts > 2.0:
+            return 4.0
+        else:
+            return 16 - 6*cluster.contacts
+        # return 16.0
 
 
 class Clustering:
