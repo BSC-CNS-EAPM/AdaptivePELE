@@ -107,9 +107,24 @@ class ExitConditionBuilder:
             metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
             metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
             return MetricExitCondition(metricCol, metricValue)
+        elif exitConditionType == blockNames.ExitConditionType.clustering:
+            ntrajs = exitConditionParams[blockNames.SimulationParams.trajectories]
+            return ClusteringExitCondition(ntrajs)
         else:
             sys.exit("Unknown exit condition type! Choices are: " + str(simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY.values()))
 
+
+class ClusteringExitCondition:
+    def __init__(self, ntrajs):
+        self.clusterNum = 0
+        self.ntrajs = ntrajs
+        self.type = simulationTypes.EXITCONDITION_TYPE.CLUSTERING
+
+    def checkExitCondition(self, clustering):
+        newClusterNum = clustering.getNumberClusters()
+        clusterDiff = newClusterNum - self.clusterNum
+        self.clusterNum = newClusterNum
+        return clusterDiff < 0.1*self.ntrajs
 
 class MetricExitCondition:
     def __init__(self, metricCol, metricValue):
