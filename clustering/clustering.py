@@ -126,12 +126,16 @@ class Node:
         self.position = position
         self.parent = parent
         self.cluster = cluster
+        if self.parent is None:
+            self.depth = 1
+        else:
+            self.depth = parent.depth+1
 
     def addChildren(self, node):
         self.children.append(node)
 
 
-class ContacsClusteringEvaluator:
+class ContactsClusteringEvaluator:
     def __init__(self, RMSDCalculator):
         self.RMSDCalculator = RMSDCalculator
         self.contacts = None
@@ -149,8 +153,16 @@ class ContacsClusteringEvaluator:
         if self.contacts is None:
             self.contacts = pdb.countContacts(resname, contactThresholdDistance)
 
-    def getInnerLimit(self, cluster):
-        return cluster.threshold2
+    def getOuterLimit(self, node):
+        # return max(node.cluster.threshold2, node.cluster.threshold2 + 10 - node.depth)
+        return node.cluster.threshold2
+        if node.depth > 5:
+            return node.cluster.threshold2
+        else:
+            return node.cluster.threshold2 + 2 ** (6-node.depth)
+
+    def getInnerLimit(self, node):
+        return node.cluster.threshold2
 
 
 class CMClusteringEvaluator:
@@ -174,11 +186,16 @@ class CMClusteringEvaluator:
         if self.contactMap is None:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
 
-    def getInnerLimit(self, cluster):
-        return 12.0
+    def getInnerLimit(self, node):
+        # return max(16, 16 * 2 - node.depth)
+        return 16
+
+    def getOuterLimit(self, node):
+        # return max(16, 16 * 2 - node.depth)
+        return 16
 
 
-class Clustering:
+class Clustering(object):
     """
         Base class for clustering methods, it defines a cluster method that
         contacts and accumulative inherit and use
@@ -283,6 +300,63 @@ class Clustering:
         with open(outputObject, 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
+    def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
+        #########################################
+        # OPTIMISATION:
+        # We use centroid distance as a lower bound for RMSD
+        #
+        # Proof:
+        # Superscript ^1 and ^2 stands for PDB1 and PDB2 respectively
+        # Exponentiation is referred as ** to avoid misunderstandings
+        # Sumation is performed over atoms
+        #
+        # RMSD**2 = sum_i ||r^1_i - r^2_i||**2 / N := sum_i d_i**2 / N
+        # dc := centroid difference
+        # dc = ||sum_i r^1_i - r^2_i|| / N := sum_i d_i / N
+        # where d_i := r^1_i - r^2_i
+        #
+        # In the end, it is a matter of showing that the square of avg. is
+        # smaller or equal to the avg. of squares:
+        # (sum_i d_i / N)**2 <= sum_i d_i**2 / N
+        #
+        # Remembering Cauchy-Schward inequality:
+        # |<u*v>| <= ||<u>||*||<v>||
+        # Setting u_i = d_i/N and v_i = 1 for all i, in an n-dim euclidean space
+        # (sum d_i / N)**2 <= sum (d_i/N)**2 * 1
+        #########################################
+        pdb = atomset.PDB()
+        pdb.initialise(snapshot, resname=self.resname)
+        self.clusteringEvaluator.cleanContactMap()
+        if np.random.rand() < 0.5:
+            tmpClusters = self.clusters.clusters
+        else:
+            tmpClusters = reversed(self.clusters.clusters)
+            # tmpClusters = self.clusters.clusters[::-1]
+        for clusterNum, cluster in enumerate(tmpClusters):
+            scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
+            if scd > self.clusteringEvaluator.getInnerLimit(cluster):
+                continue
+
+            if self.clusteringEvaluator.isElement(pdb, cluster, self.resname,
+                                                  self.contactThresholdDistance):
+                cluster.addElement(metrics)
+                return
+
+        # if made it here, the snapshot was not added into any cluster
+        # Check if contacts and contactMap are set (depending on which kind
+        # of clustering)
+        self.clusteringEvaluator.checkAttributes(pdb, self.resname, self.contactThresholdDistance)
+        contacts = self.clusteringEvaluator.contacts
+        numberOfLigandAtoms = pdb.getNumberOfAtoms()
+        contactsPerAtom = float(contacts)/numberOfLigandAtoms
+
+        threshold = self.thresholdCalculator.calculate(contactsPerAtom)
+        cluster = Cluster(pdb, thresholdRadius=threshold,
+                            contacts=contactsPerAtom,
+                            contactMap=self.clusteringEvaluator.contactMap,
+                            metrics=metrics, metricCol=col)
+        self.clusters.addCluster(cluster)
+
 
 
 class TreeClustering(Clustering):
@@ -327,15 +401,15 @@ class TreeClustering(Clustering):
             for node in clusterNode.children:
                 scd = atomset.computeSquaredCentroidDifference(node.cluster.pdb, pdb)
                 # if scd > node.cluster.threshold2+4:
-                if scd < self.clusteringEvaluator.getInnerLimit(node.cluster):
-                    if self.clusteringEvaluator.isElement(pdb, node.cluster,
-                                                          self.resname, self.contactThresholdDistance):
-                        node.cluster.addElement(metrics)
-                        return
-                    else:
-                        if scd < minDist:
-                            minDist = scd
-                            clusterNode = node
+                if scd < self.clusteringEvaluator.getOuterLimit(node):
+                    if scd < self.clusteringEvaluator.getInnerLimit(node):
+                        if self.clusteringEvaluator.isElement(pdb, node.cluster,
+                                                              self.resname, self.contactThresholdDistance):
+                            node.cluster.addElement(metrics)
+                            return
+                    if scd < minDist:
+                        minDist = scd
+                        clusterNode = node
                 else:
                     continue
             # If has compared to all the children and none is within centroid
@@ -358,6 +432,12 @@ class TreeClustering(Clustering):
         self.tree.addNode(Node(cluster, self.clusters.getNumberClusters(), clusterNode), clusterNode)
         self.clusters.addCluster(cluster)
 
+    def extractPathwayFromNode(self, node):
+        pathway = []
+        while node.parent is not None:
+            pathway.append(node.cluster)
+            node = node.parent
+        return pathway
 
 class ContactsClustering(TreeClustering):
     """
@@ -379,12 +459,14 @@ class ContactsClustering(TreeClustering):
     def __init__(self, thresholdCalculator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8, symmetries=[]):
-        TreeClustering.__init__(self, resname, reportBaseFilename,
+        # TreeClustering.__init__(self, resname, reportBaseFilename,
+        #                    columnOfReportFile, contactThresholdDistance)
+        super(ContactsClustering, self).__init__(resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
         self.type = clusteringTypes.CLUSTERING_TYPES.contacts
         self.thresholdCalculator = thresholdCalculator
         self.symmetries = symmetries
-        self.clusteringEvaluator = ContacsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
+        self.clusteringEvaluator = ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
 
 
 class ContactMapAccumulativeClustering(TreeClustering):
@@ -403,7 +485,9 @@ class ContactMapAccumulativeClustering(TreeClustering):
     def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8, symmetries=[]):
-        TreeClustering.__init__(self, resname, reportBaseFilename,
+        # TreeClustering.__init__(self, resname, reportBaseFilename,
+        #                     columnOfReportFile, contactThresholdDistance)
+        super(ContactMapAccumulativeClustering, self).__init__(resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative
         self.thresholdCalculator = thresholdCalculator
