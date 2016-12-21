@@ -109,7 +109,7 @@ class Cluster:
              and np.allclose(self.metrics, other.metrics)
 
 
-class ContacsClusteringEvaluator:
+class ContactsClusteringEvaluator:
     def __init__(self, RMSDCalculator):
         self.RMSDCalculator = RMSDCalculator
         self.contacts = None
@@ -193,6 +193,10 @@ class Clustering:
 
     def getCluster(self, clusterNum):
         return self.clusters.getCluster(clusterNum)
+
+
+    def getNumberClusters(self):
+        return self.clusters.getNumberClusters()
 
     def __eq__(self, other):
         return self.clusters == other.clusters\
@@ -344,7 +348,7 @@ class ContactsClustering(Clustering):
         self.type = clusteringTypes.CLUSTERING_TYPES.contacts
         self.thresholdCalculator = thresholdCalculator
         self.symmetries = symmetries
-        self.clusteringEvaluator = ContacsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
+        self.clusteringEvaluator = ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
 
 
 class ContactMapAccumulativeClustering(Clustering):
