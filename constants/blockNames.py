@@ -108,11 +108,13 @@ class SimulationParams:
     exitCondition = "exitCondition"
     metricCol = "metricCol"
     exitValue = "exitValue"
+    trajectories = "trajectories"
 
 
 class ExitConditionType:
     type = "type"
     metric = "metric"
+    clustering = "clustering"
 
 
 class ControlFileParams:
