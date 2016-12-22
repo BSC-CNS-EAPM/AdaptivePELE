@@ -109,7 +109,7 @@ class Cluster:
              and np.allclose(self.metrics, other.metrics)
 
 
-class ContacsClusteringEvaluator:
+class ContactsClusteringEvaluator:
     def __init__(self, RMSDCalculator):
         self.RMSDCalculator = RMSDCalculator
         self.contacts = None
@@ -194,6 +194,10 @@ class Clustering:
     def getCluster(self, clusterNum):
         return self.clusters.getCluster(clusterNum)
 
+
+    def getNumberClusters(self):
+        return self.clusters.getNumberClusters()
+
     def __eq__(self, other):
         return self.clusters == other.clusters\
             and self.reportBaseFilename == other.reportBaseFilename\
@@ -247,14 +251,14 @@ class Clustering:
 
             metric = cluster.getMetric()
             if metric:
-                writeString = "%d %d %d %.2f %.2f %.1f %.3f\n" % (i, cluster.elements,
+                writeString = "%d %d %d %.2f %.3f %.3f %.3f\n" % (i, cluster.elements,
                                                                   degeneracy[i],
                                                                   cluster.contacts,
                                                                   cluster.threshold,
                                                                   cluster.density,
                                                                   metric)
             else:
-                writeString = "%d %d %d %.2f %.2f %.1f -\n" % (i, cluster.elements,
+                writeString = "%d %d %d %.2f %.3f %.3f -\n" % (i, cluster.elements,
                                                                degeneracy[i],
                                                                cluster.contacts,
                                                                cluster.threshold,
@@ -344,7 +348,7 @@ class ContactsClustering(Clustering):
         self.type = clusteringTypes.CLUSTERING_TYPES.contacts
         self.thresholdCalculator = thresholdCalculator
         self.symmetries = symmetries
-        self.clusteringEvaluator = ContacsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
+        self.clusteringEvaluator = ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
 
 
 class ContactMapAccumulativeClustering(Clustering):
