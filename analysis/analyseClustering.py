@@ -113,26 +113,27 @@ def plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
 
 if __name__ == "__main__":
     # resname = "ALJ"
-    resname = "STR"
+    # resname = "STR"
+    resname = "K5Y"
 
-    # # Cont
-    # pklObjectFilename = "ClCont.pkl"
-    # metricPlotFilename = ""  # "results/contactClusters.png"
-    # populationPlotFilename = ""  # "results/contactClusterspop.png"
-    # contactsPlotFilename = ""  # "results/contactClustersContacts.png"
-    # titlemetric = "Metrics Contacts"
-    # titlepopulation = "Population Contacts"
-    # titlecontacts = "Number of contacts Contacts"
+    # Cont
+    pklObjectFilename = "ClCont_list.pkl"
+    metricPlotFilename = ""  # "results/contactClusters.png"
+    populationPlotFilename = ""  # "results/contactClusterspop.png"
+    contactsPlotFilename = ""  # "results/contactClustersContacts.png"
+    titlemetric = "Metrics Contacts"
+    titlepopulation = "Population Contacts"
+    titlecontacts = "Number of contacts Contacts"
 
-    # plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
-    #                    titlecontacts, metricPlotFilename,
-    #                    populationPlotFilename, contactsPlotFilename)
+    plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
+                       titlecontacts, metricPlotFilename,
+                       populationPlotFilename, contactsPlotFilename)
 
     # Acc
-    pklObjectFilename = "ClAcc_PR_heav.pkl"
-    metricPlotFilename = "results/metricplotAcc_acc_PR_heav.png"
-    populationPlotFilename = "results/populationAcc_acc_PR_heav.png"
-    contactsPlotFilename = "results/contactsplotAcc_acc_PR_heav.png"
+    pklObjectFilename = "ClAcc_list.pkl"
+    #metricPlotFilename = "results/metricplotAcc_acc_PR_heav.png"
+    #populationPlotFilename = "results/populationAcc_acc_PR_heav.png"
+    #contactsPlotFilename = "results/contactsplotAcc_acc_PR_heav.png"
     titlemetric = "Metrics Accumulative"
     titlepopulation = "Population Accumulative"
     titlecontacts = "Number of contacts Accumulative"

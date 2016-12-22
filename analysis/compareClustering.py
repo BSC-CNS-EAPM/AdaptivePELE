@@ -9,55 +9,56 @@ from spawning import spawning, densitycalculator
 ntrajs = 127
 nclusters = 80
 thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
-# thresholdCalculator = thresholdCalculatorBuilder.build({
-#         "thresholdCalculator": {
-#             "type": "constant",
-#             "params": {
-#                 "value": 2
-#             }
-#         }
-# })
-thresholdCalculator = thresholdCalculatorBuilder.build({})
-# Distance index
-similarityEvaluator = clustering.differenceDistanceEvaluator()
-thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
-    "thresholdCalculator": {
-        "type": "heaviside",
-        "params": {
-            "conditions": [1.2, 1.0, 0.5, 0.0],
-            "values": [0.2, 0.4, 0.5, 0.8]
+thresholdCalculator = thresholdCalculatorBuilder.build({
+        "thresholdCalculator": {
+            "type": "heaviside",
+            "params": {
+                "values": [2, 3, 4, 5],
+                "conditions": [1, 0.75, 0.5]
+            }
         }
-    }
 })
-# Jaccard index
-similarityEvaluator = clustering.JaccardEvaluator()
+# thresholdCalculator = thresholdCalculatorBuilder.build({})
+# Distance index
+# similarityEvaluator = clustering.differenceDistanceEvaluator()
 # thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
 #     "thresholdCalculator": {
-#         "type" : "constant",
-#         "params" : {
-#             "value" : 0.015
+#         "type": "heaviside",
+#         "params": {
+#             "conditions": [1.2, 1.0, 0.5, 0.0],
+#             "values": [0.2, 0.4, 0.5, 0.8]
 #         }
 #     }
 # })
+# Jaccard index
+similarityEvaluator = clustering.JaccardEvaluator()
 thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
     "thresholdCalculator": {
-        "type" : "heaviside",
+        "type" : "constant",
         "params" : {
-            "conditions" : [0.75, 0.25],
-            "values" : [0.03,0.015,0.001]
+            "value" : 0.03
         }
     }
 })
+# thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
+#     "thresholdCalculator": {
+#         "type" : "heaviside",
+#         "params" : {
+#             "conditions" : [1, 0.75, 0.5],
+#             "values" : [0.025, 0.03, 0.04, 0.05]
+#         }
+#     }
+# })
 # correlation
-similarityEvaluator = clustering.correlationEvaluator()
-thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
-    "thresholdCalculator": {
-        "type": "constant",
-        "params": {
-            "value": 0.15
-        }
-    }
-})
+# similarityEvaluator = clustering.correlationEvaluator()
+# thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
+#     "thresholdCalculator": {
+#         "type": "constant",
+#         "params": {
+#             "value": 0.15
+#         }
+#     }
+# })
 densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
 densityCalculator = densityCalculatorBuilder.build({
        "density": {
