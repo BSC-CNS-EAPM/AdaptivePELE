@@ -27,7 +27,7 @@ def writeStructures(clusteringObject, listStructures, checker=lambda x: True, ou
     output = ""
     for element in listStructures:
         cluster = clObject.clusters.clusters[element]
-        if checker(cluster):
+        if checker is None or checker(cluster):
             print "Writing", pathToWrite%element
             cluster.pdb.pdb += "\nENDMDL\n"
             output += cluster.pdb.pdb
