@@ -1,7 +1,7 @@
 import argparse
 from spawning import spawning, densitycalculator
 from clustering import clustering
-from atomset import atomset
+from atomset import atomset, RMSDCalculator
 from utilities import utilities
 from scipy.sparse.csgraph import shortest_path
 import numpy as np
@@ -22,13 +22,13 @@ def parseArgs():
     return args
 
 
-def getOptimalCluster(clusteringObj, native):
+def getOptimalCluster(clusteringObj, native, RMSDCalc):
     optimalMetric = 1000000
     optimalIndex = 0
     nativePDB = atomset.PDB()
     nativePDB.initialise(native)
     for i, cluster in enumerate(clusteringObj.clusters.clusters):
-        metric = clusteringObj.RMSDCalculator.computeRMSD(cluster.pdb, nativePDB)
+        metric = RMSDCalc.computeRMSD(cluster.pdb, nativePDB)
         if metric < optimalMetric:
             optimalMetric = metric
             optimalIndex = i
@@ -36,7 +36,7 @@ def getOptimalCluster(clusteringObj, native):
     return optimalIndex
 
 
-def createNetworkMatrix(clusteringObj, threshold):
+def createNetworkMatrix(clusteringObj, threshold, RMSDCalc):
     n = clusteringObj.clusters.getNumberClusters()
     matrix = np.zeros((n, n))
     for i, cluster in enumerate(clusteringObj.clusters.clusters):
@@ -47,7 +47,7 @@ def createNetworkMatrix(clusteringObj, threshold):
             if atomset.computeSquaredCentroidDifference(cluster.pdb, cluster2.pdb) > threshold:
                 matrix[i, j] = matrix[j, i] = np.inf
             else:
-                matrix[i, j] = matrix[j, i] = clusteringObj.RMSDCalculator.computeRMSD(cluster.pdb, cluster2.pdb)
+                matrix[i, j] = matrix[j, i] = RMSDCalc.computeRMSD(cluster.pdb, cluster2.pdb)
     return matrix
 
 
@@ -100,11 +100,12 @@ def main(args):
     pathwayFilename = args.pathwayFilename
     ntrajs = args.ntrajs
     threshold = args.threshold
+    RMSDCalc = RMSDCalculator.RMSDCalculator(clusteringObj.symmetries)
 
     # use graph algorithm to establish a path
     initial_cluster = 0
-    final_cluster = getOptimalCluster(clusteringObj, native)
-    distanceMatrix = createNetworkMatrix(clusteringObj, threshold)
+    final_cluster = getOptimalCluster(clusteringObj, native, RMSDCalc)
+    distanceMatrix = createNetworkMatrix(clusteringObj, threshold, RMSDCalc)
     predecessors = obtainShortestPath(distanceMatrix)
     pathway = createPathway(initial_cluster, final_cluster, predecessors)
     print "Pathway clusters:"
