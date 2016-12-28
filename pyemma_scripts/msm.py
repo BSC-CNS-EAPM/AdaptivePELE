@@ -28,9 +28,9 @@ def is_connected(MSM_object):
     """ Check if the MSM created is connected"""
     return msm.analysis.is_connected(MSM_object.transition_matrix)
 
-def ChapmanKolmogorovTest(MSM_object, nsets,memberships=None, error_estimation=False):
+def ChapmanKolmogorovTest(MSM_object, nsets,memberships=None, error_estimation=False, mlags=2):
     """ Perform the ChapmanKolmogorov test to validate the MSM"""
-    return MSM_object.cktest(nsets,memberships=memberships,err_est=error_estimation)
+    return MSM_object.cktest(nsets,memberships=memberships,err_est=error_estimation, mlags=mlags)
 
 def plotChapmanKolmogorovTest(CKObject, layout=None, padding_between=0.1,
                               padding_top=0.075):
