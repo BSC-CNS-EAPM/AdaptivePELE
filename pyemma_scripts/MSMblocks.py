@@ -43,7 +43,7 @@ class PrepareMSM:
 
 class MSM:
     def __init__(self, cl, lagtimes, numPCCA, itsOutput=None, numberOfITS=-1,
-                 itsErrors=None, error_estimationCK=None):
+                 itsErrors=None, error_estimationCK=None, mlags=2):
         self.MSMFile = "MSM_object.pkl"
         if os.path.exists(self.MSMFile):
             self.MSM_object = helper.loadMSM(self.MSMFile)
@@ -55,6 +55,7 @@ class MSM:
         self.numberOfITS = numberOfITS
         self.itsErrors = itsErrors
         self.error_estimationCK = error_estimationCK
+        self.mlags = mlags
         self.MSM_object = None
 
     def estimate(self):
@@ -64,12 +65,12 @@ class MSM:
         self.PCCA(self.numPCCA)
         print "Saving MSM object..."
         helper.saveMSM(self.MSM_object)
-        self.performCPTest(self.error_estimationCK)
+        self.performCKTest(self.error_estimationCK)
 
     def getMSM_object(self):
         return self.MSM_object
 
-    def performCPTest(self, error_estimationCK=None):
+    def performCKTest(self, error_estimationCK=None):
         # Chapman-Kolgomorov validation
         nsetsCK = len(self.MSM_object.metastable_sets)
         print ("Performing Chapman-Kolmogorov validation with the %d sets from"
@@ -78,7 +79,8 @@ class MSM:
         membershipsCK = self.MSM_object.metastable_memberships
         CKObject = msm.ChapmanKolmogorovTest(self.MSM_object,
                                              nsetsCK, memberships=membershipsCK,
-                                             error_estimation=error_estimationCK)
+                                             error_estimation=error_estimationCK,
+                                             mlags=self.mlags)
         msm.plotChapmanKolmogorovTest(CKObject)
         plt.show()
 
