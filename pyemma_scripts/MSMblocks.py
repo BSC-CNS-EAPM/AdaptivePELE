@@ -8,14 +8,14 @@ import matplotlib.pyplot as plt
 
 
 class PrepareMSM:
-    def __init__(self,numClusters,trajectoryFolder, trajectoryBasename, stride=1):
+    def __init__(self, numClusters, trajectoryFolder, trajectoryBasename, stride=1):
 
         self.discretizedFolder = "discretized"
         self.clusterCentersFile = os.path.join(self.discretizedFolder,
                                                "clusterCenters.dat")
         self.discTraj = os.path.join(self.discretizedFolder, "%s.disctraj")
         self.clusteringFile = "clustering_object.pkl"
-        self.stride=stride
+        self.stride = stride
         if os.path.exists(self.clusteringFile):
             self.cl = helper.loadClustering(self.clusteringFile)
         else:
@@ -29,9 +29,9 @@ class PrepareMSM:
 
         # cluster & assign
         print "Clustering data..."
-        # self.cl = trajectories.clusterTrajectories(self.x, numClusters, stride=self.stride)
-        self.cl = trajectories.clusterRegularSpace(self.x, 3 , stride=self.stride)
-        #write output
+        self.cl = trajectories.clusterTrajectories(self.x, numClusters, stride=self.stride)
+        # self.cl = trajectories.clusterRegularSpace(self.x, 3, stride=self.stride)
+        # write output
         print "Writing clustering data..."
         helper.makeFolder(self.discretizedFolder)
         helper.writeClusterCenters(self.cl, self.clusterCentersFile)
@@ -46,6 +46,7 @@ class MSM:
     def __init__(self, cl, lagtimes, numPCCA, itsOutput=None, numberOfITS=-1,
                  itsErrors=None, error_estimationCK=None, mlags=2):
         self.MSMFile = "MSM_object.pkl"
+        self.MSM_object = None
         if os.path.exists(self.MSMFile):
             self.MSM_object = helper.loadMSM(self.MSMFile)
 
@@ -57,7 +58,6 @@ class MSM:
         self.itsErrors = itsErrors
         self.error_estimationCK = error_estimationCK
         self.mlags = mlags
-        self.MSM_object = None
 
     def estimate(self):
         lagtime = self.calculateITS()
@@ -145,10 +145,11 @@ class MSM:
         return lagtime
 
     def writeClustersForWMD(self, outfile="clusters.pdb"):
-        tempStr = "ATOM  {:d<5} CLUS  A {:d<5} {:f<8}{:f<8}{:f<8}1.00  {:f<6}            C  "
+        tempStr = "HETATM  {:>5d} H1 CLT L {:>4d} {:>8.3f}{:>8.3f}{:>8.3f} 0.75  {:<6f}           H\n"
         with open(outfile, "w") as f:
             for i, coords in enumerate(self.cl.clustercenters):
-                f.write(tempStr.format(i, i, coords[0], coords[1], coords[2], self.MSM_object.pi[i]))
+                f.write(tempStr.format(i+1, i+1, coords[0], coords[1], coords[2], self.MSM_object.stationary_distribution[i]))
+
 
 class TPT:
     def __init__(self, MSM_object, cl, outfile_fluxTPT, state_labels):
