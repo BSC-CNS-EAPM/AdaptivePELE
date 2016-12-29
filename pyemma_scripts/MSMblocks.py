@@ -29,7 +29,8 @@ class PrepareMSM:
 
         # cluster & assign
         print "Clustering data..."
-        self.cl = trajectories.clusterTrajectories(self.x, numClusters, stride=self.stride)
+        # self.cl = trajectories.clusterTrajectories(self.x, numClusters, stride=self.stride)
+        self.cl = trajectories.clusterRegularSpace(self.x, 3 , stride=self.stride)
         #write output
         print "Writing clustering data..."
         helper.makeFolder(self.discretizedFolder)
@@ -62,10 +63,10 @@ class MSM:
         lagtime = self.calculateITS()
         self.createMSM(lagtime)
         self.check_connectivity()
-        self.PCCA(self.numPCCA)
+        # self.PCCA(self.numPCCA)
         print "Saving MSM object..."
         helper.saveMSM(self.MSM_object)
-        self.performCKTest(self.error_estimationCK)
+        # self.performCKTest(self.error_estimationCK)
 
     def getMSM_object(self):
         return self.MSM_object
@@ -143,6 +144,11 @@ class MSM:
                 self.lagtimes.sort()
         return lagtime
 
+    def writeClustersForWMD(self, outfile="clusters.pdb"):
+        tempStr = "ATOM  {:d<5} CLUS  A {:d<5} {:f<8}{:f<8}{:f<8}1.00  {:f<6}            C  "
+        with open(outfile, "w") as f:
+            for i, coords in enumerate(self.cl.clustercenters):
+                f.write(tempStr.format(i, i, coords[0], coords[1], coords[2], self.MSM_object.pi[i]))
 
 class TPT:
     def __init__(self, MSM_object, cl, outfile_fluxTPT, state_labels):
