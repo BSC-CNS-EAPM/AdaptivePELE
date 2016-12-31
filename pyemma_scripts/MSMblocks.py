@@ -104,7 +104,8 @@ class MSM:
     def createMSM(self, lagtime):
         # estimation
         print "Estimating MSM with lagtime %d..." % lagtime
-        self.MSM_object = msm.estimateMSM(self.cl.dtrajs, lagtime)
+        error_est = self.itsErrors or self.error_estimationCK
+        self.MSM_object = msm.estimateMSM(self.cl.dtrajs, lagtime, error_est)
 
     def calculateITS(self):
         is_converged = False
