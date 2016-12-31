@@ -11,11 +11,14 @@ def plotITS(its_object, its_plot_file=None, nits=-1):
     its_plot = mplt.plot_implied_timescales(its_object, outfile=its_plot_file, nits=nits)
     return its_plot
 
-def estimateMSM(trajectories,lagtime):
+def estimateMSM(trajectories,lagtime, error_est=False):
     """ Estimate a MSM from the trajectories using a provided lagtime that
     should be big enough so that the relevant processes have converged.
     Return a MaximumLikelihoodMSM object"""
-    MSM_object = msm.estimate_markov_model(trajectories, lagtime)
+    if error_est:
+        MSM_object = msm.bayesian_markov_model(trajectories, lagtime)
+    else:
+        MSM_object = msm.estimate_markov_model(trajectories, lagtime)
     return MSM_object
 
 def calculatePCCA(MSM_object, numPCCA):
