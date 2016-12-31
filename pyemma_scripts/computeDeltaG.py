@@ -29,10 +29,14 @@ def writePDB(pmf_xyzg, title="clusters.pdb"):
 
 
 clusteringObject = helper.loadMSM('clustering_object.pkl')
-r = clusteringObject.clustercenters
+allClusters = clusteringObject.clustercenters
 
 MSMObject = helper.loadMSM('MSM_object.pkl')
 pi = MSMObject.stationary_distribution
+
+
+r = allClusters[MSMObject.connected_sets[0]]
+
 
 #filename = "output.txt"
 #data = np.loadtxt(filename)

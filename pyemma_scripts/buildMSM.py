@@ -43,9 +43,10 @@ def main(control_file):
                                  itsErrors, error_estimationCK, mlags)
     calculateMSM.estimate()
     MSM_object = calculateMSM.getMSM_object()
-    TPTinstance = MSMblocks.TPT(MSM_object, cl, outfile_fluxTPT, state_labels)
-    TPT_Object = TPTinstance.getTPTObject()
-    coarseTPT_Object = TPTinstance.getCoarseTPTObject()
+    calculateMSM.writeClustersForWMD()
+    # TPTinstance = MSMblocks.TPT(MSM_object, cl, outfile_fluxTPT, state_labels)
+    # TPT_Object = TPTinstance.getTPTObject()
+    # coarseTPT_Object = TPTinstance.getCoarseTPTObject()
 
 
 

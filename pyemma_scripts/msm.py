@@ -1,10 +1,10 @@
-import pyemma.msm as msm
+import pyemma.msm as MSM
 import pyemma.plots as mplt
 import matplotlib.pyplot as plt
 
 def calculateITS(trajectories, lagtimes, errors = None):
     """ Calulate the implied time-scales at the given lagtimes"""
-    its_object = msm.its(trajectories, lags=lagtimes, errors=errors)
+    its_object = MSM.its(trajectories, lags=lagtimes, errors=errors)
     return its_object
 
 def plotITS(its_object, its_plot_file=None, nits=-1):
@@ -29,7 +29,7 @@ def calculatePCCA(MSM_object, numPCCA):
 
 def is_connected(MSM_object):
     """ Check if the MSM created is connected"""
-    return msm.analysis.is_connected(MSM_object.transition_matrix)
+    return MSM.analysis.is_connected(MSM_object.transition_matrix)
 
 def ChapmanKolmogorovTest(MSM_object, nsets,memberships=None, error_estimation=False, mlags=2):
     """ Perform the ChapmanKolmogorov test to validate the MSM"""
