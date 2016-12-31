@@ -1,2 +1,13 @@
 06-09-16 16:15:49 pyemma.coordinates.clustering.kmeans.KmeansClustering[0] INFO     Algorithm did not reach convergence criterion of 1e-05 in 20 iterations. Consider increasing max_iter.
 06-09-16 16:29:29 pyemma.msm.estimators.lagged_model_validators.ChapmanKolmogorovValidator[0] WARNING  Changed mlags as some mlags exceeded maximum trajectory length.
+29-12-16 11:37:01 pyemma.msm.estimators.implied_timescales.ImpliedTimescales[0] WARNING  Some timescales could not be computed. Timescales array is smaller than expected or contains NaNs
+29-12-16 11:40:05 pyemma.msm.estimators.implied_timescales.ImpliedTimescales[0] WARNING  Some timescales could not be computed. Timescales array is smaller than expected or contains NaNs
+29-12-16 11:41:30 pyemma.msm.estimators.implied_timescales.ImpliedTimescales[0] WARNING  Some timescales could not be computed. Timescales array is smaller than expected or contains NaNs
+29-12-16 11:44:01 pyemma.msm.estimators.implied_timescales.ImpliedTimescales[0] WARNING  Some timescales could not be computed. Timescales array is smaller than expected or contains NaNs
+29-12-16 11:51:39 pyemma.msm.estimators.implied_timescales.ImpliedTimescales[0] WARNING  Some timescales could not be computed. Timescales array is smaller than expected or contains NaNs
+29-12-16 11:56:36 pyemma.msm.estimators.implied_timescales.ImpliedTimescales[0] WARNING  Some timescales could not be computed. Timescales array is smaller than expected or contains NaNs
+29-12-16 12:00:35 pyemma.msm.estimators.implied_timescales.ImpliedTimescales[0] WARNING  Some timescales could not be computed. Timescales array is smaller than expected or contains NaNs
+29-12-16 12:02:09 pyemma.msm.estimators.implied_timescales.ImpliedTimescales[0] WARNING  Some timescales could not be computed. Timescales array is smaller than expected or contains NaNs
+29-12-16 12:03:16 pyemma.msm.estimators.implied_timescales.ImpliedTimescales[0] WARNING  Some timescales could not be computed. Timescales array is smaller than expected or contains NaNs
+29-12-16 12:10:26 pyemma.msm.estimators.implied_timescales.ImpliedTimescales[0] WARNING  Some timescales could not be computed. Timescales array is smaller than expected or contains NaNs
+29-12-16 12:14:11 pyemma.coordinates.clustering.kmeans.KmeansClustering[0] INFO     Algorithm did not reach convergence criterion of 1e-05 in 20 iterations. Consider increasing max_iter.
