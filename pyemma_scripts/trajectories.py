@@ -38,3 +38,12 @@ def clusterTrajectories(trajectories, numClusters, stride=1):
     Returns a KmeansClusteringObject
     """
     return coor.cluster_kmeans(data=trajectories, k=numClusters, max_iter=20, stride=stride)
+
+def clusterRegularSpace(trajectories, dmin, stride=1):
+    """
+        Cluster the trajectories using Regular Space clustering, which is a
+        modified version of Hartigan's leader algorithm
+    """
+    return coor.cluster_regspace(data=trajectories, dmin = dmin, stride=stride)
+
+

@@ -32,7 +32,7 @@ def readParams(control_file):
 def getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride):
     prepareMSM = MSMblocks.PrepareMSM(numClusters, trajectoryFolder, trajectoryBasename, stride)
     cl = prepareMSM.getClusteringObject()
-    calculateMSM = MSMblocks.MSM(cl, lagtimes, 0, itsOutput, numberOfITS, itsErrors, None)
+    calculateMSM = MSMblocks.MSM(cl, lagtimes, 0, itsOutput, numberOfITS, itsErrors, None, dtrajs=prepareMSM.dtrajs)
     if not lagtime:
         lagtime = calculateMSM.calculateITS()
     calculateMSM.createMSM(lagtime)
