@@ -17,6 +17,7 @@ def readParams(control_file):
     trajectoryBasename = params["trajectoryBasename"]
     numClusters = params["numClusters"]
     lagtimes = params["lagtimes"]
+    lagtime = params.get("lagtime", None)
     numPCCA = params["numPCCA"]
     itsOutput = params["itsOutput"]
     numberOfITS = params["numberOfITS"]
@@ -28,22 +29,22 @@ def readParams(control_file):
         state_labels = 'auto'  # json returns string as
     # unicode, and this breaks some code in pyemma
     outfile_fluxTPT = params["outfile_fluxTPT"]
-    return trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT, mlags
+    return trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT, mlags, lagtime
 
 
 def main(control_file):
 
     # parameters
-    trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT, mlags = readParams(control_file)
+    trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT, mlags, lagtime = readParams(control_file)
 
     # program
     prepareMSM = MSMblocks.PrepareMSM(numClusters, trajectoryFolder, trajectoryBasename)
     cl = prepareMSM.getClusteringObject()
     calculateMSM = MSMblocks.MSM(cl, lagtimes, numPCCA, itsOutput, numberOfITS,
-                                 itsErrors, error_estimationCK, mlags)
+                                 itsErrors, error_estimationCK, mlags, lagtime, prepareMSM.dtrajs)
     calculateMSM.estimate()
     MSM_object = calculateMSM.getMSM_object()
-    calculateMSM.writeClustersForWMD()
+    #calculateMSM.writeClustersForWMD()
     # TPTinstance = MSMblocks.TPT(MSM_object, cl, outfile_fluxTPT, state_labels)
     # TPT_Object = TPTinstance.getTPTObject()
     # coarseTPT_Object = TPTinstance.getCoarseTPTObject()
