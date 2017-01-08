@@ -24,6 +24,15 @@ def parseArgs():
     args = parser.parse_args()
     return args
 
+def expandInitialStructuresWildcard(initialStructuresWildcard):
+    """
+        Returns the initial structures after expanding the initial structures wildcard
+    """
+    totalInitialStructures = []
+    for initialStructureWildcard in initialStructuresWildcard:
+        expandedStructures = glob.glob(initialStructureWildcard)
+        totalInitialStructures.extend(expandedStructures)
+    return totalInitialStructures
 
 def checkSymmetryDict(clusteringBlock, initialStructures, resname):
     """ Check if the symmetries dictionary is valid for the system
@@ -343,7 +352,7 @@ def main(jsonParams):
     restart = generalParams[blockNames.GeneralParams.restart]
     debug = generalParams[blockNames.GeneralParams.debug]
     outputPath = generalParams[blockNames.GeneralParams.outputPath]
-    initialStructures = generalParams[blockNames.GeneralParams.initialStructures]
+    initialStructuresWildcard = generalParams[blockNames.GeneralParams.initialStructures]
     writeAll = generalParams[blockNames.GeneralParams.writeAllClustering]
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
     resname = clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.ligandResname]
@@ -365,9 +374,12 @@ def main(jsonParams):
     print "Clustering method:", clusteringType
 
     print "Output path: ", outputPath
-    print "Initial Structures: ", initialStructures
+    print "Initial Structures: ", initialStructuresWildcard
     print "================================\n\n"
 
+    print "wildcard", initialStructuresWildcard
+    initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
+    print initialStructures
     checkSymmetryDict(clusteringBlock, initialStructures, resname)
 
     outputPathConstants = constants.OutputPathConstants(outputPath)
