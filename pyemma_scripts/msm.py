@@ -16,9 +16,9 @@ def estimateMSM(trajectories,lagtime, error_est=False):
     should be big enough so that the relevant processes have converged.
     Return a MaximumLikelihoodMSM object"""
     if error_est:
-        MSM_object = msm.bayesian_markov_model(trajectories, lagtime)
+        MSM_object = MSM.bayesian_markov_model(trajectories, lagtime)
     else:
-        MSM_object = msm.estimate_markov_model(trajectories, lagtime)
+        MSM_object = MSM.estimate_markov_model(trajectories, lagtime)
     return MSM_object
 
 def calculatePCCA(MSM_object, numPCCA):
