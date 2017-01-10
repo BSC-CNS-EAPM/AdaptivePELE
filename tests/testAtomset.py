@@ -285,6 +285,19 @@ END   \n"
         np.testing.assert_array_equal(contact_map, golden_contact_map)
         self.assertEqual(golden_contacts, contacts)
 
+    def test_contactMapContacts(self):
+        # preparation
+        pdb_1 = atomset.PDB()
+        pdb_1.initialise("tests/data/symmetries/cluster_1.pdb", resname='AEN')
+        symmetryEvaluator = sym.SymmetryContactMapEvaluator([])
+
+        # function to test
+        contact_map, contacts = symmetryEvaluator.createContactMap(pdb_1,
+                                                                   "AEN", 16)
+        golden_contacts = pdb_1.countContacts("AEN", 16)
+        print golden_contacts, contacts
+        self.assertEqual(golden_contacts, contacts)
+
     def test_symmetryContactMapJaccard(self):
         pdb_1 = atomset.PDB()
         pdb_1.initialise("tests/data/symmetries/cluster_1.pdb", resname='AEN')
