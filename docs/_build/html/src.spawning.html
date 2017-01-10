@@ -308,6 +308,33 @@
 </dd></dl>
 
 <dl class="class">
+<dt id="src.spawning.spawning.IndependentRunsCalculator">
+<em class="property">class </em><code class="descclassname">src.spawning.spawning.</code><code class="descname">IndependentRunsCalculator</code><a class="reference internal" href="_modules/src/spawning/spawning.html#IndependentRunsCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.IndependentRunsCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.spawning.spawning.SpawningCalculator" title="src.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">src.spawning.spawning.SpawningCalculator</span></code></a></p>
+<dl class="method">
+<dt id="src.spawning.spawning.IndependentRunsCalculator.calculate">
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>clusteringParams</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/spawning/spawning.html#IndependentRunsCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.IndependentRunsCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.IndependentRunsCalculator.log">
+<code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/spawning/spawning.html#IndependentRunsCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.IndependentRunsCalculator.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures">
+<code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/spawning/spawning.html#IndependentRunsCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write last trajectory structure as initial one for the next iteriation</p>
+<p>outputPathConstants [In] Output constants that depend on the path
+degeneracyOfRepresentatives [In] Array with the degeneracy of each
+cluster (i.e the number of processors that will be assigned to it)
+clustering [In] clustering object
+iteration [In] Number of epoch</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="src.spawning.spawning.InverselyProportionalToPopulationCalculator">
 <em class="property">class </em><code class="descclassname">src.spawning.spawning.</code><code class="descname">InverselyProportionalToPopulationCalculator</code><span class="sig-paren">(</span><em>densityCalculator=&lt;src.spawning.densitycalculator.NullDensityCalculator instance&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/spawning/spawning.html#InverselyProportionalToPopulationCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.InverselyProportionalToPopulationCalculator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#src.spawning.spawning.DensitySpawningCalculator" title="src.spawning.spawning.DensitySpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">src.spawning.spawning.DensitySpawningCalculator</span></code></a></p>
@@ -424,6 +451,17 @@ Spawning is the way in which we split the different explorers at the begining of
 <code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningCalculator.log" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="src.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures">
+<code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/spawning/spawning.html#SpawningCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write initial structures for the next iteriation</p>
+<p>outputPathConstants [In] Output constants that depend on the path
+degeneracyOfRepresentatives [In] Array with the degeneracy of each
+cluster (i.e the number of processors that will be assigned to it)
+clustering [In] clustering object
+iteration [In] Number of epoch</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -486,32 +524,37 @@ Spawning is the way in which we split the different explorers at the begining of
 <em class="property">class </em><code class="descclassname">src.spawning.spawningTypes.</code><code class="descname">SPAWNING_TYPES</code><a class="reference internal" href="_modules/src/spawning/spawningTypes.html#SPAWNING_TYPES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
 <dt id="src.spawning.spawningTypes.SPAWNING_TYPES.FAST">
-<code class="descname">FAST</code><em class="property"> = 4</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.FAST" title="Permalink to this definition">¶</a></dt>
+<code class="descname">FAST</code><em class="property"> = 5</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.FAST" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="src.spawning.spawningTypes.SPAWNING_TYPES.epsilon">
-<code class="descname">epsilon</code><em class="property"> = 2</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.epsilon" title="Permalink to this definition">¶</a></dt>
+<code class="descname">epsilon</code><em class="property"> = 3</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.epsilon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.spawning.spawningTypes.SPAWNING_TYPES.independent">
+<code class="descname">independent</code><em class="property"> = 0</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.independent" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="src.spawning.spawningTypes.SPAWNING_TYPES.inverselyProportional">
-<code class="descname">inverselyProportional</code><em class="property"> = 1</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.inverselyProportional" title="Permalink to this definition">¶</a></dt>
+<code class="descname">inverselyProportional</code><em class="property"> = 2</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.inverselyProportional" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="src.spawning.spawningTypes.SPAWNING_TYPES.sameWeight">
-<code class="descname">sameWeight</code><em class="property"> = 0</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.sameWeight" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sameWeight</code><em class="property"> = 1</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.sameWeight" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="src.spawning.spawningTypes.SPAWNING_TYPES.simulatedAnnealing">
-<code class="descname">simulatedAnnealing</code><em class="property"> = 3</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.simulatedAnnealing" title="Permalink to this definition">¶</a></dt>
+<code class="descname">simulatedAnnealing</code><em class="property"> = 4</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.simulatedAnnealing" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="src.spawning.spawningTypes.SPAWNING_TYPES.variableEpsilon">
-<code class="descname">variableEpsilon</code><em class="property"> = 5</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.variableEpsilon" title="Permalink to this definition">¶</a></dt>
+<code class="descname">variableEpsilon</code><em class="property"> = 6</em><a class="headerlink" href="#src.spawning.spawningTypes.SPAWNING_TYPES.variableEpsilon" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

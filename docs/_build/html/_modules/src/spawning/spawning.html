@@ -143,6 +143,10 @@
 <span class="kn">from</span> <span class="nn">constants</span> <span class="k">import</span> <span class="n">blockNames</span>
 <span class="kn">import</span> <span class="nn">spawningTypes</span>
 <span class="kn">import</span> <span class="nn">densitycalculator</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">from</span> <span class="nn">constants</span> <span class="k">import</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">utilities</span> <span class="k">import</span> <span class="n">utilities</span>
 
 
 <div class="viewcode-block" id="return_sign"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.spawning.return_sign">[docs]</a><span class="k">def</span> <span class="nf">return_sign</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
@@ -177,6 +181,8 @@
         <span class="n">spawningTypeString</span> <span class="o">=</span> <span class="n">spawningBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">spawningTypeString</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">sameWeight</span><span class="p">:</span>
             <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">SameWeightDegeneracyCalculator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">spawningTypeString</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">independent</span><span class="p">:</span>
+            <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">IndependentRunsCalculator</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">spawningTypeString</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">inverselyProportional</span><span class="p">:</span>
             <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">InverselyProportionalToPopulationCalculator</span><span class="p">(</span><span class="n">densityCalculator</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">spawningTypeString</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">epsilon</span><span class="p">:</span>
@@ -252,6 +258,28 @@
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="SpawningCalculator.log"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.spawning.SpawningCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="SpawningCalculator.writeSpawningInitialStructures"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures">[docs]</a>    <span class="k">def</span> <span class="nf">writeSpawningInitialStructures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span><span class="p">,</span> <span class="n">clustering</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write initial structures for the next iteriation</span>
+
+<span class="sd">            outputPathConstants [In] Output constants that depend on the path</span>
+<span class="sd">            degeneracyOfRepresentatives [In] Array with the degeneracy of each</span>
+<span class="sd">            cluster (i.e the number of processors that will be assigned to it)</span>
+<span class="sd">            clustering [In] clustering object</span>
+<span class="sd">            iteration [In] Number of epoch</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tmpInitialStructuresTemplate</span> <span class="o">=</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clustering</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">degeneracyOfRepresentatives</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+                <span class="n">outputFilename</span> <span class="o">=</span> <span class="n">tmpInitialStructuresTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="n">counts</span><span class="p">)</span>
+                <span class="nb">print</span> <span class="s1">&#39;Writing to &#39;</span><span class="p">,</span> <span class="n">outputFilename</span><span class="p">,</span> <span class="s1">&#39;cluster&#39;</span><span class="p">,</span> <span class="n">i</span>
+                <span class="n">cluster</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="n">outputFilename</span><span class="p">)</span>
+
+                <span class="n">counts</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="nb">print</span> <span class="s2">&quot;counts &amp; cluster centers&quot;</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">degeneracyOfRepresentatives</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">return</span> <span class="n">counts</span></div>
 
 <div class="viewcode-block" id="SpawningCalculator.divideTrajAccordingToWeights"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.spawning.SpawningCalculator.divideTrajAccordingToWeights">[docs]</a>    <span class="k">def</span> <span class="nf">divideTrajAccordingToWeights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -329,6 +357,42 @@
             <span class="n">cluster</span><span class="o">.</span><span class="n">density</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">densityCalculator</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span>
             <span class="n">densities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">density</span>
         <span class="k">return</span> <span class="n">densities</span></div></div>
+
+<div class="viewcode-block" id="IndependentRunsCalculator"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.spawning.IndependentRunsCalculator">[docs]</a><span class="k">class</span> <span class="nc">IndependentRunsCalculator</span><span class="p">(</span><span class="n">SpawningCalculator</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calculator</span> <span class="o">=</span> <span class="n">SameWeightDegeneracyCalculator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">independent</span>
+
+<div class="viewcode-block" id="IndependentRunsCalculator.calculate"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.spawning.IndependentRunsCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">clusteringParams</span><span class="p">,</span>
+                  <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculator</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">clusteringParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IndependentRunsCalculator.log"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.spawning.IndependentRunsCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="IndependentRunsCalculator.writeSpawningInitialStructures"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures">[docs]</a>    <span class="k">def</span> <span class="nf">writeSpawningInitialStructures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span><span class="p">,</span> <span class="n">clustering</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write last trajectory structure as initial one for the next iteriation</span>
+
+<span class="sd">            outputPathConstants [In] Output constants that depend on the path</span>
+<span class="sd">            degeneracyOfRepresentatives [In] Array with the degeneracy of each</span>
+<span class="sd">            cluster (i.e the number of processors that will be assigned to it)</span>
+<span class="sd">            clustering [In] clustering object</span>
+<span class="sd">            iteration [In] Number of epoch</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trajWildcard</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">trajectoryBasename</span><span class="p">)</span>
+        <span class="n">trajectories</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">trajWildcard</span><span class="o">%</span><span class="p">(</span><span class="n">iteration</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">trajectory</span> <span class="ow">in</span> <span class="n">trajectories</span><span class="p">:</span>
+            <span class="n">lastSnapshot</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">trajectory</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">4</span><span class="p">])</span><span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="n">trajectories</span><span class="p">)</span>  <span class="c1">#to start with 0</span>
+            <span class="n">outputFilename</span> <span class="o">=</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputFilename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">lastSnapshot</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">trajectories</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="SameWeightDegeneracyCalculator"><a class="viewcode-back" href="../../../src.spawning.html#src.spawning.spawning.SameWeightDegeneracyCalculator">[docs]</a><span class="k">class</span> <span class="nc">SameWeightDegeneracyCalculator</span><span class="p">(</span><span class="n">SpawningCalculator</span><span class="p">):</span>

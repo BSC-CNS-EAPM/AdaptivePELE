@@ -9,4 +9,14 @@ atomset Package
     :undoc-members:
     :show-inheritance:
 
+.. automodule:: src.atomset.RMSDCalculator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: src.atomset.SymmetryContactMapEvaluator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 .. toctree::

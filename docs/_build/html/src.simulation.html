@@ -165,13 +165,13 @@
 <dt id="src.simulation.simulationTypes.EXITCONDITION_TYPE">
 <em class="property">class </em><code class="descclassname">src.simulation.simulationTypes.</code><code class="descname">EXITCONDITION_TYPE</code><a class="reference internal" href="_modules/src/simulation/simulationTypes.html#EXITCONDITION_TYPE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationTypes.EXITCONDITION_TYPE" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
-<dt id="src.simulation.simulationTypes.EXITCONDITION_TYPE.METRIC">
-<code class="descname">METRIC</code><em class="property"> = 0</em><a class="headerlink" href="#src.simulation.simulationTypes.EXITCONDITION_TYPE.METRIC" title="Permalink to this definition">¶</a></dt>
+<dt id="src.simulation.simulationTypes.EXITCONDITION_TYPE.CLUSTERING">
+<code class="descname">CLUSTERING</code><em class="property"> = 1</em><a class="headerlink" href="#src.simulation.simulationTypes.EXITCONDITION_TYPE.CLUSTERING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="src.simulation.simulationTypes.EXITCONDITION_TYPE.foo">
-<code class="descname">foo</code><em class="property"> = 1</em><a class="headerlink" href="#src.simulation.simulationTypes.EXITCONDITION_TYPE.foo" title="Permalink to this definition">¶</a></dt>
+<dt id="src.simulation.simulationTypes.EXITCONDITION_TYPE.METRIC">
+<code class="descname">METRIC</code><em class="property"> = 0</em><a class="headerlink" href="#src.simulation.simulationTypes.EXITCONDITION_TYPE.METRIC" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -200,6 +200,16 @@
 <div class="section" id="module-src.simulation.simulationrunner">
 <span id="simulationrunner-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">simulationrunner</span></code> Module<a class="headerlink" href="#module-src.simulation.simulationrunner" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="src.simulation.simulationrunner.ClusteringExitCondition">
+<em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">ClusteringExitCondition</code><span class="sig-paren">(</span><em>ntrajs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#ClusteringExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.ClusteringExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.simulation.simulationrunner.ClusteringExitCondition.checkExitCondition">
+<code class="descname">checkExitCondition</code><span class="sig-paren">(</span><em>clustering</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#ClusteringExitCondition.checkExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.ClusteringExitCondition.checkExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="src.simulation.simulationrunner.ExitConditionBuilder">
 <em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">ExitConditionBuilder</code><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#ExitConditionBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.ExitConditionBuilder" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
@@ -211,7 +221,7 @@
 
 <dl class="class">
 <dt id="src.simulation.simulationrunner.MetricExitCondition">
-<em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">MetricExitCondition</code><span class="sig-paren">(</span><em>metricCol</em>, <em>metricValue</em>, <em>type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#MetricExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.MetricExitCondition" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">MetricExitCondition</code><span class="sig-paren">(</span><em>metricCol</em>, <em>metricValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#MetricExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.MetricExitCondition" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="src.simulation.simulationrunner.MetricExitCondition.checkExitCondition">
 <code class="descname">checkExitCondition</code><span class="sig-paren">(</span><em>clustering</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#MetricExitCondition.checkExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.MetricExitCondition.checkExitCondition" title="Permalink to this definition">¶</a></dt>

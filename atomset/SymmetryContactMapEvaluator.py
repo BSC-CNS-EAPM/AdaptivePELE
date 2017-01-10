@@ -58,9 +58,8 @@ class SymmetryContactMapEvaluator:
         ligandPDB = atomset.PDB()
         ligandPDB.initialise(PDBobj.pdb, resname=ligandResname,
                              heavyAtoms=True)
-
         alphaCarbonsPDB = atomset.PDB()
-        alphaCarbonsPDB.initialise(PDBobj.pdb, type="PROTEIN", atomname="CA")
+        alphaCarbonsPDB.initialise(PDBobj.pdb, type="CM")
 
         # empty contact map, rows are atoms of the ligand, columns are protein
         # alpha carbons
@@ -101,7 +100,7 @@ class SymmetryContactMapEvaluator:
                              heavyAtoms=True)
 
         alphaCarbonsPDB = atomset.PDB()
-        alphaCarbonsPDB.initialise(PDBobj.pdb, type="PROTEIN", atomname="CA")
+        alphaCarbonsPDB.initialise(PDBobj.pdb, type="CM")
 
         # empty contact map, rows are atoms of the ligand, columns are protein
         # alpha carbons
