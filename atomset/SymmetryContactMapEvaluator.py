@@ -73,7 +73,8 @@ class SymmetryContactMapEvaluator:
                 dist2 = ligandPDB.atoms[ligandAtom].squaredDistance(alphaCarbonsPDB.atoms[proteinAtom])
                 if dist2 < contactThresholdDistance2:
                     contactMap[rowind, colind] = True
-                    contacts.update([proteinAtom])
+                    if alphaCarbonsPDB.atoms[proteinAtom].name == "CA":
+                        contacts.update([proteinAtom])
         return contactMap, len(contacts)
 
     def buildContactMap(self, PDBobj, ligandResname, contactThresholdDistance):
@@ -112,7 +113,8 @@ class SymmetryContactMapEvaluator:
                 dist2 = ligandPDB.atoms[ligandAtom].squaredDistance(alphaCarbonsPDB.atoms[proteinAtom])
                 if dist2 < contactThresholdDistance2:
                     contactMap[rowind, colind] = True
-                    contacts.update([proteinAtom])
+                    if alphaCarbonsPDB.atoms[proteinAtom].name == "CA":
+                        contacts.update([proteinAtom])
         return contactMap, len(contacts)
 
     def evaluateJaccard(self, contactMap, cluster):
