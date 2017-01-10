@@ -171,6 +171,14 @@ class PDB:
     _typeProtein = "PROTEIN"
     _typeHetero = "HETERO"
     _typeAll = "ALL"
+    _typeCM = "CM"
+    CMAtoms = {"ALA": "CB", "VAL": "CG1", "LEU": "CG", "ILE": "CD1",
+               "MET": "CE", "PRO": "CG", "PHE": "CZ", "TYR": "OH",
+               "TRP": "CH2", "SER": "OG", "THR": "CG2", "CYS": "SG",
+               "ASN": "ND2", "GLN": "NE2", "LYS": "NZ", "HIS": "CE1",
+               "HIE": "CE1", "HID": "CE1", "HIP": "CE1", "ARG": "NE",
+               "ASP": "OD1", "GLU": "OE1", "GLY": "empty"}
+    # CMAtoms = {x: "empty" for x in CMAtoms}
 
     def __init__(self):
         """
@@ -221,20 +229,28 @@ class PDB:
 
         for atomLine in stringWithPDBContent:
 
-            # HUGE optimisation (not to create an atom each time ~ 2e-5 s/atom)
-            if resname != "" and not atomLine[17:20].strip() == resname:
-                # optimisation
-                continue
-            if atomname != "" and not atomLine[12:16].strip() == atomname:
-                # optimisation
-                continue
+            if type == self._typeCM:
+                atomName = atomLine[12:16].strip()
+                resName = atomLine[17:20].strip()
+                if resName not in self.CMAtoms:
+                    continue
+                if atomName != "CA" and atomName != self.CMAtoms[resName]:
+                    continue
+            else:
+                # HUGE optimisation (not to create an atom each time ~ 2e-5 s/atom)
+                if resname != "" and not atomLine[17:20].strip() == resname:
+                    # optimisation
+                    continue
+                if atomname != "" and not atomLine[12:16].strip() == atomname:
+                    # optimisation
+                    continue
 
             atom = Atom(atomLine)
             # Here atom will be not null, empty or not.
             # With "try", we prune empty atoms
             try:
                 if (not heavyAtoms or atom.isHeavyAtom()) and\
-                   (type == self._typeAll or (type == self._typeProtein and atom.isProtein()) or (type == self._typeHetero and atom.isHeteroAtom())):
+                   (type == self._typeAll or type == self._typeCM or (type == self._typeProtein and atom.isProtein()) or (type == self._typeHetero and atom.isHeteroAtom())):
                         self.atoms.update({atom.id: atom})
                         self.atomList.append(atom.id)
             except:

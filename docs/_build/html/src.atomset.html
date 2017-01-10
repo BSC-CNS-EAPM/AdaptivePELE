@@ -264,11 +264,6 @@ the initialise method to load the file</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="src.atomset.atomset.PDB.contactMapnew">
-<code class="descname">contactMapnew</code><span class="sig-paren">(</span><em>ligandResname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.contactMapnew"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.contactMapnew" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="src.atomset.atomset.PDB.countContacts">
 <code class="descname">countContacts</code><span class="sig-paren">(</span><em>ligandResname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.countContacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.countContacts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count the number of alpha carbons that are in contact with the
@@ -284,34 +279,6 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="src.atomset.atomset.PDB.createContactMap">
-<code class="descname">createContactMap</code><span class="sig-paren">(</span><em>ligandResname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.createContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.createContactMap" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create the contact map of the protein and ligand. The contact map is
-a boolean matrix that has as many rows as the number of ligand heavy
-atoms and as many columns as the number of alpha carbons. The
-value is one if the ligand atom and the alpha carbons are less than
-contactThresholdDistance Amstrongs away</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ligandResname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the PDB</li>
-<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array &#8211; The contact map of the ligand and the protein</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
 </td>
 </tr>
 </tbody>
@@ -531,6 +498,200 @@ created</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<span class="target" id="module-src.atomset.RMSDCalculator"></span><dl class="class">
+<dt id="src.atomset.RMSDCalculator.RMSDCalculator">
+<em class="property">class </em><code class="descclassname">src.atomset.RMSDCalculator.</code><code class="descname">RMSDCalculator</code><span class="sig-paren">(</span><em>symmetries=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/RMSDCalculator.html#RMSDCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.RMSDCalculator.RMSDCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>symmetries</strong> (<em>list</em>) &#8211; List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="src.atomset.RMSDCalculator.RMSDCalculator.computeNonSymmAtoms">
+<code class="descname">computeNonSymmAtoms</code><span class="sig-paren">(</span><em>PDB</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/RMSDCalculator.html#RMSDCalculator.computeNonSymmAtoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.RMSDCalculator.RMSDCalculator.computeNonSymmAtoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.RMSDCalculator.RMSDCalculator.computeRMSD">
+<code class="descname">computeRMSD</code><span class="sig-paren">(</span><em>PDB1</em>, <em>PDB2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/RMSDCalculator.html#RMSDCalculator.computeRMSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.RMSDCalculator.RMSDCalculator.computeRMSD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the RMSD between two PDB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDB1</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The squared RMSD between two PDB</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.RMSDCalculator.RMSDCalculator.computeRMSD2">
+<code class="descname">computeRMSD2</code><span class="sig-paren">(</span><em>PDB1</em>, <em>PDB2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/RMSDCalculator.html#RMSDCalculator.computeRMSD2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.RMSDCalculator.RMSDCalculator.computeRMSD2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the squared RMSD between two PDB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDB1</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The squared RMSD between two PDB</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-src.atomset.SymmetryContactMapEvaluator"></span><dl class="class">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator">
+<em class="property">class </em><code class="descclassname">src.atomset.SymmetryContactMapEvaluator.</code><code class="descname">SymmetryContactMapEvaluator</code><span class="sig-paren">(</span><em>symmetries=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>symmetries</strong> (<em>list</em>) &#8211; List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildContactMap">
+<code class="descname">buildContactMap</code><span class="sig-paren">(</span><em>PDBobj</em>, <em>ligandResname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.buildContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildContactMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the contact map of the protein and ligand. The contact map is
+a boolean matrix that has as many rows as the number of ligand heavy
+atoms and as many columns as the number of alpha carbons. The
+value is one if the ligand atom and the alpha carbons are less than
+contactThresholdDistance Amstrongs away</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDBobj</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; PDB object that contains the conformation&#8217;s info</li>
+<li><strong>ligandResname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the PDB</li>
+<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array &#8211; The contact map of the ligand and the protein</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildContactMapWithRowMap">
+<code class="descname">buildContactMapWithRowMap</code><span class="sig-paren">(</span><em>PDBobj</em>, <em>ligandResname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.buildContactMapWithRowMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildContactMapWithRowMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a map that relates symmetric atoms in the ligand to row
+indices in the contactMap matrix and the contact map of the protein
+and ligand. The contact map is a boolean matrix that has as many
+rows as the number of ligand heavy atoms and as many columns as the
+number of alpha carbons. The value is one if the ligand atom and
+the alpha carbons are less than contactThresholdDistance Amstrongs
+away</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDBobj</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; PDB object that contains the conformation&#8217;s info</li>
+<li><strong>ligandResname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the PDB</li>
+<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array &#8211; The contact map of the ligand and the protein</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildOptimalPermutationContactMap">
+<code class="descname">buildOptimalPermutationContactMap</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.buildOptimalPermutationContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildOptimalPermutationContactMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a permutated version of the contactMap which maximizes the
+similarity between the two contactMaps
+:param contactMap: contactMap of the conformation to compare
+:type contactMap: numpy.Array
+:param cluster: cluster object to which we are comparing
+:type cluster: Cluster
+:returns: numpy.Array &#8211; The permutated contact map</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.createContactMap">
+<code class="descname">createContactMap</code><span class="sig-paren">(</span><em>PDB</em>, <em>ligandResname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.createContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.createContactMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the contact map of the protein and ligand. The contact map is
+a boolean matrix that has as many rows as the number of ligand heavy
+atoms and as many columns as the number of alpha carbons. The
+value is one if the ligand atom and the alpha carbons are less than
+contactThresholdDistance Amstrongs away</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ligandResname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the PDB</li>
+<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array &#8211; The contact map of the ligand and the protein</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateCorrelation">
+<code class="descname">evaluateCorrelation</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.evaluateCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateCorrelation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateDifferenceDistance">
+<code class="descname">evaluateDifferenceDistance</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.evaluateDifferenceDistance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateDifferenceDistance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateJaccard">
+<code class="descname">evaluateJaccard</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.evaluateJaccard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateJaccard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.atomset.SymmetryContactMapEvaluator.calculateCorrelationContactMaps">
+<code class="descclassname">src.atomset.SymmetryContactMapEvaluator.</code><code class="descname">calculateCorrelationContactMaps</code><span class="sig-paren">(</span><em>contactMap</em>, <em>clusterContactMap</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#calculateCorrelationContactMaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.calculateCorrelationContactMaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the correlation of two contactMaps</p>
 </dd></dl>
 
 <div class="toctree-wrapper compound">

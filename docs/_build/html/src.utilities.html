@@ -163,8 +163,12 @@
 <span id="clusteringutilities-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">clusteringUtilities</span></code> Module<a class="headerlink" href="#module-src.utilities.clusteringUtilities" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="src.utilities.clusteringUtilities.writeStructures">
-<code class="descclassname">src.utilities.clusteringUtilities.</code><code class="descname">writeStructures</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>listStructures</em>, <em>outputPath='cluster.pdb'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utilities/clusteringUtilities.html#writeStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utilities.clusteringUtilities.writeStructures" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">src.utilities.clusteringUtilities.</code><code class="descname">writeStructures</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>listStructures</em>, <em>checker=&lt;function &lt;lambda&gt;&gt;</em>, <em>outputPath='cluster.pdb'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utilities/clusteringUtilities.html#writeStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.utilities.clusteringUtilities.writeStructures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that prints all clusters in listStructures so that checker evaluates to true</p>
+<p>clusteringObject [In] Clustering object with clusters to print
+checker [In] Lambda function with the checker that should evaluate to True for intersted structures
+outputPath [In] Output cluster pdb filename</p>
+</dd></dl>
 
 </div>
 <div class="section" id="module-src.utilities.utilities">

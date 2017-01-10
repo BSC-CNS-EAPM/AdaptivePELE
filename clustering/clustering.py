@@ -161,8 +161,8 @@ class ContactsClusteringEvaluator:
         else:
             return node.cluster.threshold2 + 2 ** (6-node.depth)
 
-    def getInnerLimit(self, node):
-        return node.cluster.threshold2
+    def getInnerLimit(self, cluster):
+        return cluster.threshold2
 
 
 class CMClusteringEvaluator:
@@ -186,16 +186,21 @@ class CMClusteringEvaluator:
         if self.contactMap is None:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
 
-    def getInnerLimit(self, node):
+    def getInnerLimit(self, cluster):
         # return max(16, 16 * 2 - node.depth)
-        return 16
+        if cluster.contacts > 2.0:
+            return 4.0
+        else:
+            return 16-6*cluster.contacts
+        # return 16
 
     def getOuterLimit(self, node):
         # return max(16, 16 * 2 - node.depth)
         return 16
 
 
-class Clustering(object):
+# class Clustering(object):
+class Clustering:
     """
         Base class for clustering methods, it defines a cluster method that
         contacts and accumulative inherit and use
@@ -327,7 +332,7 @@ class Clustering(object):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         self.clusteringEvaluator.cleanContactMap()
-        if np.random.rand() < 0.5:
+        if np.random.rand() < 2.0:
             tmpClusters = self.clusters.clusters
         else:
             tmpClusters = reversed(self.clusters.clusters)
@@ -439,7 +444,7 @@ class TreeClustering(Clustering):
             node = node.parent
         return pathway
 
-class ContactsClustering(TreeClustering):
+class ContactsClustering(Clustering):
     """
         Cluster together all snapshots that are closer to the cluster center
         than certain threshold. This threshold is assigned according to the
@@ -461,15 +466,17 @@ class ContactsClustering(TreeClustering):
                  contactThresholdDistance=8, symmetries=[]):
         # TreeClustering.__init__(self, resname, reportBaseFilename,
         #                    columnOfReportFile, contactThresholdDistance)
-        super(ContactsClustering, self).__init__(resname, reportBaseFilename,
-                            columnOfReportFile, contactThresholdDistance)
+        Clustering.__init__(self, resname, reportBaseFilename,
+                           columnOfReportFile, contactThresholdDistance)
+        # super(ContactsClustering, self).__init__(resname, reportBaseFilename,
+        #                     columnOfReportFile, contactThresholdDistance)
         self.type = clusteringTypes.CLUSTERING_TYPES.contacts
         self.thresholdCalculator = thresholdCalculator
         self.symmetries = symmetries
         self.clusteringEvaluator = ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
 
 
-class ContactMapAccumulativeClustering(TreeClustering):
+class ContactMapAccumulativeClustering(Clustering):
     """ Cluster together all snapshots that have similar enough contactMaps.
         This similarity can be calculated with different methods (see similariyEvaluator documentation)
 
@@ -487,8 +494,10 @@ class ContactMapAccumulativeClustering(TreeClustering):
                  contactThresholdDistance=8, symmetries=[]):
         # TreeClustering.__init__(self, resname, reportBaseFilename,
         #                     columnOfReportFile, contactThresholdDistance)
-        super(ContactMapAccumulativeClustering, self).__init__(resname, reportBaseFilename,
+        Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance)
+        # super(ContactMapAccumulativeClustering, self).__init__(resname, reportBaseFilename,
+        #                     columnOfReportFile, contactThresholdDistance)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative
         self.thresholdCalculator = thresholdCalculator
         self.similarityEvaluator = similarityEvaluator

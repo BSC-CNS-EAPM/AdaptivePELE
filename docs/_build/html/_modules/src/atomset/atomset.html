@@ -516,74 +516,7 @@
                 <span class="k">if</span> <span class="n">dist2</span> <span class="o">&lt;</span> <span class="n">contactThresholdDistance2</span><span class="p">:</span>
                     <span class="n">contacts</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">proteinAtomId</span><span class="p">])</span>
 
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="PDB.createContactMap"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.createContactMap">[docs]</a>    <span class="k">def</span> <span class="nf">createContactMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ligandResname</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Create the contact map of the protein and ligand. The contact map is</span>
-<span class="sd">            a boolean matrix that has as many rows as the number of ligand heavy</span>
-<span class="sd">            atoms and as many columns as the number of alpha carbons. The</span>
-<span class="sd">            value is one if the ligand atom and the alpha carbons are less than</span>
-<span class="sd">            contactThresholdDistance Amstrongs away</span>
-
-<span class="sd">            :param ligandResname: Residue name of the ligand in the PDB</span>
-<span class="sd">            :type ligandResname: str</span>
-<span class="sd">            :param contactThresholdDistance: Maximum distance at which two atoms are considered in contanct (in Angstroms)</span>
-<span class="sd">            :type contactThresholdDistance: int</span>
-<span class="sd">            :returns: numpy.Array -- The contact map of the ligand and the protein</span>
-<span class="sd">            :returns: int -- The number of alpha carbons in contact with the ligand</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">contactThresholdDistance2</span> <span class="o">=</span> <span class="n">contactThresholdDistance</span><span class="o">**</span><span class="mi">2</span>
-
-        <span class="n">ligandPDB</span> <span class="o">=</span> <span class="n">PDB</span><span class="p">()</span>
-        <span class="n">ligandPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">ligandResname</span><span class="p">,</span> <span class="n">heavyAtoms</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="n">alphaCarbonsPDB</span> <span class="o">=</span> <span class="n">PDB</span><span class="p">()</span>
-        <span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_typeProtein</span><span class="p">,</span>
-                                   <span class="n">atomname</span><span class="o">=</span><span class="s2">&quot;CA&quot;</span><span class="p">)</span>
-
-        <span class="c1"># empty contact map, rows are atoms of the ligand, columns are protein</span>
-        <span class="c1"># alpha carbons</span>
-        <span class="n">contactMap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">ligandPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">),</span>
-                               <span class="nb">len</span><span class="p">(</span><span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="n">contacts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
-        <span class="k">for</span> <span class="n">rowind</span><span class="p">,</span> <span class="n">ligandAtom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ligandPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">colind</span><span class="p">,</span> <span class="n">proteinAtom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">):</span>
-                <span class="n">dist2</span> <span class="o">=</span> <span class="n">ligandPDB</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">ligandAtom</span><span class="p">]</span><span class="o">.</span><span class="n">squaredDistance</span><span class="p">(</span><span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">proteinAtom</span><span class="p">])</span>
-                <span class="k">if</span> <span class="n">dist2</span> <span class="o">&lt;</span> <span class="n">contactThresholdDistance2</span><span class="p">:</span>
-                    <span class="n">contactMap</span><span class="p">[</span><span class="n">rowind</span><span class="p">,</span> <span class="n">colind</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                    <span class="n">contacts</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">proteinAtom</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">contactMap</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="PDB.contactMapnew"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.PDB.contactMapnew">[docs]</a>    <span class="k">def</span> <span class="nf">contactMapnew</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ligandResname</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="p">):</span>
-        <span class="n">contactThresholdDistance2</span> <span class="o">=</span> <span class="n">contactThresholdDistance</span><span class="o">**</span><span class="mi">2</span>
-
-        <span class="n">ligandPDB</span> <span class="o">=</span> <span class="n">PDB</span><span class="p">()</span>
-        <span class="n">ligandPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">ligandResname</span><span class="p">,</span> <span class="n">heavyAtoms</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="n">alphaCarbonsPDB</span> <span class="o">=</span> <span class="n">PDB</span><span class="p">()</span>
-        <span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_typeProtein</span><span class="p">,</span>
-                                   <span class="n">atomname</span><span class="o">=</span><span class="s2">&quot;CA&quot;</span><span class="p">)</span>
-        <span class="n">nLigand</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ligandPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">)</span>
-        <span class="n">nAlpha</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">)</span>
-
-        <span class="n">alphaCarbonCoords</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">getAtomCoords</span><span class="p">(),</span> <span class="n">alphaCarbonsPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">)</span>
-        <span class="n">alphaCarbonCoords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">alphaCarbonCoords</span><span class="p">)</span>
-        <span class="n">ligandPositions</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">alphaPositions</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">rowind</span><span class="p">,</span> <span class="n">ligandAtomId</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ligandPDB</span><span class="o">.</span><span class="n">atomList</span><span class="p">):</span>
-            <span class="n">ligandAtom</span> <span class="o">=</span> <span class="n">ligandPDB</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">ligandAtomId</span><span class="p">]</span>
-            <span class="n">distanceCoords</span> <span class="o">=</span> <span class="p">(</span><span class="n">alphaCarbonCoords</span> <span class="o">-</span> <span class="n">ligandAtom</span><span class="o">.</span><span class="n">getAtomCoords</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span>
-            <span class="n">distanceCoords</span> <span class="o">=</span> <span class="n">distanceCoords</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">alphaPosCurrent</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">distanceCoords</span> <span class="o">&lt;</span> <span class="n">contactThresholdDistance2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">alphaPositions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">alphaPosCurrent</span><span class="p">)</span>
-            <span class="n">ligandPositions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">alphaPosCurrent</span><span class="p">)</span><span class="o">+</span><span class="n">rowind</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">alphaPositions</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="n">Coo_matrix</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">ligandPositions</span><span class="p">,</span> <span class="n">alphaPositions</span><span class="p">)),</span>
-                                       <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nLigand</span><span class="p">,</span> <span class="n">nAlpha</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="n">contactMap</span> <span class="o">=</span> <span class="n">Coo_matrix</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
-        <span class="n">nContacts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">contactMap</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">contactMap</span><span class="p">,</span> <span class="n">Coo_matrix</span></div></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="computeCOMDifference"><a class="viewcode-back" href="../../../src.atomset.html#src.atomset.atomset.computeCOMDifference">[docs]</a><span class="k">def</span> <span class="nf">computeCOMDifference</span><span class="p">(</span><span class="n">PDB1</span><span class="p">,</span> <span class="n">PDB2</span><span class="p">):</span>

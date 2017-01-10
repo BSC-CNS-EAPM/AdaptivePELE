@@ -164,10 +164,35 @@
 <div class="section" id="module-src.clustering.clustering">
 <span id="clustering-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">clustering</span></code> Module<a class="headerlink" href="#module-src.clustering.clustering" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="src.clustering.clustering.CMClusteringEvaluator">
+<em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">CMClusteringEvaluator</code><span class="sig-paren">(</span><em>similarityEvaluator</em>, <em>symmetryEvaluator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#CMClusteringEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.CMClusteringEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.clustering.clustering.CMClusteringEvaluator.checkAttributes">
+<code class="descname">checkAttributes</code><span class="sig-paren">(</span><em>pdb</em>, <em>resname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#CMClusteringEvaluator.checkAttributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.CMClusteringEvaluator.checkAttributes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.CMClusteringEvaluator.cleanContactMap">
+<code class="descname">cleanContactMap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#CMClusteringEvaluator.cleanContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.CMClusteringEvaluator.cleanContactMap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.CMClusteringEvaluator.getInnerLimit">
+<code class="descname">getInnerLimit</code><span class="sig-paren">(</span><em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#CMClusteringEvaluator.getInnerLimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.CMClusteringEvaluator.getInnerLimit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.CMClusteringEvaluator.isElement">
+<code class="descname">isElement</code><span class="sig-paren">(</span><em>pdb</em>, <em>cluster</em>, <em>resname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#CMClusteringEvaluator.isElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.CMClusteringEvaluator.isElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="src.clustering.clustering.Cluster">
-<em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">Cluster</code><span class="sig-paren">(</span><em>pdb</em>, <em>thresholdRadius=None</em>, <em>contactMap=None</em>, <em>contacts=None</em>, <em>metrics=[]</em>, <em>metricCol=None</em>, <em>density=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">Cluster</code><span class="sig-paren">(</span><em>pdb</em>, <em>thresholdRadius=None</em>, <em>contactMap=None</em>, <em>contacts=None</em>, <em>metrics=[]</em>, <em>metricCol=None</em>, <em>density=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>A cluster contains a representative structure(pdb), the number of
-elements, its density, threhold, number of contacts,
+elements, its density, threshold, number of contacts,
 a contactMap(sometimes) and a metric</p>
 <p>contacts stands for contacts/ligandAtom</p>
 <dl class="method">
@@ -183,6 +208,11 @@ a contactMap(sometimes) and a metric</p>
 <dl class="method">
 <dt id="src.clustering.clustering.Cluster.getMetric">
 <code class="descname">getMetric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster.getMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster.getMetric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Cluster.getMetricFromColumn">
+<code class="descname">getMetricFromColumn</code><span class="sig-paren">(</span><em>numcol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#Cluster.getMetricFromColumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Cluster.getMetricFromColumn" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -208,11 +238,26 @@ columnOfReportFile [In] Column of the report file that contain the metric of int
 contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
 considered in contact(default 8)</p>
 <dl class="method">
+<dt id="src.clustering.clustering.Clustering.addSnapshotToCluster">
+<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>snapshot</em>, <em>metrics=[]</em>, <em>col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#Clustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="src.clustering.clustering.Clustering.cluster">
 <code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#Clustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clustering.cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the snaptshots contained in the pahts folder
 paths [In] List of folders with the snapshots</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Clustering.getCluster">
+<code class="descname">getCluster</code><span class="sig-paren">(</span><em>clusterNum</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#Clustering.getCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clustering.getCluster" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.Clustering.getNumberClusters">
+<code class="descname">getNumberClusters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#Clustering.getNumberClusters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.Clustering.getNumberClusters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="src.clustering.clustering.Clustering.setCol">
@@ -276,7 +321,7 @@ of the summary</p>
 
 <dl class="class">
 <dt id="src.clustering.clustering.ContactMapAccumulativeClustering">
-<em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">ContactMapAccumulativeClustering</code><span class="sig-paren">(</span><em>thresholdCalculator</em>, <em>similarityEvaluator</em>, <em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapAccumulativeClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapAccumulativeClustering" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">ContactMapAccumulativeClustering</code><span class="sig-paren">(</span><em>thresholdCalculator</em>, <em>similarityEvaluator</em>, <em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>symmetries=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapAccumulativeClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapAccumulativeClustering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#src.clustering.clustering.Clustering" title="src.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">src.clustering.clustering.Clustering</span></code></a></p>
 <p>Cluster together all snapshots that have similar enough contactMaps.
 This similarity can be calculated with different methods (see similariyEvaluator documentation)</p>
@@ -288,16 +333,11 @@ reportBaseFilename [In] Name of the file that contains the metrics of the snapsh
 columnOfReportFile [In] Column of the report file that contain the metric of interest
 contactThresholdDistance [In] Distance at wich a ligand atom and a protein
 atom are considered in contact(default 8)</p>
-<dl class="method">
-<dt id="src.clustering.clustering.ContactMapAccumulativeClustering.addSnapshotToCluster">
-<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>snapshot</em>, <em>metrics=[]</em>, <em>metricCol=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapAccumulativeClustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapAccumulativeClustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
 <dt id="src.clustering.clustering.ContactMapAgglomerativeClustering">
-<em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">ContactMapAgglomerativeClustering</code><span class="sig-paren">(</span><em>nclusters</em>, <em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapAgglomerativeClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapAgglomerativeClustering" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">ContactMapAgglomerativeClustering</code><span class="sig-paren">(</span><em>nclusters</em>, <em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>symmetries=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapAgglomerativeClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapAgglomerativeClustering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#src.clustering.clustering.Clustering" title="src.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">src.clustering.clustering.Clustering</span></code></a></p>
 <p>nclusters[In] Number of the cluster to generate with the hierarchical clustering algorithm
 resname [In] String containing the three letter name of the ligan in the pdb
@@ -334,7 +374,7 @@ Labels [In] Numpy array with the cluster each snapshot belongs to</p>
 
 <dl class="class">
 <dt id="src.clustering.clustering.ContactMapClustering">
-<em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">ContactMapClustering</code><span class="sig-paren">(</span><em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapClustering" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">ContactMapClustering</code><span class="sig-paren">(</span><em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>symmetries=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactMapClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactMapClustering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#src.clustering.clustering.Clustering" title="src.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">src.clustering.clustering.Clustering</span></code></a></p>
 <dl class="method">
 <dt id="src.clustering.clustering.ContactMapClustering.cluster">
@@ -378,9 +418,29 @@ columnOfReportFile [In] Column of the report file that contain the
 metric of interest
 contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
 considered in contact(default 8)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="src.clustering.clustering.ContactsClusteringEvaluator">
+<em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">ContactsClusteringEvaluator</code><span class="sig-paren">(</span><em>RMSDCalculator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClusteringEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClusteringEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.clustering.clustering.ContactsClusteringEvaluator.checkAttributes">
+<code class="descname">checkAttributes</code><span class="sig-paren">(</span><em>pdb</em>, <em>resname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClusteringEvaluator.checkAttributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClusteringEvaluator.checkAttributes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
-<dt id="src.clustering.clustering.ContactsClustering.addSnapshotToCluster">
-<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>snapshot</em>, <em>metrics=[]</em>, <em>col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
+<dt id="src.clustering.clustering.ContactsClusteringEvaluator.cleanContactMap">
+<code class="descname">cleanContactMap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClusteringEvaluator.cleanContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClusteringEvaluator.cleanContactMap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.ContactsClusteringEvaluator.getInnerLimit">
+<code class="descname">getInnerLimit</code><span class="sig-paren">(</span><em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClusteringEvaluator.getInnerLimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClusteringEvaluator.getInnerLimit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.ContactsClusteringEvaluator.isElement">
+<code class="descname">isElement</code><span class="sig-paren">(</span><em>pdb</em>, <em>cluster</em>, <em>resname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#ContactsClusteringEvaluator.isElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.ContactsClusteringEvaluator.isElement" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -389,21 +449,35 @@ considered in contact(default 8)</p>
 <dt id="src.clustering.clustering.JaccardEvaluator">
 <em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">JaccardEvaluator</code><a class="reference internal" href="_modules/src/clustering/clustering.html#JaccardEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.JaccardEvaluator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate the similarity of two contactMaps by calculating the Jaccard
-index, that is, the ratio between the intersection of the two contact maps and their
-union</p>
+index, that is, the ratio between the intersection of the two contact
+maps and their union</p>
 <dl class="method">
 <dt id="src.clustering.clustering.JaccardEvaluator.isSimilarCluster">
-<code class="descname">isSimilarCluster</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#JaccardEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.JaccardEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">isSimilarCluster</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em>, <em>symContactMapEvaluator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#JaccardEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.JaccardEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate if two contactMaps are similar or not, return True if yes,
 False otherwise</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="function">
-<dt id="src.clustering.clustering.calculateCorrelationContactMaps">
-<code class="descclassname">src.clustering.clustering.</code><code class="descname">calculateCorrelationContactMaps</code><span class="sig-paren">(</span><em>contactMap</em>, <em>clusterContactMap</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#calculateCorrelationContactMaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.calculateCorrelationContactMaps" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the correlation of two contactMaps</p>
+<dl class="class">
+<dt id="src.clustering.clustering.SequentialLastSnapshotClustering">
+<em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">SequentialLastSnapshotClustering</code><span class="sig-paren">(</span><em>resname=None</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#SequentialLastSnapshotClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.SequentialLastSnapshotClustering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.clustering.clustering.Clustering" title="src.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">src.clustering.clustering.Clustering</span></code></a></p>
+<p>Assigned  the last snapshot of the trajectory to a cluster.
+Only useful for PELE sequential runs</p>
+<dl class="method">
+<dt id="src.clustering.clustering.SequentialLastSnapshotClustering.addSnapshotToCluster">
+<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>snapshot</em>, <em>metrics=[]</em>, <em>col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#SequentialLastSnapshotClustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.SequentialLastSnapshotClustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.clustering.clustering.SequentialLastSnapshotClustering.cluster">
+<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#SequentialLastSnapshotClustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.SequentialLastSnapshotClustering.cluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster the snaptshots contained in the pahts folder
+paths [In] List of folders with the snapshots</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="function">
@@ -440,10 +514,11 @@ n_clusters [In] Number of clusters that the clustering should generate</p>
 <dl class="class">
 <dt id="src.clustering.clustering.correlationEvaluator">
 <em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">correlationEvaluator</code><a class="reference internal" href="_modules/src/clustering/clustering.html#correlationEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.correlationEvaluator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate the similarity of two contact maps by calculating thir correlation</p>
+<dd><p>Evaluate the similarity of two contact maps by calculating their
+correlation</p>
 <dl class="method">
 <dt id="src.clustering.clustering.correlationEvaluator.isSimilarCluster">
-<code class="descname">isSimilarCluster</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#correlationEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.correlationEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">isSimilarCluster</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em>, <em>symContactMapEvaluator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#correlationEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.correlationEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate if two contactMaps are similar or not, return True if yes,
 False otherwise</p>
 </dd></dl>
@@ -454,10 +529,11 @@ False otherwise</p>
 <dt id="src.clustering.clustering.differenceDistanceEvaluator">
 <em class="property">class </em><code class="descclassname">src.clustering.clustering.</code><code class="descname">differenceDistanceEvaluator</code><a class="reference internal" href="_modules/src/clustering/clustering.html#differenceDistanceEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.differenceDistanceEvaluator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate the similarity of two contactMaps by calculating the ratio of
-the number of differences over the average of elements in the contacts maps</p>
+the number of differences over the average of elements in the contacts
+maps</p>
 <dl class="method">
 <dt id="src.clustering.clustering.differenceDistanceEvaluator.isSimilarCluster">
-<code class="descname">isSimilarCluster</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#differenceDistanceEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.differenceDistanceEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">isSimilarCluster</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em>, <em>symContactMapEvaluator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#differenceDistanceEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.differenceDistanceEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate if two contactMaps are similar or not, return True if yes,
 False otherwise</p>
 </dd></dl>
@@ -482,7 +558,7 @@ False otherwise</p>
 
 <dl class="function">
 <dt id="src.clustering.clustering.processSnapshots">
-<code class="descclassname">src.clustering.clustering.</code><code class="descname">processSnapshots</code><span class="sig-paren">(</span><em>trajectories</em>, <em>reportBaseFilename</em>, <em>col</em>, <em>contactThresholdDistance</em>, <em>resname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#processSnapshots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.processSnapshots" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.clustering.clustering.</code><code class="descname">processSnapshots</code><span class="sig-paren">(</span><em>trajectories</em>, <em>reportBaseFilename</em>, <em>col</em>, <em>contactThresholdDistance</em>, <em>resname</em>, <em>symmetryEvaluator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/clustering/clustering.html#processSnapshots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.clustering.clustering.processSnapshots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create list of pdb, contactMaps, metrics and contacts from a series of
 snapshots</p>
 </dd></dl>
@@ -528,6 +604,11 @@ metrics</p>
 <dl class="attribute">
 <dt id="src.clustering.clusteringTypes.CLUSTERING_TYPES.contacts">
 <code class="descname">contacts</code><em class="property"> = 0</em><a class="headerlink" href="#src.clustering.clusteringTypes.CLUSTERING_TYPES.contacts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.clustering.clusteringTypes.CLUSTERING_TYPES.lastSnapshot">
+<code class="descname">lastSnapshot</code><em class="property"> = 4</em><a class="headerlink" href="#src.clustering.clusteringTypes.CLUSTERING_TYPES.lastSnapshot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
