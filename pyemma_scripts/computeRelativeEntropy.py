@@ -43,7 +43,10 @@ def getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagti
     counts += 1.0/numClusters
     transition = markov.buildTransitionMatrix(counts)
 
-    return transition, MSM_object.stationary_distribution, lagtime
+    fullStationaryDistribution = np.zeros(MSM_object.nstates_full)
+    active = MSM_object.active_set
+    fullStationaryDistribution[active] = MSM_object.stationary_distribution
+    return transition, fullStationaryDistribution, lagtime
 
 def makeRandomSampleOfNtrajs(X, ntrajs=None, length=None):
     if ntrajs:
@@ -64,6 +67,15 @@ def assignNewTrajecories(Xsample, goldenMSMClusterCenters, lagtime):
     transition = markov.buildTransitionMatrix(counts)
     return transition
 
+def plotIsocostLines(extent, allTrajLengths, numberOfTrajs, steps=10):
+    minCost = allTrajLengths[0]*numberOfTrajs[0]
+    maxCost = allTrajLengths[-1]*numberOfTrajs[-1]
+    d = (maxCost - minCost) / steps
+    for cost in np.arange(minCost, maxCost, d):
+        x = np.arange(extent[0], extent[1], 1)
+        y = cost / x
+        plt.plot(x,y, color="black")
+
 
 def main(controlFile):
     trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, sampleSize, numRuns, stride = readParams(controlFile)
@@ -74,28 +86,33 @@ def main(controlFile):
 
     #np.random.seed(250793)
 
-    seq = False
+    seq = True
     entropies = []
 
     if seq:
         try:
             X = trajectories.loadCOMFiles(trajectoryFolder2, trajectoryBasename)
 
-            numberOfTrajs = range(64, 64*4, 64)
+            dTrajs = 50
+            numberOfTrajs = range(63, 512, dTrajs)
+            numberOfTrajs = range(50, 502, dTrajs)
             # numberOfTrajs = range(50, sampleSize, 50)
 
             #only trying different traj lengths if sampleSize is defined in control file
             shortestTrajSize = min([len(i) for i in X])
             lowerLimit = 2*lagtime
             upperLimit = shortestTrajSize
-            #allTrajLengths = range(lowerLimit, upperLimit, 200)
-            allTrajLengths = range(lowerLimit, 401, 100) 
+            upperLimit = 1001
+            dTrajLengths = 100
+            allTrajLengths = range(lowerLimit, upperLimit, dTrajLengths)
+            #allTrajLengths = range(lowerLimit, 401, 100) 
             #allTrajLengths = [None]
         except TypeError:
             numberOfTrajs = [None]
             allTrajLengths = [None]
     else:
         # epochFolders = [int(i) for i in os.listdir(trajectoryFolder2) if i.isdigit()]
+        dTrajs = 1
         epochFolders = range(3)
         epochFolders.sort()
         # import pdb as debug
@@ -103,7 +120,8 @@ def main(controlFile):
         lowerLimit = 200+50
         numberOfTrajs = epochFolders
         upperLimit = 401
-        allTrajLengths = range(lowerLimit, upperLimit, 50)
+        dTrajLengths = 50
+        allTrajLengths = range(lowerLimit, upperLimit, dTrajLengths)
 
 
     for length in allTrajLengths:
@@ -139,7 +157,7 @@ def main(controlFile):
         entropies.append(lengthEntropies)
 
     np.save("matrix_adaptive.npy", entropies)
-    #entropies = np.load("matrix_1.npy")
+    #entropies = np.load("matrix_adaptive.npy")
     entropies = np.log10(entropies)
 
     for i, length in enumerate(allTrajLengths):
@@ -147,20 +165,36 @@ def main(controlFile):
             print length, ntrajs, entropies[i][j]
         print ""
 
-    if length and ntrajs:
+    if ntrajs and length:
         plt.figure(1)
         if seq:
-            plt.imshow(entropies, interpolation="nearest", origin="lower", aspect="auto", extent=[numberOfTrajs[0], numberOfTrajs[-1], allTrajLengths[0], allTrajLengths[-1]])
+            extent = [numberOfTrajs[0] - dTrajs/2, numberOfTrajs[-1] + dTrajs/2,
+                    allTrajLengths[0] - dTrajLengths/2, allTrajLengths[-1] + dTrajLengths/2]
+            #plot isocost lines
+            plotIsocostLines(extent, allTrajLengths, numberOfTrajs, 11)
+            plt.imshow(entropies, interpolation="nearest", origin="lower", aspect="auto", extent=extent)
         else:
-            plt.imshow(entropies, interpolation="nearest", origin="lower", aspect="auto", extent=[numberOfTrajs[0], numberOfTrajs[-1] + 1, allTrajLengths[0], allTrajLengths[-1]])
+            plt.imshow(entropies, interpolation="nearest", origin="lower", aspect="auto", extent=extent)
+        import os
+        cwd = os.getcwd()
+        cwd = cwd.replace("/", "_")
+        #plt.save(cwd + ".eps")
+        #plt.show()
         #plt.imshow(entropies, interpolation="nearest", extent=[numberOfTrajs[0], numberOfTrajs[-1], 800, 801])
         plt.colorbar()
+        plt.savefig(cwd + ".eps")
         plt.figure(2)
         if seq:
-            plt.imshow(entropies, interpolation="bilinear", origin="lower", aspect="auto",  extent=[numberOfTrajs[0], numberOfTrajs[-1], allTrajLengths[0], allTrajLengths[-1]])
+            plotIsocostLines(extent, allTrajLengths, numberOfTrajs, 11)
+            plt.imshow(entropies, interpolation="bilinear", origin="lower", aspect="auto",  extent=extent)
         else:
-            plt.imshow(entropies, interpolation="bilinear", origin="lower", aspect="auto",  extent=[numberOfTrajs[0], numberOfTrajs[-1]+1, allTrajLengths[0], allTrajLengths[-1]])
+            plt.imshow(entropies, interpolation="bilinear", origin="lower", aspect="auto",  extent=extent)
         plt.colorbar()
+        import os
+        cwd = os.getcwd()
+        cwd = cwd.replace("/", "_")
+        #plt.save(cwd + "2.eps")
+        plt.savefig(cwd + "2.eps")
         plt.show()
     elif ntrajs:
         print numberOfTrajs, entropies[0]
