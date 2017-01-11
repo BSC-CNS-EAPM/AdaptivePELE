@@ -70,6 +70,20 @@ def createPathway(initial_cluster, final_cluster, predecessors):
     return pathway
 
 
+def removeRemarksPDB(native, modelNum):
+    pdbStr = ["MODEL %d\n" % modelNum]
+    with open(native) as f:
+        for line in f:
+            if line.startswith("MODEL"):
+                break
+            elif line.startswith("ATOM") or line.startswith("HETATM"):
+                pdbStr.append(line)
+        for line in f:
+            pdbStr.append(line)
+    pdbStr.append("ENDMDL\n")
+    return ''.join(pdbStr)
+
+
 def writePathwayTrajectory(ClOrd, pathway, filename, native):
     pathwayFile = open(filename, "w")
     pathwayFile.write("REMARK 000 File created using PELE++\n")
@@ -88,7 +102,7 @@ def writePathwayTrajectory(ClOrd, pathway, filename, native):
             elif line:
                 pathwayFile.write(line+"\n")
         pathwayFile.write("ENDMDL\n")
-    pathwayFile.write(open(native).read())
+    pathwayFile.write(removeRemarksPDB(native, i+2))
     pathwayFile.close()
 
 
