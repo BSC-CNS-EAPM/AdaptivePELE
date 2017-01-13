@@ -43,8 +43,8 @@ thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
     "thresholdCalculator": {
         "type" : "heaviside",
         "params" : {
-            "conditions" : [0.75],
-            "values" : [0.03,0.05]
+            "conditions" : [0.2],
+            "values" : [0.001,0.002]
         }
     }
 })
@@ -70,7 +70,7 @@ densityCalculator = densityCalculatorBuilder.build({
    }
 )
 # densityCalculator = densityCalculatorBuilder.build({})
-contactThresholdDistance = 8
+contactThresholdDistance = 4
 ClDouble = clustering.ContactMapClustering(resname="ALJ",
                                            reportBaseFilename="report",
                                            columnOfReportFile=5,
@@ -86,21 +86,21 @@ ClCont = clustering.ContactsClustering(thresholdCalculator, resname="K5Y",
                                        symmetries={})
 ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
                                                     similarityEvaluator,
-                                                    resname="K5Y",
+                                                    resname="STR",
                                                     reportBaseFilename="report",
                                                     columnOfReportFile=4,
                                                     contactThresholdDistance=contactThresholdDistance)
 spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 
-for i in range(1):
+for i in range(55):
     # path =["trajs/%d/run_traj*"%i]
     # paths_report = ["trajs/%d/run_report*"%i]
     # path = ["../3ptb_4_64_inversely_1/%d/traj*" % i]
     # paths_report = ["../3ptb_4_64_inversely_1/%d/report*" % i]
-    # path = ["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/traj*"%i]
-    # paths_report = ["/home/bsc72/bsc72021/simulations/5ALJ/5ALJ_evp_agg_linear_80clusters/simulations/5ALJ_evp_agg/%d/report*"%i]
-    path = ["/home/jgilaber/4K5Y/trajs_64_7/%d/traj*"%i]
-    paths_report = ["/home/jgilaber/4K5Y/trajs_64_7/%d/report*"%i]
+    path = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtra/automate_CM_7/%d/traj*"%i]
+    paths_report = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtra/automate_CM_7/%d/report*"%i]
+    # path = ["/home/jgilaber/4K5Y/trajs_64_7/%d/traj*"%i]
+    # paths_report = ["/home/jgilaber/4K5Y/trajs_64_7/%d/report*"%i]
     trajs = clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:
@@ -139,8 +139,6 @@ for i in range(1):
     print "Total time of clustering accumulative, epoch %d: %.6f"%(i,endTimeAcc-startTimeAcc)
     print "Number of clusters accumulative epoch %d: %d"%(i,len(ClAcc.clusters.clusters))
     print ""
-    print ClAcc.clusters.clusters[0].contactMap.shape
-    print ClAcc.clusters.clusters[1].contactMap.shape
     degeneraciesAcc = spawningObject.calculate(ClAcc.clusters.clusters, ntrajs, {})
-    ClAcc.writeOutput("clsummary",degeneraciesAcc,"ClAcc_Tree.pkl", False)
-    os.rename("clsummary/summary.txt", "results/summary_ClAcc_Tree.txt")
+    ClAcc.writeOutput("clsummary",degeneraciesAcc,"ClAcc.pkl", False)
+    os.rename("clsummary/summary.txt", "results/summary_PR_thres4.txt")

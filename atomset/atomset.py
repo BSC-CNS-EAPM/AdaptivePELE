@@ -1,7 +1,6 @@
 import numpy as np
 import re
 import StringIO
-from scipy import sparse
 
 
 class Atom:
@@ -179,7 +178,12 @@ class PDB:
                "HIE": "CE1", "HID": "CE1", "HIP": "CE1", "ARG": "NE",
                "ASP": "OD1", "GLU": "OE1", "GLY": "empty"}
     # CMAtoms = {x: "empty" for x in CMAtoms}
-
+    # CMAtoms = {"ALA": "empty", "VAL": "empty", "LEU": "empty", "ILE": "empty",
+    #            "MET": "empty", "PRO": "empty", "PHE": "CZ", "TYR": "OH",
+    #            "TRP": "CH2", "SER": "empty", "THR": "empty", "CYS": "empty",
+    #            "ASN": "empty", "GLN": "empty", "LYS": "NZ", "HIS": "CE1",
+    #            "HIE": "CE1", "HID": "CE1", "HIP": "CE1", "ARG": "NE",
+    #            "ASP": "OD1", "GLU": "OE1", "GLY": "empty"}
     def __init__(self):
         """
             Object that will contain the information of a PDB file. Has to call
