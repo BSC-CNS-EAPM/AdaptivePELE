@@ -138,3 +138,18 @@ class clusteringTest(unittest.TestCase):
         self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
         self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
         # self.assertEqual(allClusters[2].elements, goldenElementsCluster3)
+
+    def test_CMInnerLimit(self):
+        CMEvaluator = clustering.CMClusteringEvaluator(None, None)
+        cluster1_8 = clustering.Cluster(None, contacts=1, contactThreshold=8)
+        cluster2_8 = clustering.Cluster(None, contacts=2.2, contactThreshold=8)
+        cluster1_6 = clustering.Cluster(None, contacts=0.4, contactThreshold=6)
+        cluster2_6 = clustering.Cluster(None, contacts=1.0, contactThreshold=6)
+        cluster1_4 = clustering.Cluster(None, contacts=0.1, contactThreshold=4)
+        cluster2_4 = clustering.Cluster(None, contacts=0.3, contactThreshold=4)
+        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_8), 10)
+        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_8), 4)
+        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_6), 10)
+        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_6), 4)
+        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_4), 10)
+        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_4), 4)
