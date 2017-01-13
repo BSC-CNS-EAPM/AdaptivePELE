@@ -199,7 +199,7 @@ class DensitySpawningCalculator(SpawningCalculator):
         densities = np.zeros(len(clusters))
         for i, cluster in enumerate(clusters):
             contacts = cluster.getContacts()
-            cluster.density = self.densityCalculator.calculate(contacts)
+            cluster.density = self.densityCalculator.calculate(contacts, cluster.contactThreshold)
             densities[i] = cluster.density
         return densities
 
