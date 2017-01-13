@@ -287,14 +287,14 @@ class Clustering:
 
             metric = cluster.getMetric()
             if metric:
-                writeString = "%d %d %d %.2f %.2f %.1f %.3f\n" % (i, cluster.elements,
+                writeString = "%d %d %d %.2f %.4f %.1f %.3f\n" % (i, cluster.elements,
                                                                   degeneracy[i],
                                                                   cluster.contacts,
                                                                   cluster.threshold,
                                                                   cluster.density,
                                                                   metric)
             else:
-                writeString = "%d %d %d %.2f %.2f %.1f -\n" % (i, cluster.elements,
+                writeString = "%d %d %d %.2f %.4f %.1f -\n" % (i, cluster.elements,
                                                                degeneracy[i],
                                                                cluster.contacts,
                                                                cluster.threshold,
