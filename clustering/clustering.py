@@ -50,7 +50,8 @@ class Cluster:
         a contactMap(sometimes) and a metric
     """
     def __init__(self, pdb, thresholdRadius=None, contactMap=None,
-                 contacts=None, metrics=[], metricCol=None, density=None):
+                 contacts=None, metrics=[], metricCol=None, density=None,
+                 contactThreshold=8):
         """
             contacts stands for contacts/ligandAtom
         """
@@ -62,6 +63,7 @@ class Cluster:
         self.contactMap = contactMap
         self.metrics = metrics
         self.metricCol = metricCol
+        self.contactThreshold = contactThreshold
 
         if self.threshold is None:
             self.threshold2 = None
@@ -166,6 +168,9 @@ class ContactsClusteringEvaluator:
 
 
 class CMClusteringEvaluator:
+    limitSlope = {8: 6, 6: 15, 4: 60}
+    limitMax = {8: 2, 6: 0.8, 4: 0.2}
+
     def __init__(self, similarityEvaluator, symmetryEvaluator):
         self.similarityEvaluator = similarityEvaluator
         self.symmetryEvaluator = symmetryEvaluator
@@ -187,12 +192,10 @@ class CMClusteringEvaluator:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
 
     def getInnerLimit(self, cluster):
-        # return max(16, 16 * 2 - node.depth)
-        if cluster.contacts > 2.0:
+        if cluster.contacts > self.limitMax[cluster.contactThreshold]:
             return 4.0
         else:
-            return 16-6*cluster.contacts
-        # return 16
+            return 16-self.limitSlope[cluster.contactThreshold]*cluster.contacts
 
     def getOuterLimit(self, node):
         # return max(16, 16 * 2 - node.depth)
@@ -357,9 +360,10 @@ class Clustering:
 
         threshold = self.thresholdCalculator.calculate(contactsPerAtom)
         cluster = Cluster(pdb, thresholdRadius=threshold,
-                            contacts=contactsPerAtom,
-                            contactMap=self.clusteringEvaluator.contactMap,
-                            metrics=metrics, metricCol=col)
+                          contacts=contactsPerAtom,
+                          contactMap=self.clusteringEvaluator.contactMap,
+                          metrics=metrics, metricCol=col,
+                          contactThreshold=self.contactThresholdDistance)
         self.clusters.addCluster(cluster)
 
 
