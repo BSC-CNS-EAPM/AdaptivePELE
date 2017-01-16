@@ -40,6 +40,38 @@ def normaliseMatrixRows(M):
 def buildTransitionMatrix(C):
     return normaliseMatrixRows(C)
 
+def buildRevTransitionMatrix(C):
+    """
+        #Implemented as Prinz paper
+    """
+    X = C + C.T
+    x = X.sum(axis=1)
+    c = C.sum(axis=1)
+
+    iterations = 1000
+    n = len(x)
+
+    #np.seterr(all='raise')
+    T = np.zeros(C.shape)
+    for it in range(iterations):
+        if it % 10 == 0: print "it:", it
+        for i in range(n):
+            X[i,i] = C[i,i] * (x[i] - X[i,i]) / (c[i] - C[i,i])
+        x = X.sum(axis=1)
+        for i in range(n - 1):
+            for j in range(i + 1, n):
+                a = c[i] - C[i,j] + c[j] - C[j,i]
+                b = c[i]*(x[j]-X[i,j]) + c[j]*(x[i] - X[i,j]) -(C[i,j] + C[j,i])*(x[i] + x[j] - 2*X[i,j])
+                z = -(C[i,j] + C[j,i])*(x[i] - X[i,j])*(x[j] - X[i,j])
+                X[i,j] = X[j,i] = (-b + np.sqrt(b**2 - 4*a*z))/(2*a)
+        x = X.sum(axis=1)
+            
+
+        for i in range(n):
+            for j in range(n):
+                T[i,j] = X[i,j]/x[i]
+    return T
+
 def runSimulation(P, steps, startingPosition):
     n = P.shape[0]
     position = startingPosition
@@ -106,16 +138,18 @@ def estimateTransitionMatrix(trajectories, n, tau, symm=True):
     if symm: C = C+C.T #symmetrize
     return buildTransitionMatrix(C)
 
-def getSortedEigen(tau, trajs, n):
-    estimatedT = estimateTransitionMatrix(trajs, n, tau)
-    #T.T*pi = pi; or pi*T = pi, where pi is col and row array respectively
-
-    eigenvals, eigenvectors = scipy.linalg.eig(estimatedT, left=True, right=False)
+def getSortedEigen(T):
+    eigenvals, eigenvectors = scipy.linalg.eig(T, left=True, right=False)
     sortedIndices = np.argsort(eigenvals)[::-1]
 
-    reigenvals, reigenvectors = scipy.linalg.eig(estimatedT)
-    rsortedIndices = np.argsort(reigenvals)[::-1]
-    return eigenvals[sortedIndices], eigenvectors[sortedIndices]
+    #reigenvals, reigenvectors = scipy.linalg.eig(T.T)
+    #rsortedIndices = np.argsort(reigenvals)[::-1]
+    return eigenvals[sortedIndices], eigenvectors[:,sortedIndices]
+
+def getSortedEigenFromDtrajsFromDtrajs(tau, trajs, n):
+    estimatedT = estimateTransitionMatrix(trajs, n, tau)
+    #T.T*pi = pi; or pi*T = pi, where pi is col and row array respectively
+    return getSortedEigen(estimatedT)
 
 def getStationaryDistr(lowestEigenvector):
     absStationary = np.abs(lowestEigenvector)
@@ -134,7 +168,7 @@ def getGoldenTForGivenTau(T, tau):
 def plotEigenvalEvolutionInTau(trajs, taus, n):
     allEigenvals = []
     for i, tau in enumerate(taus):
-        eigenvals, eigenvectors = getSortedEigen(tau, trajs, n)
+        eigenvals, eigenvectors = getSortedEigenFromDtrajs(tau, trajs, n)
         allEigenvals.append(eigenvals)
 
     allEigenvals = np.array(allEigenvals) #rework
@@ -191,7 +225,7 @@ def main():
     for trajNum in trajNumbers:
         for i,j in enumerate(simLengths):
             trimmedTrajs = trajs[0:trajNum,:j]
-            eigenvals, eigenvec = getSortedEigen(tau, trimmedTrajs, n)
+            eigenvals, eigenvec = getSortedEigenFromDtrajs(tau, trimmedTrajs, n)
             stationary = getStationaryDistr(eigenvec[:,0])
 
             estimatedT = estimateTransitionMatrix(trimmedTrajs, n, tau)
