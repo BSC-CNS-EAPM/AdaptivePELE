@@ -15,7 +15,7 @@ def loadCOMFiles(trajectoryFolder, trajectory_basename):
         x[i] = currentX
     if not x:
         raise ValueError("Didn't find any trajectory files in the specified path!!!")
-    return x
+    return x, files
 
 
 def loadCoordinates(path, trajectories_basename='*traj*.pdb', topfile=''):

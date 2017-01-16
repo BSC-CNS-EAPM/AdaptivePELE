@@ -9,6 +9,7 @@ def calculateITS(trajectories, lagtimes, errors = None):
 
 def plotITS(its_object, its_plot_file=None, nits=-1):
     its_plot = mplt.plot_implied_timescales(its_object, outfile=its_plot_file, nits=nits)
+    plt.savefig("its.eps")
     return its_plot
 
 def estimateMSM(trajectories,lagtime, error_est=False):
@@ -16,9 +17,11 @@ def estimateMSM(trajectories,lagtime, error_est=False):
     should be big enough so that the relevant processes have converged.
     Return a MaximumLikelihoodMSM object"""
     if error_est:
+        print "Computing msm with bayes error calc"
         MSM_object = MSM.bayesian_markov_model(trajectories, lagtime)
     else:
-        MSM_object = MSM.estimate_markov_model(trajectories, lagtime)
+        print "Computing msm with no error calc"
+        MSM_object = MSM.estimate_markov_model(trajectories, lagtime, count_mode='sliding')
     return MSM_object
 
 def calculatePCCA(MSM_object, numPCCA):
@@ -40,6 +43,7 @@ def plotChapmanKolmogorovTest(CKObject, layout=None, padding_between=0.1,
     """ Plot the results of the Chapman-Kolgomorov tests"""
     mplt.plot_cktest(CKObject,layout=layout, padding_between=padding_between,
                      padding_top=padding_top)
+    plt.savefig("CK.eps")
 
 def plot_PCCA_clusters(cluster_object, MSM_object):
     cols = ['orange', 'magenta', 'red', 'black', 'blue', 'green',]
