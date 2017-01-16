@@ -5,6 +5,7 @@ import helper
 import runMarkovChainModel as markov
 import trajectories
 from pyemma.coordinates.clustering import AssignCenters
+from pyemma import msm as pyemmaMSM
 import msm
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,11 +29,29 @@ def readParams(control_file):
     stride = params.get("stride", 1)
     return trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, sampleSize, numRuns, stride
 
+"""
+def getStationaryDistributionAndTransitionMatrix(goldenMSMClusterCenters, lagtime, trajectoryFolder, trajectoryBasename):
+(self, cl, lagtimes, numPCCA, itsOutput=None, numberOfITS=-1,
+                 itsErrors=None, error_estimationCK=None, mlags=2, lagtime=None, dtrajs=[]):
+    calculateMSM = MSMblocks.MSM(cl, lagtimes=[], numPCCA=0, itsOutput=None, numberOfITS=0, itsError=None, error_estimationCK=None, dtrajs=prepareMSM.dtrajs)
+    assign = AssignCenters(goldenMSMClusterCenters)
+    dTrajs = assign.assign(Xsample)
+    #own estimation
+    counts = markov.estimateCountMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime)
+    #counts += 1.0/counts.shape[0]
+    ownTransition = markov.buildTransitionMatrix(counts)
+
+    eigenvals, eigenvectors = scipy.linalg.eig(T, left=True, right=False)
+    sortedIndices = np.argsort(eigenvals)[::-1]
+    #stationary distribution
+    goldenStationary = getStationaryDistr(eigenvectors[:, sortedIndices[0]])
+"""
+    
 
 def getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride):
     prepareMSM = MSMblocks.PrepareMSM(numClusters, trajectoryFolder, trajectoryBasename, stride)
     cl = prepareMSM.getClusteringObject()
-    calculateMSM = MSMblocks.MSM(cl, lagtimes, 0, itsOutput, numberOfITS, itsErrors, None, dtrajs=prepareMSM.dtrajs)
+    calculateMSM = MSMblocks.MSM(cl, lagtimes, 0, itsOutput, numberOfITS, itsErrors, False, dtrajs=prepareMSM.dtrajs)
     if not lagtime:
         lagtime = calculateMSM.calculateITS()
     calculateMSM.createMSM(lagtime)
@@ -43,10 +62,35 @@ def getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagti
     counts += 1.0/numClusters
     transition = markov.buildTransitionMatrix(counts)
 
+    #print counts
+    """
+    goldenMSMClusterCentersFile = "discretized/clusterCenters.dat"
+    goldenMSMClusterCenters = np.loadtxt(goldenMSMClusterCentersFile)
+    assign = AssignCenters(goldenMSMClusterCenters)
+    X,unused = trajectories.loadCOMFiles(".", "traj")
+    dTrajs = assign.assign(X)
+    #own estimation
+    counts = markov.estimateCountMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime=200)
+    """
+
     fullStationaryDistribution = np.zeros(MSM_object.nstates_full)
     active = MSM_object.active_set
     fullStationaryDistribution[active] = MSM_object.stationary_distribution
-    return transition, fullStationaryDistribution, lagtime
+
+    """
+    nclusters = numClusters
+    fullTransitionMatrix = np.zeros((nclusters,nclusters))
+    active = MSM_object.active_set
+    pyemmaT = MSM_object.transition_matrix
+    for el, i in zip(active, range(len(active))):
+        fullTransitionMatrix[el,active] = pyemmaT[i]
+
+    T = markov.buildRevTransitionMatrix(counts)
+
+    eigenvals, eigenvec = markov.getSortedEigen(T)
+    stationary = markov.getStationaryDistr(eigenvec[:,0])
+    """
+    return transition, fullStationaryDistribution, lagtime #full stationary has zeros if there are states not in active set
 
 def makeRandomSampleOfNtrajs(X, ntrajs=None, length=None):
     if ntrajs:
@@ -54,18 +98,27 @@ def makeRandomSampleOfNtrajs(X, ntrajs=None, length=None):
     else:
         indices = range(len(X))
 
-    Xsample = map(lambda x: X[x][:length,:], indices)
+    try:
+        Xsample = map(lambda x: X[x][:length,:], indices)
+    except:
+        for index in indices:
+            try:
+                X[index][:length,:]
+            except:
+                import sys
+                sys.exit("There is a problem with the trajectory!")
+            
     return Xsample
 
 def assignNewTrajecories(Xsample, goldenMSMClusterCenters, lagtime):
     assign = AssignCenters(goldenMSMClusterCenters)
     dTrajs = assign.assign(Xsample)
+    #own estimation
     counts = markov.estimateCountMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime)
-    #secondMSM = msm.estimateMSM(dTrajs, lagtime)
-    #counts = secondMSM.count_matrix_full
     counts += 1.0/counts.shape[0]
-    transition = markov.buildTransitionMatrix(counts)
-    return transition
+    ownTransition = markov.buildTransitionMatrix(counts)
+
+    return ownTransition
 
 def plotIsocostLines(extent, allTrajLengths, numberOfTrajs, steps=10):
     minCost = allTrajLengths[0]*numberOfTrajs[0]
@@ -91,18 +144,22 @@ def main(controlFile):
 
     if seq:
         try:
-            X = trajectories.loadCOMFiles(trajectoryFolder2, trajectoryBasename)
+            X,unused = trajectories.loadCOMFiles(trajectoryFolder2, trajectoryBasename)
 
             dTrajs = 50
+            #dTrajs = 100
             numberOfTrajs = range(63, 512, dTrajs)
-            numberOfTrajs = range(50, 502, dTrajs)
+            numberOfTrajs = range(100, 1001, dTrajs)
             # numberOfTrajs = range(50, sampleSize, 50)
 
             #only trying different traj lengths if sampleSize is defined in control file
             shortestTrajSize = min([len(i) for i in X])
             lowerLimit = 2*lagtime
             upperLimit = shortestTrajSize
-            upperLimit = 1001
+            upperLimit = 501
+            upperLimit = 2001
+            #upperLimit = 2001
+            dTrajLengths = 25
             dTrajLengths = 100
             allTrajLengths = range(lowerLimit, upperLimit, dTrajLengths)
             #allTrajLengths = range(lowerLimit, 401, 100) 
@@ -133,7 +190,7 @@ def main(controlFile):
 
             if not seq:
                 currentEpochFolder = os.path.join(trajectoryFolder2, str(ntrajs))
-                currentX = trajectories.loadCOMFiles(currentEpochFolder, trajectoryBasename)
+                currentX,unused = trajectories.loadCOMFiles(currentEpochFolder, trajectoryBasename)
                 X.extend(currentX) 
 
             if not ntrajs % 25:
