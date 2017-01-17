@@ -10,42 +10,36 @@ import msm
 import numpy as np
 import matplotlib.pyplot as plt
 
-import pdb as debug
-
+from src.pyemma_scripts import revTransitionMatrix #cython implementation
 
 def readParams(control_file):
     params = MSMblocks.readParams(control_file)
-    trajectoryFolder = params["trajectoryFolder"]
-    trajectoryFolder2 = params["trajectoryFolder2"]
+    disctrajFolder = params["disctrajFolder"]
+    trajectoryFolder = params["goldenTrajFolder"]
+    trajectoryFolder2 = params["trajFolder"]
     trajectoryBasename = params["trajectoryBasename"]
     numClusters = params["numClusters"]
-    lagtimes = params["lagtimes"]
-    itsOutput = params["itsOutput"]
-    numberOfITS = params["numberOfITS"]
-    itsErrors = params["itsErrors"]
     lagtime = params.get("lagtime", 0)
     sampleSize = params.get("sampleSize", None)
     numRuns = params.get("numRuns", 1)
-    stride = params.get("stride", 1)
-    return trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, sampleSize, numRuns, stride
+    return disctrajFolder, trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtime, sampleSize, numRuns
 
-"""
-def getStationaryDistributionAndTransitionMatrix(goldenMSMClusterCenters, lagtime, trajectoryFolder, trajectoryBasename):
-(self, cl, lagtimes, numPCCA, itsOutput=None, numberOfITS=-1,
-                 itsErrors=None, error_estimationCK=None, mlags=2, lagtime=None, dtrajs=[]):
-    calculateMSM = MSMblocks.MSM(cl, lagtimes=[], numPCCA=0, itsOutput=None, numberOfITS=0, itsError=None, error_estimationCK=None, dtrajs=prepareMSM.dtrajs)
+def getStationaryDistributionAndTransitionMatrix(X, goldenMSMClusterCenters, lagtime):
     assign = AssignCenters(goldenMSMClusterCenters)
-    dTrajs = assign.assign(Xsample)
-    #own estimation
-    counts = markov.estimateCountMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime)
-    #counts += 1.0/counts.shape[0]
-    ownTransition = markov.buildTransitionMatrix(counts)
+    dTrajs = assign.assign(X)
 
-    eigenvals, eigenvectors = scipy.linalg.eig(T, left=True, right=False)
-    sortedIndices = np.argsort(eigenvals)[::-1]
-    #stationary distribution
-    goldenStationary = getStationaryDistr(eigenvectors[:, sortedIndices[0]])
-"""
+    counts = markov.estimateCountMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime)
+    counts += 1.0/counts.shape[0]
+
+    T = revTransitionMatrix.buildRevTransitionMatrix_fast(counts, iterations=5)
+    #other (slower) options
+    #transition = markov.buildRevTransitionMatrix_fast(counts, iterations=5)
+    #transition = markov.buildRevTransitionMatrix(counts)
+
+    eigenvals, eigenvec = markov.getSortedEigen(T)
+    pi = markov.getStationaryDistr(eigenvec[:,0])
+
+    return pi, T
     
 
 def getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride):
@@ -63,33 +57,10 @@ def getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagti
     transition = markov.buildTransitionMatrix(counts)
 
     #print counts
-    """
-    goldenMSMClusterCentersFile = "discretized/clusterCenters.dat"
-    goldenMSMClusterCenters = np.loadtxt(goldenMSMClusterCentersFile)
-    assign = AssignCenters(goldenMSMClusterCenters)
-    X,unused = trajectories.loadCOMFiles(".", "traj")
-    dTrajs = assign.assign(X)
-    #own estimation
-    counts = markov.estimateCountMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime=200)
-    """
-
     fullStationaryDistribution = np.zeros(MSM_object.nstates_full)
     active = MSM_object.active_set
     fullStationaryDistribution[active] = MSM_object.stationary_distribution
 
-    """
-    nclusters = numClusters
-    fullTransitionMatrix = np.zeros((nclusters,nclusters))
-    active = MSM_object.active_set
-    pyemmaT = MSM_object.transition_matrix
-    for el, i in zip(active, range(len(active))):
-        fullTransitionMatrix[el,active] = pyemmaT[i]
-
-    T = markov.buildRevTransitionMatrix(counts)
-
-    eigenvals, eigenvec = markov.getSortedEigen(T)
-    stationary = markov.getStationaryDistr(eigenvec[:,0])
-    """
     return transition, fullStationaryDistribution, lagtime #full stationary has zeros if there are states not in active set
 
 def makeRandomSampleOfNtrajs(X, ntrajs=None, length=None):
@@ -116,9 +87,11 @@ def assignNewTrajecories(Xsample, goldenMSMClusterCenters, lagtime):
     #own estimation
     counts = markov.estimateCountMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime)
     counts += 1.0/counts.shape[0]
-    ownTransition = markov.buildTransitionMatrix(counts)
-
-    return ownTransition
+    transition = revTransitionMatrix.buildRevTransitionMatrix_fast(counts, iterations=5)
+    #other (slower) options
+    #transition = markov.buildRevTransitionMatrix_fast(counts, iterations=5)
+    #transition = markov.buildRevTransitionMatrix(counts)
+    return transition
 
 def plotIsocostLines(extent, allTrajLengths, numberOfTrajs, steps=10):
     minCost = allTrajLengths[0]*numberOfTrajs[0]
@@ -131,11 +104,27 @@ def plotIsocostLines(extent, allTrajLengths, numberOfTrajs, steps=10):
 
 
 def main(controlFile):
-    trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, sampleSize, numRuns, stride = readParams(controlFile)
-    refTransition, refStationaryDist, lagtime = getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride)
+    """
+        Takes cluster centers file, builds dtrajs, and computes relative entropy
+    """
+    disctrajFolder, trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtime, sampleSize, numRuns = readParams(controlFile)
+    #Deprecated, to avoid dependencies on pyemma
+    #refTransition, refStationaryDist, lagtime = getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride)
 
+    goldX, unused = trajectories.loadCOMFiles(trajectoryFolder, trajectoryBasename)
+    
+    import os
+    clusterCenters = os.path.join(disctrajFolder, "discretized/clusterCenters.dat")
+    try:
+        goldenMSMClusterCenters = np.loadtxt(clusterCenters)
+    except:
+        try:
+            clusterCenters = os.path.join(disctrajFolder, "clusterCenters.dat")
+            goldenMSMClusterCenters = np.loadtxt(clusterCenters)
+        except:
+            sys.exit("Didn't find cluster centers")
 
-    goldenMSMClusterCenters = np.loadtxt("discretized/clusterCenters.dat")
+    pi, T = getStationaryDistributionAndTransitionMatrix(goldX, goldenMSMClusterCenters, lagtime)
 
     #np.random.seed(250793)
 
@@ -147,9 +136,12 @@ def main(controlFile):
             X,unused = trajectories.loadCOMFiles(trajectoryFolder2, trajectoryBasename)
 
             dTrajs = 50
+            numberOfTrajs = range(99, 500, dTrajs)
+
+            dTrajs = 100
+            numberOfTrajs = range(99, 600, dTrajs)
+
             #dTrajs = 100
-            numberOfTrajs = range(63, 512, dTrajs)
-            numberOfTrajs = range(100, 1001, dTrajs)
             # numberOfTrajs = range(50, sampleSize, 50)
 
             #only trying different traj lengths if sampleSize is defined in control file
@@ -157,13 +149,11 @@ def main(controlFile):
             lowerLimit = 2*lagtime
             upperLimit = shortestTrajSize
             upperLimit = 501
-            upperLimit = 2001
+            upperLimit = 1001
             #upperLimit = 2001
-            dTrajLengths = 25
-            dTrajLengths = 100
+            dTrajLengths = 50
+            #dTrajLengths = 200
             allTrajLengths = range(lowerLimit, upperLimit, dTrajLengths)
-            #allTrajLengths = range(lowerLimit, 401, 100) 
-            #allTrajLengths = [None]
         except TypeError:
             numberOfTrajs = [None]
             allTrajLengths = [None]
@@ -204,13 +194,13 @@ def main(controlFile):
 
                 transitionMatrix = assignNewTrajecories(Xsample, goldenMSMClusterCenters, lagtime)
                 try:
-                    s = markov.getRelativeEntropy(refStationaryDist, refTransition, transitionMatrix)
-                    print s
+                    s = markov.getRelativeEntropy(pi, T, transitionMatrix)
                     relativeEntropy += s
                 except ValueError:
                     j -= 1
             lengthEntropies.append(relativeEntropy/float(numRuns))
-            print relativeEntropy, lengthEntropies
+            print length, ntrajs, relativeEntropy/float(numRuns)
+        print lengthEntropies
         entropies.append(lengthEntropies)
 
     np.save("matrix_adaptive.npy", entropies)
@@ -232,7 +222,6 @@ def main(controlFile):
             plt.imshow(entropies, interpolation="nearest", origin="lower", aspect="auto", extent=extent)
         else:
             plt.imshow(entropies, interpolation="nearest", origin="lower", aspect="auto", extent=extent)
-        import os
         cwd = os.getcwd()
         cwd = cwd.replace("/", "_")
         #plt.save(cwd + ".eps")

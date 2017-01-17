@@ -40,6 +40,48 @@ def normaliseMatrixRows(M):
 def buildTransitionMatrix(C):
     return normaliseMatrixRows(C)
 
+def buildRevTransitionMatrix_fast(C, iterations=5):
+    """
+        #Implemented as Prinz paper
+    """
+    X = C + C.T
+    x = X.sum(axis=1)
+    c = C.sum(axis=1)
+
+    return loop(iterations, X, x, C, c)
+
+def loop(iterations, X, x, C, c):
+
+    n = len(x)
+
+    c_vec = c[:,np.newaxis]
+    A = c_vec - C + c_vec.T - C.T
+
+    for it in range(iterations):
+        if it != 0 and it % 10 == 0: print it
+
+        for i in range(n):
+            X[i,i] = C[i,i] * (x[i] - X[i,i]) / (c[i] - C[i,i])
+
+        x = X.sum(axis=1)
+
+        x_vec = x[:,np.newaxis]
+
+        B = c_vec*(x_vec.T - X) + c_vec.T*(x_vec - X) - (C + C.T) * (x_vec + x_vec.T - 2 * X)
+        Z = -(C+C.T) * (x_vec - X) * (x_vec.T - X)
+
+        indicesU = np.triu_indices(n,1)
+        X[indicesU] = (-B[indicesU] + np.sqrt(B[indicesU]**2 - 4 * A[indicesU]*Z[indicesU]))/ (2 * A[indicesU])
+        X.T[indicesU] = X[indicesU]
+
+        x = X.sum(axis=1)
+
+    T = np.zeros((n,n))
+    for i in range(n):
+        for j in range(n):
+            T[i,j] = X[i,j]/x[i]
+    return T
+    #return X / x[:,np.newaxis]
 def buildRevTransitionMatrix(C):
     """
         #Implemented as Prinz paper
@@ -48,13 +90,12 @@ def buildRevTransitionMatrix(C):
     x = X.sum(axis=1)
     c = C.sum(axis=1)
 
-    iterations = 1000
+    iterations = 5
     n = len(x)
 
-    #np.seterr(all='raise')
     T = np.zeros(C.shape)
     for it in range(iterations):
-        if it % 10 == 0: print "it:", it
+        if it != 0 and it % 10 == 0: print it
         for i in range(n):
             X[i,i] = C[i,i] * (x[i] - X[i,i]) / (c[i] - C[i,i])
         x = X.sum(axis=1)
@@ -67,10 +108,11 @@ def buildRevTransitionMatrix(C):
         x = X.sum(axis=1)
             
 
-        for i in range(n):
-            for j in range(n):
-                T[i,j] = X[i,j]/x[i]
+    for i in range(n):
+        for j in range(n):
+            T[i,j] = X[i,j]/x[i]
     return T
+
 
 def runSimulation(P, steps, startingPosition):
     n = P.shape[0]
@@ -125,7 +167,7 @@ def estimateCountMatrix(trajectories, n, tau):
     col = np.concatenate(cols)
     data = np.ones(row.size)
     C = scipy.sparse.coo_matrix((data, (row, col)), shape=(n, n))
-    return C.toarray() + 1./n
+    return C.toarray()
 
 def printMatrix(matrix):
     for array in matrix:
@@ -134,8 +176,8 @@ def printMatrix(matrix):
         print ""
 
 def estimateTransitionMatrix(trajectories, n, tau, symm=True):
-    C = estimateCountMatrix(trajectories, n, tau)
-    if symm: C = C+C.T #symmetrize
+    C = estimateCountMatrix(trajectories, n, tau) + 1./n
+    if symm: return buildRevTransitionMatrix(C)
     return buildTransitionMatrix(C)
 
 def getSortedEigen(T):
