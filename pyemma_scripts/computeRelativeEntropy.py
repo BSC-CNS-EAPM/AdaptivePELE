@@ -25,8 +25,7 @@ def readParams(control_file):
     return disctrajFolder, trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtime, sampleSize, numRuns
 
 def getStationaryDistributionAndTransitionMatrix(X, goldenMSMClusterCenters, lagtime):
-    assign = AssignCenters(goldenMSMClusterCenters)
-    dTrajs = assign.assign(X)
+    dTrajs = assignTrajectories(goldenMSMClusterCenters, X)
 
     counts = markov.estimateCountMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime)
     counts += 1.0/counts.shape[0]
@@ -39,7 +38,7 @@ def getStationaryDistributionAndTransitionMatrix(X, goldenMSMClusterCenters, lag
     eigenvals, eigenvec = markov.getSortedEigen(T)
     pi = markov.getStationaryDistr(eigenvec[:,0])
 
-    return pi, T
+    return pi, T, dTrajs
     
 
 def getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride):
@@ -81,11 +80,32 @@ def makeRandomSampleOfNtrajs(X, ntrajs=None, length=None):
             
     return Xsample
 
-def assignNewTrajecories(Xsample, goldenMSMClusterCenters, lagtime):
+def makeRandomSampleOfdtrajs(dtrajs, ntrajs=None, length=None):
+    if ntrajs:
+        indices = np.array(np.random.choice(range(len(dtrajs)), ntrajs))
+    else:
+        indices = range(len(dtrajs))
+
+    try:
+        Xsample = map(lambda x: dtrajs[x][:length], indices)
+    except:
+        for index in indices:
+            try:
+                dtrajs[index][:length]
+            except:
+                import sys
+                sys.exit("There is a problem with the trajectory!")
+            
+    return Xsample
+
+def assignTrajectories(goldenMSMClusterCenters, X):
     assign = AssignCenters(goldenMSMClusterCenters)
-    dTrajs = assign.assign(Xsample)
+    dTrajs = assign.assign(X)
+    return dTrajs
+
+def estimateTWithDiscTrajs(dTrajs, nclusters, lagtime):
     #own estimation
-    counts = markov.estimateCountMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime)
+    counts = markov.estimateCountMatrix(dTrajs, nclusters, lagtime)
     counts += 1.0/counts.shape[0]
     transition = revTransitionMatrix.buildRevTransitionMatrix_fast(counts, iterations=5)
     #other (slower) options
@@ -124,9 +144,9 @@ def main(controlFile):
         except:
             sys.exit("Didn't find cluster centers")
 
-    pi, T = getStationaryDistributionAndTransitionMatrix(goldX, goldenMSMClusterCenters, lagtime)
+    pi, T, dTrajs = getStationaryDistributionAndTransitionMatrix(goldX, goldenMSMClusterCenters, lagtime)
 
-    #np.random.seed(250793)
+    np.random.seed(250793)
 
     seq = True
     entropies = []
@@ -134,6 +154,7 @@ def main(controlFile):
     if seq:
         try:
             X,unused = trajectories.loadCOMFiles(trajectoryFolder2, trajectoryBasename)
+            discTrajs = assignTrajectories(goldenMSMClusterCenters, X)
 
             dTrajs = 50
             numberOfTrajs = range(99, 500, dTrajs)
@@ -188,11 +209,12 @@ def main(controlFile):
             relativeEntropy = 0
             for j in range(numRuns):
                 if seq:
-                    Xsample = makeRandomSampleOfNtrajs(X, ntrajs, length)
+                    #Xsample = makeRandomSampleOfNtrajs(X, ntrajs, length)
+                    discTrajsSample = makeRandomSampleOfdtrajs(discTrajs,  ntrajs, length)
                 else:
-                    Xsample = map(lambda x: x[:length,:], X)
+                    discTrajsSample = map(lambda x: x[:length,:], discTrajs)
 
-                transitionMatrix = assignNewTrajecories(Xsample, goldenMSMClusterCenters, lagtime)
+                transitionMatrix = estimateTWithDiscTrajs(discTrajsSample, goldenMSMClusterCenters.shape[0], lagtime)
                 try:
                     s = markov.getRelativeEntropy(pi, T, transitionMatrix)
                     relativeEntropy += s
