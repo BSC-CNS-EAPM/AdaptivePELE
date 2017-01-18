@@ -98,7 +98,7 @@ class Cluster:
         print "Number of contacts: %.2f" % self.contacts
 
     def writePDB(self, path):
-        self.pdb.writePDB(path)
+        self.pdb.writePDB(str(path))
 
     def getContacts(self):
         return self.contacts
@@ -784,14 +784,14 @@ class ClusteringBuilder:
     def buildClustering(self, clusteringBlock, reportBaseFilename=None, columnOfReportFile=None):
         paramsBlock = clusteringBlock[blockNames.ClusteringTypes.params]
         try:
-            resname = paramsBlock[blockNames.ClusteringTypes.ligandResname].upper()
+            resname = str(paramsBlock[blockNames.ClusteringTypes.ligandResname].upper())
             clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
             contactThresholdDistance = paramsBlock[blockNames.ClusteringTypes.contactThresholdDistance]
         except KeyError as err:
             err.message += ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
         if clusteringType == blockNames.ClusteringTypes.contacts:
-            symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries,[])
+            symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries, [])
 
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
@@ -1004,7 +1004,7 @@ def processSnapshots(trajectories, reportBaseFilename, col,
         metrics.extend(metricstraj.tolist())
         for num, snapshot in enumerate(snapshots):
             pdb = atomset.PDB()
-            pdb.initialise(snapshot, resname=resname)
+            pdb.initialise(snapshot, resname=str(resname))
             pdb_list.append(pdb)
             contactMap, contactnum = symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             contactmaps.append(contactMap)

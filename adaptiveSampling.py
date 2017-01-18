@@ -35,7 +35,7 @@ def checkSymmetryDict(clusteringBlock, initialStructures, resname):
     symmetries = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.symmetries, {})
     for structure in initialStructures:
         PDB = atomset.PDB()
-        PDB.initialise(structure, resname=resname)
+        PDB.initialise(str(structure), resname=resname)
         utilities.assertSymmetriesDict(symmetries, PDB)
 
 
@@ -54,7 +54,7 @@ def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries):
     reportName = "*report_%d"
     trajs = glob.glob(os.path.join(outputPath, trajName))
     nativePDB = atomset.PDB()
-    nativePDB.initialise(nativeStructure, resname=resname)
+    nativePDB.initialise(str(nativeStructure), resname=resname)
     for traj in trajs:
         trajNum = utilities.getTrajNum(traj)
         rmsd = list(utilities.getRMSD(traj, nativePDB, resname, symmetries))
@@ -368,7 +368,7 @@ def main(jsonParams):
     initialStructures = generalParams[blockNames.GeneralParams.initialStructures]
     writeAll = generalParams[blockNames.GeneralParams.writeAllClustering]
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
-    resname = clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.ligandResname]
+    resname = str(clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.ligandResname])
 
 
     print "================================"

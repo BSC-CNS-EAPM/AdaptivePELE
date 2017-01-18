@@ -1,9 +1,11 @@
 import numpy as np
 import re
 import StringIO
+cimport cython
+cimport numpy as np
 
 
-class Atom:
+cdef class Atom:
     _chargePattern = re.compile("[0-9]|\+|\-")
     _ATOM_WEIGHTS = {"H": 1.00794,
                     "D": 2.01410178,  # deuterium
@@ -73,7 +75,6 @@ class Atom:
                     "HG": 200.59,
                     "PB": 207.2,
                     "U": 238.03}
-
     def __init__(self, atomContent):
         """ Create an atom from a pdb line
 
@@ -133,11 +134,26 @@ class Atom:
         print self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.x, self.y, self.z, self.type, self.mass
         # print self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.r, self.type, self.mass
 
-    def __eq__(self, atom2):
-        return self.id == atom2.id
-
-    def __lt__(self, atom2):
-        return self.serial < atom2.serial
+    def __richcmp__(self, Atom atom2, int op):
+        if op == 2:
+            #equality
+            return self.id == atom2.id
+        elif op == 3:
+            return self.id != atom2.id
+        elif op == 1:
+            if self.id == atom2.id:
+                return True
+            else:
+                return self.serial < atom2.serial
+        elif op == 5:
+            if self.id == atom2.id:
+                return True
+            else:
+                return self.serial > atom2.serial
+        elif op == 0:
+            return self.serial < atom2.serial
+        elif op == 4:
+            return self.serial > atom2.serial
 
     def __str__(self):
         return "%s: %s %s %s [%f, %f, %f] %s %f" % (self.id, self.atomSerial,
@@ -154,7 +170,7 @@ class Atom:
         """
         return np.array([self.x, self.y, self.z])
 
-    def squaredDistance(self, atom2):
+    def squaredDistance(self, Atom atom2):
         """
             Calculate the squared distance between two atoms
 
@@ -162,28 +178,29 @@ class Atom:
             :type atom2: Atom
             :returns: float -- The distance between the atoms
         """
-        d = (self.x - atom2.x)**2 + (self.y - atom2.y)**2 + (self.z - atom2.z)**2
-        return d
+        return (self.x - atom2.x)**2 + (self.y - atom2.y)**2 + (self.z - atom2.z)**2
 
 
-class PDB:
+
+cdef class PDB:
+
     _typeProtein = "PROTEIN"
     _typeHetero = "HETERO"
     _typeAll = "ALL"
     _typeCM = "CM"
-    CMAtoms = {"ALA": "CB", "VAL": "CG1", "LEU": "CG", "ILE": "CD1",
-               "MET": "CE", "PRO": "CG", "PHE": "CZ", "TYR": "OH",
-               "TRP": "CH2", "SER": "OG", "THR": "CG2", "CYS": "SG",
-               "ASN": "ND2", "GLN": "NE2", "LYS": "NZ", "HIS": "CE1",
+    # CMAtoms = {"ALA": "CB", "VAL": "CG1", "LEU": "CG", "ILE": "CD1",
+    #         "MET": "CE", "PRO": "CG", "PHE": "CZ", "TYR": "OH",
+    #         "TRP": "CH2", "SER": "OG", "THR": "CG2", "CYS": "SG",
+    #         "ASN": "ND2", "GLN": "NE2", "LYS": "NZ", "HIS": "CE1",
+    #         "HIE": "CE1", "HID": "CE1", "HIP": "CE1", "ARG": "NE",
+    #         "ASP": "OD1", "GLU": "OE1", "GLY": "empty"}
+    # CMAtoms = {x: "empty" for x in CMAtoms}
+    CMAtoms = {"ALA": "empty", "VAL": "empty", "LEU": "empty", "ILE": "empty",
+               "MET": "empty", "PRO": "empty", "PHE": "CZ", "TYR": "OH",
+               "TRP": "CH2", "SER": "empty", "THR": "empty", "CYS": "empty",
+               "ASN": "empty", "GLN": "empty", "LYS": "NZ", "HIS": "CE1",
                "HIE": "CE1", "HID": "CE1", "HIP": "CE1", "ARG": "NE",
                "ASP": "OD1", "GLU": "OE1", "GLY": "empty"}
-    # CMAtoms = {x: "empty" for x in CMAtoms}
-    # CMAtoms = {"ALA": "empty", "VAL": "empty", "LEU": "empty", "ILE": "empty",
-    #            "MET": "empty", "PRO": "empty", "PHE": "CZ", "TYR": "OH",
-    #            "TRP": "CH2", "SER": "empty", "THR": "empty", "CYS": "empty",
-    #            "ASN": "empty", "GLN": "empty", "LYS": "NZ", "HIS": "CE1",
-    #            "HIE": "CE1", "HID": "CE1", "HIP": "CE1", "ARG": "NE",
-    #            "ASP": "OD1", "GLU": "OE1", "GLY": "empty"}
     def __init__(self):
         """
             Object that will contain the information of a PDB file. Has to call
@@ -200,14 +217,22 @@ class PDB:
         # Necessary for contactMaps
         self.atomList = []
 
-    def __eq__(self, other):
+    def __richcmp__(self, object other, int op):
         """ Compare two pdb strings, remark lines should be ignored and only the
         atoms and its information should be compared"""
-        pdb1 = [element.strip() for element in self.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
-        pdb2 = [element.strip() for element in other.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
-        return pdb1 == pdb2
+        cdef list pdb1, pdb2
+        if op == 2:
+            pdb1 = [element.strip() for element in self.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
+            pdb2 = [element.strip() for element in other.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
+            return pdb1 == pdb2
+        elif op == 3:
+            pdb1 = [element.strip() for element in self.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
+            pdb2 = [element.strip() for element in other.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
+            return pdb1 != pdb2
+        else:
+            print "No boolean operator available for PDB apart from equality"
 
-    def initialise(self, PDBstr, heavyAtoms=True, resname="", atomname="", type="ALL"):
+    def initialise(self, str PDBstr, bint heavyAtoms=True, str resname="", str atomname="", str type="ALL"):
         """
             Load the information from a PDB file or a string with the PDB
             contents
@@ -224,15 +249,21 @@ class PDB:
             :type type: str
             :raises: ValueError if the pdb contained no atoms
         """
+        cdef object PDBContent
+        cdef list stringWithPDBContent
+        cdef int atomLineNum
+        cdef str atomName, resName, atomLine
+        cdef Atom atom
         PDBContent = StringIO.StringIO(readPDB(PDBstr))  # Using StringIO
         # creates a buffer that can handle a pdb file or a string containing
         # the PDB
         self.pdb = PDBContent.read()  # in case one wants to write it
 
         stringWithPDBContent = self.pdb.split('\n')
-
-        for atomLine in stringWithPDBContent:
-
+        for atomLineNum in range(len(stringWithPDBContent)):
+            atomLine = stringWithPDBContent[atomLineNum]
+            if not atomLine.startswith("ATOM") and not atomLine.startswith("HETATM"):
+                continue
             if type == self._typeCM:
                 atomName = atomLine[12:16].strip()
                 resName = atomLine[17:20].strip()
@@ -266,14 +297,17 @@ class PDB:
         """
             Calculate the total mass of the PDB
         """
-        self.totalMass = 0
-        for atomId, atom in self.atoms.items():
+        cdef int atomNum
+        self.totalMass = 0.0
+        for atomNum in range(len(self.atomList)):
+            atom = self.atoms[self.atomList[atomNum]]
             self.totalMass += atom.mass
 
     def printAtoms(self):
         """
             Print Atom information for all the atoms in the PDB
         """
+        cdef Atom atom
         for atom in self.atoms.values():
             print atom  # atom.printAtom()
 
@@ -304,8 +338,11 @@ class PDB:
         """
         if not self.totalMass:
             self.computeTotalMass()
+        cdef list COM
+        cdef int atomNum
         COM = [0., 0., 0.]
-        for atomId, atom in self.atoms.items():
+        for atomNum in range(len(self.atomList)):
+            atom = self.atoms[self.atomList[atomNum]]
             COM[0] += atom.mass * atom.x
             COM[1] += atom.mass * atom.y
             COM[2] += atom.mass * atom.z
@@ -333,8 +370,12 @@ class PDB:
 
             :returns: List -- List with the centroid coordinates
         """
+        cdef list centroid
+        cdef double n
+        cdef int atomNum
         centroid = [0., 0., 0.]
-        for atomId, atom in self.atoms.items():
+        for atomNum in range(len(self.atomList)):
+            atom = self.atoms[self.atomList[atomNum]]
             centroid[0] += atom.x
             centroid[1] += atom.y
             centroid[2] += atom.z
@@ -357,7 +398,7 @@ class PDB:
         else:
             return self.centroid
 
-    def writePDB(self, path):
+    def writePDB(self, str path):
         """
             Write the pdb contents of the file from wich the PDB object was
             created
@@ -365,11 +406,12 @@ class PDB:
             :param path: Path of the file where to write the pdb
             :type path: str
         """
-        file = open(path, 'w')
-        file.write(self.pdb)
-        file.close()
+        cdef object fileHandle
+        fileHandle = open(path, 'w')
+        fileHandle.write(self.pdb)
+        fileHandle.close()
 
-    def countContacts(self, ligandResname, contactThresholdDistance):
+    def countContacts(self, str ligandResname, int contactThresholdDistance):
         """
             Count the number of alpha carbons that are in contact with the
             protein (i.e. less than contactThresholdDistance Amstrogms away)
@@ -380,7 +422,10 @@ class PDB:
             :type contactThresholdDistance: int
             :returns: int -- The number of alpha carbons in contact with the ligand
         """
-        contactThresholdDistance2 = contactThresholdDistance**2
+        cdef double contactThresholdDistance2,dist2
+        contactThresholdDistance2= contactThresholdDistance**2
+
+        cdef PDB ligandPDB, alphaCarbonsPDB
 
         ligandPDB = PDB()
         ligandPDB.initialise(self.pdb, resname=ligandResname, heavyAtoms=True)
@@ -388,12 +433,17 @@ class PDB:
         alphaCarbonsPDB = PDB()
         alphaCarbonsPDB.initialise(self.pdb, type=self._typeProtein,
                                    atomname="CA")
-
         # count contacts
-        contacts = set([])
-        for ligandAtomId, ligandAtom in ligandPDB.atoms.items():
-            # can be optimised with cell list
-            for proteinAtomId, proteinAtom in alphaCarbonsPDB.atoms.items():
+        cdef set contacts = set([])
+        cdef int rowind, colind
+        cdef str proteinAtomId
+        cdef Atom ligandAtom, proteinAtom
+        for rowind in range(len(ligandPDB.atomList)):
+        # can be optimised with cell list
+            ligandAtom = ligandPDB.atoms[ligandPDB.atomList[rowind]]
+            for colind in range(len(alphaCarbonsPDB.atomList)):
+                proteinAtomId = alphaCarbonsPDB.atomList[colind]
+                proteinAtom = alphaCarbonsPDB.atoms[proteinAtomId]
                 dist2 = ligandAtom.squaredDistance(proteinAtom)
                 if dist2 < contactThresholdDistance2:
                     contacts.update([proteinAtomId])

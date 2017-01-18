@@ -6,6 +6,7 @@ import tests.testAdaptiveSampling as tAdaptive
 import tests.testThresholdcalculator as tThreshold
 import tests.testDensityCalculator as tDensity
 
+
 def main():
     testSuite = unittest.TestSuite()
 
