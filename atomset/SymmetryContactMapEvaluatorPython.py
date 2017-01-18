@@ -130,9 +130,12 @@ class SymmetryContactMapEvaluator:
         permContactMap = self.buildOptimalPermutationContactMap(contactMap,
                                                                 cluster)
         similarity = calculateCorrelationContactMaps(permContactMap, cluster.contactMap)
+        print similarity
         similarity += 1  # Necessary to omit negative correlations
         similarity /= 2.0  # Correlation values need to be higher now
+        print similarity
         distance = 1-similarity
+        print distance
         return distance
 
     def evaluateDifferenceDistance(self, contactMap, cluster):

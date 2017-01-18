@@ -295,7 +295,6 @@ END   \n"
         contact_map, contacts = symmetryEvaluator.createContactMap(pdb_1,
                                                                    "AEN", 16)
         golden_contacts = pdb_1.countContacts("AEN", 16)
-        print golden_contacts, contacts
         self.assertEqual(golden_contacts, contacts)
 
     def test_symmetryContactMapJaccard(self):
@@ -341,7 +340,7 @@ END   \n"
         correlationNosym = symmetryEvaluatorEmpty.evaluateCorrelation(contactMapNoSym, cluster)
 
         self.assertEqual(contacts1, contactsSym)
-        self.assertEqual(goldenCorrelation, correlationSym)
+        self.assertAlmostEqual(goldenCorrelation, correlationSym)
         self.assertNotAlmostEqual(correlationSym, correlationNosym)
 
     def test_symmetryContactMapDifference(self):
