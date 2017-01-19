@@ -5,6 +5,7 @@ class ClusteringTypes:
     contactMapAffinity = "contactMapAffinity"
     contactMapAgglomerative = "contactMapAgglomerative"
     contactMapAccumulative = "contactMapAccumulative"
+    lastSnapshot = "lastSnapshot"
     thresholdCalculator = "thresholdCalculator"
     ligandResname = "ligandResname"
     contactThresholdDistance = "contactThresholdDistance"
@@ -35,7 +36,7 @@ class DensityCalculator:
     heaviside = "heaviside"
     null = "null"
     constant = "constant"
-    quadratic = "quadratic"
+    continuous = "continuous"
 
 
 class DensityCalculatorParams:
@@ -45,6 +46,7 @@ class DensityCalculatorParams:
 
 class StringSpawningTypes:
     type = "type"
+    independent = "independent"
     sameWeight = "sameWeight"
     inverselyProportional = "inverselyProportional"
     epsilon = "epsilon"
@@ -103,6 +105,16 @@ class SimulationParams:
     seed = "seed"
     peleSteps = "peleSteps"
     iterations = "iterations"
+    exitCondition = "exitCondition"
+    metricCol = "metricCol"
+    exitValue = "exitValue"
+    trajectories = "trajectories"
+
+
+class ExitConditionType:
+    type = "type"
+    metric = "metric"
+    clustering = "clustering"
 
 
 class ControlFileParams:

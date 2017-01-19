@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="Adaptive Sampling  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -84,7 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptiveSampling.html">AdaptiveSampling Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Blalbalbke</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Adaptive Sampling Overview</a></li>
 </ul>
 
             
@@ -134,19 +136,19 @@
            <div itemprop="articleBody">
             
   <h1>Source code for src.clustering.clustering</h1><div class="highlight"><pre>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">clusteringTypes</span>
 <span class="kn">import</span> <span class="nn">thresholdcalculator</span>
-<span class="kn">from</span> <span class="nn">constants</span> <span class="kn">import</span> <span class="n">blockNames</span>
-<span class="kn">from</span> <span class="nn">atomset</span> <span class="kn">import</span> <span class="n">atomset</span>
-<span class="kn">from</span> <span class="nn">utilities</span> <span class="kn">import</span> <span class="n">utilities</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">AffinityPropagation</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">AgglomerativeClustering</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">from</span> <span class="nn">constants</span> <span class="k">import</span> <span class="n">blockNames</span>
+<span class="kn">from</span> <span class="nn">atomset</span> <span class="k">import</span> <span class="n">atomset</span><span class="p">,</span> <span class="n">RMSDCalculator</span>
+<span class="kn">from</span> <span class="nn">utilities</span> <span class="k">import</span> <span class="n">utilities</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">AffinityPropagation</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">AgglomerativeClustering</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">KMeans</span>
 
 
 <div class="viewcode-block" id="Clusters"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Clusters">[docs]</a><span class="k">class</span> <span class="nc">Clusters</span><span class="p">:</span>
@@ -154,28 +156,38 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="Clusters.addCluster"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Clusters.addCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cluster</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="Clusters.printClusters"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Clusters.printClusters">[docs]</a>    <span class="k">def</span> <span class="nf">printClusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
-            <span class="k">print</span> <span class="s">&quot;--------------&quot;</span>
-            <span class="k">print</span> <span class="s">&quot;CLUSTER #</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">i</span>
-            <span class="k">print</span> <span class="s">&quot;--------------&quot;</span>
-            <span class="n">cluster</span><span class="o">.</span><span class="n">printCluster</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
-            <span class="k">print</span> <span class="s">&quot;&quot;</span>
-</div>
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">clusters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span></div>
 
-</div>
+<div class="viewcode-block" id="Clusters.insertCluster"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Clusters.insertCluster">[docs]</a>    <span class="k">def</span> <span class="nf">insertCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">cluster</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Insert a cluster in a specified index&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">cluster</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Clusters.getNumberClusters"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Clusters.getNumberClusters">[docs]</a>    <span class="k">def</span> <span class="nf">getNumberClusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Clusters.getCluster"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Clusters.getCluster">[docs]</a>    <span class="k">def</span> <span class="nf">getCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusterNum</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">clusterNum</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Clusters.printClusters"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Clusters.printClusters">[docs]</a>    <span class="k">def</span> <span class="nf">printClusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
+            <span class="nb">print</span> <span class="s2">&quot;--------------&quot;</span>
+            <span class="nb">print</span> <span class="s2">&quot;CLUSTER #</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span>
+            <span class="nb">print</span> <span class="s2">&quot;--------------&quot;</span>
+            <span class="n">cluster</span><span class="o">.</span><span class="n">printCluster</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="s2">&quot;&quot;</span></div>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">clusters</span></div>
+
+
 <div class="viewcode-block" id="Cluster"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Cluster">[docs]</a><span class="k">class</span> <span class="nc">Cluster</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A cluster contains a representative structure(pdb), the number of</span>
 <span class="sd">        elements, its density, threhold, number of contacts,</span>
 <span class="sd">        a contactMap(sometimes) and a metric</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb</span><span class="p">,</span> <span class="n">thresholdRadius</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">contactMap</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">contacts</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                 <span class="n">metrics</span><span class="o">=</span><span class="p">[],</span> <span class="n">metricCol</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb</span><span class="p">,</span> <span class="n">thresholdRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contactMap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contacts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">metrics</span><span class="o">=</span><span class="p">[],</span> <span class="n">metricCol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            contacts stands for contacts/ligandAtom</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -188,40 +200,45 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span> <span class="o">=</span> <span class="n">metricCol</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">threshold2</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">threshold2</span> <span class="o">=</span> <span class="n">thresholdRadius</span><span class="o">*</span><span class="n">thresholdRadius</span>
+
 <div class="viewcode-block" id="Cluster.getMetric"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Cluster.getMetric">[docs]</a>    <span class="k">def</span> <span class="nf">getMetric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
-</div>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
 <div class="viewcode-block" id="Cluster.addElement"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Cluster.addElement">[docs]</a>    <span class="k">def</span> <span class="nf">addElement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span> <span class="ow">and</span> <span class="n">metrics</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span>
-</div>
-<div class="viewcode-block" id="Cluster.printCluster"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Cluster.printCluster">[docs]</a>    <span class="k">def</span> <span class="nf">printCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span></div>
+
+<div class="viewcode-block" id="Cluster.printCluster"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Cluster.printCluster">[docs]</a>    <span class="k">def</span> <span class="nf">printCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">printAtoms</span><span class="p">()</span>
-        <span class="k">print</span> <span class="s">&quot;Elements: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span>
-        <span class="k">print</span> <span class="s">&quot;Metrics: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span>
+            <span class="nb">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">printAtoms</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="s2">&quot;Elements: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span>
+        <span class="nb">print</span> <span class="s2">&quot;Metrics: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s">&quot;Radius threshold: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span>
-        <span class="k">print</span> <span class="s">&quot;Number of contacts: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span>
-</div>
+            <span class="nb">print</span> <span class="s2">&quot;Radius threshold: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span>
+        <span class="nb">print</span> <span class="s2">&quot;Number of contacts: </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span></div>
+
 <div class="viewcode-block" id="Cluster.writePDB"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Cluster.writePDB">[docs]</a>    <span class="k">def</span> <span class="nf">writePDB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Cluster.getContacts"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Cluster.getContacts">[docs]</a>    <span class="k">def</span> <span class="nf">getContacts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span>
-</div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span></div>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">pdb</span>\
              <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span>\
              <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">threshold</span>\
              <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">contacts</span>\
-             <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span></div>
 
-</div>
+
 <div class="viewcode-block" id="Clustering"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Clustering">[docs]</a><span class="k">class</span> <span class="nc">Clustering</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Base class for clustering methods, it defines a cluster method that</span>
@@ -233,35 +250,33 @@
 <span class="sd">        contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are</span>
 <span class="sd">        considered in contact(default 8)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">columnOfReportFile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;BaseClass&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;BaseClass&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="n">Clusters</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">reportBaseFilename</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span> <span class="o">=</span> <span class="n">reportBaseFilename</span> <span class="o">+</span> <span class="s">&quot;_</span><span class="si">%d</span><span class="s">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span> <span class="o">=</span> <span class="n">reportBaseFilename</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">%d</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="n">resname</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">col</span> <span class="o">=</span> <span class="n">columnOfReportFile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contactThresholdDistance</span> <span class="o">=</span> <span class="n">contactThresholdDistance</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">symmetries</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symmetries</span> <span class="o">=</span> <span class="p">[]</span>
+
 
 <div class="viewcode-block" id="Clustering.setCol"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Clustering.setCol">[docs]</a>    <span class="k">def</span> <span class="nf">setCol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">col</span> <span class="o">=</span> <span class="n">col</span>
 
         <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">:</span>
-            <span class="n">cluster</span><span class="o">.</span><span class="n">metricCol</span> <span class="o">=</span> <span class="n">col</span>
-</div>
+            <span class="n">cluster</span><span class="o">.</span><span class="n">metricCol</span> <span class="o">=</span> <span class="n">col</span></div>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">clusters</span>\
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">reportBaseFilename</span>\
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">resname</span>\
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">col</span>
 
-    <span class="c"># Moved the cluster methods of contactsClustering to the Clustering</span>
-    <span class="c"># superclass in order to make accessible to contactMapAccumaltiveClustering</span>
-    <span class="c"># and avoid duplicate code</span>
 <div class="viewcode-block" id="Clustering.cluster"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Clustering.cluster">[docs]</a>    <span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Cluster the snaptshots contained in the pahts folder</span>
@@ -271,7 +286,7 @@
         <span class="k">for</span> <span class="n">trajectory</span> <span class="ow">in</span> <span class="n">trajectories</span><span class="p">:</span>
             <span class="n">trajNum</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTrajNum</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)</span>
 
-            <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+            <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span><span class="p">:</span>
                 <span class="n">reportFilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
                                               <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">)</span>
@@ -281,8 +296,8 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">metrics</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">snapshot</span><span class="p">)</span>
-</div>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">snapshot</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Clustering.writeOutput"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.Clustering.writeOutput">[docs]</a>    <span class="k">def</span> <span class="nf">writeOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">degeneracy</span><span class="p">,</span> <span class="n">outputObject</span><span class="p">,</span> <span class="n">writeAll</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Writes all the clustering information in outputPath</span>
@@ -297,26 +312,26 @@
         <span class="n">utilities</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
         <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
 
-        <span class="n">summaryFilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="s">&quot;summary.txt&quot;</span><span class="p">)</span>
-        <span class="n">summaryFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">summaryFilename</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
-        <span class="n">summaryFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#cluster size degeneracy contacts threshold density metric</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">summaryFilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="s2">&quot;summary.txt&quot;</span><span class="p">)</span>
+        <span class="n">summaryFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">summaryFilename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">summaryFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;#cluster size degeneracy contacts threshold density metric</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">writeAll</span><span class="p">:</span>
-                <span class="n">outputFilename</span> <span class="o">=</span> <span class="s">&quot;cluster_</span><span class="si">%d</span><span class="s">.pdb&quot;</span> <span class="o">%</span> <span class="n">i</span>
+                <span class="n">outputFilename</span> <span class="o">=</span> <span class="s2">&quot;cluster_</span><span class="si">%d</span><span class="s2">.pdb&quot;</span> <span class="o">%</span> <span class="n">i</span>
                 <span class="n">outputFilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">outputFilename</span><span class="p">)</span>
                 <span class="n">cluster</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="n">outputFilename</span><span class="p">)</span>
 
             <span class="n">metric</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">getMetric</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">metric</span><span class="p">:</span>
-                <span class="n">writeString</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%d</span><span class="s"> </span><span class="si">%d</span><span class="s"> </span><span class="si">%d</span><span class="s"> </span><span class="si">%.2f</span><span class="s"> </span><span class="si">%.2f</span><span class="s"> </span><span class="si">%.1f</span><span class="s"> </span><span class="si">%.3f</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">cluster</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span>
+                <span class="n">writeString</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%.2f</span><span class="s2"> </span><span class="si">%.2f</span><span class="s2"> </span><span class="si">%.1f</span><span class="s2"> </span><span class="si">%.3f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">cluster</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span>
                                                                 <span class="n">degeneracy</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
                                                                 <span class="n">cluster</span><span class="o">.</span><span class="n">contacts</span><span class="p">,</span>
                                                                 <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span>
                                                                 <span class="n">cluster</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
                                                                 <span class="n">metric</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">writeString</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%d</span><span class="s"> </span><span class="si">%d</span><span class="s"> </span><span class="si">%d</span><span class="s"> </span><span class="si">%.2f</span><span class="s"> </span><span class="si">%.2f</span><span class="s"> </span><span class="si">%.1f</span><span class="s"> -</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">cluster</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span>
+                <span class="n">writeString</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%.2f</span><span class="s2"> </span><span class="si">%.2f</span><span class="s2"> </span><span class="si">%.1f</span><span class="s2"> -</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">cluster</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span>
                                                              <span class="n">degeneracy</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
                                                              <span class="n">cluster</span><span class="o">.</span><span class="n">contacts</span><span class="p">,</span>
                                                              <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span>
@@ -324,10 +339,10 @@
             <span class="n">summaryFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeString</span><span class="p">)</span>
         <span class="n">summaryFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputObject</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputObject</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="ContactsClustering"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ContactsClustering">[docs]</a><span class="k">class</span> <span class="nc">ContactsClustering</span><span class="p">(</span><span class="n">Clustering</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Cluster together all snapshots that are closer to the cluster center</span>
@@ -345,25 +360,53 @@
 <span class="sd">        contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are</span>
 <span class="sd">        considered in contact(default 8)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thresholdCalculator</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">reportBaseFilename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thresholdCalculator</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="p">[]):</span>
         <span class="n">Clustering</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="p">,</span>
                             <span class="n">columnOfReportFile</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contacts</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">thresholdCalculator</span> <span class="o">=</span> <span class="n">thresholdCalculator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">symmetries</span> <span class="o">=</span> <span class="n">symmetries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">RMSDCalculator</span> <span class="o">=</span> <span class="n">RMSDCalculator</span><span class="o">.</span><span class="n">RMSDCalculator</span><span class="p">(</span><span class="n">symmetries</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ContactsClustering.addSnapshotToCluster"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ContactsClustering.addSnapshotToCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addSnapshotToCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[],</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="ContactsClustering.addSnapshotToCluster"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ContactsClustering.addSnapshotToCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addSnapshotToCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[],</span> <span class="n">col</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">pdb</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
         <span class="n">pdb</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">clusterNum</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">atomset</span><span class="o">.</span><span class="n">computeRMSD</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">pdb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetries</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span><span class="p">:</span>
+            <span class="c1">#########################################</span>
+            <span class="c1"># OPTIMISATION:</span>
+            <span class="c1"># We use centroid distance as a lower bound for RMSD</span>
+            <span class="c1">#</span>
+            <span class="c1"># Proof:</span>
+            <span class="c1"># Superscript ^1 and ^2 stands for PDB1 and PDB2 respectively</span>
+            <span class="c1"># Exponentiation is referred as ** to avoid misunderstandings</span>
+            <span class="c1"># Sumation is performed over atoms</span>
+            <span class="c1">#</span>
+            <span class="c1"># RMSD**2 = sum_i ||r^1_i - r^2_i||**2 / N := sum_i d_i**2 / N</span>
+            <span class="c1"># dc := centroid difference</span>
+            <span class="c1"># dc = ||sum_i r^1_i - r^2_i|| / N := sum_i d_i / N</span>
+            <span class="c1"># where d_i := r^1_i - r^2_i</span>
+            <span class="c1">#</span>
+            <span class="c1"># In the end, it is a matter of showing that the square of avg. is</span>
+            <span class="c1"># smaller or equal to the avg. of squares:</span>
+            <span class="c1"># (sum_i d_i / N)**2 &lt;= sum_i d_i**2 / N</span>
+            <span class="c1">#</span>
+            <span class="c1"># Remembering Cauchy-Schward inequality:</span>
+            <span class="c1"># |&lt;u*v&gt;| &lt;= ||&lt;u&gt;||*||&lt;v&gt;||</span>
+            <span class="c1"># Setting u_i = d_i/N and v_i = 1 for all i, in an n-dim euclidean space</span>
+            <span class="c1"># (sum d_i / N)**2 &lt;= sum (d_i/N)**2 * 1</span>
+            <span class="c1">#########################################</span>
+            <span class="n">scd</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">computeSquaredCentroidDifference</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">pdb</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">scd</span> <span class="o">&gt;</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold2</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">RMSDCalculator</span><span class="o">.</span><span class="n">computeRMSD</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">pdb</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span><span class="p">:</span>
                 <span class="n">cluster</span><span class="o">.</span><span class="n">addElement</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
                 <span class="k">return</span>
 
-        <span class="c"># if made it here, the snapshot was not added into any cluster</span>
+        <span class="c1"># if made it here, the snapshot was not added into any cluster</span>
         <span class="n">contacts</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">countContacts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">)</span>
         <span class="n">numberOfLigandAtoms</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">getNumberOfAtoms</span><span class="p">()</span>
         <span class="n">contactsPerAtom</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span><span class="o">/</span><span class="n">numberOfLigandAtoms</span>
@@ -371,12 +414,12 @@
         <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholdCalculator</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">contactsPerAtom</span><span class="p">)</span>
         <span class="n">cluster</span> <span class="o">=</span> <span class="n">Cluster</span><span class="p">(</span><span class="n">pdb</span><span class="p">,</span> <span class="n">thresholdRadius</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span> <span class="n">contacts</span><span class="o">=</span><span class="n">contactsPerAtom</span><span class="p">,</span>
                           <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">metricCol</span><span class="o">=</span><span class="n">col</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">addCluster</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">addCluster</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="ContactMapClustering"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ContactMapClustering">[docs]</a><span class="k">class</span> <span class="nc">ContactMapClustering</span><span class="p">(</span><span class="n">Clustering</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">columnOfReportFile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
         <span class="n">Clustering</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="p">,</span>
                             <span class="n">columnOfReportFile</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMapAffinity</span>
@@ -397,7 +440,7 @@
         <span class="n">preferences</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span><span class="n">contactmaps</span><span class="p">)</span>
 
         <span class="n">preferences</span> <span class="o">=</span> <span class="nb">float</span><span class="p">((</span><span class="nb">min</span><span class="p">(</span><span class="n">preferences</span><span class="p">)</span><span class="o">-</span><span class="nb">max</span><span class="p">(</span><span class="n">preferences</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">preferences</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">preferences</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span> <span class="o">=</span> <span class="n">clusteringResultsParameters</span><span class="p">(</span><span class="n">pdb_list</span><span class="o">=</span><span class="n">pdb_list</span><span class="p">,</span>
                                                             <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span>
                                                             <span class="n">contactmaps</span><span class="o">=</span><span class="n">contactmaps</span><span class="p">,</span><span class="n">contacts</span><span class="o">=</span><span class="n">contacts</span><span class="p">)</span>
@@ -405,27 +448,27 @@
         <span class="n">contactmapsArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">contactmaps</span><span class="p">)</span>
         <span class="n">cluster_center_indices</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">clusterContactMaps</span><span class="p">(</span><span class="n">contactmapsArray</span><span class="p">,</span> <span class="n">preferences</span><span class="o">=</span><span class="n">preferences</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">processClusterResults</span><span class="p">(</span><span class="s">&quot;first&quot;</span><span class="p">,</span> <span class="n">cluster_center_indices</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
-        <span class="c"># print &quot;Number of clusters after first clustering&quot;, len(self.firstClusteringParams.newClusters.clusters)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processClusterResults</span><span class="p">(</span><span class="s2">&quot;first&quot;</span><span class="p">,</span> <span class="n">cluster_center_indices</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+        <span class="c1"># print &quot;Number of clusters after first clustering&quot;, len(self.firstClusteringParams.newClusters.clusters)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">clusterNum</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">contactmaps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">contactMap</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;old:</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">clusterNum</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;old:</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">clusterNum</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
 
             <span class="n">preferences</span> <span class="o">=</span> <span class="nb">float</span><span class="p">((</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span><span class="o">-</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">elements</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">preferences</span> <span class="o">=</span> <span class="mf">0.5</span>
-            <span class="c"># preferences = -np.array(self.secondClusteringParams.elements)</span>
-            <span class="c"># prefereneces = None</span>
+            <span class="c1"># preferences = -np.array(self.secondClusteringParams.elements)</span>
+            <span class="c1"># prefereneces = None</span>
             <span class="n">secondcontactmapsArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">contactmaps</span><span class="p">)</span>
             <span class="n">cluster_center_indices</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">clusterContactMaps</span><span class="p">(</span><span class="n">secondcontactmapsArray</span><span class="p">,</span> <span class="n">preferences</span><span class="o">=</span><span class="n">preferences</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">processClusterResults</span><span class="p">(</span><span class="s">&quot;second&quot;</span><span class="p">,</span> <span class="n">cluster_center_indices</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
-            <span class="c"># print &quot;Number of clusters after second clustering&quot;, len(self.secondClusteringParams.newClusters.clusters)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processClusterResults</span><span class="p">(</span><span class="s2">&quot;second&quot;</span><span class="p">,</span> <span class="n">cluster_center_indices</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+            <span class="c1"># print &quot;Number of clusters after second clustering&quot;, len(self.secondClusteringParams.newClusters.clusters)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">newClusters</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">newClusters</span>
-</div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">newClusters</span></div>
+
 <div class="viewcode-block" id="ContactMapClustering.processClusterResults"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ContactMapClustering.processClusterResults">[docs]</a>    <span class="k">def</span> <span class="nf">processClusterResults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">cluster_center_indices</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Analyse the results obtained from the affinity propagation</span>
 <span class="sd">        algorithm.</span>
@@ -440,7 +483,7 @@
 
             <span class="n">cluster_members</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">indices</span> <span class="o">==</span> <span class="n">center_ind</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">process</span> <span class="o">==</span> <span class="s">&quot;first&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">process</span> <span class="o">==</span> <span class="s2">&quot;first&quot;</span><span class="p">:</span>
                 <span class="n">elements_in_cluster</span> <span class="o">=</span> <span class="n">cluster_members</span><span class="o">.</span><span class="n">size</span>
                 <span class="n">metricsArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
                 <span class="n">best_metric_ind</span> <span class="o">=</span> <span class="n">cluster_members</span><span class="p">[</span><span class="n">metricsArray</span><span class="p">[</span><span class="n">cluster_members</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>
@@ -458,7 +501,7 @@
                                   <span class="n">contacts</span><span class="o">=</span><span class="n">contactsPerAtom</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">best_metrics</span><span class="p">,</span> <span class="n">metricCol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
 
                 <span class="n">cluster</span><span class="o">.</span><span class="n">elements</span> <span class="o">+=</span> <span class="n">elements_in_cluster</span><span class="o">-</span><span class="mi">1</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;new:</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">center_ind</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;new:</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">center_ind</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">contactmaps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">contactMap</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
@@ -469,7 +512,7 @@
                 <span class="n">elements_in_cluster</span> <span class="o">=</span> <span class="n">elementsArray</span><span class="p">[</span><span class="n">cluster_members</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
                 <span class="n">index</span> <span class="o">=</span> <span class="n">selectRandomCenter</span><span class="p">(</span><span class="n">cluster_members</span><span class="p">,</span>
                                            <span class="n">metricsArray</span><span class="p">[</span><span class="n">cluster_members</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">])</span>
-                <span class="n">cluster_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">cluster_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
                 <span class="n">best_metric_ind</span> <span class="o">=</span> <span class="n">cluster_members</span><span class="p">[</span><span class="n">metricsArray</span><span class="p">[</span><span class="n">cluster_members</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>
                 <span class="n">best_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">best_metric_ind</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">newClusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
@@ -480,9 +523,9 @@
                 <span class="n">cluster</span><span class="o">.</span><span class="n">elements</span> <span class="o">+=</span> <span class="p">(</span><span class="n">elements_in_cluster</span><span class="o">-</span><span class="n">cluster</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">newClusters</span><span class="o">.</span><span class="n">addCluster</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span>
 
-            <span class="n">center_ind</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">center_ind</span> <span class="o">+=</span> <span class="mi">1</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="ContactMapAgglomerativeClustering"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ContactMapAgglomerativeClustering">[docs]</a><span class="k">class</span> <span class="nc">ContactMapAgglomerativeClustering</span><span class="p">(</span><span class="n">Clustering</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;nclusters[In] Number of the cluster to generate with the hierarchical clustering algorithm</span>
 <span class="sd">        resname [In] String containing the three letter name of the ligan in the pdb</span>
@@ -491,8 +534,8 @@
 <span class="sd">        contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are</span>
 <span class="sd">        considered in contact(default 8)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nclusters</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">columnOfReportFile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nclusters</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
         <span class="n">Clustering</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="p">,</span>
                             <span class="n">columnOfReportFile</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMapAgglomerative</span>
@@ -517,23 +560,23 @@
                                      <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">contactmaps</span><span class="o">=</span><span class="n">contactmaps</span><span class="p">,</span> <span class="n">contacts</span><span class="o">=</span><span class="n">contacts</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span> <span class="o">=</span> <span class="n">clusteringResultsParameters</span><span class="p">(</span><span class="n">contactmaps</span><span class="o">=</span><span class="p">[])</span>
         <span class="n">clusters</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">clusterAgglomerativeContactMaps</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">contactmaps</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">nclusters</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">processClusterResults</span><span class="p">(</span><span class="s">&quot;first&quot;</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processClusterResults</span><span class="p">(</span><span class="s2">&quot;first&quot;</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">clusterNum</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">contactmaps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">contactMap</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;old:</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">clusterNum</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;old:</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">clusterNum</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
 
             <span class="n">new_contactmaps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">contactmaps</span><span class="p">)</span>
             <span class="n">clusters</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">clusterAgglomerativeContactMaps</span><span class="p">(</span><span class="n">new_contactmaps</span><span class="p">,</span>
                                                                <span class="bp">self</span><span class="o">.</span><span class="n">nclusters</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">processClusterResults</span><span class="p">(</span><span class="s">&quot;second&quot;</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processClusterResults</span><span class="p">(</span><span class="s2">&quot;second&quot;</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">newClusters</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">newClusters</span>
-</div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">newClusters</span></div>
+
 <div class="viewcode-block" id="ContactMapAgglomerativeClustering.processClusterResults"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ContactMapAgglomerativeClustering.processClusterResults">[docs]</a>    <span class="k">def</span> <span class="nf">processClusterResults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Analyse the results obtained from the affinity propagation</span>
 <span class="sd">        algorithm.</span>
@@ -545,20 +588,20 @@
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">:</span>
             <span class="n">cluster_members</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">index</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">process</span> <span class="o">==</span> <span class="s">&quot;first&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">process</span> <span class="o">==</span> <span class="s2">&quot;first&quot;</span><span class="p">:</span>
                 <span class="n">elements_in_cluster</span> <span class="o">=</span> <span class="n">cluster_members</span><span class="o">.</span><span class="n">size</span>
-                <span class="c"># contactmapsArray = np.array(self.firstClusteringParams.contactmaps)</span>
-                <span class="c"># cluster_index = clusterKmeans(contactmapsArray[cluster_members],1)</span>
-                <span class="c"># Instead of using Kmeans to obtain a &quot;center&quot; or representative</span>
-                <span class="c"># cluster, select one of the members randomly</span>
+                <span class="c1"># contactmapsArray = np.array(self.firstClusteringParams.contactmaps)</span>
+                <span class="c1"># cluster_index = clusterKmeans(contactmapsArray[cluster_members],1)</span>
+                <span class="c1"># Instead of using Kmeans to obtain a &quot;center&quot; or representative</span>
+                <span class="c1"># cluster, select one of the members randomly</span>
                 <span class="n">metricsArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
                 <span class="n">best_metric_ind</span> <span class="o">=</span> <span class="n">cluster_members</span><span class="p">[</span><span class="n">metricsArray</span><span class="p">[</span><span class="n">cluster_members</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>
                 <span class="n">best_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">best_metric_ind</span><span class="p">]</span>
 
                 <span class="n">cluster_center</span> <span class="o">=</span> <span class="n">selectRandomCenter</span><span class="p">(</span><span class="n">cluster_members</span><span class="p">,</span>
                                                     <span class="n">metricsArray</span><span class="p">[</span><span class="n">cluster_members</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">])</span>
-                <span class="c"># cluster = Cluster(self.firstClusteringParams.pdb_list[best_metric_ind],</span>
-                <span class="c">#                   contactMap=self.firstClusteringParams.contactmaps[best_metric_ind], metric=best_metric)</span>
+                <span class="c1"># cluster = Cluster(self.firstClusteringParams.pdb_list[best_metric_ind],</span>
+                <span class="c1">#                   contactMap=self.firstClusteringParams.contactmaps[best_metric_ind], metric=best_metric)</span>
 
                 <span class="n">contacts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">contacts</span><span class="p">[</span><span class="n">cluster_center</span><span class="p">]</span>
                 <span class="n">numberOfLigandAtoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">pdb_list</span><span class="p">[</span><span class="n">cluster_center</span><span class="p">]</span><span class="o">.</span><span class="n">getNumberOfAtoms</span><span class="p">()</span>
@@ -569,7 +612,7 @@
                                   <span class="n">contacts</span><span class="o">=</span><span class="n">contactsPerAtom</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">best_metrics</span><span class="p">,</span> <span class="n">metricCol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
 
                 <span class="n">cluster</span><span class="o">.</span><span class="n">elements</span> <span class="o">+=</span> <span class="n">elements_in_cluster</span><span class="o">-</span><span class="mi">1</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;new:</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">index</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;new:</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">index</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">contactmaps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">contactMap</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
@@ -580,22 +623,22 @@
                 <span class="n">elements_in_cluster</span> <span class="o">=</span> <span class="n">elementsArray</span><span class="p">[</span><span class="n">cluster_members</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
                 <span class="n">best_metric_ind</span> <span class="o">=</span> <span class="n">cluster_members</span><span class="p">[</span><span class="n">metricsArray</span><span class="p">[</span><span class="n">cluster_members</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>
                 <span class="n">best_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">best_metric_ind</span><span class="p">]</span>
-                <span class="c"># contactmapsArray = np.array(self.firstClusteringParams.contactmaps)</span>
-                <span class="c"># cluster_index = clusterKmeans(contactmapsArray[cluster_members],1)</span>
-                <span class="c"># Instead of using Kmeans to obtain a &quot;center&quot; or representative</span>
-                <span class="c"># cluster, select one of the members randomly</span>
+                <span class="c1"># contactmapsArray = np.array(self.firstClusteringParams.contactmaps)</span>
+                <span class="c1"># cluster_index = clusterKmeans(contactmapsArray[cluster_members],1)</span>
+                <span class="c1"># Instead of using Kmeans to obtain a &quot;center&quot; or representative</span>
+                <span class="c1"># cluster, select one of the members randomly</span>
                 <span class="n">cluster_center</span> <span class="o">=</span> <span class="n">selectRandomCenter</span><span class="p">(</span><span class="n">cluster_members</span><span class="p">,</span>
                                                     <span class="n">metricsArray</span><span class="p">[</span><span class="n">cluster_members</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">])</span>
-                <span class="n">cluster_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="n">cluster_center</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">cluster_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="n">cluster_center</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">cluster_center</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nclusters</span><span class="p">:</span>
                     <span class="n">cluster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstClusteringParams</span><span class="o">.</span><span class="n">newClusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">cluster_index</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">cluster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">cluster_index</span><span class="p">]</span>
                 <span class="n">cluster</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">best_metrics</span>
                 <span class="n">cluster</span><span class="o">.</span><span class="n">elements</span> <span class="o">+=</span> <span class="p">(</span><span class="n">elements_in_cluster</span><span class="o">-</span><span class="n">cluster</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">newClusters</span><span class="o">.</span><span class="n">addCluster</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondClusteringParams</span><span class="o">.</span><span class="n">newClusters</span><span class="o">.</span><span class="n">addCluster</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="ContactMapAccumulativeClustering"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ContactMapAccumulativeClustering">[docs]</a><span class="k">class</span> <span class="nc">ContactMapAccumulativeClustering</span><span class="p">(</span><span class="n">Clustering</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Cluster together all snapshots that have similar enough contactMaps.</span>
 <span class="sd">        This similarity can be calculated with different methods (see similariyEvaluator documentation)</span>
@@ -609,8 +652,8 @@
 <span class="sd">        contactThresholdDistance [In] Distance at wich a ligand atom and a protein</span>
 <span class="sd">        atom are considered in contact(default 8)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thresholdCalculator</span><span class="p">,</span> <span class="n">similarityEvaluator</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">reportBaseFilename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thresholdCalculator</span><span class="p">,</span> <span class="n">similarityEvaluator</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
         <span class="n">Clustering</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="p">,</span>
                             <span class="n">columnOfReportFile</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="p">)</span>
@@ -618,8 +661,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">thresholdCalculator</span> <span class="o">=</span> <span class="n">thresholdCalculator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">similarityEvaluator</span> <span class="o">=</span> <span class="n">similarityEvaluator</span>
 
-    <span class="c">#TODO: refactor --&gt; move to parent class and only keep here contactMap creation</span>
-<div class="viewcode-block" id="ContactMapAccumulativeClustering.addSnapshotToCluster"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ContactMapAccumulativeClustering.addSnapshotToCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addSnapshotToCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[],</span> <span class="n">metricCol</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="c1"># TODO: refactor --&gt; move to parent class and only keep here contactMap creation</span>
+    <span class="c1"># TODO symmetries for contactMap</span>
+<div class="viewcode-block" id="ContactMapAccumulativeClustering.addSnapshotToCluster"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ContactMapAccumulativeClustering.addSnapshotToCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addSnapshotToCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[],</span> <span class="n">metricCol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">pdb</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
         <span class="n">pdb</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">)</span>
         <span class="n">contactMap</span><span class="p">,</span> <span class="n">contacts</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">createContactMap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">)</span>
@@ -628,7 +672,7 @@
                 <span class="n">cluster</span><span class="o">.</span><span class="n">addElement</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
                 <span class="k">return</span>
 
-        <span class="c"># if made it here, the snapshot was not added into any cluster</span>
+        <span class="c1"># if made it here, the snapshot was not added into any cluster</span>
         <span class="n">numberOfLigandAtoms</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">getNumberOfAtoms</span><span class="p">()</span>
         <span class="n">contactsPerAtom</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span><span class="o">/</span><span class="n">numberOfLigandAtoms</span>
 
@@ -636,21 +680,21 @@
         <span class="n">cluster</span> <span class="o">=</span> <span class="n">Cluster</span><span class="p">(</span><span class="n">pdb</span><span class="p">,</span> <span class="n">thresholdRadius</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
                           <span class="n">contacts</span><span class="o">=</span><span class="n">contactsPerAtom</span><span class="p">,</span> <span class="n">contactMap</span><span class="o">=</span><span class="n">contactMap</span><span class="p">,</span>
                           <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">metricCol</span><span class="o">=</span><span class="n">metricCol</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">addCluster</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">addCluster</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="ClusteringBuilder"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ClusteringBuilder">[docs]</a><span class="k">class</span> <span class="nc">ClusteringBuilder</span><span class="p">:</span>
-<div class="viewcode-block" id="ClusteringBuilder.buildClustering"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ClusteringBuilder.buildClustering">[docs]</a>    <span class="k">def</span> <span class="nf">buildClustering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ClusteringBuilder.buildClustering"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.ClusteringBuilder.buildClustering">[docs]</a>    <span class="k">def</span> <span class="nf">buildClustering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">paramsBlock</span> <span class="o">=</span> <span class="n">clusteringBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">resname</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">ligandResname</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
             <span class="n">clusteringType</span> <span class="o">=</span> <span class="n">clusteringBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
             <span class="n">contactThresholdDistance</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="n">err</span><span class="o">.</span><span class="n">message</span> <span class="o">+=</span> <span class="s">&quot;: Need to provide mandatory parameter in clustering block&quot;</span>
+            <span class="n">err</span><span class="o">.</span><span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot;: Need to provide mandatory parameter in clustering block&quot;</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">clusteringType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">contacts</span><span class="p">:</span>
-            <span class="n">symmetries</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">symmetries</span><span class="p">,{})</span>
+            <span class="n">symmetries</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">symmetries</span><span class="p">,[])</span>
 
             <span class="n">thresholdCalculatorBuilder</span> <span class="o">=</span> <span class="n">thresholdcalculator</span><span class="o">.</span><span class="n">ThresholdCalculatorBuilder</span><span class="p">()</span>
             <span class="n">thresholdCalculator</span> <span class="o">=</span> <span class="n">thresholdCalculatorBuilder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">clusteringBlock</span><span class="p">)</span>
@@ -673,16 +717,16 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">similarityEvaluatorType</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">similarityEvaluator</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No similarity Evaluator specified!!&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No similarity Evaluator specified!!&quot;</span><span class="p">)</span>
             <span class="n">similarityBuilder</span> <span class="o">=</span> <span class="n">similarityEvaluatorBuilder</span><span class="p">()</span>
             <span class="n">similarityEvaluator</span> <span class="o">=</span> <span class="n">similarityBuilder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">similarityEvaluatorType</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ContactMapAccumulativeClustering</span><span class="p">(</span><span class="n">thresholdCalculator</span><span class="p">,</span> <span class="n">similarityEvaluator</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span>
                                       <span class="n">reportBaseFilename</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s">&quot;Unknown clustering method! Choices are: &quot;</span> <span class="o">+</span>
-                     <span class="nb">str</span><span class="p">(</span><span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown clustering method! Choices are: &quot;</span> <span class="o">+</span>
+                     <span class="nb">str</span><span class="p">(</span><span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="clusteringResultsParameters"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.clusteringResultsParameters">[docs]</a><span class="k">class</span> <span class="nc">clusteringResultsParameters</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper object to pass parameters in the ContactMap affinity and agglomerative clustering</span>
@@ -694,9 +738,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">newClusters</span> <span class="o">=</span> <span class="n">Clusters</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span> <span class="o">=</span> <span class="n">contacts</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span> <span class="o">=</span> <span class="n">contacts</span></div>
 
-</div>
+
 <div class="viewcode-block" id="similarityEvaluatorBuilder"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.similarityEvaluatorBuilder">[docs]</a><span class="k">class</span> <span class="nc">similarityEvaluatorBuilder</span><span class="p">:</span>
 <div class="viewcode-block" id="similarityEvaluatorBuilder.build"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.similarityEvaluatorBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">similarityEvaluatorType</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">similarityEvaluatorType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">differenceDistance</span><span class="p">:</span>
@@ -706,9 +750,9 @@
         <span class="k">elif</span> <span class="n">similarityEvaluatorType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">correlation</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">correlationEvaluator</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s">&quot;Unknown threshold calculator type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">clusteringTypes</span><span class="o">.</span><span class="n">SIMILARITY_TYPES_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown threshold calculator type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">clusteringTypes</span><span class="o">.</span><span class="n">SIMILARITY_TYPES_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="differenceDistanceEvaluator"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.differenceDistanceEvaluator">[docs]</a><span class="k">class</span> <span class="nc">differenceDistanceEvaluator</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the similarity of two contactMaps by calculating the ratio of</span>
@@ -722,15 +766,15 @@
         <span class="n">differenceContactMaps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">contactMap</span><span class="o">-</span><span class="n">cluster</span><span class="o">.</span><span class="n">contactMap</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="n">averageContacts</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">contactMap</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">+</span><span class="n">cluster</span><span class="o">.</span><span class="n">contactMap</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">averageContacts</span><span class="p">:</span>
-            <span class="c"># The only way the denominator can be 0 is if both contactMaps are</span>
-            <span class="c"># all zeros, thus being equal and belonging to the same cluster</span>
-            <span class="k">return</span> <span class="bp">True</span>
+            <span class="c1"># The only way the denominator can be 0 is if both contactMaps are</span>
+            <span class="c1"># all zeros, thus being equal and belonging to the same cluster</span>
+            <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">distance</span> <span class="o">=</span> <span class="n">differenceContactMaps</span><span class="o">/</span><span class="n">averageContacts</span>
-            <span class="k">return</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span>
+            <span class="k">return</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span></div></div>
 
 
-</div></div>
+
 <div class="viewcode-block" id="JaccardEvaluator"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.JaccardEvaluator">[docs]</a><span class="k">class</span> <span class="nc">JaccardEvaluator</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the similarity of two contactMaps by calculating the Jaccard</span>
@@ -746,9 +790,9 @@
         <span class="n">unionContactMaps</span> <span class="o">=</span> <span class="n">contactMap</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">cluster</span><span class="o">.</span><span class="n">contactMap</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="n">intersectContactMaps</span>
         <span class="n">similarity</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">intersectContactMaps</span><span class="p">)</span><span class="o">/</span><span class="n">unionContactMaps</span>
         <span class="n">distance</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">similarity</span>
-        <span class="k">return</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span>
+        <span class="k">return</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="correlationEvaluator"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.correlationEvaluator">[docs]</a><span class="k">class</span> <span class="nc">correlationEvaluator</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the similarity of two contact maps by calculating thir correlation</span>
@@ -759,14 +803,14 @@
 <span class="sd">            False otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">similarity</span> <span class="o">=</span> <span class="n">calculateCorrelationContactMaps</span><span class="p">(</span><span class="n">contactMap</span><span class="p">,</span> <span class="n">cluster</span><span class="o">.</span><span class="n">contactMap</span><span class="p">)</span>
-        <span class="n">similarity</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c"># Necessary to omit negative correlations</span>
-        <span class="n">similarity</span> <span class="o">/=</span> <span class="mf">2.0</span>  <span class="c"># Correlation values need to be higher now</span>
+        <span class="n">similarity</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Necessary to omit negative correlations</span>
+        <span class="n">similarity</span> <span class="o">/=</span> <span class="mf">2.0</span>  <span class="c1"># Correlation values need to be higher now</span>
         <span class="n">distance</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">similarity</span>
-        <span class="k">return</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span>
+        <span class="k">return</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span></div></div>
 
 
-<span class="c"># TODO: should it be a class method?</span></div></div>
-<div class="viewcode-block" id="clusterContactMaps"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.clusterContactMaps">[docs]</a><span class="k">def</span> <span class="nf">clusterContactMaps</span><span class="p">(</span><span class="n">contactmaps</span><span class="p">,</span> <span class="n">preferences</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<span class="c1"># TODO: should it be a class method?</span>
+<div class="viewcode-block" id="clusterContactMaps"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.clusterContactMaps">[docs]</a><span class="k">def</span> <span class="nf">clusterContactMaps</span><span class="p">(</span><span class="n">contactmaps</span><span class="p">,</span> <span class="n">preferences</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Cluster multiple contact maps with the affinity propagation algorithm</span>
 <span class="sd">        contactmaps [In] Array of contact maps</span>
@@ -776,12 +820,12 @@
     <span class="n">contactmaps</span> <span class="o">=</span> <span class="n">contactmaps</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">contactmaps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">affinitypropagation</span> <span class="o">=</span> <span class="n">AffinityPropagation</span><span class="p">(</span><span class="n">damping</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
                                               <span class="n">preference</span><span class="o">=</span><span class="n">preferences</span><span class="p">,</span>
-                                              <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">contactmaps</span><span class="p">)</span>
+                                              <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">contactmaps</span><span class="p">)</span>
     <span class="n">cluster_center_indices</span> <span class="o">=</span> <span class="n">affinitypropagation</span><span class="o">.</span><span class="n">cluster_centers_indices_</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="n">affinitypropagation</span><span class="o">.</span><span class="n">labels_</span>
-    <span class="k">return</span> <span class="n">cluster_center_indices</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cluster_center_indices</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span></div>
 
-</div>
+
 <div class="viewcode-block" id="clusterAgglomerativeContactMaps"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.clusterAgglomerativeContactMaps">[docs]</a><span class="k">def</span> <span class="nf">clusterAgglomerativeContactMaps</span><span class="p">(</span><span class="n">contactmaps</span><span class="p">,</span> <span class="n">n_clusters</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Cluster multiple contact maps with the hierarchical clustering algorithm</span>
@@ -790,12 +834,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">contactmaps</span> <span class="o">=</span> <span class="n">contactmaps</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">contactmaps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">agglomerative</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
-                                            <span class="n">linkage</span><span class="o">=</span><span class="s">&#39;complete&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">contactmaps</span><span class="p">)</span>
+                                            <span class="n">linkage</span><span class="o">=</span><span class="s1">&#39;complete&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">contactmaps</span><span class="p">)</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="n">agglomerative</span><span class="o">.</span><span class="n">labels_</span>
     <span class="n">clusters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">labels</span>
+    <span class="k">return</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">labels</span></div>
 
-</div>
+
 <div class="viewcode-block" id="clusterKmeans"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.clusterKmeans">[docs]</a><span class="k">def</span> <span class="nf">clusterKmeans</span><span class="p">(</span><span class="n">contactmaps</span><span class="p">,</span> <span class="n">n_clusters</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Cluster  multiple contact maps with the kmeans clustering algorithm</span>
@@ -808,9 +852,9 @@
     <span class="n">contactmaps</span> <span class="o">-=</span> <span class="n">center</span>
     <span class="n">distances</span> <span class="o">=</span> <span class="n">contactmaps</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">cluster_center</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">cluster_center</span>
+    <span class="k">return</span> <span class="n">cluster_center</span></div>
 
-</div>
+
 <div class="viewcode-block" id="getAllTrajectories"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.getAllTrajectories">[docs]</a><span class="k">def</span> <span class="nf">getAllTrajectories</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find all the trajectory files in the paths specified</span>
@@ -822,17 +866,17 @@
     <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
         <span class="n">files</span> <span class="o">+=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">files</span>
+    <span class="k">return</span> <span class="n">files</span></div>
 
-</div>
+
 <div class="viewcode-block" id="selectRandomCenter"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.selectRandomCenter">[docs]</a><span class="k">def</span> <span class="nf">selectRandomCenter</span><span class="p">(</span><span class="n">cluster_members</span><span class="p">,</span> <span class="n">metrics_weights</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract a center randomly from a cluster, weighted according to their</span>
 <span class="sd">        metrics</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">metrics_weights</span> <span class="o">-=</span> <span class="n">metrics_weights</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">metrics_weights</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mf">1e-8</span><span class="p">:</span>
-        <span class="n">metrics_weights</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">metrics_weights</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">8</span><span class="p">:</span>
+        <span class="n">metrics_weights</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">T</span> <span class="o">=</span> <span class="mi">500</span>
         <span class="n">kbT</span> <span class="o">=</span> <span class="mf">0.001987</span><span class="o">*</span><span class="n">T</span>
@@ -840,19 +884,26 @@
         <span class="n">metrics_weights</span> <span class="o">/=</span> <span class="n">metrics_weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="n">cluster_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">cluster_members</span><span class="p">,</span>
                                      <span class="n">p</span><span class="o">=</span><span class="n">metrics_weights</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">cluster_index</span>
+    <span class="k">return</span> <span class="n">cluster_index</span></div>
 
-</div>
+
 <div class="viewcode-block" id="calculateCorrelationContactMaps"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.calculateCorrelationContactMaps">[docs]</a><span class="k">def</span> <span class="nf">calculateCorrelationContactMaps</span><span class="p">(</span><span class="n">contactMap</span><span class="p">,</span> <span class="n">clusterContactMap</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the correlation of two contactMaps</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">contactMap1</span> <span class="o">=</span> <span class="n">contactMap</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-    <span class="c"># Reshape the matrix into a 1D array to use the numpy corrcoef function</span>
+    <span class="c1"># Reshape the matrix into a 1D array to use the numpy corrcoef function</span>
     <span class="n">contactMap2</span> <span class="o">=</span> <span class="n">clusterContactMap</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">contactMap1</span><span class="p">,</span> <span class="n">contactMap2</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">total1</span> <span class="o">=</span> <span class="n">contactMap1</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">total2</span> <span class="o">=</span> <span class="n">contactMap2</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">total1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">total2</span><span class="p">:</span>
+        <span class="c1"># if any array is all zeros the correlation will be NaN</span>
+        <span class="c1"># if both are zero, correlation is perfect (i.e 1) else it is different</span>
+        <span class="c1"># and will be in different clusters</span>
+        <span class="k">return</span> <span class="n">total1</span> <span class="o">==</span> <span class="n">total2</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">contactMap1</span><span class="p">,</span> <span class="n">contactMap2</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></div>
 
-</div>
+
 <div class="viewcode-block" id="processSnapshots"><a class="viewcode-back" href="../../../src.clustering.html#src.clustering.clustering.processSnapshots">[docs]</a><span class="k">def</span> <span class="nf">processSnapshots</span><span class="p">(</span><span class="n">trajectories</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span>
                      <span class="n">contactThresholdDistance</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -865,14 +916,14 @@
     <span class="n">contacts</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">trajectory</span> <span class="ow">in</span> <span class="n">trajectories</span><span class="p">:</span>
         <span class="n">trajNum</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTrajNum</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)</span>
-        <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">reportBaseFilename</span><span class="p">:</span>
             <span class="n">reportFilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
                                           <span class="n">reportBaseFilename</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">)</span>
             <span class="n">metricstraj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">reportFilename</span><span class="p">,</span> <span class="n">ndmin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">metricstraj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">snapshots</span><span class="p">))</span>
-        <span class="c"># Prepare data for clustering</span>
+        <span class="c1"># Prepare data for clustering</span>
         <span class="n">metrics</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">metricstraj</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">):</span>
             <span class="n">pdb</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>

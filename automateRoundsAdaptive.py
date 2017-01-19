@@ -1,7 +1,8 @@
 from simulation import simulationrunner
 import adaptiveSampling
 import argparse
-import os 
+import os
+
 
 def automateSimulation(args):
     controlFile = args.controlFile
@@ -16,7 +17,7 @@ def automateSimulation(args):
     if epochs:
         rangeOfEpochs = epochs
     else:
-        rangeOfEpochs = range(1,numSimulations+1)
+        rangeOfEpochs = range(1, numSimulations+1)
     print "rangeOfEpochs", rangeOfEpochs
 
     for i in rangeOfEpochs:
@@ -25,8 +26,8 @@ def automateSimulation(args):
         controlFileDictionary["SEED"] = SEED_i
         outputPath_i = controlFileDictionary["OUTPUTPATH"] % (simulationName, i)
         controlFileDictionary["OUTPUTPATH"] = outputPath_i
-        controlFileName = "tmp_%s_controlfile_%s_%d.conf" % (os.path.splitext(controlFile)[0],simulationName, i)
-        controlFileName.replace("/","_")
+        controlFileName = "tmp_%s_controlfile_%s_%d.conf" % (os.path.splitext(controlFile)[0], simulationName, i)
+        controlFileName = controlFileName.replace("/","_")
         simulationRunner.makeWorkingControlFile(controlFileName, controlFileDictionary)
         print "Starting simulation %d" % i
         adaptiveSampling.main(controlFileName)
@@ -40,7 +41,7 @@ def parseArguments():
     parser.add_argument('nProcessors', type=int)
     parser.add_argument('nSteps', type=int)
     parser.add_argument('simulationName', type=str)
-    parser.add_argument("-e", "--epochs", nargs='*', type=int, help="Epochs to run") 
+    parser.add_argument("-e", "--epochs", nargs='*', type=int, help="Epochs to run")
     args = parser.parse_args()
     return args
 

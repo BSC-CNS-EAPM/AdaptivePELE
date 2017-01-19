@@ -1,5 +1,6 @@
 from utilities import clusteringUtilities
 import argparse
+import math
 
 
 def parseArgs():
@@ -9,12 +10,18 @@ def parseArgs():
     parser.add_argument('outputPath', type=str,
                         help="Path where to write the structures, including "
                         "name of the files, i.e output/path/cluster.pdb")
-    parser.add_argument("structures", nargs='*', type=int,
+    parser.add_argument("structures", nargs='*', type=list, default=None,
                         help="Structures to write")
+    parser.add_argument("--threshold", type=float, default=None,
+                        help="Only print those structures with mathcing threshold")
     args = parser.parse_args()
     return args
 
 if __name__ == "__main__":
     args = parseArgs()
-    clusteringUtilities.writeStructures(args.clObject, args.structures,
+    if not args.threshold is None:
+        condition = lambda x: abs(x.threshold-args.threshold) < 0.01
+    else:
+        condition = None
+    clusteringUtilities.writeStructures(args.clObject, args.structures, condition,
                                         args.outputPath)

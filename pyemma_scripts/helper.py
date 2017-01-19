@@ -1,9 +1,17 @@
 import os
 import numpy as np
 import cPickle
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 
 def writeClusterCenters(cl, outputFilename):
     np.savetxt(outputFilename, cl.clustercenters)
+
+def writeDtrajs(filenames, dtrajs, filenameTemplate="%s.disctraj"):
+    for filename, dtraj in zip(filenames, dtrajs):
+        fname = os.path.split(filename)[-1][:-4]
+        dtrajfname = filenameTemplate%(fname)
+        np.savetxt(dtrajfname, dtraj, fmt="%d")
 
 def makeFolder(outputDir):
     if not os.path.exists(outputDir):
@@ -30,3 +38,17 @@ def loadClustering(clusteringFile):
     with open(clusteringFile,"r") as clustering_file:
         cl = cPickle.load(clustering_file)
     return cl
+
+def plot3DScatter(matrix):
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ccx = matrix[:, 0]
+    ccy = matrix[:, 1]
+    ccz = matrix[:, 2]
+    ax.scatter(ccx, ccy, zs=ccz)
+    # scatter1 = ax.scatter(ccx, ccy, zs=ccz, c=metrics)
+    # fig.colorbar(scatter1)
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.set_xlabel('x')
+    return fig

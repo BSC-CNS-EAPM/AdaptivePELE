@@ -1,6 +1,7 @@
 import numpy as np
 import re
 import StringIO
+from scipy import sparse
 
 
 class Atom:
@@ -146,9 +147,17 @@ class Atom:
                                                     self.type, self.mass)
         # return "%s: %s %s %s [%f, %f, %f] %s %f"%(self.id, self.atomSerial, self.resChain, self.resnum, self.r[0], self.r[1], self.r[2], self.type, self.mass)
 
+    def getAtomCoords(self):
+        """
+            Get the coordinates of the atom
+
+            :returns: numpy.Array -- Array with the coordinate of the atom
+        """
+        return np.array([self.x, self.y, self.z])
+
     def squaredDistance(self, atom2):
         """
-            Calculate the distance between two atoms
+            Calculate the squared distance between two atoms
 
             :param atom2: Second Atom to whom the distance will be calculated
             :type atom2: Atom
@@ -173,7 +182,9 @@ class PDB:
         # Where atomId := serail:atomName:resName
         self.totalMass = 0
         self.pdb = ""
-        self.com = 0
+        self.com = None
+        self.centroid = None
+
         # Necessary for contactMaps
         self.atomList = []
 
@@ -267,26 +278,64 @@ class PDB:
 
     def extractCOM(self):
         """
-            Calculate the center of mass of the PDB
+            Calculate the PDB's center of mass
 
-            :returns: numpy.Array -- Array with the coordinates of the center of mass
+            :returns: list -- List with the center of mass coordinates
         """
         if not self.totalMass:
             self.computeTotalMass()
-        COM = np.array([0., 0., 0.])
+        COM = [0., 0., 0.]
         for atomId, atom in self.atoms.items():
-            COM += atom.mass * np.array([atom.x, atom.y, atom.z])
-        COM /= self.totalMass
+            COM[0] += atom.mass * atom.x
+            COM[1] += atom.mass * atom.y
+            COM[2] += atom.mass * atom.z
+
+        COM[0] /= self.totalMass
+        COM[1] /= self.totalMass
+        COM[2] /= self.totalMass
         self.com = COM
         return COM
 
     def getCOM(self):
         """
-            Get the center of mass of the PDB
+            Get the PDB's center of mass
 
-            :returns: numpy.Array -- Array with the coordinates of the center of mass
+            :returns: list -- List with the center of mass coordinates
         """
-        return self.com
+        if self.com is None:
+            return self.extractCOM()
+        else:
+            return self.com
+
+    def extractCentroid(self):
+        """
+            Calculate the PDB centroid
+
+            :returns: List -- List with the centroid coordinates
+        """
+        centroid = [0., 0., 0.]
+        for atomId, atom in self.atoms.items():
+            centroid[0] += atom.x
+            centroid[1] += atom.y
+            centroid[2] += atom.z
+
+        n = float(len(self.atoms))
+        centroid[0] /= n
+        centroid[1] /= n
+        centroid[2] /= n
+        self.centroid = centroid
+        return centroid
+
+    def getCentroid(self):
+        """
+            Get the PDB's centroid
+
+            :returns: list -- List with the centroid coordinates
+        """
+        if self.centroid is None:
+            return self.extractCentroid()
+        else:
+            return self.centroid
 
     def writePDB(self, path):
         """
@@ -331,105 +380,59 @@ class PDB:
 
         return len(contacts)
 
-    def createContactMap(self, ligandResname, contactThresholdDistance):
-        """
-            Create the contact map of the protein and ligand. The contact map is
-            a boolean matrix that has as many rows as the number of ligand heavy
-            atoms and as many columns as the number of alpha carbons. The
-            value is one if the ligand atom and the alpha carbons are less than
-            contactThresholdDistance Amstrongs away
-
-            :param ligandResname: Residue name of the ligand in the PDB
-            :type ligandResname: str
-            :param contactThresholdDistance: Maximum distance at which two atoms are considered in contanct (in Angstroms)
-            :type contactThresholdDistance: int
-            :returns: numpy.Array -- The contact map of the ligand and the protein
-            :returns: int -- The number of alpha carbons in contact with the ligand
-        """
-        contactThresholdDistance2 = contactThresholdDistance**2
-
-        ligandPDB = PDB()
-        ligandPDB.initialise(self.pdb, resname=ligandResname, heavyAtoms=True)
-
-        alphaCarbonsPDB = PDB()
-        alphaCarbonsPDB.initialise(self.pdb, type=self._typeProtein,
-                                   atomname="CA")
-
-        # empty contact map, rows are atoms of the ligand, columns are protein
-        # alpha carbons
-        contactMap = np.zeros((len(ligandPDB.atomList),
-                               len(alphaCarbonsPDB.atomList)), dtype=bool)
-        contacts = set([])
-        for rowind, ligandAtom in enumerate(ligandPDB.atomList):
-            for colind, proteinAtom in enumerate(alphaCarbonsPDB.atomList):
-                dist2 = ligandPDB.atoms[ligandAtom].squaredDistance(alphaCarbonsPDB.atoms[proteinAtom])
-                if dist2 < contactThresholdDistance2:
-                    contactMap[rowind, colind] = True
-                    contacts.update([proteinAtom])
-        return contactMap, len(contacts)
-
-
-def computeRMSD2(PDB1, PDB2, symmetries={}):
-    """
-        Compute the squared RMSD between two PDB
-
-        :param PDB1: First PDB with which the RMSD will be calculated
-        :type PDB1: PDB
-        :param PDB2: First PDB with which the RMSD will be calculated
-        :type PDB2: PDB
-        :param symmetries: Dictionary with elements atomId:symmetricalAtomId corresponding with the symmetrical atoms
-        :type symmetries: dict
-        :returns: float -- The squared RMSD between two PDB
-    """
-    rmsd = 0
-    for atom1Id, atom1 in PDB1.atoms.iteritems():
-        d2 = []
-        # HANDLE THE CASE WHEN ATOM2 IS NOT FOUND
-        atom2 = PDB2.getAtom(atom1Id)
-        d2 = atom1.squaredDistance(atom2)
-        if symmetries:
-            symAtom2Id = symmetries.get(atom1Id)
-            if symAtom2Id:
-                symAtom2 = PDB2.getAtom(symAtom2Id)
-                d2sym = atom1.squaredDistance(symAtom2)
-            else:
-                d2sym = d2
-        else:
-            d2sym = d2
-
-        rmsd += min(d2, d2sym)
-    n = len(PDB1.atoms.items())
-    return rmsd/n
-
-
-def computeRMSD(PDB1, PDB2, symmetries={}):
-    """
-        Compute the RMSD between two PDB
-
-        :param PDB1: First PDB with which the RMSD will be calculated
-        :type PDB1: PDB
-        :param PDB2: First PDB with which the RMSD will be calculated
-        :type PDB2: PDB
-        :param symmetries: Dictionary with elements atomId:symmetricalAtomId corresponding with the symmetrical atoms
-        :type symmetries: dict
-        :returns: float -- The squared RMSD between two PDB
-    """
-    return np.sqrt(computeRMSD2(PDB1, PDB2, symmetries))
-
 
 def computeCOMDifference(PDB1, PDB2):
     """
-        Compute the differences between the center of mass of two PDB
+        Compute the difference between the center of mass of two PDB
 
         :param PDB1: First PDB with which the RMSD will be calculated
         :type PDB1: PDB
         :param PDB2: First PDB with which the RMSD will be calculated
         :type PDB2: PDB
-        :returns: numpy.Array -- The difference in the center of mass between two PDB
+        :returns: float -- The distance between the centers of mass between two PDB
     """
-    COM1 = PDB1.extractCOM()
-    COM2 = PDB2.extractCOM()
-    return np.linalg.norm(COM1 - COM2)
+    return computeCOMDifference(PDB1, PDB2)
+
+
+def computeCOMSquaredDifference(PDB1, PDB2):
+    """
+        Compute the squared difference between the center of mass of two PDB
+
+        :param PDB1: First PDB with which the RMSD will be calculated
+        :type PDB1: PDB
+        :param PDB2: First PDB with which the RMSD will be calculated
+        :type PDB2: PDB
+        :returns: float -- The squared distance between the centers of mass between two PDB
+    """
+
+    COM1 = PDB1.getCOM()
+    COM2 = PDB2.getCOM()
+
+    dx = COM1[0] - COM2[0]
+    dy = COM1[1] - COM2[1]
+    dz = COM1[2] - COM2[2]
+
+    return dx*dx + dy*dy + dz*dz
+
+
+def computeSquaredCentroidDifference(PDB1, PDB2):
+    """
+        Compute the centroid squared difference between two PDBs
+
+        :param PDB1: First PDB
+        :type PDB1: PDB
+        :param PDB2: Second PDB
+        :type PDB2: PDB
+        :returns: float -- The squared centroid distance between two PDB
+    """
+    centroid1 = PDB1.getCentroid()
+    centroid2 = PDB2.getCentroid()
+
+    dx = centroid1[0] - centroid2[0]
+    dy = centroid1[1] - centroid2[1]
+    dz = centroid1[2] - centroid2[2]
+
+    return dx*dx + dy*dy + dz*dz
 
 
 def readPDB(pdbfile):

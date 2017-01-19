@@ -49,8 +49,8 @@ class thresholdCalculatorTest(unittest.TestCase):
         values = thresholdCalculator.values
         conditions = thresholdCalculator.conditions
 
-        goldenValues = [2.,2.5,3,4.]
-        goldenConditions = [1.2,1.0,0.0]
+        goldenValues = [2.,3,4.,5]
+        goldenConditions = [1.0,0.75,0.5]
         np.testing.assert_almost_equal(np.array(values), np.array(goldenValues), 10)
         np.testing.assert_almost_equal(np.array(conditions), np.array(goldenConditions), 10)
 
@@ -68,8 +68,8 @@ class thresholdCalculatorTest(unittest.TestCase):
         values = thresholdCalculator.values
         conditions = thresholdCalculator.conditions
 
-        goldenValues = [2.,2.5,3,4.]
-        goldenConditions = [1.2,1.0,0.0]
+        goldenValues = [2.,3,4.,5]
+        goldenConditions = [1.0,0.75, 0.5]
         np.testing.assert_almost_equal(np.array(values), np.array(goldenValues) , 10)
         np.testing.assert_almost_equal(np.array(conditions),np.array(goldenConditions), 10)
 

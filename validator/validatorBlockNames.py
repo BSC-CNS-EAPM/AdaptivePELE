@@ -8,18 +8,18 @@ class ControlFileParams:
 class GeneralParams:
     mandatory = {
         "restart": "bool",
-        "outputPath": "unicode",
+        "outputPath": "basestring",
         "initialStructures": "list",
         "debug": "bool",
         "writeAllClusteringStructures": "bool"
     }
     params = {
         "restart": "bool",
-        "outputPath": "unicode",
+        "outputPath": "basestring",
         "initialStructures": "list",
         "debug": "bool",
         "writeAllClusteringStructures": "bool",
-        "nativeStructure": "unicode"
+        "nativeStructure": "basestring"
     }
 
 
@@ -27,37 +27,38 @@ class SpawningParams:
     params = {
         "epsilon": "numbers.Real",
         "T": "numbers.Real",
-        "reportFilename": "unicode",
+        "reportFilename": "basestring",
         "metricColumnInReport": "numbers.Real",
-        "varEpsilonType": "unicode",
+        "varEpsilonType": "basestring",
         "maxEpsilon": "numbers.Real",
         "minEpsilon": "numbers.Real",
         "variationWindow": "numbers.Real",
         "maxEpsilonWindow": "numbers.Real",
         "period": "numbers.Real",
-        "metricWeights": "unicode"
+        "metricWeights": "basestring"
     }
     types = {
         "sameWeight": {},
+        "independent": {},
         "inverselyProportional": {},
         "epsilon": {
             "epsilon": "numbers.Real",
             "T": "numbers.Real",
-            "reportFilename": "unicode",
+            "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
         },
         "FAST": {
             "epsilon": "numbers.Real",
             "T": "numbers.Real",
-            "reportFilename": "unicode",
+            "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
         },
         "variableEpsilon": {
             "epsilon": "numbers.Real",
             "T": "numbers.Real",
-            "reportFilename": "unicode",
+            "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
-            "varEpsilonType": "unicode",
+            "varEpsilonType": "basestring",
             "maxEpsilon": "numbers.Real",
             "minEpsilon": "numbers.Real",
             "variationWindow": "numbers.Real",
@@ -67,18 +68,18 @@ class SpawningParams:
     }
     density = {
         "types": {
-            "heaviside": "unicode",
-            "null": "unicode",
-            "constant": "unicode",
-            "quadratic": "unicode"
+            "heaviside": "basestring",
+            "null": "basestring",
+            "constant": "basestring",
+            "continuous": "basestring"
         },
         "params": {
-            "heaviside": "unicode",
-            "null": "unicode",
-            "constant": "unicode",
+            "heaviside": "basestring",
+            "null": "basestring",
+            "constant": "basestring",
             "values": "list",
             "conditions": "list",
-            "quadratic": "unicode"
+            "continuous": "basestring"
         }
     }
 
@@ -86,14 +87,14 @@ class SpawningParams:
 class SimulationParams:
     types = {"pele": {
                 "processors": "numbers.Real",
-                "controlFile": "unicode",
+                "controlFile": "basestring",
                 "seed": "numbers.Real",
                 "peleSteps": "numbers.Real",
                 "iterations": "numbers.Real"
     },
              "test": {
-                "destination": "unicode",
-                "origin": "unicode",
+                "destination": "basestring",
+                "origin": "basestring",
                 "processors": "numbers.Real",
                 "seed": "numbers.Real",
                 "peleSteps": "numbers.Real",
@@ -101,61 +102,76 @@ class SimulationParams:
              },
              "md": {}}
     params = {
-        "executable": "unicode",
-        "data": "unicode",
-        "documents": "unicode",
-        "destination": "unicode",
-        "origin": "unicode",
+        "executable": "basestring",
+        "data": "basestring",
+        "documents": "basestring",
+        "destination": "basestring",
+        "origin": "basestring",
         "processors": "numbers.Real",
-        "controlFile": "unicode",
+        "controlFile": "basestring",
         "seed": "numbers.Real",
         "peleSteps": "numbers.Real",
-        "iterations": "numbers.Real"
+        "iterations": "numbers.Real",
+        "exitCondition": "dict"
+    }
+    exitCondition = {
+        "types": {
+            "metric": "basestring"
+        },
+        "params": {
+            "metricCol": "int",
+            "exitValue": "numbers.Real"
+        }
     }
 
 
 class clusteringTypes:
     types = {
         "contacts": {
-            "ligandResname": "unicode",
+            "ligandResname": "basestring",
             "contactThresholdDistance": "numbers.Real",
         },
         "contactMapAffinity": {
-            "ligandResname": "unicode",
+            "ligandResname": "basestring",
             "contactThresholdDistance": "numbers.Real",
         },
         "contactMapAgglomerative": {
-            "ligandResname": "unicode",
+            "ligandResname": "basestring",
             "contactThresholdDistance": "numbers.Real",
             "nclusters": "numbers.Real"
         },
         "contactMapAccumulative": {
-            "ligandResname": "unicode",
+            "ligandResname": "basestring",
             "contactThresholdDistance": "numbers.Real",
-            "similarityEvaluator": "unicode"
+            "similarityEvaluator": "basestring"
         },
+        "lastSnapshot": {
+            "ligandResname": "basestring",
+            "contactThresholdDistance": "numbers.Real",
+        }
     }
     params = {
-        "contacts": "unicode",
-        "contactMapAffinity": "unicode",
-        "contactMapAgglomerative": "unicode",
-        "contactMapAccumaltive": "unicode",
-        "ligandResname": "unicode",
+        "contacts": "basestring",
+        "contactMapAffinity": "basestring",
+        "contactMapAgglomerative": "basestring",
+        "contactMapAccumaltive": "basestring",
+        "lastSnapshot": "basestring",
+        "ligandResname": "basestring",
         "contactThresholdDistance": "numbers.Real",
-        "similarityEvaluator": "unicode",
-        "symmetries": "dict",
+        "similarityEvaluator": "basestring",
+        "symmetries": "list",
         "nclusters": "numbers.Real"
     }
     thresholdCalculator = {
         "types": {
-            "heaviside": "unicode",
-            "constant": "unicode"
+            "heaviside": "basestring",
+            "constant": "basestring"
         },
         "params": {
             "conditions": "list",
             "values": "list",
             "value": "numbers.Real",
-            "heaviside": "unicode",
-            "constant": "unicode"
+            "heaviside": "basestring",
+            "constant": "basestring"
         }
     }

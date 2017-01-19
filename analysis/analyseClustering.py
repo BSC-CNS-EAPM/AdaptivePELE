@@ -79,8 +79,6 @@ def plotClusters(cluster_matrix, metrics, title):
     ccx = cluster_matrix[:, 0]
     ccy = cluster_matrix[:, 1]
     ccz = cluster_matrix[:, 2]
-    print title
-    print ccx.size
     fig.suptitle(title)
     scatter1 = ax.scatter(ccx, ccy, zs=ccz, c=metrics)
     fig.colorbar(scatter1)
@@ -116,9 +114,10 @@ def plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
 if __name__ == "__main__":
     # resname = "ALJ"
     resname = "STR"
+    # resname = "K5Y"
 
-    # # Cont
-    # pklObjectFilename = "ClCont.pkl"
+    # Cont
+    # pklObjectFilename = "ClCont_list.pkl"
     # metricPlotFilename = ""  # "results/contactClusters.png"
     # populationPlotFilename = ""  # "results/contactClusterspop.png"
     # contactsPlotFilename = ""  # "results/contactClustersContacts.png"
@@ -131,10 +130,10 @@ if __name__ == "__main__":
     #                    populationPlotFilename, contactsPlotFilename)
 
     # Acc
-    pklObjectFilename = "ClAcc_PR_heav.pkl"
-    metricPlotFilename = "results/metricplotAcc_acc_PR_heav.png"
-    populationPlotFilename = "results/populationAcc_acc_PR_heav.png"
-    contactsPlotFilename = "results/contactsplotAcc_acc_PR_heav.png"
+    pklObjectFilename = "51/clustering/object.pkl"
+    metricPlotFilename = ""  # "results/metricplotAcc_acc_PR_heav.png"
+    populationPlotFilename = ""  # "results/populationAcc_acc_PR_heav.png"
+    contactsPlotFilename = ""  # "results/contactsplotAcc_acc_PR_heav.png"
     titlemetric = "Metrics Accumulative"
     titlepopulation = "Population Accumulative"
     titlecontacts = "Number of contacts Accumulative"
