@@ -88,7 +88,7 @@ def buildRevTransitionMatrix(C):
     x = X.sum(axis=1)
     c = C.sum(axis=1)
 
-    iterations = 5
+    iterations = 1000
     n = len(x)
 
     T = np.zeros(C.shape)
