@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 import helper
@@ -150,7 +151,8 @@ def main(controlFile):
     """
     try:
         disctrajFolder, trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtime, sampleSize, numRuns, dtrajs, maxNtraj, minNtraj, dlength, maxlength = readParams(controlFile)
-    except:
+    except IOError:
+        print "Removing discretized trajectory files"
         if controlFile == "rm":
             os.remove("golden_dtraj.npy")
             os.remove("c_dtraj.npy")
