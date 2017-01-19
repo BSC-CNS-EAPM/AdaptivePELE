@@ -9,9 +9,11 @@ from constants import blockNames
 from atomset import atomset, RMSDCalculator
 from atomset import SymmetryContactMapEvaluator as sym
 from utilities import utilities
-from sklearn.cluster import AffinityPropagation
-from sklearn.cluster import AgglomerativeClustering
-from sklearn.cluster import KMeans
+import socket
+if not "bsccv" in socket.gethostname():
+    from sklearn.cluster import AffinityPropagation
+    from sklearn.cluster import AgglomerativeClustering
+    from sklearn.cluster import KMeans
 
 
 class Clusters:
