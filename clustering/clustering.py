@@ -2,7 +2,8 @@ import sys
 import glob
 import numpy as np
 import os
-import pickle
+# import pickle
+import cPickle as pickle
 import clusteringTypes
 import thresholdcalculator
 from constants import blockNames
@@ -365,7 +366,6 @@ class Clustering:
                           metrics=metrics, metricCol=col,
                           contactThreshold=self.contactThresholdDistance)
         self.clusters.addCluster(cluster)
-
 
 
 class TreeClustering(Clustering):
