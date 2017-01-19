@@ -79,7 +79,8 @@ class MSM:
         else:
             its_object = msm.calculateITS(self.dtrajs, self.lagtimes, self.itsErrors)
             plot_its = msm.plotITS(its_object, self.itsOutput, self.numberOfITS) 
-        self.createMSM(self.lagtime)
+        if self.MSM_object is None:
+            self.createMSM(self.lagtime)
         self.check_connectivity()
         #self.PCCA(self.numPCCA)
         print "Saving MSM object..."
