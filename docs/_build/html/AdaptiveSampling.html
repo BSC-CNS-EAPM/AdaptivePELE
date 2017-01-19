@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="Adaptive Sampling  documentation" href="index.html"/>
         <link rel="next" title="analysis Package" href="src.analysis.html"/>
         <link rel="prev" title="Welcome to AdaptiveSampling’s documentation!" href="index.html"/> 
@@ -84,9 +86,9 @@
             
             
                 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">AdaptiveSampling Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-src.adaptiveSampling"><tt class="docutils literal"><span class="pre">adaptiveSampling</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-src.automateRoundsAdaptive"><tt class="docutils literal"><span class="pre">automateRoundsAdaptive</span></tt> Module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">AdaptiveSampling Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="src.analysis.html">analysis Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.atomset.html">atomset Package</a></li>
@@ -99,7 +101,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Examples.html">Blalbalbke</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Adaptive Sampling Overview</a></li>
 </ul>
 
             
@@ -122,7 +124,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -151,10 +153,10 @@
   <div class="section" id="module-src.__init__">
 <span id="adaptivesampling-package"></span><h1>AdaptiveSampling Package<a class="headerlink" href="#module-src.__init__" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-src.adaptiveSampling">
-<span id="adaptivesampling-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">adaptiveSampling</span></tt> Module<a class="headerlink" href="#module-src.adaptiveSampling" title="Permalink to this headline">¶</a></h2>
+<span id="adaptivesampling-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">adaptiveSampling</span></code> Module<a class="headerlink" href="#module-src.adaptiveSampling" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="src.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInNewSimulation">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">buildNewClusteringAndWriteInitialStructuresInNewSimulation</tt><big>(</big><em>debug</em>, <em>outputPath</em>, <em>controlFile</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>initialStructures</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#buildNewClusteringAndWriteInitialStructuresInNewSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInNewSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">buildNewClusteringAndWriteInitialStructuresInNewSimulation</code><span class="sig-paren">(</span><em>debug</em>, <em>outputPath</em>, <em>controlFile</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>initialStructures</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#buildNewClusteringAndWriteInitialStructuresInNewSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInNewSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>It build the clustering object and copies initial structures from control file.
 Returns the clustering object to use and the initial structures filenames as string</p>
 <p>debug [In] Whether to delete or not the previous simulation
@@ -170,7 +172,7 @@ returns initialStructuresAsString, the initial structures filenames in a string<
 
 <dl class="function">
 <dt id="src.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInRestart">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">buildNewClusteringAndWriteInitialStructuresInRestart</tt><big>(</big><em>firstRun</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>spawningCalculator</em>, <em>simulationRunner</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#buildNewClusteringAndWriteInitialStructuresInRestart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInRestart" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">buildNewClusteringAndWriteInitialStructuresInRestart</code><span class="sig-paren">(</span><em>firstRun</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>spawningCalculator</em>, <em>simulationRunner</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#buildNewClusteringAndWriteInitialStructuresInRestart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInRestart" title="Permalink to this definition">¶</a></dt>
 <dd><p>It reads the previous clustering method, and, if there are changes,
 it reclusters the previous trajectories. Returns the clustering object to use,
 and the initial structure filenames as strings</p>
@@ -186,7 +188,7 @@ returns initialStructuresAsString, the initial structures filenames in a string<
 
 <dl class="function">
 <dt id="src.adaptiveSampling.checkSymmetryDict">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">checkSymmetryDict</tt><big>(</big><em>clusteringBlock</em>, <em>initialStructures</em>, <em>resname</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#checkSymmetryDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.checkSymmetryDict" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">checkSymmetryDict</code><span class="sig-paren">(</span><em>clusteringBlock</em>, <em>initialStructures</em>, <em>resname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#checkSymmetryDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.checkSymmetryDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the symmetries dictionary is valid for the system</p>
 <p>clusteringBlock [In] Block with the clustering-related parameters
 initialStructures [In] List of the initial structures
@@ -195,7 +197,7 @@ resname [In] Residue name of the ligand in the system pdb</p>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.clusterEpochTrajs">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">clusterEpochTrajs</tt><big>(</big><em>clusteringMethod</em>, <em>epoch</em>, <em>epochOutputPathTempletized</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#clusterEpochTrajs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.clusterEpochTrajs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">clusterEpochTrajs</code><span class="sig-paren">(</span><em>clusteringMethod</em>, <em>epoch</em>, <em>epochOutputPathTempletized</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#clusterEpochTrajs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.clusterEpochTrajs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the trajecotories of a given epoch into the clusteringMethod
 object
 clusteringMethod [In] Object that holds all the clustering-related
@@ -206,7 +208,7 @@ epochOutputPathTempletized [In] Path where to find the trajectories</p>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.clusterPreviousEpochs">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">clusterPreviousEpochs</tt><big>(</big><em>clusteringMethod</em>, <em>finalEpoch</em>, <em>epochOutputPathTempletized</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#clusterPreviousEpochs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.clusterPreviousEpochs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">clusterPreviousEpochs</code><span class="sig-paren">(</span><em>clusteringMethod</em>, <em>finalEpoch</em>, <em>epochOutputPathTempletized</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#clusterPreviousEpochs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.clusterPreviousEpochs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the epoch until finalEpoch into the clusteringMethod</p>
 <p>clusteringMethod [In] Object that holds all the clustering-related
 information
@@ -216,7 +218,7 @@ epochOutputPathTempletized [In] Path where to find the trajectories</p>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.copyInitialStructures">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">copyInitialStructures</tt><big>(</big><em>initialStructures</em>, <em>tmpInitialStructuresTemplate</em>, <em>iteration</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#copyInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.copyInitialStructures" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">copyInitialStructures</code><span class="sig-paren">(</span><em>initialStructures</em>, <em>tmpInitialStructuresTemplate</em>, <em>iteration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#copyInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.copyInitialStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copy the initial structures from a certain iteration</p>
 <p>initialStructures [In] Name of the initial structures to copy
 tmpInitialStructuresTemplate [In] Template with the name of the initial
@@ -226,7 +228,7 @@ iteration [In] Number of epoch</p>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.createMultipleComplexesFilenames">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">createMultipleComplexesFilenames</tt><big>(</big><em>numberOfSnapshots</em>, <em>tmpInitialStructuresTemplate</em>, <em>iteration</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#createMultipleComplexesFilenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.createMultipleComplexesFilenames" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">createMultipleComplexesFilenames</code><span class="sig-paren">(</span><em>numberOfSnapshots</em>, <em>tmpInitialStructuresTemplate</em>, <em>iteration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#createMultipleComplexesFilenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.createMultipleComplexesFilenames" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the string to substitute the complexes in the pele control file</p>
 <p>numberOfSnapshots [In] Number of complexes to write
 tmpInitialStructuresTemplate [In] Template with the name of the initial
@@ -236,7 +238,7 @@ iteration [In] Number of epoch</p>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.findFirstRun">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">findFirstRun</tt><big>(</big><em>outputPath</em>, <em>clusteringOutputObject</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#findFirstRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.findFirstRun" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">findFirstRun</code><span class="sig-paren">(</span><em>outputPath</em>, <em>clusteringOutputObject</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#findFirstRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.findFirstRun" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the last epoch that was properly simulated and clusterized and
 and return the first epoch to run in case of restart</p>
 <p>outputPath [In] Simulation output path
@@ -245,7 +247,7 @@ clusteringOutputObject [In] Templetized name of the clustering object</p>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.fixReportsSymmetry">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">fixReportsSymmetry</tt><big>(</big><em>outputPath</em>, <em>resname</em>, <em>nativeStructure</em>, <em>symmetries</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#fixReportsSymmetry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.fixReportsSymmetry" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">fixReportsSymmetry</code><span class="sig-paren">(</span><em>outputPath</em>, <em>resname</em>, <em>nativeStructure</em>, <em>symmetries</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#fixReportsSymmetry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.fixReportsSymmetry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Correct the RMSD for symmetries in the reports. New reports are stored
 in the fixedReport_i where i is the number of the report</p>
 <p>outputPath [In] Path where to find the trajectories
@@ -256,7 +258,7 @@ symmetries [In] Dictionary containg the symmetries of the ligand</p>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.generateSnapshotSelectionStringLastRound">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">generateSnapshotSelectionStringLastRound</tt><big>(</big><em>currentEpoch</em>, <em>epochOutputPathTempletized</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#generateSnapshotSelectionStringLastRound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.generateSnapshotSelectionStringLastRound" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">generateSnapshotSelectionStringLastRound</code><span class="sig-paren">(</span><em>currentEpoch</em>, <em>epochOutputPathTempletized</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#generateSnapshotSelectionStringLastRound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.generateSnapshotSelectionStringLastRound" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate the template for the name of the trajectories in the current
 epoch
 currentEpoch [In] Epoch number
@@ -266,7 +268,7 @@ trajectories of any epoch are stored</p>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.getWorkingClusteringObject">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">getWorkingClusteringObject</tt><big>(</big><em>firstRun</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#getWorkingClusteringObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.getWorkingClusteringObject" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">getWorkingClusteringObject</code><span class="sig-paren">(</span><em>firstRun</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#getWorkingClusteringObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.getWorkingClusteringObject" title="Permalink to this definition">¶</a></dt>
 <dd><p>It reads the previous clustering method, and, if there are changes,
 it reclusters the previous trajectories. Returns the clustering object to use</p>
 <p>firstRun [In] New epoch to run
@@ -278,47 +280,58 @@ spawningParams [In] Contains spawning params, to know what reportFile and column
 
 <dl class="function">
 <dt id="src.adaptiveSampling.loadParams">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">loadParams</tt><big>(</big><em>jsonParams</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#loadParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.loadParams" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">loadParams</code><span class="sig-paren">(</span><em>jsonParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#loadParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.loadParams" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the control file in JSON format and extract the blocks of simulation,
 general parameters, clustering and spawning</p>
-<blockquote>
-<div>jsonParams [In] Control file in JSON format from where the parameters
-will be read</div></blockquote>
+<p>jsonParams [In] Control file in JSON format from where the parameters
+will be read</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.main">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">main</tt><big>(</big><em>jsonParams=None</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main body of the adaptive sampling program.
-jsonParams[In] A string with the name of the control file to use</p>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">main</code><span class="sig-paren">(</span><em>jsonParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main body of the adaptive sampling program.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Params jsonParams:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">A string with the name of the control file to use</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.needToRecluster">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">needToRecluster</tt><big>(</big><em>oldClusteringMethod</em>, <em>newClusteringMethod</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#needToRecluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.needToRecluster" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">needToRecluster</code><span class="sig-paren">(</span><em>oldClusteringMethod</em>, <em>newClusteringMethod</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#needToRecluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.needToRecluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the parameters have changed in a restart and we need to redo
-the clustering
-oldClusteringMethod [In] clusteringMethod in the previous simulation
+the clustering</p>
+<p>oldClusteringMethod [In] clusteringMethod in the previous simulation
 newClusteringMethod [In] clusteringMethod specified in the restart simulation</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="src.adaptiveSampling.parseArgs">
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">parseArgs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="src.adaptiveSampling.preparePeleControlFile">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">preparePeleControlFile</tt><big>(</big><em>i</em>, <em>outputPathConstants</em>, <em>simulationRunner</em>, <em>peleControlFileDictionary</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#preparePeleControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.preparePeleControlFile" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">preparePeleControlFile</code><span class="sig-paren">(</span><em>i</em>, <em>outputPathConstants</em>, <em>simulationRunner</em>, <em>peleControlFileDictionary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#preparePeleControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.preparePeleControlFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Substitute the parameters in the pele control file specified with the
 provided in the control file</p>
-<blockquote>
-<div>i [In] Epoch number
+<p>i [In] Epoch number
 outputPathConstants [In] Object that has as attributes constant related
 to the outputPath that will be used to create the working control file
 simulationRunner [In] Simulation runner object
 peleControlFileDictionary [In] Dictonary containing the values of the
-parameters to substitute in the control file</div></blockquote>
+parameters to substitute in the control file</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.saveInitialControlFile">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">saveInitialControlFile</tt><big>(</big><em>jsonParams</em>, <em>originalControlFile</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#saveInitialControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.saveInitialControlFile" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">saveInitialControlFile</code><span class="sig-paren">(</span><em>jsonParams</em>, <em>originalControlFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#saveInitialControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.saveInitialControlFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save the control file jsonParams in originalControlFile</p>
 <p>jsonParams [In] Input control file in JSON format
 originalControlFile [In] Path where to save the control file</p>
@@ -326,7 +339,7 @@ originalControlFile [In] Path where to save the control file</p>
 
 <dl class="function">
 <dt id="src.adaptiveSampling.writeSpawningInitialStructures">
-<tt class="descclassname">src.adaptiveSampling.</tt><tt class="descname">writeSpawningInitialStructures</tt><big>(</big><em>tmpInitialStructuresTemplate</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em><big>)</big><a class="reference internal" href="_modules/src/adaptiveSampling.html#writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.adaptiveSampling.</code><code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>tmpInitialStructuresTemplate</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/adaptiveSampling.html#writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.adaptiveSampling.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write initial structures for the next iteriation</p>
 <p>tmpInitialStructuresTemplate [In] Template of the name of the initial
 structures
@@ -338,20 +351,20 @@ iteration [In] Number of epoch</p>
 
 </div>
 <div class="section" id="module-src.automateRoundsAdaptive">
-<span id="automateroundsadaptive-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">automateRoundsAdaptive</span></tt> Module<a class="headerlink" href="#module-src.automateRoundsAdaptive" title="Permalink to this headline">¶</a></h2>
+<span id="automateroundsadaptive-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module<a class="headerlink" href="#module-src.automateRoundsAdaptive" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="src.automateRoundsAdaptive.automateSimulation">
-<tt class="descclassname">src.automateRoundsAdaptive.</tt><tt class="descname">automateSimulation</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="_modules/src/automateRoundsAdaptive.html#automateSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.automateRoundsAdaptive.automateSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.automateRoundsAdaptive.</code><code class="descname">automateSimulation</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/automateRoundsAdaptive.html#automateSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.automateRoundsAdaptive.automateSimulation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.automateRoundsAdaptive.main">
-<tt class="descclassname">src.automateRoundsAdaptive.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/automateRoundsAdaptive.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.automateRoundsAdaptive.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.automateRoundsAdaptive.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/automateRoundsAdaptive.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.automateRoundsAdaptive.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.automateRoundsAdaptive.parseArguments">
-<tt class="descclassname">src.automateRoundsAdaptive.</tt><tt class="descname">parseArguments</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/src/automateRoundsAdaptive.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.automateRoundsAdaptive.parseArguments" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.automateRoundsAdaptive.</code><code class="descname">parseArguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/automateRoundsAdaptive.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.automateRoundsAdaptive.parseArguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -360,56 +373,56 @@ iteration [In] Number of epoch</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="src.analysis.html">analysis Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.correctRMSD"><tt class="docutils literal"><span class="pre">correctRMSD</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.foldersFirstBindingEvent"><tt class="docutils literal"><span class="pre">foldersFirstBindingEvent</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.generateGnuplotFile"><tt class="docutils literal"><span class="pre">generateGnuplotFile</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.makePNGs"><tt class="docutils literal"><span class="pre">makePNGs</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.numberOfOwnClusters"><tt class="docutils literal"><span class="pre">numberOfOwnClusters</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.writeClusteringStructures"><tt class="docutils literal"><span class="pre">writeClusteringStructures</span></tt> Module</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.correctRMSD"><code class="docutils literal"><span class="pre">correctRMSD</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.foldersFirstBindingEvent"><code class="docutils literal"><span class="pre">foldersFirstBindingEvent</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.generateGnuplotFile"><code class="docutils literal"><span class="pre">generateGnuplotFile</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.makePNGs"><code class="docutils literal"><span class="pre">makePNGs</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.numberOfOwnClusters"><code class="docutils literal"><span class="pre">numberOfOwnClusters</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.analysis.html#module-src.analysis.writeClusteringStructures"><code class="docutils literal"><span class="pre">writeClusteringStructures</span></code> Module</a><ul class="simple">
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="src.atomset.html">atomset Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="src.atomset.html#module-src.atomset.atomset"><tt class="docutils literal"><span class="pre">atomset</span></tt> Module</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="src.atomset.html#module-src.atomset.atomset"><code class="docutils literal"><span class="pre">atomset</span></code> Module</a><ul class="simple">
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="src.clustering.html">clustering Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="src.clustering.html#module-src.clustering.clustering"><tt class="docutils literal"><span class="pre">clustering</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.clustering.html#module-src.clustering.clusteringTypes"><tt class="docutils literal"><span class="pre">clusteringTypes</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.clustering.html#module-src.clustering.thresholdcalculator"><tt class="docutils literal"><span class="pre">thresholdcalculator</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.clustering.html#module-src.clustering.thresholdcalculatortypes"><tt class="docutils literal"><span class="pre">thresholdcalculatortypes</span></tt> Module</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="src.clustering.html#module-src.clustering.clustering"><code class="docutils literal"><span class="pre">clustering</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.clustering.html#module-src.clustering.clusteringTypes"><code class="docutils literal"><span class="pre">clusteringTypes</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.clustering.html#module-src.clustering.thresholdcalculator"><code class="docutils literal"><span class="pre">thresholdcalculator</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.clustering.html#module-src.clustering.thresholdcalculatortypes"><code class="docutils literal"><span class="pre">thresholdcalculatortypes</span></code> Module</a><ul class="simple">
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="src.simulation.html">simulation Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="src.simulation.html#module-src.simulation.simulationTypes"><tt class="docutils literal"><span class="pre">simulationTypes</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.simulation.html#module-src.simulation.simulationrunner"><tt class="docutils literal"><span class="pre">simulationrunner</span></tt> Module</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="src.simulation.html#module-src.simulation.simulationTypes"><code class="docutils literal"><span class="pre">simulationTypes</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.simulation.html#module-src.simulation.simulationrunner"><code class="docutils literal"><span class="pre">simulationrunner</span></code> Module</a><ul class="simple">
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="src.spawning.html">spawning Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="src.spawning.html#module-src.spawning.densitycalculator"><tt class="docutils literal"><span class="pre">densitycalculator</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.spawning.html#module-src.spawning.densitycalculatortypes"><tt class="docutils literal"><span class="pre">densitycalculatortypes</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.spawning.html#module-src.spawning.spawning"><tt class="docutils literal"><span class="pre">spawning</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.spawning.html#module-src.spawning.spawningTypes"><tt class="docutils literal"><span class="pre">spawningTypes</span></tt> Module</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="src.spawning.html#module-src.spawning.densitycalculator"><code class="docutils literal"><span class="pre">densitycalculator</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.spawning.html#module-src.spawning.densitycalculatortypes"><code class="docutils literal"><span class="pre">densitycalculatortypes</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.spawning.html#module-src.spawning.spawning"><code class="docutils literal"><span class="pre">spawning</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.spawning.html#module-src.spawning.spawningTypes"><code class="docutils literal"><span class="pre">spawningTypes</span></code> Module</a><ul class="simple">
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="src.utilities.html">utilities Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="src.utilities.html#module-src.utilities.clusteringUtilities"><tt class="docutils literal"><span class="pre">clusteringUtilities</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="src.utilities.html#module-src.utilities.utilities"><tt class="docutils literal"><span class="pre">utilities</span></tt> Module</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="src.utilities.html#module-src.utilities.clusteringUtilities"><code class="docutils literal"><span class="pre">clusteringUtilities</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.utilities.html#module-src.utilities.utilities"><code class="docutils literal"><span class="pre">utilities</span></code> Module</a><ul class="simple">
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="src.validator.html">validator Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="src.validator.html#module-src.validator.controlFileValidator"><tt class="docutils literal"><span class="pre">controlFileValidator</span></tt> Module</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="src.validator.html#module-src.validator.controlFileValidator"><code class="docutils literal"><span class="pre">controlFileValidator</span></code> Module</a><ul class="simple">
 </ul>
 </li>
 </ul>
@@ -459,7 +472,7 @@ iteration [In] Number of epoch</p>
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'',
+            URL_ROOT:'./',
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

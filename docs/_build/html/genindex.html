@@ -1,8 +1,6 @@
 
 
 
-
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -33,6 +31,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="#"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="Adaptive Sampling  documentation" href="index.html"/> 
 
   
@@ -85,7 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="AdaptiveSampling.html">AdaptiveSampling Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Examples.html">Blalbalbke</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Adaptive Sampling Overview</a></li>
 </ul>
 
             
@@ -150,7 +151,6 @@
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
- | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
@@ -209,6 +209,10 @@
   </dt>
 
         
+  <dt><a href="src.simulation.html#src.simulation.simulationrunner.ExitConditionBuilder.build">(src.simulation.simulationrunner.ExitConditionBuilder method)</a>
+  </dt>
+
+        
   <dt><a href="src.simulation.html#src.simulation.simulationrunner.RunnerBuilder.build">(src.simulation.simulationrunner.RunnerBuilder method)</a>
   </dt>
 
@@ -221,6 +225,8 @@
   </dt>
 
       </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.clustering.html#src.clustering.clustering.ClusteringBuilder.buildClustering">buildClustering() (src.clustering.clustering.ClusteringBuilder method)</a>
   </dt>
@@ -233,8 +239,6 @@
   <dt><a href="src.analysis.html#src.analysis.makePNGs.buildGnuplotString">buildGnuplotString() (in module src.analysis.makePNGs)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="AdaptiveSampling.html#src.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInNewSimulation">buildNewClusteringAndWriteInitialStructuresInNewSimulation() (in module src.adaptiveSampling)</a>
   </dt>
@@ -271,6 +275,10 @@
   </dt>
 
         
+  <dt><a href="src.spawning.html#src.spawning.densitycalculator.ContinuousDensityCalculator.calculate">(src.spawning.densitycalculator.ContinuousDensityCalculator method)</a>
+  </dt>
+
+        
   <dt><a href="src.spawning.html#src.spawning.densitycalculator.DensityCalculator.calculate">(src.spawning.densitycalculator.DensityCalculator method)</a>
   </dt>
 
@@ -280,10 +288,6 @@
 
         
   <dt><a href="src.spawning.html#src.spawning.densitycalculator.NullDensityCalculator.calculate">(src.spawning.densitycalculator.NullDensityCalculator method)</a>
-  </dt>
-
-        
-  <dt><a href="src.spawning.html#src.spawning.densitycalculator.QuadraticDensityCalculator.calculate">(src.spawning.densitycalculator.QuadraticDensityCalculator method)</a>
   </dt>
 
         
@@ -340,6 +344,16 @@
   </dt>
 
       
+  <dt><a href="src.simulation.html#src.simulation.simulationrunner.MetricExitCondition.checkExitCondition">checkExitCondition() (src.simulation.simulationrunner.MetricExitCondition method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="src.simulation.html#src.simulation.simulationrunner.SimulationRunner.checkExitCondition">(src.simulation.simulationrunner.SimulationRunner method)</a>
+  </dt>
+
+      </dl></dd>
+      
   <dt><a href="AdaptiveSampling.html#src.adaptiveSampling.checkSymmetryDict">checkSymmetryDict() (in module src.adaptiveSampling)</a>
   </dt>
 
@@ -377,6 +391,8 @@
   <dt><a href="AdaptiveSampling.html#src.adaptiveSampling.clusterEpochTrajs">clusterEpochTrajs() (in module src.adaptiveSampling)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.clustering.html#src.clustering.clustering.Clustering">Clustering (class in src.clustering.clustering)</a>
   </dt>
@@ -405,18 +421,16 @@
   <dt><a href="src.clustering.html#src.clustering.clustering.Clusters">Clusters (class in src.clustering.clustering)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.atomset.html#src.atomset.atomset.computeCOMDifference">computeCOMDifference() (in module src.atomset.atomset)</a>
   </dt>
 
       
-  <dt><a href="src.atomset.html#src.atomset.atomset.computeRMSD">computeRMSD() (in module src.atomset.atomset)</a>
+  <dt><a href="src.atomset.html#src.atomset.atomset.computeCOMSquaredDifference">computeCOMSquaredDifference() (in module src.atomset.atomset)</a>
   </dt>
 
       
-  <dt><a href="src.atomset.html#src.atomset.atomset.computeRMSD2">computeRMSD2() (in module src.atomset.atomset)</a>
+  <dt><a href="src.atomset.html#src.atomset.atomset.computeSquaredCentroidDifference">computeSquaredCentroidDifference() (in module src.atomset.atomset)</a>
   </dt>
 
       
@@ -456,11 +470,23 @@
   </dt>
 
       
+  <dt><a href="src.atomset.html#src.atomset.atomset.PDB.contactMapnew">contactMapnew() (src.atomset.atomset.PDB method)</a>
+  </dt>
+
+      
   <dt><a href="src.clustering.html#src.clustering.clusteringTypes.CLUSTERING_TYPES.contacts">contacts (src.clustering.clusteringTypes.CLUSTERING_TYPES attribute)</a>
   </dt>
 
       
   <dt><a href="src.clustering.html#src.clustering.clustering.ContactsClustering">ContactsClustering (class in src.clustering.clustering)</a>
+  </dt>
+
+      
+  <dt><a href="src.spawning.html#src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES.continuous">continuous (src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES attribute)</a>
+  </dt>
+
+      
+  <dt><a href="src.spawning.html#src.spawning.densitycalculator.ContinuousDensityCalculator">ContinuousDensityCalculator (class in src.spawning.densitycalculator)</a>
   </dt>
 
       
@@ -517,12 +543,12 @@
   <dt><a href="src.spawning.html#src.spawning.spawning.DensitySpawningCalculator">DensitySpawningCalculator (class in src.spawning.spawning)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.clustering.html#src.clustering.clusteringTypes.SIMILARITY_TYPES.differenceDistance">differenceDistance (src.clustering.clusteringTypes.SIMILARITY_TYPES attribute)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.clustering.html#src.clustering.clustering.differenceDistanceEvaluator">differenceDistanceEvaluator (class in src.clustering.clustering)</a>
   </dt>
@@ -561,10 +587,22 @@
   <dt><a href="src.spawning.html#src.spawning.spawning.EpsilonDegeneracyCalculator">EpsilonDegeneracyCalculator (class in src.spawning.spawning)</a>
   </dt>
 
+      
+  <dt><a href="src.simulation.html#src.simulation.simulationTypes.EXITCONDITION_TYPE">EXITCONDITION_TYPE (class in src.simulation.simulationTypes)</a>
+  </dt>
+
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="src.simulation.html#src.simulation.simulationrunner.ExitConditionBuilder">ExitConditionBuilder (class in src.simulation.simulationrunner)</a>
+  </dt>
+
+      
   <dt><a href="src.analysis.html#src.analysis.correctRMSD.extendReportWithRmsd">extendReportWithRmsd() (in module src.analysis.correctRMSD)</a>
+  </dt>
+
+      
+  <dt><a href="src.atomset.html#src.atomset.atomset.PDB.extractCentroid">extractCentroid() (src.atomset.atomset.PDB method)</a>
   </dt>
 
       
@@ -603,6 +641,10 @@
   <dt><a href="AdaptiveSampling.html#src.adaptiveSampling.fixReportsSymmetry">fixReportsSymmetry() (in module src.adaptiveSampling)</a>
   </dt>
 
+      
+  <dt><a href="src.simulation.html#src.simulation.simulationTypes.EXITCONDITION_TYPE.foo">foo (src.simulation.simulationTypes.EXITCONDITION_TYPE attribute)</a>
+  </dt>
+
   </dl></td>
 </tr></table>
 
@@ -622,10 +664,6 @@
   </dt>
 
       
-  <dt><a href="src.utilities.html#src.utilities.utilities.generateReciprocalAtoms">generateReciprocalAtoms() (in module src.utilities.utilities)</a>
-  </dt>
-
-      
   <dt><a href="AdaptiveSampling.html#src.adaptiveSampling.generateSnapshotSelectionStringLastRound">generateSnapshotSelectionStringLastRound() (in module src.adaptiveSampling)</a>
   </dt>
 
@@ -639,6 +677,18 @@
 
       
   <dt><a href="src.atomset.html#src.atomset.atomset.PDB.getAtom">getAtom() (src.atomset.atomset.PDB method)</a>
+  </dt>
+
+      
+  <dt><a href="src.atomset.html#src.atomset.atomset.Atom.getAtomCoords">getAtomCoords() (src.atomset.atomset.Atom method)</a>
+  </dt>
+
+      
+  <dt><a href="src.atomset.html#src.atomset.atomset.PDB.getCentroid">getCentroid() (src.atomset.atomset.PDB method)</a>
+  </dt>
+
+      
+  <dt><a href="src.clustering.html#src.clustering.clustering.Clusters.getCluster">getCluster() (src.clustering.clustering.Clusters method)</a>
   </dt>
 
       
@@ -656,11 +706,25 @@
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="src.clustering.html#src.clustering.thresholdcalculator.ThresholdCalculatorConstant.getMaxThreshold">getMaxThreshold() (src.clustering.thresholdcalculator.ThresholdCalculatorConstant method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="src.clustering.html#src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside.getMaxThreshold">(src.clustering.thresholdcalculator.ThresholdCalculatorHeaviside method)</a>
+  </dt>
+
+      </dl></dd>
+      
   <dt><a href="src.clustering.html#src.clustering.clustering.Cluster.getMetric">getMetric() (src.clustering.clustering.Cluster method)</a>
   </dt>
 
       
   <dt><a href="src.spawning.html#src.spawning.spawning.SpawningCalculator.getMetrics">getMetrics() (src.spawning.spawning.SpawningCalculator method)</a>
+  </dt>
+
+      
+  <dt><a href="src.clustering.html#src.clustering.clustering.Clusters.getNumberClusters">getNumberClusters() (src.clustering.clustering.Clusters method)</a>
   </dt>
 
       
@@ -702,6 +766,12 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="src.simulation.html#src.simulation.simulationrunner.SimulationRunner.hasExitCondition">hasExitCondition() (src.simulation.simulationrunner.SimulationRunner method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
   <dt><a href="src.clustering.html#src.clustering.thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.heaviside">heaviside (src.clustering.thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES attribute)</a>
   </dt>
 
@@ -719,6 +789,10 @@
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.atomset.html#src.atomset.atomset.PDB.initialise">initialise() (src.atomset.atomset.PDB method)</a>
+  </dt>
+
+      
+  <dt><a href="src.clustering.html#src.clustering.clustering.Clusters.insertCluster">insertCluster() (src.clustering.clustering.Clusters method)</a>
   </dt>
 
       
@@ -787,8 +861,6 @@
   <dt><a href="src.spawning.html#src.spawning.spawning.VariableEpsilonDegeneracyCalculator.linearVariation">linearVariation() (src.spawning.spawning.VariableEpsilonDegeneracyCalculator method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="AdaptiveSampling.html#src.adaptiveSampling.loadParams">loadParams() (in module src.adaptiveSampling)</a>
   </dt>
@@ -851,12 +923,12 @@
   </dt>
 
       </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.utilities.html#src.utilities.utilities.makeFolder">makeFolder() (in module src.utilities.utilities)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.simulation.html#src.simulation.simulationrunner.SimulationRunner.makeWorkingControlFile">makeWorkingControlFile() (src.simulation.simulationrunner.SimulationRunner method)</a>
   </dt>
@@ -869,6 +941,14 @@
       </dl></dd>
       
   <dt><a href="src.simulation.html#src.simulation.simulationTypes.SIMULATION_TYPE.MD">MD (src.simulation.simulationTypes.SIMULATION_TYPE attribute)</a>
+  </dt>
+
+      
+  <dt><a href="src.simulation.html#src.simulation.simulationTypes.EXITCONDITION_TYPE.METRIC">METRIC (src.simulation.simulationTypes.EXITCONDITION_TYPE attribute)</a>
+  </dt>
+
+      
+  <dt><a href="src.simulation.html#src.simulation.simulationrunner.MetricExitCondition">MetricExitCondition (class in src.simulation.simulationrunner)</a>
   </dt>
 
   </dl></td>
@@ -902,9 +982,15 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="src.analysis.html#src.analysis.writeClusteringStructures.parseArgs">parseArgs() (in module src.analysis.writeClusteringStructures)</a>
+  <dt><a href="AdaptiveSampling.html#src.adaptiveSampling.parseArgs">parseArgs() (in module src.adaptiveSampling)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="src.analysis.html#src.analysis.writeClusteringStructures.parseArgs">(in module src.analysis.writeClusteringStructures)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="src.analysis.html#src.analysis.correctRMSD.parseArguments">parseArguments() (in module src.analysis.correctRMSD)</a>
   </dt>
@@ -939,6 +1025,8 @@
   <dt><a href="src.analysis.html#src.analysis.numberOfOwnClusters.plotClustersPerValue">plotClustersPerValue() (in module src.analysis.numberOfOwnClusters)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.analysis.html#src.analysis.numberOfOwnClusters.plotContactsHistogram">plotContactsHistogram() (in module src.analysis.numberOfOwnClusters)</a>
   </dt>
@@ -947,8 +1035,6 @@
   <dt><a href="AdaptiveSampling.html#src.adaptiveSampling.preparePeleControlFile">preparePeleControlFile() (in module src.adaptiveSampling)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.atomset.html#src.atomset.atomset.Atom.printAtom">printAtom() (src.atomset.atomset.Atom method)</a>
   </dt>
@@ -986,22 +1072,6 @@
   </dl></td>
 </tr></table>
 
-<h2 id="Q">Q</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="src.spawning.html#src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES.quadratic">quadratic (src.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES attribute)</a>
-  </dt>
-
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="src.spawning.html#src.spawning.densitycalculator.QuadraticDensityCalculator">QuadraticDensityCalculator (class in src.spawning.densitycalculator)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
@@ -1017,12 +1087,12 @@
   <dt><a href="src.atomset.html#src.atomset.atomset.readPDB">readPDB() (in module src.atomset.atomset)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.spawning.html#src.spawning.spawning.return_sign">return_sign() (in module src.spawning.spawning)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.simulation.html#src.simulation.simulationrunner.RunnerBuilder">RunnerBuilder (class in src.simulation.simulationrunner)</a>
   </dt>
@@ -1127,12 +1197,12 @@
   <dt><a href="AdaptiveSampling.html#module-src.adaptiveSampling">src.adaptiveSampling (module)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.analysis.html#module-src.analysis.correctRMSD">src.analysis.correctRMSD (module)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.analysis.html#module-src.analysis.foldersFirstBindingEvent">src.analysis.foldersFirstBindingEvent (module)</a>
   </dt>
@@ -1231,12 +1301,12 @@
   <dt><a href="src.clustering.html#src.clustering.thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES">THRESHOLD_CALCULATOR_TYPES (class in src.clustering.thresholdcalculatortypes)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.clustering.html#src.clustering.thresholdcalculator.ThresholdCalculator">ThresholdCalculator (class in src.clustering.thresholdcalculator)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.clustering.html#src.clustering.thresholdcalculator.ThresholdCalculatorBuilder">ThresholdCalculatorBuilder (class in src.clustering.thresholdcalculator)</a>
   </dt>
@@ -1263,12 +1333,12 @@
   <dt><a href="src.validator.html#src.validator.controlFileValidator.validateBlock">validateBlock() (in module src.validator.controlFileValidator)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.validator.html#src.validator.controlFileValidator.validateGeneralBlock">validateGeneralBlock() (in module src.validator.controlFileValidator)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="src.spawning.html#src.spawning.spawningTypes.SPAWNING_TYPES.variableEpsilon">variableEpsilon (src.spawning.spawningTypes.SPAWNING_TYPES attribute)</a>
   </dt>
@@ -1342,7 +1412,7 @@
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'',
+            URL_ROOT:'./',
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -1,4 +1,6 @@
-from atomset import atomset
+from atomset import atomset, RMSDCalculator
+from atomset import SymmetryContactMapEvaluator as sym
+from clustering import clustering
 import unittest
 import numpy as np
 
@@ -215,9 +217,10 @@ END   \n"
         pdb_native.initialise("tests/data/ain_native_fixed.pdb", resname='AIN')
         pdb_traj = atomset.PDB()
         pdb_traj.initialise("tests/data/ain_trajectory.pdb", resname='AIN')
+        RMSDCalc = RMSDCalculator.RMSDCalculator()
 
         # function to test
-        RMSD = atomset.computeRMSD(pdb_native, pdb_traj)
+        RMSD = RMSDCalc.computeRMSD(pdb_native, pdb_traj)
         golden_RMSD = 3.928617
         self.assertAlmostEqual(RMSD, golden_RMSD, 5)
 
@@ -227,11 +230,36 @@ END   \n"
         pdb_native.initialise("tests/data/ain_native_fixed.pdb", resname='AIN')
         pdb_traj = atomset.PDB()
         pdb_traj.initialise("tests/data/ain_trajectory.pdb", resname='AIN')
-
+        symDict = [{"1733:O1:AIN": "1735:O2:AIN"}]
+        RMSDCalc = RMSDCalculator.RMSDCalculator(symDict)
         # function to test
-        RMSD = atomset.computeRMSD(pdb_native, pdb_traj, {"1733:O1:AIN":"1735:O2:AIN", "1735:O2:AIN":"1733:O1:AIN"})
+        RMSD = RMSDCalc.computeRMSD(pdb_native, pdb_traj)
+        reverseRMSD = RMSDCalc.computeRMSD(pdb_traj, pdb_native)
         golden_RMSD = 3.860743
+        self.assertAlmostEqual(RMSD, reverseRMSD, 5)
         self.assertAlmostEqual(RMSD, golden_RMSD, 5)
+
+    def test_combination_symmetries(self):
+        # preparation
+        pdb_0 = atomset.PDB()
+        pdb_0.initialise("tests/data/symmetries/cluster_0.pdb", resname='AEN')
+        pdb_1 = atomset.PDB()
+        pdb_1.initialise("tests/data/symmetries/cluster_1.pdb", resname='AEN')
+        pdb_2 = atomset.PDB()
+        pdb_2.initialise("tests/data/symmetries/cluster_2.pdb", resname='AEN')
+        symmetries3PTB = [{"3225:C3:AEN": "3227:C5:AEN", "3224:C2:AEN": "3228:C6:AEN"},
+                          {"3230:N1:AEN": "3231:N2:AEN"}]
+        RMSDCalc = RMSDCalculator.RMSDCalculator(symmetries3PTB)
+        # funtion to test
+        RMSD02 = RMSDCalc.computeRMSD(pdb_0, pdb_2)
+        RMSD20 = RMSDCalc.computeRMSD(pdb_2, pdb_0)
+        RMSD01 = RMSDCalc.computeRMSD(pdb_0, pdb_1)
+        RMSD10 = RMSDCalc.computeRMSD(pdb_1, pdb_0)
+        RMSD21 = RMSDCalc.computeRMSD(pdb_2, pdb_1)
+        RMSD12 = RMSDCalc.computeRMSD(pdb_1, pdb_2)
+        self.assertEqual(RMSD01, RMSD10)
+        self.assertEqual(RMSD02, RMSD20)
+        self.assertEqual(RMSD21, RMSD12)
 
     def testPDB_contacts(self):
         # preparation
@@ -247,10 +275,81 @@ END   \n"
         # preparation
         pdb_native = atomset.PDB()
         pdb_native.initialise("tests/data/pdb_test_contact.pdb")
+        symmetryEvaluator = sym.SymmetryContactMapEvaluator([])
 
         # function to test
-        contact_map, contacts = pdb_native.createContactMap("AIN", 8)
+        contact_map, contacts = symmetryEvaluator.createContactMap(pdb_native,
+                                                                   "AIN", 8)
         golden_contact_map = np.array([[1, 0, 0, 0], [0, 1, 1, 1]])
         golden_contacts = pdb_native.countContacts("AIN", 8)
         np.testing.assert_array_equal(contact_map, golden_contact_map)
         self.assertEqual(golden_contacts, contacts)
+
+    def test_symmetryContactMapJaccard(self):
+        pdb_1 = atomset.PDB()
+        pdb_1.initialise("tests/data/symmetries/cluster_1.pdb", resname='AEN')
+        pdb_1_sym = atomset.PDB()
+        pdb_1_sym.initialise("tests/data/symmetries/cluster_1_sym.pdb",
+                             resname='AEN')
+        symmetries3PTB = [{"3230:N1:AEN": "3231:N2:AEN"}]
+        symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries3PTB)
+        symmetryEvaluatorEmpty = sym.SymmetryContactMapEvaluator()
+
+        contactMap1, contacts1 = symmetryEvaluator.buildContactMap(pdb_1, 'AEN', 16)
+        cluster = clustering.Cluster(pdb_1, contactMap=contactMap1)
+        contactMap1Sym, contactsSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
+        contactMapNoSym, contactsNoSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
+
+        goldenJaccard = 0.0
+        Jaccard = symmetryEvaluator.evaluateJaccard(contactMap1Sym, cluster)
+        JaccardNosym = symmetryEvaluatorEmpty.evaluateJaccard(contactMapNoSym, cluster)
+
+        self.assertEqual(contacts1, contactsSym)
+        self.assertAlmostEqual(goldenJaccard, Jaccard)
+        self.assertNotAlmostEqual(Jaccard, JaccardNosym)
+
+    def test_symmetryContactMapCorrelation(self):
+        pdb_1 = atomset.PDB()
+        pdb_1.initialise("tests/data/symmetries/cluster_1.pdb", resname='AEN')
+        pdb_1_sym = atomset.PDB()
+        pdb_1_sym.initialise("tests/data/symmetries/cluster_1_sym.pdb",
+                             resname='AEN')
+        symmetries3PTB = [{"3230:N1:AEN": "3231:N2:AEN"}]
+        symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries3PTB)
+        symmetryEvaluatorEmpty = sym.SymmetryContactMapEvaluator()
+
+        contactMap1, contacts1 = symmetryEvaluator.buildContactMap(pdb_1, 'AEN', 16)
+        cluster = clustering.Cluster(pdb_1, contactMap=contactMap1)
+        contactMap1Sym, contactsSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
+        contactMapNoSym, contactsNoSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
+
+        goldenCorrelation = 0.0
+        correlationSym = symmetryEvaluator.evaluateCorrelation(contactMap1Sym, cluster)
+        correlationNosym = symmetryEvaluatorEmpty.evaluateCorrelation(contactMapNoSym, cluster)
+
+        self.assertEqual(contacts1, contactsSym)
+        self.assertAlmostEqual(goldenCorrelation, correlationSym)
+        self.assertNotAlmostEqual(correlationSym, correlationNosym)
+
+    def test_symmetryContactMapDifference(self):
+        pdb_1 = atomset.PDB()
+        pdb_1.initialise("tests/data/symmetries/cluster_1.pdb", resname='AEN')
+        pdb_1_sym = atomset.PDB()
+        pdb_1_sym.initialise("tests/data/symmetries/cluster_1_sym.pdb",
+                             resname='AEN')
+        symmetries3PTB = [{"3230:N1:AEN": "3231:N2:AEN"}]
+        symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries3PTB)
+        symmetryEvaluatorEmpty = sym.SymmetryContactMapEvaluator()
+
+        contactMap1, contacts1 = symmetryEvaluator.buildContactMap(pdb_1, 'AEN', 16)
+        cluster = clustering.Cluster(pdb_1, contactMap=contactMap1)
+        contactMap1Sym, contactsSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
+        contactMapNoSym, contactsNoSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
+
+        goldenDifference = 0.0
+        DifferenceSym = symmetryEvaluator.evaluateDifferenceDistance(contactMap1Sym, cluster)
+        DifferenceNosym = symmetryEvaluatorEmpty.evaluateDifferenceDistance(contactMapNoSym, cluster)
+
+        self.assertEqual(contacts1, contactsSym)
+        self.assertAlmostEqual(goldenDifference, DifferenceSym)
+        self.assertNotAlmostEqual(DifferenceSym, DifferenceNosym)

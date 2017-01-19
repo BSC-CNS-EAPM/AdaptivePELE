@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="Adaptive Sampling  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -84,7 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptiveSampling.html">AdaptiveSampling Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Blalbalbke</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">Adaptive Sampling Overview</a></li>
 </ul>
 
             
@@ -134,22 +136,27 @@
            <div itemprop="articleBody">
             
   <h1>Source code for src.utilities.clusteringUtilities</h1><div class="highlight"><pre>
-<span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">utilities</span>
 
 
-<div class="viewcode-block" id="writeStructures"><a class="viewcode-back" href="../../../src.utilities.html#src.utilities.clusteringUtilities.writeStructures">[docs]</a><span class="k">def</span> <span class="nf">writeStructures</span><span class="p">(</span><span class="n">clusteringObject</span><span class="p">,</span> <span class="n">listStructures</span><span class="p">,</span> <span class="n">outputPath</span><span class="o">=</span><span class="s">&quot;cluster.pdb&quot;</span><span class="p">):</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">clusteringObject</span><span class="p">,</span> <span class="s">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<div class="viewcode-block" id="writeStructures"><a class="viewcode-back" href="../../../src.utilities.html#src.utilities.clusteringUtilities.writeStructures">[docs]</a><span class="k">def</span> <span class="nf">writeStructures</span><span class="p">(</span><span class="n">clusteringObject</span><span class="p">,</span> <span class="n">listStructures</span><span class="p">,</span> <span class="n">outputPath</span><span class="o">=</span><span class="s2">&quot;cluster.pdb&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">clusteringObject</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">clObject</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="n">nameStructure</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
-    <span class="n">outputName</span> <span class="o">=</span> <span class="n">nameStructure</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;_</span><span class="si">%d</span><span class="s">&#39;</span><span class="o">+</span><span class="n">nameStructure</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">outputName</span> <span class="o">=</span> <span class="n">nameStructure</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;_</span><span class="si">%d</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">nameStructure</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">outputName</span><span class="p">)</span>
     <span class="n">pathToWrite</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
         <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">pathToWrite</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">listStructures</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">listStructures</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1">#If no listStructures, write all</span>
+        <span class="n">listStructures</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">clObject</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">))</span>
+
     <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">listStructures</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="n">pathToWrite</span><span class="p">,</span> <span class="n">pathToWrite</span><span class="o">%</span><span class="n">element</span>
         <span class="n">clObject</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">element</span><span class="p">]</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="n">pathToWrite</span> <span class="o">%</span> <span class="n">element</span><span class="p">)</span></div>
 </pre></div>
 
