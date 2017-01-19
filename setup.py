@@ -14,3 +14,6 @@ setup(
     include_dirs=[numpy.get_include()]
 
 )
+# Run the following line to compile atomset package
+# python setup.py build_ext --inplace
+
