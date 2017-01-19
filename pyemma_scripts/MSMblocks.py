@@ -8,14 +8,15 @@ import matplotlib.pyplot as plt
 
 
 class PrepareMSM:
-    def __init__(self, numClusters, trajectoryFolder, trajectoryBasename, stride=1):
+    def __init__(self, numClusters, trajectoryFolder, trajectoryBasename, stride=1, cluster=True):
 
         self.discretizedFolder = "discretized"
         self.clusterCentersFile = os.path.join(self.discretizedFolder,
                                                "clusterCenters.dat")
-        self.discTraj = os.path.join(self.discretizedFolder, "%s.disctraj")
+        self.dTrajTemplateName = os.path.join(self.discretizedFolder, "%s.disctraj")
         self.clusteringFile = "clustering_object.pkl"
         self.stride = stride
+        self.trajFilenames = []
         self.dtrajs = []
         self.cl = None
 
@@ -27,7 +28,7 @@ class PrepareMSM:
 
     def clusterTrajectories(self, numClusters, trajectoryFolder, trajectoryBasename):
         print "Loading trajectories..."
-        self.x = trajectories.loadCOMFiles(trajectoryFolder, trajectoryBasename)
+        self.x, self.trajFilenames = trajectories.loadCOMFiles(trajectoryFolder, trajectoryBasename)
 
         # cluster & assign
         if self.cl is None:
@@ -45,6 +46,7 @@ class PrepareMSM:
         print "Writing clustering data..."
         helper.makeFolder(self.discretizedFolder)
         helper.writeClusterCenters(self.cl, self.clusterCentersFile)
+        helper.writeDtrajs(self.trajFilenames, self.dtrajs, self.dTrajTemplateName)
         print "Saving clustering object..."
         helper.saveClustering(self.cl, self.clusteringFile)
 
@@ -60,7 +62,7 @@ class MSM:
         if os.path.exists(self.MSMFile):
             self.MSM_object = helper.loadMSM(self.MSMFile)
 
-        self.cl = cl
+        self.cl = cl #only used for pcca
         self.lagtimes = lagtimes
         self.numPCCA = numPCCA
         self.itsOutput = itsOutput
@@ -77,7 +79,8 @@ class MSM:
         else:
             its_object = msm.calculateITS(self.dtrajs, self.lagtimes, self.itsErrors)
             plot_its = msm.plotITS(its_object, self.itsOutput, self.numberOfITS) 
-        self.createMSM(self.lagtime)
+        if self.MSM_object is None:
+            self.createMSM(self.lagtime)
         self.check_connectivity()
         #self.PCCA(self.numPCCA)
         print "Saving MSM object..."

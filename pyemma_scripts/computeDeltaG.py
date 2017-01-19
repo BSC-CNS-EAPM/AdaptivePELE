@@ -71,7 +71,7 @@ def main(trajWildcard, reweightingT=1000):
     #r = data[:,0:3]
     #pi = data[:,3]
 
-    d = 1.0
+    d = 0.75
 
     originalFilenames = glob.glob(trajWildcard)
 
