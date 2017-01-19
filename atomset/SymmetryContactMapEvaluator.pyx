@@ -6,9 +6,9 @@ cimport atomset
 
 
 cdef class SymmetryContactMapEvaluator:
-    cdef set symmetricAtoms,
-    cdef list symmetries
-    cdef dict symToRowMap
+    # cdef set symmetricAtoms,
+    # cdef list symmetries
+    # cdef dict symToRowMap
     def __init__(self, symmetries=[]):
         """
             :param symmetries: List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms
@@ -19,6 +19,17 @@ cdef class SymmetryContactMapEvaluator:
             self.symmetricAtoms.update(set(group.keys()).union(set(group.values())))
         self.symmetries = symmetries
         self.symToRowMap = {}
+
+
+    def __getstate__(self):
+        state = {'symmetries': self.symmetries, 'symToRowMap': self.symToRowMap,
+                 'symmetricAtoms': self.symmetricAtoms}
+        return state
+
+    def __setstate__(self, state):
+        self.symmetries = state['symmetries']
+        self.symToRowMap = state['symToRowMap']
+        self.symmetricAtoms = state['symmetricAtoms']
 
     def createContactMap(self, atomset.PDB PDB, str ligandResname, int contactThresholdDistance):
         """

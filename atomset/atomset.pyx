@@ -103,13 +103,37 @@ cdef class Atom:
             self.id = self.atomSerial + ":" + self.name + ":" + self.resname
             # self.id = self.atomSerial
 
+    def __getstate__(self):
+        # Copy the object's state from
+        state = {"atomSerial": self.atomSerial, "name": self.name, "x": self.x,
+                 "y": self.y, "z": self.z, "mass": self.mass, "type": self.type,
+                 "resname": self.resname, "resChain": self.resChain,
+                 "resnum": self.resnum, "protein": self.protein, "id": self.id}
+        return state
+
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.atomSerial = state['atomSerial']
+        self.name = state['name']
+        self.resname = state['resname']
+        self.resnum = state['resnum']
+        self.resChain = state['resChain']
+        self.type = state['type']
+        self.id = state['id']
+        self.mass = state['mass']
+        self.x = state['x']
+        self.y = state['x']
+        self.z = state['x']
+        self.protein = state['protein']
+
     def isHeavyAtom(self):
-        """
+       """
             Check if Atom is a heavy atom
 
             :returns: bool -- True if Atom is heavy atom, false otherwise
-        """
-        return self.type != 'H'
+       """
+       return self.type != 'H'
 
     def isProtein(self):
         """
@@ -231,6 +255,23 @@ cdef class PDB:
             return pdb1 != pdb2
         else:
             print "No boolean operator available for PDB apart from equality"
+
+    def __getstate__(self):
+        # Copy the object's state from
+        state = {"atoms": self.atoms, "atomList": self.atomList,
+                 "com": self.com, "centroid": self.centroid,
+                 "totalMass": self.totalMass, "pdb": self.pdb}
+        return state
+
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.atoms = state['atoms']
+        self.atomList = state['atomList']
+        self.com = state['com']
+        self.centroid = state['centroid']
+        self.totalMass = state['totalMass']
+        self.pdb = state['pdb']
 
     def initialise(self, str PDBstr, bint heavyAtoms=True, str resname="", str atomname="", str type="ALL"):
         """

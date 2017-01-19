@@ -19,3 +19,6 @@ os
 setuptools
 sys
 build/
+atomset/*.c
+atomset/*.so
+atomset/build

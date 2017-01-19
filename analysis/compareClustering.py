@@ -92,7 +92,7 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
                                                     contactThresholdDistance=contactThresholdDistance)
 spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 
-for i in range(2):
+for i in range(1):
     # path =["trajs/%d/run_traj*"%i]
     # paths_report = ["trajs/%d/run_report*"%i]
     # path = ["../3ptb_4_64_inversely_1/%d/traj*" % i]
@@ -113,9 +113,9 @@ for i in range(2):
     endTimeCont = time.time()
     print "Total time of clustering contacts, epoch %d: %.6f"%(i,endTimeCont-startTimeCont)
     print "Number of clusters contacts epoch %d: %d"%(i,len(ClCont.clusters.clusters))
-    # degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs, {})
-    # ClCont.writeOutput("clsummary",degeneraciesCont,"object_Cont.pkl", False)
-    # os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
+    degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs, {})
+    ClCont.writeOutput("clsummary",degeneraciesCont,"object_Cont.pkl", False)
+    os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
     # startTimeDouble = time.time()
     # ClDouble.cluster(path)
     # endTimeDouble = time.time()
@@ -133,12 +133,12 @@ for i in range(2):
     # degeneraciesAgg = spawningObject.calculate(ClAgg.clusters.clusters, ntrajs, {})
     # ClAgg.writeOutput("clsummary",degeneraciesAgg,"ClAgg.pkl", False)
     # os.rename("clsummary/summary.txt", "results/summary_ClAgg.txt")
-    startTimeAcc = time.time()
-    ClAcc.cluster(path)
-    endTimeAcc = time.time()
-    print "Total time of clustering accumulative, epoch %d: %.6f"%(i,endTimeAcc-startTimeAcc)
-    print "Number of clusters accumulative epoch %d: %d"%(i,len(ClAcc.clusters.clusters))
-    print ""
+    # startTimeAcc = time.time()
+    # ClAcc.cluster(path)
+    # endTimeAcc = time.time()
+    # print "Total time of clustering accumulative, epoch %d: %.6f"%(i,endTimeAcc-startTimeAcc)
+    # print "Number of clusters accumulative epoch %d: %d"%(i,len(ClAcc.clusters.clusters))
+    # print ""
     # degeneraciesAcc = spawningObject.calculate(ClAcc.clusters.clusters, ntrajs, {})
     # ClAcc.writeOutput("clsummary",degeneraciesAcc,"ClAcc.pkl", False)
     # os.rename("clsummary/summary.txt", "results/summary_ClAcc.txt")
