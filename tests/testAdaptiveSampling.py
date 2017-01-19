@@ -15,19 +15,11 @@ class TestadaptiveSampling(unittest.TestCase):
         for i in range(2, 3):
             with open(outputPathObject % i, 'rb') as f2:
                 outputCluster = pickle.load(f2)
-            outputCluster.clusters.printClusters()
             # with open(goldenPathObject % i, 'rb') as f:
             #     goldenCluster = pickle.load(f)
             # goldenCluster.clusters.printClusters()
             self.assertEqual(outputCluster.clusters.getNumberClusters(), len(goldenClusters))
             for goldCl, outCl in zip(goldenClusters, outputCluster.clusters.clusters):
-                outCl.printCluster()
-                goldCl.printCluster()
-                print type(goldCl.pdb)
-                print type(goldCl.pdb.pdb)
-                print type(outCl.pdb)
-                print type(outCl.pdb.pdb)
-                print len(outCl.pdb.pdb), len(goldCl.pdb.pdb)
                 self.assertEqual(outCl, goldCl)
 
     def checkStartingConformations(self, goldenPath, outputPath):
@@ -98,14 +90,13 @@ class TestadaptiveSampling(unittest.TestCase):
             goldenClusters.append(cluster)
         self.integrationTest(controlFile, goldenPath, outputPath, goldenClusters)
 
-    def _testIntegration2(self):
+    def testIntegration2(self):
         """
             Simulations are not run, trajectories and reports are copied
         """
         controlFile = "tests/data/3ptb_data/integrationTest2.conf"
         goldenPath = "tests/data/3ptb_data/srcTest2Epsilon"
         outputPath = "tests/data/3ptb_data/Test2"
-        pdbs = [open(goldenPath+"/2/clustering/cluster_%d.pdb" % i).read() for i in range(5)]
         elements = [35, 14, 8, 14, 1]
         metrics = [[1.0, 0.0, 0.0, -7498.07, 20.1909, 0.216436],
                    [1.0, 0.0, 0.0, -7498.06, 18.5232, 0.229384],
@@ -115,25 +106,28 @@ class TestadaptiveSampling(unittest.TestCase):
                   ]
         goldenClusters = []
         for i in range(5):
-            cluster = clustering.Cluster(pdbs[i], 4, metrics=metrics[i])
+            pdb = atomset.PDB()
+            pdb.initialise(goldenPath+"/2/clustering/cluster_%d.pdb" % i, resname="AEN")
+            cluster = clustering.Cluster(pdb, 4, metrics=metrics[i])
             cluster.elements = elements[i]
             cluster.contacts = 0
             goldenClusters.append(cluster)
 
         self.integrationTest(controlFile, goldenPath, outputPath, goldenClusters)
 
-    def _testIntegration3(self):
+    def testIntegration3(self):
         """
             Simulations are actually run
         """
         controlFile = "tests/data/3ptb_data/integrationTest3.conf"
         goldenPath = "tests/data/3ptb_data/originTest3"
         outputPath = "tests/data/3ptb_data/Test3"
-        pdbs = [open(goldenPath+"/2/clustering/cluster_%d.pdb" % i).read() for i in range(4)]
         elements = [27, 22, 21, 2]
         goldenClusters = []
         for i in range(4):
-            cluster = clustering.Cluster(pdbs[i], 4)
+            pdb = atomset.PDB()
+            pdb.initialise(goldenPath+"/2/clustering/cluster_%d.pdb" % i, resname="AEN")
+            cluster = clustering.Cluster(pdb, 4)
             cluster.elements = elements[i]
             cluster.contacts = 0
             goldenClusters.append(cluster)

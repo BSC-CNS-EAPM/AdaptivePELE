@@ -5,8 +5,8 @@ cimport atomset
 
 
 cdef class RMSDCalculator:
-    cdef set nonSymmetricalAtomsSet
-    cdef list symmetries
+    # cdef set nonSymmetricalAtomsSet
+    # cdef list symmetries
     def __init__(self, symmetries=[]):
         """
             :param symmetries: List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms
@@ -14,6 +14,15 @@ cdef class RMSDCalculator:
         """
         self.nonSymmetricalAtomsSet = None
         self.symmetries = symmetries
+
+    def __getstate__(self):
+        state = {'nonSymmetricalAtomsSet': self.nonSymmetricalAtomsSet,
+                 'symmetries': self.symmetries}
+        return state
+
+    def __setstate__(self, state):
+        self.nonSymmetricalAtomsSet = state['nonSymmetricalAtomsSet']
+        self.symmetries = state['symmetries']
 
     def computeNonSymmAtoms(self, atomset.PDB PDB):
         cdef set allAtomsSet
