@@ -1,6 +1,6 @@
+import json
 import os
 import sys
-import MSMblocks
 import helper
 import runMarkovChainModel as markov
 import trajectories
@@ -12,8 +12,13 @@ import matplotlib.pyplot as plt
 
 from src.pyemma_scripts import revTransitionMatrix #cython implementation
 
+def readJSON(controlFile):
+    with open(controlFile, "r") as f:
+        paramsJSON = json.load(f)
+    return paramsJSON
+
 def readParams(control_file):
-    params = MSMblocks.readParams(control_file)
+    params = readJSON(control_file)
     disctrajFolder = params["disctrajFolder"]
     trajectoryFolder = params["goldenTrajFolder"]
     trajectoryFolder2 = params["trajFolder"]
@@ -22,45 +27,28 @@ def readParams(control_file):
     lagtime = params.get("lagtime", 0)
     sampleSize = params.get("sampleSize", None)
     numRuns = params.get("numRuns", 1)
-    return disctrajFolder, trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtime, sampleSize, numRuns
+    dTraj = params.get("dtraj", None)
+    maxNtraj = params.get("maxntraj", None)
+    minNtraj = params.get("minntraj", None)
+    dlength = params.get("dlength", None)
+    maxlength = params.get("maxlength", None)
+    return disctrajFolder, trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtime, sampleSize, numRuns, dTraj, maxNtraj, minNtraj, dlength, maxlength
 
-def getStationaryDistributionAndTransitionMatrix(X, goldenMSMClusterCenters, lagtime):
-    dTrajs = assignTrajectories(goldenMSMClusterCenters, X)
-
-    counts = markov.estimateCountMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime)
+def getStationaryDistributionAndTransitionMatrix(dTrajs, nclusters, lagtime):
+    counts = markov.estimateCountMatrix(dTrajs, nclusters, lagtime)
     counts += 1.0/counts.shape[0]
 
-    T = revTransitionMatrix.buildRevTransitionMatrix_fast(counts, iterations=5)
+    realT = revTransitionMatrix.buildRevTransitionMatrix_fast(counts, iterations=1000)
+    T = markov.buildTransitionMatrix(counts) #fastest
     #other (slower) options
     #transition = markov.buildRevTransitionMatrix_fast(counts, iterations=5)
     #transition = markov.buildRevTransitionMatrix(counts)
 
-    eigenvals, eigenvec = markov.getSortedEigen(T)
+    eigenvals, eigenvec = markov.getSortedEigen(realT)
     pi = markov.getStationaryDistr(eigenvec[:,0])
 
-    return pi, T, dTrajs
+    return pi, T
     
-
-def getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride):
-    prepareMSM = MSMblocks.PrepareMSM(numClusters, trajectoryFolder, trajectoryBasename, stride)
-    cl = prepareMSM.getClusteringObject()
-    calculateMSM = MSMblocks.MSM(cl, lagtimes, 0, itsOutput, numberOfITS, itsErrors, False, dtrajs=prepareMSM.dtrajs)
-    if not lagtime:
-        lagtime = calculateMSM.calculateITS()
-    calculateMSM.createMSM(lagtime)
-    calculateMSM.check_connectivity()
-    MSM_object = calculateMSM.getMSM_object()
-    helper.saveMSM(MSM_object)
-    counts = MSM_object.count_matrix_full
-    counts += 1.0/numClusters
-    transition = markov.buildTransitionMatrix(counts)
-
-    #print counts
-    fullStationaryDistribution = np.zeros(MSM_object.nstates_full)
-    active = MSM_object.active_set
-    fullStationaryDistribution[active] = MSM_object.stationary_distribution
-
-    return transition, fullStationaryDistribution, lagtime #full stationary has zeros if there are states not in active set
 
 def makeRandomSampleOfNtrajs(X, ntrajs=None, length=None):
     if ntrajs:
@@ -87,7 +75,7 @@ def makeRandomSampleOfdtrajs(dtrajs, ntrajs=None, length=None):
         indices = range(len(dtrajs))
 
     try:
-        Xsample = map(lambda x: dtrajs[x][:length], indices)
+        Xsample = map(lambda x: np.array(dtrajs[x][:length]), indices)
     except:
         for index in indices:
             try:
@@ -107,7 +95,8 @@ def estimateTWithDiscTrajs(dTrajs, nclusters, lagtime):
     #own estimation
     counts = markov.estimateCountMatrix(dTrajs, nclusters, lagtime)
     counts += 1.0/counts.shape[0]
-    transition = revTransitionMatrix.buildRevTransitionMatrix_fast(counts, iterations=5)
+    #transition = revTransitionMatrix.buildRevTransitionMatrix_fast(counts, iterations=100)
+    transition = markov.buildTransitionMatrix(counts)
     #other (slower) options
     #transition = markov.buildRevTransitionMatrix_fast(counts, iterations=5)
     #transition = markov.buildRevTransitionMatrix(counts)
@@ -123,17 +112,21 @@ def plotIsocostLines(extent, allTrajLengths, numberOfTrajs, steps=10):
         plt.plot(x,y, color="black")
 
 
-def main(controlFile):
-    """
-        Takes cluster centers file, builds dtrajs, and computes relative entropy
-    """
-    disctrajFolder, trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtime, sampleSize, numRuns = readParams(controlFile)
-    #Deprecated, to avoid dependencies on pyemma
-    #refTransition, refStationaryDist, lagtime = getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride)
+def readDTrajOrAssign(filename, goldenMSMClusterCenters, X):
+    if os.path.exists(filename):
+        print "Reading current disc trajs from file: ", filename
+        discTrajs = np.load(filename).tolist()
+    else:
+        discTrajs = assignTrajectories(goldenMSMClusterCenters, X)
+        np.save(filename, np.array(discTrajs))
+    return discTrajs
 
-    goldX, unused = trajectories.loadCOMFiles(trajectoryFolder, trajectoryBasename)
-    
-    import os
+def buildDTraj(trajectoryFolder, trajectoryBasename, disctrajFolder, filename="golden_dtraj.npy"):
+    """
+        Builds discretized trajectories.
+        If it finds g_dtraj.npy, it builds them reading the file. 
+        Otherwise, it reads X, reads cluster centers, and assigns them using the Voronoi of EMMA.
+    """
     clusterCenters = os.path.join(disctrajFolder, "discretized/clusterCenters.dat")
     try:
         goldenMSMClusterCenters = np.loadtxt(clusterCenters)
@@ -144,9 +137,33 @@ def main(controlFile):
         except:
             sys.exit("Didn't find cluster centers")
 
-    pi, T, dTrajs = getStationaryDistributionAndTransitionMatrix(goldX, goldenMSMClusterCenters, lagtime)
+    if os.path.exists(filename):
+        print "Reading current disc trajs from file: ", filename
+        dTrajs = np.load(filename).tolist()
+    else: #TODO: refactor readDTrajOrAssign
+        goldX, unused = trajectories.loadCOMFiles(trajectoryFolder, trajectoryBasename)
+        dTrajs = readDTrajOrAssign(filename, goldenMSMClusterCenters, goldX)
+    return dTrajs, goldenMSMClusterCenters
 
-    np.random.seed(250793)
+def main(controlFile):
+    """
+        Takes cluster centers file, builds dtrajs, and computes relative entropy
+    """
+    try:
+        disctrajFolder, trajectoryFolder, trajectoryFolder2, trajectoryBasename, numClusters, lagtime, sampleSize, numRuns, dtrajs, maxNtraj, minNtraj, dlength, maxlength = readParams(controlFile)
+    except IOError:
+        print "Removing discretized trajectory files"
+        if controlFile == "rm":
+            os.remove("golden_dtraj.npy")
+            os.remove("c_dtraj.npy")
+        
+    #Deprecated, to avoid dependencies on pyemma
+    #refTransition, refStationaryDist, lagtime = getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride)
+
+    dTrajs, goldenMSMClusterCenters = buildDTraj(trajectoryFolder, trajectoryBasename, disctrajFolder, "golden_dtraj.npy")
+    pi, T = getStationaryDistributionAndTransitionMatrix(dTrajs, goldenMSMClusterCenters.shape[0], lagtime)
+
+    #np.random.seed(250793)
 
     seq = True
     entropies = []
@@ -154,13 +171,13 @@ def main(controlFile):
     if seq:
         try:
             X,unused = trajectories.loadCOMFiles(trajectoryFolder2, trajectoryBasename)
-            discTrajs = assignTrajectories(goldenMSMClusterCenters, X)
+            discTrajs = readDTrajOrAssign("c_dtraj.npy", goldenMSMClusterCenters, X)
 
-            dTrajs = 50
-            numberOfTrajs = range(99, 500, dTrajs)
-
-            dTrajs = 100
-            numberOfTrajs = range(99, 600, dTrajs)
+            if dtrajs is None:
+                dtrajs = 100
+            if maxNtraj is None:
+                maxNtraj = len(discTrajs)
+            numberOfTrajs = range(minNtraj, maxNtraj, dtrajs)
 
             #dTrajs = 100
             # numberOfTrajs = range(50, sampleSize, 50)
@@ -168,13 +185,12 @@ def main(controlFile):
             #only trying different traj lengths if sampleSize is defined in control file
             shortestTrajSize = min([len(i) for i in X])
             lowerLimit = 2*lagtime
-            upperLimit = shortestTrajSize
-            upperLimit = 501
-            upperLimit = 1001
-            #upperLimit = 2001
-            dTrajLengths = 50
-            #dTrajLengths = 200
-            allTrajLengths = range(lowerLimit, upperLimit, dTrajLengths)
+            
+            if maxlength is None:
+                maxlength = shortestTrajSize
+            if dlength is None:
+                dlength = 100
+            allTrajLengths = range(lowerLimit, maxlength, dlength)
         except TypeError:
             numberOfTrajs = [None]
             allTrajLengths = [None]
@@ -237,13 +253,14 @@ def main(controlFile):
     if ntrajs and length:
         plt.figure(1)
         if seq:
-            extent = [numberOfTrajs[0] - dTrajs/2, numberOfTrajs[-1] + dTrajs/2,
-                    allTrajLengths[0] - dTrajLengths/2, allTrajLengths[-1] + dTrajLengths/2]
+            extent = [numberOfTrajs[0] - dtrajs/2, numberOfTrajs[-1] + dtrajs/2,
+                    allTrajLengths[0] - dlength/2, allTrajLengths[-1] + dlength/2]
             #plot isocost lines
-            plotIsocostLines(extent, allTrajLengths, numberOfTrajs, 11)
+            plotIsocostLines(extent, allTrajLengths, numberOfTrajs, 9)
             plt.imshow(entropies, interpolation="nearest", origin="lower", aspect="auto", extent=extent)
         else:
             plt.imshow(entropies, interpolation="nearest", origin="lower", aspect="auto", extent=extent)
+        import os
         cwd = os.getcwd()
         cwd = cwd.replace("/", "_")
         #plt.save(cwd + ".eps")
@@ -253,7 +270,7 @@ def main(controlFile):
         plt.savefig(cwd + ".eps")
         plt.figure(2)
         if seq:
-            plotIsocostLines(extent, allTrajLengths, numberOfTrajs, 11)
+            plotIsocostLines(extent, allTrajLengths, numberOfTrajs, 9)
             plt.imshow(entropies, interpolation="bilinear", origin="lower", aspect="auto",  extent=extent)
         else:
             plt.imshow(entropies, interpolation="bilinear", origin="lower", aspect="auto",  extent=extent)
@@ -261,7 +278,6 @@ def main(controlFile):
         import os
         cwd = os.getcwd()
         cwd = cwd.replace("/", "_")
-        #plt.save(cwd + "2.eps")
         plt.savefig(cwd + "2.eps")
         plt.show()
     elif ntrajs:

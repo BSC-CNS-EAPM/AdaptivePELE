@@ -58,8 +58,6 @@ def loop(iterations, X, x, C, c):
     A = c_vec - C + c_vec.T - C.T
 
     for it in range(iterations):
-        if it != 0 and it % 10 == 0: print it
-
         for i in range(n):
             X[i,i] = C[i,i] * (x[i] - X[i,i]) / (c[i] - C[i,i])
 
@@ -90,7 +88,7 @@ def buildRevTransitionMatrix(C):
     x = X.sum(axis=1)
     c = C.sum(axis=1)
 
-    iterations = 5
+    iterations = 1000
     n = len(x)
 
     T = np.zeros(C.shape)
