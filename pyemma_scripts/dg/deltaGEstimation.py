@@ -5,7 +5,7 @@ from simulation import simulationrunner
 import shutil
 import computeDG
 import glob
-from other import checkDetailedBalance
+import checkDetailedBalance
 
 def rm(filename):
     try:
