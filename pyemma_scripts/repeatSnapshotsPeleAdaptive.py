@@ -6,14 +6,15 @@ import argparse
 
 
 def parseArguments():
-    desc = "Extracts coordinates in <currentFolder>/extractedCoordinates/coord*"
+    desc = "Adds repeated snapshots in rejected steps. If total steps are provided, add also steps until the end"
     parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("-t", "--totalSteps", type=int, default=0, help="Total number of steps in traj") 
     parser.add_argument("folderTraj",
                         help="Folder where the epochs trajs are stored")
     args = parser.parse_args()
-    return args.folderTraj
+    return args.totalSteps, args.folderTraj
 
-folderTraj = parseArguments()
+totalSteps, folderTraj = parseArguments()
 inputTrajectoryFolder = "%s/extractedCoordinates/"
 baseTrajectoryName = "coord_"
 reportName = '*report_'
@@ -81,10 +82,17 @@ for folder in Epochs:
             # !!!!
             # WARNING!!! Add last snapshot DID NOT CHECK when report/traj don't match
             # !!!!
-            snapshot = trajectory[-1].split()
-            snapshot[0] = str(counter)
-            snapshot = ' '.join(snapshot)
-            completeTrajectory.append(snapshot)
+            if totalSteps == 0:
+                iterations = range(1)
+            else:
+                iterations = range(totalSteps + 1 - counter)
+
+            for i in iterations:
+                snapshot = trajectory[-1].split()
+                snapshot[0] = str(counter)
+                snapshot = ' '.join(snapshot)
+                completeTrajectory.append(snapshot)
+                counter += 1
 
             outputFilename = outputTrajectoryFolderEpoch + baseTrajectoryName + trajectoryNumber + '.dat'
             outputFile = open(outputFilename, 'w')

@@ -25,20 +25,21 @@ def readParams(control_file):
     error_estimationCK = params["error_estimationCK"]
     state_labels = params["state_labels"]
     mlags = params["mlags"]
+    stride = params.get("stride", 1)
     if state_labels is None:
         state_labels = 'auto'  # json returns string as
     # unicode, and this breaks some code in pyemma
     outfile_fluxTPT = params["outfile_fluxTPT"]
-    return trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT, mlags, lagtime
+    return trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT, mlags, lagtime, stride
 
 
 def main(control_file):
 
     # parameters
-    trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT, mlags, lagtime = readParams(control_file)
+    trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, itsErrors, error_estimationCK, state_labels, outfile_fluxTPT, mlags, lagtime, stride = readParams(control_file)
 
     # program
-    prepareMSM = MSMblocks.PrepareMSM(numClusters, trajectoryFolder, trajectoryBasename)
+    prepareMSM = MSMblocks.PrepareMSM(numClusters, trajectoryFolder, trajectoryBasename, stride=stride)
     cl = prepareMSM.getClusteringObject()
     calculateMSM = MSMblocks.MSM(cl, lagtimes, numPCCA, itsOutput, numberOfITS,
                                  itsErrors, error_estimationCK, mlags, lagtime, prepareMSM.dtrajs)
