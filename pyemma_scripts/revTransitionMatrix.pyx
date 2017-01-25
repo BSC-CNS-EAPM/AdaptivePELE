@@ -16,8 +16,6 @@ def loop(int iterations, np.ndarray[double, ndim=2] X, np.ndarray[double, ndim=1
     cdef int n = len(x)
 
     for it in range(iterations):
-        if it != 0 and it % 10 == 0: print it
-
         for i in range(n):
             X[i,i] = C[i,i] * (x[i] - X[i,i]) / (c[i] - C[i,i])
 
