@@ -4,6 +4,8 @@ import firstSnapshots
 from simulation import simulationrunner
 import shutil
 import glob
+import buildMSM
+import computeDeltaG
 
 """
     1) Change hardcoded params, e.g. ntrajs, length, lagtime, nclusters,...
