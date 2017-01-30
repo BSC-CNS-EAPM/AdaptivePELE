@@ -75,7 +75,7 @@ cdef class Atom:
                     "HG": 200.59,
                     "PB": 207.2,
                     "U": 238.03}
-    def __init__(self, atomContent):
+    def __init__(self, str atomContent):
         """ Create an atom from a pdb line
 
             :param atomContent: Line of the pdb from which the atom will be created
@@ -502,10 +502,10 @@ def computeCOMDifference(PDB1, PDB2):
         :type PDB2: PDB
         :returns: float -- The distance between the centers of mass between two PDB
     """
-    return computeCOMDifference(PDB1, PDB2)
+    return np.sqrt(computeCOMSquaredDifference(PDB1, PDB2))
 
 
-def computeCOMSquaredDifference(PDB1, PDB2):
+def computeCOMSquaredDifference(PDB PDB1, PDB PDB2):
     """
         Compute the squared difference between the center of mass of two PDB
 
@@ -515,7 +515,7 @@ def computeCOMSquaredDifference(PDB1, PDB2):
         :type PDB2: PDB
         :returns: float -- The squared distance between the centers of mass between two PDB
     """
-
+    cdef list COM1, COM2
     COM1 = PDB1.getCOM()
     COM2 = PDB2.getCOM()
 
@@ -526,7 +526,7 @@ def computeCOMSquaredDifference(PDB1, PDB2):
     return dx*dx + dy*dy + dz*dz
 
 
-def computeSquaredCentroidDifference(PDB1, PDB2):
+def computeSquaredCentroidDifference(PDB PDB1, PDB PDB2):
     """
         Compute the centroid squared difference between two PDBs
 
@@ -536,6 +536,7 @@ def computeSquaredCentroidDifference(PDB1, PDB2):
         :type PDB2: PDB
         :returns: float -- The squared centroid distance between two PDB
     """
+    cdef list centroid1, centroid2
     centroid1 = PDB1.getCentroid()
     centroid2 = PDB2.getCentroid()
 
@@ -544,7 +545,6 @@ def computeSquaredCentroidDifference(PDB1, PDB2):
     dz = centroid1[2] - centroid2[2]
 
     return dx*dx + dy*dy + dz*dz
-
 
 def readPDB(pdbfile):
     """
