@@ -57,10 +57,12 @@ class DensityCalculatorHeaviside(DensityCalculator):
 
     def calculate(self, contacts, contactThreshold):
         for i in range(len(self.conditions)):
-            #change, so that whole condition is in array
+            # change, so that whole condition is in array
             if contacts > self.conditions[i]:
                 return self.values[i]
-        #the way it's built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the "else" value
+        # the way it's built, it makes more sense to return this value, but,
+        # should check that len(value) = len(conditions) + 1 in order to
+        # return the "else" value
         return self.values[-1]
 
 
@@ -86,7 +88,11 @@ class ContinuousDensityCalculator(DensityCalculator):
         #     return 32
         # else:
         #     return 8.76571*contacts**2-2.44857*contacts+0.28829
-        if contacts > self.limit[contactThreshold]:
+        # if contacts > self.limit[contactThreshold]:
+        #     return 8
+        # else:
+        #     return 64.0/(-self.slope[contactThreshold]*contacts+6)**3
+        if contacts > 1.0:
             return 8
         else:
-            return 64.0/(-self.slope[contactThreshold]*contacts+6)**3
+            return 64.0/(-4*contacts+6)**3
