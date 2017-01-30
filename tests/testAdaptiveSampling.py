@@ -17,7 +17,7 @@ class TestadaptiveSampling(unittest.TestCase):
                 outputCluster = pickle.load(f2)
             # with open(goldenPathObject % i, 'rb') as f:
             #     goldenCluster = pickle.load(f)
-            # goldenCluster.clusters.printClusters()
+            # outputCluster.clusters.printClusters()
             self.assertEqual(outputCluster.clusters.getNumberClusters(), len(goldenClusters))
             for goldCl, outCl in zip(goldenClusters, outputCluster.clusters.clusters):
                 self.assertEqual(outCl, goldCl)
