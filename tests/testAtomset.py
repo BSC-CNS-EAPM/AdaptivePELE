@@ -288,13 +288,13 @@ END   \n"
     def test_contactMapContacts(self):
         # preparation
         pdb_1 = atomset.PDB()
-        pdb_1.initialise("tests/data/symmetries/cluster_1.pdb", resname='AEN')
+        pdb_1.initialise("tests/data/pdb_test_contact.pdb", resname='AIN')
         symmetryEvaluator = sym.SymmetryContactMapEvaluator([])
 
         # function to test
         contact_map, contacts = symmetryEvaluator.createContactMap(pdb_1,
-                                                                   "AEN", 16)
-        golden_contacts = pdb_1.countContacts("AEN", 16)
+                                                                   "AIN", 16)
+        golden_contacts = pdb_1.countContacts("AIN", 8)
         self.assertEqual(golden_contacts, contacts)
 
     def test_symmetryContactMapJaccard(self):
