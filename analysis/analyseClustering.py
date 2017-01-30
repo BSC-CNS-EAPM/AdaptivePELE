@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from atomset import atomset
 from mpl_toolkits.mplot3d import Axes3D
 import pdb as debug
+import argparse
 
 
 def extractCOMMatrix(clusters, resname):
@@ -111,13 +112,23 @@ def plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
 
     print "Number of elements", totalElements
 
+
+def parseArguments():
+    desc = "3D visualization of clustering"
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("clusteringObject", type=str, help="Clustering object")
+    parser.add_argument("resname", type=str, help="Resname in the pdb")
+    args = parser.parse_args()
+
+    return args.clusteringObject, args.resname
+
 if __name__ == "__main__":
     # resname = "ALJ"
     # resname = "STR"
-    resname = "K5Y"
-
+    # resname = "K5Y"
+    pklObjectFilename, resname = parseArguments()
     # Cont
-    pklObjectFilename = "object_Cont_forw.pkl"
+    # pklObjectFilename = "object_Cont_forw.pkl"
     metricPlotFilename = ""  # "results/contactClusters.png"
     populationPlotFilename = ""  # "results/contactClusterspop.png"
     contactsPlotFilename = ""  # "results/contactClustersContacts.png"
@@ -129,35 +140,35 @@ if __name__ == "__main__":
                        titlecontacts, metricPlotFilename,
                        populationPlotFilename, contactsPlotFilename)
 
-    # Acc
-    #pklObjectFilename = "ClAcc_PR_heav.pkl"
-    pklObjectFilename = "object_Cont_rev.pkl"
-    metricPlotFilename = ""  # "results/metricplotAcc_acc_PR_heav.png"
-    populationPlotFilename = ""  # "results/populationAcc_acc_PR_heav.png"
-    contactsPlotFilename = ""  # "results/contactsplotAcc_acc_PR_heav.png"
-    titlemetric = "Metrics Reverese"
-    titlepopulation = "Population Reverse"
-    titlecontacts = "Number of contacts reverse"
-    # titlemetric = "Metrics Accumulative"
-    #titlepopulation = "Population Accumulative"
-    #titlecontacts = "Number of contacts Accumulative"
+    # # Acc
+    # #pklObjectFilename = "ClAcc_PR_heav.pkl"
+    # pklObjectFilename = "object_Cont_rev.pkl"
+    # metricPlotFilename = ""  # "results/metricplotAcc_acc_PR_heav.png"
+    # populationPlotFilename = ""  # "results/populationAcc_acc_PR_heav.png"
+    # contactsPlotFilename = ""  # "results/contactsplotAcc_acc_PR_heav.png"
+    # titlemetric = "Metrics Reverese"
+    # titlepopulation = "Population Reverse"
+    # titlecontacts = "Number of contacts reverse"
+    # # titlemetric = "Metrics Accumulative"
+    # #titlepopulation = "Population Accumulative"
+    # #titlecontacts = "Number of contacts Accumulative"
 
-    plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
-                       titlecontacts, metricPlotFilename,
-                       populationPlotFilename, contactsPlotFilename)
+    # plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
+    #                    titlecontacts, metricPlotFilename,
+    #                    populationPlotFilename, contactsPlotFilename)
 
-    pklObjectFilename = "object_Cont_mix.pkl"
-    metricPlotFilename = ""  # "results/metricplotAcc_acc_PR_heav.png"
-    populationPlotFilename = ""  # "results/populationAcc_acc_PR_heav.png"
-    contactsPlotFilename = ""  # "results/contactsplotAcc_acc_PR_heav.png"
-    titlemetric = "Metrics mixed"
-    titlepopulation = "Population mixed"
-    titlecontacts = "Number of contacts mixed"
-    # titlemetric = "Metrics Accumulative"
-    #titlepopulation = "Population Accumulative"
-    #titlecontacts = "Number of contacts Accumulative"
+    # pklObjectFilename = "object_Cont_mix.pkl"
+    # metricPlotFilename = ""  # "results/metricplotAcc_acc_PR_heav.png"
+    # populationPlotFilename = ""  # "results/populationAcc_acc_PR_heav.png"
+    # contactsPlotFilename = ""  # "results/contactsplotAcc_acc_PR_heav.png"
+    # titlemetric = "Metrics mixed"
+    # titlepopulation = "Population mixed"
+    # titlecontacts = "Number of contacts mixed"
+    # # titlemetric = "Metrics Accumulative"
+    # #titlepopulation = "Population Accumulative"
+    # #titlecontacts = "Number of contacts Accumulative"
 
-    plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
-                       titlecontacts, metricPlotFilename,
-                       populationPlotFilename, contactsPlotFilename)
+    # plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
+    #                    titlecontacts, metricPlotFilename,
+    #                    populationPlotFilename, contactsPlotFilename)
     plt.show()
