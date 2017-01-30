@@ -73,7 +73,13 @@ class densityCalculatorTest(unittest.TestCase):
 
         self.assertAlmostEqual(densityCalculator.calculate(0.5, 8), 1)
         self.assertAlmostEqual(densityCalculator.calculate(1.5, 8), 8)
-        self.assertAlmostEqual(densityCalculator.calculate(0.2, 6), 1)
-        self.assertAlmostEqual(densityCalculator.calculate(0.5, 6), 8)
-        self.assertAlmostEqual(densityCalculator.calculate(0.05, 4), 1)
-        self.assertAlmostEqual(densityCalculator.calculate(0.2, 4), 8)
+        self.assertAlmostEqual(densityCalculator.calculate(0.5, 6), 1)
+        self.assertAlmostEqual(densityCalculator.calculate(1.5, 6), 8)
+        self.assertAlmostEqual(densityCalculator.calculate(0.5, 4), 1)
+        self.assertAlmostEqual(densityCalculator.calculate(1.5, 4), 8)
+        # Changed behaviour, now densities are always set with contact threshold
+        # 8
+        # self.assertAlmostEqual(densityCalculator.calculate(0.2, 6), 1)
+        # self.assertAlmostEqual(densityCalculator.calculate(0.5, 6), 8)
+        # self.assertAlmostEqual(densityCalculator.calculate(0.05, 4), 1)
+        # self.assertAlmostEqual(densityCalculator.calculate(0.2, 4), 8)

@@ -195,10 +195,14 @@ class CMClusteringEvaluator:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
 
     def getInnerLimit(self, cluster):
-        if cluster.contacts > self.limitMax[cluster.contactThreshold]:
+        # if cluster.contacts > self.limitMax[cluster.contactThreshold]:
+        #     return 4.0
+        # else:
+        #     return 16-self.limitSlope[cluster.contactThreshold]*cluster.contacts
+        if cluster.contacts > 2.0:
             return 4.0
         else:
-            return 16-self.limitSlope[cluster.contactThreshold]*cluster.contacts
+            return 16-6*cluster.contacts
 
     def getOuterLimit(self, node):
         # return max(16, 16 * 2 - node.depth)
