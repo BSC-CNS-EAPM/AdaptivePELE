@@ -126,7 +126,8 @@ def writeSpawningInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRep
         for j in range(int(degeneracyOfRepresentatives[i])):
             outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
             print 'Writing to ', outputFilename, 'cluster', i
-            cluster.writePDB(outputFilename)
+            cluster.writeSpawningStructure(outputFilename)
+            # cluster.writePDB(outputFilename)
 
             counts += 1
 

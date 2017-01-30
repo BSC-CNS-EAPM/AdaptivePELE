@@ -59,6 +59,7 @@ class Cluster:
             contacts stands for contacts/ligandAtom
         """
         self.pdb = pdb
+        self.altStructure = None
         self.elements = 1
         self.threshold = thresholdRadius
         self.density = density
@@ -106,6 +107,16 @@ class Cluster:
     def getContacts(self):
         return self.contacts
 
+    def writeSpawningStructure(self, path):
+        """
+            With 50 % probability select the cluster center to spawn in
+            the next epoch
+        """
+        if self.altStructure is None or np.random.uniform() < 0.5:
+            self.pdb.writePDB(str(path))
+        else:
+            self.altStructure.writePDB(str(path))
+
     def __eq__(self, other):
         return self.pdb == other.pdb\
              and self.elements == other.elements\
@@ -148,7 +159,8 @@ class ContactsClusteringEvaluator:
         self.contactMap = None
 
     def isElement(self, pdb, cluster, resname, contactThresholdDistance):
-        return self.RMSDCalculator.computeRMSD(cluster.pdb, pdb) < cluster.threshold
+        dist = self.RMSDCalculator.computeRMSD(cluster.pdb, pdb)
+        return dist < cluster.threshold, dist
 
     def cleanContactMap(self):
         self.contactMap = None
@@ -352,8 +364,11 @@ class Clustering:
             if scd > self.clusteringEvaluator.getInnerLimit(cluster):
                 continue
 
-            if self.clusteringEvaluator.isElement(pdb, cluster, self.resname,
-                                                  self.contactThresholdDistance):
+            isSimilar, dist = self.clusteringEvaluator.isElement(pdb, cluster,
+                                                                 self.resname, self.contactThresholdDistance)
+            if isSimilar:
+                if dist > cluster.threshold/2:
+                    cluster.altStructure = pdb
                 cluster.addElement(metrics)
                 return
 
@@ -875,7 +890,7 @@ class differenceDistanceEvaluator:
             False otherwise
         """
         distance = symContactMapEvaluator.evaluateDifferenceDistance(contactMap, cluster)
-        return distance < cluster.threshold
+        return distance < cluster.threshold, distance
 
 
 class JaccardEvaluator:
@@ -890,7 +905,7 @@ class JaccardEvaluator:
             False otherwise
         """
         distance = symContactMapEvaluator.evaluateJaccard(contactMap, cluster)
-        return distance < cluster.threshold
+        return distance < cluster.threshold, distance
 
 
 class correlationEvaluator:
@@ -904,7 +919,7 @@ class correlationEvaluator:
             False otherwise
         """
         distance = symContactMapEvaluator.evaluateCorrelation(contactMap, cluster)
-        return distance < cluster.threshold
+        return distance < cluster.threshold, distance
 
 
 # TODO: should it be a class method?
