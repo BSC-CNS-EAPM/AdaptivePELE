@@ -6,9 +6,6 @@ cimport atomset
 
 
 cdef class SymmetryContactMapEvaluator:
-    # cdef set symmetricAtoms,
-    # cdef list symmetries
-    # cdef dict symToRowMap
     def __init__(self, symmetries=[]):
         """
             :param symmetries: List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms
@@ -100,8 +97,11 @@ cdef class SymmetryContactMapEvaluator:
                 dist2 = ligandAtom.squaredDistance(proteinAtom)
                 if dist2 < contactThresholdDistance2:
                     contactMap[rowind, colind] = True
-                    if proteinAtom.name == "CA":
-                        contacts.update([proteinAtomID])
+                if proteinAtom.name == "CA" and dist2 < 64.0:
+                    # Contact ratio will be always calculated using a contact
+                    # threshold of 8, so that tresholds and denisities are
+                    # independent of the contact threshold of the contactMap
+                    contacts.update([proteinAtomID])
         return contactMap.view(np.bool), len(contacts)
 
     def buildContactMap(self, atomset.PDB PDBobj, str ligandResname, int contactThresholdDistance):
@@ -151,15 +151,33 @@ cdef class SymmetryContactMapEvaluator:
                 dist2 = ligandAtom.squaredDistance(proteinAtom)
                 if dist2 < contactThresholdDistance2:
                     contactMap[rowind, colind] = True
-                    if proteinAtom.name == "CA":
-                        contacts.update([proteinAtomID])
+                if proteinAtom.name == "CA" and dist2 < 64.0:
+                    # Contact ratio will be always calculated using a contact
+                    # threshold of 8, so that tresholds and denisities are
+                    # independent of the contact threshold of the contactMap
+                    contacts.update([proteinAtomID])
         return contactMap.view(np.bool), len(contacts)
 
     def evaluateJaccard(self, contactMap, cluster):
         permContactMap = self.buildOptimalPermutationContactMap(contactMap,
                                                                 cluster)
-        intersectContactMaps = (permContactMap == cluster.contactMap).sum()
-        unionContactMaps = permContactMap.size + cluster.contactMap.size - intersectContactMaps
+        intersectContactMaps = (permContactMap & cluster.contactMap).sum()
+        unionContactMaps = permContactMap.sum() + cluster.contactMap.sum() - intersectContactMaps
+        if unionContactMaps == 0:
+            return 1
+        # intersectContactMaps = (permContactMap == cluster.contactMap).sum()
+        # unionContactMaps = permContactMap.size + cluster.contactMap.size - intersectContactMaps
+        similarity = float(intersectContactMaps)/unionContactMaps
+        distance = 1-similarity
+        return distance
+
+    def evaluateJaccardSet(self, contactMap, cluster):
+        permContactMap = self.buildOptimalPermutationContactMap(contactMap,
+                                                                cluster)
+        intersectContactMaps = (permContactMap & cluster.contactMap).sum()
+        unionContactMaps = permContactMap.sum() + cluster.contactMap.sum() - intersectContactMaps
+        if unionContactMaps == 0:
+            return 1
         similarity = float(intersectContactMaps)/unionContactMaps
         distance = 1-similarity
         return distance

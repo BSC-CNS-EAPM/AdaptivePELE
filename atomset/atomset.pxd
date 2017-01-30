@@ -1,5 +1,5 @@
 cdef class Atom:
-    cdef public str atomSerial, name, resname, resChain, resnum, type, id, atomContent
+    cdef public str atomSerial, name, resname, resChain, resnum, type, id
     cdef public double x, y, z, mass
     cdef public bint protein
 
