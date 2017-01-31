@@ -164,7 +164,7 @@ cdef class SymmetryContactMapEvaluator:
         intersectContactMaps = (permContactMap & cluster.contactMap).sum()
         unionContactMaps = permContactMap.sum() + cluster.contactMap.sum() - intersectContactMaps
         if unionContactMaps == 0:
-            return 1
+            return 0.0
         # intersectContactMaps = (permContactMap == cluster.contactMap).sum()
         # unionContactMaps = permContactMap.size + cluster.contactMap.size - intersectContactMaps
         similarity = float(intersectContactMaps)/unionContactMaps
@@ -199,7 +199,7 @@ cdef class SymmetryContactMapEvaluator:
         if not averageContacts:
             # The only way the denominator can be 0 is if both contactMaps are
             # all zeros, thus being equal and belonging to the same cluster
-            return True
+            return 0.0
         else:
             distance = differenceContactMaps/averageContacts
             return distance
