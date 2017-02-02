@@ -57,6 +57,8 @@ class SpawningBuilder:
             spawningCalculator = FASTDegeneracyCalculator(densityCalculator)
         elif spawningTypeString == blockNames.StringSpawningTypes.variableEpsilon:
             spawningCalculator = VariableEpsilonDegeneracyCalculator(densityCalculator)
+        elif spawningTypeString == blockNames.StringSpawningTypes.UCB:
+            spawningCalculator = UCBCalculator(densityCalculator)
         else:
             sys.exit("Unknown spawning type! Choices are: " + str(spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
         return spawningCalculator
@@ -92,7 +94,8 @@ class SpawningParams:
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon or\
                 spawningType == blockNames.StringSpawningTypes.fast or \
-                spawningType == blockNames.StringSpawningTypes.simulatedAnnealing:
+                spawningType == blockNames.StringSpawningTypes.simulatedAnnealing or \
+                spawningType == blockNames.StringSpawningTypes.UCB:
             self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
         if spawningType == blockNames.StringSpawningTypes.variableEpsilon:
@@ -454,3 +457,38 @@ class FASTDegeneracyCalculator(DensitySpawningCalculator):
 
     def log(self):
         pass
+
+
+class UCBCalculator(DensitySpawningCalculator):
+
+    def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
+        DensitySpawningCalculator.__init__(self, densityCalculator)
+        self.type = spawningTypes.SPAWNING_TYPES.UCB
+        self.prevMetrics = []
+        self.alpha = 0.5
+        self.averageMetric = 0
+
+    def log(self):
+        pass
+
+    def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
+        sizes = np.array(self.getSizes(clusters))
+        densities = self.calculateDensities(clusters)
+        metrics = np.array(self.getMetrics(clusters))
+        population = np.array(range(1, len(metrics)+1))
+        self.averageMetric = np.mean(metrics)
+        for i, metric in enumerate(metrics):
+            if i < len(self.prevMetrics):
+                self.prevMetrics[i] = abs(metric-self.prevMetrics[i])/abs(metric)
+            else:
+                self.prevMetrics.append(-(metric-self.averageMetric)/abs(metric))
+
+        values = np.array(self.prevMetrics)+self.alpha*np.sqrt(1/sizes)
+        if densities.any():
+            weights = values*densities
+        else:
+            weights = values
+        argweights = weights.argsort()
+        weights_trimmed = np.zeros(len(sizes))
+        weights_trimmed[argweights[-trajToDistribute:]] = weights[argweights[-trajToDistribute:]]
+        return self.divideInverselyProportionalToArray(weights_trimmed, trajToDistribute)

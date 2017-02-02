@@ -131,7 +131,7 @@ def main():
     clusteringFolder = "clustering"
     summaryFile = "summary.txt"
     folder = "."
-    #end params
+    # end params
 
     clusteringSummaryFile = os.path.join(clusteringFolder, summaryFile)
     templetizedClusteringSummaryFile = os.path.join("%d", clusteringSummaryFile)
@@ -146,16 +146,15 @@ def main():
 
     plotClustersPerValue(clustersPerDensityValue)
     plt.legend(loc=2)
-    #plt.title("n=64, different thresholds, variable density")
-    #plt.savefig("../3ptb_4_64_numberOfClusters_density_corner.png")
+    # plt.title("n=64, different thresholds, variable density")
+    # plt.savefig("../3ptb_4_64_numberOfClusters_density_corner.png")
 
     plt.figure(2)
     plt.plot(totalNumberOfClustersPerEpoch, label="All clusters")
     plotClustersPerValue(clustersPerThresholdValue)
     plt.legend(loc=2)
-    #plt.title("n=64, different thresholds, variable density")
-    #plt.savefig("../3ptb_4_64_numberOfClusters_threshold_corner.png")
-
+    # plt.title("n=64, different thresholds, variable density")
+    # plt.savefig("set2.png")
 
     plt.figure(3)
     plotContactsHistogram(folder, templetizedClusteringSummaryFile)
