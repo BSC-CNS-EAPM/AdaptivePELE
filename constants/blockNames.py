@@ -53,6 +53,7 @@ class StringSpawningTypes:
     simulatedAnnealing = "simulatedAnnealing"
     # New parameters for variable epsilon(experimental)
     variableEpsilon = "variableEpsilon"
+    UCB = "UCB"
 
 
 class SpawningParams:

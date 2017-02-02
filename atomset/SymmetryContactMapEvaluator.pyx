@@ -163,7 +163,7 @@ cdef class SymmetryContactMapEvaluator:
                                                                 cluster)
         intersectContactMaps = (permContactMap & cluster.contactMap).sum()
         unionContactMaps = permContactMap.sum() + cluster.contactMap.sum() - intersectContactMaps
-        if unionContactMaps == 0:
+        if unionContactMaps < 1e-7:
             return 0.0
         # intersectContactMaps = (permContactMap == cluster.contactMap).sum()
         # unionContactMaps = permContactMap.size + cluster.contactMap.size - intersectContactMaps
