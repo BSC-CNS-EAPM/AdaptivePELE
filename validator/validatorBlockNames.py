@@ -59,6 +59,10 @@ class SpawningParams:
             "metricColumnInReport": "numbers.Real",
             "varEpsilonType": "basestring",
             "maxEpsilon": "numbers.Real"
+        },
+        "UCB": {
+            "reportFilename": "basestring",
+            "metricColumnInReport": "numbers.Real"
         }
     }
     density = {
