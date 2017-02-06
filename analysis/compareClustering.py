@@ -71,7 +71,7 @@ densityCalculator = densityCalculatorBuilder.build({
 # densityCalculator = densityCalculatorBuilder.build({})
 contactThresholdDistance = 8
 resname = "STR"
-nEpochs = 35
+nEpochs = 5
 ClDouble = clustering.ContactMapClustering(resname=resname,
                                            reportBaseFilename="report",
                                            columnOfReportFile=5,
@@ -89,19 +89,19 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
                                                     similarityEvaluator,
                                                     resname=resname,
                                                     reportBaseFilename="report",
-                                                    columnOfReportFile=4,
+                                                    columnOfReportFile=5,
                                                     contactThresholdDistance=contactThresholdDistance)
 # spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 spawningObject = spawning.UCBCalculator(densityCalculator)
 for i in range(nEpochs):
     # path =["trajs/%d/run_traj*"%i]
     # paths_report = ["trajs/%d/run_report*"%i]
-    # path = ["../3ptb_4_64_inversely_1/%d/traj*" % i]
-    # paths_report = ["../3ptb_4_64_inversely_1/%d/report*" % i]
+    path = ["/home/bsc72/bsc72021/simulations/PR/testCM_4_32/simulation/PRprog_CM_variabExtra_UCB_5/%d/traj*" % i]
+    paths_report = ["/home/bsc72/bsc72021/simulations/PR/testCM_4_32/simulation/PRprog_CM_variabExtra_UCB_5//%d/report*" % i]
     # path = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtra/automate_CM_7/%d/traj*"%i]
     # paths_report = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtra/automate_CM_7/%d/report*"%i]
-    path = ["/home/jgilaber/PR/PRprog_4_64CMExtraSubset_thres/automate_CM_3/%d/traj*"%i]
-    paths_report = ["/home/jgilaber/PR/PRprog_4_64CMExtraSubset_thres/automate_CM_3/%d/report*"%i]
+    # path = ["/home/jgilaber/PR/PRprog_4_64CMExtraSubset_thres/automate_CM_3/%d/traj*"%i]
+    # paths_report = ["/home/jgilaber/PR/PRprog_4_64CMExtraSubset_thres/automate_CM_3/%d/report*"%i]
     # path = ["/home/jgilaber/4DAJ/4DAJ_4_64CMExtraSubsetSingle/%d/traj*"%i]
     # paths_report = ["/home/jgilaber/4DAJ/4DAJ_4_64CMExtraSubsetSingle/%d/report*"%i]
     trajs = clustering.getAllTrajectories(paths_report)
