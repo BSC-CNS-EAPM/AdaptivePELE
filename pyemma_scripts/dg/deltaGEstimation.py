@@ -3,32 +3,10 @@ import numpy as np
 import firstSnapshots
 from simulation import simulationrunner
 import shutil
+import computeDG
 import glob
+import checkDetailedBalance
 
-"""
-    1) Change hardcoded params, e.g. ntrajs, length, lagtime, nclusters,...
-    2) Needs of a templetized_control_MSM.conf with $clusters and $lagtime as template (if wanted), otherwise, create a file with the same name and no templetized attr
-"""
-
-
-"""
-    Params TO BE CHANGED
-"""
-ntrajs = 511*2
-length = 2000
-lagtime = 200
-nclusters = 0
-nruns = 10
-useAllTrajInFirstRun = True
-
-controlFile = "templetized_control_MSM.conf" #unused, but remember it needs to be defined
-trajWildcard = "traj*"
-folderWithTraj = "rawData"
-
-
-"""
-    Functions
-"""
 def rm(filename):
     try:
         os.remove(filename)
@@ -45,22 +23,21 @@ def copyAllTrajectories(trajWildcard, folderWithTraj):
     for f in allfiles:
         shutil.copy(f, ".")
 
-def computeDG(lagtime, clusters):
-    simulationParameters = simulationrunner.SimulationParameters()
-    controlFile = "templetized_control_MSM.conf"
-    simulationParameters.templetizedControlFile = controlFile
-    sr = simulationrunner.SimulationRunner(simulationParameters)
+ntrajs = 511
+length = 2500
+lagtime = 200
+nclusters = 100
+nruns = 100
+useAllTrajInFirstRun = True
 
-    controlFileDictionary = {"lagtime": lagtime, "clusters": clusters}
-    sr.makeWorkingControlFile("control_MSM.conf", controlFileDictionary)
-    buildMSM.main("control_MSM.conf")
-    deltaGLine = computeDeltaG.main("traj_*")
-    return deltaGLine 
+computeDetailedBalance = True
 
-"""
-    Main
-"""
+controlFile = "templetized_control_MSM.conf" #unused, but remember it needs to be defined
+trajWildcard = "traj*"
+folderWithTraj = "rawData"
+
 deltaGs = {}
+detailedBalance = {}
 for i in range(nruns):
     rmTrajFiles(trajWildcard)
     if useAllTrajInFirstRun and i == 0: #this uses full length trajectories
@@ -70,17 +47,35 @@ for i in range(nruns):
         firstSnapshots.main(length, ntrajs)
     rm("clustering_object.pkl") 
     rm("MSM_object.pkl") 
-    deltaG = computeDG(lagtime, nclusters)
+    rmTrajFiles("discretized/traj_*")
+    deltaG = computeDG.computeDG(lagtime, nclusters)
     try:
         deltaGs[lagtime].append(deltaG)
     except KeyError:
         deltaGs[lagtime] = [deltaG]
+
+    if computeDetailedBalance:
+        frobeniusAvg, relativeEntropyT, unused = checkDetailedBalance.main("discretized", 0, lagtime)
+        try:
+            detailedBalance['frobenius'].append(frobeniusAvg)
+            detailedBalance['relativeEntropy'].append(relativeEntropyT)
+        except KeyError:
+            detailedBalance['frobenius'] = [frobeniusAvg]
+            detailedBalance['relativeEntropy'] = [relativeEntropyT]
+
     shutil.copyfile("its.png", "its_%d.png"%i)
     shutil.copyfile("volumeOfClusters.dat", "volumeOfClusters_%d.dat"%i)
     shutil.copyfile("clusters.pdb", "clusters_%d.pdb"%i)
     shutil.copyfile("pmf_xyzg.dat", "pmf_xyzg_%d.dat"%i)
+    if i == 0:
+        try:
+            shutil.copyfile("db_frobenius.eps", "db_frobenius_%d.eps"%i)
+            shutil.copyfile("db_abs_diff.eps", "db_abs_diff_%d.eps"%i)
+            shutil.copyfile("db_flux.eps", "db_flux_%d.eps"%i)
+        except:
+            pass
 
-#SUMMARY RESULTS
+#PLOT RESULTS
 print "clusters: %d, ntrajs: %d, trajLength: %d"%(nclusters, ntrajs, length)
 for key, val in deltaGs.iteritems():
     print key
@@ -91,3 +86,13 @@ for key, val in deltaGs.iteritems():
         dG = element.split()[1]
         dGs.append(float(dG))
     print "dG = %f +- %f"%(np.mean(dGs), np.std(dGs))
+
+if computeDetailedBalance:
+    for key, val in detailedBalance.iteritems():
+        print key
+        print "====="
+        values = []
+        for element in val:
+            print element
+            values.append(float(element))
+        print "%s = %f +- %f"%(key, np.mean(values), np.std(values))

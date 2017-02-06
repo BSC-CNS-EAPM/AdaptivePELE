@@ -13,6 +13,8 @@ pyemma_scripts/simulation
 pyemma_scripts/controlFiles
 pyemma_scripts/tmp*
 pyemma_scripts/results
+pyemma_scripts/revTransitionMatrix.c
+pyemma_scripts/src/pyemma_scripts/revTransitionMatrix.so
 epsilon_values.txt
 .ropeproject/
 os
