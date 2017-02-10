@@ -11,7 +11,7 @@ from atomset import atomset, RMSDCalculator
 from atomset import SymmetryContactMapEvaluator as sym
 from utilities import utilities
 import socket
-if not "bsccv" in socket.gethostname():
+if "bsccv" not in socket.gethostname():
     from sklearn.cluster import AffinityPropagation
     from sklearn.cluster import AgglomerativeClustering
     from sklearn.cluster import KMeans
@@ -68,6 +68,7 @@ class Cluster:
         self.metrics = metrics
         self.metricCol = metricCol
         self.contactThreshold = contactThreshold
+        self.altMetrics = []
 
         if self.threshold is None:
             self.threshold2 = None
@@ -77,6 +78,12 @@ class Cluster:
     def getMetric(self):
         if len(self.metrics):
             return self.metrics[self.metricCol]
+        else:
+            return None
+
+    def getAltMetric(self):
+        if len(self.altMetrics):
+            return self.altMetrics[self.metricCol]
         else:
             return None
 
@@ -196,7 +203,6 @@ class CMClusteringEvaluator:
         if self.contactMap is None:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
         return self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster, self.symmetryEvaluator)
-
 
     def cleanContactMap(self):
         self.contactMap = None
@@ -367,8 +373,9 @@ class Clustering:
             isSimilar, dist = self.clusteringEvaluator.isElement(pdb, cluster,
                                                                  self.resname, self.contactThresholdDistance)
             if isSimilar:
-                if dist > cluster.threshold/2:
+                if dist > cluster.threshold/2 and (len(cluster.altMetrics) == 0 or cluster.getAltMetric() > metrics[cluster.metricCol]):
                     cluster.altStructure = pdb
+                    cluster.altMetrics = metrics
                 cluster.addElement(metrics)
                 return
 
