@@ -4,6 +4,12 @@ import glob
 import sys
 import argparse
 from scipy.ndimage import filters
+from pyemma.coordinates.clustering import AssignCenters
+
+def assignNewTrajecories(trajs, clusterCenters):
+    assign = AssignCenters(clusterCenters)
+    dTrajs = assign.assign(trajs)
+    return dTrajs
 
 def parseArgs():
     parser = argparse.ArgumentParser(description="Script that computes delta G")
@@ -55,8 +61,9 @@ def reweightProbabilities(T, Torig, origProb):
 
 
 def main(trajWildcard, reweightingT=1000):
-    clusteringObject = helper.loadMSM('clustering_object.pkl')
-    allClusters = clusteringObject.clustercenters
+    #clusteringObject = helper.loadMSM('clustering_object.pkl')
+    #allClusters = clusteringObject.clustercenters
+    allClusters = np.loadtxt("discretized/clusterCenters.dat")
 
     MSMObject = helper.loadMSM('MSM_object.pkl')
     pi = MSMObject.stationary_distribution
@@ -113,7 +120,9 @@ def main(trajWildcard, reweightingT=1000):
     print "Number of clusters", numberOfClusters
 
 
-    dtrajs = clusteringObject.assign(originalCoordinates)
+    #dtrajs = clusteringObject.assign(originalCoordinates)
+    clusterCenters = r
+    dtrajs = assignNewTrajecories(originalCoordinates, clusterCenters)
     for i in range(numberOfClusters):
         allCoords = []
         for j,(trajOriginalCoordinates,dtraj) in enumerate(zip(originalCoordinates, dtrajs)):
