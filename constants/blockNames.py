@@ -8,6 +8,7 @@ class ClusteringTypes:
     lastSnapshot = "lastSnapshot"
     thresholdCalculator = "thresholdCalculator"
     ligandResname = "ligandResname"
+    alternativeStructure = "alternativeStructure"
     contactThresholdDistance = "contactThresholdDistance"
     nclusters = "nclusters"
     similarityEvaluator = "similarityEvaluator"

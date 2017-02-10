@@ -159,6 +159,7 @@ class clusteringTypes:
         "contactThresholdDistance": "numbers.Real",
         "similarityEvaluator": "basestring",
         "symmetries": "list",
+        "alternativeStructure": "bool",
         "nclusters": "numbers.Real"
     }
     thresholdCalculator = {
