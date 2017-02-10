@@ -12,7 +12,7 @@ def rm(filename):
     except OSError:
         pass
 
-def computeDG(lagtime, clusters):
+def computeDG(lagtime, clusters, trajWildCard):
     simulationParameters = simulationrunner.SimulationParameters()
     controlFile = "templetized_control_MSM.conf"
     simulationParameters.templetizedControlFile = controlFile
@@ -21,7 +21,7 @@ def computeDG(lagtime, clusters):
     controlFileDictionary = {"lagtime": lagtime, "clusters": clusters}
     sr.makeWorkingControlFile("control_MSM.conf", controlFileDictionary)
     buildMSM.main("control_MSM.conf")
-    deltaGLine = computeDeltaG.main("traj_*")
+    deltaGLine = computeDeltaG.main(trajWildCard)
     return deltaGLine 
 
 def estimateDGValue(nruns, lagtime, clusters, length, ntraj, col=1):

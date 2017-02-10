@@ -23,7 +23,7 @@ def copyAllTrajectories(trajWildcard, folderWithTraj):
     for f in allfiles:
         shutil.copy(f, ".")
 
-ntrajs = 511
+ntrajs = 50
 length = 2500
 lagtime = 200
 nclusters = 100
@@ -35,24 +35,40 @@ computeDetailedBalance = True
 controlFile = "templetized_control_MSM.conf" #unused, but remember it needs to be defined
 trajWildcard = "traj*"
 folderWithTraj = "rawData"
-
+folderTraj = "."
 deltaGs = {}
 detailedBalance = {}
-for i in range(nruns):
-    rmTrajFiles(trajWildcard)
-    if useAllTrajInFirstRun and i == 0: #this uses full length trajectories
-        rm("clustering_object.pkl") 
-        copyAllTrajectories(trajWildcard, folderWithTraj)
-    else:
-        firstSnapshots.main(length, ntrajs)
+allFolders = os.listdir(folderTraj)
+Epochs = [int(epoch) for epoch in allFolders if epoch.isdigit()]
+[shutil.rmtree(fold) for fold in glob.glob("coord_*")]
+i = -1
+for folder in sorted(Epochs):
+    print "Epoch", folder
+    # rmTrajFiles(trajWildcard)
+    # if useAllTrajInFirstRun and i == 0: #this uses full length trajectories
+    #     rm("clustering_object.pkl") 
+    #     copyAllTrajectories(trajWildcard, folderWithTraj)
+    # else:
+    #     firstSnapshots.main(length, ntrajs)
+    i += 1
+    folder = str(folder)
+    shutil.copytree(os.path.join(folderTraj, folder, "repeatedExtractedCoordinates"), "coord_"+folder)
     rm("clustering_object.pkl") 
     rm("MSM_object.pkl") 
     rmTrajFiles("discretized/traj_*")
-    deltaG = computeDG.computeDG(lagtime, nclusters)
+    if i < 1:
+        nclusters = 10
+    elif i < 3:
+        nclusters = 50
+    elif i < 5:
+        nclusters = 100  
+    else:
+        nclusters = 200
+    deltaG = computeDG.computeDG(lagtime, nclusters, os.path.join("coord_%s"%folder,"coord_*"))
     try:
-        deltaGs[lagtime].append(deltaG)
+        deltaGs[folder].append(deltaG)
     except KeyError:
-        deltaGs[lagtime] = [deltaG]
+        deltaGs[folder] = [deltaG]
 
     if computeDetailedBalance:
         frobeniusAvg, relativeEntropyT, unused = checkDetailedBalance.main("discretized", 0, lagtime)
@@ -85,7 +101,10 @@ for key, val in deltaGs.iteritems():
         print element
         dG = element.split()[1]
         dGs.append(float(dG))
-    print "dG = %f +- %f"%(np.mean(dGs), np.std(dGs))
+    try:
+        print "dG = %f +- %f"%(np.mean(dGs), np.std(dGs))
+    except:
+        print "dG = %f"%(np.mean(dGs))
 
 if computeDetailedBalance:
     for key, val in detailedBalance.iteritems():
