@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-
+import glob 
 import sys
 import os
 import argparse
@@ -30,7 +30,7 @@ def loadAllAtomsInPdb(filename, atoms):
 
 def extractFilenumber(filename):
     last = filename.rfind('.')
-    first = filename.find('.')
+    first = filename.rfind('.', 0, last)
 
     return filename[first+1:last]
 
@@ -64,7 +64,7 @@ def parseArguments():
 def main():
     originalPDBfileWildcard, atoms, folderTraj = parseArguments()
 
-    allFolders = os.listdir(folderTrajs)
+    allFolders = os.listdir(folderTraj)
     Epochs = [epoch for epoch in allFolders if epoch.isdigit()]
     for folder in Epochs:
         currentEpochFolder = os.path.join(folderTraj, folder)

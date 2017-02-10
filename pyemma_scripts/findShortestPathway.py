@@ -16,7 +16,7 @@ def parseArgs():
     parser.add_argument('clusteringObj', type=str)
     parser.add_argument('native', type=str)
     parser.add_argument('ntrajs', type=int)
-    parser.add_argument('threshold', type=int)
+    parser.add_argument('threshold', type=float)
     parser.add_argument('pathwayFilename', type=str, default="pathway.pdb", nargs='?')
     args = parser.parse_args()
     return args
@@ -44,7 +44,8 @@ def createNetworkMatrix(clusteringObj, threshold, RMSDCalc):
             if i == j:
                 continue
             cluster2 = clusteringObj.getCluster(j)
-            if atomset.computeSquaredCentroidDifference(cluster.pdb, cluster2.pdb) > threshold:
+            rmsd =  RMSDCalc.computeRMSD(cluster.pdb, cluster2.pdb)
+            if rmsd > threshold:
                 matrix[i, j] = matrix[j, i] = np.inf
             else:
                 matrix[i, j] = matrix[j, i] = RMSDCalc.computeRMSD(cluster.pdb, cluster2.pdb)
