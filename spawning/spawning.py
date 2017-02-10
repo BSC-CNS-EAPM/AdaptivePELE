@@ -503,7 +503,7 @@ class UCBCalculator(DensitySpawningCalculator):
         weights_trimmed = np.zeros(len(sizes))
         weights_trimmed[argweights[-trajToDistribute:]] = self.prevMetrics[argweights[-trajToDistribute:]]
         # values = weights_trimmed+self.alpha*np.sqrt((1/sizes))
-        values = weights_trimmed+self.alpha*(1/sizes)
+        values = weights_trimmed**2+self.alpha*(1/sizes)
         # minVal = np.min(values)
         # if minVal < 0:
         #     # if there is a negative value shift all the values so that the min
