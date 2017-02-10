@@ -15,6 +15,7 @@ class Cluster:
         self.trajFilenames = []
         self.dtrajs = []
         self.alwaysCluster = alwaysCluster
+        self.numClusters = numClusters
 
         self.clusterTrajectories(trajectoryFolder, trajectoryBasename)
 
@@ -24,7 +25,7 @@ class Cluster:
         algorithm.
         Returns a KmeansClusteringObject
         """
-        return coor.cluster_kmeans(data=trajectories, k=self.numClusters, max_iter=20, stride=self.stride)
+        return coor.cluster_kmeans(data=trajectories, k=self.numClusters, max_iter=500, stride=self.stride)
 
     def assignNewTrajecories(self, trajs):
         assign = AssignCenters(self.clusterCentersFile)
@@ -44,13 +45,13 @@ class Cluster:
             print "Assigning data..."
             self.dtrajs = cl.dtrajs[:]
         else:
-            print "Assigning data..."
+            print "Assigning data (clustering exists)..."
             self.dtrajs = self.assignNewTrajecories(self.x)
 
         print "Writing clustering data..."
         self.writeDtrajs(self.trajFilenames, self.dtrajs, self.dTrajTemplateName)
 
-    def writeClusterCenters(cl, outputFilename):
+    def writeClusterCenters(self, cl, outputFilename):
         np.savetxt(outputFilename, cl.clustercenters)
 
     def writeDtrajs(self, filenames, dtrajs, filenameTemplate="%s.disctraj"):
