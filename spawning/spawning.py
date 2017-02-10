@@ -57,6 +57,8 @@ class SpawningBuilder:
             spawningCalculator = FASTDegeneracyCalculator(densityCalculator)
         elif spawningTypeString == blockNames.StringSpawningTypes.variableEpsilon:
             spawningCalculator = VariableEpsilonDegeneracyCalculator(densityCalculator)
+        elif spawningTypeString == blockNames.StringSpawningTypes.UCB:
+            spawningCalculator = UCBCalculator(densityCalculator)
         else:
             sys.exit("Unknown spawning type! Choices are: " + str(spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
         return spawningCalculator
@@ -92,7 +94,8 @@ class SpawningParams:
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon or\
                 spawningType == blockNames.StringSpawningTypes.fast or \
-                spawningType == blockNames.StringSpawningTypes.simulatedAnnealing:
+                spawningType == blockNames.StringSpawningTypes.simulatedAnnealing or \
+                spawningType == blockNames.StringSpawningTypes.UCB:
             self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
         if spawningType == blockNames.StringSpawningTypes.variableEpsilon:
@@ -454,3 +457,63 @@ class FASTDegeneracyCalculator(DensitySpawningCalculator):
 
     def log(self):
         pass
+
+
+class UCBCalculator(DensitySpawningCalculator):
+
+    def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
+        DensitySpawningCalculator.__init__(self, densityCalculator)
+        self.type = spawningTypes.SPAWNING_TYPES.UCB
+        self.prevMetrics = np.array([0.0])
+        self.averages = []
+        self.alpha = 0.5
+        self.averageMetric = 0
+        self.epoch = np.array([0.0])
+
+    def log(self):
+        pass
+
+    def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
+        self.epoch += 1
+        sizes = np.array(self.getSizes(clusters))
+        densities = self.calculateDensities(clusters)
+        metrics = np.array(self.getMetrics(clusters))
+        # self.averageMetric = np.mean(metrics)
+        maximumValue = np.max(metrics)
+        shiftedMetrics = np.subtract(metrics, maximumValue)
+        if abs(shiftedMetrics.sum()) < 1e-8:
+            weights = np.ones(len(metrics))/len(metrics)
+        else:
+            weights = (1.*shiftedMetrics)/min(shiftedMetrics)
+        # for i, metric in enumerate(metrics):
+        #     if i < len(self.prevMetrics):
+        #         self.prevMetrics[i] = abs(metric-self.prevMetrics[i])/abs(metric)
+        #         self.averages[i] += (self.prevMetrics[i]-self.averages[i])/sizes[i]
+        #     else:
+        #         self.prevMetrics.append(-(metric-self.averageMetric)/abs(metric))
+        #         self.averages.append(-(metric-self.averageMetric)/abs(metric))
+        l = self.prevMetrics.size
+        n = weights.size
+        self.prevMetrics = np.pad(self.prevMetrics, (0, n-l), 'constant', constant_values=(0.0))
+        self.epoch = np.pad(self.epoch, (0, n-l), 'constant', constant_values=(1.0))
+        # avg[:l] = self.prevMetrics[:l]
+        self.prevMetrics += (weights-self.prevMetrics)/self.epoch
+        # values = np.array(self.averages)+self.alpha*np.sqrt(1/sizes)
+        argweights = self.prevMetrics.argsort()
+        weights_trimmed = np.zeros(len(sizes))
+        weights_trimmed[argweights[-trajToDistribute:]] = self.prevMetrics[argweights[-trajToDistribute:]]
+        # values = weights_trimmed+self.alpha*np.sqrt((1/sizes))
+        values = weights_trimmed+self.alpha*(1/sizes)
+        # minVal = np.min(values)
+        # if minVal < 0:
+        #     # if there is a negative value shift all the values so that the min
+        #     # value is zero
+        #    values += abs(minVal)
+        if densities.any():
+            weights = values*densities
+        else:
+            weights = values
+        argweights = weights.argsort()
+        weights_trimmed = np.zeros(len(sizes))
+        weights_trimmed[argweights[-trajToDistribute:]] = weights[argweights[-trajToDistribute:]]
+        return self.divideProportionalToArray(weights_trimmed, trajToDistribute)

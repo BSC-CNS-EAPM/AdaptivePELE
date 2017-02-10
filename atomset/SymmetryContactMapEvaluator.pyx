@@ -16,17 +16,22 @@ cdef class SymmetryContactMapEvaluator:
             self.symmetricAtoms.update(set(group.keys()).union(set(group.values())))
         self.symmetries = symmetries
         self.symToRowMap = {}
+        self.ligandList = []
+        self.proteinList = []
 
 
     def __getstate__(self):
         state = {'symmetries': self.symmetries, 'symToRowMap': self.symToRowMap,
-                 'symmetricAtoms': self.symmetricAtoms}
+                 'symmetricAtoms': self.symmetricAtoms,
+                 'ligandList': self.ligandList, 'proteinList': self.proteinList}
         return state
 
     def __setstate__(self, state):
         self.symmetries = state['symmetries']
         self.symToRowMap = state['symToRowMap']
         self.symmetricAtoms = state['symmetricAtoms']
+        self.ligandList = state['ligandList']
+        self.proteinList = state['proteinList']
 
     def createContactMap(self, atomset.PDB PDB, str ligandResname, int contactThresholdDistance):
         """
@@ -80,7 +85,10 @@ cdef class SymmetryContactMapEvaluator:
                              heavyAtoms=True)
         alphaCarbonsPDB = atomset.PDB()
         alphaCarbonsPDB.initialise(PDBobj.pdb, type="CM")
-
+        if not self.ligandList:
+            self.ligandList = ligandPDB.atomList
+        if not self.proteinList:
+            self.proteinList = alphaCarbonsPDB.atomList
         # empty contact map, rows are atoms of the ligand, columns are protein
         # alpha carbons
         contactMap = np.zeros((len(ligandPDB.atomList),
@@ -134,7 +142,10 @@ cdef class SymmetryContactMapEvaluator:
                              heavyAtoms=True)
         alphaCarbonsPDB = atomset.PDB()
         alphaCarbonsPDB.initialise(PDBobj.pdb, type="CM")
-
+        if not self.ligandList:
+            self.ligandList = ligandPDB.atomList
+        if not self.proteinList:
+            self.proteinList = alphaCarbonsPDB.atomList
         # empty contact map, rows are atoms of the ligand, columns are protein
         # alpha carbons
         contactMap = np.zeros((len(ligandPDB.atomList),
@@ -163,7 +174,7 @@ cdef class SymmetryContactMapEvaluator:
                                                                 cluster)
         intersectContactMaps = (permContactMap & cluster.contactMap).sum()
         unionContactMaps = permContactMap.sum() + cluster.contactMap.sum() - intersectContactMaps
-        if unionContactMaps == 0:
+        if unionContactMaps < 1e-7:
             return 0.0
         # intersectContactMaps = (permContactMap == cluster.contactMap).sum()
         # unionContactMaps = permContactMap.size + cluster.contactMap.size - intersectContactMaps

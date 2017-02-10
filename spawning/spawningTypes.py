@@ -2,7 +2,7 @@ from constants import blockNames
 
 
 class SPAWNING_TYPES:
-    sameWeight, inverselyProportional, epsilon, simulatedAnnealing, FAST, variableEpsilon = range(6)
+    sameWeight, inverselyProportional, epsilon, simulatedAnnealing, FAST, variableEpsilon, UCB = range(7)
 
 SPAWNING_TYPE_TO_STRING_DICTIONARY = {
     SPAWNING_TYPES.sameWeight: blockNames.StringSpawningTypes.sameWeight,
@@ -11,6 +11,7 @@ SPAWNING_TYPE_TO_STRING_DICTIONARY = {
     SPAWNING_TYPES.FAST: blockNames.StringSpawningTypes.fast,
     SPAWNING_TYPES.variableEpsilon: blockNames.StringSpawningTypes.variableEpsilon,
     SPAWNING_TYPES.simulatedAnnealing: blockNames.StringSpawningTypes.simulatedAnnealing,
+    SPAWNING_TYPES.UCB: blockNames.StringSpawningTypes.UCB
 }
 
 
