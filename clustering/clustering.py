@@ -54,7 +54,7 @@ class Cluster:
     """
     def __init__(self, pdb, thresholdRadius=None, contactMap=None,
                  contacts=None, metrics=[], metricCol=None, density=None,
-                 contactThreshold=8):
+                 contactThreshold=8, altSelection=False):
         """
             contacts stands for contacts/ligandAtom
         """
@@ -69,6 +69,7 @@ class Cluster:
         self.metricCol = metricCol
         self.contactThreshold = contactThreshold
         self.altMetrics = []
+        self.altSelection = altSelection
 
         if self.threshold is None:
             self.threshold2 = None
@@ -119,9 +120,10 @@ class Cluster:
             With 50 % probability select the cluster center to spawn in
             the next epoch
         """
-        if self.altStructure is None or np.random.uniform() < 0.5:
+        if not self.altSelection or self.altStructure is None or np.random.uniform() < 0.5:
             self.pdb.writePDB(str(path))
         else:
+            print self.altSelection, "***"
             self.altStructure.writePDB(str(path))
 
     def __eq__(self, other):
@@ -240,7 +242,8 @@ class Clustering:
         considered in contact(default 8)
     """
     def __init__(self, resname=None, reportBaseFilename=None,
-                 columnOfReportFile=None, contactThresholdDistance=8):
+                 columnOfReportFile=None, contactThresholdDistance=8,
+                 altSelection=False):
         self.type = "BaseClass"
 
         self.clusters = Clusters()
@@ -252,6 +255,7 @@ class Clustering:
         self.col = columnOfReportFile
         self.contactThresholdDistance = contactThresholdDistance
         self.symmetries = []
+        self.altSelection = altSelection
 
     def setCol(self, col):
         self.col = col
@@ -392,7 +396,8 @@ class Clustering:
                           contacts=contactsPerAtom,
                           contactMap=self.clusteringEvaluator.contactMap,
                           metrics=metrics, metricCol=col,
-                          contactThreshold=self.contactThresholdDistance)
+                          contactThreshold=self.contactThresholdDistance,
+                          altSelection=self.altSelection)
         self.clusters.addCluster(cluster)
 
 
@@ -495,13 +500,12 @@ class ContactsClustering(Clustering):
     """
     def __init__(self, thresholdCalculator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8, symmetries=[]):
+                 contactThresholdDistance=8, symmetries=[], altSelection=False):
         # TreeClustering.__init__(self, resname, reportBaseFilename,
         #                    columnOfReportFile, contactThresholdDistance)
         Clustering.__init__(self, resname, reportBaseFilename,
-                           columnOfReportFile, contactThresholdDistance)
-        # super(ContactsClustering, self).__init__(resname, reportBaseFilename,
-        #                     columnOfReportFile, contactThresholdDistance)
+                           columnOfReportFile, contactThresholdDistance,
+                            altSelection=altSelection)
         self.type = clusteringTypes.CLUSTERING_TYPES.contacts
         self.thresholdCalculator = thresholdCalculator
         self.symmetries = symmetries
@@ -523,13 +527,12 @@ class ContactMapAccumulativeClustering(Clustering):
     """
     def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8, symmetries=[]):
+                 contactThresholdDistance=8, symmetries=[], altSelection=False):
         # TreeClustering.__init__(self, resname, reportBaseFilename,
         #                     columnOfReportFile, contactThresholdDistance)
         Clustering.__init__(self, resname, reportBaseFilename,
-                            columnOfReportFile, contactThresholdDistance)
-        # super(ContactMapAccumulativeClustering, self).__init__(resname, reportBaseFilename,
-        #                     columnOfReportFile, contactThresholdDistance)
+                            columnOfReportFile, contactThresholdDistance,
+                            altSelection=altSelection)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative
         self.thresholdCalculator = thresholdCalculator
         self.similarityEvaluator = similarityEvaluator
@@ -815,6 +818,7 @@ class ClusteringBuilder:
             resname = str(paramsBlock[blockNames.ClusteringTypes.ligandResname].upper())
             clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
             contactThresholdDistance = paramsBlock[blockNames.ClusteringTypes.contactThresholdDistance]
+            altSelection = paramsBlock.get(blockNames.ClusteringTypes.alternativeStructure, False)
         except KeyError as err:
             err.message += ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
@@ -825,7 +829,8 @@ class ClusteringBuilder:
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
             return ContactsClustering(thresholdCalculator, resname,
                                       reportBaseFilename, columnOfReportFile,
-                                      contactThresholdDistance, symmetries)
+                                      contactThresholdDistance, symmetries,
+                                      altSelection=altSelection)
         elif clusteringType == blockNames.ClusteringTypes.lastSnapshot:
 
             return SequentialLastSnapshotClustering(resname, reportBaseFilename,
@@ -853,7 +858,7 @@ class ClusteringBuilder:
             similarityEvaluator = similarityBuilder.build(similarityEvaluatorType)
             return ContactMapAccumulativeClustering(thresholdCalculator, similarityEvaluator, resname,
                                                     reportBaseFilename, columnOfReportFile,
-                                                    contactThresholdDistance, symmetries)
+                                                    contactThresholdDistance, symmetries, altSelection)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))
