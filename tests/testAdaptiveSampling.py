@@ -38,7 +38,6 @@ class TestadaptiveSampling(unittest.TestCase):
                     outputInitial.initialise(outputPathInitial % (j, 0))
                 else:
                     outputInitial.initialise(outputPathInitial % (j, ij % 4))
-
                 self.assertEqual(goldenInitial, outputInitial)
 
     def checkTrajectories(self, goldenPath, outputPath):
@@ -54,7 +53,6 @@ class TestadaptiveSampling(unittest.TestCase):
                 outputTrajFile = open(outputPathTrajectory % (epoch, i), 'r')
                 outputTraj = outputTrajFile.read()
                 outputTrajFile.close()
-
                 self.assertEqual(goldenTraj, outputTraj)
 
     def integrationTest(self, controlFile, goldenPath, outputPath, goldenClusters):

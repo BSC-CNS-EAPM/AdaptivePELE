@@ -53,9 +53,9 @@ def validateBlock(blockName, controlFileBlock):
     isCorrect = True
     blockType = controlFileBlock["type"]
     # Check if type selected is valid
-    if not isinstance(blockType, unicode):
+    if not isinstance(blockType, basestring):
         warnings.warn("Type for %s should be %s and instead is %s" %
-                      (blockType, 'unicode', type(blockType).__name__))
+                      (blockType, 'basestring', type(blockType).__name__))
         isCorrect = False
 
     # check for mandatory parameters
@@ -109,9 +109,9 @@ def validateBlock(blockName, controlFileBlock):
                 warnings.warn("Type %s in %s not found." %
                               (blockType, blockName.__name__))
                 isCorrect = False
-            if not isinstance(blockType, unicode):
+            if not isinstance(blockType, basestring):
                 warnings.warn("Type for %s should be %s and instead is %s" %
-                              (blockType, 'unicode', type(blockType).__name__))
+                              (blockType, 'basestring', type(blockType).__name__))
                 isCorrect = False
             # check rest of parameters specified
             # Do a get on the "params" block and return an empty list if not found
