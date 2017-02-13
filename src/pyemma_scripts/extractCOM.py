@@ -1,7 +1,7 @@
 import os
 import argparse
 # import minimumGCluster.atomset as atomset
-from atomset import atomset
+import atomset.atomset as atomset
 
 DIRECTORY = 'extractedCoordinates'
 BASEOUTPUTFILENAME = 'coord'

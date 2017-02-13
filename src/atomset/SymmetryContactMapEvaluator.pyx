@@ -2,7 +2,7 @@ import atomset
 import numpy as np
 cimport cython
 cimport numpy as np
-cimport atomset
+cimport src.atomset.atomset as atomset
 
 
 cdef class SymmetryContactMapEvaluator:

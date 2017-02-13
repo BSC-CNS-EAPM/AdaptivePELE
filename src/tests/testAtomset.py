@@ -1,5 +1,6 @@
-from atomset import atomset, RMSDCalculator
+from atomset import RMSDCalculator
 from atomset import SymmetryContactMapEvaluator as sym
+import atomset.atomset as atomset
 from clustering import clustering
 import unittest
 import numpy as np

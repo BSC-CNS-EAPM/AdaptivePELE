@@ -1,7 +1,7 @@
 import adaptiveSampling
 import unittest
 import pickle
-from atomset import atomset
+import atomset.atomset as atomset
 from clustering import clustering
 import shutil
 import os
