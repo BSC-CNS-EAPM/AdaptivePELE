@@ -158,8 +158,13 @@ cdef class SymmetryContactMapEvaluator:
     def evaluateJaccard(self, contactMap, cluster):
         permContactMap = self.buildOptimalPermutationContactMap(contactMap,
                                                                 cluster)
-        intersectContactMaps = (permContactMap == cluster.contactMap).sum()
-        unionContactMaps = permContactMap.size + cluster.contactMap.size - intersectContactMaps
+        # intersectContactMaps = (permContactMap == cluster.contactMap).sum()
+        # unionContactMaps = permContactMap.size + cluster.contactMap.size - intersectContactMaps
+        intersectContactMaps = (permContactMap & cluster.contactMap).sum()
+        unionContactMaps = permContactMap.sum() + cluster.contactMap.sum() - intersectContactMaps
+        if unionContactMaps < 1e-7:
+            # both contactMaps have zero contacts
+            return 0.0
         similarity = float(intersectContactMaps)/unionContactMaps
         distance = 1-similarity
         return distance
@@ -181,7 +186,7 @@ cdef class SymmetryContactMapEvaluator:
         if not averageContacts:
             # The only way the denominator can be 0 is if both contactMaps are
             # all zeros, thus being equal and belonging to the same cluster
-            return True
+            return 0
         else:
             distance = differenceContactMaps/averageContacts
             return distance

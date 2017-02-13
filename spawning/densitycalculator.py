@@ -74,8 +74,8 @@ class NullDensityCalculator(DensityCalculator):
 
 
 class ContinuousDensityCalculator(DensityCalculator):
-    limit = {8: 1.0, 6: 0.4, 4: 0.1}
-    slope = {8: 4.0, 6: 10, 4: 40}
+    limit = {8: 1.0, 6: 0.4, 4: 0.1, 10: 4.0}
+    slope = {8: 4.0, 6: 10.0, 4: 40.0, 10: 2.0}
 
     def __init__(self):
         DensityCalculator.__init__(self)

@@ -1,0 +1,380 @@
+PELE version 1.5.0.12025_20151022
+[New Task] Task: 1
+* Complex
+Summary:
+Number of proteins: 1
+Number of DNA chains: 0
+Number of RNA chains: 0
+Number of Ligands: 2
+
+Loaded residues: 6
+All links
+
+Number of loaded atoms: 70
+
+Topology Summary: 
+Number of parameterized bonds: 68
+Number of parameterized angles: 118
+Number of parameterized dihedrals: 150
+Number of parameterized improper dihedrals: 15
+Number of 14 pairs: 156
+
+Chain A_0 charge: 0.800
+Chain A_0 charge: 2.000
+Chain L_0 charge: 1.000
+Total charge: 3.800
+
+
+* Solvent.
+solventType: OBC
+useDebyeLength: true
+ionicStrength: 0.25
+
+
+* Potential.
+ForceField: OPLS2005
+
+nonBondingVersion: NB_GEN_MSCALE
+shortNeutrumNeutrum: 10
+shortChargedNeutrum: 10
+shortChargedCharged: 15
+longNeutrumNeutrum: 15
+longChargedNeutrum: 20
+longChargedCharged: 30
+
+
+Simulation Permanent Constraints: Number of constraints: 0
+
+Task Permanent Constraints
+Number of constraints: 0
+
+ANM Permanent Constraints
+Number of constraints: 0
+
+Atom Pulling Constraints
+Number of constraints: 0
+
+Constraints on Hydrogen Bonds
+Number of constraints: 0
+
+Perturbed Atom Set COM Constraints
+Number of constraints: 0
+
+
+
+
+
+* Pele parameters:
+temperature: 1000
+anmFrequency: 1
+minimizationFrequency: 1
+sideChainPredictionFrequency: 1
+minimizationRegionRadius: 100
+sideChainPredictionRegionRadius: 5
+numberOfTopSideSelectedLinks: 0
+topSideRadius: 0
+activateProximityDetection: true, proximityDistance: 5
+perturbationCOMConstraintConstant: 1
+numberOfPeleSteps: 5
+
+All minimizations use Truncated Newton algorithm:
+* Movement step components:
+----------------------------
+** naive
+Parameters:
+gridResolution: 10
+overlapFactor: 0.7
+rotationScalingFactor: 0.2
+rotationRangeFactor: 0.25
+translationRange: 1
+TranslationRangeType: centered translation modulus generator
+TranslationDirection: STEERED
+steeringUpdateFrequency: 2
+atLeastOneSelectedTrial: false
+numberOfStericTrials: 1000
+numberOfTrials: 3
+
+
+** ANM:
+ANM Cartesian algorithm:
+Direction selection strategy:
+directionGeneration: random
+
+Mixing strategy:
+modesMixingOption: mixAllModesEquallyRandom
+
+Magnitude calculation
+moveMagnitudeGeneration: noRandom
+
+Normal modes: 
+Modes calculated using Lapack
+cutoff: 12
+
+Modes picking strategy:
+pickingCase: RANDOM_MODE
+
+ANM parameters:
+numberOfModes: 6
+thermalScaling: true
+eigenUpdateFrequency: 100000
+modesChangeFrequency: 6
+relaxationSpringConstant: 1
+Number of nodes: 4
+Node list: 
+A:16:ILE_:_CA_ A:17:VAL_:_CA_ A:18:GLY_:_CA_ A:19:GLY_:_CA_A:16:ILE_:_CA_ A:17:VAL_:_CA_ A:18:GLY_:_CA_ A:19:GLY_:_CA_ 
+
+
+* Relaxation step components:
+----------------------------
+** Side Chain Prediction:
+Zhexin Algorithm:
+Parameters:
+discardHighEnergySolutions: true
+resolution: 10
+initialOverlapFactor: 0.75
+minimalOverlapFactor: 0.7
+numberOfIterations: 2
+randomize: false
+
+
+
+** Relaxation constrained minimization
+Parameters:
+EnergyDifference: 1
+MinimumRMS: 0.1
+MaximumMinimizationIterations: 3
+MaximumNewtonIterations: 100
+nonBondingListUpdatedEachMinStep: true
+sgbUpdated: true
+alphaUpdated: true
+iterationsBetweenNBlistLongUpdate: 2
+
+
+
+
+Value of metrics at beginning of Task 1
+AcceptedSteps    Energy    Binding Energy    
+0    -541.599    0.00780667    
+[Parameter change]  Task: 1, Step: 1, Pele::parameters -> {anmFrequency: 10000, minimizationRegionRadius: 10}
+[Parameter change]  Task: 1, Step: 1, Perturbation::parameters -> {translationRange: 2}
+[Parameter change]  Task: 1, Step: 1, Perturbation::parameters -> {rotationScalingFactor: 0.1}
+
+
+[New Step] Step: 1
+[Energy] Task: 1, Step: 1, Initial energy:  -541.599
+ENERGY BOND: 9.139523423162153
+ENERGY BOND SGB: 826.3297386442769
+ENERGY ANGLE: 5.232945987206806
+ENERGY ANGLE SGB: -401.1765921330555
+ENERGY TORSION: 7.726398000524342
+ENERGY 14: 115.5019570499214
+ENERGY 14 SGB: -121.990292910869
+ENERGY NBOND: -139.2778901816361
+ENERGY NBOND SGB: 119.62487423218
+ENERGY CONSTRAINTS: 0
+ENERGY VACUUM + SGB + CONSTRAINTS: 421.1106621117109
+ENERGY NON POLAR: 6.886832405593268
+ENERGY SELF: -969.596836564629
+ENERGY VACUUM + SGB + CONSTRAINTS + SELF + NON POLAR: -541.5993420473249
+
+Perturbation:
+beginning: atomSet is too far
+Current trial energy: -541.636 best: -541.636
+Current trial energy: -541.636 best: -541.636
+Current trial energy: -541.636 best: -541.636
+Best trial: 1 out of 3
+atomSet is too far
+Perturbation Ef: -541.636 Ei: -541.599 dE: -0.0371234 dt: 0.007185 s
+Perturbed AtomSet is too far, skipping ANM...
+Perturbed AtomSet is too far, skipping relax side chain prediction and minimization...
+Perturbed AtomSet is too far, skipping relax minimization...
+Perturbed AtomSet is too far, skipping metropolis update...
+
+Metropolis Ef: -541.599 Ei: -541.599 dE: -2.27374e-13 Probability: 1 Accepted Step: true
+[Energy] Task: 1, Step: 1, Final energy:  -541.599
+Accepted!
+Total step time: 0.014774 s
+
+
+Value of metrics after Step 1
+AcceptedSteps    Energy    Binding Energy    
+1    -541.599    0.00780667    
+[Parameter change]  Task: 1, Step: 1, Pele::parameters -> {anmFrequency: 10000, minimizationRegionRadius: 10}
+[Parameter change]  Task: 1, Step: 1, Perturbation::parameters -> {translationRange: 0.75}
+[Parameter change]  Task: 1, Step: 1, Perturbation::parameters -> {rotationScalingFactor: 0.1}
+
+
+[New Step] Step: 2
+[Energy] Task: 1, Step: 2, Initial energy:  -541.599
+ENERGY BOND: 9.139523423162162
+ENERGY BOND SGB: 826.3297386442766
+ENERGY ANGLE: 5.232945987206813
+ENERGY ANGLE SGB: -401.1765921330555
+ENERGY TORSION: 7.72639800052441
+ENERGY 14: 115.5019570499213
+ENERGY 14 SGB: -121.990292910869
+ENERGY NBOND: -139.2778901816362
+ENERGY NBOND SGB: 119.6248742321801
+ENERGY CONSTRAINTS: 0
+ENERGY VACUUM + SGB + CONSTRAINTS: 421.1106621117108
+ENERGY NON POLAR: 6.886832405593268
+ENERGY SELF: -969.596836564629
+ENERGY VACUUM + SGB + CONSTRAINTS + SELF + NON POLAR: -541.599342047325
+
+Perturbation:
+beginning: atomSet is too far
+Current trial energy: -541.636 best: -541.636
+Current trial energy: -541.636 best: -541.636
+Current trial energy: -541.636 best: -541.636
+Best trial: 3 out of 3
+atomSet is too far
+Perturbation Ef: -541.636 Ei: -541.599 dE: -0.0371234 dt: 0.007516 s
+Perturbed AtomSet is too far, skipping ANM...
+Perturbed AtomSet is too far, skipping relax side chain prediction and minimization...
+Perturbed AtomSet is too far, skipping relax minimization...
+Perturbed AtomSet is too far, skipping metropolis update...
+
+Metropolis Ef: -541.6 Ei: -541.599 dE: -0.00100435 Probability: 1 Accepted Step: true
+[Energy] Task: 1, Step: 2, Final energy:  -541.6
+Accepted!
+Total step time: 0.01511 s
+
+
+Value of metrics after Step 2
+AcceptedSteps    Energy    Binding Energy    
+2    -541.6    0.00680232    
+[Parameter change]  Task: 1, Step: 2, Pele::parameters -> {anmFrequency: 10000, minimizationRegionRadius: 10}
+[Parameter change]  Task: 1, Step: 2, Perturbation::parameters -> {translationRange: 0.75}
+[Parameter change]  Task: 1, Step: 2, Perturbation::parameters -> {rotationScalingFactor: 0.1}
+
+
+[New Step] Step: 3
+[Energy] Task: 1, Step: 3, Initial energy:  -541.6
+ENERGY BOND: 9.139523423162164
+ENERGY BOND SGB: 826.3297386442769
+ENERGY ANGLE: 5.232945987206818
+ENERGY ANGLE SGB: -401.1765921330553
+ENERGY TORSION: 7.726398000524405
+ENERGY 14: 115.5019570499213
+ENERGY 14 SGB: -121.990292910869
+ENERGY NBOND: -143.4712335107179
+ENERGY NBOND SGB: 123.8172132079628
+ENERGY CONSTRAINTS: 0
+ENERGY VACUUM + SGB + CONSTRAINTS: 421.1096577584121
+ENERGY NON POLAR: 6.886832405593268
+ENERGY SELF: -969.596836564629
+ENERGY VACUUM + SGB + CONSTRAINTS + SELF + NON POLAR: -541.6003464006236
+
+Perturbation:
+beginning: atomSet is too far
+Current trial energy: -541.636 best: -541.636
+Current trial energy: -541.636 best: -541.636
+Current trial energy: -541.636 best: -541.636
+Best trial: 3 out of 3
+atomSet is too far
+Perturbation Ef: -541.636 Ei: -541.6 dE: -0.0361191 dt: 0.006776 s
+Perturbed AtomSet is too far, skipping ANM...
+Perturbed AtomSet is too far, skipping relax side chain prediction and minimization...
+Perturbed AtomSet is too far, skipping relax minimization...
+Perturbed AtomSet is too far, skipping metropolis update...
+
+Metropolis Ef: -541.599 Ei: -541.6 dE: 0.00100435 Probability: 0.999495 Accepted Step: true
+[Energy] Task: 1, Step: 3, Final energy:  -541.599
+Accepted!
+Total step time: 0.013677 s
+
+
+Value of metrics after Step 3
+AcceptedSteps    Energy    Binding Energy    
+3    -541.599    0.00780667    
+[Parameter change]  Task: 1, Step: 3, Pele::parameters -> {anmFrequency: 10000, minimizationRegionRadius: 10}
+[Parameter change]  Task: 1, Step: 3, Perturbation::parameters -> {translationRange: 0.75}
+[Parameter change]  Task: 1, Step: 3, Perturbation::parameters -> {rotationScalingFactor: 0.05}
+
+
+[New Step] Step: 4
+[Energy] Task: 1, Step: 4, Initial energy:  -541.599
+ENERGY BOND: 9.139523423162036
+ENERGY BOND SGB: 826.3297386442766
+ENERGY ANGLE: 5.232945987206783
+ENERGY ANGLE SGB: -401.1765921330555
+ENERGY TORSION: 7.726398000524384
+ENERGY 14: 115.5019570499214
+ENERGY 14 SGB: -121.9902929108691
+ENERGY NBOND: -139.2778901816363
+ENERGY NBOND SGB: 119.6248742321799
+ENERGY CONSTRAINTS: 0
+ENERGY VACUUM + SGB + CONSTRAINTS: 421.1106621117103
+ENERGY NON POLAR: 6.886832405593268
+ENERGY SELF: -969.596836564629
+ENERGY VACUUM + SGB + CONSTRAINTS + SELF + NON POLAR: -541.5993420473254
+
+Perturbation:
+beginning: atomSet is too far
+Current trial energy: -541.636 best: -541.636
+Current trial energy: -541.636 best: -541.636
+Current trial energy: -541.636 best: -541.636
+Best trial: 3 out of 3
+atomSet is too far
+Perturbation Ef: -541.636 Ei: -541.599 dE: -0.0371234 dt: 0.006906 s
+Perturbed AtomSet is too far, skipping ANM...
+Perturbed AtomSet is too far, skipping relax side chain prediction and minimization...
+Perturbed AtomSet is too far, skipping relax minimization...
+Perturbed AtomSet is too far, skipping metropolis update...
+
+Metropolis Ef: -541.599 Ei: -541.599 dE: -1.13687e-13 Probability: 1 Accepted Step: true
+[Energy] Task: 1, Step: 4, Final energy:  -541.599
+Accepted!
+Total step time: 0.014976 s
+
+
+Value of metrics after Step 4
+AcceptedSteps    Energy    Binding Energy    
+4    -541.599    0.00780667    
+[Parameter change]  Task: 1, Step: 4, Pele::parameters -> {anmFrequency: 10000, minimizationRegionRadius: 10}
+[Parameter change]  Task: 1, Step: 4, Perturbation::parameters -> {translationRange: 0.75}
+[Parameter change]  Task: 1, Step: 4, Perturbation::parameters -> {rotationScalingFactor: 0.1}
+
+
+[New Step] Step: 5
+[Energy] Task: 1, Step: 5, Initial energy:  -541.599
+ENERGY BOND: 9.139523423162011
+ENERGY BOND SGB: 826.3297386442769
+ENERGY ANGLE: 5.232945987206799
+ENERGY ANGLE SGB: -401.1765921330556
+ENERGY TORSION: 7.726398000524373
+ENERGY 14: 115.5019570499213
+ENERGY 14 SGB: -121.9902929108691
+ENERGY NBOND: -139.2778901816365
+ENERGY NBOND SGB: 119.6248742321801
+ENERGY CONSTRAINTS: 0
+ENERGY VACUUM + SGB + CONSTRAINTS: 421.1106621117102
+ENERGY NON POLAR: 6.886832405593268
+ENERGY SELF: -969.596836564629
+ENERGY VACUUM + SGB + CONSTRAINTS + SELF + NON POLAR: -541.5993420473255
+
+Perturbation:
+beginning: atomSet is too far
+Current trial energy: -541.636 best: -541.636
+Current trial energy: -541.636 best: -541.636
+Current trial energy: -541.636 best: -541.636
+Best trial: 1 out of 3
+atomSet is too far
+Perturbation Ef: -541.636 Ei: -541.599 dE: -0.0371234 dt: 0.00752 s
+Perturbed AtomSet is too far, skipping ANM...
+Perturbed AtomSet is too far, skipping relax side chain prediction and minimization...
+Perturbed AtomSet is too far, skipping relax minimization...
+Perturbed AtomSet is too far, skipping metropolis update...
+
+Metropolis Ef: -541.599 Ei: -541.599 dE: 2.27374e-13 Probability: 1 Accepted Step: true
+[Energy] Task: 1, Step: 5, Final energy:  -541.599
+Accepted!
+Total step time: 0.015571 s
+
+
+Value of metrics after Step 5
+AcceptedSteps    Energy    Binding Energy    
+5    -541.599    0.00780667    
+[Parameter change]  Task: 1, Step: 5, Pele::parameters -> {anmFrequency: 1, minimizationRegionRadius: 1000}
+[Parameter change]  Task: 1, Step: 5, Perturbation::parameters -> {translationRange: 2}
+[Parameter change]  Task: 1, Step: 5, Perturbation::parameters -> {rotationScalingFactor: 0.1}

@@ -11,7 +11,7 @@ from atomset import atomset, RMSDCalculator
 from atomset import SymmetryContactMapEvaluator as sym
 from utilities import utilities
 import socket
-if not "bsccv" in socket.gethostname():
+if "bsccv" not in socket.gethostname():
     from sklearn.cluster import AffinityPropagation
     from sklearn.cluster import AgglomerativeClustering
     from sklearn.cluster import KMeans
@@ -171,8 +171,8 @@ class ContactsClusteringEvaluator:
 
 
 class CMClusteringEvaluator:
-    limitSlope = {8: 6, 6: 15, 4: 60}
-    limitMax = {8: 2, 6: 0.8, 4: 0.2}
+    limitSlope = {8: 6, 6: 15, 4: 60, 10: 3}
+    limitMax = {8: 2, 6: 0.8, 4: 0.2, 10: 4}
 
     def __init__(self, similarityEvaluator, symmetryEvaluator):
         self.similarityEvaluator = similarityEvaluator
@@ -183,6 +183,8 @@ class CMClusteringEvaluator:
     def isElement(self, pdb, cluster, resname, contactThresholdDistance):
         if self.contactMap is None:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
+            # self.contactMap, foo = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
+            # self.contacts = pdb.countContacts(resname, 8)  # contactThresholdDistance)
         return self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster, self.symmetryEvaluator)
 
 
@@ -193,12 +195,14 @@ class CMClusteringEvaluator:
     def checkAttributes(self, pdb, resname, contactThresholdDistance):
         if self.contactMap is None:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
+            # self.contactMap, foo = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
+            # self.contacts = pdb.countContacts(resname, 8)  # contactThresholdDistance)
 
     def getInnerLimit(self, cluster):
         if cluster.contacts > self.limitMax[cluster.contactThreshold]:
             return 4.0
         else:
-            return 16-self.limitSlope[cluster.contactThreshold]*cluster.contacts
+            return 16-cluster.contacts*self.limitSlope[cluster.contactThreshold]
 
     def getOuterLimit(self, node):
         # return max(16, 16 * 2 - node.depth)
@@ -347,7 +351,6 @@ class Clustering:
             scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
             if scd > self.clusteringEvaluator.getInnerLimit(cluster):
                 continue
-
             if self.clusteringEvaluator.isElement(pdb, cluster, self.resname,
                                                   self.contactThresholdDistance):
                 cluster.addElement(metrics)
