@@ -1,4 +1,4 @@
-from atomset import atomset
+import atomset.atomset as atomset
 import os
 import glob
 import numpy as np

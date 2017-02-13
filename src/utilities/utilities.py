@@ -2,7 +2,8 @@ import os
 import shutil
 import numpy as np
 import pickle
-from atomset import atomset, RMSDCalculator
+from atomset import RMSDCalculator
+import atomset.atomset as atomset
 
 
 def cleanup(tmpFolder):

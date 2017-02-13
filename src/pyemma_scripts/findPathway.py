@@ -3,7 +3,8 @@ import os
 import pickle
 import argparse
 import json
-from atomset import atomset, RMSDCalculator
+from atomset import RMSDCalculator
+import atomset.atomset as atomset
 from clustering import clustering, clusteringTypes, thresholdcalculator
 from spawning import spawning, densitycalculator
 from analysis import analyseClustering

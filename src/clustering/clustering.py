@@ -2,12 +2,13 @@ import sys
 import glob
 import numpy as np
 import os
-# import pickle
-import cPickle as pickle
+import pickle
+# import cPickle as pickle
 import clusteringTypes
 import thresholdcalculator
 from constants import blockNames
-from atomset import atomset, RMSDCalculator
+from atomset import RMSDCalculator
+import atomset.atomset as atomset
 from atomset import SymmetryContactMapEvaluator as sym
 from utilities import utilities
 import socket
@@ -123,7 +124,6 @@ class Cluster:
         if not self.altSelection or self.altStructure is None or np.random.uniform() < 0.5:
             self.pdb.writePDB(str(path))
         else:
-            print self.altSelection, "***"
             self.altStructure.writePDB(str(path))
 
     def __eq__(self, other):
