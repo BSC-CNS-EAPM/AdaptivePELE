@@ -7,10 +7,10 @@ import pickle
 import clusteringTypes
 import thresholdcalculator
 from constants import blockNames
-from atomset import RMSDCalculator
 import atomset.atomset as atomset
-from atomset import SymmetryContactMapEvaluator as sym
 from utilities import utilities
+from atomset import SymmetryContactMapEvaluator as sym
+from atomset import RMSDCalculator
 import socket
 if "bsccv" not in socket.gethostname():
     from sklearn.cluster import AffinityPropagation
