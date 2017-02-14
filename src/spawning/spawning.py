@@ -466,7 +466,7 @@ class UCBCalculator(DensitySpawningCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.UCB
         self.prevMetrics = np.array([0.0])
         self.averages = []
-        self.alpha = 0.5
+        self.alpha = 1.0
         self.averageMetric = 0
         self.epoch = np.array([0.0])
 
@@ -494,8 +494,17 @@ class UCBCalculator(DensitySpawningCalculator):
         #         self.averages.append(-(metric-self.averageMetric)/abs(metric))
         l = self.prevMetrics.size
         n = weights.size
-        self.prevMetrics = np.pad(self.prevMetrics, (0, n-l), 'constant', constant_values=(0.0))
-        self.epoch = np.pad(self.epoch, (0, n-l), 'constant', constant_values=(1.0))
+        try:
+            self.prevMetrics = np.pad(self.prevMetrics, (0, n-l), 'constant', constant_values=(0.0))
+            self.epoch = np.pad(self.epoch, (0, n-l), 'constant', constant_values=(1.0))
+        except AttributeError:
+            # Numpy version in life is too old to use pad function
+            prevMetrics = np.zeros_like(weights)
+            epochs = np.ones_like(weights)
+            prevMetrics[:l] = self.prevMetrics
+            self.prevMetrics = prevMetrics
+            epochs[:l] = self.epoch
+            self.epoch = epochs
         # avg[:l] = self.prevMetrics[:l]
         self.prevMetrics += (weights-self.prevMetrics)/self.epoch
         # values = np.array(self.averages)+self.alpha*np.sqrt(1/sizes)
