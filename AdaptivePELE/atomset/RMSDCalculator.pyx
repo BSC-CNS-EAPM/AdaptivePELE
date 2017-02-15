@@ -1,12 +1,10 @@
 import numpy as np
 cimport cython
 cimport numpy as np
-cimport src.atomset.atomset as atomset
+cimport AdaptivePELE.atomset.atomset as atomset
 
 
 cdef class RMSDCalculator:
-    # cdef set nonSymmetricalAtomsSet
-    # cdef list symmetries
     def __init__(self, symmetries=[]):
         """
             :param symmetries: List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms
