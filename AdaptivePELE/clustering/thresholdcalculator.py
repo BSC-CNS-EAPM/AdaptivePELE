@@ -1,4 +1,4 @@
-from constants import blockNames
+from AdaptivePELE.constants import blockNames
 import thresholdcalculatortypes
 import sys
 import numpy as np

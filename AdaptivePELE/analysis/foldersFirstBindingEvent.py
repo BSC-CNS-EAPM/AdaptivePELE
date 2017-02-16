@@ -1,7 +1,7 @@
 import argparse
 import os
 import findfirstbindingevent
-from analysis import analyse
+import analyse
 
 def parseArguments():
     desc = "Program that computes the first binding event for a series of adaptive sampling runs"

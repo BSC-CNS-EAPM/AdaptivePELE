@@ -1,9 +1,9 @@
-from clustering import clustering, thresholdcalculator
+from ApativePELE.clustering import clustering, thresholdcalculator
 import time
 # import pickle
 # import pdb as debug
 import os
-from spawning import spawning, densitycalculator
+from AdaptivePELE.spawning import spawning, densitycalculator
 
 ntrajs = 31
 nclusters = 80

@@ -1,10 +1,10 @@
-import adaptiveSampling
 import unittest
 import pickle
-import atomset.atomset as atomset
-from clustering import clustering
 import shutil
 import os
+import AdaptivePELE.adaptiveSampling as adaptiveSampling
+import AdaptivePELE.atomset.atomset as atomset
+from AdaptivePELE.clustering import clustering
 
 
 class TestadaptiveSampling(unittest.TestCase):

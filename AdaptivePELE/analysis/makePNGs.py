@@ -2,7 +2,7 @@ import os
 import subprocess
 import pdb
 import glob
-from analysis import generateGnuplotFile
+import generateGnuplotFile
 
 """
     Instructions:

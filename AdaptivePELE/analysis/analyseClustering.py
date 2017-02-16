@@ -1,7 +1,7 @@
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
-import atomset.atomset as atomset
+from AdaptivePELE.atomset import atomset
 from mpl_toolkits.mplot3d import Axes3D
 import pdb as debug
 import argparse

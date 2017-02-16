@@ -1,7 +1,7 @@
-from atomset import RMSDCalculator
-from atomset import SymmetryContactMapEvaluator as sym
-import atomset.atomset as atomset
-from clustering import clustering
+from AdaptivePELE.atomset import RMSDCalculator
+from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
+from AdaptivePELE.clustering import clustering
+import AdaptivePELE.atomset.atomset as atomset
 import unittest
 import numpy as np
 

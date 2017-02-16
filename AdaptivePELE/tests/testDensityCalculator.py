@@ -1,5 +1,5 @@
-from spawning import densitycalculator
-from spawning import densitycalculatortypes
+from AdaptivePELE.spawning import densitycalculator
+from AdaptivePELE.spawning import densitycalculatortypes
 import unittest
 
 class densityCalculatorTest(unittest.TestCase):

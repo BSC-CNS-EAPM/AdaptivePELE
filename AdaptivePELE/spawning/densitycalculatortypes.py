@@ -1,4 +1,4 @@
-from constants import blockNames
+from AdaptivePELE.constants import blockNames
 
 class DENSITY_CALCULATOR_TYPES:
     null, heaviside, continuous = range(3)

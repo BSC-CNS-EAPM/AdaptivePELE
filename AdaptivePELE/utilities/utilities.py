@@ -2,8 +2,8 @@ import os
 import shutil
 import numpy as np
 import pickle
-from atomset import RMSDCalculator
-import atomset.atomset as atomset
+from AdaptivePELE.atomset import RMSDCalculator
+import AdaptivePELE.atomset.atomset as atomset
 
 
 def cleanup(tmpFolder):

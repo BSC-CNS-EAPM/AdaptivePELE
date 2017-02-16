@@ -1,4 +1,4 @@
-from clustering import clustering
+from AdaptivePELE.clustering import clustering
 import unittest
 import socket
 
@@ -123,27 +123,27 @@ class clusteringTest(unittest.TestCase):
         # assertion
         allClusters = clusteringInstance.clusters.clusters
         clusteringInstance.clusters.printClusters()
-        goldenNumberOfClusters = 3
-        goldenEnergyCluster1 = -8421.5
-        goldenEnergyCluster2 = -8424.8
-        goldenEnergyCluster3 = -8453.29
-        goldenElementsCluster1 = 1
-        goldenElementsCluster2 = 1
-        goldenElementsCluster3 = 1
-
-        # goldenNumberOfClusters = 2
-        # goldenEnergyCluster1 = -8424.8
-        # goldenEnergyCluster2 = -8453.29
-        # goldenElementsCluster1 = 2
+        # goldenNumberOfClusters = 3
+        # goldenEnergyCluster1 = -8421.5
+        # goldenEnergyCluster2 = -8424.8
+        # goldenEnergyCluster3 = -8453.29
+        # goldenElementsCluster1 = 1
         # goldenElementsCluster2 = 1
+        # goldenElementsCluster3 = 1
+
+        goldenNumberOfClusters = 2
+        goldenEnergyCluster1 = -8424.8
+        goldenEnergyCluster2 = -8453.29
+        goldenElementsCluster1 = 2
+        goldenElementsCluster2 = 1
 
         self.assertEqual(len(allClusters), goldenNumberOfClusters)
         self.assertAlmostEqual(allClusters[0].getMetric(), goldenEnergyCluster1, 2)
         self.assertAlmostEqual(allClusters[1].getMetric(), goldenEnergyCluster2, 2)
-        self.assertAlmostEqual(allClusters[2].getMetric(), goldenEnergyCluster3, 2)
+        # self.assertAlmostEqual(allClusters[2].getMetric(), goldenEnergyCluster3, 2)
         self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
         self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
-        self.assertEqual(allClusters[2].elements, goldenElementsCluster3)
+        # self.assertEqual(allClusters[2].elements, goldenElementsCluster3)
 
     def test_CMInnerLimit(self):
         CMEvaluator = clustering.CMClusteringEvaluator(None, None)

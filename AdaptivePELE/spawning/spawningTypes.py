@@ -1,4 +1,4 @@
-from constants import blockNames
+from AdaptivePELE.constants import blockNames
 
 
 class SPAWNING_TYPES:

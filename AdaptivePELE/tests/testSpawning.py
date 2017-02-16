@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
-import spawning.spawning as spawning
-from clustering import clustering
-from spawning import densitycalculator
+import AdaptivePELE.spawning.spawning as spawning
+from AdaptivePELE.clustering import clustering
+from AdaptivePELE.spawning import densitycalculator
 
 
 class TestSpawningCalculator(unittest.TestCase):
