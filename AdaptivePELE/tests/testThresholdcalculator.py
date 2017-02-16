@@ -1,4 +1,4 @@
-from clustering import thresholdcalculator
+from AdaptivePELE.clustering import thresholdcalculator
 import unittest
 import numpy as np
 

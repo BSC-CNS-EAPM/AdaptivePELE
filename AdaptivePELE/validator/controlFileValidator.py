@@ -1,5 +1,5 @@
 import validatorBlockNames
-from constants import blockNames
+from AdaptivePELE.constants import blockNames
 import json
 import warnings
 import numbers

@@ -3,13 +3,13 @@ import os
 import pickle
 import argparse
 import json
-from atomset import RMSDCalculator
-import atomset.atomset as atomset
-from clustering import clustering, clusteringTypes, thresholdcalculator
-from spawning import spawning, densitycalculator
-from analysis import analyseClustering
-from simulation import simulationrunner
-import adaptiveSampling
+from AdaptivePELE.atomset import RMSDCalculator
+import AdaptivePELE.atomset.atomset as atomset
+from AdaptivePELE.clustering import clustering, clusteringTypes, thresholdcalculator
+from AdaptivePELE.spawning import spawning, densitycalculator
+from AdaptivePELE.analysis import analyseClustering
+from AdaptivePELE.simulation import simulationrunner
+import AdaptivePELE.adaptiveSampling as adaptiveSampling
 
 
 def parseArgs():

@@ -6,17 +6,17 @@ import pickle
 # import cPickle as pickle
 import clusteringTypes
 import thresholdcalculator
-from constants import blockNames
-import atomset.atomset as atomset
-from utilities import utilities
-from atomset import SymmetryContactMapEvaluator as sym
-from atomset import RMSDCalculator
+from AdaptivePELE.constants import blockNames
+import AdaptivePELE.atomset.atomset as atomset
+from AdaptivePELE.utilities import utilities
+from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
+from AdaptivePELE.atomset import RMSDCalculator
 import socket
-if "bsccv" not in socket.gethostname():
-    from sklearn.cluster import AffinityPropagation
-    from sklearn.cluster import AgglomerativeClustering
-    from sklearn.cluster import KMeans
-
+# if "bsccv" not in socket.gethostname():
+#     from sklearn.cluster import AffinityPropagation
+#     from sklearn.cluster import AgglomerativeClustering
+#     from sklearn.cluster import KMeans
+ 
 
 class Clusters:
     def __init__(self):

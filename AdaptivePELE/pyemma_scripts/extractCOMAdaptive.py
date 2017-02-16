@@ -2,7 +2,7 @@ import os
 import argparse
 import glob
 # import minimumGCluster.atomset as atomset
-import atomset.atomset as atomset
+import AdaptivePELE.atomset.atomset as atomset
 
 DIRECTORY = '%s/extractedCoordinates'
 BASEOUTPUTFILENAME = 'coord'

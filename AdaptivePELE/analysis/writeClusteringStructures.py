@@ -1,4 +1,4 @@
-from utilities import clusteringUtilities
+from AdaptivePELE.utilities import clusteringUtilities
 import argparse
 
 

@@ -1,8 +1,7 @@
 import time
 import os
-from constants import constants
+from AdaptivePELE.constants import constants, blockNames
 import subprocess
-from constants import blockNames
 import shutil
 import simulationTypes
 import string

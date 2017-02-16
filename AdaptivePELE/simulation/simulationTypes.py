@@ -1,4 +1,4 @@
-from constants import blockNames
+from AdaptivePELE.constants import blockNames
 
 class SIMULATION_TYPE:
     PELE, MD, TEST = range(3)

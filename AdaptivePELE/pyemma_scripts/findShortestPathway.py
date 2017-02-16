@@ -1,8 +1,8 @@
 import argparse
-from spawning import spawning, densitycalculator
-from clustering import clustering
-from utilities import utilities
-import atomset.atomset as atomset
+from AdaptivePELE.spawning import spawning, densitycalculator
+from AdaptivePELE.clustering import clustering
+from AdaptivePELE.utilities import utilities
+import AdaptivePELE.atomset.atomset as atomset
 from scipy.sparse.csgraph import shortest_path
 import numpy as np
 

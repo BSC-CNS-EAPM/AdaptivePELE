@@ -1,4 +1,4 @@
-import atomset.atomset as atomset
+import AdaptivePELE.atomset.atomset as atomset
 import os
 import glob
 import numpy as np
