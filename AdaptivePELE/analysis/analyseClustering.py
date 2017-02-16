@@ -139,7 +139,7 @@ if __name__ == "__main__":
     plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
                        titlecontacts, metricPlotFilename,
                        populationPlotFilename, contactsPlotFilename)
-
+    plt.show()
     # # Acc
     # #pklObjectFilename = "ClAcc_PR_heav.pkl"
     # pklObjectFilename = "object_Cont_rev.pkl"
@@ -171,4 +171,3 @@ if __name__ == "__main__":
     # plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
     #                    titlecontacts, metricPlotFilename,
     #                    populationPlotFilename, contactsPlotFilename)
-    plt.show()

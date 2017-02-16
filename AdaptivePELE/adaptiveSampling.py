@@ -5,13 +5,13 @@ import os
 import json
 import time
 import glob
-from constants import blockNames, constants
-from atomset import atomset
-from utilities import utilities
-from validator import controlFileValidator
-from spawning import spawning, spawningTypes
-from simulation import simulationrunner, simulationTypes
-from clustering import clustering, clusteringTypes
+from AdaptivePELE.constants import blockNames, constants
+from AdaptivePELE.atomset import atomset
+from AdaptivePELE.utilities import utilities
+from AdaptivePELE.validator import controlFileValidator
+from AdaptivePELE.spawning import spawning, spawningTypes
+from AdaptivePELE.simulation import simulationrunner, simulationTypes
+from AdaptivePELE.clustering import clustering, clusteringTypes
 import argparse
 
 
