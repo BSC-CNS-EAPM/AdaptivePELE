@@ -1,0 +1,770 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>atomset Package &mdash; Adaptive Sampling  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Adaptive Sampling  documentation" href="index.html"/>
+        <link rel="up" title="AdaptiveSampling Package" href="AdaptiveSampling.html"/>
+        <link rel="next" title="clustering Package" href="src.clustering.html"/>
+        <link rel="prev" title="analysis Package" href="src.analysis.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Adaptive Sampling
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptiveSampling.html">AdaptiveSampling Package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="AdaptiveSampling.html#module-src.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptiveSampling.html#module-src.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="AdaptiveSampling.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="src.analysis.html">analysis Package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">atomset Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.atomset.atomset"><code class="docutils literal"><span class="pre">atomset</span></code> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.clustering.html">clustering Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.simulation.html">simulation Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.spawning.html">spawning Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.utilities.html">utilities Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.validator.html">validator Package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Adaptive Sampling Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Adaptive Sampling</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+        <li><a href="AdaptiveSampling.html">AdaptiveSampling Package</a> &raquo;</li>
+      
+    <li>atomset Package</li>
+    <li class="wy-breadcrumbs-aside">
+      
+          
+          <a href="_sources/src.atomset.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="atomset-package">
+<h1>atomset Package<a class="headerlink" href="#atomset-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-src.atomset.atomset">
+<span id="atomset-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">atomset</span></code> Module<a class="headerlink" href="#module-src.atomset.atomset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.atomset.atomset.Atom">
+<em class="property">class </em><code class="descclassname">src.atomset.atomset.</code><code class="descname">Atom</code><span class="sig-paren">(</span><em>atomContent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#Atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.Atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an atom from a pdb line</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomContent</strong> (<em>str</em>) &#8211; Line of the pdb from which the atom will be created</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="src.atomset.atomset.Atom.getAtomCoords">
+<code class="descname">getAtomCoords</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#Atom.getAtomCoords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.Atom.getAtomCoords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the coordinates of the atom</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy.Array &#8211; Array with the coordinate of the atom</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.Atom.isHeavyAtom">
+<code class="descname">isHeavyAtom</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#Atom.isHeavyAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.Atom.isHeavyAtom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if Atom is a heavy atom</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if Atom is heavy atom, false otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.Atom.isHeteroAtom">
+<code class="descname">isHeteroAtom</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#Atom.isHeteroAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.Atom.isHeteroAtom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if Atom is an hetero atom</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if Atom is an hetero atom, false otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.Atom.isProtein">
+<code class="descname">isProtein</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#Atom.isProtein"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.Atom.isProtein" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if Atom is a protein atom</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if Atom is a protein atom, false otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.Atom.printAtom">
+<code class="descname">printAtom</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#Atom.printAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.Atom.printAtom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print Atom information</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.Atom.squaredDistance">
+<code class="descname">squaredDistance</code><span class="sig-paren">(</span><em>atom2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#Atom.squaredDistance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.Atom.squaredDistance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the squared distance between two atoms</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atom2</strong> (<a class="reference internal" href="#src.atomset.atomset.Atom" title="src.atomset.atomset.Atom"><em>Atom</em></a>) &#8211; Second Atom to whom the distance will be calculated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; The distance between the atoms</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.atomset.atomset.PDB">
+<em class="property">class </em><code class="descclassname">src.atomset.atomset.</code><code class="descname">PDB</code><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object that will contain the information of a PDB file. Has to call
+the initialise method to load the file</p>
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.computeTotalMass">
+<code class="descname">computeTotalMass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.computeTotalMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.computeTotalMass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the total mass of the PDB</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.countContacts">
+<code class="descname">countContacts</code><span class="sig-paren">(</span><em>ligandResname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.countContacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.countContacts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count the number of alpha carbons that are in contact with the
+protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ligandResname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the PDB</li>
+<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.extractCOM">
+<code class="descname">extractCOM</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.extractCOM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.extractCOM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the PDB&#8217;s center of mass</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List with the center of mass coordinates</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.extractCentroid">
+<code class="descname">extractCentroid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.extractCentroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.extractCentroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the PDB centroid</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List &#8211; List with the centroid coordinates</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.getAtom">
+<code class="descname">getAtom</code><span class="sig-paren">(</span><em>atomId</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.getAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.getAtom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an Atom in the PDB by its id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomId</strong> (<em>str</em>) &#8211; Id of the Atom (in the format &#8220;atomserial:atomName:resname&#8221;)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Number of atoms in the PDB</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">KeyError if the id is not in the PDB</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.getCOM">
+<code class="descname">getCOM</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.getCOM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.getCOM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the PDB&#8217;s center of mass</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List with the center of mass coordinates</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.getCentroid">
+<code class="descname">getCentroid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.getCentroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.getCentroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the PDB&#8217;s centroid</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List with the centroid coordinates</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.getNumberOfAtoms">
+<code class="descname">getNumberOfAtoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.getNumberOfAtoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.getNumberOfAtoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of Atoms in the PDB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Number of atoms in the PDB</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.initialise">
+<code class="descname">initialise</code><span class="sig-paren">(</span><em>PDBstr</em>, <em>heavyAtoms=True</em>, <em>resname=''</em>, <em>atomname=''</em>, <em>type='ALL'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.initialise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.initialise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the information from a PDB file or a string with the PDB
+contents</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDBstr</strong> (<em>str</em>) &#8211; may be a path to the PDB file or a string with the contents of the PDB</li>
+<li><strong>heavyAtoms</strong> (<em>bool</em>) &#8211; wether to consider only heavy atoms (True if onl y heavy atoms have to be considered)</li>
+<li><strong>resname</strong> (<em>str</em>) &#8211; Residue name to select from the pdb (will only select the residues with that name)</li>
+<li><strong>resname</strong> &#8211; Residue name to select from the pdb (will only select the residues with that name)</li>
+<li><strong>type</strong> (<em>str</em>) &#8211; type of atoms to select: may be ALL, PROTEIN or HETERO</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError if the pdb contained no atoms</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.printAtoms">
+<code class="descname">printAtoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.printAtoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.printAtoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print Atom information for all the atoms in the PDB</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.atomset.PDB.writePDB">
+<code class="descname">writePDB</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#PDB.writePDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.PDB.writePDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the pdb contents of the file from wich the PDB object was
+created</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) &#8211; Path of the file where to write the pdb</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.atomset.atomset.computeCOMDifference">
+<code class="descclassname">src.atomset.atomset.</code><code class="descname">computeCOMDifference</code><span class="sig-paren">(</span><em>PDB1</em>, <em>PDB2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#computeCOMDifference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.computeCOMDifference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the difference between the center of mass of two PDB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDB1</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The distance between the centers of mass between two PDB</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.atomset.atomset.computeCOMSquaredDifference">
+<code class="descclassname">src.atomset.atomset.</code><code class="descname">computeCOMSquaredDifference</code><span class="sig-paren">(</span><em>PDB1</em>, <em>PDB2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#computeCOMSquaredDifference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.computeCOMSquaredDifference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the squared difference between the center of mass of two PDB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDB1</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The squared distance between the centers of mass between two PDB</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.atomset.atomset.computeSquaredCentroidDifference">
+<code class="descclassname">src.atomset.atomset.</code><code class="descname">computeSquaredCentroidDifference</code><span class="sig-paren">(</span><em>PDB1</em>, <em>PDB2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#computeSquaredCentroidDifference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.computeSquaredCentroidDifference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the centroid squared difference between two PDBs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDB1</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; Second PDB</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The squared centroid distance between two PDB</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.atomset.atomset.readPDB">
+<code class="descclassname">src.atomset.atomset.</code><code class="descname">readPDB</code><span class="sig-paren">(</span><em>pdbfile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/atomset.html#readPDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.atomset.readPDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function, parses a string with PDB content or the path of a pdb file into a string</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pdbfile</strong> (<em>str</em>) &#8211; A string with PDB content or the path of a pdb file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str &#8211; A string with PDB content</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-src.atomset.RMSDCalculator"></span><dl class="class">
+<dt id="src.atomset.RMSDCalculator.RMSDCalculator">
+<em class="property">class </em><code class="descclassname">src.atomset.RMSDCalculator.</code><code class="descname">RMSDCalculator</code><span class="sig-paren">(</span><em>symmetries=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/RMSDCalculator.html#RMSDCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.RMSDCalculator.RMSDCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>symmetries</strong> (<em>list</em>) &#8211; List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="src.atomset.RMSDCalculator.RMSDCalculator.computeNonSymmAtoms">
+<code class="descname">computeNonSymmAtoms</code><span class="sig-paren">(</span><em>PDB</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/RMSDCalculator.html#RMSDCalculator.computeNonSymmAtoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.RMSDCalculator.RMSDCalculator.computeNonSymmAtoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.RMSDCalculator.RMSDCalculator.computeRMSD">
+<code class="descname">computeRMSD</code><span class="sig-paren">(</span><em>PDB1</em>, <em>PDB2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/RMSDCalculator.html#RMSDCalculator.computeRMSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.RMSDCalculator.RMSDCalculator.computeRMSD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the RMSD between two PDB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDB1</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The squared RMSD between two PDB</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.RMSDCalculator.RMSDCalculator.computeRMSD2">
+<code class="descname">computeRMSD2</code><span class="sig-paren">(</span><em>PDB1</em>, <em>PDB2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/RMSDCalculator.html#RMSDCalculator.computeRMSD2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.RMSDCalculator.RMSDCalculator.computeRMSD2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the squared RMSD between two PDB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDB1</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The squared RMSD between two PDB</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-src.atomset.SymmetryContactMapEvaluator"></span><dl class="class">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator">
+<em class="property">class </em><code class="descclassname">src.atomset.SymmetryContactMapEvaluator.</code><code class="descname">SymmetryContactMapEvaluator</code><span class="sig-paren">(</span><em>symmetries=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>symmetries</strong> (<em>list</em>) &#8211; List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildContactMap">
+<code class="descname">buildContactMap</code><span class="sig-paren">(</span><em>PDBobj</em>, <em>ligandResname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.buildContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildContactMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the contact map of the protein and ligand. The contact map is
+a boolean matrix that has as many rows as the number of ligand heavy
+atoms and as many columns as the number of alpha carbons. The
+value is one if the ligand atom and the alpha carbons are less than
+contactThresholdDistance Amstrongs away</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDBobj</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; PDB object that contains the conformation&#8217;s info</li>
+<li><strong>ligandResname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the PDB</li>
+<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array &#8211; The contact map of the ligand and the protein</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildContactMapWithRowMap">
+<code class="descname">buildContactMapWithRowMap</code><span class="sig-paren">(</span><em>PDBobj</em>, <em>ligandResname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.buildContactMapWithRowMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildContactMapWithRowMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a map that relates symmetric atoms in the ligand to row
+indices in the contactMap matrix and the contact map of the protein
+and ligand. The contact map is a boolean matrix that has as many
+rows as the number of ligand heavy atoms and as many columns as the
+number of alpha carbons. The value is one if the ligand atom and
+the alpha carbons are less than contactThresholdDistance Amstrongs
+away</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>PDBobj</strong> (<a class="reference internal" href="#src.atomset.atomset.PDB" title="src.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; PDB object that contains the conformation&#8217;s info</li>
+<li><strong>ligandResname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the PDB</li>
+<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array &#8211; The contact map of the ligand and the protein</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildOptimalPermutationContactMap">
+<code class="descname">buildOptimalPermutationContactMap</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.buildOptimalPermutationContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildOptimalPermutationContactMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a permutated version of the contactMap which maximizes the
+similarity between the two contactMaps
+:param contactMap: contactMap of the conformation to compare
+:type contactMap: numpy.Array
+:param cluster: cluster object to which we are comparing
+:type cluster: Cluster
+:returns: numpy.Array &#8211; The permutated contact map</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.createContactMap">
+<code class="descname">createContactMap</code><span class="sig-paren">(</span><em>PDB</em>, <em>ligandResname</em>, <em>contactThresholdDistance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.createContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.createContactMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the contact map of the protein and ligand. The contact map is
+a boolean matrix that has as many rows as the number of ligand heavy
+atoms and as many columns as the number of alpha carbons. The
+value is one if the ligand atom and the alpha carbons are less than
+contactThresholdDistance Amstrongs away</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ligandResname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the PDB</li>
+<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array &#8211; The contact map of the ligand and the protein</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateCorrelation">
+<code class="descname">evaluateCorrelation</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.evaluateCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateCorrelation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateDifferenceDistance">
+<code class="descname">evaluateDifferenceDistance</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.evaluateDifferenceDistance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateDifferenceDistance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateJaccard">
+<code class="descname">evaluateJaccard</code><span class="sig-paren">(</span><em>contactMap</em>, <em>cluster</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#SymmetryContactMapEvaluator.evaluateJaccard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateJaccard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.atomset.SymmetryContactMapEvaluator.calculateCorrelationContactMaps">
+<code class="descclassname">src.atomset.SymmetryContactMapEvaluator.</code><code class="descname">calculateCorrelationContactMaps</code><span class="sig-paren">(</span><em>contactMap</em>, <em>clusterContactMap</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/atomset/SymmetryContactMapEvaluator.html#calculateCorrelationContactMaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.atomset.SymmetryContactMapEvaluator.calculateCorrelationContactMaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the correlation of two contactMaps</p>
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="src.clustering.html" class="btn btn-neutral float-right" title="clustering Package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="src.analysis.html" class="btn btn-neutral" title="analysis Package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Daniel Lecina, Joan Francesc Gilabert.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

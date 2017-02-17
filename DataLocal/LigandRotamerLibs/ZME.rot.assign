@@ -1,6 +1,0 @@
-rot assign res ZME &
-   sidelib FREE30 _N1_ _C4_ &
-   sidelib FREE30 _C4_ _C5_ &
-   sidelib FREE30 _C5_ _N2_ &
-     newgrp &
-   sidelib FREE30 _C2_ _C15 &

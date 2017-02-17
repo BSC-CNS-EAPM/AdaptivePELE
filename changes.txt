@@ -1,15 +1,7 @@
 Behavior changes from previous version:
-    *) Changed quadratic function for continuous
-    *) Changed symmetry dictionary for list of dictionaries, with symmetry groups
-    *) Added support for symmetry with contactMap
-    *) Added lastSnapshot clustering for easy restart of sequential runs
-    *) Added independent spawning to perform classical PELE simulations
-    *) Added exitCondition on metric
-    *) Added support for changing clustering when clustering method parameter changes, and be able to handle
-    metric column change in spawning
-    *) Added suport for wildcard in control file input structures
-    *) Added several scripts for analysis
-
-Bug fixes:
-    *) Fixed bug of incorrect atom consideration in symmetries
-    *) Fixed bug of NaN correlation similarity evaluator in contactMap
+    *) Follow proper packaging conventions for Python packaging
+    *) Atomset package implemented in Cython (faster)
+    *) Jaccard index is calcualed using only the cells of the matrix that are 1
+    *) Added alternative structure to each cluster that will spawn 50% of the
+    time
+    *) Implemented UCB algorithm for spawning
