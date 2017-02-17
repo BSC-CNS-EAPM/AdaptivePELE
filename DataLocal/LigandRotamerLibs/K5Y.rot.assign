@@ -1,6 +1,0 @@
-rot assign res K5Y &
-   sidelib FREE30 _C6_ _N1_ &
-   sidelib FREE30 _N1_ _C2_ &
-     newgrp &
-   sidelib FREE30 _C9_ _O1_ &
-   sidelib FREE30 _O1_ _C3_ &
