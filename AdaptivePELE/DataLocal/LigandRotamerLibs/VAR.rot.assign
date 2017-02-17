@@ -1,7 +1,0 @@
-rot assign res VAR &
-   sidelib FREE10 _C4_ _O1_ &
-     newgrp &
-   sidelib FREE10 _C1_ _C7_ &
-   sidelib FREE10 _C7_ _O3_ &
-     newgrp &
-   sidelib FREE10 _C5_ _O2_ &
