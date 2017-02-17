@@ -1,5 +1,0 @@
-rot assign res L12 &
-   sidelib FREE10 _C2_ _C1_ &
-     newgrp &
-   sidelib FREE10 _N3_ _C3_ &
-   sidelib FREE10 _C3_ _C4_ &

@@ -1,4 +1,0 @@
-rot assign res AIN &
-   sidelib FREE10 _C3_ _C7_ &
-     newgrp &
-   sidelib FREE10 _C2_ _O3_ &
