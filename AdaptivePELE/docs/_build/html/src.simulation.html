@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>simulation Package &mdash; Adaptive Sampling  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Adaptive Sampling  documentation" href="index.html"/>
+        <link rel="up" title="AdaptiveSampling Package" href="AdaptiveSampling.html"/>
+        <link rel="next" title="spawning Package" href="src.spawning.html"/>
+        <link rel="prev" title="clustering Package" href="src.clustering.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Adaptive Sampling
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptiveSampling.html">AdaptiveSampling Package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="AdaptiveSampling.html#module-src.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptiveSampling.html#module-src.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="AdaptiveSampling.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="src.analysis.html">analysis Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.atomset.html">atomset Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.clustering.html">clustering Package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">simulation Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.simulation.simulationTypes"><code class="docutils literal"><span class="pre">simulationTypes</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.simulation.simulationrunner"><code class="docutils literal"><span class="pre">simulationrunner</span></code> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.spawning.html">spawning Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.utilities.html">utilities Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.validator.html">validator Package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Adaptive Sampling Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Adaptive Sampling</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+        <li><a href="AdaptiveSampling.html">AdaptiveSampling Package</a> &raquo;</li>
+      
+    <li>simulation Package</li>
+    <li class="wy-breadcrumbs-aside">
+      
+          
+          <a href="_sources/src.simulation.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="simulation-package">
+<h1>simulation Package<a class="headerlink" href="#simulation-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-src.simulation.simulationTypes">
+<span id="simulationtypes-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">simulationTypes</span></code> Module<a class="headerlink" href="#module-src.simulation.simulationTypes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.simulation.simulationTypes.EXITCONDITION_TYPE">
+<em class="property">class </em><code class="descclassname">src.simulation.simulationTypes.</code><code class="descname">EXITCONDITION_TYPE</code><a class="reference internal" href="_modules/src/simulation/simulationTypes.html#EXITCONDITION_TYPE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationTypes.EXITCONDITION_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="src.simulation.simulationTypes.EXITCONDITION_TYPE.CLUSTERING">
+<code class="descname">CLUSTERING</code><em class="property"> = 1</em><a class="headerlink" href="#src.simulation.simulationTypes.EXITCONDITION_TYPE.CLUSTERING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.simulation.simulationTypes.EXITCONDITION_TYPE.METRIC">
+<code class="descname">METRIC</code><em class="property"> = 0</em><a class="headerlink" href="#src.simulation.simulationTypes.EXITCONDITION_TYPE.METRIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.simulation.simulationTypes.SIMULATION_TYPE">
+<em class="property">class </em><code class="descclassname">src.simulation.simulationTypes.</code><code class="descname">SIMULATION_TYPE</code><a class="reference internal" href="_modules/src/simulation/simulationTypes.html#SIMULATION_TYPE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationTypes.SIMULATION_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="src.simulation.simulationTypes.SIMULATION_TYPE.MD">
+<code class="descname">MD</code><em class="property"> = 1</em><a class="headerlink" href="#src.simulation.simulationTypes.SIMULATION_TYPE.MD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.simulation.simulationTypes.SIMULATION_TYPE.PELE">
+<code class="descname">PELE</code><em class="property"> = 0</em><a class="headerlink" href="#src.simulation.simulationTypes.SIMULATION_TYPE.PELE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.simulation.simulationTypes.SIMULATION_TYPE.TEST">
+<code class="descname">TEST</code><em class="property"> = 2</em><a class="headerlink" href="#src.simulation.simulationTypes.SIMULATION_TYPE.TEST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.simulation.simulationrunner">
+<span id="simulationrunner-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">simulationrunner</span></code> Module<a class="headerlink" href="#module-src.simulation.simulationrunner" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.simulation.simulationrunner.ClusteringExitCondition">
+<em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">ClusteringExitCondition</code><span class="sig-paren">(</span><em>ntrajs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#ClusteringExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.ClusteringExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.simulation.simulationrunner.ClusteringExitCondition.checkExitCondition">
+<code class="descname">checkExitCondition</code><span class="sig-paren">(</span><em>clustering</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#ClusteringExitCondition.checkExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.ClusteringExitCondition.checkExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.simulation.simulationrunner.ExitConditionBuilder">
+<em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">ExitConditionBuilder</code><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#ExitConditionBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.ExitConditionBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.simulation.simulationrunner.ExitConditionBuilder.build">
+<code class="descname">build</code><span class="sig-paren">(</span><em>exitConditionBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#ExitConditionBuilder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.ExitConditionBuilder.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.simulation.simulationrunner.MetricExitCondition">
+<em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">MetricExitCondition</code><span class="sig-paren">(</span><em>metricCol</em>, <em>metricValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#MetricExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.MetricExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.simulation.simulationrunner.MetricExitCondition.checkExitCondition">
+<code class="descname">checkExitCondition</code><span class="sig-paren">(</span><em>clustering</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#MetricExitCondition.checkExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.MetricExitCondition.checkExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over all unchecked cluster and check if the exit condtion
+is met</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.simulation.simulationrunner.PeleSimulation">
+<em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">PeleSimulation</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#PeleSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.PeleSimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.simulation.simulationrunner.SimulationRunner" title="src.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">src.simulation.simulationrunner.SimulationRunner</span></code></a></p>
+<dl class="method">
+<dt id="src.simulation.simulationrunner.PeleSimulation.createSymbolicLinks">
+<code class="descname">createSymbolicLinks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#PeleSimulation.createSymbolicLinks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.PeleSimulation.createSymbolicLinks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.simulation.simulationrunner.PeleSimulation.runSimulation">
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#PeleSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.PeleSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.simulation.simulationrunner.RunnerBuilder">
+<em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">RunnerBuilder</code><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#RunnerBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.RunnerBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.simulation.simulationrunner.RunnerBuilder.build">
+<code class="descname">build</code><span class="sig-paren">(</span><em>simulationRunnerBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#RunnerBuilder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.RunnerBuilder.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.simulation.simulationrunner.SimulationParameters">
+<em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">SimulationParameters</code><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#SimulationParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.SimulationParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="src.simulation.simulationrunner.SimulationRunner">
+<em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">SimulationRunner</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#SimulationRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.SimulationRunner" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="src.simulation.simulationrunner.SimulationRunner.checkExitCondition">
+<code class="descname">checkExitCondition</code><span class="sig-paren">(</span><em>clustering</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#SimulationRunner.checkExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.SimulationRunner.checkExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.simulation.simulationrunner.SimulationRunner.hasExitCondition">
+<code class="descname">hasExitCondition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#SimulationRunner.hasExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.SimulationRunner.hasExitCondition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.simulation.simulationrunner.SimulationRunner.makeWorkingControlFile">
+<code class="descname">makeWorkingControlFile</code><span class="sig-paren">(</span><em>workingControlFilename</em>, <em>dictionary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#SimulationRunner.makeWorkingControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.SimulationRunner.makeWorkingControlFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.simulation.simulationrunner.SimulationRunner.runSimulation">
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#SimulationRunner.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.SimulationRunner.runSimulation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.simulation.simulationrunner.TestSimulation">
+<em class="property">class </em><code class="descclassname">src.simulation.simulationrunner.</code><code class="descname">TestSimulation</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#TestSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.TestSimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.simulation.simulationrunner.SimulationRunner" title="src.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">src.simulation.simulationrunner.SimulationRunner</span></code></a></p>
+<p>Class used for testing</p>
+<dl class="method">
+<dt id="src.simulation.simulationrunner.TestSimulation.makeWorkingControlFile">
+<code class="descname">makeWorkingControlFile</code><span class="sig-paren">(</span><em>workingControlFilename</em>, <em>dictionary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#TestSimulation.makeWorkingControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.TestSimulation.makeWorkingControlFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.simulation.simulationrunner.TestSimulation.runSimulation">
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/simulation/simulationrunner.html#TestSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.simulation.simulationrunner.TestSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="src.spawning.html" class="btn btn-neutral float-right" title="spawning Package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="src.clustering.html" class="btn btn-neutral" title="clustering Package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Daniel Lecina, Joan Francesc Gilabert.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

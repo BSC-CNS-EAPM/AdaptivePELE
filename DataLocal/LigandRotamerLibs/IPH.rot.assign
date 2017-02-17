@@ -1,8 +1,0 @@
-rot assign res IPH &
-   sidelib FREE10 _C2_ _C1_ &
-   sidelib FREE10 _C6_ _C11 &
-   sidelib FREE10 _N2_ _C15 &
-     newgrp &
-   sidelib FREE10 _C13 _C14 &
-   sidelib FREE10 _N3_ _C18 &
-   sidelib FREE10 _C18 _C19 &

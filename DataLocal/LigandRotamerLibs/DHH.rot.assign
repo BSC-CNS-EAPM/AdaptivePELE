@@ -1,6 +1,0 @@
-rot assign res DHH &
-   sidelib FREE30 _C7_ _C6_ &
-     newgrp &
-   sidelib FREE30 _N1_ _C12 &
-   sidelib FREE30 _C12 _C13 &
-   sidelib FREE30 _C15 _O1_ &
