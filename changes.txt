@@ -1,4 +1,5 @@
 Behavior changes from previous version:
+    *) Follow proper packaging conventions for Python packaging
     *) Atomset package implemented in Cython (faster)
     *) Jaccard index is calcualed using only the cells of the matrix that are 1
     *) Added alternative structure to each cluster that will spawn 50% of the
