@@ -318,7 +318,7 @@ END   \n"
         JaccardNosym = symmetryEvaluatorEmpty.evaluateJaccard(contactMapNoSym, cluster)
 
         self.assertEqual(contacts1, contactsSym)
-        self.assertEqual(goldenJaccard, Jaccard)
+        self.assertAlmostEqual(goldenJaccard, Jaccard)
         self.assertNotAlmostEqual(Jaccard, JaccardNosym)
 
     def test_symmetryContactMapCorrelation(self):
@@ -364,5 +364,5 @@ END   \n"
         DifferenceNosym = symmetryEvaluatorEmpty.evaluateDifferenceDistance(contactMapNoSym, cluster)
 
         self.assertEqual(contacts1, contactsSym)
-        self.assertEqual(goldenDifference, DifferenceSym)
+        self.assertAlmostEqual(goldenDifference, DifferenceSym)
         self.assertNotAlmostEqual(DifferenceSym, DifferenceNosym)
