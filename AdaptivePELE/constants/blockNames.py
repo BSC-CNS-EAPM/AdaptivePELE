@@ -47,6 +47,7 @@ class DensityCalculatorParams:
 
 class StringSpawningTypes:
     type = "type"
+    independent = "independent"
     sameWeight = "sameWeight"
     inverselyProportional = "inverselyProportional"
     epsilon = "epsilon"
@@ -110,11 +111,13 @@ class SimulationParams:
     exitCondition = "exitCondition"
     metricCol = "metricCol"
     exitValue = "exitValue"
+    trajectories = "trajectories"
 
 
 class ExitConditionType:
     type = "type"
     metric = "metric"
+    clustering = "clustering"
 
 
 class ControlFileParams:

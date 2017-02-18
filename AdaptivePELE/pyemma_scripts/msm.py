@@ -1,21 +1,27 @@
-import pyemma.msm as msm
+import pyemma.msm as MSM
 import pyemma.plots as mplt
 import matplotlib.pyplot as plt
 
 def calculateITS(trajectories, lagtimes, errors = None):
     """ Calulate the implied time-scales at the given lagtimes"""
-    its_object = msm.its(trajectories, lags=lagtimes, errors=errors)
+    its_object = MSM.its(trajectories, lags=lagtimes, errors=errors)
     return its_object
 
 def plotITS(its_object, its_plot_file=None, nits=-1):
     its_plot = mplt.plot_implied_timescales(its_object, outfile=its_plot_file, nits=nits)
+    plt.savefig("its.eps")
     return its_plot
 
-def estimateMSM(trajectories,lagtime):
+def estimateMSM(trajectories,lagtime, error_est=False):
     """ Estimate a MSM from the trajectories using a provided lagtime that
     should be big enough so that the relevant processes have converged.
     Return a MaximumLikelihoodMSM object"""
-    MSM_object = msm.estimate_markov_model(trajectories, lagtime)
+    if error_est:
+        print "Computing msm with bayes error calc"
+        MSM_object = MSM.bayesian_markov_model(trajectories, lagtime)
+    else:
+        print "Computing msm with no error calc"
+        MSM_object = MSM.estimate_markov_model(trajectories, lagtime, count_mode='sliding')
     return MSM_object
 
 def calculatePCCA(MSM_object, numPCCA):
@@ -26,17 +32,18 @@ def calculatePCCA(MSM_object, numPCCA):
 
 def is_connected(MSM_object):
     """ Check if the MSM created is connected"""
-    return msm.analysis.is_connected(MSM_object.transition_matrix)
+    return MSM.analysis.is_connected(MSM_object.transition_matrix)
 
-def ChapmanKolmogorovTest(MSM_object, nsets,memberships=None, error_estimation=False):
+def ChapmanKolmogorovTest(MSM_object, nsets,memberships=None, error_estimation=False, mlags=2):
     """ Perform the ChapmanKolmogorov test to validate the MSM"""
-    return MSM_object.cktest(nsets,memberships=memberships,err_est=error_estimation)
+    return MSM_object.cktest(nsets,memberships=memberships,err_est=error_estimation, mlags=mlags)
 
 def plotChapmanKolmogorovTest(CKObject, layout=None, padding_between=0.1,
                               padding_top=0.075):
     """ Plot the results of the Chapman-Kolgomorov tests"""
     mplt.plot_cktest(CKObject,layout=layout, padding_between=padding_between,
                      padding_top=padding_top)
+    plt.savefig("CK.eps")
 
 def plot_PCCA_clusters(cluster_object, MSM_object):
     cols = ['orange', 'magenta', 'red', 'black', 'blue', 'green',]
