@@ -24,6 +24,7 @@ AdaptivePELE/atomset/*.so
 AdaptivePELE/atomset/build
 AdaptivePELE/Data*
 AdaptivePELE/Documents
+AdaptivePELE/docs/_build
 .ropeproject
 build
 AdaptivePELE/*.pyc
