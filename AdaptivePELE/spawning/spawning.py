@@ -7,8 +7,8 @@ import spawningTypes
 import densitycalculator
 import os
 import glob
-from constants import constants
-from utilities import utilities
+from AdaptivePELE.constants import constants
+from AdaptivePELE.utilities import utilities
 
 
 def return_sign(i, m, n, r):
