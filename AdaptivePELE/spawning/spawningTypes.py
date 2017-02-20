@@ -2,7 +2,7 @@ from AdaptivePELE.constants import blockNames
 
 
 class SPAWNING_TYPES:
-    sameWeight, inverselyProportional, epsilon, simulatedAnnealing, FAST, variableEpsilon, UCB = range(7)
+    sameWeight, inverselyProportional, epsilon, simulatedAnnealing, FAST, variableEpsilon, UCB, independent = range(8)
 
 SPAWNING_TYPE_TO_STRING_DICTIONARY = {
     SPAWNING_TYPES.independent: blockNames.StringSpawningTypes.independent,

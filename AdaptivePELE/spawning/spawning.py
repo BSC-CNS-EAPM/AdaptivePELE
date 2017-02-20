@@ -531,7 +531,7 @@ class UCBCalculator(DensitySpawningCalculator):
         self.prevMetrics = np.array([0.0])
         self.averages = []
         self.alpha = 1.0
-        self.beta = 0.5
+        self.beta = 0.25
         self.averageMetric = 0
         self.epoch = np.array([0.0])
 
