@@ -5,6 +5,10 @@ import random
 from AdaptivePELE.constants import blockNames
 import spawningTypes
 import densitycalculator
+import os
+import glob
+from constants import constants
+from utilities import utilities
 
 
 def return_sign(i, m, n, r):
@@ -49,6 +53,8 @@ class SpawningBuilder:
         spawningTypeString = spawningBlock[blockNames.StringSpawningTypes.type]
         if spawningTypeString == blockNames.StringSpawningTypes.sameWeight:
             spawningCalculator = SameWeightDegeneracyCalculator()
+        elif spawningTypeString == blockNames.StringSpawningTypes.independent:
+            spawningCalculator = IndependentRunsCalculator()
         elif spawningTypeString == blockNames.StringSpawningTypes.inverselyProportional:
             spawningCalculator = InverselyProportionalToPopulationCalculator(densityCalculator)
         elif spawningTypeString == blockNames.StringSpawningTypes.epsilon:
@@ -129,6 +135,28 @@ class SpawningCalculator:
     def log(self):
         pass
 
+    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration):
+        """ Write initial structures for the next iteriation
+
+            outputPathConstants [In] Output constants that depend on the path
+            degeneracyOfRepresentatives [In] Array with the degeneracy of each
+            cluster (i.e the number of processors that will be assigned to it)
+            clustering [In] clustering object
+            iteration [In] Number of epoch
+        """
+        tmpInitialStructuresTemplate = outputPathConstants.tmpInitialStructuresTemplate
+        counts = 0
+        for i, cluster in enumerate(clustering.clusters.clusters):
+            for j in range(int(degeneracyOfRepresentatives[i])):
+                outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
+                print 'Writing to ', outputFilename, 'cluster', i
+                cluster.writePDB(outputFilename)
+
+                counts += 1
+
+        print "counts & cluster centers", counts, np.where(np.array(degeneracyOfRepresentatives) > 0)[0].size
+        return counts
+
     def divideTrajAccordingToWeights(self, weights, trajToDistribute):
         """
             weights must be normalized (i.e. sum(weights) = 1)
@@ -205,6 +233,42 @@ class DensitySpawningCalculator(SpawningCalculator):
             cluster.density = self.densityCalculator.calculate(contacts, cluster.contactThreshold)
             densities[i] = cluster.density
         return densities
+
+class IndependentRunsCalculator(SpawningCalculator):
+
+    def __init__(self):
+        self.calculator = SameWeightDegeneracyCalculator()
+        self.type = spawningTypes.SPAWNING_TYPES.independent
+
+    def calculate(self, clusters, trajToDistribute, clusteringParams,
+                  currentEpoch=None):
+        return self.calculator.calculate(clusters, trajToDistribute, clusteringParams, currentEpoch)
+
+    def log(self):
+        pass
+
+    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration):
+        """ Write last trajectory structure as initial one for the next iteriation
+
+            outputPathConstants [In] Output constants that depend on the path
+            degeneracyOfRepresentatives [In] Array with the degeneracy of each
+            cluster (i.e the number of processors that will be assigned to it)
+            clustering [In] clustering object
+            iteration [In] Number of epoch
+        """
+        trajWildcard = os.path.join(outputPathConstants.epochOutputPathTempletized, constants.trajectoryBasename)
+        trajectories = glob.glob(trajWildcard%(iteration-1))
+        for trajectory in trajectories:
+            lastSnapshot = utilities.getSnapshots(trajectory)[-1]
+
+            num = int(trajectory.split("_")[-1][:-4])%len(trajectories)  #to start with 0
+            outputFilename = outputPathConstants.tmpInitialStructuresTemplate % (iteration, num)
+
+            f = open(outputFilename, 'w')
+            f.write(lastSnapshot)
+            f.close()
+
+        return len(trajectories)
 
 
 class SameWeightDegeneracyCalculator(SpawningCalculator):
@@ -467,7 +531,7 @@ class UCBCalculator(DensitySpawningCalculator):
         self.prevMetrics = np.array([0.0])
         self.averages = []
         self.alpha = 1.0
-        self.beta = 0.5
+        self.beta = 0.25
         self.averageMetric = 0
         self.epoch = np.array([0.0])
 

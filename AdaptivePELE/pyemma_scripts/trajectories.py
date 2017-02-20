@@ -15,7 +15,7 @@ def loadCOMFiles(trajectoryFolder, trajectory_basename):
         x[i] = currentX
     if not x:
         raise ValueError("Didn't find any trajectory files in the specified path!!!")
-    return x
+    return x, files
 
 
 def loadCoordinates(path, trajectories_basename='*traj*.pdb', topfile=''):
@@ -32,9 +32,18 @@ def loadCoordinates(path, trajectories_basename='*traj*.pdb', topfile=''):
 # More preprocessing staff?
 
 
-def clusterTrajectories(trajectories, numClusters):
+def clusterTrajectories(trajectories, numClusters, stride=1):
     """ Cluster the trajectories into numClusters clusters using kmeans
     algorithm.
     Returns a KmeansClusteringObject
     """
-    return coor.cluster_kmeans(data=trajectories, k=numClusters, max_iter=20)
+    return coor.cluster_kmeans(data=trajectories, k=numClusters, max_iter=20, stride=stride)
+
+def clusterRegularSpace(trajectories, dmin, stride=1):
+    """
+        Cluster the trajectories using Regular Space clustering, which is a
+        modified version of Hartigan's leader algorithm
+    """
+    return coor.cluster_regspace(data=trajectories, dmin = dmin, stride=stride)
+
+

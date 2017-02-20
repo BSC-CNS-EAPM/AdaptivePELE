@@ -12,16 +12,14 @@ import generateGnuplotFile
         Change params to match simulation.
 """
 
-folders = {"8_16":"3ptb_8_16", "8_32":"3ptb_8_32", "8_64":"3ptb_8_64", "8_128":"3ptb_8_128",\
-           "4_16":"3ptb_4_16", "4_32":"3ptb_4_32", "4_64":"3ptb_4_64", "4_128":"3ptb_4_128"}
+folders = {"4_512":"PRprog_4_512"} #, "4_64":"3ptb_4_64", "4_128":"3ptb_4_128"}
 
 subfoldersWildcard = "inversely_*"
+subfoldersWildcard = "be_epsilon_*"
 
-titles = {"8_16":"n=16, 8 steps, %s", "8_32":"n=32, 8 steps, %s", "8_64":"n=64, 8 steps, %s", "8_128":"n = 128, 8 steps, %s",\
-           "4_16":"n=16, 4 steps, %s", "4_32":"n=32, 4 steps, %s", "4_64":"n=64, 4 steps, %s", "4_128":"n=128, 4 steps, %s"}
+titles = { "4_512":"n=32, 4 steps, %s"} #, "4_64":"n=64, 4 steps, %s", "4_128":"n=128, 4 steps, %s"}
 
-outputFilenames = {"8_16":"16_8_%s", "8_32":"32_8_%s", "8_64":"64_8_%s", "8_128":"128_8_%s",\
-           "4_16":"16_4_%s", "4_32":"32_4_%s", "4_64":"64_4_%s", "4_128":"128_4_%s"}
+outputFilenames = { "4_512":"512_4_%s"} #, "4_64":"64_4_%s", "4_128":"128_4_%s"}
 
 params = {"stepsCol" : 2,
         "RMSDCol" : 5,
@@ -29,7 +27,7 @@ params = {"stepsCol" : 2,
         "reportFilename" : "report_"}
 
 
-gplFolder = "/gpfs/scratch/bsc72/bsc72755/adaptiveSampling/simulations"
+gplFolder = "/gpfs/scratch/bsc72/bsc72755/adaptiveSampling/simulation"
 tmpFolder = "/tmp"
 
 tmpPlotFile = os.path.join(tmpFolder, "tmp.gpl")
@@ -74,6 +72,7 @@ for key, folder in folders.iteritems():
     params["stepsPerRun"] = int(key.split("_")[0])
 
     subfolders = glob.glob(subfoldersWildcard)
+    print subfolders
     for subfolder in subfolders:
         os.chdir(subfolder)
 
