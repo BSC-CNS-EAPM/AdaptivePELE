@@ -270,6 +270,10 @@ class Clustering:
     def getCluster(self, clusterNum):
         return self.clusters.getCluster(clusterNum)
 
+
+    def getNumberClusters(self):
+        return self.clusters.getNumberClusters()
+
     def __eq__(self, other):
         return self.clusters == other.clusters\
             and self.reportBaseFilename == other.reportBaseFilename\
@@ -543,6 +547,37 @@ class ContactMapAccumulativeClustering(Clustering):
         self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
         self.clusteringEvaluator = CMClusteringEvaluator(similarityEvaluator, self.symmetryEvaluator)
 
+
+class SequentialLastSnapshotClustering(Clustering):
+    """
+        Assigned  the last snapshot of the trajectory to a cluster.
+        Only useful for PELE sequential runs
+    """
+    def cluster(self, paths):
+        """
+            Cluster the snaptshots contained in the pahts folder
+            paths [In] List of folders with the snapshots
+        """
+        # Clean clusters at every step, so we only have the last snapshot of
+        # each trajectory as clusters
+        self.clusters = Clusters()
+        trajectories = getAllTrajectories(paths)
+        for trajectory in trajectories:
+            trajNum = utilities.getTrajNum(trajectory)
+
+            snapshots = utilities.getSnapshots(trajectory, True)
+            if self.reportBaseFilename:
+                reportFilename = os.path.join(os.path.split(trajectory)[0],
+                                              self.reportBaseFilename % trajNum)
+                metrics = np.loadtxt(reportFilename, ndmin=2)
+                # Pass as cluster metrics the minimum value for each metric,
+                # thus the metrics are not valid to do any spawning, only to
+                # check the exit condition
+                metrics = metrics.min(axis=0)
+
+                self.addSnapshotToCluster(snapshots[-1], metrics, self.col)
+            else:
+                self.addSnapshotToCluster(snapshots[-1])
 
 class SequentialLastSnapshotClustering(Clustering):
     """
