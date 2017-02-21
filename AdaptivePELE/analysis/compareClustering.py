@@ -8,23 +8,34 @@ from AdaptivePELE.spawning import spawning, densitycalculator
 ntrajs = 31
 nclusters = 80
 thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
-# thresholdCalculator = thresholdCalculatorBuilder.build({
-#         "thresholdCalculator": {
-#             "type": "constant",
-#             "params": {
-#                 "value": 2
-#             }
-#         }
-# })
-thresholdCalculator = thresholdCalculatorBuilder.build({})
+thresholdCalculator = thresholdCalculatorBuilder.build({
+        "thresholdCalculator": {
+            "type": "heaviside",
+            "params": {
+                "values": [2, 3, 4, 5],
+                "conditions": [1, 0.75, 0.5]
+            }
+        }
+})
+# thresholdCalculator = thresholdCalculatorBuilder.build({})
 # Distance index
-similarityEvaluator = clustering.differenceDistanceEvaluator()
+# similarityEvaluator = clustering.differenceDistanceEvaluator()
+# thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
+#     "thresholdCalculator": {
+#         "type": "heaviside",
+#         "params": {
+#             "conditions": [1.2, 1.0, 0.5, 0.0],
+#             "values": [0.2, 0.4, 0.5, 0.8]
+#         }
+#     }
+# })
+# Jaccard index
+similarityEvaluator = clustering.JaccardEvaluator()
 thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
     "thresholdCalculator": {
-        "type": "heaviside",
-        "params": {
-            "conditions": [1.2, 1.0, 0.5, 0.0],
-            "values": [0.2, 0.4, 0.5, 0.8]
+        "type" : "constant",
+        "params" : {
+            "value" : 0.03
         }
     }
 })
@@ -32,9 +43,10 @@ thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
 similarityEvaluator = clustering.JaccardEvaluator()
 # thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
 #     "thresholdCalculator": {
-#         "type" : "constant",
+#         "type" : "heaviside",
 #         "params" : {
-#             "value" : 0.015
+#             "conditions" : [1, 0.75, 0.5],
+#             "values" : [0.025, 0.03, 0.04, 0.05]
 #         }
 #     }
 # })
