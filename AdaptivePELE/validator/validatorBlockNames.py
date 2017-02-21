@@ -39,6 +39,7 @@ class SpawningParams:
     }
     types = {
         "sameWeight": {},
+        "independent": {},
         "inverselyProportional": {},
         "epsilon": {
             "epsilon": "numbers.Real",

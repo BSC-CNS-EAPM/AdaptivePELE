@@ -27,9 +27,8 @@ def automateSimulation(args):
         outputPath_i = controlFileDictionary["OUTPUTPATH"] % (simulationName, i)
         controlFileDictionary["OUTPUTPATH"] = outputPath_i
         controlFileName = "tmp_%s_controlfile_%s_%d.conf" % (os.path.splitext(controlFile)[0], simulationName, i)
-        controlFileName.replace("/", "_")
-        simulationRunner.makeWorkingControlFile(controlFileName,
-                                                controlFileDictionary)
+        controlFileName = controlFileName.replace("/","_")
+        simulationRunner.makeWorkingControlFile(controlFileName, controlFileDictionary)
         print "Starting simulation %d" % i
         adaptiveSampling.main(controlFileName)
 

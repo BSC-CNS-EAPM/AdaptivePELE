@@ -7,6 +7,12 @@ import matplotlib.pyplot as plt
 def writeClusterCenters(cl, outputFilename):
     np.savetxt(outputFilename, cl.clustercenters)
 
+def writeDtrajs(filenames, dtrajs, filenameTemplate="%s.disctraj"):
+    for filename, dtraj in zip(filenames, dtrajs):
+        fname = os.path.split(filename)[-1][:-4]
+        dtrajfname = filenameTemplate%(fname)
+        np.savetxt(dtrajfname, dtraj, fmt="%d")
+
 def makeFolder(outputDir):
     if not os.path.exists(outputDir):
         os.makedirs(outputDir)

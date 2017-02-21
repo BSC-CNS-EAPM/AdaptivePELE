@@ -78,7 +78,7 @@ class OrderedContactsClustering(clustering.Clustering):
 
         cluster = clustering.Cluster(pdb, thresholdRadius=threshold,
                                      contacts=contactsPerAtom, metrics=metrics,
-                                     metricCol=col)
+                                     metricCol=col, density=1)
         if snapshotPosition is not None:
             self.clusters.insertCluster(snapshotPosition, cluster)
             self.distancesList.insert(snapshotPosition, initial_scd)
@@ -200,13 +200,14 @@ def plotMetricsDegeneracy(ClPath, resname, degeneracies):
 
 
 def clusterTrajectories(resname, trajFolder, clusteringObject,
-                        reportBaseFilename="report", symmetries=[]):
+                        clusteringThreshold, reportBaseFilename="report",
+                        symmetries=[]):
     thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
     thresholdCalculator = thresholdCalculatorBuilder.build({
             "thresholdCalculator": {
                 "type": "constant",
                 "params": {
-                    "value": 2
+                    "value": clusteringThreshold
                 }
             }
     })
@@ -253,6 +254,7 @@ def main(jsonBlock):
     symmetries = jsonBlock["symmetries"]
     trajFolder = jsonBlock["trajFolder"]
     clusteringObject = jsonBlock["clusteringObject"]
+    clusteringThreshold = jsonBlock["clusteringThreshold"]
     pathwayFilename = jsonBlock["pathwayFilename"]
     templetizedInitialName = jsonBlock["templetizedInitialName"].encode()
     secondControlFileTemp = jsonBlock["secondControlFileTemp"]
@@ -267,6 +269,7 @@ def main(jsonBlock):
 
     ClOrd, thresholdCalculator = clusterTrajectories(resname, trajFolder,
                                                      clusteringObject,
+                                                     clusteringThreshold,
                                                      symmetries=symmetries)
 
     # use graph algorithm to establish a path
