@@ -3,4 +3,5 @@
 ###################
 
 * I didnt use "__" for private methods, maybe use convention
+* More robust pickle handling so there is no breaking between versions
 * Support for MD propagators

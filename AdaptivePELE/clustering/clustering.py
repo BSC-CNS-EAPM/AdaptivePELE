@@ -12,11 +12,12 @@ from AdaptivePELE.utilities import utilities
 from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
 from AdaptivePELE.atomset import RMSDCalculator
 import socket
+import heapq
 # if "bsccv" not in socket.gethostname():
 #     from sklearn.cluster import AffinityPropagation
 #     from sklearn.cluster import AgglomerativeClustering
 #     from sklearn.cluster import KMeans
- 
+
 
 class Clusters:
     def __init__(self):
@@ -47,6 +48,44 @@ class Clusters:
         return self.clusters == other.clusters
 
 
+class AltStructures:
+    """
+        Helper class, each cluster will have an instance of AltStructures that
+        will maintain a priority queue (pq) of alternative structures to spawn
+        from encoded as tuples (priority, PDB).
+    """
+    def __init__(self):
+        self.altStructPQ = []
+        self.limitSize = 25
+
+    def altSpawnSelection(self):
+        """
+            Select an alternative PDB from the cluster center to spawn from
+        """
+        weights = 1.0/np.array(range(1, len(self.altStructPQ)+1))
+        weights /= weights.sum()
+        ind = np.random.choice(range(len(self.altStructPQ)), p=weights)
+        return self.altStructPQ[ind][1]
+
+    def cleanPQ(self):
+        """
+            Ensure that the alternative structures priority queue has no more
+            elements than the limit in order to ensure efficiency
+        """
+        if len(self.altStructPQ) < self.limitSize:
+            return
+        limit = len(self.altStructPQ)
+        del self.altStructPQ[self.limitSize-limit:]
+
+    def addStructure(self, PDB, metric):
+        heapq.heappush(self.altStructPQ, (metric, PDB))
+        if len(self.altStructPQ) > 2*self.limitSize:
+            self.cleanPQ()
+
+    def sizePQ(self):
+        return len(self.altStructPQ)
+
+
 class Cluster:
     """
         A cluster contains a representative structure(pdb), the number of
@@ -60,7 +99,7 @@ class Cluster:
             contacts stands for contacts/ligandAtom
         """
         self.pdb = pdb
-        self.altStructure = None
+        self.altStructure = AltStructures()
         self.elements = 1
         self.threshold = thresholdRadius
         self.density = density
@@ -121,10 +160,11 @@ class Cluster:
             With 50 % probability select the cluster center to spawn in
             the next epoch
         """
-        if not self.altSelection or self.altStructure is None or np.random.uniform() < 0.5:
+        if not self.altSelection or self.metricCol is None or np.random.uniform() < 0.5:
             self.pdb.writePDB(str(path))
         else:
-            self.altStructure.writePDB(str(path))
+            # pick an alternative structure from the priority queue
+            self.altStructure.altSpawnSelection().writePDB(str(path))
 
     def __eq__(self, other):
         return self.pdb == other.pdb\
@@ -300,6 +340,8 @@ class Clustering:
             else:
                 for num, snapshot in enumerate(snapshots):
                     self.addSnapshotToCluster(snapshot)
+        for cluster in self.clusters.clusters:
+            cluster.altStructure.cleanPQ()
 
     def writeOutput(self, outputPath, degeneracy, outputObject, writeAll):
         """
@@ -346,38 +388,10 @@ class Clustering:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
     def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
-        #########################################
-        # OPTIMISATION:
-        # We use centroid distance as a lower bound for RMSD
-        #
-        # Proof:
-        # Superscript ^1 and ^2 stands for PDB1 and PDB2 respectively
-        # Exponentiation is referred as ** to avoid misunderstandings
-        # Sumation is performed over atoms
-        #
-        # RMSD**2 = sum_i ||r^1_i - r^2_i||**2 / N := sum_i d_i**2 / N
-        # dc := centroid difference
-        # dc = ||sum_i r^1_i - r^2_i|| / N := sum_i d_i / N
-        # where d_i := r^1_i - r^2_i
-        #
-        # In the end, it is a matter of showing that the square of avg. is
-        # smaller or equal to the avg. of squares:
-        # (sum_i d_i / N)**2 <= sum_i d_i**2 / N
-        #
-        # Remembering Cauchy-Schward inequality:
-        # |<u*v>| <= ||<u>||*||<v>||
-        # Setting u_i = d_i/N and v_i = 1 for all i, in an n-dim euclidean space
-        # (sum d_i / N)**2 <= sum (d_i/N)**2 * 1
-        #########################################
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         self.clusteringEvaluator.cleanContactMap()
-        if np.random.rand() < 2.0:
-            tmpClusters = self.clusters.clusters
-        else:
-            tmpClusters = reversed(self.clusters.clusters)
-            # tmpClusters = self.clusters.clusters[::-1]
-        for clusterNum, cluster in enumerate(tmpClusters):
+        for clusterNum, cluster in enumerate(self.clusters.clusters):
             scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
             if scd > self.clusteringEvaluator.getInnerLimit(cluster):
                 continue
@@ -385,9 +399,11 @@ class Clustering:
             isSimilar, dist = self.clusteringEvaluator.isElement(pdb, cluster,
                                                                  self.resname, self.contactThresholdDistance)
             if isSimilar:
-                if dist > cluster.threshold/2 and (len(cluster.altMetrics) == 0 or cluster.getAltMetric() > metrics[cluster.metricCol]):
-                    cluster.altStructure = pdb
-                    cluster.altMetrics = metrics
+                # if dist > cluster.threshold/2 and (len(cluster.altMetrics) == 0 or cluster.getAltMetric() > metrics[cluster.metricCol]):
+                #     cluster.altStructure = pdb
+                #     cluster.altMetrics = metrics
+                if self.col is not None:
+                    cluster.altStructure.addStructure(pdb, metrics[self.col])
                 cluster.addElement(metrics)
                 return
 
