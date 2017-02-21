@@ -2,7 +2,7 @@ import AdaptivePELE.atomset.atomset as atomset
 import os
 import glob
 import numpy as np
-from utilities import utilities
+from AdaptivePELE.utilities import utilities
 import argparse
 import json
 
