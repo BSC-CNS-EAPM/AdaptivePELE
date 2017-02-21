@@ -30,8 +30,8 @@ cdef class SymmetryContactMapEvaluator:
         self.symmetries = state['symmetries']
         self.symToRowMap = state['symToRowMap']
         self.symmetricAtoms = state['symmetricAtoms']
-        self.ligandList = state['ligandList']
-        self.proteinList = state['proteinList']
+        self.ligandList = state.get('ligandList', [])
+        self.proteinList = state.get('proteinList', [])
 
     def createContactMap(self, atomset.PDB PDB, str ligandResname, int contactThresholdDistance):
         """
