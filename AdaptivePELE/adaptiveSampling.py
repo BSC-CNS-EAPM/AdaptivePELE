@@ -120,30 +120,6 @@ def generateSnapshotSelectionStringLastRound(currentEpoch, epochOutputPathTemple
     return " \"" + os.path.join(epochOutputPathTempletized % currentEpoch, constants.trajectoryBasename) + "\""
 
 
-def writeSpawningInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clustering, iteration):
-    """ Write initial structures for the next iteriation
-
-        tmpInitialStructuresTemplate [In] Template of the name of the initial
-        structures
-        degeneracyOfRepresentatives [In] Array with the degeneracy of each
-        cluster (i.e the number of processors that will be assigned to it)
-        clustering [In] clustering object
-        iteration [In] Number of epoch
-    """
-    counts = 0
-    for i, cluster in enumerate(clustering.clusters.clusters):
-        for j in range(int(degeneracyOfRepresentatives[i])):
-            outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
-            print 'Writing to ', outputFilename, 'cluster', i
-            cluster.writeSpawningStructure(outputFilename)
-            # cluster.writePDB(outputFilename)
-
-            counts += 1
-
-    print "counts & cluster centers", counts, np.where(np.array(degeneracyOfRepresentatives) > 0)[0].size
-    return counts
-
-
 def findFirstRun(outputPath, clusteringOutputObject):
     """
         Find the last epoch that was properly simulated and clusterized and
@@ -294,9 +270,7 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
     degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
     spawningCalculator.log()
     print "Degeneracy", degeneracyOfRepresentatives
-
     seedingPoints = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun)
-
     initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
 
     return clusteringMethod, initialStructuresAsString
