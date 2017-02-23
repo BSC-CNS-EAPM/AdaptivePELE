@@ -1,7 +1,7 @@
 Behavior changes from previous version:
-    *) Follow proper packaging conventions for Python packaging
-    *) Atomset package implemented in Cython (faster)
-    *) Jaccard index is calcualed using only the cells of the matrix that are 1
-    *) Added alternative structure to each cluster that will spawn 50% of the
-    time
-    *) Implemented UCB algorithm for spawning
+    *) Alternative structures are stored in a priority queue and spawn randomly
+    according to the metric
+
+Bug fixes:
+    *) Fix bug in spawning of alternative structures, was not calling the new
+    code for randomly spawn from cluster center of alternative structure

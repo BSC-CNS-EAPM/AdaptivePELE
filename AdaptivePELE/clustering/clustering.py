@@ -11,6 +11,7 @@ import AdaptivePELE.atomset.atomset as atomset
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
 from AdaptivePELE.atomset import RMSDCalculator
+from scipy import stats
 import socket
 import heapq
 # if "bsccv" not in socket.gethostname():
@@ -64,7 +65,10 @@ class AltStructures:
         """
         weights = 1.0/np.array(range(1, len(self.altStructPQ)+1))
         weights /= weights.sum()
-        ind = np.random.choice(range(len(self.altStructPQ)), p=weights)
+        # This function only works on numpy >= 1.7, on life we have 1.6
+        # ind = np.random.choice(range(len(self.altStructPQ)), p=weights)
+        r = stats.rv_discrete(values=(range(self.sizePQ()),weights))
+        ind = r.rvs()
         return self.altStructPQ[ind][1]
 
     def cleanPQ(self):
@@ -160,7 +164,7 @@ class Cluster:
             With 50 % probability select the cluster center to spawn in
             the next epoch
         """
-        if not self.altSelection or self.metricCol is None or np.random.uniform() < 0.5:
+        if not self.altSelection or self.altStructure.sizePQ() == 0 or np.random.uniform() < 0.5:
             self.pdb.writePDB(str(path))
         else:
             # pick an alternative structure from the priority queue

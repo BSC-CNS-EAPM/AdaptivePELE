@@ -150,7 +150,8 @@ class SpawningCalculator:
             for j in range(int(degeneracyOfRepresentatives[i])):
                 outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
                 print 'Writing to ', outputFilename, 'cluster', i
-                cluster.writePDB(outputFilename)
+                # cluster.writePDB(outputFilename)
+                cluster.writeSpawningStructure(outputFilename)
 
                 counts += 1
 
@@ -530,7 +531,7 @@ class UCBCalculator(DensitySpawningCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.UCB
         self.prevMetrics = np.array([0.0])
         self.averages = []
-        self.alpha = 2.0
+        self.alpha = 1.0
         self.beta = 0.25
         self.averageMetric = 0
         self.epoch = np.array([0.0])
@@ -578,7 +579,7 @@ class UCBCalculator(DensitySpawningCalculator):
         weights_trimmed[argweights[-trajToDistribute:]] = self.prevMetrics[argweights[-trajToDistribute:]]
         # values = weights_trimmed+self.alpha*np.sqrt((1/sizes))
         # values = weights_trimmed**2+self.alpha*(1/sizes**3)
-        values = self.beta*weights_trimmed+self.alpha*(1/sizes)
+        values = self.beta*weights_trimmed**2+self.alpha*(1/sizes)
         # minVal = np.min(values)
         # if minVal < 0:
         #     # if there is a negative value shift all the values so that the min
