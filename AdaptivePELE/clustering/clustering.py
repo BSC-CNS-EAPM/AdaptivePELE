@@ -165,9 +165,11 @@ class Cluster:
             the next epoch
         """
         if not self.altSelection or self.altStructure.sizePQ() == 0 or np.random.uniform() < 0.5:
+            print "cluster center"
             self.pdb.writePDB(str(path))
         else:
             # pick an alternative structure from the priority queue
+            print "alternative structure"
             self.altStructure.altSpawnSelection().writePDB(str(path))
 
     def __eq__(self, other):
