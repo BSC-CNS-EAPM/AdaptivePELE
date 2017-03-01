@@ -169,45 +169,43 @@ cdef class SymmetryContactMapEvaluator:
                     contacts.update([proteinAtomID])
         return contactMap.view(np.bool), len(contacts)
 
-    def evaluateJaccard(self, contactMap, cluster):
+    def evaluateJaccard(self, contactMap, clusterContactMap):
         permContactMap = self.buildOptimalPermutationContactMap(contactMap,
-                                                                cluster)
-        intersectContactMaps = (permContactMap & cluster.contactMap).sum()
-        unionContactMaps = permContactMap.sum() + cluster.contactMap.sum() - intersectContactMaps
+                                                                clusterContactMap)
+        intersectContactMaps = (permContactMap & clusterContactMap).sum()
+        unionContactMaps = permContactMap.sum() + clusterContactMap.sum() - intersectContactMaps
         if unionContactMaps < 1e-7:
             # both contactMaps have zero contacts
             return 0.0
-        # intersectContactMaps = (permContactMap == cluster.contactMap).sum()
-        # unionContactMaps = permContactMap.size + cluster.contactMap.size - intersectContactMaps
         similarity = float(intersectContactMaps)/unionContactMaps
         distance = 1-similarity
         return distance
 
-    def evaluateJaccardSet(self, contactMap, cluster):
+    def evaluateJaccardSet(self, contactMap, clusterContactMap):
         permContactMap = self.buildOptimalPermutationContactMap(contactMap,
-                                                                cluster)
-        intersectContactMaps = (permContactMap & cluster.contactMap).sum()
-        unionContactMaps = permContactMap.sum() + cluster.contactMap.sum() - intersectContactMaps
+                                                                clusterContactMap)
+        intersectContactMaps = (permContactMap & clusterContactMap).sum()
+        unionContactMaps = permContactMap.sum() + clusterContactMap.sum() - intersectContactMaps
         if unionContactMaps == 0:
             return 1
         similarity = float(intersectContactMaps)/unionContactMaps
         distance = 1-similarity
         return distance
 
-    def evaluateCorrelation(self, contactMap, cluster):
+    def evaluateCorrelation(self, contactMap, clusterContactMap):
         permContactMap = self.buildOptimalPermutationContactMap(contactMap,
-                                                                cluster)
-        similarity = calculateCorrelationContactMaps(permContactMap, cluster.contactMap)
+                                                                clusterContactMap)
+        similarity = calculateCorrelationContactMaps(permContactMap, clusterContactMap)
         similarity += 1  # Necessary to omit negative correlations
         similarity /= 2.0  # Correlation values need to be higher now
         distance = 1-similarity
         return distance
 
-    def evaluateDifferenceDistance(self, contactMap, cluster):
+    def evaluateDifferenceDistance(self, contactMap, clusterContactMap):
         permContactMap = self.buildOptimalPermutationContactMap(contactMap,
-                                                                cluster)
-        differenceContactMaps = np.abs(permContactMap-cluster.contactMap).sum()
-        averageContacts = (0.5*(permContactMap.sum()+cluster.contactMap.sum()))
+                                                                clusterContactMap)
+        differenceContactMaps = np.abs(permContactMap-clusterContactMap).sum()
+        averageContacts = (0.5*(permContactMap.sum()+clusterContactMap.sum()))
         if not averageContacts:
             # The only way the denominator can be 0 is if both contactMaps are
             # all zeros, thus being equal and belonging to the same cluster
@@ -216,14 +214,14 @@ cdef class SymmetryContactMapEvaluator:
             distance = differenceContactMaps/averageContacts
             return distance
 
-    def buildOptimalPermutationContactMap(self, contactMap, cluster):
+    def buildOptimalPermutationContactMap(self, contactMap, clusterContactMap):
         """
             Build a permutated version of the contactMap which maximizes the
             similarity between the two contactMaps
             :param contactMap: contactMap of the conformation to compare
             :type contactMap: numpy.Array
-            :param cluster: cluster object to which we are comparing
-            :type cluster: Cluster
+            :param clusterContactMap: cluster contactMap to which we are comparing
+            :type cluster: numpy.Array
             :returns: numpy.Array -- The permutated contact map
         """
         if not self.symmetries and not self.symToRowMap:
@@ -234,8 +232,8 @@ cdef class SymmetryContactMapEvaluator:
                 try:
                     atom1Row = self.symToRowMap[atom1Id]
                     atom2Row = self.symToRowMap[atom2Id]
-                    line11 = cluster.contactMap[atom1Row]
-                    line12 = cluster.contactMap[atom2Row]
+                    line11 = clusterContactMap[atom1Row]
+                    line12 = clusterContactMap[atom2Row]
                     line21 = contactMap[atom1Row]
                     line22 = contactMap[atom2Row]
                 except KeyError as err:
