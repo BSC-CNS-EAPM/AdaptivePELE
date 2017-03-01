@@ -57,19 +57,30 @@ class AltStructures:
     """
     def __init__(self):
         self.altStructPQ = []
-        self.limitSize = 25
+        self.limitSize = 10
 
-    def altSpawnSelection(self):
+    def altSpawnSelection(self, centerPair):
         """
             Select an alternative PDB from the cluster center to spawn from
         """
-        weights = 1.0/np.array(range(1, len(self.altStructPQ)+1))
+        subpopulations = [i[0] for i in self.altStructPQ]
+        totalSubpopulation = sum(subpopulations)
+        # Create a list of the population distributed between the cluster
+        # center and the alternative structures
+        weights = 1.0/np.array([centerPair[0]-totalSubpopulation]+subpopulations)
         weights /= weights.sum()
         # This function only works on numpy >= 1.7, on life we have 1.6
         # ind = np.random.choice(range(len(self.altStructPQ)), p=weights)
-        r = stats.rv_discrete(values=(range(self.sizePQ()),weights))
+        r = stats.rv_discrete(values=(range(self.sizePQ()), weights))
         ind = r.rvs()
-        return self.altStructPQ[ind][1]
+        # The first value of the distribution is always the cluster center
+        if ind == 0:
+            print "cluster center"
+            return centerPair[1]
+        else:
+            # pick an alternative structure from the priority queue
+            print "alternative structure"
+            return self.altStructPQ[ind][1].pdb
 
     def cleanPQ(self):
         """
@@ -81,8 +92,20 @@ class AltStructures:
         limit = len(self.altStructPQ)
         del self.altStructPQ[self.limitSize-limit:]
 
-    def addStructure(self, PDB, metric):
-        heapq.heappush(self.altStructPQ, (metric, PDB))
+    def addStructure(self, PDB, threshold, resname, contactThreshold, similarityEvaluator):
+        i = 0
+        for priority, subCluster in self.altStructPQ:
+            isSimilar, distance = similarityEvaluator.isElement(PDB, subCluster, resname, contactThreshold)
+            if distance < subCluster.threshold/2.0:
+                subCluster.addElement([])
+                del self.altStructPQ[i]
+                heapq.heappush(self.altStructPQ, (subCluster.elements, subCluster))
+                if len(self.altStructPQ) > 2*self.limitSize:
+                    self.cleanPQ()
+                return
+            i += 1
+        newCluster = Cluster(PDB, thresholdRadius=threshold, contactThreshold=contactThreshold, contactMap=similarityEvaluator.contactMap)
+        heapq.heappush(self.altStructPQ, (1, newCluster))
         if len(self.altStructPQ) > 2*self.limitSize:
             self.cleanPQ()
 
@@ -164,13 +187,11 @@ class Cluster:
             With 50 % probability select the cluster center to spawn in
             the next epoch
         """
-        if not self.altSelection or self.altStructure.sizePQ() == 0 or np.random.uniform() < 0.5:
+        if not self.altSelection or self.altStructure.sizePQ() == 0:
             print "cluster center"
             self.pdb.writePDB(str(path))
         else:
-            # pick an alternative structure from the priority queue
-            print "alternative structure"
-            self.altStructure.altSpawnSelection().writePDB(str(path))
+            self.altStructure.altSpawnSelection((self.elements, self.pdb)).writePDB(str(path))
 
     def __eq__(self, other):
         return self.pdb == other.pdb\
@@ -178,32 +199,6 @@ class Cluster:
              and self.threshold == other.threshold\
              and self.contacts == other.contacts\
              and np.allclose(self.metrics, other.metrics)
-
-
-class Tree:
-    def __init__(self):
-        """ Rooted tree, the root is an empty Node with all parameters set to
-            None
-        """
-        self.root = Node(None, None, None)
-
-    def addNode(self, node, parentNode):
-        parentNode.addChildren(node)
-
-
-class Node:
-    def __init__(self, cluster, position, parent):
-        self.children = []
-        self.position = position
-        self.parent = parent
-        self.cluster = cluster
-        if self.parent is None:
-            self.depth = 1
-        else:
-            self.depth = parent.depth+1
-
-    def addChildren(self, node):
-        self.children.append(node)
 
 
 class ContactsClusteringEvaluator:
@@ -252,7 +247,8 @@ class CMClusteringEvaluator:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             # self.contactMap, foo = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             # self.contacts = pdb.countContacts(resname, 8)  # contactThresholdDistance)
-        return self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster, self.symmetryEvaluator)
+        distance = self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster.contactMap, self.symmetryEvaluator)
+        return distance < cluster.threshold, distance
 
     def cleanContactMap(self):
         self.contactMap = None
@@ -279,7 +275,6 @@ class CMClusteringEvaluator:
         return 16
 
 
-# class Clustering(object):
 class Clustering:
     """
         Base class for clustering methods, it defines a cluster method that
@@ -405,11 +400,8 @@ class Clustering:
             isSimilar, dist = self.clusteringEvaluator.isElement(pdb, cluster,
                                                                  self.resname, self.contactThresholdDistance)
             if isSimilar:
-                # if dist > cluster.threshold/2 and (len(cluster.altMetrics) == 0 or cluster.getAltMetric() > metrics[cluster.metricCol]):
-                #     cluster.altStructure = pdb
-                #     cluster.altMetrics = metrics
-                if self.col is not None:
-                    cluster.altStructure.addStructure(pdb, metrics[self.col])
+                if dist > cluster.threshold/2:
+                    cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.contactThresholdDistance, self.clusteringEvaluator)
                 cluster.addElement(metrics)
                 return
 
@@ -431,86 +423,6 @@ class Clustering:
         self.clusters.addCluster(cluster)
 
 
-class TreeClustering(Clustering):
-    def __init__(self, resname=None, reportBaseFilename=None,
-                 columnOfReportFile=None, contactThresholdDistance=8,
-                 symmetries=[]):
-        Clustering.__init__(self, resname, reportBaseFilename,
-                            columnOfReportFile, contactThresholdDistance)
-        self.clusteringEvaluator = None
-        self.tree = Tree()
-
-    def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
-        #########################################
-        # OPTIMISATION:
-        # We use centroid distance as a lower bound for RMSD
-        #
-        # Proof:
-        # Superscript ^1 and ^2 stands for PDB1 and PDB2 respectively
-        # Exponentiation is referred as ** to avoid misunderstandings
-        # Sumation is performed over atoms
-        #
-        # RMSD**2 = sum_i ||r^1_i - r^2_i||**2 / N := sum_i d_i**2 / N
-        # dc := centroid difference
-        # dc = ||sum_i r^1_i - r^2_i|| / N := sum_i d_i / N
-        # where d_i := r^1_i - r^2_i
-        #
-        # In the end, it is a matter of showing that the square of avg. is
-        # smaller or equal to the avg. of squares:
-        # (sum_i d_i / N)**2 <= sum_i d_i**2 / N
-        #
-        # Remembering Cauchy-Schward inequality:
-        # |<u*v>| <= ||<u>||*||<v>||
-        # Setting u_i = d_i/N and v_i = 1 for all i, in an n-dim euclidean space
-        # (sum d_i / N)**2 <= sum (d_i/N)**2 * 1
-        #########################################
-        pdb = atomset.PDB()
-        pdb.initialise(snapshot, resname=self.resname)
-        clusterNode = self.tree.root
-        self.clusteringEvaluator.cleanContactMap()
-        minDist = 100
-        while clusterNode.children:
-            for node in clusterNode.children:
-                scd = atomset.computeSquaredCentroidDifference(node.cluster.pdb, pdb)
-                # if scd > node.cluster.threshold2+4:
-                if scd < self.clusteringEvaluator.getOuterLimit(node):
-                    if scd < self.clusteringEvaluator.getInnerLimit(node):
-                        if self.clusteringEvaluator.isElement(pdb, node.cluster,
-                                                              self.resname, self.contactThresholdDistance):
-                            node.cluster.addElement(metrics)
-                            return
-                    if scd < minDist:
-                        minDist = scd
-                        clusterNode = node
-                else:
-                    continue
-            # If has compared to all the children and none is within centroid
-            # distance, add a new children node
-            break
-
-        # if made it here, the snapshot was not added into any cluster
-        # Check if contacts and contactMap are set (depending on which kind
-        # of clustering)
-        self.clusteringEvaluator.checkAttributes(pdb, self.resname, self.contactThresholdDistance)
-        contacts = self.clusteringEvaluator.contacts
-        numberOfLigandAtoms = pdb.getNumberOfAtoms()
-        contactsPerAtom = float(contacts)/numberOfLigandAtoms
-
-        threshold = self.thresholdCalculator.calculate(contactsPerAtom)
-        cluster = Cluster(pdb, thresholdRadius=threshold,
-                          contacts=contactsPerAtom,
-                          contactMap=self.clusteringEvaluator.contactMap,
-                          metrics=metrics, metricCol=col)
-        self.tree.addNode(Node(cluster, self.clusters.getNumberClusters(), clusterNode), clusterNode)
-        self.clusters.addCluster(cluster)
-
-    def extractPathwayFromNode(self, node):
-        pathway = []
-        while node.parent is not None:
-            pathway.append(node.cluster)
-            node = node.parent
-        return pathway
-
 class ContactsClustering(Clustering):
     """
         Cluster together all snapshots that are closer to the cluster center
@@ -531,8 +443,6 @@ class ContactsClustering(Clustering):
     def __init__(self, thresholdCalculator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8, symmetries=[], altSelection=False):
-        # TreeClustering.__init__(self, resname, reportBaseFilename,
-        #                    columnOfReportFile, contactThresholdDistance)
         Clustering.__init__(self, resname, reportBaseFilename,
                            columnOfReportFile, contactThresholdDistance,
                             altSelection=altSelection)
@@ -558,8 +468,6 @@ class ContactMapAccumulativeClustering(Clustering):
     def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8, symmetries=[], altSelection=False):
-        # TreeClustering.__init__(self, resname, reportBaseFilename,
-        #                     columnOfReportFile, contactThresholdDistance)
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance,
                             altSelection=altSelection)
@@ -957,13 +865,12 @@ class differenceDistanceEvaluator:
         the number of differences over the average of elements in the contacts
         maps
     """
-    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
+    def isSimilarCluster(self, contactMap, clusterContactMap, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        distance = symContactMapEvaluator.evaluateDifferenceDistance(contactMap, cluster)
-        return distance < cluster.threshold, distance
+        return symContactMapEvaluator.evaluateDifferenceDistance(contactMap, clusterContactMap)
 
 
 class JaccardEvaluator:
@@ -972,13 +879,12 @@ class JaccardEvaluator:
         index, that is, the ratio between the intersection of the two contact
         maps and their union
     """
-    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
+    def isSimilarCluster(self, contactMap, clusterContactMap, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        distance = symContactMapEvaluator.evaluateJaccard(contactMap, cluster)
-        return distance < cluster.threshold, distance
+        return symContactMapEvaluator.evaluateJaccard(contactMap, clusterContactMap)
 
 
 class correlationEvaluator:
@@ -986,13 +892,12 @@ class correlationEvaluator:
         Evaluate the similarity of two contact maps by calculating their
         correlation
     """
-    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
+    def isSimilarCluster(self, contactMap, clusterContactMap, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        distance = symContactMapEvaluator.evaluateCorrelation(contactMap, cluster)
-        return distance < cluster.threshold, distance
+        return symContactMapEvaluator.evaluateCorrelation(contactMap, clusterContactMap)
 
 
 # TODO: should it be a class method?
