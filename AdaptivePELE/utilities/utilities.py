@@ -1,7 +1,8 @@
 import os
 import shutil
 import numpy as np
-import pickle
+# import pickle
+import cPickle as pickle
 from AdaptivePELE.atomset import RMSDCalculator
 import AdaptivePELE.atomset.atomset as atomset
 
