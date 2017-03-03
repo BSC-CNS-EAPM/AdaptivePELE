@@ -243,6 +243,25 @@ class TestSpawningCalculator(unittest.TestCase):
         # self.assertAlmostEqual(params.epsilon, params.minEpsilon)
 
 
+    def testUCBCalculator(self):
+        UCB = spawning.UCBCalculator()
+        params = spawning.SpawningParams()
+        params.alpha = 8.0
+
+        clusters = clustering.Clusters()
+        sizes = [6, 2, 3, 1]
+        energies = [-4, -2, -2, -1]
+        for size, energy in zip(sizes, energies):
+            cluster = clustering.Cluster(None, None, None, None, metricCol=0)
+            cluster.elements = size
+            cluster.metrics = [energy]
+            clusters.addCluster(cluster)
+
+        trajs = 20
+        degeneracy = UCB.calculate(clusters.clusters, trajs, params)
+        golden = np.array([3, 5, 3, 9])
+        np.testing.assert_array_equal(degeneracy, golden)
+
 def main():
     return unittest.main(exit=False)
 
