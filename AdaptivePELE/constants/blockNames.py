@@ -77,6 +77,7 @@ class SpawningParams:
     metricWeights = "metricWeights"
     linear = "linear"
     boltzmann = "boltzmann"
+    alpha = "alpha"
 
 
 class SpawningDensity:
