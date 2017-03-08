@@ -134,10 +134,32 @@ def findFirstRun(outputPath, clusteringOutputObject):
     epochFolders = [int(epoch) for epoch in allFolders if epoch.isdigit()]
     epochFolders.sort(reverse=True)
 
+    objectsFound = []
     for epoch in epochFolders:
         if os.path.exists(clusteringOutputObject % epoch):
+            objectsFound.append(epoch)
+        if epoch < (objectsFound[0]-5):
+            break
+    while objectsFound:
+        epoch = objectsFound.pop(0)
+        if checkIntegrityClusteringObject(clusteringOutputObject % epoch):
             return epoch + 1
     return 0
+
+
+def checkIntegrityClusteringObject(objectPath):
+    """
+        Test wheter the found clustering object to reload is a valid object
+
+        :param objectPath: Path to the clustering object
+        :param objectPath: str
+        :returns: bool -- True if the clustering object found is valid
+    """
+    try:
+        utilities.readClusteringObject(objectPath)
+        return True
+    except EOFError:
+        return False
 
 
 def loadParams(jsonParams):
@@ -375,7 +397,6 @@ def main(jsonParams):
 
     print "wildcard", initialStructuresWildcard
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
-    print initialStructures
     checkSymmetryDict(clusteringBlock, initialStructures, resname)
 
     outputPathConstants = constants.OutputPathConstants(outputPath)

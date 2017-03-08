@@ -138,3 +138,26 @@ class TestadaptiveSampling(unittest.TestCase):
                    "if the test are not running on MareNostrum or life")
             shutil.rmtree(outputPath)
             shutil.rmtree("tmp_tests_data_3ptb_data_Test3/")
+
+    def testRestartEmptyClustering(self):
+        controlFile = "tests/data/3ptb_data/integrationTest3.conf"
+        outputPath = "tests/data/3ptb_data/RestartTest"
+        tmpFolder = "tmp_" + outputPath.replace("/", "_")
+        clusteringObjectPath = os.path.join(outputPath, "2", "object.pkl")
+
+        try:
+            # Function to test --> integration test
+            adaptiveSampling.main(controlFile)
+
+            # Assertions
+            self.assertTrue(adaptiveSampling.checkIntegrityClusteringObject(clusteringObjectPath))
+        except SystemExit:
+            # Catch error for not having PELE installed
+            print ("Warning! There was a sysExit in test3, this is usually "
+                   "caused by not having PELE installed, so it can be ignored "
+                   "if the test are not running on MareNostrum or life")
+        # Remove clustering object from the simulation and create and empty one
+        open(clusteringObjectPath, "w").close()
+        # cleanup
+        shutil.rmtree(outputPath)
+        shutil.rmtree(tmpFolder)
