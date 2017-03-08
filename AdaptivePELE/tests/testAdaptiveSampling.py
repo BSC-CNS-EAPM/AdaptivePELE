@@ -140,15 +140,15 @@ class TestadaptiveSampling(unittest.TestCase):
             shutil.rmtree("tmp_tests_data_3ptb_data_Test3/")
 
     def testRestartEmptyClustering(self):
-        controlFile = "tests/data/3ptb_data/integrationTest3.conf"
+        controlFile = "tests/data/3ptb_data/restartTest.conf"
         outputPath = "tests/data/3ptb_data/RestartTest"
         tmpFolder = "tmp_" + outputPath.replace("/", "_")
-        clusteringObjectPath = os.path.join(outputPath, "2", "object.pkl")
+        clusteringObjectPath = os.path.join(outputPath, "2", "clustering", "object.pkl")
+        shutil.copy("tests/data/3ptb_data/object_test_bk.pkl", os.path.join(outputPath, "1", "clustering", "object.pkl"))
 
         try:
             # Function to test --> integration test
             adaptiveSampling.main(controlFile)
-
             # Assertions
             self.assertTrue(adaptiveSampling.checkIntegrityClusteringObject(clusteringObjectPath))
         except SystemExit:
@@ -159,5 +159,4 @@ class TestadaptiveSampling(unittest.TestCase):
         # Remove clustering object from the simulation and create and empty one
         open(clusteringObjectPath, "w").close()
         # cleanup
-        shutil.rmtree(outputPath)
         shutil.rmtree(tmpFolder)
