@@ -581,6 +581,7 @@ class UCBCalculator(DensitySpawningCalculator):
         # values = weights_trimmed+clusteringParams.alpha*np.sqrt((1/sizes))
         # values = self.beta*weights_trimmed**2+clusteringParams.alpha*(1/sizes**2)
         values = self.beta*weights_trimmed**2+clusteringParams.alpha*(1/sizes)
+        # values = self.beta*weights_trimmed**2+(clusteringParams.alpha/((np.log2(currentEpoch+2))**(1/4.0)))*(1/sizes)
         # minVal = np.min(values)
         # if minVal < 0:
         #     # if there is a negative value shift all the values so that the min

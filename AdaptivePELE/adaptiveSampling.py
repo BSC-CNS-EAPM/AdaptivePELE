@@ -138,7 +138,7 @@ def findFirstRun(outputPath, clusteringOutputObject):
     for epoch in epochFolders:
         if os.path.exists(clusteringOutputObject % epoch):
             objectsFound.append(epoch)
-        if epoch < (objectsFound[0]-5):
+        if objectsFound and epoch < (objectsFound[0]-5):
             break
     while objectsFound:
         epoch = objectsFound.pop(0)
