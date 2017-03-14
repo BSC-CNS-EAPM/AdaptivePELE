@@ -265,12 +265,28 @@ class CMClusteringEvaluator:
         #     return 4.0
         # else:
         #     return 16-self.limitSlope[cluster.contactThreshold]*cluster.contacts
+        # if cluster.contacts > 2.0:
+        #     return 4.0
+        # elif cluster.contacts <= 0.5:
+        #     return 25.0
+        # else:
+        #     return 25-14*(cluster.contacts-0.5)
+
         if cluster.contacts > 2.0:
             return 4.0
-        elif cluster.contacts <= 0.5:
+        elif cluster.contacts < 0.5:
             return 25.0
         else:
-            return 25-14*(cluster.contacts-0.5)
+            return 16-8*(cluster.contacts-0.5)
+
+       #  if cluster.contacts > 1.0:
+       #      return 4.0
+       #  elif cluster.contacts > 0.75:
+       #      return 9.0
+       #  elif cluster.contacts > 0.5:
+       #      return 16.0
+       #  else:
+       #      return 25
 
     def getOuterLimit(self, node):
         # return max(16, 16 * 2 - node.depth)
