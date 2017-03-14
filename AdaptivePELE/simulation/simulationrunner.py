@@ -63,7 +63,7 @@ class SimulationRunner:
     def makeInitialMapping(self, clusterInitial):
         clusterList = self.processorsToClusterMapping[:]
         ind = 0
-        for i in xrange(self.parameters.processors):
+        for i in xrange(self.parameters.processors-1):
             clusterList[i] = clusterInitial[ind]
             ind += 1
             ind %= len(clusterInitial)

@@ -290,6 +290,12 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
     """
     clusteringMethod = getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner)
 
+    if not hasattr(clusteringMethod, "FDT"):
+        #TODO: Build proper pickling for clustering
+        import networkx
+        clusteringMethod.FDT = networkx.DiGraph()
+        clusteringMethod.conformationNetwork = networkx.DiGraph()
+
     degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
     spawningCalculator.log()
     print "Degeneracy", degeneracyOfRepresentatives
@@ -329,7 +335,7 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
                                                          spawningParams.reportFilename,
                                                          spawningParams.reportCol)
     initialClusters = clusteringMethod.clusterInitialStructures(initialStructures)
-    return clusteringMethod, initialStructuresAsString
+    return clusteringMethod, initialStructuresAsString, initialClusters
 
 
 def preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControlFileDictionary):
@@ -417,6 +423,7 @@ def main(jsonParams):
         firstRun = 0  # if restart false, but there were previous simulations
         clusteringMethod, initialStructuresAsString, initialClusters = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
         simulationRunner.makeInitialMapping(initialClusters)
+
 
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
 
