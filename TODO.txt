@@ -2,6 +2,6 @@
 ###  TODO LIST  ###
 ###################
 
-* I didnt use "__" for private methods, maybe use convention
 * More robust pickle handling so there is no breaking between versions
+* I didnt use "__" for private methods, maybe use convention
 * Support for MD propagators

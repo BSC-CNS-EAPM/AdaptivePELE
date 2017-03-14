@@ -164,7 +164,7 @@ class Cluster:
 
     def addElement(self, metrics):
         self.elements += 1
-        if self.metrics is None and len(metrics):
+        if self.metrics is None:
             # Special case where cluster in created during clustering of
             # initial structures
             self.metrics = metrics
@@ -356,9 +356,9 @@ class Clustering:
             :type initialStructures: list
         """
         clusterInitial = []
-        for structurePath in initialStructures:
+        for i, structurePath in enumerate(initialStructures):
             pdb = atomset.PDB()
-            pdb.initialise(structurePath, resname=self.resname)
+            pdb.initialise(str(structurePath), resname=self.resname)
             for clusterNum, cluster in enumerate(self.clusters.clusters):
                 scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
                 if scd > self.clusteringEvaluator.getInnerLimit(cluster):
@@ -367,10 +367,13 @@ class Clustering:
                 isSimilar, dist = self.clusteringEvaluator.isElement(pdb, cluster,
                                                                     self.resname, self.contactThresholdDistance)
                 if isSimilar:
-                    cluster.addElement()
+                    cluster.addElement([])
                     clusterInitial.append(clusterNum)
                     self.clusters.clusters[clusterNum].elements = 0
+                    break
 
+            if len(clusterInitial) == i+1:
+                continue
             # if made it here, the snapshot was not added into any cluster
             # Check if contacts and contactMap are set (depending on which kind
             # of clustering)
