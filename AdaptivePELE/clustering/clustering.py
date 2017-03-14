@@ -13,6 +13,7 @@ from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
 from AdaptivePELE.atomset import RMSDCalculator
 from scipy import stats
 import socket
+import networkx as nx
 import heapq
 # if "bsccv" not in socket.gethostname():
 #     from sklearn.cluster import AffinityPropagation
@@ -163,6 +164,11 @@ class Cluster:
 
     def addElement(self, metrics):
         self.elements += 1
+        if self.metrics is None and len(metrics):
+            # Special case where cluster in created during clustering of
+            # initial structures
+            self.metrics = metrics
+            return
         if len(metrics) and len(self.metrics):
             # Set all metrics to the minimum value
             self.metrics = np.minimum(self.metrics, metrics)
@@ -303,6 +309,8 @@ class Clustering:
         self.contactThresholdDistance = contactThresholdDistance
         self.symmetries = []
         self.altSelection = altSelection
+        self.conformationNetwork = nx.DiGraph()
+        self.FDT = nx.DiGraph()
 
     def setCol(self, col):
         self.col = col
@@ -323,7 +331,54 @@ class Clustering:
             and self.resname == other.resname\
             and self.col == other.col
 
-    def cluster(self, paths):
+    def clusterInitialStructures(self, initialStructures):
+        """
+            Cluster the initial structures. This will allow to obtain a working
+            processor to cluster mapping (see SimulationRunner docs for more info)
+            for simulation with multiple initial structures
+            :param initialStructures: List of the initial structures of the simulation
+            :type initialStructures: list
+        """
+        clusterInitial = []
+        for structurePath in initialStructures:
+            pdb = atomset.PDB()
+            pdb.initialise(structurePath, resname=self.resname)
+            for clusterNum, cluster in enumerate(self.clusters.clusters):
+                scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
+                if scd > self.clusteringEvaluator.getInnerLimit(cluster):
+                    continue
+
+                isSimilar, dist = self.clusteringEvaluator.isElement(pdb, cluster,
+                                                                    self.resname, self.contactThresholdDistance)
+                if isSimilar:
+                    cluster.addElement()
+                    clusterInitial.append(clusterNum)
+                    self.clusters.clusters[clusterNum].elements = 0
+
+            # if made it here, the snapshot was not added into any cluster
+            # Check if contacts and contactMap are set (depending on which kind
+            # of clustering)
+            self.clusteringEvaluator.checkAttributes(pdb, self.resname, self.contactThresholdDistance)
+            contacts = self.clusteringEvaluator.contacts
+            numberOfLigandAtoms = pdb.getNumberOfAtoms()
+            contactsPerAtom = float(contacts)/numberOfLigandAtoms
+
+            threshold = self.thresholdCalculator.calculate(contactsPerAtom)
+            cluster = Cluster(pdb, thresholdRadius=threshold,
+                            contacts=contactsPerAtom,
+                            contactMap=self.clusteringEvaluator.contactMap,
+                            metrics=None, metricCol=self.col,
+                            contactThreshold=self.contactThresholdDistance,
+                            altSelection=self.altSelection)
+            self.clusters.addCluster(cluster)
+            clusterNum = self.getNumberClusters()-1
+            clusterInitial.append(clusterNum)
+            self.clusters.clusters[clusterNum].elements = 0
+            self.conformationNetwork.add_node(clusterNum)
+            self.FDT.add_node(clusterNum)
+        return clusterInitial
+
+    def cluster(self, paths, processorsToClusterMapping):
         """
             Cluster the snaptshots contained in the pahts folder
             paths [In] List of folders with the snapshots
@@ -339,10 +394,10 @@ class Clustering:
                 metrics = np.loadtxt(reportFilename, ndmin=2)
 
                 for num, snapshot in enumerate(snapshots):
-                    self.addSnapshotToCluster(snapshot, metrics[num], self.col)
+                    self.addSnapshotToCluster(snapshot, processorsToClusterMapping[trajNum-1], metrics[num], self.col)
             else:
                 for num, snapshot in enumerate(snapshots):
-                    self.addSnapshotToCluster(snapshot)
+                    self.addSnapshotToCluster(snapshot, processorsToClusterMapping[trajNum-1])
         for cluster in self.clusters.clusters:
             cluster.altStructure.cleanPQ()
 
@@ -390,7 +445,7 @@ class Clustering:
         with open(outputObject, 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
-    def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
+    def addSnapshotToCluster(self, snapshot, origCluster, metrics=[], col=None):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         self.clusteringEvaluator.cleanContactMap()
@@ -405,6 +460,15 @@ class Clustering:
                 if dist > cluster.threshold/2:
                     cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.contactThresholdDistance, self.clusteringEvaluator)
                 cluster.addElement(metrics)
+                if not self.conformationNetwork.has_edge(origCluster, clusterNum):
+                    # simple directe network
+                    self.conformationNetwork.add_edge(origCluster, clusterNum)
+                # if self.conformationNetwork.out_degree(clusterNum) == 0 and origCluster != clusterNum:
+                #     # No self-loops or back edges
+                #     self.conformationNetwork.add_edge(origCluster, clusterNum)
+                if self.FDT.degree(clusterNum) == 0 and origCluster != clusterNum:
+                    # First discovery tree
+                    self.FDT.add_edge(origCluster, clusterNum)
                 return
 
         # if made it here, the snapshot was not added into any cluster
@@ -423,6 +487,53 @@ class Clustering:
                           contactThreshold=self.contactThresholdDistance,
                           altSelection=self.altSelection)
         self.clusters.addCluster(cluster)
+        clusterNum = self.clusters.getNumberClusters()-1
+        self.conformationNetwork.add_node(clusterNum)
+        self.FDT.add_node(clusterNum)
+        self.conformationNetwork.add_edge(origCluster, clusterNum)
+        if origCluster != clusterNum:
+            self.FDT.add_edge(origCluster, clusterNum)
+
+    def writeConformationNetwork(self, path):
+        """
+            Write the conformational network to file to visulize it
+            :param path: Path where to write the network
+            :type path: str
+        """
+        nx.write_edgelist(self.conformationNetwork, path)
+
+    def writeFDT(self, path):
+        """
+            Write the first discovery tree to file in edgelist format to
+            visualize it
+            :param path: Path where to write the network
+            :type path: str
+        """
+        nx.write_edgelist(self.FDT, path)
+
+    def writeConformationNodeMetric(self, path, metricCol):
+        """
+            Write the metric of each node in the conformation network in a
+            tab-separated file
+            :param path: Path where to write the network
+            :type path: str
+            :param metricCol: Column of the metric of interest
+            :type metricCol: int
+        """
+        with open(path, "w") as f:
+            for i, cluster in enumerate(self.clusters.clusters):
+                f.write("%d\t%.4f\n" % (i, cluster.getMetricFromColumn(metricCol)))
+
+    def writeConformationNodePopulation(self, path):
+        """
+            Write the population of each node in the conformation network in a
+            tab-separated file
+            :param path: Path where to write the network
+            :type path: str
+        """
+        with open(path, "w") as f:
+            for i, cluster in enumerate(self.clusters.clusters):
+                f.write("%d\t%d\n" % (i, cluster.elements))
 
 
 class ContactsClustering(Clustering):
