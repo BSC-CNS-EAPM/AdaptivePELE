@@ -45,13 +45,13 @@ cdef class RMSDCalculator:
         cdef atomset.Atom atom11, atom12, atom21, atom22, atom1, atom2
         cdef dict group
         cdef int n
-        rmsd = 0
+        rmsd = 0.0
         if self.nonSymmetricalAtomsSet is None:
             self.computeNonSymmAtoms(PDB1)
 
         for group in self.symmetries:
-            d2 = 0
-            d2sm = 0
+            d2 = 0.0
+            d2sm = 0.0
             for atom1Id, atom2Id in group.iteritems():
                 try:
                     atom11 = PDB1.getAtom(atom1Id)
