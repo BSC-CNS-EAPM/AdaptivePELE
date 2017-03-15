@@ -73,7 +73,7 @@ class AltStructures:
         # This function only works on numpy >= 1.7, on life we have 1.6
         # ind = np.random.choice(range(len(self.altStructPQ)), p=weights)
         r = stats.rv_discrete(values=(range(self.sizePQ()), weights))
-        ind = r.rvs()
+        ind = r.rvs(size=10)[0]
         # The first value of the distribution is always the cluster center
         if ind == 0:
             print "cluster center"
