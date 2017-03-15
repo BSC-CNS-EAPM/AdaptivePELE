@@ -1,5 +1,6 @@
 from AdaptivePELE.clustering import clustering, thresholdcalculator
 import time
+import sys
 # import pickle
 # import pdb as debug
 import os
@@ -141,29 +142,30 @@ for i in range(nEpochs):
         for line in open(traj, "r"):
             total_snapshots += 1
         total_snapshots -= 1
-    print "Total snapsthots for epoch %d: %d" % (i, total_snapshots)
+    sys.stderr.write("Total snapsthots for epoch %d: %d\n" % (i, total_snapshots))
     startTimeCont = time.time()
     ClCont.cluster(path, processorMapping)
     endTimeCont = time.time()
-    print "Total time of clustering contacts, epoch %d: %.6f"%(i,endTimeCont-startTimeCont)
-    print "Number of clusters contacts epoch %d: %d"%(i,len(ClCont.clusters.clusters))
+    sys.stderr.write("Total time of clustering contacts, epoch %d: %.6f\n"%(i,endTimeCont-startTimeCont))
+    sys.stderr.write("Number of clusters contacts epoch %d: %d\n"%(i,len(ClCont.clusters.clusters)))
     degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs-1, spawnParams)
     nProc = 0
     clusterList = processorMapping[:]
-    for i in xrange(len(ClCont.clusters.clusters)):
-        for j in range(int(degeneraciesCont[i])):
-            clusterList[nProc] = i
+    for icl in xrange(len(ClCont.clusters.clusters)):
+        for j in range(int(degeneraciesCont[icl])):
+            clusterList[nProc] = icl
             nProc += 1
     assert nProc == ntrajs-1
     processorMapping = clusterList[1:]+[clusterList[0]]
+    with open("mappings/mapping%d.txt"%i, "w") as f:
+        f.write(','.join(map(str, processorMapping)))
     ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
     os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
     # startTimeAcc = time.time()
     # ClAcc.cluster(path)
     # endTimeAcc = time.time()
-    # print "Total time of clustering accumulative, epoch %d: %.6f" % (i,endTimeAcc-startTimeAcc)
-    # print "Number of clusters accumulative epoch %d: %d" % (i,len(ClAcc.clusters.clusters))
-    # print ""
+    # sys.stderr.write("Total time of clustering accumulative, epoch %d\n: %.6f" % (i,endTimeAcc-startTimeAcc))
+    # sys.stderr.write("Number of clusters accumulative epoch %d: %d\n" % (i,len(ClAcc.clusters.clusters)))
     # degeneraciesAcc = spawningObject.calculate(ClAcc.clusters.clusters, ntrajs-1, spawnParams)
     # summaryFolder = "%d/clustering" % i
     # if not os.path.exists(summaryFolder):
@@ -183,3 +185,4 @@ ClCont.writeConformationNetwork("conformationNetwork.edgelist")
 ClCont.writeFDT("FDT.edgelist")
 ClCont.writeConformationNodeMetric("nodesMetrics.txt", 4)
 ClCont.writeConformationNodePopulation("nodesPopulation.txt")
+ClCont.writePathwayOptimalCluster("pathwayFDT.pdb")

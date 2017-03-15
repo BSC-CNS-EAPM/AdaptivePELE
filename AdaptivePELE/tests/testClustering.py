@@ -15,7 +15,7 @@ class clusteringTest(unittest.TestCase):
         trajNames = ["tests/data/aspirin_data/traj*"]
 
         # function to test
-        clusteringInstance.cluster(trajNames)
+        clusteringInstance.cluster(trajNames, range(8))
 
         # assertion
         allClusters = clusteringInstance.clusters.clusters
@@ -114,7 +114,7 @@ class clusteringTest(unittest.TestCase):
         trajNames = ["tests/data/aspirin_data/traj*"]
 
         # function to test
-        clusteringInstance.cluster(trajNames)
+        clusteringInstance.cluster(trajNames, range(8))
         # assertion
         allClusters = clusteringInstance.clusters.clusters
         clusteringInstance.clusters.printClusters()
@@ -148,12 +148,20 @@ class clusteringTest(unittest.TestCase):
         cluster1_6 = clustering.Cluster(None, contacts=1.0, contactThreshold=6)
         cluster1_4 = clustering.Cluster(None, contacts=1.0, contactThreshold=4)
         cluster2_4 = clustering.Cluster(None, contacts=2.2, contactThreshold=4)
-        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_8), 18)
+        # Reduced slope to 8
+        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_8), 12)
         self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_8), 4)
-        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_6), 18)
+        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_6), 12)
         self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_6), 4)
-        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_4), 18)
+        self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_4), 12)
         self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_4), 4)
+        # Slope 14
+        # self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_8), 18)
+        # self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_8), 4)
+        # self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_6), 18)
+        # self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_6), 4)
+        # self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_4), 18)
+        # self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_4), 4)
         # Now the limits are always calculated with threshold 8
         # self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_6), 10)
         # self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_6), 4)

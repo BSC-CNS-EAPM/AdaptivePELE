@@ -114,6 +114,7 @@ class TestSimulation(SimulationRunner):
         Class used for testing
     """
     def __init__(self, parameters):
+        SimulationRunner.__init__(self, parameters)
         self.type = simulationTypes.SIMULATION_TYPE.TEST
         self.copied = False
         self.parameters = parameters
