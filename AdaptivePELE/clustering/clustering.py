@@ -326,7 +326,7 @@ class Clustering:
         self.symmetries = []
         self.altSelection = altSelection
         self.conformationNetwork = nx.DiGraph()
-        self.FDT = nx.DiGraph()
+        self.epoch = -1
 
     def setCol(self, col):
         self.col = col
@@ -373,6 +373,11 @@ class Clustering:
                     break
 
             if len(clusterInitial) == i+1:
+                # If an initial structure is similar enough to be added as
+                # element in a previous cluster, move to the next structure,
+                # this function is practically a duplicate of the
+                # addSnapshotToCluster function and this blocks substitutes the
+                # return statement after adding an element
                 continue
             # if made it here, the snapshot was not added into any cluster
             # Check if contacts and contactMap are set (depending on which kind
@@ -393,15 +398,16 @@ class Clustering:
             clusterNum = self.getNumberClusters()-1
             clusterInitial.append(clusterNum)
             self.clusters.clusters[clusterNum].elements = 0
-            self.conformationNetwork.add_node(clusterNum)
-            self.FDT.add_node(clusterNum)
+            self.conformationNetwork.add_node(clusterNum, parent='root', epoch=0)
         return clusterInitial
 
     def cluster(self, paths, processorsToClusterMapping):
         """
             Cluster the snaptshots contained in the pahts folder
-            paths [In] List of folders with the snapshots
+            :param paths: List of folders with the snapshots
+            :type paths: list
         """
+        self.epoch += 1
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
@@ -424,12 +430,16 @@ class Clustering:
         """
             Writes all the clustering information in outputPath
 
-            outputPath [In] Folder that will contain all the clustering information
-            degeneracy [In] Degeneracy of each cluster. It must be in the same order
+            :param outputPath: Folder that will contain all the clustering information
+            :type outputPath: str
+            :param degeneracy: Degeneracy of each cluster. It must be in the same order
             as in the self.clusters list
-            outputObject [In] Output name for the pickle object
-            writeAll [In] Boolean, wether to write pdb files for all cluster in addition
+            :type degeneracy: list
+            :param outputObject: Output name for the pickle object
+            :type outputObject: str
+            :param writeAll: Wether to write pdb files for all cluster in addition
             of the summary
+            :type writeAll: bool
         """
         utilities.cleanup(outputPath)
         utilities.makeFolder(outputPath)
@@ -479,15 +489,14 @@ class Clustering:
                 if dist > cluster.threshold/2:
                     cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.contactThresholdDistance, self.clusteringEvaluator)
                 cluster.addElement(metrics)
-                if not self.conformationNetwork.has_edge(origCluster, clusterNum):
+                if self.conformationNetwork.has_edge(origCluster, clusterNum):
                     # simple directe network
-                    self.conformationNetwork.add_edge(origCluster, clusterNum)
+                    self.conformationNetwork[origCluster][clusterNum]['transition'] += 1
+                else:
+                    self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
                 # if self.conformationNetwork.out_degree(clusterNum) == 0 and origCluster != clusterNum:
                 #     # No self-loops or back edges
                 #     self.conformationNetwork.add_edge(origCluster, clusterNum)
-                if self.FDT.degree(clusterNum) == 0 and origCluster != clusterNum:
-                    # First discovery tree
-                    self.FDT.add_edge(origCluster, clusterNum)
                 return
 
         # if made it here, the snapshot was not added into any cluster
@@ -507,11 +516,14 @@ class Clustering:
                           altSelection=self.altSelection)
         self.clusters.addCluster(cluster)
         clusterNum = self.clusters.getNumberClusters()-1
-        self.conformationNetwork.add_node(clusterNum)
-        self.FDT.add_node(clusterNum)
-        self.conformationNetwork.add_edge(origCluster, clusterNum)
-        if origCluster != clusterNum:
-            self.FDT.add_edge(origCluster, clusterNum)
+        if clusterNum == origCluster:
+            # The clusterNum should only be equal to origCluster when the first
+            # cluster is created and the clusterInitialStructures function has
+            # not been called, i.e. when usind the compareClustering script
+            self.conformationNetwork.add_node(clusterNum, parent='root', epoch=self.epoch)
+        else:
+            self.conformationNetwork.add_node(clusterNum, parent=origCluster, epoch=self.epoch)
+        self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
 
     def writeConformationNetwork(self, path):
         """
@@ -528,7 +540,10 @@ class Clustering:
             :param path: Path where to write the network
             :type path: str
         """
-        nx.write_edgelist(self.FDT, path)
+        with open(path, "w") as fw:
+            for node, data in self.conformationNetwork.nodes_iter(data=True):
+                if data['parent'] != 'root':
+                    fw.write("%d\t%d\n" % (data['parent'], node))
 
     def writeConformationNodeMetric(self, path, metricCol):
         """
@@ -553,6 +568,71 @@ class Clustering:
         with open(path, "w") as f:
             for i, cluster in enumerate(self.clusters.clusters):
                 f.write("%d\t%d\n" % (i, cluster.elements))
+
+
+    def createPathwayToCluster(self, clusterLeave):
+        """
+            Retrace the FDT from a specific cluster to the root where it was
+            discovered
+            :param clusterLeave: End point of the pathway to reconstruct
+            :type clusterLeave: int
+        """
+        pathway = []
+        nodeLabel = clusterLeave
+        while nodeLabel != "root":
+            pathway.append(nodeLabel)
+            nodeLabel = self.conformationNetwork.node[nodeLabel]['parent']
+        return pathway[::-1]
+
+    def getOptimalMetric(self):
+        """
+            Find the cluster with the best metric
+        """
+        optimalMetric = 100
+        optimalMetricIndex = 0
+        for i, cluster in enumerate(self.clusters.clusters):
+            if cluster.getMetric() < optimalMetric:
+                optimalMetric = cluster.getMetric()
+                optimalMetricIndex = i
+        return optimalMetricIndex
+
+    def writePathwayTrajectory(self, pathway, filename):
+        """
+            Write a list of cluster forming a pathway into a trajectory pdb file
+            :param pathway: List of clusters that form the pathway
+            :type pathway: list
+            :param filename: Path where to write the trajectory
+            :type filename: str
+        """
+        pathwayFile = open(filename, "w")
+        pathwayFile.write("REMARK 000 File created using PELE++\n")
+        pathwayFile.write("REMARK 000 Pathway trajectory created using the FDT\n")
+        pathwayFile.write("REMARK 000 List of cluster belonging to the pathway %s\n" % ' '.join(map(str, pathway)))
+        for i, step_cluster in enumerate(pathway):
+            cluster = self.clusters.clusters[step_cluster]
+            pathwayFile.write("MODEL %d\n" % (i+1))
+            pdbStr = cluster.pdb.pdb
+            pdbList = pdbStr.split("\n")
+            for line in pdbList:
+                line = line.strip()
+                # Avoid writing previous REMARK block
+                if line.startswith("REMARK ") or line.startswith("MODEL "):
+                    continue
+                elif line:
+                    pathwayFile.write(line+"\n")
+            pathwayFile.write("ENDMDL\n")
+        pathwayFile.close()
+
+    def writePathwayOptimalCluster(self, filename):
+        """
+            Extracte the pathway to the cluster with the best metric as a
+            trajectory and  write it to a PDB file
+            :param filename: Path where to write the trajectory
+            :type filename: str
+        """
+        optimalCluster = self.getOptimalMetric()
+        pathway = self.createPathwayToCluster(optimalCluster)
+        self.writePathwayTrajectory(pathway, filename)
 
 
 class ContactsClustering(Clustering):
