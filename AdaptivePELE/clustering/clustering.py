@@ -556,7 +556,11 @@ class Clustering:
         """
         with open(path, "w") as f:
             for i, cluster in enumerate(self.clusters.clusters):
-                f.write("%d\t%.4f\n" % (i, cluster.getMetricFromColumn(metricCol)))
+                metric = cluster.getMetricFromColumn(metricCol)
+                if metric is None:
+                    f.write("%d\t-\n" % i)
+                else:
+                    f.write("%d\t%.4f\n" % (i, metric))
 
     def writeConformationNodePopulation(self, path):
         """
@@ -616,7 +620,7 @@ class Clustering:
             for line in pdbList:
                 line = line.strip()
                 # Avoid writing previous REMARK block
-                if line.startswith("REMARK ") or line.startswith("MODEL "):
+                if line.startswith("REMARK ") or line.startswith("MODEL ") or line == "END":
                     continue
                 elif line:
                     pathwayFile.write(line+"\n")
@@ -633,6 +637,37 @@ class Clustering:
         optimalCluster = self.getOptimalMetric()
         pathway = self.createPathwayToCluster(optimalCluster)
         self.writePathwayTrajectory(pathway, filename)
+
+    def calculateMetastabilityIndex(self):
+        """
+            Calculate the metastablity index, mI. mI is the ratio of transitions
+            from a given cluster that remains within the same cluster
+        """
+        metInd = {}
+        for node in self.conformationNetwork.nodes_iter():
+            totalOut = 0
+            selfTrans = 0
+            for n, edge, data in self.conformationNetwork.out_edges_iter(node, data=True):
+                if edge == node:
+                    selfTrans = data['transition']
+                totalOut += data['transition']
+            if totalOut+selfTrans:
+                metInd[node] = selfTrans/float(totalOut)
+            else:
+                metInd[node] = 0
+        return metInd
+
+    def writeMetastabilityIndex(self, filename, metInd=None):
+        """
+            Write the metastability index of each node to file.
+            :param filename: Path where to write the trajectory
+            :type filename: str
+        """
+        if metInd is None:
+            metInd = self.calculateMetastabilityIndex()
+        with open(filename, "w") as f:
+            for node, met in metInd.iteritems():
+                f.write("%d\t%.4f\n" % (node, met))
 
 
 class ContactsClustering(Clustering):
