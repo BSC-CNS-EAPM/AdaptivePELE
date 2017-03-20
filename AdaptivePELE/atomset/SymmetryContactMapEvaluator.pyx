@@ -181,17 +181,6 @@ cdef class SymmetryContactMapEvaluator:
         distance = 1-similarity
         return distance
 
-    def evaluateJaccardSet(self, contactMap, clusterContactMap):
-        permContactMap = self.buildOptimalPermutationContactMap(contactMap,
-                                                                clusterContactMap)
-        intersectContactMaps = (permContactMap & clusterContactMap).sum()
-        unionContactMaps = permContactMap.sum() + clusterContactMap.sum() - intersectContactMaps
-        if unionContactMaps == 0:
-            return 1
-        similarity = float(intersectContactMaps)/unionContactMaps
-        distance = 1-similarity
-        return distance
-
     def evaluateCorrelation(self, contactMap, clusterContactMap):
         permContactMap = self.buildOptimalPermutationContactMap(contactMap,
                                                                 clusterContactMap)

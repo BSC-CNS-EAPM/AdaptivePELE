@@ -271,6 +271,7 @@ class CMClusteringEvaluator:
         #     return 4.0
         # else:
         #     return 16-self.limitSlope[cluster.contactThreshold]*cluster.contacts
+
         # if cluster.contacts > 2.0:
         #     return 4.0
         # elif cluster.contacts <= 0.5:
@@ -285,14 +286,14 @@ class CMClusteringEvaluator:
         else:
             return 16-8*(cluster.contacts-0.5)
 
-       #  if cluster.contacts > 1.0:
-       #      return 4.0
-       #  elif cluster.contacts > 0.75:
-       #      return 9.0
-       #  elif cluster.contacts > 0.5:
-       #      return 16.0
-       #  else:
-       #      return 25
+        # if cluster.contacts > 1.0:
+        #     return 4.0
+        # elif cluster.contacts > 0.75:
+        #     return 9.0
+        # elif cluster.contacts > 0.5:
+        #     return 16.0
+        # else:
+        #      return 25
 
     def getOuterLimit(self, node):
         # return max(16, 16 * 2 - node.depth)
@@ -490,13 +491,9 @@ class Clustering:
                     cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.contactThresholdDistance, self.clusteringEvaluator)
                 cluster.addElement(metrics)
                 if self.conformationNetwork.has_edge(origCluster, clusterNum):
-                    # simple directe network
                     self.conformationNetwork[origCluster][clusterNum]['transition'] += 1
                 else:
                     self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
-                # if self.conformationNetwork.out_degree(clusterNum) == 0 and origCluster != clusterNum:
-                #     # No self-loops or back edges
-                #     self.conformationNetwork.add_edge(origCluster, clusterNum)
                 return
 
         # if made it here, the snapshot was not added into any cluster
@@ -527,7 +524,7 @@ class Clustering:
 
     def writeConformationNetwork(self, path):
         """
-            Write the conformational network to file to visulize it
+            Write the conformational network to file to visualize it
             :param path: Path where to write the network
             :type path: str
         """
