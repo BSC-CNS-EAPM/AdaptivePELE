@@ -4,6 +4,13 @@ Behavior changes from previous version:
     according to this population
     *) Added conformation network and first discovery tree to improve
     simulation analysis
+    *) Added scripts to plot RMSF for each residue over a trajectory
+    *) Added scripts to calculate contact map histogram for each residue over a
+    trajectory or a complete simulation
+    *) Added scripts to create a network of residues  over a trajectory or a 
+    complete simulation
+    *) Added more robust pickling interface so old simulation can be used with
+    newer version (to some extent)
 
 Bug fixes:
     *) Fix bug in spawning of alternative structures, was not calling the new

@@ -75,7 +75,7 @@ class SimulationRunner:
 
     def readMappingFromDisk(self, epochDir):
         with open(epochDir+"/processorMapping.txt") as f:
-            self.processorsToClusterMapping = map(int, f.read.rstrip().split(','))
+            self.processorsToClusterMapping = map(int, f.read().rstrip().split(','))
 
     def setZeroMapping(self):
         self.processorsToClusterMapping = [0 for i in xrange(1, self.parameters.processors)]
