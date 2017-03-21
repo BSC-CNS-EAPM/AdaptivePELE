@@ -24,6 +24,7 @@ class SimulationParameters:
 class SimulationRunner:
     def __init__(self, parameters):
         self.parameters = parameters
+        self.processorsToClusterMapping = [0 for i in xrange(1, self.parameters.processors)]
 
     def runSimulation(self, runningControlFile=""):
         pass
@@ -48,6 +49,36 @@ class SimulationRunner:
         outputFileContent = outputFileContent.replace("'", '"')
         outputFile.write(outputFileContent)
         outputFile.close()
+
+    def updateMappingProcessors(self, degeneracies, clustering):
+        nProc = 0
+        clusterList = self.processorsToClusterMapping[:]
+        for i in xrange(len(clustering.clusters.clusters)):
+            for j in range(int(degeneracies[i])):
+                clusterList[nProc] = i
+                nProc += 1
+        assert nProc == self.parameters.processors-1
+        self.processorsToClusterMapping = clusterList[1:]+[clusterList[0]]
+
+    def makeInitialMapping(self, clusterInitial):
+        clusterList = self.processorsToClusterMapping[:]
+        ind = 0
+        for i in xrange(self.parameters.processors-1):
+            clusterList[i] = clusterInitial[ind]
+            ind += 1
+            ind %= len(clusterInitial)
+        self.processorsToClusterMapping = clusterList[1:]+[clusterList[0]]
+
+    def writeMappingToDisk(self, epochDir):
+        with open(epochDir+"/processorMapping.txt", "w") as f:
+            f.write(','.join(map(str, self.processorsToClusterMapping)))
+
+    def readMappingFromDisk(self, epochDir):
+        with open(epochDir+"/processorMapping.txt") as f:
+            self.processorsToClusterMapping = map(int, f.read.rstrip().split(','))
+
+    def setZeroMapping(self):
+        self.processorsToClusterMapping = [0 for i in xrange(1, self.parameters.processors)]
 
 
 class PeleSimulation(SimulationRunner):
@@ -83,6 +114,7 @@ class TestSimulation(SimulationRunner):
         Class used for testing
     """
     def __init__(self, parameters):
+        SimulationRunner.__init__(self, parameters)
         self.type = simulationTypes.SIMULATION_TYPE.TEST
         self.copied = False
         self.parameters = parameters

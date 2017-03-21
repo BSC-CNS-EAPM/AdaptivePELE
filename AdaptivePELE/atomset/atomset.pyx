@@ -123,8 +123,8 @@ cdef class Atom:
         self.id = state['id']
         self.mass = state['mass']
         self.x = state['x']
-        self.y = state['x']
-        self.z = state['x']
+        self.y = state['y']
+        self.z = state['z']
         self.protein = state['protein']
 
     def isHeavyAtom(self):
