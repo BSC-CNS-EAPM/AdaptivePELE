@@ -25,6 +25,18 @@ class Clusters:
     def __init__(self):
         self.clusters = []
 
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"clusters": self.clusters}
+        return state
+
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.clusters = state['clusters']
+
     def addCluster(self, cluster):
         self.clusters.append(cluster)
 
@@ -59,6 +71,18 @@ class AltStructures:
     def __init__(self):
         self.altStructPQ = []
         self.limitSize = 10
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"altStructPQ": self.altStructPQ, "limitSize": self.limitSize}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.limitSize = state['limitSize']
+        self.altStructPQ = state['altStructPQ']
 
     def altSpawnSelection(self, centerPair):
         """
@@ -136,7 +160,6 @@ class Cluster:
         self.metrics = metrics
         self.metricCol = metricCol
         self.contactThreshold = contactThreshold
-        self.altMetrics = []
         self.altSelection = altSelection
 
         if self.threshold is None:
@@ -144,15 +167,37 @@ class Cluster:
         else:
             self.threshold2 = thresholdRadius*thresholdRadius
 
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"pdb": self.pdb, "altStructure": self.altStructure,
+                 "elements": self.elements, "threshold": self.threshold,
+                 "densitiy": self.density, "contacts": self.contacts,
+                 "contactMap": self.contactMap,  "metrics": self.metrics,
+                 "metricCol": self.metricCol, "threshold2": self.threshold2,
+                 "contactThreshold": self.contactThreshold,
+                 "altSelection": self.altSelection}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.pdb = state['pdb']
+        self.altStructure = state.get('altStructPQ', AltStructures())
+        self.elements = state['elements']
+        self.threshold = state.get('threshold')
+        self.density = state.get('density')
+        self.contacts = state.get('contacts')
+        self.contactMap = state.get('contactMap')
+        self.metrics = state.get('metrics', [])
+        self.metricCol = state.get('metricCol')
+        self.threshold2 = state.get('threshold2')
+        self.contactThreshold = state.get('contactThreshold', 8)
+        self.altSelection = state.get('altSelection', False)
+
     def getMetric(self):
         if len(self.metrics):
             return self.metrics[self.metricCol]
-        else:
-            return None
-
-    def getAltMetric(self):
-        if len(self.altMetrics):
-            return self.altMetrics[self.metricCol]
         else:
             return None
 
@@ -214,6 +259,20 @@ class ContactsClusteringEvaluator:
         # Only here for compatibility purpose
         self.contactMap = None
 
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"RMSDCalculator": self.RMSDCalculator,
+                 "contacts": self.contacts, "contactMap": self.contactMap}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.RMSDCalculator = state.get('RMSDCalculator', RMSDCalculator.RMSDCalculator())
+        self.contacts = state.get('contacts')
+        self.contactMap = state.get('contactMap')
+
     def isElement(self, pdb, cluster, resname, contactThresholdDistance):
         dist = self.RMSDCalculator.computeRMSD(cluster.pdb, pdb)
         return dist < cluster.threshold, dist
@@ -247,6 +306,22 @@ class CMClusteringEvaluator:
         self.symmetryEvaluator = symmetryEvaluator
         self.contacts = None
         self.contactMap = None
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"similarityEvaluator": self.similarityEvaluator,
+                 "symmetryEvaluator": self.symmetryEvaluator,
+                 "contacts": self.contacts, "contactMap": self.contactMap}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.similarityEvaluator = state.get('similarityEvaluator')
+        self.symmetryEvaluator = state.get('symmetryEvaluator')
+        self.contacts = state.get('contacts')
+        self.contactMap = state.get('contactMap')
 
     def isElement(self, pdb, cluster, resname, contactThresholdDistance):
         if self.contactMap is None:
@@ -328,6 +403,32 @@ class Clustering:
         self.altSelection = altSelection
         self.conformationNetwork = nx.DiGraph()
         self.epoch = -1
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"type": self.type, "clusters": self.clusters,
+                 "reportBaseFilename": self.reportBaseFilename,
+                 "resname": self.resname, "col": self.col, "epoch": self.epoch,
+                 "symmetries": self.symmetries,
+                 "conformationNetwork": self.conformationNetwork,
+                 "contactThresholdDistance": self.contactThresholdDistance,
+                 "altSelection": self.altSelection}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.type = state['type']
+        self.clusters = state['clusters']
+        self.reportBaseFilename = state.get('reportBaseFilename')
+        self.resname = state.get('resname')
+        self.col = state.get('col')
+        self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
+        self.symmetries = state.get('symmetries', [])
+        self.altSelection = state.get('altSelection', False)
+        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.epoch = state.get('metricCol', -1)
 
     def setCol(self, col):
         self.col = col
@@ -695,6 +796,36 @@ class ContactsClustering(Clustering):
         self.symmetries = symmetries
         self.clusteringEvaluator = ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
 
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"type": self.type, "clusters": self.clusters,
+                 "reportBaseFilename": self.reportBaseFilename,
+                 "resname": self.resname, "col": self.col, "epoch": self.epoch,
+                 "symmetries": self.symmetries,
+                 "conformationNetwork": self.conformationNetwork,
+                 "contactThresholdDistance": self.contactThresholdDistance,
+                 "altSelection": self.altSelection,
+                 "thresholdCalculator": self.thresholdCalculator,
+                 "clusteringEvaluator": self.clusteringEvaluator}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.type = state['type']
+        self.clusters = state['clusters']
+        self.reportBaseFilename = state.get('reportBaseFilename')
+        self.resname = state.get('resname')
+        self.col = state.get('col')
+        self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
+        self.symmetries = state.get('symmetries', [])
+        self.altSelection = state.get('altSelection', False)
+        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.epoch = state.get('metricCol', -1)
+        self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant())
+        self.clusteringEvaluator = state.get('clusteringEvaluator', ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(self.symmetries)))
+
 
 class ContactMapAccumulativeClustering(Clustering):
     """ Cluster together all snapshots that have similar enough contactMaps.
@@ -721,37 +852,40 @@ class ContactMapAccumulativeClustering(Clustering):
         self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
         self.clusteringEvaluator = CMClusteringEvaluator(similarityEvaluator, self.symmetryEvaluator)
 
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"type": self.type, "clusters": self.clusters,
+                 "reportBaseFilename": self.reportBaseFilename,
+                 "resname": self.resname, "col": self.col, "epoch": self.epoch,
+                 "symmetries": self.symmetries,
+                 "conformationNetwork": self.conformationNetwork,
+                 "contactThresholdDistance": self.contactThresholdDistance,
+                 "altSelection": self.altSelection,
+                 "thresholdCalculator": self.thresholdCalculator,
+                 "similariyEvaluator": self.similarityEvaluator,
+                 "symmetryEvaluator": self.symmetryEvaluator,
+                 "clusteringEvaluator": self.clusteringEvaluator}
+        return state
 
-class SequentialLastSnapshotClustering(Clustering):
-    """
-        Assigned  the last snapshot of the trajectory to a cluster.
-        Only useful for PELE sequential runs
-    """
-    def cluster(self, paths):
-        """
-            Cluster the snaptshots contained in the pahts folder
-            paths [In] List of folders with the snapshots
-        """
-        # Clean clusters at every step, so we only have the last snapshot of
-        # each trajectory as clusters
-        self.clusters = Clusters()
-        trajectories = getAllTrajectories(paths)
-        for trajectory in trajectories:
-            trajNum = utilities.getTrajNum(trajectory)
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.type = state['type']
+        self.clusters = state['clusters']
+        self.reportBaseFilename = state.get('reportBaseFilename')
+        self.resname = state.get('resname')
+        self.col = state.get('col')
+        self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
+        self.symmetries = state.get('symmetries', [])
+        self.altSelection = state.get('altSelection', False)
+        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.epoch = state.get('metricCol', -1)
+        self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant(value=0.3))
+        self.similariyEvaluator = state.get('similariyEvaluator', JaccardEvaluator())
+        self.symmetryEvaluator = state.get('symmetryEvaluator', sym.SymmetryContactMapEvaluator(self.symmetries))
+        self.clusteringEvaluator = state.get('clusteringEvaluator', CMClusteringEvaluator(self.similarityEvaluator, self.symmetryEvaluator))
 
-            snapshots = utilities.getSnapshots(trajectory, True)
-            if self.reportBaseFilename:
-                reportFilename = os.path.join(os.path.split(trajectory)[0],
-                                              self.reportBaseFilename % trajNum)
-                metrics = np.loadtxt(reportFilename, ndmin=2)
-                # Pass as cluster metrics the minimum value for each metric,
-                # thus the metrics are not valid to do any spawning, only to
-                # check the exit condition
-                metrics = metrics.min(axis=0)
-
-                self.addSnapshotToCluster(snapshots[-1], metrics, self.col)
-            else:
-                self.addSnapshotToCluster(snapshots[-1])
 
 class SequentialLastSnapshotClustering(Clustering):
     """

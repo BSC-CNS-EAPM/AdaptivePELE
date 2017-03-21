@@ -70,8 +70,9 @@ class ThresholdCalculatorConstant(ThresholdCalculator):
             distance-ordered clustering(in early development)"""
         return self.value
 
+
 class ThresholdCalculatorHeaviside(ThresholdCalculator):
-    def __init__(self, conditions=[1.2, 1.0, 0.0], values=[2, 2.5, 3, 4]):
+    def __init__(self, conditions=[1.0, 0.75, 0.5], values=[2, 3, 4, 5.0]):
         self.type = thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.heaviside
 
         if len(values) != len(conditions) and len(values) != len(conditions) + 1:
