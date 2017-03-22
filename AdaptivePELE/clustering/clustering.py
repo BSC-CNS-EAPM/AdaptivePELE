@@ -882,7 +882,7 @@ class ContactMapAccumulativeClustering(Clustering):
         self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
         self.epoch = state.get('metricCol', -1)
         self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant(value=0.3))
-        self.similariyEvaluator = state.get('similariyEvaluator', JaccardEvaluator())
+        self.similarityEvaluator = state.get('similariyEvaluator', JaccardEvaluator())
         self.symmetryEvaluator = state.get('symmetryEvaluator', sym.SymmetryContactMapEvaluator(self.symmetries))
         self.clusteringEvaluator = state.get('clusteringEvaluator', CMClusteringEvaluator(self.similarityEvaluator, self.symmetryEvaluator))
 
