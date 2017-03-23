@@ -1,7 +1,7 @@
 import argparse
+import sys
 from AdaptivePELE.atomset import atomset, SymmetryContactMapEvaluator
 from AdaptivePELE.utilities import utilities
-import matplotlib.pyplot as plt
 import numpy as np
 import networkx as nx
 import itertools
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     symEval = SymmetryContactMapEvaluator.SymmetryContactMapEvaluator()
     refPDB = None
     network = nx.Graph()
-    print "Creating network"
+    sys.stderr.write("Creating network...\n")
 
     for pdb in generateConformations(resname, clAcc, trajectory):
         contactMap, foo = symEval.createContactMap(pdb, resname, contactThreshold)
