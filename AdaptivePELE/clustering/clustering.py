@@ -513,7 +513,7 @@ class Clustering:
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
-
+            origCluster = processorsToClusterMapping[trajNum-1]
             snapshots = utilities.getSnapshots(trajectory, True)
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
@@ -521,10 +521,10 @@ class Clustering:
                 metrics = np.loadtxt(reportFilename, ndmin=2)
 
                 for num, snapshot in enumerate(snapshots):
-                    self.addSnapshotToCluster(snapshot, processorsToClusterMapping[trajNum-1], metrics[num], self.col)
+                    origCluster = self.addSnapshotToCluster(snapshot, origCluster, metrics[num], self.col)
             else:
                 for num, snapshot in enumerate(snapshots):
-                    self.addSnapshotToCluster(snapshot, processorsToClusterMapping[trajNum-1])
+                    origCluster = self.addSnapshotToCluster(snapshot, origCluster)
         for cluster in self.clusters.clusters:
             cluster.altStructure.cleanPQ()
 
@@ -595,7 +595,7 @@ class Clustering:
                     self.conformationNetwork[origCluster][clusterNum]['transition'] += 1
                 else:
                     self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
-                return
+                return origCluster
 
         # if made it here, the snapshot was not added into any cluster
         # Check if contacts and contactMap are set (depending on which kind
@@ -622,6 +622,11 @@ class Clustering:
         else:
             self.conformationNetwork.add_node(clusterNum, parent=origCluster, epoch=self.epoch)
         self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
+        # If a new cluster is discovered during a trajectory, the next step in
+        # the same trajectory will be considered to start from these new
+        # cluster, thus resulting in a more precise conformation network and
+        # smoother pathways
+        return clusterNum
 
     def writeConformationNetwork(self, path):
         """
