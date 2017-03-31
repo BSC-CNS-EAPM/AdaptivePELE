@@ -414,7 +414,9 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         middleWindow = int(clusteringParams.period/2)
         leftWindow = int(clusteringParams.maxEpsilonWindow/2)
         rightWindow = leftWindow+middleWindow
-
+        if currentEpoch == clusteringParams.period-1:
+            # Avoid negative epsilon for minEpsilon = 0
+            return
         rateEpsilonVariation = [(clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(middleWindow-leftWindow), (clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(clusteringParams.period-rightWindow-1)]
         clusteringParams.epsilon += return_sign(currentEpoch, leftWindow,
                                                 middleWindow, rightWindow) * rateEpsilonVariation[currentEpoch > middleWindow]
