@@ -68,6 +68,7 @@ if __name__ == "__main__":
     for residue, atoms in residueMapping.iteritems():
         RMSFresidue[residue] = sum([RMSF[atom] for atom in atoms])
         RMSFresidue[residue] /= len(atoms)
+        RMSFresidue[residue] = np.sqrt(RMSFresidue[residue])
 
     print "Residue\tRMSF"
     for res in sorted(RMSFresidue, key=lambda x: RMSFresidue[x], reverse=True)[:nResidues]:
