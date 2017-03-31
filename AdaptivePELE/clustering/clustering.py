@@ -595,7 +595,7 @@ class Clustering:
                     self.conformationNetwork[origCluster][clusterNum]['transition'] += 1
                 else:
                     self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
-                return origCluster
+                return clusterNum
 
         # if made it here, the snapshot was not added into any cluster
         # Check if contacts and contactMap are set (depending on which kind
