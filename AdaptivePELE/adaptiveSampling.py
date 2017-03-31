@@ -291,10 +291,7 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
     clusteringMethod = getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner)
 
     if not hasattr(clusteringMethod, "conformationNetwork"):
-        #TODO: Build proper pickling for clustering
-        import networkx
         clusteringMethod.epoch = firstRun
-        clusteringMethod.conformationNetwork = networkx.DiGraph()
 
     degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
     spawningCalculator.log()

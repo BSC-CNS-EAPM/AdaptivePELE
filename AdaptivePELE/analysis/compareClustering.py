@@ -114,7 +114,12 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
 # spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 # spawningObject = spawning.UCBCalculator(densityCalculator)
 spawningObject = spawning.EpsilonDegeneracyCalculator(densityCalculator)
+ClAcc.clusterInitialStructures(["/home/jgilaber/PR/PR_prog_initial_adaptive.pdb"])
 processorMapping = [0 for i in xrange(ntrajs-1)]
+if not os.path.exists("mappings"):
+    os.makedirs("mappings")
+if not os.path.exists("results"):
+    os.makedirs("results")
 for i in range(nEpochs):
     # path =["trajs/%d/run_traj*"%i]
     # paths_report = ["trajs/%d/run_report*"%i]
@@ -168,10 +173,10 @@ for i in range(nEpochs):
             clusterList[nProc] = icl
             nProc += 1
     assert nProc == ntrajs-1
-    ClAcc.writeOutput("clsummary",degeneraciesAcc,"ClAcc.pkl", False)
+    ClAcc.writeOutput("clsummary", degeneraciesAcc, "ClAcc.pkl", False)
     os.rename("clsummary/summary.txt", "results/summary_ClAcc.txt")
     processorMapping = clusterList[1:]+[clusterList[0]]
-    with open("mappings/mapping%d.txt"%i, "w") as f:
+    with open("mappings/mapping%d.txt" % i, "w") as f:
         f.write(','.join(map(str, processorMapping)))
     # for i, element in enumerate(degeneraciesCont):
     #     if element > 2 and ClCont.clusters.clusters[i].elements > 1:
