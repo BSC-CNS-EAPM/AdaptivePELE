@@ -557,7 +557,7 @@ class Clustering:
                 cluster.writePDB(outputFilename)
 
             metric = cluster.getMetric()
-            if metric:
+            if metric is None:
                 writeString = "%d %d %d %.2f %.4f %.1f %.3f\n" % (i, cluster.elements,
                                                                   degeneracy[i],
                                                                   cluster.contacts,
@@ -691,15 +691,19 @@ class Clustering:
             nodeLabel = self.conformationNetwork.node[nodeLabel]['parent']
         return pathway[::-1]
 
-    def getOptimalMetric(self):
+    def getOptimalMetric(self, column=None):
         """
             Find the cluster with the best metric
         """
         optimalMetric = 100
         optimalMetricIndex = 0
         for i, cluster in enumerate(self.clusters.clusters):
-            if cluster.getMetric() < optimalMetric:
-                optimalMetric = cluster.getMetric()
+            if column is None:
+                metric = cluster.getMetric()
+            else:
+                metric = cluster.getMetricFromColumn(column)
+            if metric < optimalMetric:
+                optimalMetric = metric
                 optimalMetricIndex = i
         return optimalMetricIndex
 

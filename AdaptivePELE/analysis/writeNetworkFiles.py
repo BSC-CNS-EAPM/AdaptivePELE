@@ -26,7 +26,7 @@ if __name__ == "__main__":
         outputPath = ""
     sys.stderr.write("Reading clustering object...\n")
     cl = utilities.readClusteringObject(clusteringObject)
-    optimalCluster = cl.getOptimalMetric()
+    optimalCluster = cl.getOptimalMetric(4)
     pathway = cl.createPathwayToCluster(optimalCluster)
     metInd = cl.calculateMetastabilityIndex()
     if not os.path.exists(outputPath+"conformationNetwork%s.edgelist" % suffix):
