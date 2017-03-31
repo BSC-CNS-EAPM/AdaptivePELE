@@ -53,6 +53,8 @@ class SimulationRunner:
     def updateMappingProcessors(self, degeneracies, clustering):
         nProc = 0
         clusterList = self.processorsToClusterMapping[:]
+        assert len(clusterList) == self.parameters.processors-1
+        assert len(clusterList) == sum(degeneracies)
         for i in xrange(len(clustering.clusters.clusters)):
             for j in range(int(degeneracies[i])):
                 clusterList[nProc] = i
