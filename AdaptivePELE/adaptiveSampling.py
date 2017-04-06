@@ -5,6 +5,8 @@ import os
 import json
 import time
 import glob
+import argparse
+import networkx as nx
 from AdaptivePELE.constants import blockNames, constants
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.utilities import utilities
@@ -12,7 +14,6 @@ from AdaptivePELE.validator import controlFileValidator
 from AdaptivePELE.spawning import spawning, spawningTypes
 from AdaptivePELE.simulation import simulationrunner, simulationTypes
 from AdaptivePELE.clustering import clustering, clusteringTypes
-import argparse
 
 
 def parseArgs():
@@ -354,6 +355,17 @@ def preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControl
     simulationRunner.makeWorkingControlFile(outputPathConstants.tmpControlFilename % i, peleControlFileDictionary)
 
 
+def distributeAmongClusters(sortedNodes, clusteringMethod, nProcessors):
+    degeneracy = np.zeros_like(clusteringMethod.clusters.clusters)
+    nStates = len(sortedNodes)
+    degPerState = nProcessors/nStates
+    for state in sortedNodes:
+        degeneracy[state] = degPerState
+    extraProc = nProcessors - nStates*degPerState
+    degeneracy[sortedNodes[:extraProc]] += 1
+    return degeneracy
+
+
 def main(jsonParams):
     """
         Main body of the adaptive sampling program.
@@ -445,12 +457,17 @@ def main(jsonParams):
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
+        # TODO: Avoid hard-coded value, (add parameter to control file?)
+        if i % 5:
+            degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
+            spawningCalculator.log()
+            print "Degeneracy", degeneracyOfRepresentatives
+        else:
+            betweenness = nx.betweenness_centrality(clusteringMethod.conformationNetwork, weight='transition')
+            sortedNodes = sorted(betweenness, key=lambda x: betweenness[x], reverse=True)[:5]
+            degeneracyOfRepresentatives = distributeAmongClusters(sortedNodes, clusteringMethod, simulationRunner.parameters.processors-1)
 
-        degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
-        spawningCalculator.log()
-        print "Degeneracy", degeneracyOfRepresentatives
         simulationRunner.updateMappingProcessors(degeneracyOfRepresentatives, clusteringMethod)
-
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,

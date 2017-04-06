@@ -87,10 +87,10 @@ spawnParams.buildSpawningParameters({
         }
     })
 contactThresholdDistance = 8
-resname = "STR"
-nEpochs = 62
+resname = "DAJ"
+nEpochs = 21
 altSel = False
-ntrajs = 64
+ntrajs = 32
 ClDouble = clustering.ContactMapClustering(resname=resname,
                                            reportBaseFilename="report",
                                            columnOfReportFile=5,
@@ -114,7 +114,9 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
 # spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 # spawningObject = spawning.UCBCalculator(densityCalculator)
 spawningObject = spawning.EpsilonDegeneracyCalculator(densityCalculator)
-ClAcc.clusterInitialStructures(["/home/jgilaber/PR/PR_prog_initial_adaptive.pdb"])
+# ClAcc.clusterInitialStructures(["/home/jgilaber/PR/PR_prog_initial_adaptive.pdb"])
+ClCont.clusterInitialStructures(["/home/jgilaber/4DAJ/4DAJ_initial_adaptive.pdb"])
+import networkx as nx
 processorMapping = [0 for i in xrange(ntrajs-1)]
 if not os.path.exists("mappings"):
     os.makedirs("mappings")
@@ -127,10 +129,10 @@ for i in range(nEpochs):
     # paths_report = ["/home/bsc72/bsc72021/simulations/PR/testCM_4_32/simulation/PRprog_CM_variabExtra_UCB_5//%d/report*" % i]
     # path = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/traj*"%i]
     # paths_report = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/report*"%i]
-    path = ["/home/jgilaber/PR/PR_simulation_network/%d/traj*"%i]
-    paths_report = ["/home/jgilaber/PR/PR_simulation_network/%d/report*"%i]
-    # path = ["/home/jgilaber/4DAJ/4DAJ_4_64CMExtraSubsetSingle/%d/traj*"%i]
-    # paths_report = ["/home/jgilaber/4DAJ/4DAJ_4_64CMExtraSubsetSingle/%d/report*"%i]
+    # path = ["/home/jgilaber/PR/PR_simulation_network/%d/traj*"%i]
+    # paths_report = ["/home/jgilaber/PR/PR_simulation_network/%d/report*"%i]
+    path = ["/home/jgilaber/4DAJ/4DAJ_4_32/%d/traj*"%i]
+    paths_report = ["/home/jgilaber/4DAJ/4DAJ_4_32/%d/report*"%i]
     trajs = clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:
@@ -138,46 +140,53 @@ for i in range(nEpochs):
             total_snapshots += 1
         total_snapshots -= 1
     sys.stderr.write("Total snapsthots for epoch %d: %d\n" % (i, total_snapshots))
-    # startTimeCont = time.time()
-    # ClCont.cluster(path, processorMapping)
-    # endTimeCont = time.time()
-    # sys.stderr.write("Total time of clustering contacts, epoch %d: %.6f\n"%(i,endTimeCont-startTimeCont))
-    # sys.stderr.write("Number of clusters contacts epoch %d: %d\n"%(i,len(ClCont.clusters.clusters)))
-    # degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs-1, spawnParams)
-    # nProc = 0
-    # clusterList = processorMapping[:]
-    # for icl in xrange(len(ClCont.clusters.clusters)):
-    #     for j in range(int(degeneraciesCont[icl])):
-    #         clusterList[nProc] = icl
-    #         nProc += 1
-    # assert nProc == ntrajs-1
-    # processorMapping = clusterList[1:]+[clusterList[0]]
-    # with open("mappings/mapping%d.txt"%i, "w") as f:
-    #     f.write(','.join(map(str, processorMapping)))
-    # ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
-    # os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
-
-    startTimeAcc = time.time()
-    ClAcc.cluster(path, processorMapping)
-    endTimeAcc = time.time()
-    sys.stderr.write("Total time of clustering accumulative, epoch %d: %.6f\n" % (i,endTimeAcc-startTimeAcc))
-    sys.stderr.write("Number of clusters accumulative epoch %d: %d\n" % (i,len(ClAcc.clusters.clusters)))
-    degeneraciesAcc = spawningObject.calculate(ClAcc.clusters.clusters, ntrajs-1, spawnParams)
-    # summaryFolder = "%d/clustering" % i
-    # if not os.path.exists(summaryFolder):
-    #     os.makedirs(summaryFolder)
+    startTimeCont = time.time()
+    ClCont.cluster(path, processorMapping)
+    endTimeCont = time.time()
+    sys.stderr.write("Total time of clustering contacts, epoch %d: %.6f\n"%(i,endTimeCont-startTimeCont))
+    sys.stderr.write("Number of clusters contacts epoch %d: %d\n"%(i,len(ClCont.clusters.clusters)))
+    degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs-1, spawnParams)
     nProc = 0
     clusterList = processorMapping[:]
-    for icl in xrange(len(ClAcc.clusters.clusters)):
-        for j in range(int(degeneraciesAcc[icl])):
+    for icl in xrange(len(ClCont.clusters.clusters)):
+        for j in range(int(degeneraciesCont[icl])):
             clusterList[nProc] = icl
             nProc += 1
     assert nProc == ntrajs-1
-    ClAcc.writeOutput("clsummary", degeneraciesAcc, "ClAcc.pkl", False)
-    os.rename("clsummary/summary.txt", "results/summary_ClAcc.txt")
     processorMapping = clusterList[1:]+[clusterList[0]]
-    with open("mappings/mapping%d.txt" % i, "w") as f:
+    with open("mappings/mapping%d.txt"%i, "w") as f:
         f.write(','.join(map(str, processorMapping)))
+    ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
+    os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
+    print "epoch ", i
+    bet = nx.betweenness_centrality(ClCont.conformationNetwork)
+    betW = nx.betweenness_centrality(ClCont.conformationNetwork, weight='transition')
+    sortUnw = sorted(bet, key=lambda x: bet[x], reverse=True)[:10]
+    sortW = sorted(betW, key=lambda x: betW[x], reverse=True)[:10]
+    for ji in xrange(10):
+        print ji, sortUnw[ji], bet[sortUnw[ji]],"||", sortW[ji], betW[sortW[ji]]
+    print ""
+    # startTimeAcc = time.time()
+    # ClAcc.cluster(path, processorMapping)
+    # endTimeAcc = time.time()
+    # sys.stderr.write("Total time of clustering accumulative, epoch %d: %.6f\n" % (i,endTimeAcc-startTimeAcc))
+    # sys.stderr.write("Number of clusters accumulative epoch %d: %d\n" % (i,len(ClAcc.clusters.clusters)))
+    # degeneraciesAcc = spawningObject.calculate(ClAcc.clusters.clusters, ntrajs-1, spawnParams)
+    # # summaryFolder = "%d/clustering" % i
+    # # if not os.path.exists(summaryFolder):
+    # #     os.makedirs(summaryFolder)
+    # nProc = 0
+    # clusterList = processorMapping[:]
+    # for icl in xrange(len(ClAcc.clusters.clusters)):
+    #     for j in range(int(degeneraciesAcc[icl])):
+    #         clusterList[nProc] = icl
+    #         nProc += 1
+    # assert nProc == ntrajs-1
+    # ClAcc.writeOutput("clsummary", degeneraciesAcc, "ClAcc.pkl", False)
+    # os.rename("clsummary/summary.txt", "results/summary_ClAcc.txt")
+    # processorMapping = clusterList[1:]+[clusterList[0]]
+    # with open("mappings/mapping%d.txt" % i, "w") as f:
+    #     f.write(','.join(map(str, processorMapping)))
     # for i, element in enumerate(degeneraciesCont):
     #     if element > 2 and ClCont.clusters.clusters[i].elements > 1:
     #         for j in xrange(element):
