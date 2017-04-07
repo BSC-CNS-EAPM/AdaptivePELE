@@ -458,13 +458,14 @@ def main(jsonParams):
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
         # TODO: Avoid hard-coded value, (add parameter to control file?)
-        if i % 5:
+        if (i+1) % 5:
             degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
             spawningCalculator.log()
             print "Degeneracy", degeneracyOfRepresentatives
         else:
+            spawningCalculator.calculateDensities(clusteringMethod.clusters.clusters)
             betweenness = nx.betweenness_centrality(clusteringMethod.conformationNetwork, weight='transition')
-            sortedNodes = sorted(betweenness, key=lambda x: betweenness[x], reverse=True)[:5]
+            sortedNodes = sorted(betweenness, key=lambda x: betweenness[x], reverse=True)[:10]
             degeneracyOfRepresentatives = distributeAmongClusters(sortedNodes, clusteringMethod, simulationRunner.parameters.processors-1)
 
         simulationRunner.updateMappingProcessors(degeneracyOfRepresentatives, clusteringMethod)
