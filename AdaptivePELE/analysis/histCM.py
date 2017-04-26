@@ -9,7 +9,7 @@ def parseArguments():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("resname", type=str, help="Ligand resname in pdb")
     parser.add_argument("contactThreshold", type=int, help="Contact threshold to calculate contactMap")
-    parser.add_argument("-trajectory", action="append", help="Path to the trajectory or pdbs to analyse")
+    parser.add_argument("-trajectory", type=str, nargs='+', help="Path to the trajectory or pdbs to analyse")
     parser.add_argument("-clustering", help="Path to the clustering object to analyse")
     parser.add_argument("-nRes", type=int, default=10, help="Number of top residues to display")
     args = parser.parse_args()
