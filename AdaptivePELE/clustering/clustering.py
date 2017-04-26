@@ -158,6 +158,7 @@ class Cluster:
         self.contacts = contacts
         self.contactMap = contactMap
         self.metrics = metrics
+        self.originalMetrics = metrics
         self.metricCol = metricCol
         self.contactThreshold = contactThreshold
         self.altSelection = altSelection
@@ -177,7 +178,8 @@ class Cluster:
                  "contactMap": self.contactMap,  "metrics": self.metrics,
                  "metricCol": self.metricCol, "threshold2": self.threshold2,
                  "contactThreshold": self.contactThreshold,
-                 "altSelection": self.altSelection}
+                 "altSelection": self.altSelection,
+                 "originalMetrics": self.originalMetrics}
         return state
 
     def __setstate__(self, state):
@@ -190,6 +192,7 @@ class Cluster:
         self.contacts = state.get('contacts')
         self.contactMap = state.get('contactMap')
         self.metrics = state.get('metrics', [])
+        self.originalMetrics = state.get('originalMetrics', [])
         self.metricCol = state.get('metricCol')
         self.threshold2 = state.get('threshold2')
         self.contactThreshold = state.get('contactThreshold', 8)
@@ -214,6 +217,8 @@ class Cluster:
             # initial structures
             self.metrics = metrics
             return
+        if self.originalMetrics is None:
+            self.originalMetrics = metrics
         if len(metrics) and len(self.metrics):
             # Set all metrics to the minimum value
             self.metrics = np.minimum(self.metrics, metrics)
@@ -439,6 +444,12 @@ class Clustering:
     def getCluster(self, clusterNum):
         return self.clusters.getCluster(clusterNum)
 
+
+    def clusterIterator(self):
+        # TODO: may be interesting to add some condition to filter, check
+        # itertools module, its probably implemented
+        for cluster in self.clusters.clusters:
+            yield cluster
 
     def getNumberClusters(self):
         return self.clusters.getNumberClusters()
