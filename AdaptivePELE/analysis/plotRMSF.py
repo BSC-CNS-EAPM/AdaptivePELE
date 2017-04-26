@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 def parseArguments():
     desc = "Calculate the aggregate RMSF for every residue of the protein\n"
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("trajectory", action="append", help="Path to the trajectory or pdbs to analyse")
+    parser.add_argument("trajectory", type=str, nargs='+', help="Path to the trajectory or pdbs to analyse")
     parser.add_argument("-ref", default=None, help="Reference structure, if not specified use average of the trajectories")
     parser.add_argument("-nRes", type=int, default=10, help="Number of top RMSF residues to display")
     args = parser.parse_args()
