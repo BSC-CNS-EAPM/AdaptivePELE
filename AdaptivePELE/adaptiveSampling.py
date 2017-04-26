@@ -25,6 +25,7 @@ def parseArgs():
     args = parser.parse_args()
     return args
 
+
 def expandInitialStructuresWildcard(initialStructuresWildcard):
     """
         Returns the initial structures after expanding the initial structures wildcard
@@ -34,6 +35,7 @@ def expandInitialStructuresWildcard(initialStructuresWildcard):
         expandedStructures = glob.glob(initialStructureWildcard)
         totalInitialStructures.extend(expandedStructures)
     return totalInitialStructures
+
 
 def checkSymmetryDict(clusteringBlock, initialStructures, resname):
     """ Check if the symmetries dictionary is valid for the system
@@ -47,6 +49,41 @@ def checkSymmetryDict(clusteringBlock, initialStructures, resname):
         PDB = atomset.PDB()
         PDB.initialise(str(structure), resname=resname)
         utilities.assertSymmetriesDict(symmetries, PDB)
+
+
+def getMetastableClusters(clustering, numClusters=5):
+    betweenness = nx.betweenness_centrality(clustering.conformationNetwork, weight='transition')
+    b2 = np.array([betweenness[i] for i in xrange(len(betweenness))])
+    # conf = clustering.conformationNetwork
+    # thresholds = [cluster.threshold for cluster in clustering.clusters.clusters]
+    # metInd = np.zeros_like(thresholds, dtype=np.float)
+    # for node in conf.nodes_iter():
+    #     if conf.degree(node) < 5:
+    #         metInd[node] = 0.0
+    #         continue
+    #     totalIn = 0
+    #     totalOut = 0
+    #     selfTrans = 0
+    #     totalKin = 0
+    #     for source, foo, data in conf.in_edges_iter(node, data=True):
+    #         if source != node:
+    #             totalIn += data['transition']*thresholds[source]**3
+    #     for n, edge, data in conf.out_edges_iter(node, data=True):
+    #         if edge == node:
+    #             selfTrans = data['transition']
+    #         totalOut += data['transition']*thresholds[edge]**3
+    #         totalKin += data['transition']
+    #     if totalOut+selfTrans:
+    #         metInd[node] = (totalIn/float(totalOut))*(selfTrans/float(totalKin))
+    #     else:
+    #         metInd[node] = 0.0
+    # finalMetInd = metInd*b2
+    # TODO: remove excessive prints
+    finalMetInd = b2
+    print "Centrality scores"
+    for i, val in enumerate(finalMetInd):
+        print i, val
+    return np.argsort(finalMetInd)[-1:-numClusters-1:-1]
 
 
 def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries):
@@ -272,8 +309,9 @@ def getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, s
 
     return clusteringMethod
 
+
 def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock,
-        spawningParams, spawningCalculator, simulationRunner):
+                                                         spawningParams, spawningCalculator, simulationRunner):
     """
         It reads the previous clustering method, and, if there are changes,
         it reclusters the previous trajectories. Returns the clustering object to use,
@@ -302,6 +340,7 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
     simulationRunner.updateMappingProcessors(degeneracyOfRepresentatives, clusteringMethod)
 
     return clusteringMethod, initialStructuresAsString
+
 
 def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, controlFile, outputPathConstants, clusteringBlock, spawningParams, initialStructures):
     """
@@ -392,7 +431,6 @@ def main(jsonParams):
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
     resname = str(clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.ligandResname])
 
-
     print "================================"
     print "            PARAMS              "
     print "================================"
@@ -433,9 +471,11 @@ def main(jsonParams):
         clusteringMethod, initialStructuresAsString, initialClusters = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
         simulationRunner.makeInitialMapping(initialClusters)
 
-
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
 
+    #TODO: remove temporary bool to specify longer epochs
+    specialRun = False
+    originalValue = simulationRunner.parameters.peleSteps
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
 
@@ -447,7 +487,12 @@ def main(jsonParams):
             startTime = time.time()
             simulationRunner.runSimulation(outputPathConstants.tmpControlFilename % i)
             endTime = time.time()
+            print simulationRunner.parameters.peleSteps
             print "PELE %s sec" % (endTime - startTime)
+            if specialRun:
+                #TODO: proper interface for this ugly block
+                peleControlFileDictionary["PELE_STEPS"] = originalValue
+                specialRun = False
 
         simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
 
@@ -458,14 +503,24 @@ def main(jsonParams):
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
         # TODO: Avoid hard-coded value, (add parameter to control file?)
-        if i % 5:
+        if (i+1) % 15:
             degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
             spawningCalculator.log()
             print "Degeneracy", degeneracyOfRepresentatives
         else:
-            betweenness = nx.betweenness_centrality(clusteringMethod.conformationNetwork, weight='transition')
-            sortedNodes = sorted(betweenness, key=lambda x: betweenness[x], reverse=True)[:5]
-            degeneracyOfRepresentatives = distributeAmongClusters(sortedNodes, clusteringMethod, simulationRunner.parameters.processors-1)
+            specialRun = True
+            # peleControlFileDictionary["PELE_STEPS"] = 10
+            print "Distributing among most metastable clusters"
+            spawningCalculator.calculateDensities(clusteringMethod.clusters.clusters)
+            sortedNodes = getMetastableClusters(clusteringMethod, 10)
+            print sortedNodes
+            # degeneracyOfRepresentatives = distributeAmongClusters(sortedNodes, clusteringMethod, simulationRunner.parameters.processors-1)
+            clusterList = [clusteringMethod.getCluster(numCluster) for numCluster in sortedNodes]
+            degeneracyShort = spawningCalculator.calculate(clusterList, simulationRunner.parameters.processors-1, spawningParams, i)
+            degeneracyOfRepresentatives = np.zeros_like(clusteringMethod.clusters.clusters)
+            for nNode, node in enumerate(sortedNodes):
+                degeneracyOfRepresentatives[node] = degeneracyShort[nNode]
+            spawningCalculator.log()
 
         simulationRunner.updateMappingProcessors(degeneracyOfRepresentatives, clusteringMethod)
 
