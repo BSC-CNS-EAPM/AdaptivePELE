@@ -185,7 +185,7 @@ class Cluster:
     def __setstate__(self, state):
         # Restore instance attributes
         self.pdb = state['pdb']
-        self.altStructure = state.get('altStructPQ', AltStructures())
+        self.altStructure = state.get('altStructure', AltStructures())
         self.elements = state['elements']
         self.threshold = state.get('threshold')
         self.density = state.get('density')
