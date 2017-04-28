@@ -22,7 +22,7 @@ AdaptivePELE/build/
 AdaptivePELE/atomset/*.c
 AdaptivePELE/atomset/*.so
 AdaptivePELE/atomset/build
-AdaptivePELE/Data*
+AdaptivePELE/Data
 AdaptivePELE/Documents
 AdaptivePELE/docs/_build
 .ropeproject

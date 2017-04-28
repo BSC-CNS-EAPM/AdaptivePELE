@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from AdaptivePELE.atomset import atomset
 from mpl_toolkits.mplot3d import Axes3D
-import pdb as debug
 import argparse
 
 
@@ -89,26 +88,40 @@ def plotClusters(cluster_matrix, metrics, title):
     return fig
 
 
+def extractInfo(inputFile):
+    clusterInfo = np.loadtxt(inputFile)
+    return clusterInfo[:, 1]
+
+
 def plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
                        titlecontacts, metricPlotFilename="",
-                       populationPlotFilename="", contactsPlotFilename=""):
+                       populationPlotFilename="", contactsPlotFilename="",
+                       metricFlag=False, populationFlag=False,
+                       contactsFlag=False, inputFile=None):
 
     with open(pklObjectFilename, "r") as f:
         clObject = pickle.load(f)
 
     comCoord, metrics, totalElements, population, contacts = extractCOMMatrix(clObject.clusters.clusters, resname)
 
-    # plot = plotClusters(comCoord, metrics, titlemetric)
-    # if metricPlotFilename:
-    #     plot.savefig(metricPlotFilename)
+    if inputFile is not None:
+        clustersInfo = extractInfo(inputFile)
+        plotClusters(comCoord, clustersInfo, "")
 
-    plotContpop = plotClusters(comCoord, population, titlepopulation)
-    if populationPlotFilename:
-        plotContpop.savefig(populationPlotFilename)
+    if metricFlag:
+        plot = plotClusters(comCoord, metrics, titlemetric)
+        if metricPlotFilename:
+            plot.savefig(metricPlotFilename)
 
-    # plotContcont = plotClusters(comCoord, contacts, titlecontacts)
-    # if contactsPlotFilename:
-    #     plotContcont.savefig(contactsPlotFilename)
+    if populationFlag:
+        plotContpop = plotClusters(comCoord, population, titlepopulation)
+        if populationPlotFilename:
+            plotContpop.savefig(populationPlotFilename)
+
+    if contactsFlag:
+        plotContcont = plotClusters(comCoord, contacts, titlecontacts)
+        if contactsPlotFilename:
+            plotContcont.savefig(contactsPlotFilename)
 
     print "Number of elements", totalElements
 
@@ -118,17 +131,17 @@ def parseArguments():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("clusteringObject", type=str, help="Clustering object")
     parser.add_argument("resname", type=str, help="Resname in the pdb")
+    parser.add_argument("-metrics", action="store_true", help="Wether to plot the metric of the clusters as color")
+    parser.add_argument("-population", action="store_true", help="Wether to plot the population of the clusters as color")
+    parser.add_argument("-contacts", action="store_true", help="Wether to plot the contacts of the clusters as color")
+    parser.add_argument("-i", type=str, default=None, help="File with cluster-associated information")
     args = parser.parse_args()
 
-    return args.clusteringObject, args.resname
+    return args.clusteringObject, args.resname, args.metrics, args.population, args.contacts, args.i
 
 if __name__ == "__main__":
-    # resname = "ALJ"
-    # resname = "STR"
-    # resname = "K5Y"
-    pklObjectFilename, resname = parseArguments()
-    # Cont
-    # pklObjectFilename = "object_Cont_forw.pkl"
+    pklObjectFilename, resname, metricsFlag, populationFlag, contactsFlag, inputFile = parseArguments()
+
     metricPlotFilename = ""  # "results/contactClusters.png"
     populationPlotFilename = ""  # "results/contactClusterspop.png"
     contactsPlotFilename = ""  # "results/contactClustersContacts.png"
@@ -138,36 +151,6 @@ if __name__ == "__main__":
 
     plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
                        titlecontacts, metricPlotFilename,
-                       populationPlotFilename, contactsPlotFilename)
+                       populationPlotFilename, contactsPlotFilename, metricsFlag,
+                       populationFlag, contactsFlag, inputFile)
     plt.show()
-    # # Acc
-    # #pklObjectFilename = "ClAcc_PR_heav.pkl"
-    # pklObjectFilename = "object_Cont_rev.pkl"
-    # metricPlotFilename = ""  # "results/metricplotAcc_acc_PR_heav.png"
-    # populationPlotFilename = ""  # "results/populationAcc_acc_PR_heav.png"
-    # contactsPlotFilename = ""  # "results/contactsplotAcc_acc_PR_heav.png"
-    # titlemetric = "Metrics Reverese"
-    # titlepopulation = "Population Reverse"
-    # titlecontacts = "Number of contacts reverse"
-    # # titlemetric = "Metrics Accumulative"
-    # #titlepopulation = "Population Accumulative"
-    # #titlecontacts = "Number of contacts Accumulative"
-
-    # plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
-    #                    titlecontacts, metricPlotFilename,
-    #                    populationPlotFilename, contactsPlotFilename)
-
-    # pklObjectFilename = "object_Cont_mix.pkl"
-    # metricPlotFilename = ""  # "results/metricplotAcc_acc_PR_heav.png"
-    # populationPlotFilename = ""  # "results/populationAcc_acc_PR_heav.png"
-    # contactsPlotFilename = ""  # "results/contactsplotAcc_acc_PR_heav.png"
-    # titlemetric = "Metrics mixed"
-    # titlepopulation = "Population mixed"
-    # titlecontacts = "Number of contacts mixed"
-    # # titlemetric = "Metrics Accumulative"
-    # #titlepopulation = "Population Accumulative"
-    # #titlecontacts = "Number of contacts Accumulative"
-
-    # plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
-    #                    titlecontacts, metricPlotFilename,
-    #                    populationPlotFilename, contactsPlotFilename)

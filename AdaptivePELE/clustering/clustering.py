@@ -11,16 +11,31 @@ import AdaptivePELE.atomset.atomset as atomset
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
 from AdaptivePELE.atomset import RMSDCalculator
+from scipy import stats
 import socket
+import networkx as nx
+import heapq
 # if "bsccv" not in socket.gethostname():
 #     from sklearn.cluster import AffinityPropagation
 #     from sklearn.cluster import AgglomerativeClustering
 #     from sklearn.cluster import KMeans
- 
+
 
 class Clusters:
     def __init__(self):
         self.clusters = []
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"clusters": self.clusters}
+        return state
+
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.clusters = state['clusters']
 
     def addCluster(self, cluster):
         self.clusters.append(cluster)
@@ -47,6 +62,82 @@ class Clusters:
         return self.clusters == other.clusters
 
 
+class AltStructures:
+    """
+        Helper class, each cluster will have an instance of AltStructures that
+        will maintain a priority queue (pq) of alternative structures to spawn
+        from encoded as tuples (priority, PDB).
+    """
+    def __init__(self):
+        self.altStructPQ = []
+        self.limitSize = 10
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"altStructPQ": self.altStructPQ, "limitSize": self.limitSize}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.limitSize = state['limitSize']
+        self.altStructPQ = state['altStructPQ']
+
+    def altSpawnSelection(self, centerPair):
+        """
+            Select an alternative PDB from the cluster center to spawn from
+        """
+        subpopulations = [i[0] for i in self.altStructPQ]
+        totalSubpopulation = sum(subpopulations)
+        # Create a list of the population distributed between the cluster
+        # center and the alternative structures
+        weights = 1.0/np.array([centerPair[0]-totalSubpopulation]+subpopulations)
+        weights /= weights.sum()
+        # This function only works on numpy >= 1.7, on life we have 1.6
+        # ind = np.random.choice(range(len(self.altStructPQ)), p=weights)
+        r = stats.rv_discrete(values=(range(self.sizePQ()), weights))
+        ind = r.rvs(size=10)[0]
+        # The first value of the distribution is always the cluster center
+        if ind == 0:
+            print "cluster center"
+            return centerPair[1]
+        else:
+            # pick an alternative structure from the priority queue
+            print "alternative structure"
+            return self.altStructPQ[ind][1].pdb
+
+    def cleanPQ(self):
+        """
+            Ensure that the alternative structures priority queue has no more
+            elements than the limit in order to ensure efficiency
+        """
+        if len(self.altStructPQ) < self.limitSize:
+            return
+        limit = len(self.altStructPQ)
+        del self.altStructPQ[self.limitSize-limit:]
+
+    def addStructure(self, PDB, threshold, resname, contactThreshold, similarityEvaluator):
+        i = 0
+        for priority, subCluster in self.altStructPQ:
+            isSimilar, distance = similarityEvaluator.isElement(PDB, subCluster, resname, contactThreshold)
+            if distance < subCluster.threshold/2.0:
+                subCluster.addElement([])
+                del self.altStructPQ[i]
+                heapq.heappush(self.altStructPQ, (subCluster.elements, subCluster))
+                if len(self.altStructPQ) > 2*self.limitSize:
+                    self.cleanPQ()
+                return
+            i += 1
+        newCluster = Cluster(PDB, thresholdRadius=threshold, contactThreshold=contactThreshold, contactMap=similarityEvaluator.contactMap)
+        heapq.heappush(self.altStructPQ, (1, newCluster))
+        if len(self.altStructPQ) > 2*self.limitSize:
+            self.cleanPQ()
+
+    def sizePQ(self):
+        return len(self.altStructPQ)
+
+
 class Cluster:
     """
         A cluster contains a representative structure(pdb), the number of
@@ -60,16 +151,16 @@ class Cluster:
             contacts stands for contacts/ligandAtom
         """
         self.pdb = pdb
-        self.altStructure = None
+        self.altStructure = AltStructures()
         self.elements = 1
         self.threshold = thresholdRadius
         self.density = density
         self.contacts = contacts
         self.contactMap = contactMap
         self.metrics = metrics
+        self.originalMetrics = metrics
         self.metricCol = metricCol
         self.contactThreshold = contactThreshold
-        self.altMetrics = []
         self.altSelection = altSelection
 
         if self.threshold is None:
@@ -77,15 +168,39 @@ class Cluster:
         else:
             self.threshold2 = thresholdRadius*thresholdRadius
 
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"pdb": self.pdb, "altStructure": self.altStructure,
+                 "elements": self.elements, "threshold": self.threshold,
+                 "densitiy": self.density, "contacts": self.contacts,
+                 "contactMap": self.contactMap,  "metrics": self.metrics,
+                 "metricCol": self.metricCol, "threshold2": self.threshold2,
+                 "contactThreshold": self.contactThreshold,
+                 "altSelection": self.altSelection,
+                 "originalMetrics": self.originalMetrics}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.pdb = state['pdb']
+        self.altStructure = state.get('altStructure', AltStructures())
+        self.elements = state['elements']
+        self.threshold = state.get('threshold')
+        self.density = state.get('density')
+        self.contacts = state.get('contacts')
+        self.contactMap = state.get('contactMap')
+        self.metrics = state.get('metrics', [])
+        self.originalMetrics = state.get('originalMetrics', [])
+        self.metricCol = state.get('metricCol')
+        self.threshold2 = state.get('threshold2')
+        self.contactThreshold = state.get('contactThreshold', 8)
+        self.altSelection = state.get('altSelection', False)
+
     def getMetric(self):
         if len(self.metrics):
             return self.metrics[self.metricCol]
-        else:
-            return None
-
-    def getAltMetric(self):
-        if len(self.altMetrics):
-            return self.altMetrics[self.metricCol]
         else:
             return None
 
@@ -97,6 +212,13 @@ class Cluster:
 
     def addElement(self, metrics):
         self.elements += 1
+        if self.metrics is None:
+            # Special case where cluster in created during clustering of
+            # initial structures
+            self.metrics = metrics
+            return
+        if self.originalMetrics is None:
+            self.originalMetrics = metrics
         if len(metrics) and len(self.metrics):
             # Set all metrics to the minimum value
             self.metrics = np.minimum(self.metrics, metrics)
@@ -121,10 +243,11 @@ class Cluster:
             With 50 % probability select the cluster center to spawn in
             the next epoch
         """
-        if not self.altSelection or self.altStructure is None or np.random.uniform() < 0.5:
+        if not self.altSelection or self.altStructure.sizePQ() == 0:
+            print "cluster center"
             self.pdb.writePDB(str(path))
         else:
-            self.altStructure.writePDB(str(path))
+            self.altStructure.altSpawnSelection((self.elements, self.pdb)).writePDB(str(path))
 
     def __eq__(self, other):
         return self.pdb == other.pdb\
@@ -134,38 +257,26 @@ class Cluster:
              and np.allclose(self.metrics, other.metrics)
 
 
-class Tree:
-    def __init__(self):
-        """ Rooted tree, the root is an empty Node with all parameters set to
-            None
-        """
-        self.root = Node(None, None, None)
-
-    def addNode(self, node, parentNode):
-        parentNode.addChildren(node)
-
-
-class Node:
-    def __init__(self, cluster, position, parent):
-        self.children = []
-        self.position = position
-        self.parent = parent
-        self.cluster = cluster
-        if self.parent is None:
-            self.depth = 1
-        else:
-            self.depth = parent.depth+1
-
-    def addChildren(self, node):
-        self.children.append(node)
-
-
 class ContactsClusteringEvaluator:
     def __init__(self, RMSDCalculator):
         self.RMSDCalculator = RMSDCalculator
         self.contacts = None
         # Only here for compatibility purpose
         self.contactMap = None
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"RMSDCalculator": self.RMSDCalculator,
+                 "contacts": self.contacts, "contactMap": self.contactMap}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.RMSDCalculator = state.get('RMSDCalculator', RMSDCalculator.RMSDCalculator())
+        self.contacts = state.get('contacts')
+        self.contactMap = state.get('contactMap')
 
     def isElement(self, pdb, cluster, resname, contactThresholdDistance):
         dist = self.RMSDCalculator.computeRMSD(cluster.pdb, pdb)
@@ -201,12 +312,29 @@ class CMClusteringEvaluator:
         self.contacts = None
         self.contactMap = None
 
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"similarityEvaluator": self.similarityEvaluator,
+                 "symmetryEvaluator": self.symmetryEvaluator,
+                 "contacts": self.contacts, "contactMap": self.contactMap}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.similarityEvaluator = state.get('similarityEvaluator')
+        self.symmetryEvaluator = state.get('symmetryEvaluator')
+        self.contacts = state.get('contacts')
+        self.contactMap = state.get('contactMap')
+
     def isElement(self, pdb, cluster, resname, contactThresholdDistance):
         if self.contactMap is None:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             # self.contactMap, foo = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             # self.contacts = pdb.countContacts(resname, 8)  # contactThresholdDistance)
-        return self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster, self.symmetryEvaluator)
+        distance = self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster.contactMap, self.symmetryEvaluator)
+        return distance < cluster.threshold, distance
 
     def cleanContactMap(self):
         self.contactMap = None
@@ -223,17 +351,35 @@ class CMClusteringEvaluator:
         #     return 4.0
         # else:
         #     return 16-self.limitSlope[cluster.contactThreshold]*cluster.contacts
+
+        # if cluster.contacts > 2.0:
+        #     return 4.0
+        # elif cluster.contacts <= 0.5:
+        #     return 25.0
+        # else:
+        #     return 25-14*(cluster.contacts-0.5)
+
         if cluster.contacts > 2.0:
             return 4.0
+        elif cluster.contacts < 0.5:
+            return 25.0
         else:
-            return 16-6*cluster.contacts
+            return 16-8*(cluster.contacts-0.5)
+
+        # if cluster.contacts > 1.0:
+        #     return 4.0
+        # elif cluster.contacts > 0.75:
+        #     return 9.0
+        # elif cluster.contacts > 0.5:
+        #     return 16.0
+        # else:
+        #      return 25
 
     def getOuterLimit(self, node):
         # return max(16, 16 * 2 - node.depth)
         return 16
 
 
-# class Clustering(object):
 class Clustering:
     """
         Base class for clustering methods, it defines a cluster method that
@@ -260,6 +406,34 @@ class Clustering:
         self.contactThresholdDistance = contactThresholdDistance
         self.symmetries = []
         self.altSelection = altSelection
+        self.conformationNetwork = nx.DiGraph()
+        self.epoch = -1
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"type": self.type, "clusters": self.clusters,
+                 "reportBaseFilename": self.reportBaseFilename,
+                 "resname": self.resname, "col": self.col, "epoch": self.epoch,
+                 "symmetries": self.symmetries,
+                 "conformationNetwork": self.conformationNetwork,
+                 "contactThresholdDistance": self.contactThresholdDistance,
+                 "altSelection": self.altSelection}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.type = state['type']
+        self.clusters = state['clusters']
+        self.reportBaseFilename = state.get('reportBaseFilename')
+        self.resname = state.get('resname')
+        self.col = state.get('col')
+        self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
+        self.symmetries = state.get('symmetries', [])
+        self.altSelection = state.get('altSelection', False)
+        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.epoch = state.get('metricCol', -1)
 
     def setCol(self, col):
         self.col = col
@@ -271,6 +445,12 @@ class Clustering:
         return self.clusters.getCluster(clusterNum)
 
 
+    def clusterIterator(self):
+        # TODO: may be interesting to add some condition to filter, check
+        # itertools module, its probably implemented
+        for cluster in self.clusters.clusters:
+            yield cluster
+
     def getNumberClusters(self):
         return self.clusters.getNumberClusters()
 
@@ -280,15 +460,71 @@ class Clustering:
             and self.resname == other.resname\
             and self.col == other.col
 
-    def cluster(self, paths):
+    def clusterInitialStructures(self, initialStructures):
+        """
+            Cluster the initial structures. This will allow to obtain a working
+            processor to cluster mapping (see SimulationRunner docs for more info)
+            for simulation with multiple initial structures
+            :param initialStructures: List of the initial structures of the simulation
+            :type initialStructures: list
+        """
+        clusterInitial = []
+        for i, structurePath in enumerate(initialStructures):
+            pdb = atomset.PDB()
+            pdb.initialise(str(structurePath), resname=self.resname)
+            for clusterNum, cluster in enumerate(self.clusters.clusters):
+                scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
+                if scd > self.clusteringEvaluator.getInnerLimit(cluster):
+                    continue
+
+                isSimilar, dist = self.clusteringEvaluator.isElement(pdb, cluster,
+                                                                    self.resname, self.contactThresholdDistance)
+                if isSimilar:
+                    cluster.addElement([])
+                    clusterInitial.append(clusterNum)
+                    self.clusters.clusters[clusterNum].elements = 0
+                    break
+
+            if len(clusterInitial) == i+1:
+                # If an initial structure is similar enough to be added as
+                # element in a previous cluster, move to the next structure,
+                # this function is practically a duplicate of the
+                # addSnapshotToCluster function and this blocks substitutes the
+                # return statement after adding an element
+                continue
+            # if made it here, the snapshot was not added into any cluster
+            # Check if contacts and contactMap are set (depending on which kind
+            # of clustering)
+            self.clusteringEvaluator.checkAttributes(pdb, self.resname, self.contactThresholdDistance)
+            contacts = self.clusteringEvaluator.contacts
+            numberOfLigandAtoms = pdb.getNumberOfAtoms()
+            contactsPerAtom = float(contacts)/numberOfLigandAtoms
+
+            threshold = self.thresholdCalculator.calculate(contactsPerAtom)
+            cluster = Cluster(pdb, thresholdRadius=threshold,
+                            contacts=contactsPerAtom,
+                            contactMap=self.clusteringEvaluator.contactMap,
+                            metrics=None, metricCol=self.col,
+                            contactThreshold=self.contactThresholdDistance,
+                            altSelection=self.altSelection)
+            self.clusters.addCluster(cluster)
+            clusterNum = self.getNumberClusters()-1
+            clusterInitial.append(clusterNum)
+            self.clusters.clusters[clusterNum].elements = 0
+            self.conformationNetwork.add_node(clusterNum, parent='root', epoch=0)
+        return clusterInitial
+
+    def cluster(self, paths, processorsToClusterMapping):
         """
             Cluster the snaptshots contained in the pahts folder
-            paths [In] List of folders with the snapshots
+            :param paths: List of folders with the snapshots
+            :type paths: list
         """
+        self.epoch += 1
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
-
+            origCluster = processorsToClusterMapping[trajNum-1]
             snapshots = utilities.getSnapshots(trajectory, True)
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
@@ -296,21 +532,27 @@ class Clustering:
                 metrics = np.loadtxt(reportFilename, ndmin=2)
 
                 for num, snapshot in enumerate(snapshots):
-                    self.addSnapshotToCluster(snapshot, metrics[num], self.col)
+                    origCluster = self.addSnapshotToCluster(snapshot, origCluster, metrics[num], self.col)
             else:
                 for num, snapshot in enumerate(snapshots):
-                    self.addSnapshotToCluster(snapshot)
+                    origCluster = self.addSnapshotToCluster(snapshot, origCluster)
+        for cluster in self.clusters.clusters:
+            cluster.altStructure.cleanPQ()
 
     def writeOutput(self, outputPath, degeneracy, outputObject, writeAll):
         """
             Writes all the clustering information in outputPath
 
-            outputPath [In] Folder that will contain all the clustering information
-            degeneracy [In] Degeneracy of each cluster. It must be in the same order
+            :param outputPath: Folder that will contain all the clustering information
+            :type outputPath: str
+            :param degeneracy: Degeneracy of each cluster. It must be in the same order
             as in the self.clusters list
-            outputObject [In] Output name for the pickle object
-            writeAll [In] Boolean, wether to write pdb files for all cluster in addition
+            :type degeneracy: list
+            :param outputObject: Output name for the pickle object
+            :type outputObject: str
+            :param writeAll: Wether to write pdb files for all cluster in addition
             of the summary
+            :type writeAll: bool
         """
         utilities.cleanup(outputPath)
         utilities.makeFolder(outputPath)
@@ -326,58 +568,30 @@ class Clustering:
                 cluster.writePDB(outputFilename)
 
             metric = cluster.getMetric()
-            if metric:
+            if metric is None:
+                writeString = "%d %d %d %.2f %.4f %.1f -\n" % (i, cluster.elements,
+                                                               degeneracy[i],
+                                                               cluster.contacts,
+                                                               cluster.threshold,
+                                                               cluster.density)
+            else:
                 writeString = "%d %d %d %.2f %.4f %.1f %.3f\n" % (i, cluster.elements,
                                                                   degeneracy[i],
                                                                   cluster.contacts,
                                                                   cluster.threshold,
                                                                   cluster.density,
                                                                   metric)
-            else:
-                writeString = "%d %d %d %.2f %.4f %.1f -\n" % (i, cluster.elements,
-                                                               degeneracy[i],
-                                                               cluster.contacts,
-                                                               cluster.threshold,
-                                                               cluster.density)
             summaryFile.write(writeString)
         summaryFile.close()
 
         with open(outputObject, 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
-    def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
-        #########################################
-        # OPTIMISATION:
-        # We use centroid distance as a lower bound for RMSD
-        #
-        # Proof:
-        # Superscript ^1 and ^2 stands for PDB1 and PDB2 respectively
-        # Exponentiation is referred as ** to avoid misunderstandings
-        # Sumation is performed over atoms
-        #
-        # RMSD**2 = sum_i ||r^1_i - r^2_i||**2 / N := sum_i d_i**2 / N
-        # dc := centroid difference
-        # dc = ||sum_i r^1_i - r^2_i|| / N := sum_i d_i / N
-        # where d_i := r^1_i - r^2_i
-        #
-        # In the end, it is a matter of showing that the square of avg. is
-        # smaller or equal to the avg. of squares:
-        # (sum_i d_i / N)**2 <= sum_i d_i**2 / N
-        #
-        # Remembering Cauchy-Schward inequality:
-        # |<u*v>| <= ||<u>||*||<v>||
-        # Setting u_i = d_i/N and v_i = 1 for all i, in an n-dim euclidean space
-        # (sum d_i / N)**2 <= sum (d_i/N)**2 * 1
-        #########################################
+    def addSnapshotToCluster(self, snapshot, origCluster, metrics=[], col=None):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         self.clusteringEvaluator.cleanContactMap()
-        if np.random.rand() < 2.0:
-            tmpClusters = self.clusters.clusters
-        else:
-            tmpClusters = reversed(self.clusters.clusters)
-            # tmpClusters = self.clusters.clusters[::-1]
-        for clusterNum, cluster in enumerate(tmpClusters):
+        for clusterNum, cluster in enumerate(self.clusters.clusters):
             scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
             if scd > self.clusteringEvaluator.getInnerLimit(cluster):
                 continue
@@ -385,11 +599,14 @@ class Clustering:
             isSimilar, dist = self.clusteringEvaluator.isElement(pdb, cluster,
                                                                  self.resname, self.contactThresholdDistance)
             if isSimilar:
-                if dist > cluster.threshold/2 and (len(cluster.altMetrics) == 0 or cluster.getAltMetric() > metrics[cluster.metricCol]):
-                    cluster.altStructure = pdb
-                    cluster.altMetrics = metrics
+                if dist > cluster.threshold/2:
+                    cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.contactThresholdDistance, self.clusteringEvaluator)
                 cluster.addElement(metrics)
-                return
+                if self.conformationNetwork.has_edge(origCluster, clusterNum):
+                    self.conformationNetwork[origCluster][clusterNum]['transition'] += 1
+                else:
+                    self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
+                return clusterNum
 
         # if made it here, the snapshot was not added into any cluster
         # Check if contacts and contactMap are set (depending on which kind
@@ -407,87 +624,169 @@ class Clustering:
                           contactThreshold=self.contactThresholdDistance,
                           altSelection=self.altSelection)
         self.clusters.addCluster(cluster)
+        clusterNum = self.clusters.getNumberClusters()-1
+        if clusterNum == origCluster:
+            # The clusterNum should only be equal to origCluster when the first
+            # cluster is created and the clusterInitialStructures function has
+            # not been called, i.e. when usind the compareClustering script
+            self.conformationNetwork.add_node(clusterNum, parent='root', epoch=self.epoch)
+        else:
+            self.conformationNetwork.add_node(clusterNum, parent=origCluster, epoch=self.epoch)
+        self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
+        # If a new cluster is discovered during a trajectory, the next step in
+        # the same trajectory will be considered to start from these new
+        # cluster, thus resulting in a more precise conformation network and
+        # smoother pathways
+        return clusterNum
 
+    def writeConformationNetwork(self, path):
+        """
+            Write the conformational network to file to visualize it
+            :param path: Path where to write the network
+            :type path: str
+        """
+        nx.write_edgelist(self.conformationNetwork, path)
 
-class TreeClustering(Clustering):
-    def __init__(self, resname=None, reportBaseFilename=None,
-                 columnOfReportFile=None, contactThresholdDistance=8,
-                 symmetries=[]):
-        Clustering.__init__(self, resname, reportBaseFilename,
-                            columnOfReportFile, contactThresholdDistance)
-        self.clusteringEvaluator = None
-        self.tree = Tree()
+    def writeFDT(self, path):
+        """
+            Write the first discovery tree to file in edgelist format to
+            visualize it
+            :param path: Path where to write the network
+            :type path: str
+        """
+        with open(path, "w") as fw:
+            for node, data in self.conformationNetwork.nodes_iter(data=True):
+                if data['parent'] != 'root':
+                    fw.write("%d\t%d\n" % (data['parent'], node))
 
-    def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
-        #########################################
-        # OPTIMISATION:
-        # We use centroid distance as a lower bound for RMSD
-        #
-        # Proof:
-        # Superscript ^1 and ^2 stands for PDB1 and PDB2 respectively
-        # Exponentiation is referred as ** to avoid misunderstandings
-        # Sumation is performed over atoms
-        #
-        # RMSD**2 = sum_i ||r^1_i - r^2_i||**2 / N := sum_i d_i**2 / N
-        # dc := centroid difference
-        # dc = ||sum_i r^1_i - r^2_i|| / N := sum_i d_i / N
-        # where d_i := r^1_i - r^2_i
-        #
-        # In the end, it is a matter of showing that the square of avg. is
-        # smaller or equal to the avg. of squares:
-        # (sum_i d_i / N)**2 <= sum_i d_i**2 / N
-        #
-        # Remembering Cauchy-Schward inequality:
-        # |<u*v>| <= ||<u>||*||<v>||
-        # Setting u_i = d_i/N and v_i = 1 for all i, in an n-dim euclidean space
-        # (sum d_i / N)**2 <= sum (d_i/N)**2 * 1
-        #########################################
-        pdb = atomset.PDB()
-        pdb.initialise(snapshot, resname=self.resname)
-        clusterNode = self.tree.root
-        self.clusteringEvaluator.cleanContactMap()
-        minDist = 100
-        while clusterNode.children:
-            for node in clusterNode.children:
-                scd = atomset.computeSquaredCentroidDifference(node.cluster.pdb, pdb)
-                # if scd > node.cluster.threshold2+4:
-                if scd < self.clusteringEvaluator.getOuterLimit(node):
-                    if scd < self.clusteringEvaluator.getInnerLimit(node):
-                        if self.clusteringEvaluator.isElement(pdb, node.cluster,
-                                                              self.resname, self.contactThresholdDistance):
-                            node.cluster.addElement(metrics)
-                            return
-                    if scd < minDist:
-                        minDist = scd
-                        clusterNode = node
+    def writeConformationNodeMetric(self, path, metricCol):
+        """
+            Write the metric of each node in the conformation network in a
+            tab-separated file
+            :param path: Path where to write the network
+            :type path: str
+            :param metricCol: Column of the metric of interest
+            :type metricCol: int
+        """
+        with open(path, "w") as f:
+            for i, cluster in enumerate(self.clusters.clusters):
+                metric = cluster.getMetricFromColumn(metricCol)
+                if metric is None:
+                    f.write("%d\t-\n" % i)
                 else:
-                    continue
-            # If has compared to all the children and none is within centroid
-            # distance, add a new children node
-            break
+                    f.write("%d\t%.4f\n" % (i, metric))
 
-        # if made it here, the snapshot was not added into any cluster
-        # Check if contacts and contactMap are set (depending on which kind
-        # of clustering)
-        self.clusteringEvaluator.checkAttributes(pdb, self.resname, self.contactThresholdDistance)
-        contacts = self.clusteringEvaluator.contacts
-        numberOfLigandAtoms = pdb.getNumberOfAtoms()
-        contactsPerAtom = float(contacts)/numberOfLigandAtoms
+    def writeConformationNodePopulation(self, path):
+        """
+            Write the population of each node in the conformation network in a
+            tab-separated file
+            :param path: Path where to write the network
+            :type path: str
+        """
+        with open(path, "w") as f:
+            for i, cluster in enumerate(self.clusters.clusters):
+                f.write("%d\t%d\n" % (i, cluster.elements))
 
-        threshold = self.thresholdCalculator.calculate(contactsPerAtom)
-        cluster = Cluster(pdb, thresholdRadius=threshold,
-                          contacts=contactsPerAtom,
-                          contactMap=self.clusteringEvaluator.contactMap,
-                          metrics=metrics, metricCol=col)
-        self.tree.addNode(Node(cluster, self.clusters.getNumberClusters(), clusterNode), clusterNode)
-        self.clusters.addCluster(cluster)
 
-    def extractPathwayFromNode(self, node):
+    def createPathwayToCluster(self, clusterLeave):
+        """
+            Retrace the FDT from a specific cluster to the root where it was
+            discovered
+            :param clusterLeave: End point of the pathway to reconstruct
+            :type clusterLeave: int
+        """
         pathway = []
-        while node.parent is not None:
-            pathway.append(node.cluster)
-            node = node.parent
-        return pathway
+        nodeLabel = clusterLeave
+        while nodeLabel != "root":
+            pathway.append(nodeLabel)
+            nodeLabel = self.conformationNetwork.node[nodeLabel]['parent']
+        return pathway[::-1]
+
+    def getOptimalMetric(self, column=None):
+        """
+            Find the cluster with the best metric
+        """
+        optimalMetric = 100
+        optimalMetricIndex = 0
+        for i, cluster in enumerate(self.clusters.clusters):
+            if column is None:
+                metric = cluster.getMetric()
+            else:
+                metric = cluster.getMetricFromColumn(column)
+            if metric < optimalMetric:
+                optimalMetric = metric
+                optimalMetricIndex = i
+        return optimalMetricIndex
+
+    def writePathwayTrajectory(self, pathway, filename):
+        """
+            Write a list of cluster forming a pathway into a trajectory pdb file
+            :param pathway: List of clusters that form the pathway
+            :type pathway: list
+            :param filename: Path where to write the trajectory
+            :type filename: str
+        """
+        pathwayFile = open(filename, "w")
+        pathwayFile.write("REMARK 000 File created using PELE++\n")
+        pathwayFile.write("REMARK 000 Pathway trajectory created using the FDT\n")
+        pathwayFile.write("REMARK 000 List of cluster belonging to the pathway %s\n" % ' '.join(map(str, pathway)))
+        for i, step_cluster in enumerate(pathway):
+            cluster = self.clusters.clusters[step_cluster]
+            pathwayFile.write("MODEL %d\n" % (i+1))
+            pdbStr = cluster.pdb.pdb
+            pdbList = pdbStr.split("\n")
+            for line in pdbList:
+                line = line.strip()
+                # Avoid writing previous REMARK block
+                if line.startswith("REMARK ") or line.startswith("MODEL ") or line == "END":
+                    continue
+                elif line:
+                    pathwayFile.write(line+"\n")
+            pathwayFile.write("ENDMDL\n")
+        pathwayFile.close()
+
+    def writePathwayOptimalCluster(self, filename):
+        """
+            Extracte the pathway to the cluster with the best metric as a
+            trajectory and  write it to a PDB file
+            :param filename: Path where to write the trajectory
+            :type filename: str
+        """
+        optimalCluster = self.getOptimalMetric()
+        pathway = self.createPathwayToCluster(optimalCluster)
+        self.writePathwayTrajectory(pathway, filename)
+
+    def calculateMetastabilityIndex(self):
+        """
+            Calculate the metastablity index, mI. mI is the ratio of transitions
+            from a given cluster that remains within the same cluster
+        """
+        metInd = {}
+        for node in self.conformationNetwork.nodes_iter():
+            totalOut = 0
+            selfTrans = 0
+            for n, edge, data in self.conformationNetwork.out_edges_iter(node, data=True):
+                if edge == node:
+                    selfTrans = data['transition']
+                totalOut += data['transition']
+            if totalOut+selfTrans:
+                metInd[node] = selfTrans/float(totalOut)
+            else:
+                metInd[node] = 0
+        return metInd
+
+    def writeMetastabilityIndex(self, filename, metInd=None):
+        """
+            Write the metastability index of each node to file.
+            :param filename: Path where to write the trajectory
+            :type filename: str
+        """
+        if metInd is None:
+            metInd = self.calculateMetastabilityIndex()
+        with open(filename, "w") as f:
+            for node, met in metInd.iteritems():
+                f.write("%d\t%.4f\n" % (node, met))
+
 
 class ContactsClustering(Clustering):
     """
@@ -509,8 +808,6 @@ class ContactsClustering(Clustering):
     def __init__(self, thresholdCalculator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8, symmetries=[], altSelection=False):
-        # TreeClustering.__init__(self, resname, reportBaseFilename,
-        #                    columnOfReportFile, contactThresholdDistance)
         Clustering.__init__(self, resname, reportBaseFilename,
                            columnOfReportFile, contactThresholdDistance,
                             altSelection=altSelection)
@@ -518,6 +815,36 @@ class ContactsClustering(Clustering):
         self.thresholdCalculator = thresholdCalculator
         self.symmetries = symmetries
         self.clusteringEvaluator = ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"type": self.type, "clusters": self.clusters,
+                 "reportBaseFilename": self.reportBaseFilename,
+                 "resname": self.resname, "col": self.col, "epoch": self.epoch,
+                 "symmetries": self.symmetries,
+                 "conformationNetwork": self.conformationNetwork,
+                 "contactThresholdDistance": self.contactThresholdDistance,
+                 "altSelection": self.altSelection,
+                 "thresholdCalculator": self.thresholdCalculator,
+                 "clusteringEvaluator": self.clusteringEvaluator}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.type = state['type']
+        self.clusters = state['clusters']
+        self.reportBaseFilename = state.get('reportBaseFilename')
+        self.resname = state.get('resname')
+        self.col = state.get('col')
+        self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
+        self.symmetries = state.get('symmetries', [])
+        self.altSelection = state.get('altSelection', False)
+        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.epoch = state.get('metricCol', -1)
+        self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant())
+        self.clusteringEvaluator = state.get('clusteringEvaluator', ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(self.symmetries)))
 
 
 class ContactMapAccumulativeClustering(Clustering):
@@ -536,8 +863,6 @@ class ContactMapAccumulativeClustering(Clustering):
     def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8, symmetries=[], altSelection=False):
-        # TreeClustering.__init__(self, resname, reportBaseFilename,
-        #                     columnOfReportFile, contactThresholdDistance)
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance,
                             altSelection=altSelection)
@@ -547,37 +872,40 @@ class ContactMapAccumulativeClustering(Clustering):
         self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
         self.clusteringEvaluator = CMClusteringEvaluator(similarityEvaluator, self.symmetryEvaluator)
 
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"type": self.type, "clusters": self.clusters,
+                 "reportBaseFilename": self.reportBaseFilename,
+                 "resname": self.resname, "col": self.col, "epoch": self.epoch,
+                 "symmetries": self.symmetries,
+                 "conformationNetwork": self.conformationNetwork,
+                 "contactThresholdDistance": self.contactThresholdDistance,
+                 "altSelection": self.altSelection,
+                 "thresholdCalculator": self.thresholdCalculator,
+                 "similariyEvaluator": self.similarityEvaluator,
+                 "symmetryEvaluator": self.symmetryEvaluator,
+                 "clusteringEvaluator": self.clusteringEvaluator}
+        return state
 
-class SequentialLastSnapshotClustering(Clustering):
-    """
-        Assigned  the last snapshot of the trajectory to a cluster.
-        Only useful for PELE sequential runs
-    """
-    def cluster(self, paths):
-        """
-            Cluster the snaptshots contained in the pahts folder
-            paths [In] List of folders with the snapshots
-        """
-        # Clean clusters at every step, so we only have the last snapshot of
-        # each trajectory as clusters
-        self.clusters = Clusters()
-        trajectories = getAllTrajectories(paths)
-        for trajectory in trajectories:
-            trajNum = utilities.getTrajNum(trajectory)
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.type = state['type']
+        self.clusters = state['clusters']
+        self.reportBaseFilename = state.get('reportBaseFilename')
+        self.resname = state.get('resname')
+        self.col = state.get('col')
+        self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
+        self.symmetries = state.get('symmetries', [])
+        self.altSelection = state.get('altSelection', False)
+        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.epoch = state.get('metricCol', -1)
+        self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant(value=0.3))
+        self.similarityEvaluator = state.get('similariyEvaluator', JaccardEvaluator())
+        self.symmetryEvaluator = state.get('symmetryEvaluator', sym.SymmetryContactMapEvaluator(self.symmetries))
+        self.clusteringEvaluator = state.get('clusteringEvaluator', CMClusteringEvaluator(self.similarityEvaluator, self.symmetryEvaluator))
 
-            snapshots = utilities.getSnapshots(trajectory, True)
-            if self.reportBaseFilename:
-                reportFilename = os.path.join(os.path.split(trajectory)[0],
-                                              self.reportBaseFilename % trajNum)
-                metrics = np.loadtxt(reportFilename, ndmin=2)
-                # Pass as cluster metrics the minimum value for each metric,
-                # thus the metrics are not valid to do any spawning, only to
-                # check the exit condition
-                metrics = metrics.min(axis=0)
-
-                self.addSnapshotToCluster(snapshots[-1], metrics, self.col)
-            else:
-                self.addSnapshotToCluster(snapshots[-1])
 
 class SequentialLastSnapshotClustering(Clustering):
     """
@@ -935,13 +1263,12 @@ class differenceDistanceEvaluator:
         the number of differences over the average of elements in the contacts
         maps
     """
-    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
+    def isSimilarCluster(self, contactMap, clusterContactMap, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        distance = symContactMapEvaluator.evaluateDifferenceDistance(contactMap, cluster)
-        return distance < cluster.threshold, distance
+        return symContactMapEvaluator.evaluateDifferenceDistance(contactMap, clusterContactMap)
 
 
 class JaccardEvaluator:
@@ -950,13 +1277,12 @@ class JaccardEvaluator:
         index, that is, the ratio between the intersection of the two contact
         maps and their union
     """
-    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
+    def isSimilarCluster(self, contactMap, clusterContactMap, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        distance = symContactMapEvaluator.evaluateJaccard(contactMap, cluster)
-        return distance < cluster.threshold, distance
+        return symContactMapEvaluator.evaluateJaccard(contactMap, clusterContactMap)
 
 
 class correlationEvaluator:
@@ -964,13 +1290,12 @@ class correlationEvaluator:
         Evaluate the similarity of two contact maps by calculating their
         correlation
     """
-    def isSimilarCluster(self, contactMap, cluster, symContactMapEvaluator):
+    def isSimilarCluster(self, contactMap, clusterContactMap, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
         """
-        distance = symContactMapEvaluator.evaluateCorrelation(contactMap, cluster)
-        return distance < cluster.threshold, distance
+        return symContactMapEvaluator.evaluateCorrelation(contactMap, clusterContactMap)
 
 
 # TODO: should it be a class method?

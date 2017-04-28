@@ -45,8 +45,8 @@ else:
 
 setup(
     name="AdaptivePELE",
-    version="1.1",
-    description='Enhanced sampling of molecular simulation',
+    version="1.2",
+    description='Enhanced sampling of molecular simulations',
     long_description=long_description,
     url="https://github.com/cescgina/AdaptivePELE",
     author='Daniel Lecina, Joan Francesc Gilabert',
@@ -54,7 +54,7 @@ setup(
     license='',
     packages=find_packages(exclude=['docs', 'tests']),
     package_data={ "AdaptivePELE/atomset": ['*.pxd'] },
-    install_requires=['numpy'],
+    install_requires=['numpy', 'networkx'],
     cmdclass = cmdclass,
     ext_modules = cythonize(ext_modules),  # accepts a glob pattern
     include_dirs=[numpy.get_include()]
