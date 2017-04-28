@@ -1,4 +1,4 @@
-AdaptiveSampling Package
+AdaptivePELE Package
 ========================
 
 .. automodule:: AdaptivePELE.__init__

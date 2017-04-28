@@ -314,8 +314,8 @@ END   \n"
         contactMapNoSym, contactsNoSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
 
         goldenJaccard = 0.0
-        Jaccard = symmetryEvaluator.evaluateJaccard(contactMap1Sym, cluster)
-        JaccardNosym = symmetryEvaluatorEmpty.evaluateJaccard(contactMapNoSym, cluster)
+        Jaccard = symmetryEvaluator.evaluateJaccard(contactMap1Sym, cluster.contactMap)
+        JaccardNosym = symmetryEvaluatorEmpty.evaluateJaccard(contactMapNoSym, cluster.contactMap)
 
         self.assertEqual(contacts1, contactsSym)
         self.assertAlmostEqual(goldenJaccard, Jaccard)
@@ -337,8 +337,8 @@ END   \n"
         contactMapNoSym, contactsNoSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
 
         goldenCorrelation = 0.0
-        correlationSym = symmetryEvaluator.evaluateCorrelation(contactMap1Sym, cluster)
-        correlationNosym = symmetryEvaluatorEmpty.evaluateCorrelation(contactMapNoSym, cluster)
+        correlationSym = symmetryEvaluator.evaluateCorrelation(contactMap1Sym, cluster.contactMap)
+        correlationNosym = symmetryEvaluatorEmpty.evaluateCorrelation(contactMapNoSym, cluster.contactMap)
 
         self.assertEqual(contacts1, contactsSym)
         self.assertAlmostEqual(goldenCorrelation, correlationSym)
@@ -360,8 +360,8 @@ END   \n"
         contactMapNoSym, contactsNoSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
 
         goldenDifference = 0.0
-        DifferenceSym = symmetryEvaluator.evaluateDifferenceDistance(contactMap1Sym, cluster)
-        DifferenceNosym = symmetryEvaluatorEmpty.evaluateDifferenceDistance(contactMapNoSym, cluster)
+        DifferenceSym = symmetryEvaluator.evaluateDifferenceDistance(contactMap1Sym, cluster.contactMap)
+        DifferenceNosym = symmetryEvaluatorEmpty.evaluateDifferenceDistance(contactMapNoSym, cluster.contactMap)
 
         self.assertEqual(contacts1, contactsSym)
         self.assertAlmostEqual(goldenDifference, DifferenceSym)
