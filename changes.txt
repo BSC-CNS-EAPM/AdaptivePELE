@@ -1,7 +1,19 @@
 Behavior changes from previous version:
-    *) Follow proper packaging conventions for Python packaging
-    *) Atomset package implemented in Cython (faster)
-    *) Jaccard index is calcualed using only the cells of the matrix that are 1
-    *) Added alternative structure to each cluster that will spawn 50% of the
-    time
-    *) Implemented UCB algorithm for spawning
+    *) Alternative structures are stored in a priority queue with the priority
+    set to the population of the subclusters spawn inversely proportinal way
+    according to this population
+    *) Added conformation network and first discovery tree to improve
+    simulation analysis
+    *) Added scripts to plot RMSF for each residue over a trajectory
+    *) Added scripts to calculate contact map histogram for each residue over a
+    trajectory or a complete simulation
+    *) Added scripts to create a network of residues  over a trajectory or a 
+    complete simulation
+    *) Added more robust pickling interface so old simulation can be used with
+    newer version (to some extent)
+
+Bug fixes:
+    *) Fix bug in spawning of alternative structures, was not calling the new
+    code for randomly spawn from cluster center of alternative structure
+    *) Fix bug in pickling (serializing) coordinates of Atom objects
+    *) Fix bug in pickling AltStructures objects

@@ -1,4 +1,4 @@
-Adaptive Sampling Overview
+AdaptivePELE Overview
 ==========================
 
 This page will try to give you an overview of the program, enough to get you
