@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Adaptive Sampling'
+project = u'AdaptivePELE'
 copyright = u'2016, Daniel Lecina, Joan Francesc Gilabert'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -48,7 +48,7 @@ copyright = u'2016, Daniel Lecina, Joan Francesc Gilabert'
 # built documents.
 #
 # The short X.Y version.
-version = 'v1.1'
+version = 'v1.2'
 # The full version, including alpha/beta/rc tags.
 release = ''
 
