@@ -5,6 +5,8 @@ import os
 import json
 import time
 import glob
+import argparse
+import networkx as nx
 from AdaptivePELE.constants import blockNames, constants
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.utilities import utilities
@@ -12,7 +14,6 @@ from AdaptivePELE.validator import controlFileValidator
 from AdaptivePELE.spawning import spawning, spawningTypes
 from AdaptivePELE.simulation import simulationrunner, simulationTypes
 from AdaptivePELE.clustering import clustering, clusteringTypes
-import argparse
 
 
 def parseArgs():
@@ -24,6 +25,7 @@ def parseArgs():
     args = parser.parse_args()
     return args
 
+
 def expandInitialStructuresWildcard(initialStructuresWildcard):
     """
         Returns the initial structures after expanding the initial structures wildcard
@@ -33,6 +35,7 @@ def expandInitialStructuresWildcard(initialStructuresWildcard):
         expandedStructures = glob.glob(initialStructureWildcard)
         totalInitialStructures.extend(expandedStructures)
     return totalInitialStructures
+
 
 def checkSymmetryDict(clusteringBlock, initialStructures, resname):
     """ Check if the symmetries dictionary is valid for the system
@@ -120,30 +123,6 @@ def generateSnapshotSelectionStringLastRound(currentEpoch, epochOutputPathTemple
     return " \"" + os.path.join(epochOutputPathTempletized % currentEpoch, constants.trajectoryBasename) + "\""
 
 
-def writeSpawningInitialStructures(tmpInitialStructuresTemplate, degeneracyOfRepresentatives, clustering, iteration):
-    """ Write initial structures for the next iteriation
-
-        tmpInitialStructuresTemplate [In] Template of the name of the initial
-        structures
-        degeneracyOfRepresentatives [In] Array with the degeneracy of each
-        cluster (i.e the number of processors that will be assigned to it)
-        clustering [In] clustering object
-        iteration [In] Number of epoch
-    """
-    counts = 0
-    for i, cluster in enumerate(clustering.clusters.clusters):
-        for j in range(int(degeneracyOfRepresentatives[i])):
-            outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
-            print 'Writing to ', outputFilename, 'cluster', i
-            cluster.writeSpawningStructure(outputFilename)
-            # cluster.writePDB(outputFilename)
-
-            counts += 1
-
-    print "counts & cluster centers", counts, np.where(np.array(degeneracyOfRepresentatives) > 0)[0].size
-    return counts
-
-
 def findFirstRun(outputPath, clusteringOutputObject):
     """
         Find the last epoch that was properly simulated and clusterized and
@@ -158,10 +137,32 @@ def findFirstRun(outputPath, clusteringOutputObject):
     epochFolders = [int(epoch) for epoch in allFolders if epoch.isdigit()]
     epochFolders.sort(reverse=True)
 
+    objectsFound = []
     for epoch in epochFolders:
         if os.path.exists(clusteringOutputObject % epoch):
+            objectsFound.append(epoch)
+        if objectsFound and epoch < (objectsFound[0]-5):
+            break
+    while objectsFound:
+        epoch = objectsFound.pop(0)
+        if checkIntegrityClusteringObject(clusteringOutputObject % epoch):
             return epoch + 1
     return 0
+
+
+def checkIntegrityClusteringObject(objectPath):
+    """
+        Test wheter the found clustering object to reload is a valid object
+
+        :param objectPath: Path to the clustering object
+        :param objectPath: str
+        :returns: bool -- True if the clustering object found is valid
+    """
+    try:
+        utilities.readClusteringObject(objectPath)
+        return True
+    except EOFError:
+        return False
 
 
 def loadParams(jsonParams):
@@ -211,7 +212,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return oldClusteringMethod.nclusters != newClusteringMethod.nclusters
 
 
-def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
+def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, processorsToClusterMapping):
     """ Cluster the trajecotories of a given epoch into the clusteringMethod
         object
         clusteringMethod [In] Object that holds all the clustering-related
@@ -224,10 +225,10 @@ def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
     paths = eval(snapshotsJSONSelectionString)
     if len(glob.glob(paths[-1])) == 0:
         sys.exit("No more trajectories to cluster")
-    clusteringMethod.cluster(paths)
+    clusteringMethod.cluster(paths, processorsToClusterMapping)
 
 
-def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized):
+def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner):
     """ Cluster the epoch until finalEpoch into the clusteringMethod
 
         clusteringMethod [In] Object that holds all the clustering-related
@@ -235,10 +236,11 @@ def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletiz
         finalEpoch [In] Number of the final epoch to cluster (Not included)
         epochOutputPathTempletized [In] Path where to find the trajectories"""
     for i in range(finalEpoch):
-        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized)
+        simulationRunner.readMappingFromDisk(epochOutputPathTempletized % i)
+        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized, simulationRunner.processorsToClusterMapping)
 
 
-def getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, spawningParams):
+def getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner):
     """
         It reads the previous clustering method, and, if there are changes,
         it reclusters the previous trajectories. Returns the clustering object to use
@@ -263,7 +265,7 @@ def getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, s
     if needToRecluster(oldClusteringMethod, clusteringMethod):
         print "Reclustering!"
         startTime = time.time()
-        clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.epochOutputPathTempletized)
+        clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner)
         endTime = time.time()
         print "Reclustering took %s sec" % (endTime - startTime)
     else:
@@ -272,8 +274,9 @@ def getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, s
 
     return clusteringMethod
 
+
 def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock,
-        spawningParams, spawningCalculator, simulationRunner):
+                                                         spawningParams, spawningCalculator, simulationRunner):
     """
         It reads the previous clustering method, and, if there are changes,
         it reclusters the previous trajectories. Returns the clustering object to use,
@@ -289,21 +292,24 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
         returns clusteringMethod, the clustering method to use in the adaptive sampling simulation
         returns initialStructuresAsString, the initial structures filenames in a string
     """
-    clusteringMethod = getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, spawningParams)
+    clusteringMethod = getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner)
+
+    if not hasattr(clusteringMethod, "conformationNetwork"):
+        clusteringMethod.epoch = firstRun
 
     degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
     spawningCalculator.log()
     print "Degeneracy", degeneracyOfRepresentatives
-
     seedingPoints = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun)
-
     initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
+    simulationRunner.updateMappingProcessors(degeneracyOfRepresentatives, clusteringMethod)
 
     return clusteringMethod, initialStructuresAsString
 
+
 def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, controlFile, outputPathConstants, clusteringBlock, spawningParams, initialStructures):
     """
-        It build the clustering object and copies initial structures from control file.
+        Build the clustering object and copies initial structures from control file.
         Returns the clustering object to use and the initial structures filenames as string
 
         debug [In] Whether to delete or not the previous simulation
@@ -330,8 +336,8 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
     clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
                                                          spawningParams.reportFilename,
                                                          spawningParams.reportCol)
-
-    return clusteringMethod, initialStructuresAsString
+    initialClusters = clusteringMethod.clusterInitialStructures(initialStructures)
+    return clusteringMethod, initialStructuresAsString, initialClusters
 
 
 def preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControlFileDictionary):
@@ -351,6 +357,17 @@ def preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControl
     peleControlFileDictionary["OUTPUT_PATH"] = outputDir
     peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + i*simulationRunner.parameters.processors
     simulationRunner.makeWorkingControlFile(outputPathConstants.tmpControlFilename % i, peleControlFileDictionary)
+
+
+def distributeAmongClusters(sortedNodes, clusteringMethod, nProcessors):
+    degeneracy = np.zeros_like(clusteringMethod.clusters.clusters)
+    nStates = len(sortedNodes)
+    degPerState = nProcessors/nStates
+    for state in sortedNodes:
+        degeneracy[state] = degPerState
+    extraProc = nProcessors - nStates*degPerState
+    degeneracy[sortedNodes[:extraProc]] += 1
+    return degeneracy
 
 
 def main(jsonParams):
@@ -379,7 +396,6 @@ def main(jsonParams):
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
     resname = str(clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.ligandResname])
 
-
     print "================================"
     print "            PARAMS              "
     print "================================"
@@ -401,7 +417,6 @@ def main(jsonParams):
 
     print "wildcard", initialStructuresWildcard
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
-    print initialStructures
     checkSymmetryDict(clusteringBlock, initialStructures, resname)
 
     outputPathConstants = constants.OutputPathConstants(outputPath)
@@ -417,11 +432,13 @@ def main(jsonParams):
     if restart and firstRun != 0:
         clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner)
     else:
-        firstRun = 0 #if restart false, but there were previous simulations
-        clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
+        firstRun = 0  # if restart false, but there were previous simulations
+        clusteringMethod, initialStructuresAsString, initialClusters = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
+        simulationRunner.makeInitialMapping(initialClusters)
 
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
 
+    originalValue = simulationRunner.parameters.peleSteps
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
 
@@ -433,23 +450,27 @@ def main(jsonParams):
             startTime = time.time()
             simulationRunner.runSimulation(outputPathConstants.tmpControlFilename % i)
             endTime = time.time()
+            print simulationRunner.parameters.peleSteps
             print "PELE %s sec" % (endTime - startTime)
+
+        simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
 
         print "Clustering..."
         startTime = time.time()
-        clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized)
+        clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, simulationRunner.processorsToClusterMapping)
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
-
 
         degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
         spawningCalculator.log()
         print "Degeneracy", degeneracyOfRepresentatives
 
+        simulationRunner.updateMappingProcessors(degeneracyOfRepresentatives, clusteringMethod)
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
                                      outputPathConstants.clusteringOutputObject % i, writeAll)
+
         if i > 0:
             # Remove old clustering object, since we already have a newer one
             try:
