@@ -15,5 +15,5 @@ Behavior changes from previous version:
 Bug fixes:
     *) Fix bug in spawning of alternative structures, was not calling the new
     code for randomly spawn from cluster center of alternative structure
-    *) Fix bug in pickling (serializing) coordinates of Atom
-    objects
+    *) Fix bug in pickling (serializing) coordinates of Atom objects
+    *) Fix bug in pickling AltStructures objects

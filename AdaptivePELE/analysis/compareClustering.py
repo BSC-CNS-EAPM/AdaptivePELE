@@ -2,9 +2,43 @@ import time
 import sys
 import os
 import numpy as np
-import matplotlib.pyplot as plt
+import networkx as nx
 from AdaptivePELE.clustering import clustering, thresholdcalculator
 from AdaptivePELE.spawning import spawning, densitycalculator
+
+
+def getUnvisitedPath(clustering, numClusters=5):
+    conf = clustering.conformationNetwork
+    visited = set()
+    path = []
+    stack = [0]
+    while stack:
+        node = stack.pop(0)
+        path.append(node)
+        visited.add(node)
+        minVisit = 1e6
+        minNeigh = None
+        for foo, target, data in conf.out_edges_iter(node, data=True):
+            if data['transition'] < minVisit and target not in visited:
+                minVisit = data['transition']
+                minNeigh = target
+        if minNeigh is not None:
+            stack.append(minNeigh)
+
+    if len(path) <= numClusters:
+        return path
+    else:
+        return path[-1:-numClusters-1:-1]
+
+def getShortestPath(clustering, numClusters=5):
+    conf = clustering.conformationNetwork
+    contacts = [cluster.contacts for cluster in clustering.clusterIterator()]
+    maxCluster = np.argmax(contacts)
+    shortPath = nx.shortest_path(conf, source=0, target=maxCluster, weight='transition')
+    if len(shortPath) <= numClusters:
+        return shortPath
+    else:
+        return shortPath[-1:-numClusters-1:-1]
 
 def getMetastableClusters(clustering, numClusters=5):
     betweenness = nx.betweenness_centrality(clustering.conformationNetwork, weight='transition')
@@ -215,7 +249,6 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
 spawningObject = spawning.EpsilonDegeneracyCalculator(densityCalculator)
 ClAcc.clusterInitialStructures(["/home/jgilaber/PR/PR_prog_initial_adaptive.pdb"])
 # ClCont.clusterInitialStructures(["/home/jgilaber/4DAJ/4DAJ_initial_adaptive.pdb"])
-import networkx as nx
 processorMapping = [0 for i in xrange(ntrajs-1)]
 if not os.path.exists("mappings"):
     os.makedirs("mappings")
@@ -226,6 +259,7 @@ fw2 = open("clustersBet.txt", "w")
 fw3 = open("clustersInd.txt", "w")
 fw4 = open("clustersIndNew.txt", "w")
 fw5 = open("clustersVol.txt", "w")
+fw6 = open("clustersVisit.txt", "w")
 for i in range(nEpochs):
     # path =["trajs/%d/run_traj*"%i]
     # paths_report = ["trajs/%d/run_report*"%i]
@@ -290,33 +324,39 @@ for i in range(nEpochs):
     processorMapping = clusterList[1:]+[clusterList[0]]
     with open("mappings/mapping%d.txt" % i, "w") as f:
         f.write(','.join(map(str, processorMapping)))
-    sortedNodes = getMetastableClusters(ClAcc, 10)
-    sortedNodes = set(sortedNodes)
-    sortedNodes2 = getMetastableClusters2(ClAcc, 10)
-    sortedNodes2 = set(sortedNodes2)
-    sortedNodes3 = getMetastableClusters3(ClAcc, 10)
-    sortedNodes3 = set(sortedNodes3)
-    sortedNodes4 = getMetastableClusters4(ClAcc, 10)
-    sortedNodes4 = set(sortedNodes4)
-    sortedNodes5 = getMetastableClusters5(ClAcc, 10)
-    sortedNodes5 = set(sortedNodes5)
-    print sortedNodes
-    print sortedNodes2
-    print sortedNodes3
-    print sortedNodes4
-    print sortedNodes5
-    for node in sortedNodes:
+    # sortedNodes = getMetastableClusters(ClAcc, 10)
+    # sortedNodes = set(sortedNodes)
+    # sortedNodes2 = getMetastableClusters2(ClAcc, 10)
+    # sortedNodes2 = set(sortedNodes2)
+    # sortedNodes3 = getMetastableClusters3(ClAcc, 10)
+    # sortedNodes3 = set(sortedNodes3)
+    # sortedNodes4 = getMetastableClusters4(ClAcc, 10)
+    # sortedNodes4 = set(sortedNodes4)
+    # sortedNodes5 = getMetastableClusters5(ClAcc, 10)
+    # sortedNodes5 = set(sortedNodes5)
+    # print sortedNodes
+    # print sortedNodes2
+    # print sortedNodes3
+    # print sortedNodes4
+    # print sortedNodes5
+    # for node in sortedNodes:
+    #     cluster = ClAcc.getCluster(node)
+    #     fw.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
+    # for node in sortedNodes2:
+    #     cluster = ClAcc.getCluster(node)
+    #     fw2.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
+    # for node in sortedNodes3:
+    #     cluster = ClAcc.getCluster(node)
+    #     fw3.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
+    # for node in sortedNodes4:
+    #     cluster = ClAcc.getCluster(node)
+    #     fw4.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
+    # for node in sortedNodes5:
+    #     cluster = ClAcc.getCluster(node)
+    #     fw5.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
+    # path = getUnvisitedPath(ClAcc, 10)
+    path = getShortestPath(ClAcc, 10)
+    print path
+    for node in path:
         cluster = ClAcc.getCluster(node)
-        fw.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
-    for node in sortedNodes2:
-        cluster = ClAcc.getCluster(node)
-        fw2.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
-    for node in sortedNodes3:
-        cluster = ClAcc.getCluster(node)
-        fw3.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
-    for node in sortedNodes4:
-        cluster = ClAcc.getCluster(node)
-        fw4.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
-    for node in sortedNodes5:
-        cluster = ClAcc.getCluster(node)
-        fw5.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
+        fw6.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
