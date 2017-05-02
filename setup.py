@@ -54,7 +54,7 @@ setup(
     license='',
     packages=find_packages(exclude=['docs', 'tests']),
     package_data={ "AdaptivePELE/atomset": ['*.pxd'] },
-    install_requires=['numpy', 'networkx'],
+    install_requires=['numpy'],
     cmdclass = cmdclass,
     ext_modules = cythonize(ext_modules),  # accepts a glob pattern
     include_dirs=[numpy.get_include()]

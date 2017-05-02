@@ -26,15 +26,17 @@ if __name__ == "__main__":
         outputPath = ""
     sys.stderr.write("Reading clustering object...\n")
     cl = utilities.readClusteringObject(clusteringObject)
+    if cl.conformationNetwork is None:
+        sys.exit("Clustering object loaded has no conformation network!!")
+    conf = cl.conformationNetwork
     optimalCluster = cl.getOptimalMetric(4)
-    pathway = cl.createPathwayToCluster(optimalCluster)
-    metInd = cl.calculateMetastabilityIndex()
+    pathway = conf.createPathwayToCluster(optimalCluster)
     if not os.path.exists(outputPath+"conformationNetwork%s.edgelist" % suffix):
         sys.stderr.write("Writing conformation network...\n")
-        cl.writeConformationNetwork(outputPath+"conformationNetwork%s.edgelist" % suffix)
+        conf.writeConformationNetwork(outputPath+"conformationNetwork%s.edgelist" % suffix)
     if not os.path.exists(outputPath+"FDT%s.edgelist" % suffix):
         sys.stderr.write("Writing FDT...\n")
-        cl.writeFDT(outputPath+"FDT%s.edgelist" % suffix)
+        conf.writeFDT(outputPath+"FDT%s.edgelist" % suffix)
     if not os.path.exists(outputPath+"pathwayFDT%s.pdb" % suffix):
         sys.stderr.write("Writing pathway to optimal cluster...\n")
         # cl.writePathwayOptimalCluster(outputPath+"pathwayFDT%s.pdb" % suffix)
@@ -44,10 +46,7 @@ if __name__ == "__main__":
         cl.writeConformationNodePopulation(outputPath+"nodesPopulation%s.txt" % suffix)
     if not os.path.exists(outputPath+"nodesMetric%s.txt" % suffix):
         sys.stderr.write("Writing nodes metrics...\n")
-        cl.writeConformationNodeMetric(outputPath+"nodesMetric%s.txt" % suffix, metricCol)
-    if not os.path.exists(outputPath+"nodesMetIndex%s.txt" % suffix):
-        sys.stderr.write("Writing metastability indeces...\n")
-        cl.writeMetastabilityIndex(outputPath+"nodesMetIndex%s.txt" % suffix)
+        cl.writeClusterMetric(outputPath+"nodesMetric%s.txt" % suffix, metricCol)
     plt.figure()
     plt.plot(pathway, [cl.clusters.clusters[i].getMetricFromColumn(5) for i in pathway])
     plt.xlabel("Cluster number")
@@ -63,9 +62,4 @@ if __name__ == "__main__":
     plt.xlabel("Cluster number")
     plt.ylabel("Energy(kcal/mol)")
     plt.savefig(outputPath+"totalEnergy_%s.png" % suffix)
-    plt.figure()
-    plt.plot(pathway, [metInd[i] for i in pathway])
-    plt.xlabel("Cluster number")
-    plt.ylabel("Metastability index")
-    plt.savefig(outputPath+"metIndex_%s.png" % suffix)
     plt.show()

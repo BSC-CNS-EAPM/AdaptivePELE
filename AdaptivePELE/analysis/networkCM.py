@@ -3,8 +3,11 @@ import sys
 from AdaptivePELE.atomset import atomset, SymmetryContactMapEvaluator
 from AdaptivePELE.utilities import utilities
 import numpy as np
-import networkx as nx
 import itertools
+try:
+    import networkx as nx
+except ImportError:
+    raise ImportError("Package networkx not found!!! Networkx is necessary to run this script")
 
 
 def parseArguments():
