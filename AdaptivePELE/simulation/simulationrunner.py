@@ -64,7 +64,7 @@ class SimulationRunner:
             with open(epochDir+"/processorMapping.txt") as f:
                 self.processorsToClusterMapping = map(int, f.read().rstrip().split(':'))
         except IOError:
-            sys.stderr.write("WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways")
+            sys.stderr.write("WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
 
     def setZeroMapping(self):
         self.processorsToClusterMapping = [0 for i in xrange(1, self.parameters.processors)]
