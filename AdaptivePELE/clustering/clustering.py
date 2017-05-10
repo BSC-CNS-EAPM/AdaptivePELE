@@ -12,9 +12,13 @@ from AdaptivePELE.utilities import utilities
 from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
 from AdaptivePELE.atomset import RMSDCalculator
 from scipy import stats
-import socket
-import networkx as nx
 import heapq
+try:
+    import networkx as nx
+    NETWORK = True
+except ImportError:
+    NETWORK = False
+# import socket
 # if "bsccv" not in socket.gethostname():
 #     from sklearn.cluster import AffinityPropagation
 #     from sklearn.cluster import AgglomerativeClustering
@@ -60,6 +64,77 @@ class Clusters:
 
     def __eq__(self, other):
         return self.clusters == other.clusters
+
+class ConformationNetwork:
+    def __init__(self):
+        if NETWORK:
+            self.network = nx.DiGraph()
+        else:
+            self.network = None
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"network": self.network}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.network = state['network']
+
+    def add_node(self, node, **kwargs):
+        if not NETWORK:
+            return
+        self.network.add_node(node, attr_dict=kwargs)
+
+    def add_edge(self, source, target):
+        if not NETWORK:
+            return
+        if self.network.has_edge(source, target):
+            self.network[source][target]['transition'] += 1
+        else:
+            self.network.add_edge(source, target, transition=1)
+
+    def writeConformationNetwork(self, path):
+        """
+            Write the conformational network to file to visualize it
+            :param path: Path where to write the network
+            :type path: str
+        """
+        if not NETWORK:
+            sys.stderr.write("Package networkx not found! Could not write network\n")
+            return
+        nx.write_edgelist(self.network, path)
+
+    def writeFDT(self, path):
+        """
+            Write the first discovery tree to file in edgelist format to
+            visualize it
+            :param path: Path where to write the network
+            :type path: str
+        """
+        if not NETWORK:
+            sys.stderr.write("Package networkx not found! Could not write network\n")
+            return
+        with open(path, "w") as fw:
+            for node, data in self.network.nodes_iter(data=True):
+                if data['parent'] != 'root':
+                    fw.write("%d\t%d\n" % (data['parent'], node))
+
+    def createPathwayToCluster(self, clusterLeave):
+        """
+            Retrace the FDT from a specific cluster to the root where it was
+            discovered
+            :param clusterLeave: End point of the pathway to reconstruct
+            :type clusterLeave: int
+        """
+        pathway = []
+        nodeLabel = clusterLeave
+        while nodeLabel != "root":
+            pathway.append(nodeLabel)
+            nodeLabel = self.network.node[nodeLabel]['parent']
+        return pathway[::-1]
 
 
 class AltStructures:
@@ -406,7 +481,7 @@ class Clustering:
         self.contactThresholdDistance = contactThresholdDistance
         self.symmetries = []
         self.altSelection = altSelection
-        self.conformationNetwork = nx.DiGraph()
+        self.conformationNetwork = ConformationNetwork()
         self.epoch = -1
 
     def __getstate__(self):
@@ -432,7 +507,7 @@ class Clustering:
         self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
         self.symmetries = state.get('symmetries', [])
         self.altSelection = state.get('altSelection', False)
-        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
         self.epoch = state.get('metricCol', -1)
 
     def setCol(self, col):
@@ -602,10 +677,7 @@ class Clustering:
                 if dist > cluster.threshold/2:
                     cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.contactThresholdDistance, self.clusteringEvaluator)
                 cluster.addElement(metrics)
-                if self.conformationNetwork.has_edge(origCluster, clusterNum):
-                    self.conformationNetwork[origCluster][clusterNum]['transition'] += 1
-                else:
-                    self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
+                self.conformationNetwork.add_edge(origCluster, clusterNum)
                 return clusterNum
 
         # if made it here, the snapshot was not added into any cluster
@@ -632,34 +704,15 @@ class Clustering:
             self.conformationNetwork.add_node(clusterNum, parent='root', epoch=self.epoch)
         else:
             self.conformationNetwork.add_node(clusterNum, parent=origCluster, epoch=self.epoch)
-        self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
+        self.conformationNetwork.add_edge(origCluster, clusterNum)
         # If a new cluster is discovered during a trajectory, the next step in
         # the same trajectory will be considered to start from these new
         # cluster, thus resulting in a more precise conformation network and
         # smoother pathways
         return clusterNum
 
-    def writeConformationNetwork(self, path):
-        """
-            Write the conformational network to file to visualize it
-            :param path: Path where to write the network
-            :type path: str
-        """
-        nx.write_edgelist(self.conformationNetwork, path)
 
-    def writeFDT(self, path):
-        """
-            Write the first discovery tree to file in edgelist format to
-            visualize it
-            :param path: Path where to write the network
-            :type path: str
-        """
-        with open(path, "w") as fw:
-            for node, data in self.conformationNetwork.nodes_iter(data=True):
-                if data['parent'] != 'root':
-                    fw.write("%d\t%d\n" % (data['parent'], node))
-
-    def writeConformationNodeMetric(self, path, metricCol):
+    def writeClusterMetric(self, path, metricCol):
         """
             Write the metric of each node in the conformation network in a
             tab-separated file
@@ -686,21 +739,6 @@ class Clustering:
         with open(path, "w") as f:
             for i, cluster in enumerate(self.clusters.clusters):
                 f.write("%d\t%d\n" % (i, cluster.elements))
-
-
-    def createPathwayToCluster(self, clusterLeave):
-        """
-            Retrace the FDT from a specific cluster to the root where it was
-            discovered
-            :param clusterLeave: End point of the pathway to reconstruct
-            :type clusterLeave: int
-        """
-        pathway = []
-        nodeLabel = clusterLeave
-        while nodeLabel != "root":
-            pathway.append(nodeLabel)
-            nodeLabel = self.conformationNetwork.node[nodeLabel]['parent']
-        return pathway[::-1]
 
     def getOptimalMetric(self, column=None):
         """
@@ -756,37 +794,6 @@ class Clustering:
         pathway = self.createPathwayToCluster(optimalCluster)
         self.writePathwayTrajectory(pathway, filename)
 
-    def calculateMetastabilityIndex(self):
-        """
-            Calculate the metastablity index, mI. mI is the ratio of transitions
-            from a given cluster that remains within the same cluster
-        """
-        metInd = {}
-        for node in self.conformationNetwork.nodes_iter():
-            totalOut = 0
-            selfTrans = 0
-            for n, edge, data in self.conformationNetwork.out_edges_iter(node, data=True):
-                if edge == node:
-                    selfTrans = data['transition']
-                totalOut += data['transition']
-            if totalOut+selfTrans:
-                metInd[node] = selfTrans/float(totalOut)
-            else:
-                metInd[node] = 0
-        return metInd
-
-    def writeMetastabilityIndex(self, filename, metInd=None):
-        """
-            Write the metastability index of each node to file.
-            :param filename: Path where to write the trajectory
-            :type filename: str
-        """
-        if metInd is None:
-            metInd = self.calculateMetastabilityIndex()
-        with open(filename, "w") as f:
-            for node, met in metInd.iteritems():
-                f.write("%d\t%.4f\n" % (node, met))
-
 
 class ContactsClustering(Clustering):
     """
@@ -841,7 +848,7 @@ class ContactsClustering(Clustering):
         self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
         self.symmetries = state.get('symmetries', [])
         self.altSelection = state.get('altSelection', False)
-        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
         self.epoch = state.get('metricCol', -1)
         self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant())
         self.clusteringEvaluator = state.get('clusteringEvaluator', ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(self.symmetries)))
@@ -899,7 +906,7 @@ class ContactMapAccumulativeClustering(Clustering):
         self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
         self.symmetries = state.get('symmetries', [])
         self.altSelection = state.get('altSelection', False)
-        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
         self.epoch = state.get('metricCol', -1)
         self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant(value=0.3))
         self.similarityEvaluator = state.get('similariyEvaluator', JaccardEvaluator())
