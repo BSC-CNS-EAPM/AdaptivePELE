@@ -10,6 +10,10 @@ class MSM:
                  itsErrors=None, error_estimationCK=None, mlags=2, lagtime=None, dtrajs=[]):
     """
     def __init__(self, error=False, dtrajs=[]):
+        """
+            If MSM_object.pkl exists, and we call estimate, does it override whatever was before?
+        """
+
         self.MSMFile = "MSM_object.pkl"
         self.MSM_object = None
         if os.path.exists(self.MSMFile):
@@ -27,7 +31,9 @@ class MSM:
         self.lagtimes = lagtimes
         self.numberOfITS = numberOfITS
         if self.lagtime is None:
-            self.lagtime = self.calculateITS() #keep calculating until convergence is reached
+            self.lagtime = self._calculateITS() #keep calculating until convergence is reached
+        else:
+            print "Using lagtime = ", lagtime
         self.buildMSM()
         self.check_connectivity()
         self.saveMSM(self.MSM_object)
@@ -69,7 +75,7 @@ class MSM:
             for index, uncon_set in enumerate(unconnected_sets):
                 print "Set %d has %d elements" % (index, uncon_set.size)
 
-    def calculateITS(self):
+    def _calculateITS(self):
         is_converged = False
         # its
         print ("Calculating implied time-scales, when it's done will prompt "
@@ -123,6 +129,8 @@ class MSM:
     def buildMSM(self):
         """ Estimate a MSM from the trajectories using a provided lagtime that
         should be big enough so that the relevant processes have converged.
+
+        self.error: whether to estimate errors or not
         """
         if self.error:
             self.MSM_object = msm.bayesian_markov_model(self.dtrajs, self.lagtime)

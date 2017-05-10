@@ -6,6 +6,15 @@ import argparse
 from scipy.ndimage import filters
 from pyemma.coordinates.clustering import AssignCenters
 
+"""
+    Script that computes the absolute binding free energy of an MSM.
+    It needs:
+        1) Trajectory wildcard in order to compute cluster volume
+        2) A discretized/clusterCenters.dat file with the cluster center
+        3) A MSM_object.pkl obtained with pyemma in order to obtain the stationary distribution
+        4) For the moment, it needs of a reweightingT, in order to do a histogram reweighting, but does not seem to work that well
+"""
+
 def assignNewTrajecories(trajs, clusterCenters):
     assign = AssignCenters(clusterCenters)
     dTrajs = assign.assign(trajs)

@@ -6,6 +6,9 @@ from pyemma.coordinates.clustering import AssignCenters
 
 class Cluster:
     def __init__(self, numClusters, trajectoryFolder, trajectoryBasename, stride=1, alwaysCluster=True):
+        """
+            alwaysCluster: clusterize regardless of wether discretized/clusterCenters.dat exists or not
+        """
 
         self.discretizedFolder = "discretized"
         self.clusterCentersFile = os.path.join(self.discretizedFolder, "clusterCenters.dat")
@@ -52,7 +55,7 @@ class Cluster:
         self.writeDtrajs(self.trajFilenames, self.dtrajs, self.dTrajTemplateName)
 
     def writeClusterCenters(self, cl, outputFilename):
-        np.savetxt(outputFilename, cl.clustercenters)
+        np.savetxt(outputFilename, cl.clustercenters, fmt="%.5f %.5f %.5f\n")
 
     def writeDtrajs(self, filenames, dtrajs, filenameTemplate="%s.disctraj"):
         for filename, dtraj in zip(filenames, dtrajs):
