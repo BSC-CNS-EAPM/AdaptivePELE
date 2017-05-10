@@ -248,12 +248,12 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
 # spawningObject = spawning.UCBCalculator(densityCalculator)
 spawningObject = spawning.EpsilonDegeneracyCalculator(densityCalculator)
 # ClAcc.clusterInitialStructures(["/home/jgilaber/PR/PR_prog_initial_adaptive.pdb"])
-ClCont.clusterInitialStructures(["/home/jgilaber/4DAJ/4DAJ_initial_adaptive.pdb"])
-processorMapping = [0 for i in xrange(ntrajs-1)]
-if not os.path.exists("mappings"):
-    os.makedirs("mappings")
-if not os.path.exists("results"):
-    os.makedirs("results")
+# ClCont.clusterInitialStructures(["/home/jgilaber/4DAJ/4DAJ_initial_adaptive.pdb"])
+# processorMapping = [0 for i in xrange(ntrajs-1)]
+# if not os.path.exists("mappings"):
+#     os.makedirs("mappings")
+# if not os.path.exists("results"):
+#     os.makedirs("results")
 # fw = open("clusters.txt", "w")
 # fw2 = open("clustersBet.txt", "w")
 # fw3 = open("clustersInd.txt", "w")
@@ -279,21 +279,23 @@ for i in range(nEpochs):
         total_snapshots -= 1
     sys.stderr.write("Total snapsthots for epoch %d: %d\n" % (i, total_snapshots))
     startTimeCont = time.time()
-    ClCont.cluster(path, processorMapping)
+    # ClCont.cluster(path, processorMapping)
+    ClCont.cluster(path)
     endTimeCont = time.time()
     sys.stderr.write("Total time of clustering contacts, epoch %d: %.6f\n"%(i,endTimeCont-startTimeCont))
     sys.stderr.write("Number of clusters contacts epoch %d: %d\n"%(i,len(ClCont.clusters.clusters)))
     degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs-1, spawnParams)
     nProc = 0
-    clusterList = processorMapping[:]
+    clusterList = []
     for icl in xrange(len(ClCont.clusters.clusters)):
         for j in range(int(degeneraciesCont[icl])):
-            clusterList[nProc] = icl
+            clusterList.append(ClCont.clusters.clusters[icl].trajPosition)
             nProc += 1
     assert nProc == ntrajs-1
     processorMapping = clusterList[1:]+[clusterList[0]]
-    with open("mappings/mapping%d.txt"%i, "w") as f:
-        f.write(','.join(map(str, processorMapping)))
+    if i < 20:
+        with open("%d/processorMapping.txt"%(i+1), "w") as f:
+            f.write(':'.join(map(str, processorMapping)))
     ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
     os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
     # sortedNodes = getMetastableClusters(ClCont, 10)

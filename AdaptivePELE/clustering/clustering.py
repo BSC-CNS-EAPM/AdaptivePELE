@@ -65,6 +65,7 @@ class Clusters:
     def __eq__(self, other):
         return self.clusters == other.clusters
 
+
 class ConformationNetwork:
     def __init__(self):
         if NETWORK:
@@ -192,7 +193,7 @@ class AltStructures:
         limit = len(self.altStructPQ)
         del self.altStructPQ[self.limitSize-limit:]
 
-    def addStructure(self, PDB, threshold, resname, contactThreshold, similarityEvaluator):
+    def addStructure(self, PDB, threshold, resname, contactThreshold, similarityEvaluator, trajPosition):
         i = 0
         for priority, subCluster in self.altStructPQ:
             isSimilar, distance = similarityEvaluator.isElement(PDB, subCluster, resname, contactThreshold)
@@ -204,7 +205,7 @@ class AltStructures:
                     self.cleanPQ()
                 return
             i += 1
-        newCluster = Cluster(PDB, thresholdRadius=threshold, contactThreshold=contactThreshold, contactMap=similarityEvaluator.contactMap)
+        newCluster = Cluster(PDB, thresholdRadius=threshold, contactThreshold=contactThreshold, contactMap=similarityEvaluator.contactMap, trajPosition=trajPosition)
         heapq.heappush(self.altStructPQ, (1, newCluster))
         if len(self.altStructPQ) > 2*self.limitSize:
             self.cleanPQ()
@@ -221,7 +222,7 @@ class Cluster:
     """
     def __init__(self, pdb, thresholdRadius=None, contactMap=None,
                  contacts=None, metrics=[], metricCol=None, density=None,
-                 contactThreshold=8, altSelection=False):
+                 contactThreshold=8, altSelection=False, trajPosition=None):
         """
             contacts stands for contacts/ligandAtom
         """
@@ -237,6 +238,7 @@ class Cluster:
         self.metricCol = metricCol
         self.contactThreshold = contactThreshold
         self.altSelection = altSelection
+        self.trajPosition = trajPosition
 
         if self.threshold is None:
             self.threshold2 = None
@@ -254,7 +256,8 @@ class Cluster:
                  "metricCol": self.metricCol, "threshold2": self.threshold2,
                  "contactThreshold": self.contactThreshold,
                  "altSelection": self.altSelection,
-                 "originalMetrics": self.originalMetrics}
+                 "originalMetrics": self.originalMetrics,
+                 "trajPosition": self.trajPosition}
         return state
 
     def __setstate__(self, state):
@@ -272,6 +275,7 @@ class Cluster:
         self.threshold2 = state.get('threshold2')
         self.contactThreshold = state.get('contactThreshold', 8)
         self.altSelection = state.get('altSelection', False)
+        self.trajPosition = state.get('trajPosition')
 
     def getMetric(self):
         if len(self.metrics):
@@ -321,8 +325,11 @@ class Cluster:
         if not self.altSelection or self.altStructure.sizePQ() == 0:
             print "cluster center"
             self.pdb.writePDB(str(path))
+            return self.trajPosition
         else:
-            self.altStructure.altSpawnSelection((self.elements, self.pdb)).writePDB(str(path))
+            spawnStruct, trajPosition = self.altStructure.altSpawnSelection((self.elements, self.pdb))
+            spawnStruct.writePDB(str(path))
+            return trajPosition
 
     def __eq__(self, other):
         return self.pdb == other.pdb\
@@ -589,7 +596,7 @@ class Clustering:
             self.conformationNetwork.add_node(clusterNum, parent='root', epoch=0)
         return clusterInitial
 
-    def cluster(self, paths, processorsToClusterMapping):
+    def cluster(self, paths):
         """
             Cluster the snaptshots contained in the pahts folder
             :param paths: List of folders with the snapshots
@@ -599,7 +606,8 @@ class Clustering:
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
-            origCluster = processorsToClusterMapping[trajNum-1]
+            # origCluster = processorsToClusterMapping[trajNum-1]
+            origCluster = None
             snapshots = utilities.getSnapshots(trajectory, True)
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
@@ -607,10 +615,10 @@ class Clustering:
                 metrics = np.loadtxt(reportFilename, ndmin=2)
 
                 for num, snapshot in enumerate(snapshots):
-                    origCluster = self.addSnapshotToCluster(snapshot, origCluster, metrics[num], self.col)
+                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col)
             else:
                 for num, snapshot in enumerate(snapshots):
-                    origCluster = self.addSnapshotToCluster(snapshot, origCluster)
+                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num)
         for cluster in self.clusters.clusters:
             cluster.altStructure.cleanPQ()
 
@@ -662,7 +670,7 @@ class Clustering:
         with open(outputObject, 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
-    def addSnapshotToCluster(self, snapshot, origCluster, metrics=[], col=None):
+    def addSnapshotToCluster(self, trajNum, snapshot, origCluster, snapshotNum, metrics=[], col=None):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         self.clusteringEvaluator.cleanContactMap()
@@ -675,8 +683,10 @@ class Clustering:
                                                                  self.resname, self.contactThresholdDistance)
             if isSimilar:
                 if dist > cluster.threshold/2:
-                    cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.contactThresholdDistance, self.clusteringEvaluator)
+                    cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.contactThresholdDistance, self.clusteringEvaluator, trajPosition=(self.epoch, trajNum, snapshotNum))
                 cluster.addElement(metrics)
+                if origCluster is None:
+                    origCluster = clusterNum
                 self.conformationNetwork.add_edge(origCluster, clusterNum)
                 return clusterNum
 
@@ -694,10 +704,11 @@ class Clustering:
                           contactMap=self.clusteringEvaluator.contactMap,
                           metrics=metrics, metricCol=col,
                           contactThreshold=self.contactThresholdDistance,
-                          altSelection=self.altSelection)
+                          altSelection=self.altSelection, trajPosition=(self.epoch, trajNum, snapshotNum))
         self.clusters.addCluster(cluster)
         clusterNum = self.clusters.getNumberClusters()-1
-        if clusterNum == origCluster:
+        if clusterNum == origCluster or origCluster is None:
+            origCluster = clusterNum
             # The clusterNum should only be equal to origCluster when the first
             # cluster is created and the clusterInitialStructures function has
             # not been called, i.e. when usind the compareClustering script
