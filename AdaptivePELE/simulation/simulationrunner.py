@@ -60,8 +60,11 @@ class SimulationRunner:
             f.write(':'.join(map(str, self.processorsToClusterMapping)))
 
     def readMappingFromDisk(self, epochDir):
-        with open(epochDir+"/processorMapping.txt") as f:
-            self.processorsToClusterMapping = map(int, f.read().rstrip().split(':'))
+        try:
+            with open(epochDir+"/processorMapping.txt") as f:
+                self.processorsToClusterMapping = map(int, f.read().rstrip().split(':'))
+        except IOError:
+            sys.stderr.write("WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways")
 
     def setZeroMapping(self):
         self.processorsToClusterMapping = [0 for i in xrange(1, self.parameters.processors)]

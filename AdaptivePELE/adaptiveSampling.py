@@ -225,7 +225,7 @@ def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, proce
     paths = eval(snapshotsJSONSelectionString)
     if len(glob.glob(paths[-1])) == 0:
         sys.exit("No more trajectories to cluster")
-    clusteringMethod.cluster(paths, processorsToClusterMapping)
+    clusteringMethod.cluster(paths)
 
 
 def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner):
@@ -302,7 +302,7 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
     print "Degeneracy", degeneracyOfRepresentatives
     seedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun)
     initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
-    simulationRunner.updateMappingProcessors(degeneracyOfRepresentatives, clusteringMethod)
+    simulationRunner.updateMappingProcessors(procMapping)
 
     return clusteringMethod, initialStructuresAsString
 

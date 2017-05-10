@@ -862,6 +862,8 @@ class ContactsClustering(Clustering):
         self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
         self.epoch = state.get('metricCol', -1)
         self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant())
+        if isinstance(self.symmetries, dict):
+            self.symmetries = [self.symmetries]
         self.clusteringEvaluator = state.get('clusteringEvaluator', ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(self.symmetries)))
 
 
