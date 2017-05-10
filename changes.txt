@@ -11,6 +11,8 @@ Behavior changes from previous version:
     complete simulation
     *) Added more robust pickling interface so old simulation can be used with
     newer version (to some extent)
+    *) Added script to reconstruct approximate path to a given snapshot
+    (writeTrajToSnapshot.py)
 
 Bug fixes:
     *) Fix bug in spawning of alternative structures, was not calling the new
