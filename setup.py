@@ -1,3 +1,6 @@
+# Run the following line to compile atomset package
+# python setup.py build_ext --inplace
+
 import numpy
 from setuptools import setup, find_packages
 # To use a consistent encoding
@@ -59,5 +62,3 @@ setup(
     ext_modules = cythonize(ext_modules),  # accepts a glob pattern
     include_dirs=[numpy.get_include()]
 )
-# Run the following line to compile atomset package
-# python setup.py build_ext --inplace
