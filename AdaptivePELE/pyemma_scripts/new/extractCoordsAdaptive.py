@@ -2,7 +2,7 @@ import os
 import argparse
 import glob
 # import minimumGCluster.atomset as atomset
-from atomset import atomset
+from AdaptivePELE.atomset import atomset
 import re
 
 DIRECTORY = '%s/extractedCoordinates'
@@ -69,7 +69,7 @@ def writeToFile(COMs, outputFilename):
 def main():
     folderTrajs, atomId, resname = parseArguments()
 
-    if atomId == "" and resname == "": 
+    if atomId == "" and resname == "":
         sys.exit("Both resname or atomId should be provided")
     elif resname == "":
         resname = atomId.split(":")[-1] #the atom Id last element is the resname

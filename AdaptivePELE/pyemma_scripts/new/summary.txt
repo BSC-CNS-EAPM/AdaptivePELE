@@ -1,4 +1,5 @@
 python extractCoordsAdaptive.py
 python repeatSnapshotsPeleAdaptive.py
 python gatherTraj.py
-
+python prepareMSMFolders.py
+python estimateDGAdaptive.py
