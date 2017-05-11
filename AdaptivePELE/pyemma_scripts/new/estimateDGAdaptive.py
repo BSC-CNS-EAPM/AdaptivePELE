@@ -17,16 +17,17 @@ with open(resultsFile, "a") as f:
 resultsEpoch = []
 for epoch, folder in enumerate(sortedFolders):
     os.chdir(folder)
-    parameters = estimateDG.Parameters(ntrajs=50*(epoch+1), 
-                            length=None, 
-                            lagtime=25, 
-                            nclusters=100, 
-                            nruns=10, 
-                            useAllTrajInFirstRun=True, 
-                            computeDetailedBalance=True, 
-                            trajWildcard="traj_*", 
+    parameters = estimateDG.Parameters(ntrajs=50*(epoch+1),
+                            length=None,
+                            lagtime=200,
+                            lagtimes=[1, 10, 25],
+                            nclusters=100,
+                            nruns=10,
+                            useAllTrajInFirstRun=True,
+                            computeDetailedBalance=True,
+                            trajWildcard="traj_*",
                             folderWithTraj="rawData")
-    dG, stdDg, db, stdDb = estimateDG.estimateDG(parameters) 
+    dG, stdDg, db, stdDb = estimateDG.estimateDG(parameters)
     print "FINAL RESUTS EPOCH %d: dG: %f +- %f, asymmetric fluxes: %f +- %f" % (epoch, dG, stdDg, db, stdDb)
     resultsEpoch.append([dG, stdDg, db, stdDb])
     with open(resultsFile, "a") as f:
