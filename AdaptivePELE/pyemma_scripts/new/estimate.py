@@ -30,10 +30,9 @@ class MSM:
         self.lagtime = lagtime
         self.lagtimes = lagtimes
         self.numberOfITS = numberOfITS
-        if self.lagtime is None:
-            self.lagtime = self._calculateITS() #keep calculating until convergence is reached
-        else:
-            print "Using lagtime = ", lagtime
+        print "LAGTIME", self.lagtime
+        self.lagtime = self._calculateITS() #keep calculating until convergence is reached
+        print "Using lagtime = ", self.lagtime
         self.buildMSM()
         self.check_connectivity()
         self.saveMSM(self.MSM_object)
@@ -86,9 +85,10 @@ class MSM:
             its_object = msm.its(self.dtrajs, lags=self.lagtimes,
                                           errors=itsErrors)
             its_plot = mplt.plot_implied_timescales(its_object, outfile=self.itsOutput, nits=self.numberOfITS) 
-            plt.savefig("its.eps")
-            plt.show()
+            plt.savefig("its.png")
+            if not self.lagtime is None: return self.lagtime
             while True:
+                plt.show()
                 convergence_answer = raw_input("Has the ITS plot converged?[y/n] ")
                 convergence_answer.rstrip()
                 convergence_answer = convergence_answer or "y"  # Making yes the default answer

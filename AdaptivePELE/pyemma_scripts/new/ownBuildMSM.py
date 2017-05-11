@@ -25,7 +25,7 @@ def readParams(control_file):
     lagtime = params.get("lagtime", None)
     numPCCA = params.get("numPCCA", None)
     itsOutput = params.get("itsOutput", None)
-    numberOfITS = params.get("numberOfITS", None)
+    numberOfITS = params.get("numberOfITS", -1)
     errors = params.get("errors", False)
     mlags = params.get("mlags", None)
 
