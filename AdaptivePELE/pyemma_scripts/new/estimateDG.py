@@ -10,7 +10,7 @@ import sys
 
 
 class Parameters:
-    def __init__(self, ntrajs, length, lagtime, nclusters, nruns, useAllTrajInFirstRun, computeDetailedBalance, trajWildcard, folderWithTraj):
+    def __init__(self, ntrajs, length, lagtime, nclusters, nruns, useAllTrajInFirstRun, computeDetailedBalance, trajWildcard, folderWithTraj, lagtimes=[]):
         #If ntrajs/length = None, all trajs/lengths will be used
         self.trajWildcard = trajWildcard
         self.folderWithTraj = folderWithTraj
@@ -21,6 +21,7 @@ class Parameters:
         self.nruns = nruns
         self.useAllTrajInFirstRun = useAllTrajInFirstRun
         self.computeDetailedBalance = computeDetailedBalance
+        self.lagtimes = lagtimes
 
 def _rm(filename):
     try:
@@ -33,7 +34,7 @@ def _rmFiles(trajWildcard):
     for f in allfiles:
         _rm(f)
 
-def _prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryBasename, workingControlFile):
+def _prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryBasename, workingControlFile, lagtimes):
     """
     #Unused alternative #1, need of a templetized control file
     simulationParameters = simulationrunner.SimulationParameters()
@@ -44,7 +45,7 @@ def _prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryBa
     sr.makeWorkingControlFile(workingControlFile, controlFileDictionary)
     """
 
-    string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"lagtime\":%d, \"itsOutput\":\"its.png\"}"%(trajectoryFolder, trajectoryBasename, clusters, lagtime)
+    string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"lagtime\":%d, \"itsOutput\":\"its.png\", \"lagtimes\":%s}"%(trajectoryFolder, trajectoryBasename, clusters, lagtime, lagtimes)
     with open(workingControlFile, 'w') as f:
         f.write(string)
 
@@ -157,7 +158,7 @@ def estimateDG(parameters):
     workingControlFile = "control_MSM.conf"
     origFilesWildcard = os.path.join(parameters.folderWithTraj, parameters.trajWildcard)
 
-    _prepareWorkingControlFile(parameters.lagtime, parameters.nclusters, parameters.folderWithTraj, parameters.trajWildcard, workingControlFile)
+    _prepareWorkingControlFile(parameters.lagtime, parameters.nclusters, parameters.folderWithTraj, parameters.trajWildcard, workingControlFile, parameters.lagtimes)
 
     deltaGs = []
     detailedBalance = []
@@ -197,11 +198,12 @@ def estimateDG(parameters):
 if __name__ == "__main__":
     parameters = Parameters(ntrajs=None, 
                             length=None, 
-                            lagtime=25, 
+                            lagtime=200, 
                             nclusters=100, 
                             nruns=10, 
                             useAllTrajInFirstRun=True, 
                             computeDetailedBalance=True, 
                             trajWildcard="traj_*", 
-                            folderWithTraj="rawData")
+                            folderWithTraj="rawData",
+                            lagtimes=[1,10,25,50,100,250,500,1000])
     estimateDG(parameters)
