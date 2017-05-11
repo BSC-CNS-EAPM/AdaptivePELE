@@ -3,10 +3,10 @@ import shutil
 import glob
 import re
 
-if not os.path.exists("trajs"):
-    os.makedirs("trajs")
+if not os.path.exists("allTrajs"):
+    os.makedirs("allTrajs")
 
-outputTrajName = "trajs/traj_%s_%s.dat"
+outputTrajName = "allTrajs/traj_%s_%s.dat"
 origTrajectories = "%s/repeatedExtractedCoordinates/coord_"
 allFolders = os.listdir(".")
 Epochs = [epoch for epoch in allFolders if epoch.isdigit()]
