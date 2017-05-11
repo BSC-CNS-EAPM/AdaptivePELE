@@ -196,14 +196,14 @@ def estimateDG(parameters):
     return meanDG, stdDG, meanDB, stdDB
 
 if __name__ == "__main__":
-    parameters = Parameters(ntrajs=None, 
-                            length=None, 
-                            lagtime=25, 
-                            nclusters=100, 
-                            nruns=10, 
-                            useAllTrajInFirstRun=True, 
-                            computeDetailedBalance=True, 
-                            trajWildcard="traj_*", 
+    parameters = Parameters(ntrajs=None,
+                            length=None,
+                            lagtime=25,
+                            nclusters=100,
+                            nruns=10,
+                            useAllTrajInFirstRun=True,
+                            computeDetailedBalance=True,
+                            trajWildcard="traj_*",
                             folderWithTraj="rawData",
                             lagtimes=[1,10,25,50,100,250,500,1000])
     estimateDG(parameters)
