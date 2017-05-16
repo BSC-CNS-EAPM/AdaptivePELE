@@ -120,10 +120,11 @@ def _setVariablesForFirstIteration(useAllTrajInFirstRun, i, ntrajs):
     return bootstrap, nWorkingTrajs
 
 def _copyMSMDataFromRun(i):
-    try:
+    try: #it may not exist
         shutil.copyfile("its.png", "its_%d.png"%i)
     except IOError:
         pass
+    suhtil.copyfile("discretized/clusterCenters.dat", "clusterCenters_%d.dat"%i)
     shutil.copyfile("volumeOfClusters.dat", "volumeOfClusters_%d.dat"%i)
     shutil.copyfile("clusters.pdb", "clusters_%d.pdb"%i)
     shutil.copyfile("pmf_xyzg.dat", "pmf_xyzg_%d.dat"%i)
