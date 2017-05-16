@@ -154,7 +154,7 @@ def main(trajWildcard, reweightingT=1000):
         histograms.append(current_hist)
 
         #filtered_hist = filters.gaussian_filter(current_hist, sigma=1)
-        if current_hist.sum() == 0: 
+        if current_hist.sum() == 0:
             filtered_hist = np.zeros(current_hist.shape)
         else:
             filtered_hist = current_hist/current_hist.sum()
@@ -180,7 +180,7 @@ def main(trajWildcard, reweightingT=1000):
 
     np.savetxt("volumeOfClusters.dat", microstateVolume)
 
-    microstateVolume = np.loadtxt("volumeOfClusters.dat")
+    # microstateVolume = np.loadtxt("volumeOfClusters.dat")
 
     Torig = 1000
     Tnew = reweightingT
@@ -193,6 +193,8 @@ def main(trajWildcard, reweightingT=1000):
     T = 300
     beta = 1 / (kb * T)
     gpmf = -kb*T*np.log(newProb/microstateVolume)
+    print gpmf[gpmf == -np.inf]
+    print gpmf[gpmf == np.inf]
     gpmf[gpmf == -np.inf] = np.inf #to avoid contribution later
     gpmf -= gpmf.min()
 
@@ -205,7 +207,7 @@ def main(trajWildcard, reweightingT=1000):
         bindingVolume = 0
         for g, volume in zip(gpmf, microstateVolume):
             if g <= upperGpmfValue:
-                bindingVolume += np.exp(-beta * g) * volume 
+                bindingVolume += np.exp(-beta * g) * volume
         deltaG = deltaW - kb*T*np.log(bindingVolume/1661)
         string = "%.1f\t%.3f\t%.3f\t%.3f\t%.3f" % (upperGpmfValue, deltaG, deltaW, bindingVolume, -kb*T*np.log(bindingVolume/1661))
         print string

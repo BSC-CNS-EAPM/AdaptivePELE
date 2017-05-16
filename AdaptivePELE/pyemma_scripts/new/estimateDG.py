@@ -125,8 +125,8 @@ def _copyMSMDataFromRun(i):
     except IOError:
         pass
     shutil.copyfile("volumeOfClusters.dat", "volumeOfClusters_%d.dat"%i)
-    shutil.copyfile("clusters.pdb", "clusters_%d.pdb"%i)
-    shutil.copyfile("pmf_xyzg.dat", "pmf_xyzg_%d.dat"%i)
+    shutil.copyfile("clusters.pdb", "clusters_%d.pdb" % i)
+    shutil.copyfile("pmf_xyzg.dat", "pmf_xyzg_%d.dat" % i)
     if i == 0:
         try:
             shutil.copyfile("db_frobenius.eps", "db_frobenius_%d.eps"%i)
