@@ -55,7 +55,7 @@ class Cluster:
         self.writeDtrajs(self.trajFilenames, self.dtrajs, self.dTrajTemplateName)
 
     def writeClusterCenters(self, cl, outputFilename):
-        np.savetxt(outputFilename, cl.clustercenters, fmt="%.5f %.5f %.5f\n")
+        np.savetxt(outputFilename, cl.clustercenters, fmt="%.5f %.5f %.5f")
 
     def writeDtrajs(self, filenames, dtrajs, filenameTemplate="%s.disctraj"):
         for filename, dtraj in zip(filenames, dtrajs):
