@@ -82,10 +82,10 @@ class MSM:
         while not is_converged:
             if self.error == False: itsErrors = None
             elif self.error == True: itsErrors = "bayes"
-            its_object = msm.its(self.dtrajs, lags=self.lagtimes,
-                                          errors=itsErrors)
-            its_plot = mplt.plot_implied_timescales(its_object, outfile=self.itsOutput, nits=self.numberOfITS) 
-            plt.savefig("its.png")
+            if not self.lagtimes == [] and not self.lagtimes is None:
+                its_object = msm.its(self.dtrajs, lags=self.lagtimes, errors=itsErrors)
+                its_plot = mplt.plot_implied_timescales(its_object, outfile=self.itsOutput, nits=self.numberOfITS) 
+                plt.savefig("its.png")
             if not self.lagtime is None: return self.lagtime
             while True:
                 plt.show()

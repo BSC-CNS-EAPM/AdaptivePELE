@@ -15,7 +15,9 @@ with open(resultsFile, "a") as f:
     f.write("#=======================\n")
 
 resultsEpoch = []
-for epoch, folder in enumerate(sortedFolders):
+initialEpoch = 0
+for i, folder in enumerate(sortedFolders[initialEpoch:]):
+    epoch = i + initialEpoch
     print epoch, folder
     os.chdir(folder)
     parameters = estimateDG.Parameters(ntrajs=50*(epoch+1),
