@@ -154,20 +154,19 @@ def main(trajWildcard, reweightingT=1000):
         histograms.append(current_hist)
 
         #filtered_hist = filters.gaussian_filter(current_hist, sigma=1)
-        if current_hist.sum() == 0:
-            filtered_hist = np.zeros(current_hist.shape)
-        else:
-            filtered_hist = current_hist/current_hist.sum()
+        #if current_hist.sum() == 0:
+        #    filtered_hist = np.zeros(current_hist.shape)
+        #else:
+        #    filtered_hist = current_hist/current_hist.sum()
 
-        nonZeroIndices = np.argwhere(filtered_hist > 0)
-
-        # microstateVolume[i] = len(nonZeroIndices) * d**3
+        #nonZeroIndices = np.argwhere(filtered_hist > 0)
+        #microstateVolume[i] = len(nonZeroIndices) * d**3
 
         if histogram.size == 0:
-            histogramFreq = pi[i]*filtered_hist
+            #histogramFreq = pi[i]*filtered_hist
             histogram = np.copy(current_hist)
         else:
-            histogramFreq += pi[i]*filtered_hist
+            #histogramFreq += pi[i]*filtered_hist
             histogram += current_hist
 
 
@@ -182,11 +181,12 @@ def main(trajWildcard, reweightingT=1000):
 
     # microstateVolume = np.loadtxt("volumeOfClusters.dat")
 
-    Torig = 1000
-    Tnew = reweightingT
-    newProb = reweightProbabilities(Tnew, Torig, pi)
-    print Torig, Tnew
-    print "normalization", np.sum(newProb)
+    #Torig = 1000
+    #Tnew = reweightingT
+    #newProb = reweightProbabilities(Tnew, Torig, pi)
+    #print Torig, Tnew
+    #print "normalization", np.sum(newProb)
+    newProb = pi
 
 
     kb = 0.0019872041

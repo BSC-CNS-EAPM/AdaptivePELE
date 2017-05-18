@@ -64,7 +64,7 @@ def _getDstName(bootstrap, i, trajFile):
     else:
         return os.path.split(trajFile)[-1]
 
-def _copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=True):
+def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=True):
     """
         Function that copies trajectories that match "fileWildcard" into the current directory.
         It may copy a subset and a part of them (length)
@@ -168,7 +168,7 @@ def estimateDG(parameters):
 
         bootstrap, nWorkingTrajs = _setVariablesForFirstIteration(parameters.useAllTrajInFirstRun, i, parameters.ntrajs)
 
-        copiedFiles = _copyWorkingTrajectories(origFilesWildcard, parameters.length, nWorkingTrajs, bootstrap)
+        copiedFiles = copyWorkingTrajectories(origFilesWildcard, parameters.length, nWorkingTrajs, bootstrap)
 
         _constructMSM(workingControlFile)
 
