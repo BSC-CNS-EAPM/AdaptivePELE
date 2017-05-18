@@ -198,12 +198,12 @@ def estimateDG(parameters):
 if __name__ == "__main__":
     parameters = Parameters(ntrajs=None,
                             length=None,
-                            lagtime=25,
+                            lagtime=400,
                             nclusters=100,
                             nruns=10,
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,
                             trajWildcard="traj_*",
-                            folderWithTraj="rawData",
+                            folderWithTraj="MSM_0/rawData",
                             lagtimes=[1,10,25,50,100,250,500,1000])
     estimateDG(parameters)
