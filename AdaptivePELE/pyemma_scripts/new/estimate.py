@@ -3,6 +3,7 @@ import cPickle
 import matplotlib.pyplot as plt
 import pyemma.msm as msm
 import pyemma.plots as mplt
+import numpy as np
 
 class MSM:
     """
@@ -25,6 +26,7 @@ class MSM:
         self.error = error
         self.lagtime = 0
         self.dtrajs = dtrajs
+        self.stationaryDistributionFilename = "stationaryDistribution.dat"
 
     def estimate(self, lagtime = None, lagtimes = [], numberOfITS = -1):
         self.lagtime = lagtime
@@ -34,6 +36,7 @@ class MSM:
         self.lagtime = self._calculateITS() #keep calculating until convergence is reached
         print "Using lagtime = ", self.lagtime
         self.buildMSM()
+        np.savetxt(self.stationaryDistributionFilename, self.MSM_object.pi)
         self.check_connectivity()
         self.saveMSM(self.MSM_object)
 
