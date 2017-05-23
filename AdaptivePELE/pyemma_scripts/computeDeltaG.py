@@ -76,6 +76,7 @@ def main(trajWildcard, reweightingT=1000):
 
     MSMObject = helper.loadMSM('MSM_object.pkl')
     pi = MSMObject.stationary_distribution
+    np.savetxt("stationaryDist_small.dat", pi)
 
 
     r = allClusters[MSMObject.connected_sets[0]]
@@ -169,10 +170,21 @@ def main(trajWildcard, reweightingT=1000):
             #histogramFreq += pi[i]*filtered_hist
             histogram += current_hist
 
-
+    nRows, nCols, nDepth = histogram.shape
     for i in range(numberOfClusters):
         histogramCluster = histograms[i]
-        histogramTotal = histogram[histogramCluster > 0]
+        histogramTotal = histogram.copy()
+        for x, y, z in zip(*np.where(histogramCluster)):
+            upBound = max(x-1, 0)
+            lowBound = min(x+2, nRows)
+            leftBound = max(0, y-1)
+            rightBound = min(y+2, nCols)
+            topBound = max(z-1, 0)
+            botBound = min(z+2, nDepth)
+            histogramCluster[upBound:lowBound, leftBound:rightBound, topBound:botBound] += 1
+            histogramTotal[upBound:lowBound, leftBound:rightBound, topBound:botBound] += 1
+        histogramTotal = histogramTotal[histogramCluster > 0]
+        # histogramTotal = histogram[histogramCluster > 0]
         histogramCluster = histogramCluster[histogramCluster > 0]
         microstateVolume[i] = (histogramCluster/histogramTotal).sum() * d**3
 
