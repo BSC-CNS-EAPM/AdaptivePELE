@@ -336,7 +336,6 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
     clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
                                                          spawningParams.reportFilename,
                                                          spawningParams.reportCol)
-    # initialClusters = clusteringMethod.clusterInitialStructures(initialStructures)
     initialClusters = []
     return clusteringMethod, initialStructuresAsString, initialClusters
 
