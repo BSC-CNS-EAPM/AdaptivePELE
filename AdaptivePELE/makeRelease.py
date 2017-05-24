@@ -1,3 +1,8 @@
+"""
+    Only for developers.
+    Change releaseName to build a new release.
+"""
+
 import glob
 import shutil
 import os

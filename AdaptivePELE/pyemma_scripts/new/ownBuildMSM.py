@@ -21,13 +21,14 @@ def readParams(control_file):
     trajectoryFolder = params["trajectoryFolder"]
     trajectoryBasename = params["trajectoryBasename"]
     numClusters = params["numClusters"]
-    lagtimes = params["lagtimes"]
+    lagtimes = params.get("lagtimes", [])
     lagtime = params.get("lagtime", None)
-    numPCCA = params["numPCCA"]
-    itsOutput = params["itsOutput"]
-    numberOfITS = params["numberOfITS"]
-    errors = params["errors"]
-    mlags = params["mlags"]
+    numPCCA = params.get("numPCCA", None)
+    itsOutput = params.get("itsOutput", None)
+    numberOfITS = params.get("numberOfITS", -1)
+    errors = params.get("errors", False)
+    mlags = params.get("mlags", None)
+
     return trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, errors, mlags, lagtime
 
 def main(control_file):
@@ -38,7 +39,7 @@ def main(control_file):
     # program
     clusteringObject = cluster.Cluster(numClusters, trajectoryFolder, trajectoryBasename, alwaysCluster=False)
     calculateMSM = estimate.MSM(error=False, dtrajs=clusteringObject.dtrajs)
-    calculateMSM.estimate(lagtime=None, lagtimes=lagtimes, numberOfITS=numberOfITS)
+    calculateMSM.estimate(lagtime=lagtime, lagtimes=lagtimes, numberOfITS=numberOfITS)
 
 
 

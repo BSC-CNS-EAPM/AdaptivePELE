@@ -3,6 +3,7 @@ import cPickle
 import matplotlib.pyplot as plt
 import pyemma.msm as msm
 import pyemma.plots as mplt
+import numpy as np
 
 class MSM:
     """
@@ -10,6 +11,10 @@ class MSM:
                  itsErrors=None, error_estimationCK=None, mlags=2, lagtime=None, dtrajs=[]):
     """
     def __init__(self, error=False, dtrajs=[]):
+        """
+            If MSM_object.pkl exists, and we call estimate, does it override whatever was before?
+        """
+
         self.MSMFile = "MSM_object.pkl"
         self.MSM_object = None
         if os.path.exists(self.MSMFile):
@@ -21,14 +26,17 @@ class MSM:
         self.error = error
         self.lagtime = 0
         self.dtrajs = dtrajs
+        self.stationaryDistributionFilename = "stationaryDistribution.dat"
 
     def estimate(self, lagtime = None, lagtimes = [], numberOfITS = -1):
         self.lagtime = lagtime
         self.lagtimes = lagtimes
         self.numberOfITS = numberOfITS
-        if self.lagtime is None:
-            self.lagtime = self.calculateITS() #keep calculating until convergence is reached
+        print "LAGTIME", self.lagtime
+        self.lagtime = self._calculateITS() #keep calculating until convergence is reached
+        print "Using lagtime = ", self.lagtime
         self.buildMSM()
+        np.savetxt(self.stationaryDistributionFilename, self.MSM_object.pi)
         self.check_connectivity()
         self.saveMSM(self.MSM_object)
 
@@ -69,7 +77,7 @@ class MSM:
             for index, uncon_set in enumerate(unconnected_sets):
                 print "Set %d has %d elements" % (index, uncon_set.size)
 
-    def calculateITS(self):
+    def _calculateITS(self):
         is_converged = False
         # its
         print ("Calculating implied time-scales, when it's done will prompt "
@@ -77,12 +85,13 @@ class MSM:
         while not is_converged:
             if self.error == False: itsErrors = None
             elif self.error == True: itsErrors = "bayes"
-            its_object = msm.its(self.dtrajs, lags=self.lagtimes,
-                                          errors=itsErrors)
-            its_plot = mplt.plot_implied_timescales(its_object, outfile=self.itsOutput, nits=self.numberOfITS) 
-            plt.savefig("its.eps")
-            plt.show()
+            if not self.lagtimes == [] and not self.lagtimes is None:
+                its_object = msm.its(self.dtrajs, lags=self.lagtimes, errors=itsErrors)
+                its_plot = mplt.plot_implied_timescales(its_object, outfile=self.itsOutput, nits=self.numberOfITS) 
+                plt.savefig("its.png")
+            if not self.lagtime is None: return self.lagtime
             while True:
+                plt.show()
                 convergence_answer = raw_input("Has the ITS plot converged?[y/n] ")
                 convergence_answer.rstrip()
                 convergence_answer = convergence_answer or "y"  # Making yes the default answer
@@ -123,6 +132,8 @@ class MSM:
     def buildMSM(self):
         """ Estimate a MSM from the trajectories using a provided lagtime that
         should be big enough so that the relevant processes have converged.
+
+        self.error: whether to estimate errors or not
         """
         if self.error:
             self.MSM_object = msm.bayesian_markov_model(self.dtrajs, self.lagtime)
