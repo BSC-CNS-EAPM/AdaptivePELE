@@ -156,7 +156,6 @@ cdef class Atom:
             Print Atom information
         """
         print self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.x, self.y, self.z, self.type, self.mass
-        # print self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.r, self.type, self.mass
 
     def __richcmp__(self, Atom atom2, int op):
         if op == 2:
@@ -184,7 +183,6 @@ cdef class Atom:
                                                     self.resChain, self.resnum,
                                                     self.x, self.y, self.z,
                                                     self.type, self.mass)
-        # return "%s: %s %s %s [%f, %f, %f] %s %f"%(self.id, self.atomSerial, self.resChain, self.resnum, self.r[0], self.r[1], self.r[2], self.type, self.mass)
 
     def getAtomCoords(self):
         """
@@ -205,13 +203,12 @@ cdef class Atom:
         return (self.x - atom2.x)**2 + (self.y - atom2.y)**2 + (self.z - atom2.z)**2
 
 
-
 cdef class PDB:
-
     _typeProtein = "PROTEIN"
     _typeHetero = "HETERO"
     _typeAll = "ALL"
     _typeCM = "CM"
+
     # CMAtoms = {"ALA": "CB", "VAL": "CG1", "LEU": "CG", "ILE": "CD1",
     #         "MET": "CE", "PRO": "CG", "PHE": "CZ", "TYR": "OH",
     #         "TRP": "CH2", "SER": "OG", "THR": "CG2", "CYS": "SG",
@@ -219,12 +216,14 @@ cdef class PDB:
     #         "HIE": "CE1", "HID": "CE1", "HIP": "CE1", "ARG": "NE",
     #         "ASP": "OD1", "GLU": "OE1", "GLY": "empty"}
     # CMAtoms = {x: "empty" for x in CMAtoms}
+    #Atoms to be used in the contact map
     CMAtoms = {"ALA": "empty", "VAL": "empty", "LEU": "empty", "ILE": "empty",
                "MET": "empty", "PRO": "empty", "PHE": "CZ", "TYR": "OH",
                "TRP": "CH2", "SER": "empty", "THR": "empty", "CYS": "empty",
                "ASN": "empty", "GLN": "empty", "LYS": "NZ", "HIS": "CE1",
                "HIE": "CE1", "HID": "CE1", "HIP": "CE1", "ARG": "NE",
                "ASP": "OD1", "GLU": "OE1", "GLY": "empty"}
+
     def __init__(self):
         """
             Object that will contain the information of a PDB file. Has to call
@@ -242,8 +241,10 @@ cdef class PDB:
         self.atomList = []
 
     def __richcmp__(self, object other, int op):
-        """ Compare two pdb strings, remark lines should be ignored and only the
-        atoms and its information should be compared"""
+        """
+            Compare two pdb strings, remark lines should be ignored and only the
+            atoms and its information should be compared
+        """
         cdef list pdb1, pdb2
         if op == 2:
             pdb1 = [element.strip() for element in self.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]

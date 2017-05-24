@@ -1,19 +1,6 @@
 Behavior changes from previous version:
-    *) Alternative structures are stored in a priority queue with the priority
-    set to the population of the subclusters spawn inversely proportinal way
-    according to this population
-    *) Added conformation network and first discovery tree to improve
-    simulation analysis
-    *) Added scripts to plot RMSF for each residue over a trajectory
-    *) Added scripts to calculate contact map histogram for each residue over a
-    trajectory or a complete simulation
-    *) Added scripts to create a network of residues  over a trajectory or a 
-    complete simulation
-    *) Added more robust pickling interface so old simulation can be used with
-    newer version (to some extent)
+    *) Added script to reconstruct precise path to a given snapshot
+    (writePrecisePathToSnapshot.py)
 
 Bug fixes:
-    *) Fix bug in spawning of alternative structures, was not calling the new
-    code for randomly spawn from cluster center of alternative structure
-    *) Fix bug in pickling (serializing) coordinates of Atom objects
-    *) Fix bug in pickling AltStructures objects
+    *) Minor bug fixes in scripts to calculate free energies

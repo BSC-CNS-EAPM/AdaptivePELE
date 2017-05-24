@@ -18,10 +18,10 @@ def parseArguments():
     parser.add_argument("-f", default='discretized', help="Folder with cluster contents") 
     parser.add_argument("-t", "--threshold", default=0, type=float, help="If Cij < threshold and Cji < threshold, Cij = Cji = 0") 
     parser.add_argument("-l", "--lagtime", default=1, type=int, help="Lagtime") 
-    parser.add_argument("-p", "--print", action=store_true)
+    parser.add_argument("-p", "--printFigs", action=store_true)
     args = parser.parse_args()
 
-    return args.f, args.threshold, args.lagtime, args.print
+    return args.f, args.threshold, args.lagtime, args.printFigs
 
 def getNumberOfClusters(folder):
     clusterCentersFilename = os.path.join(folder, CLUSTER_CENTERS)
@@ -147,8 +147,8 @@ def barPlot(figureNumber, titleString, array):
 def getRelativeEntropy(goldenStationary, goldenT, T):
     return np.dot(goldenStationary, goldenT*np.log(goldenT/T)).sum()
 
-def main(folder, countThresholds, lagtime, printFigs=False):
-    populations, transitions = computePopulationsAndTransitionProbabilities(folder, countThresholds, lagtime)
+def main(folder, countsThreshold, lagtime, printFigs=False):
+    populations, transitions = computePopulationsAndTransitionProbabilities(folder, countsThreshold, lagtime)
 
 
     #from pyemma_scripts import helper
@@ -203,5 +203,5 @@ def main(folder, countThresholds, lagtime, printFigs=False):
 
 
 if __name__ == '__main__':
-    folder, countThresholds, lagtime, printFigs  = parseArguments()
-    main(folder, countThresholds, lagtime, printFigs) 
+    folder, countsThreshold, lagtime, printFigs  = parseArguments()
+    main(folder, countsThreshold, lagtime, printFigs) 

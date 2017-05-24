@@ -253,7 +253,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
                 abs(oldClusteringMethod.contactThresholdDistance - newClusteringMethod.contactThresholdDistance) > 1e-7
 
 
-def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, processorsToClusterMapping):
+def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
     """
         Cluster the trajecotories of a given epoch
 
@@ -269,7 +269,7 @@ def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, proce
     paths = eval(snapshotsJSONSelectionString)
     if len(glob.glob(paths[-1])) == 0:
         sys.exit("No trajectories to cluster! Matching path:%s"%paths[-1])
-    clusteringMethod.cluster(paths, processorsToClusterMapping)
+    clusteringMethod.cluster(paths)
 
 
 def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner):
@@ -286,7 +286,7 @@ def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletiz
 """
     for i in range(finalEpoch):
         simulationRunner.readMappingFromDisk(epochOutputPathTempletized % i) #TODO: ask joan
-        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized, simulationRunner.processorsToClusterMapping)
+        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized)
 
 
 def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner):
@@ -363,9 +363,9 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
     degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
     spawningCalculator.log()
     print "Degeneracy", degeneracyOfRepresentatives
-    seedingPoints = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun)
+    seedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun)
     initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
-    simulationRunner.updateMappingProcessors(degeneracyOfRepresentatives, clusteringMethod)
+    simulationRunner.updateMappingProcessors(procMapping)
 
     return clusteringMethod, initialStructuresAsString
 
@@ -406,7 +406,7 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
     clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
                                                          spawningParams.reportFilename,
                                                          spawningParams.reportCol)
-    initialClusters = clusteringMethod.clusterInitialStructures(initialStructures)
+    initialClusters = []
     return clusteringMethod, initialStructuresAsString, initialClusters
 
 
@@ -493,11 +493,9 @@ def main(jsonParams):
     else:
         firstRun = 0  # if restart false, but there were previous simulations
         clusteringMethod, initialStructuresAsString, initialClusters = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
-        simulationRunner.makeInitialMapping(initialClusters)
 
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
 
-    originalValue = simulationRunner.parameters.peleSteps
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
 
@@ -509,14 +507,13 @@ def main(jsonParams):
             startTime = time.time()
             simulationRunner.runSimulation(outputPathConstants.tmpControlFilename % i)
             endTime = time.time()
-            print simulationRunner.parameters.peleSteps
             print "PELE %s sec" % (endTime - startTime)
 
         simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
 
         print "Clustering..."
         startTime = time.time()
-        clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, simulationRunner.processorsToClusterMapping)
+        clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized)
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
@@ -524,7 +521,6 @@ def main(jsonParams):
         spawningCalculator.log()
         print "Degeneracy", degeneracyOfRepresentatives
 
-        simulationRunner.updateMappingProcessors(degeneracyOfRepresentatives, clusteringMethod)
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
@@ -540,7 +536,8 @@ def main(jsonParams):
 
         # Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:
-            numberOfSeedingPoints = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1)
+            numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1)
+            simulationRunner.updateMappingProcessors(procMapping)
             initialStructuresAsString = createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
             peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
 

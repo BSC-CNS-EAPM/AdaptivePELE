@@ -12,9 +12,13 @@ from AdaptivePELE.utilities import utilities
 from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
 from AdaptivePELE.atomset import RMSDCalculator
 from scipy import stats
-import socket
-import networkx as nx
 import heapq
+try:
+    import networkx as nx
+    NETWORK = True
+except ImportError:
+    NETWORK = False
+# import socket
 # if "bsccv" not in socket.gethostname():
 #     from sklearn.cluster import AffinityPropagation
 #     from sklearn.cluster import AgglomerativeClustering
@@ -38,19 +42,50 @@ class Clusters:
         self.clusters = state['clusters']
 
     def addCluster(self, cluster):
+        """
+            Add a new cluster
+
+            :param cluster:  Cluster object to insert
+            :type cluster: :py:class:`.Cluster`
+        """
         self.clusters.append(cluster)
 
     def insertCluster(self, index, cluster):
-        """ Insert a cluster in a specified index"""
+        """
+            Insert a cluster in a specified index
+
+            :param index: Positions at which insert the cluster
+            :type index: int
+            :param cluster:  Cluster object to insert
+            :type cluster: :py:class:`.Cluster`
+        """
         self.clusters.insert(index, cluster)
 
     def getNumberClusters(self):
+        """
+            Get the number of clusters contained
+
+            :returns: int -- Number of clusters contained
+        """
         return len(self.clusters)
 
     def getCluster(self, clusterNum):
+        """
+            Get the cluster at position clusterNum
+
+            :param clusterNum: Index of the cluster to retrieve
+            :type clusterNum: int
+            :returns: :py:class:`.Cluster` -- Cluster at position clusterNum
+        """
         return self.clusters[clusterNum]
 
     def printClusters(self, verbose=False):
+        """
+            Print clusters information
+
+            :param verbose: Flag to control the verbosity of the code (default is False)
+            :type verbose: bool
+        """
         for i, cluster in enumerate(self.clusters):
             print "--------------"
             print "CLUSTER #%d" % i
@@ -60,6 +95,107 @@ class Clusters:
 
     def __eq__(self, other):
         return self.clusters == other.clusters
+
+
+class ConformationNetwork:
+    """
+        Object that contains the conformation network, a network with clusters as
+        nodes and edges representing trantions between clusters. The network is
+        stored using the networkx package[1]
+
+        References
+        ----------
+        .. [1] Networkx python package https://networkx.github.io
+    """
+    def __init__(self):
+        if NETWORK:
+            self.network = nx.DiGraph()
+        else:
+            self.network = None
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"network": self.network}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.network = state['network']
+
+    def add_node(self, node, **kwargs):
+        """
+            Add a node to the network (wrapper for networkx method)
+
+            :param node: Name of the node
+            :type node: int
+            :param kwargs: Set or change attributes using key=value.
+            :type kwargs: keyword arguments, optional
+        """
+        if not NETWORK:
+            return
+        self.network.add_node(node, attr_dict=kwargs)
+
+    def add_edge(self, source, target):
+        """
+            Add an edge to the network (wrapper for networkx method)
+
+            :param source: Name of the source node
+            :type source: int
+            :param target: Name of the target node
+            :type target: int
+        """
+        if not NETWORK:
+            return
+        if self.network.has_edge(source, target):
+            self.network[source][target]['transition'] += 1
+        else:
+            self.network.add_edge(source, target, transition=1)
+
+    def writeConformationNetwork(self, path):
+        """
+            Write the conformational network to file to visualize it
+
+            :param path: Path where to write the network
+            :type path: str
+        """
+        if not NETWORK:
+            sys.stderr.write("Package networkx not found! Could not write network\n")
+            return
+        nx.write_edgelist(self.network, path)
+
+    def writeFDT(self, path):
+        """
+            Write the first discovery tree to file in edgelist format to
+            visualize it
+
+            :param path: Path where to write the network
+            :type path: str
+        """
+        if not NETWORK:
+            sys.stderr.write("Package networkx not found! Could not write network\n")
+            return
+        with open(path, "w") as fw:
+            for node, data in self.network.nodes_iter(data=True):
+                if data['parent'] != 'root':
+                    fw.write("%d\t%d\n" % (data['parent'], node))
+
+    def createPathwayToCluster(self, clusterLeave):
+        """
+            Retrace the FDT from a specific cluster to the root where it was
+            discovered
+
+            :param clusterLeave: End point of the pathway to reconstruct
+            :type clusterLeave: int
+            :returns pathway: list -- List of snapshots conforming a pathway
+        """
+        pathway = []
+        nodeLabel = clusterLeave
+        while nodeLabel != "root":
+            pathway.append(nodeLabel)
+            nodeLabel = self.network.node[nodeLabel]['parent']
+        return pathway[::-1]
 
 
 class AltStructures:
@@ -87,6 +223,13 @@ class AltStructures:
     def altSpawnSelection(self, centerPair):
         """
             Select an alternative PDB from the cluster center to spawn from
+
+            :param centerPair: Tuple with the population of the representative structure
+                and the PDB of said structure
+            :type centerPair: int, :py:class:`.PDB`
+            :returns: :py:class:`.PDB`, tuple -- PDB of the strucutre selected to spawn and tuple
+                consisting of (epoch, trajectory, snapshot)
+
         """
         subpopulations = [i[0] for i in self.altStructPQ]
         totalSubpopulation = sum(subpopulations)
@@ -101,11 +244,11 @@ class AltStructures:
         # The first value of the distribution is always the cluster center
         if ind == 0:
             print "cluster center"
-            return centerPair[1]
+            return centerPair[1], None
         else:
             # pick an alternative structure from the priority queue
             print "alternative structure"
-            return self.altStructPQ[ind][1].pdb
+            return self.altStructPQ[ind][1].pdb, self.altStructPQ[ind][1].trajPosition
 
     def cleanPQ(self):
         """
@@ -117,7 +260,25 @@ class AltStructures:
         limit = len(self.altStructPQ)
         del self.altStructPQ[self.limitSize-limit:]
 
-    def addStructure(self, PDB, threshold, resname, contactThreshold, similarityEvaluator):
+    def addStructure(self, PDB, threshold, resname, contactThreshold, similarityEvaluator, trajPosition):
+        """
+            Perform a subclustering, with sub-clusters of size threshold/2
+
+            :param PDB: Structure to cluster
+            :type PDB: :py:class:`.PDB`
+            :param threshold: Size of the cluster
+            :type threshold: float
+            :param resname: Name of the ligand in the structure pdb
+            :type resname: str
+            :param contactThreshold: Distance at which to atoms are considered in contact
+            :type contactThreshold: float
+            :param similarityEvaluator: Object that determinates the similarity between two structures
+            :type similarityEvaluator: object
+            :param trajPosition: Tuple of (epoch, trajectory, snapshot) that permit
+                identifying the structure added
+            :type trajPosition: int, int, int
+
+        """
         i = 0
         for priority, subCluster in self.altStructPQ:
             isSimilar, distance = similarityEvaluator.isElement(PDB, subCluster, resname, contactThreshold)
@@ -129,12 +290,17 @@ class AltStructures:
                     self.cleanPQ()
                 return
             i += 1
-        newCluster = Cluster(PDB, thresholdRadius=threshold, contactThreshold=contactThreshold, contactMap=similarityEvaluator.contactMap)
+        newCluster = Cluster(PDB, thresholdRadius=threshold, contactThreshold=contactThreshold, contactMap=similarityEvaluator.contactMap, trajPosition=trajPosition)
         heapq.heappush(self.altStructPQ, (1, newCluster))
         if len(self.altStructPQ) > 2*self.limitSize:
             self.cleanPQ()
 
     def sizePQ(self):
+        """
+            Get the number of sub-clusters stored in the priority queue
+
+            :returns: int -- Number of sub-clusters stored in the priority queue
+        """
         return len(self.altStructPQ)
 
 
@@ -146,9 +312,30 @@ class Cluster:
     """
     def __init__(self, pdb, thresholdRadius=None, contactMap=None,
                  contacts=None, metrics=[], metricCol=None, density=None,
-                 contactThreshold=8, altSelection=False):
+                 contactThreshold=8, altSelection=False, trajPosition=None):
         """
-            contacts stands for contacts/ligandAtom
+            :param pdb: Pdb of the representative structure
+            :type pdb: :py:class:`.PDB`
+            :param thresholdRadius: Threshold of the cluster
+            :type thresholdRadius: float
+            :param contactMap:  The contact map of the ligand and the protein
+            :type contactMap: numpy.Array
+            :param contacts: Ratio of the number of alpha carbons in contact with the ligand
+            :type contacts: float
+            :param metrics: Array of the metrics corresponding to the cluster
+            :type metrics: numpy.Array
+            :param metricCol: Column of the prefered metric
+            :type metricCol: int
+            :param density: Density of the cluster
+            :type density: float
+            :param contactThreshold: Distance between two atoms to be considered in contact (default 8)
+            :type contactThreshold: float
+            :param altSelection: Flag that controls wether to use the alternative structures (default 8)
+            :type altSelection: bool
+            :param trajPosition: Tuple of (epoch, trajectory, snapshot) that permit
+                identifying the structure added
+            :type trajPosition: int, int, int
+
         """
         self.pdb = pdb
         self.altStructure = AltStructures()
@@ -162,6 +349,7 @@ class Cluster:
         self.metricCol = metricCol
         self.contactThreshold = contactThreshold
         self.altSelection = altSelection
+        self.trajPosition = trajPosition
 
         if self.threshold is None:
             self.threshold2 = None
@@ -179,7 +367,8 @@ class Cluster:
                  "metricCol": self.metricCol, "threshold2": self.threshold2,
                  "contactThreshold": self.contactThreshold,
                  "altSelection": self.altSelection,
-                 "originalMetrics": self.originalMetrics}
+                 "originalMetrics": self.originalMetrics,
+                 "trajPosition": self.trajPosition}
         return state
 
     def __setstate__(self, state):
@@ -197,20 +386,39 @@ class Cluster:
         self.threshold2 = state.get('threshold2')
         self.contactThreshold = state.get('contactThreshold', 8)
         self.altSelection = state.get('altSelection', False)
+        self.trajPosition = state.get('trajPosition')
 
     def getMetric(self):
+        """
+            Get the value of the prefered metric if present, otherwise return None
+
+            :returns: float -- Value of the prefered metric
+        """
         if len(self.metrics):
             return self.metrics[self.metricCol]
         else:
             return None
 
     def getMetricFromColumn(self, numcol):
+        """
+            Get the value of the metric in column numcol if present, otherwise return None
+
+            :param numcol: Column of the desired metric
+            :type numcol: int
+            :returns: float -- Value of the prefered metric
+        """
         if len(self.metrics):
             return self.metrics[numcol]
         else:
             return None
 
     def addElement(self, metrics):
+        """
+            Add a new element to the cluster
+
+            :param metrics: Array of metrics of the new structure
+            :type metrics: numpy.Array
+        """
         self.elements += 1
         if self.metrics is None:
             # Special case where cluster in created during clustering of
@@ -224,6 +432,12 @@ class Cluster:
             self.metrics = np.minimum(self.metrics, metrics)
 
     def printCluster(self, verbose=False):
+        """
+            Print cluster information
+
+            :param verbose: Flag to control the verbosity of the code (default is False)
+            :type verbose: bool
+        """
         if verbose:
             print self.pdb.printAtoms()
         print "Elements: ", self.elements
@@ -233,21 +447,39 @@ class Cluster:
         print "Number of contacts: %.2f" % self.contacts
 
     def writePDB(self, path):
+        """
+            Write the pdb of the representative structure to file
+
+            :param path: Filename of the file to write
+            :type path: str
+        """
         self.pdb.writePDB(str(path))
 
     def getContacts(self):
+        """
+            Get the contacts ratio of the cluster
+
+            :returns: float -- contact ratio of the cluster
+        """
         return self.contacts
 
     def writeSpawningStructure(self, path):
         """
-            With 50 % probability select the cluster center to spawn in
-            the next epoch
+            Write the pdb of the chones structure to spawn
+
+            :param path: Filename of the file to write
+            :type path: str
         """
         if not self.altSelection or self.altStructure.sizePQ() == 0:
             print "cluster center"
             self.pdb.writePDB(str(path))
+            return self.trajPosition
         else:
-            self.altStructure.altSpawnSelection((self.elements, self.pdb)).writePDB(str(path))
+            spawnStruct, trajPosition = self.altStructure.altSpawnSelection((self.elements, self.pdb))
+            spawnStruct.writePDB(str(path))
+            if trajPosition is None:
+                trajPosition = self.trajPosition
+            return trajPosition
 
     def __eq__(self, other):
         return self.pdb == other.pdb\
@@ -259,6 +491,13 @@ class Cluster:
 
 class ContactsClusteringEvaluator:
     def __init__(self, RMSDCalculator):
+        """
+            Helper object to carry out the RMSD clustering
+
+            :param RMSDCalculator: object that calculates the RMSD between two
+                conformations
+            :type RMSDCalculator: :py:class:`.RMSDCalculator`
+        """
         self.RMSDCalculator = RMSDCalculator
         self.contacts = None
         # Only here for compatibility purpose
@@ -279,26 +518,52 @@ class ContactsClusteringEvaluator:
         self.contactMap = state.get('contactMap')
 
     def isElement(self, pdb, cluster, resname, contactThresholdDistance):
+        """
+            Evaluate wether a conformation is a member of a cluster
+
+            :param pdb: Structure to compare
+            :type pdb: :py:class:`.PDB`
+            :param cluster: Cluster to compare
+            :type cluster: :py:class:`.Cluster`
+            :param resname: Name of the ligand in the pdb
+            :type rename: str
+            :param contactThreshold: Distance between two atoms to be considered in contact (default 8)
+            :type contactThreshold: float
+            :returns: bool, float -- Whether the structure belong to the cluster and the distance between them
+        """
         dist = self.RMSDCalculator.computeRMSD(cluster.pdb, pdb)
         return dist < cluster.threshold, dist
 
     def cleanContactMap(self):
+        """
+            Clean the attributes to prepare for next iteration
+        """
+        # TODO: this should probaly set to a "private" method
         self.contactMap = None
         self.contacts = None
 
     def checkAttributes(self, pdb, resname, contactThresholdDistance):
+        """
+            Check wether all attributes are set for this iteration
+
+            :param pdb: Structure to compare
+            :type pdb: :py:class:`.PDB`
+            :param resname: Name of the ligand in the pdb
+            :type rename: str
+            :param contactThreshold: Distance between two atoms to be considered in contact (default 8)
+            :type contactThreshold: float
+        """
         if self.contacts is None:
             self.contacts = pdb.countContacts(resname, contactThresholdDistance)
 
-    def getOuterLimit(self, node):
-        # return max(node.cluster.threshold2, node.cluster.threshold2 + 10 - node.depth)
-        return node.cluster.threshold2
-        if node.depth > 5:
-            return node.cluster.threshold2
-        else:
-            return node.cluster.threshold2 + 2 ** (6-node.depth)
-
     def getInnerLimit(self, cluster):
+        """
+            Return the threshold of the cluster
+
+            :param cluster: Cluster to compare
+            :type cluster: :py:class:`.Cluster`
+            :returns: float -- Threshold of the cluster
+        """
         return cluster.threshold2
 
 
@@ -307,6 +572,16 @@ class CMClusteringEvaluator:
     limitMax = {8: 2, 6: 0.8, 4: 0.2, 10: 4}
 
     def __init__(self, similarityEvaluator, symmetryEvaluator):
+        """
+            Helper object to carry out the RMSD clustering
+
+            :param similarityEvaluator: object that calculates the similarity
+                between two contact maps
+            :type similarityEvaluator: object
+            :param symmetryEvaluator: object to introduce the symmetry  in the
+                contacts maps
+            :type symmetryEvaluator: :py:class:`.SymmetryContactMapEvaluator`
+        """
         self.similarityEvaluator = similarityEvaluator
         self.symmetryEvaluator = symmetryEvaluator
         self.contacts = None
@@ -329,6 +604,19 @@ class CMClusteringEvaluator:
         self.contactMap = state.get('contactMap')
 
     def isElement(self, pdb, cluster, resname, contactThresholdDistance):
+        """
+            Evaluate wether a conformation is a member of a cluster
+
+            :param pdb: Structure to compare
+            :type pdb: :py:class:`.PDB`
+            :param cluster: Cluster to compare
+            :type cluster: :py:class:`.Cluster`
+            :param resname: Name of the ligand in the pdb
+            :type rename: str
+            :param contactThreshold: Distance between two atoms to be considered in contact (default 8)
+            :type contactThreshold: float
+            :returns: bool, float -- Whether the structure belong to the cluster and the distance between them
+        """
         if self.contactMap is None:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             # self.contactMap, foo = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
@@ -337,16 +625,37 @@ class CMClusteringEvaluator:
         return distance < cluster.threshold, distance
 
     def cleanContactMap(self):
+        """
+            Clean the attributes to prepare for next iteration
+        """
+        # TODO: this should probaly set to a "private" method
         self.contactMap = None
         self.contacts = None
 
     def checkAttributes(self, pdb, resname, contactThresholdDistance):
+        """
+            Check wether all attributes are set for this iteration
+
+            :param pdb: Structure to compare
+            :type pdb: :py:class:`.PDB`
+            :param resname: Name of the ligand in the pdb
+            :type rename: str
+            :param contactThreshold: Distance between two atoms to be considered in contact (default 8)
+            :type contactThreshold: float
+        """
         if self.contactMap is None:
             self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             # self.contactMap, foo = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             # self.contacts = pdb.countContacts(resname, 8)  # contactThresholdDistance)
 
     def getInnerLimit(self, cluster):
+        """
+            Return the threshold of the cluster
+
+            :param cluster: Cluster to compare
+            :type cluster: :py:class:`.Cluster`
+            :returns: float -- Threshold of the cluster
+        """
         # if cluster.contacts > self.limitMax[cluster.contactThreshold]:
         #     return 4.0
         # else:
@@ -375,25 +684,25 @@ class CMClusteringEvaluator:
         # else:
         #      return 25
 
-    def getOuterLimit(self, node):
-        # return max(16, 16 * 2 - node.depth)
-        return 16
-
 
 class Clustering:
-    """
-        Base class for clustering methods, it defines a cluster method that
-        contacts and accumulative inherit and use
-
-        resname [In] String containing the three letter name of the ligan in the pdb
-        reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
-        columnOfReportFile [In] Column of the report file that contain the metric of interest
-        contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
-        considered in contact(default 8)
-    """
     def __init__(self, resname=None, reportBaseFilename=None,
                  columnOfReportFile=None, contactThresholdDistance=8,
                  altSelection=False):
+        """
+            Base class for clustering methods, it defines a cluster method that
+            contacts and accumulative inherit and use
+
+            :param resname: String containing the three letter name of the ligand in the pdb
+            :type resname: str
+            :param reportBaseFilename: Name of the file that contains the metrics of the snapshots to cluster
+            :type reportBaseFilename: str
+            :param columnOfReportFile: Column of the report file that contain the metric of interest
+            :type columnOfReportFile: int
+            :param contactThresholdDistance: Distance at wich a ligand atom and a protein atom are
+                considered in contact(default 8)
+            :type contactThresholdDistance: float
+        """
         self.type = "BaseClass"
 
         self.clusters = Clusters()
@@ -406,7 +715,7 @@ class Clustering:
         self.contactThresholdDistance = contactThresholdDistance
         self.symmetries = []
         self.altSelection = altSelection
-        self.conformationNetwork = nx.DiGraph()
+        self.conformationNetwork = ConformationNetwork()
         self.epoch = -1
 
     def __getstate__(self):
@@ -432,26 +741,45 @@ class Clustering:
         self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
         self.symmetries = state.get('symmetries', [])
         self.altSelection = state.get('altSelection', False)
-        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
         self.epoch = state.get('metricCol', -1)
 
     def setCol(self, col):
+        """
+            Set the column of the prefered column to col
+
+            :param col: Column of the prefered column
+            :type col: int
+        """
         self.col = col
 
         for cluster in self.clusters.clusters:
             cluster.metricCol = col
 
     def getCluster(self, clusterNum):
+        """
+            Get the cluster at index clusterNum
+
+            :returns: :py:class:`.Cluster` -- Cluster at clusterNum
+        """
         return self.clusters.getCluster(clusterNum)
 
 
     def clusterIterator(self):
+        """
+            Iterator over the clusters
+        """
         # TODO: may be interesting to add some condition to filter, check
         # itertools module, its probably implemented
         for cluster in self.clusters.clusters:
             yield cluster
 
     def getNumberClusters(self):
+        """
+            Get the number of clusters
+
+            :returns: int -- Number of clusters
+        """
         return self.clusters.getNumberClusters()
 
     def __eq__(self, other):
@@ -460,63 +788,10 @@ class Clustering:
             and self.resname == other.resname\
             and self.col == other.col
 
-    def clusterInitialStructures(self, initialStructures):
+    def cluster(self, paths):
         """
-            Cluster the initial structures. This will allow to obtain a working
-            processor to cluster mapping (see SimulationRunner docs for more info)
-            for simulation with multiple initial structures
-            :param initialStructures: List of the initial structures of the simulation
-            :type initialStructures: list
-        """
-        clusterInitial = []
-        for i, structurePath in enumerate(initialStructures):
-            pdb = atomset.PDB()
-            pdb.initialise(str(structurePath), resname=self.resname)
-            for clusterNum, cluster in enumerate(self.clusters.clusters):
-                scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
-                if scd > self.clusteringEvaluator.getInnerLimit(cluster):
-                    continue
+            Cluster the snaptshots contained in the paths folder
 
-                isSimilar, dist = self.clusteringEvaluator.isElement(pdb, cluster,
-                                                                    self.resname, self.contactThresholdDistance)
-                if isSimilar:
-                    cluster.addElement([])
-                    clusterInitial.append(clusterNum)
-                    self.clusters.clusters[clusterNum].elements = 0
-                    break
-
-            if len(clusterInitial) == i+1:
-                # If an initial structure is similar enough to be added as
-                # element in a previous cluster, move to the next structure,
-                # this function is practically a duplicate of the
-                # addSnapshotToCluster function and this blocks substitutes the
-                # return statement after adding an element
-                continue
-            # if made it here, the snapshot was not added into any cluster
-            # Check if contacts and contactMap are set (depending on which kind
-            # of clustering)
-            self.clusteringEvaluator.checkAttributes(pdb, self.resname, self.contactThresholdDistance)
-            contacts = self.clusteringEvaluator.contacts
-            numberOfLigandAtoms = pdb.getNumberOfAtoms()
-            contactsPerAtom = float(contacts)/numberOfLigandAtoms
-
-            threshold = self.thresholdCalculator.calculate(contactsPerAtom)
-            cluster = Cluster(pdb, thresholdRadius=threshold,
-                            contacts=contactsPerAtom,
-                            contactMap=self.clusteringEvaluator.contactMap,
-                            metrics=None, metricCol=self.col,
-                            contactThreshold=self.contactThresholdDistance,
-                            altSelection=self.altSelection)
-            self.clusters.addCluster(cluster)
-            clusterNum = self.getNumberClusters()-1
-            clusterInitial.append(clusterNum)
-            self.clusters.clusters[clusterNum].elements = 0
-            self.conformationNetwork.add_node(clusterNum, parent='root', epoch=0)
-        return clusterInitial
-
-    def cluster(self, paths, processorsToClusterMapping):
-        """
-            Cluster the snaptshots contained in the pahts folder
             :param paths: List of folders with the snapshots
             :type paths: list
         """
@@ -524,7 +799,8 @@ class Clustering:
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
-            origCluster = processorsToClusterMapping[trajNum-1]
+            # origCluster = processorsToClusterMapping[trajNum-1]
+            origCluster = None
             snapshots = utilities.getSnapshots(trajectory, True)
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
@@ -532,10 +808,10 @@ class Clustering:
                 metrics = np.loadtxt(reportFilename, ndmin=2)
 
                 for num, snapshot in enumerate(snapshots):
-                    origCluster = self.addSnapshotToCluster(snapshot, origCluster, metrics[num], self.col)
+                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col)
             else:
                 for num, snapshot in enumerate(snapshots):
-                    origCluster = self.addSnapshotToCluster(snapshot, origCluster)
+                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num)
         for cluster in self.clusters.clusters:
             cluster.altStructure.cleanPQ()
 
@@ -546,12 +822,12 @@ class Clustering:
             :param outputPath: Folder that will contain all the clustering information
             :type outputPath: str
             :param degeneracy: Degeneracy of each cluster. It must be in the same order
-            as in the self.clusters list
+                as in the self.clusters list
             :type degeneracy: list
             :param outputObject: Output name for the pickle object
             :type outputObject: str
             :param writeAll: Wether to write pdb files for all cluster in addition
-            of the summary
+                of the summary
             :type writeAll: bool
         """
         utilities.cleanup(outputPath)
@@ -587,7 +863,24 @@ class Clustering:
         with open(outputObject, 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
-    def addSnapshotToCluster(self, snapshot, origCluster, metrics=[], col=None):
+    def addSnapshotToCluster(self, trajNum, snapshot, origCluster, snapshotNum, metrics=[], col=None):
+        """
+            Cluster a snapshot using the leader algorithm
+
+            :param trajNum: Trajectory number
+            :type trajNum: int
+            :param snapshot: Snapshot to add
+            :type snapshot: str
+            :param origCluster: Cluster found in the previos snapshot
+            :type origCluster: int
+            :param snapshotNum: Number of snapshot in its trajectory
+            :type snapshotNum: int
+            :param metrics: Array with the metrics of the snapshot
+            :type metrics: numpy.Array
+            :param col: Column of the desired metrics
+            :type col: int
+            :returns: int -- Cluster to which the snapshot belongs
+        """
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         self.clusteringEvaluator.cleanContactMap()
@@ -600,12 +893,11 @@ class Clustering:
                                                                  self.resname, self.contactThresholdDistance)
             if isSimilar:
                 if dist > cluster.threshold/2:
-                    cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.contactThresholdDistance, self.clusteringEvaluator)
+                    cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.contactThresholdDistance, self.clusteringEvaluator, trajPosition=(self.epoch, trajNum, snapshotNum))
                 cluster.addElement(metrics)
-                if self.conformationNetwork.has_edge(origCluster, clusterNum):
-                    self.conformationNetwork[origCluster][clusterNum]['transition'] += 1
-                else:
-                    self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
+                if origCluster is None:
+                    origCluster = clusterNum
+                self.conformationNetwork.add_edge(origCluster, clusterNum)
                 return clusterNum
 
         # if made it here, the snapshot was not added into any cluster
@@ -622,47 +914,30 @@ class Clustering:
                           contactMap=self.clusteringEvaluator.contactMap,
                           metrics=metrics, metricCol=col,
                           contactThreshold=self.contactThresholdDistance,
-                          altSelection=self.altSelection)
+                          altSelection=self.altSelection, trajPosition=(self.epoch, trajNum, snapshotNum))
         self.clusters.addCluster(cluster)
         clusterNum = self.clusters.getNumberClusters()-1
-        if clusterNum == origCluster:
+        if clusterNum == origCluster or origCluster is None:
+            origCluster = clusterNum
             # The clusterNum should only be equal to origCluster when the first
             # cluster is created and the clusterInitialStructures function has
             # not been called, i.e. when usind the compareClustering script
             self.conformationNetwork.add_node(clusterNum, parent='root', epoch=self.epoch)
         else:
             self.conformationNetwork.add_node(clusterNum, parent=origCluster, epoch=self.epoch)
-        self.conformationNetwork.add_edge(origCluster, clusterNum, transition=1)
+        self.conformationNetwork.add_edge(origCluster, clusterNum)
         # If a new cluster is discovered during a trajectory, the next step in
         # the same trajectory will be considered to start from these new
         # cluster, thus resulting in a more precise conformation network and
         # smoother pathways
         return clusterNum
 
-    def writeConformationNetwork(self, path):
-        """
-            Write the conformational network to file to visualize it
-            :param path: Path where to write the network
-            :type path: str
-        """
-        nx.write_edgelist(self.conformationNetwork, path)
 
-    def writeFDT(self, path):
-        """
-            Write the first discovery tree to file in edgelist format to
-            visualize it
-            :param path: Path where to write the network
-            :type path: str
-        """
-        with open(path, "w") as fw:
-            for node, data in self.conformationNetwork.nodes_iter(data=True):
-                if data['parent'] != 'root':
-                    fw.write("%d\t%d\n" % (data['parent'], node))
-
-    def writeConformationNodeMetric(self, path, metricCol):
+    def writeClusterMetric(self, path, metricCol):
         """
             Write the metric of each node in the conformation network in a
             tab-separated file
+
             :param path: Path where to write the network
             :type path: str
             :param metricCol: Column of the metric of interest
@@ -680,6 +955,7 @@ class Clustering:
         """
             Write the population of each node in the conformation network in a
             tab-separated file
+
             :param path: Path where to write the network
             :type path: str
         """
@@ -687,24 +963,13 @@ class Clustering:
             for i, cluster in enumerate(self.clusters.clusters):
                 f.write("%d\t%d\n" % (i, cluster.elements))
 
-
-    def createPathwayToCluster(self, clusterLeave):
-        """
-            Retrace the FDT from a specific cluster to the root where it was
-            discovered
-            :param clusterLeave: End point of the pathway to reconstruct
-            :type clusterLeave: int
-        """
-        pathway = []
-        nodeLabel = clusterLeave
-        while nodeLabel != "root":
-            pathway.append(nodeLabel)
-            nodeLabel = self.conformationNetwork.node[nodeLabel]['parent']
-        return pathway[::-1]
-
     def getOptimalMetric(self, column=None):
         """
             Find the cluster with the best metric
+
+            :param column: Column of the metric that defines the best cluster,
+                if not specified, the cluster metric is chosen
+            :type column: int
         """
         optimalMetric = 100
         optimalMetricIndex = 0
@@ -721,6 +986,7 @@ class Clustering:
     def writePathwayTrajectory(self, pathway, filename):
         """
             Write a list of cluster forming a pathway into a trajectory pdb file
+
             :param pathway: List of clusters that form the pathway
             :type pathway: list
             :param filename: Path where to write the trajectory
@@ -747,8 +1013,9 @@ class Clustering:
 
     def writePathwayOptimalCluster(self, filename):
         """
-            Extracte the pathway to the cluster with the best metric as a
+            Extract the pathway to the cluster with the best metric as a
             trajectory and  write it to a PDB file
+
             :param filename: Path where to write the trajectory
             :type filename: str
         """
@@ -756,58 +1023,36 @@ class Clustering:
         pathway = self.createPathwayToCluster(optimalCluster)
         self.writePathwayTrajectory(pathway, filename)
 
-    def calculateMetastabilityIndex(self):
-        """
-            Calculate the metastablity index, mI. mI is the ratio of transitions
-            from a given cluster that remains within the same cluster
-        """
-        metInd = {}
-        for node in self.conformationNetwork.nodes_iter():
-            totalOut = 0
-            selfTrans = 0
-            for n, edge, data in self.conformationNetwork.out_edges_iter(node, data=True):
-                if edge == node:
-                    selfTrans = data['transition']
-                totalOut += data['transition']
-            if totalOut+selfTrans:
-                metInd[node] = selfTrans/float(totalOut)
-            else:
-                metInd[node] = 0
-        return metInd
-
-    def writeMetastabilityIndex(self, filename, metInd=None):
-        """
-            Write the metastability index of each node to file.
-            :param filename: Path where to write the trajectory
-            :type filename: str
-        """
-        if metInd is None:
-            metInd = self.calculateMetastabilityIndex()
-        with open(filename, "w") as f:
-            for node, met in metInd.iteritems():
-                f.write("%d\t%.4f\n" % (node, met))
-
 
 class ContactsClustering(Clustering):
-    """
-        Cluster together all snapshots that are closer to the cluster center
-        than certain threshold. This threshold is assigned according to the
-        ratio of number of contacts over the number of heavy atoms of the ligand
-
-        thresholdCalculator [In] ThresholdCalculator object that calculate the
-        threshold according to the contacts ratio
-        resname [In] String containing the three letter name of the ligand
-        in the pdb
-        reportBaseFilename [In] Name of the file that contains the metrics of
-        the snapshots to cluster
-        columnOfReportFile [In] Column of the report file that contain the
-        metric of interest
-        contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
-        considered in contact(default 8)
-    """
     def __init__(self, thresholdCalculator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8, symmetries=[], altSelection=False):
+        """
+            Cluster together all snapshots that are closer to the cluster center
+            than certain threshold. This threshold is assigned according to the
+            ratio of number of contacts over the number of heavy atoms of the ligand
+
+            :param thresholdCalculator: ThresholdCalculator object that calculate the
+                threshold according to the contacts ratio
+            :type thresholdCalculator: :py:class:`.ThresholdCalculator`
+            :param resname: String containing the three letter name of the ligand
+                in the pdb
+            :type resname: str
+            :param reportBaseFilename: Name of the file that contains the metrics of
+                the snapshots to cluster
+            :type reportBaseFilename: str
+            :param columnOfReportFile: Column of the report file that contain the
+                metric of interest
+            :type columnOfReportFile: int
+            :param contactThresholdDistance: Distance at wich a ligand atom and a protein atom are
+                considered in contact(default 8)
+            :type contactThresholdDistance: float
+            :param symmetries: List of symmetric groups
+            :type symmetries: list
+            :param altSelection: Flag that controls wether to use the alternative structures (default 8)
+            :type altSelection: bool
+        """
         Clustering.__init__(self, resname, reportBaseFilename,
                            columnOfReportFile, contactThresholdDistance,
                             altSelection=altSelection)
@@ -841,28 +1086,44 @@ class ContactsClustering(Clustering):
         self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
         self.symmetries = state.get('symmetries', [])
         self.altSelection = state.get('altSelection', False)
-        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
         self.epoch = state.get('metricCol', -1)
         self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant())
+        if isinstance(self.symmetries, dict):
+            self.symmetries = [self.symmetries]
         self.clusteringEvaluator = state.get('clusteringEvaluator', ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(self.symmetries)))
 
 
 class ContactMapAccumulativeClustering(Clustering):
-    """ Cluster together all snapshots that have similar enough contactMaps.
-        This similarity can be calculated with different methods (see similariyEvaluator documentation)
-
-        thresholdCalculator [In] ThresholdCalculator object that calculate the threshold
-        similarityEvaluator [In] SimilarityEvaluator object that will determine wether two snapshots
-        are similar enough to belong to the same cluster
-        resname [In] String containing the three letter name of the ligan in the pdb
-        reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
-        columnOfReportFile [In] Column of the report file that contain the metric of interest
-        contactThresholdDistance [In] Distance at wich a ligand atom and a protein
-        atom are considered in contact(default 8)
-    """
     def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8, symmetries=[], altSelection=False):
+        """ Cluster together all snapshots that have similar enough contactMaps.
+            This similarity can be calculated with different methods (see similariyEvaluator documentation)
+
+            :param thresholdCalculator: ThresholdCalculator object that calculate the
+                threshold according to the contacts ratio
+            :type thresholdCalculator: :py:class:`.ThresholdCalculator`
+            :param similarityEvaluator: object that calculates the similarity
+                between two contact maps
+            :type similarityEvaluator: object
+            :param resname: String containing the three letter name of the ligand
+                in the pdb
+            :type resname: str
+            :param reportBaseFilename: Name of the file that contains the metrics of
+                the snapshots to cluster
+            :type reportBaseFilename: str
+            :param columnOfReportFile: Column of the report file that contain the
+                metric of interest
+            :type columnOfReportFile: int
+            :param contactThresholdDistance: Distance at wich a ligand atom and a protein atom are
+                considered in contact(default 8)
+            :type contactThresholdDistance: float
+            :param symmetries: List of symmetric groups
+            :type symmetries: list
+            :param altSelection: Flag that controls wether to use the alternative structures (default 8)
+            :type altSelection: bool
+        """
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance,
                             altSelection=altSelection)
@@ -899,7 +1160,7 @@ class ContactMapAccumulativeClustering(Clustering):
         self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
         self.symmetries = state.get('symmetries', [])
         self.altSelection = state.get('altSelection', False)
-        self.conformationNetwork = state.get('conformationNetwork', nx.DiGraph())
+        self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
         self.epoch = state.get('metricCol', -1)
         self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant(value=0.3))
         self.similarityEvaluator = state.get('similariyEvaluator', JaccardEvaluator())
@@ -914,8 +1175,10 @@ class SequentialLastSnapshotClustering(Clustering):
     """
     def cluster(self, paths):
         """
-            Cluster the snaptshots contained in the pahts folder
-            paths [In] List of folders with the snapshots
+            Cluster the snaptshots contained in the paths folder
+
+            :param paths: List of folders with the snapshots
+            :type paths: list
         """
         # Clean clusters at every step, so we only have the last snapshot of
         # each trajectory as clusters
@@ -939,6 +1202,19 @@ class SequentialLastSnapshotClustering(Clustering):
                 self.addSnapshotToCluster(snapshots[-1])
 
     def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
+        """
+            Cluster a snapshot using the leader algorithm
+
+            :param trajNum: Trajectory number
+            :type trajNum: int
+            :param snapshot: Snapshot to add
+            :type snapshot: str
+            :param metrics: Array with the metrics of the snapshot
+            :type metrics: numpy.Array
+            :param col: Column of the desired metrics
+            :type col: int
+            :returns: int -- Cluster to which the snapshot belongs
+        """
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname)
         contacts = pdb.countContacts(self.resname,
@@ -952,234 +1228,21 @@ class SequentialLastSnapshotClustering(Clustering):
         self.clusters.addCluster(cluster)
 
 
-class ContactMapClustering(Clustering):
-    def __init__(self, resname=None, reportBaseFilename=None,
-                 columnOfReportFile=None, contactThresholdDistance=8,
-                 symmetries=[]):
-        Clustering.__init__(self, resname, reportBaseFilename,
-                            columnOfReportFile, contactThresholdDistance)
-        self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAffinity
-        self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
-
-    def cluster(self, paths):
-        """Cluster the snapshots of the trajectories provided using the
-        affinity propagation algorithm and the contactMaps similarity.
-
-        A double clustering process is going on. First, all snapshots from an
-        epoch are clustered together, and then these clusters are clustered
-        together with the previous clusters, if any
-
-        Paths [in] list with the path to the trajectories to cluster"""
-        trajectories = getAllTrajectories(paths)
-
-        pdb_list, metrics, contactmaps, contacts = processSnapshots(trajectories, self.reportBaseFilename,
-                         self.col, self.contactThresholdDistance, self.resname, self.symmetryEvaluator)
-        preferences = map(np.sum,contactmaps)
-
-        preferences = float((min(preferences)-max(preferences))/2)
-        preferences = None
-        self.firstClusteringParams = clusteringResultsParameters(pdb_list=pdb_list,
-                                                            metrics=metrics,
-                                                            contactmaps=contactmaps,contacts=contacts)
-        self.secondClusteringParams = clusteringResultsParameters(contactmaps=[])
-        contactmapsArray = np.array(self.firstClusteringParams.contactmaps)
-        cluster_center_indices, indices = clusterContactMaps(contactmapsArray, preferences=preferences)
-
-        self.processClusterResults("first", cluster_center_indices, indices)
-        # print "Number of clusters after first clustering", len(self.firstClusteringParams.newClusters.clusters)
-        if len(self.clusters.clusters) > 0:
-            for clusterNum, cluster in enumerate(self.clusters.clusters):
-                self.secondClusteringParams.contactmaps.append(cluster.contactMap)
-                self.secondClusteringParams.ids.append("old:%d" % clusterNum)
-                self.secondClusteringParams.metrics.append(cluster.metrics)
-                self.secondClusteringParams.elements.append(cluster.elements)
-
-            preferences = float((min(self.secondClusteringParams.elements)-max(self.secondClusteringParams.elements))/2)
-            preferences = 0.5
-            # preferences = -np.array(self.secondClusteringParams.elements)
-            # prefereneces = None
-            secondcontactmapsArray = np.array(self.secondClusteringParams.contactmaps)
-            cluster_center_indices, indices = clusterContactMaps(secondcontactmapsArray, preferences=preferences)
-            self.processClusterResults("second", cluster_center_indices, indices)
-            # print "Number of clusters after second clustering", len(self.secondClusteringParams.newClusters.clusters)
-            self.clusters = self.secondClusteringParams.newClusters
-        else:
-            self.clusters = self.firstClusteringParams.newClusters
-
-    def processClusterResults(self, process, cluster_center_indices, indices):
-        """ Analyse the results obtained from the affinity propagation
-        algorithm.
-
-        Process [In] String to decide wether it is the results of the first or
-        second clustering
-        cluster_center_indices [In] Numpy array with the snapshots taht are
-        cluster centers
-        Indices [In] Numpy array with the cluster each snapshot belongs to"""
-        center_ind = 0
-        for index in cluster_center_indices:
-
-            cluster_members, = np.where(indices == center_ind)
-
-            if process == "first":
-                elements_in_cluster = cluster_members.size
-                metricsArray = np.array(self.firstClusteringParams.metrics)
-                best_metric_ind = cluster_members[metricsArray[cluster_members, self.col].argmin()]
-                best_metrics = self.firstClusteringParams.metrics[best_metric_ind]
-
-                cluster_index = selectRandomCenter(cluster_members,
-                                                   metricsArray[cluster_members, self.col])
-
-                contacts = self.firstClusteringParams.contacts[cluster_index]
-                numberOfLigandAtoms = self.firstClusteringParams.pdb_list[cluster_index].getNumberOfAtoms()
-                contactsPerAtom = float(contacts)/numberOfLigandAtoms
-
-                cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_index],
-                                  contactMap=self.firstClusteringParams.contactmaps[cluster_index],
-                                  contacts=contactsPerAtom, metrics=best_metrics, metricCol=self.col)
-
-                cluster.elements += elements_in_cluster-1
-                self.secondClusteringParams.ids.append('new:%d' % center_ind)
-                self.secondClusteringParams.contactmaps.append(cluster.contactMap)
-                self.secondClusteringParams.metrics.append(cluster.metrics)
-                self.secondClusteringParams.elements.append(cluster.elements)
-                self.firstClusteringParams.newClusters.addCluster(cluster)
-            else:
-                elementsArray = np.array(self.secondClusteringParams.elements)
-                metricsArray = np.array(self.secondClusteringParams.metrics)
-                elements_in_cluster = elementsArray[cluster_members].sum()
-                index = selectRandomCenter(cluster_members,
-                                           metricsArray[cluster_members, self.col])
-                cluster_index = int(self.secondClusteringParams.ids[index].split(":")[-1])
-                best_metric_ind = cluster_members[metricsArray[cluster_members, self.col].argmin()]
-                best_metrics = self.secondClusteringParams.metrics[best_metric_ind]
-                if index < len(self.firstClusteringParams.newClusters.clusters):
-                    cluster = self.firstClusteringParams.newClusters.clusters[cluster_index]
-                else:
-                    cluster = self.clusters.clusters[cluster_index]
-                cluster.metrics = best_metrics
-                cluster.elements += (elements_in_cluster-cluster.elements)
-                self.secondClusteringParams.newClusters.addCluster(cluster)
-
-            center_ind += 1
-
-
-class ContactMapAgglomerativeClustering(Clustering):
-    """nclusters[In] Number of the cluster to generate with the hierarchical clustering algorithm
-        resname [In] String containing the three letter name of the ligan in the pdb
-        reportBaseFilename [In] Name of the file that contains the metrics of the snapshots to cluster
-        columnOfReportFile [In] Column of the report file that contain the metric of interest
-        contactThresholdDistance [In] Distance at wich a ligand atom and a protein atom are
-        considered in contact(default 8)
-    """
-    def __init__(self, nclusters, resname=None, reportBaseFilename=None,
-                 columnOfReportFile=None, contactThresholdDistance=8,
-                 symmetries=[]):
-        Clustering.__init__(self, resname, reportBaseFilename,
-                            columnOfReportFile, contactThresholdDistance)
-        self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAgglomerative
-        self.nclusters = nclusters
-        self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
-
-    def cluster(self, paths):
-        """Clusters the snapshots of the trajectories provided using
-         a hierarchical clustering algorithm and the contactMaps similarity.
-
-        The snapshots are clustered together with the previous found clusters.
-        If and old cluster is found connected to a new one (with the new one
-        being the exemplar) it is ignored and only the new snapshots are
-        counted as members of the cluster. The minimum metric is used as the
-        metric of the cluster"""
-        trajectories = getAllTrajectories(paths)
-
-        pdb_list, metrics, contactmaps, contacts = processSnapshots(trajectories, self.reportBaseFilename,
-                         self.col, self.contactThresholdDistance, self.resname, self.symmetryEvaluator)
-
-
-        self.firstClusteringParams = clusteringResultsParameters(pdb_list=pdb_list,
-                                     metrics=metrics, contactmaps=contactmaps, contacts=contacts)
-        self.secondClusteringParams = clusteringResultsParameters(contactmaps=[])
-        clusters, labels = clusterAgglomerativeContactMaps(np.array(contactmaps), self.nclusters)
-        self.processClusterResults("first", clusters, labels)
-
-        if len(self.clusters.clusters) > 0:
-            for clusterNum, cluster in enumerate(self.clusters.clusters):
-                self.secondClusteringParams.contactmaps.append(cluster.contactMap)
-                self.secondClusteringParams.ids.append("old:%d" % clusterNum)
-                self.secondClusteringParams.metrics.append(cluster.metrics)
-                self.secondClusteringParams.elements.append(cluster.elements)
-
-            new_contactmaps = np.array(self.secondClusteringParams.contactmaps)
-            clusters, labels = clusterAgglomerativeContactMaps(new_contactmaps,
-                                                               self.nclusters)
-            self.processClusterResults("second", clusters, labels)
-            self.clusters = self.secondClusteringParams.newClusters
-        else:
-            self.clusters = self.firstClusteringParams.newClusters
-
-    def processClusterResults(self, process, clusters, labels):
-        """ Analyse the results obtained from the affinity propagation
-        algorithm.
-
-        Process [In] String to decide wether it is the results of the first or
-        second clustering
-        clusters [In] Numpy array with the indexes the clusters
-        Labels [In] Numpy array with the cluster each snapshot belongs to"""
-        for index in clusters:
-            cluster_members, = np.where(labels == index)
-
-            if process == "first":
-                elements_in_cluster = cluster_members.size
-                # contactmapsArray = np.array(self.firstClusteringParams.contactmaps)
-                # cluster_index = clusterKmeans(contactmapsArray[cluster_members],1)
-                # Instead of using Kmeans to obtain a "center" or representative
-                # cluster, select one of the members randomly
-                metricsArray = np.array(self.firstClusteringParams.metrics)
-                best_metric_ind = cluster_members[metricsArray[cluster_members, self.col].argmin()]
-                best_metrics = self.firstClusteringParams.metrics[best_metric_ind]
-
-                cluster_center = selectRandomCenter(cluster_members,
-                                                    metricsArray[cluster_members, self.col])
-                # cluster = Cluster(self.firstClusteringParams.pdb_list[best_metric_ind],
-                #                   contactMap=self.firstClusteringParams.contactmaps[best_metric_ind], metric=best_metric)
-
-                contacts = self.firstClusteringParams.contacts[cluster_center]
-                numberOfLigandAtoms = self.firstClusteringParams.pdb_list[cluster_center].getNumberOfAtoms()
-                contactsPerAtom = float(contacts)/numberOfLigandAtoms
-
-                cluster = Cluster(self.firstClusteringParams.pdb_list[cluster_center],
-                                  contactMap=self.firstClusteringParams.contactmaps[cluster_center],
-                                  contacts=contactsPerAtom, metrics=best_metrics, metricCol=self.col)
-
-                cluster.elements += elements_in_cluster-1
-                self.secondClusteringParams.ids.append('new:%d' % index)
-                self.secondClusteringParams.contactmaps.append(cluster.contactMap)
-                self.secondClusteringParams.metrics.append(cluster.metrics)
-                self.secondClusteringParams.elements.append(cluster.elements)
-                self.firstClusteringParams.newClusters.addCluster(cluster)
-            else:
-                elementsArray = np.array(self.secondClusteringParams.elements)
-                metricsArray = np.array(self.secondClusteringParams.metrics)
-                elements_in_cluster = elementsArray[cluster_members].sum()
-                best_metric_ind = cluster_members[metricsArray[cluster_members, self.col].argmin()]
-                best_metrics = self.secondClusteringParams.metrics[best_metric_ind]
-                # contactmapsArray = np.array(self.firstClusteringParams.contactmaps)
-                # cluster_index = clusterKmeans(contactmapsArray[cluster_members],1)
-                # Instead of using Kmeans to obtain a "center" or representative
-                # cluster, select one of the members randomly
-                cluster_center = selectRandomCenter(cluster_members,
-                                                    metricsArray[cluster_members, self.col])
-                cluster_index = int(self.secondClusteringParams.ids[cluster_center].split(":")[-1])
-                if cluster_center < self.nclusters:
-                    cluster = self.firstClusteringParams.newClusters.clusters[cluster_index]
-                else:
-                    cluster = self.clusters.clusters[cluster_index]
-                cluster.metrics = best_metrics
-                cluster.elements += (elements_in_cluster-cluster.elements)
-                self.secondClusteringParams.newClusters.addCluster(cluster)
-
-
 class ClusteringBuilder:
     def buildClustering(self, clusteringBlock, reportBaseFilename=None, columnOfReportFile=None):
+        """
+            Builder to create the appropiate clustering object
+
+            :param clusteringBlock: Parameters of the clustering process
+            :type clusteringBlock: dict
+            :param reportBaseFilename: Name of the file that contains the metrics of
+                the snapshots to cluster
+            :type reportBaseFilename: str
+            :param columnOfReportFile: Column of the report file that contain the
+                metric of interest
+            :type columnOfReportFile: int
+            :returns: object -- Clustering object selected
+        """
         paramsBlock = clusteringBlock[blockNames.ClusteringTypes.params]
         try:
             resname = str(paramsBlock[blockNames.ClusteringTypes.ligandResname].upper())
@@ -1203,16 +1266,6 @@ class ClusteringBuilder:
             return SequentialLastSnapshotClustering(resname, reportBaseFilename,
                                                     columnOfReportFile,
                                                     contactThresholdDistance)
-        elif clusteringType == blockNames.ClusteringTypes.contactMapAffinity:
-            return ContactMapClustering(resname, reportBaseFilename,
-                                        columnOfReportFile,
-                                        contactThresholdDistance)
-        elif clusteringType == blockNames.ClusteringTypes.contactMapAgglomerative:
-            nclusters = paramsBlock[blockNames.ClusteringTypes.nclusters]
-            return ContactMapAgglomerativeClustering(nclusters, resname,
-                                                     reportBaseFilename,
-                                                     columnOfReportFile,
-                                                     contactThresholdDistance)
         elif clusteringType == blockNames.ClusteringTypes.contactMapAccumulative:
             symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries,[])
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
@@ -1231,22 +1284,15 @@ class ClusteringBuilder:
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))
 
 
-class clusteringResultsParameters:
-    """
-        Helper object to pass parameters in the ContactMap affinity and agglomerative clustering
-    """
-    def __init__(self, pdb_list=[], metrics=[], contactmaps=[], contacts=[]):
-            self.pdb_list = pdb_list
-            self.metrics = metrics
-            self.contactmaps = contactmaps
-            self.elements = []
-            self.ids = []
-            self.newClusters = Clusters()
-            self.contacts = contacts
-
-
 class similarityEvaluatorBuilder:
     def build(self, similarityEvaluatorType):
+        """
+            Builder to create the appropiate similarityEvaluator
+
+            :param similarityEvaluatorType: Type of similarityEvaluator chosen
+            :type similarityEvaluatorType: str
+            :returns: object -- SimilarityEvaluator object selected
+        """
         if similarityEvaluatorType == blockNames.ClusteringTypes.differenceDistance:
             return differenceDistanceEvaluator()
         elif similarityEvaluatorType == blockNames.ClusteringTypes.Jaccard:
@@ -1267,6 +1313,14 @@ class differenceDistanceEvaluator:
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
+
+            :param contactMap: contactMap of the structure to compare
+            :type contactMap: numpy.Array
+            :param contactMap: contactMap of the structure to compare
+            :type contactMap: numpy.Array
+            :param symContactMapEvaluator: Contact Map symmetry evaluator object
+            :type symContactMapEvaluator: :py:class:`.SymmetryContactMapEvaluator`
+            :returns: float -- distance between contact maps
         """
         return symContactMapEvaluator.evaluateDifferenceDistance(contactMap, clusterContactMap)
 
@@ -1281,6 +1335,14 @@ class JaccardEvaluator:
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
+
+            :param contactMap: contactMap of the structure to compare
+            :type contactMap: numpy.Array
+            :param contactMap: contactMap of the structure to compare
+            :type contactMap: numpy.Array
+            :param symContactMapEvaluator: Contact Map symmetry evaluator object
+            :type symContactMapEvaluator: :py:class:`.SymmetryContactMapEvaluator`
+            :returns: float -- distance between contact maps
         """
         return symContactMapEvaluator.evaluateJaccard(contactMap, clusterContactMap)
 
@@ -1294,54 +1356,16 @@ class correlationEvaluator:
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
             False otherwise
+
+            :param contactMap: contactMap of the structure to compare
+            :type contactMap: numpy.Array
+            :param contactMap: contactMap of the structure to compare
+            :type contactMap: numpy.Array
+            :param symContactMapEvaluator: Contact Map symmetry evaluator object
+            :type symContactMapEvaluator: :py:class:`.SymmetryContactMapEvaluator`
+            :returns: float -- distance between contact maps
         """
         return symContactMapEvaluator.evaluateCorrelation(contactMap, clusterContactMap)
-
-
-# TODO: should it be a class method?
-def clusterContactMaps(contactmaps, preferences=None):
-    """
-        Cluster multiple contact maps with the affinity propagation algorithm
-        contactmaps [In] Array of contact maps
-        preferences [In] Input value to the affinity propagation algorithm, it
-        affects the number of clusters that will be generated
-    """
-    contactmaps = contactmaps.reshape((contactmaps.shape[0], -1))
-    affinitypropagation = AffinityPropagation(damping=0.9,
-                                              preference=preferences,
-                                              verbose=False).fit(contactmaps)
-    cluster_center_indices = affinitypropagation.cluster_centers_indices_
-    labels = affinitypropagation.labels_
-    return cluster_center_indices, np.array(labels)
-
-
-def clusterAgglomerativeContactMaps(contactmaps, n_clusters):
-    """
-        Cluster multiple contact maps with the hierarchical clustering algorithm
-        contactmaps [In] Array of contact maps
-        n_clusters [In] Number of clusters that the clustering should generate
-    """
-    contactmaps = contactmaps.reshape((contactmaps.shape[0], -1))
-    agglomerative = AgglomerativeClustering(n_clusters=n_clusters,
-                                            linkage='complete').fit(contactmaps)
-    labels = agglomerative.labels_
-    clusters = np.unique(labels)
-    return clusters, labels
-
-
-def clusterKmeans(contactmaps, n_clusters):
-    """
-        Cluster  multiple contact maps with the kmeans clustering algorithm
-        contactmaps [In] Array of contact maps
-        n_clusters [In] Number of clusters that the clustering should generate
-    """
-    contactmaps = contactmaps.reshape((contactmaps.shape[0], -1))
-    kmeans = KMeans(n_clusters=n_clusters).fit(contactmaps)
-    center = kmeans.cluster_centers_[0]
-    contactmaps -= center
-    distances = contactmaps.sum(axis=1)
-    cluster_center = abs(distances).argmin()
-    return cluster_center
 
 
 def getAllTrajectories(paths):
@@ -1358,52 +1382,3 @@ def getAllTrajectories(paths):
     # sort the files obtained by glob by name, so that the results will be the
     # same on all computers
     return sorted(files)
-
-
-def selectRandomCenter(cluster_members, metrics_weights):
-    """
-        Extract a center randomly from a cluster, weighted according to their
-        metrics
-    """
-    metrics_weights -= metrics_weights.max()
-    if abs(metrics_weights.sum()) < 1e-8:
-        metrics_weights = None
-    else:
-        T = 500
-        kbT = 0.001987*T
-        metrics_weights = np.exp(-metrics_weights/kbT)
-        metrics_weights /= metrics_weights.sum()
-    cluster_index = np.random.choice(cluster_members,
-                                     p=metrics_weights)
-    return cluster_index
-
-
-def processSnapshots(trajectories, reportBaseFilename, col,
-                     contactThresholdDistance, resname, symmetryEvaluator):
-    """
-        Create list of pdb, contactMaps, metrics and contacts from a series of
-        snapshots
-    """
-    pdb_list = []
-    metrics = []
-    contactmaps = []
-    contacts = []
-    for trajectory in trajectories:
-        trajNum = utilities.getTrajNum(trajectory)
-        snapshots = utilities.getSnapshots(trajectory, True)
-        if reportBaseFilename:
-            reportFilename = os.path.join(os.path.split(trajectory)[0],
-                                          reportBaseFilename % trajNum)
-            metricstraj = np.loadtxt(reportFilename, ndmin=2)
-        else:
-            metricstraj = np.zeros(len(snapshots))
-        # Prepare data for clustering
-        metrics.extend(metricstraj.tolist())
-        for num, snapshot in enumerate(snapshots):
-            pdb = atomset.PDB()
-            pdb.initialise(snapshot, resname=str(resname))
-            pdb_list.append(pdb)
-            contactMap, contactnum = symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
-            contactmaps.append(contactMap)
-            contacts.append(contactnum)
-    return pdb_list, metrics, contactmaps, contacts

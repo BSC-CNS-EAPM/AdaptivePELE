@@ -5,11 +5,26 @@ import sys
 import argparse
 from scipy.ndimage import filters
 from pyemma.coordinates.clustering import AssignCenters
+import itertools
+
+"""
+    Script that computes the absolute binding free energy of an MSM.
+    It needs:
+        1) Trajectory wildcard in order to compute cluster volume
+        2) A discretized/clusterCenters.dat file with the cluster center
+        3) A MSM_object.pkl obtained with pyemma in order to obtain the stationary distribution
+        4) For the moment, it needs of a reweightingT, in order to do a histogram reweighting, but does not seem to work that well
+"""
 
 def assignNewTrajecories(trajs, clusterCenters):
     assign = AssignCenters(clusterCenters)
     dTrajs = assign.assign(trajs)
     return dTrajs
+
+def expandTrajs(trajList):
+    d = 0.5
+    combinations = np.array([[0,1,0], [1,0,0], [0,0,1], [0,-1,0], [-1,0,0], [0,0,-1]])
+    return list(trajList+combinations*d)
 
 def parseArgs():
     parser = argparse.ArgumentParser(description="Script that computes delta G")
@@ -67,6 +82,7 @@ def main(trajWildcard, reweightingT=1000):
 
     MSMObject = helper.loadMSM('MSM_object.pkl')
     pi = MSMObject.stationary_distribution
+    np.savetxt("stationaryDist_small.dat", pi)
 
 
     r = allClusters[MSMObject.connected_sets[0]]
@@ -84,8 +100,14 @@ def main(trajWildcard, reweightingT=1000):
 
     originalCoordinates = []
     for i, originalFilename in enumerate(originalFilenames):
-        trajOriginalCoordinates = np.loadtxt(originalFilename, usecols=(1,2,3))
-        originalCoordinates.append(trajOriginalCoordinates)
+        trajOriginalCoordinates = list(np.loadtxt(originalFilename, usecols=(1,2,3)))
+        if np.random.random() < 0.0:
+            # Add artificial neighbours to improve volume estimation, set
+            # randomly since its very slow
+            sys.stderr.write("Introducing artificial neighbours\n")
+            newCoords = map(expandTrajs, trajOriginalCoordinates)
+            trajOriginalCoordinates.extend(list(itertools.chain.from_iterable(newCoords)))
+        originalCoordinates.append(np.array(trajOriginalCoordinates))
 
     maxval = 3*[-np.inf]
     minval = 3*[np.inf]
@@ -108,7 +130,6 @@ def main(trajWildcard, reweightingT=1000):
                         np.ceil(maxval[i]),
             d) for i in range(3)]
     """
-
 
     numberOfClusters = r.shape[0]
     histogram = np.array([])
@@ -145,25 +166,39 @@ def main(trajWildcard, reweightingT=1000):
         histograms.append(current_hist)
 
         #filtered_hist = filters.gaussian_filter(current_hist, sigma=1)
-        if current_hist.sum() == 0: 
-            filtered_hist = np.zeros(current_hist.shape)
-        else:
-            filtered_hist = current_hist/current_hist.sum()
+        #if current_hist.sum() == 0:
+        #    filtered_hist = np.zeros(current_hist.shape)
+        #else:
+        #    filtered_hist = current_hist/current_hist.sum()
 
-        nonZeroIndices = np.argwhere(filtered_hist > 0)
-
-        # microstateVolume[i] = len(nonZeroIndices) * d**3
+        #nonZeroIndices = np.argwhere(filtered_hist > 0)
+        #microstateVolume[i] = len(nonZeroIndices) * d**3
 
         if histogram.size == 0:
-            histogramFreq = pi[i]*filtered_hist
+            #histogramFreq = pi[i]*filtered_hist
             histogram = np.copy(current_hist)
         else:
-            histogramFreq += pi[i]*filtered_hist
+            #histogramFreq += pi[i]*filtered_hist
             histogram += current_hist
 
-
+    nRows, nCols, nDepth = histogram.shape
     for i in range(numberOfClusters):
         histogramCluster = histograms[i]
+        # Add "pseudocounts" to try to fill the holes that lead to volume
+        # underestimation compared to Matlab script for free energies
+        # histogramTotal = histogram.copy()
+        # for x, y, z in zip(*np.where(histogramCluster)):
+        #     upBound = max(x-1, 0)
+        #     lowBound = min(x+2, nRows)
+        #     leftBound = max(0, y-1)
+        #     rightBound = min(y+2, nCols)
+        #     topBound = max(z-1, 0)
+        #     botBound = min(z+2, nDepth)
+        #     signsCluster = np.sign(histogramCluster[upBound:lowBound, leftBound:rightBound, topBound:botBound])
+        #     signs = np.sign(histogramTotal[upBound:lowBound, leftBound:rightBound, topBound:botBound])
+        #     histogramCluster[upBound:lowBound, leftBound:rightBound, topBound:botBound] += (1-signsCluster)*d/8  # + signsCluster*d/2
+        #     histogramTotal[upBound:lowBound, leftBound:rightBound, topBound:botBound] += (1-signsCluster)  # + signs * d/2
+        # histogramTotal = histogramTotal[histogramCluster > 0]
         histogramTotal = histogram[histogramCluster > 0]
         histogramCluster = histogramCluster[histogramCluster > 0]
         microstateVolume[i] = (histogramCluster/histogramTotal).sum() * d**3
@@ -171,19 +206,22 @@ def main(trajWildcard, reweightingT=1000):
 
     np.savetxt("volumeOfClusters.dat", microstateVolume)
 
-    microstateVolume = np.loadtxt("volumeOfClusters.dat")
+    # microstateVolume = np.loadtxt("volumeOfClusters.dat")
 
-    Torig = 1000
-    Tnew = reweightingT
-    newProb = reweightProbabilities(Tnew, Torig, pi)
-    print Torig, Tnew
-    print "normalization", np.sum(newProb)
+    #Torig = 1000
+    #Tnew = reweightingT
+    #newProb = reweightProbabilities(Tnew, Torig, pi)
+    #print Torig, Tnew
+    #print "normalization", np.sum(newProb)
+    newProb = pi
 
 
     kb = 0.0019872041
     T = 300
     beta = 1 / (kb * T)
     gpmf = -kb*T*np.log(newProb/microstateVolume)
+    print gpmf[gpmf == -np.inf]
+    print gpmf[gpmf == np.inf]
     gpmf[gpmf == -np.inf] = np.inf #to avoid contribution later
     gpmf -= gpmf.min()
 
@@ -196,7 +234,7 @@ def main(trajWildcard, reweightingT=1000):
         bindingVolume = 0
         for g, volume in zip(gpmf, microstateVolume):
             if g <= upperGpmfValue:
-                bindingVolume += np.exp(-beta * g) * volume 
+                bindingVolume += np.exp(-beta * g) * volume
         deltaG = deltaW - kb*T*np.log(bindingVolume/1661)
         string = "%.1f\t%.3f\t%.3f\t%.3f\t%.3f" % (upperGpmfValue, deltaG, deltaW, bindingVolume, -kb*T*np.log(bindingVolume/1661))
         print string
