@@ -22,7 +22,7 @@ for i, folder in enumerate(sortedFolders[initialEpoch:]):
     os.chdir(folder)
     parameters = estimateDG.Parameters(ntrajs=50*(epoch+1),
                             length=None,
-                            lagtime=400,
+                            lagtime=25,
                             lagtimes=[1, 10, 25, 50, 100, 200, 400, 800],
                             nclusters=100,
                             nruns=10,

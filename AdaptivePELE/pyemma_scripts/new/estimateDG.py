@@ -106,7 +106,7 @@ def _cleanupFiles(trajWildcard):
     _rmFiles("clustering_object.pkl")
     _rmFiles("MSM_object.pkl")
     _rmFiles("discretized/traj_*")
-    _rmFiles("discretized/clusterCenter*")
+    #_rmFiles("discretized/clusterCenter*")
     _rmFiles(trajWildcard)
 
 def _setVariablesForFirstIteration(useAllTrajInFirstRun, i, ntrajs):

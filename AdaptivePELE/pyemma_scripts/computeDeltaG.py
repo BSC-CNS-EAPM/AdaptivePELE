@@ -5,6 +5,7 @@ import sys
 import argparse
 from scipy.ndimage import filters
 from pyemma.coordinates.clustering import AssignCenters
+import itertools
 
 """
     Script that computes the absolute binding free energy of an MSM.
@@ -19,6 +20,11 @@ def assignNewTrajecories(trajs, clusterCenters):
     assign = AssignCenters(clusterCenters)
     dTrajs = assign.assign(trajs)
     return dTrajs
+
+def expandTrajs(trajList):
+    d = 0.5
+    combinations = np.array([[0,1,0], [1,0,0], [0,0,1], [0,-1,0], [-1,0,0], [0,0,-1]])
+    return list(trajList+combinations*d)
 
 def parseArgs():
     parser = argparse.ArgumentParser(description="Script that computes delta G")
@@ -94,8 +100,14 @@ def main(trajWildcard, reweightingT=1000):
 
     originalCoordinates = []
     for i, originalFilename in enumerate(originalFilenames):
-        trajOriginalCoordinates = np.loadtxt(originalFilename, usecols=(1,2,3))
-        originalCoordinates.append(trajOriginalCoordinates)
+        trajOriginalCoordinates = list(np.loadtxt(originalFilename, usecols=(1,2,3)))
+        if np.random.random() < 0.0:
+            # Add artificial neighbours to improve volume estimation, set
+            # randomly since its very slow
+            sys.stderr.write("Introducing artificial neighbours\n")
+            newCoords = map(expandTrajs, trajOriginalCoordinates)
+            trajOriginalCoordinates.extend(list(itertools.chain.from_iterable(newCoords)))
+        originalCoordinates.append(np.array(trajOriginalCoordinates))
 
     maxval = 3*[-np.inf]
     minval = 3*[np.inf]
@@ -118,7 +130,6 @@ def main(trajWildcard, reweightingT=1000):
                         np.ceil(maxval[i]),
             d) for i in range(3)]
     """
-
 
     numberOfClusters = r.shape[0]
     histogram = np.array([])
@@ -173,18 +184,22 @@ def main(trajWildcard, reweightingT=1000):
     nRows, nCols, nDepth = histogram.shape
     for i in range(numberOfClusters):
         histogramCluster = histograms[i]
-        histogramTotal = histogram.copy()
-        for x, y, z in zip(*np.where(histogramCluster)):
-            upBound = max(x-1, 0)
-            lowBound = min(x+2, nRows)
-            leftBound = max(0, y-1)
-            rightBound = min(y+2, nCols)
-            topBound = max(z-1, 0)
-            botBound = min(z+2, nDepth)
-            histogramCluster[upBound:lowBound, leftBound:rightBound, topBound:botBound] += 1
-            histogramTotal[upBound:lowBound, leftBound:rightBound, topBound:botBound] += 1
-        histogramTotal = histogramTotal[histogramCluster > 0]
-        # histogramTotal = histogram[histogramCluster > 0]
+        # Add "pseudocounts" to try to fill the holes that lead to volume
+        # underestimation compared to Matlab script for free energies
+        # histogramTotal = histogram.copy()
+        # for x, y, z in zip(*np.where(histogramCluster)):
+        #     upBound = max(x-1, 0)
+        #     lowBound = min(x+2, nRows)
+        #     leftBound = max(0, y-1)
+        #     rightBound = min(y+2, nCols)
+        #     topBound = max(z-1, 0)
+        #     botBound = min(z+2, nDepth)
+        #     signsCluster = np.sign(histogramCluster[upBound:lowBound, leftBound:rightBound, topBound:botBound])
+        #     signs = np.sign(histogramTotal[upBound:lowBound, leftBound:rightBound, topBound:botBound])
+        #     histogramCluster[upBound:lowBound, leftBound:rightBound, topBound:botBound] += (1-signsCluster)*d/8  # + signsCluster*d/2
+        #     histogramTotal[upBound:lowBound, leftBound:rightBound, topBound:botBound] += (1-signsCluster)  # + signs * d/2
+        # histogramTotal = histogramTotal[histogramCluster > 0]
+        histogramTotal = histogram[histogramCluster > 0]
         histogramCluster = histogramCluster[histogramCluster > 0]
         microstateVolume[i] = (histogramCluster/histogramTotal).sum() * d**3
 
