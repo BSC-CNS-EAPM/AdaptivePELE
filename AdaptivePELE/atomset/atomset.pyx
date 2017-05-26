@@ -209,13 +209,6 @@ cdef class PDB:
     _typeAll = "ALL"
     _typeCM = "CM"
 
-    # CMAtoms = {"ALA": "CB", "VAL": "CG1", "LEU": "CG", "ILE": "CD1",
-    #         "MET": "CE", "PRO": "CG", "PHE": "CZ", "TYR": "OH",
-    #         "TRP": "CH2", "SER": "OG", "THR": "CG2", "CYS": "SG",
-    #         "ASN": "ND2", "GLN": "NE2", "LYS": "NZ", "HIS": "CE1",
-    #         "HIE": "CE1", "HID": "CE1", "HIP": "CE1", "ARG": "NE",
-    #         "ASP": "OD1", "GLU": "OE1", "GLY": "empty"}
-    # CMAtoms = {x: "empty" for x in CMAtoms}
     #Atoms to be used in the contact map
     CMAtoms = {"ALA": "empty", "VAL": "empty", "LEU": "empty", "ILE": "empty",
                "MET": "empty", "PRO": "empty", "PHE": "CZ", "TYR": "OH",
@@ -274,7 +267,7 @@ cdef class PDB:
         self.totalMass = state['totalMass']
         self.pdb = state['pdb']
 
-    def initialise(self, str PDBstr, bint heavyAtoms=True, str resname="", str atomname="", str type="ALL"):
+    def initialise(self, str PDBstr, bint heavyAtoms=True, str resname="", str atomname="", str type="ALL", str chain="", str resnum =""):
         """
             Load the information from a PDB file or a string with the PDB
             contents
@@ -285,8 +278,8 @@ cdef class PDB:
             :type heavyAtoms: bool
             :param resname: Residue name to select from the pdb (will only select the residues with that name)
             :type resname: str
-            :param resname: Residue name to select from the pdb (will only select the residues with that name)
-            :type resname: str
+            :param atomname: Residue name to select from the pdb (will only select the atoms with that name)
+            :type atomname: str
             :param type: type of atoms to select: may be ALL, PROTEIN or HETERO
             :type type: str
             :raises: ValueError if the pdb contained no atoms
@@ -302,8 +295,7 @@ cdef class PDB:
         self.pdb = PDBContent.read()  # in case one wants to write it
 
         stringWithPDBContent = self.pdb.split('\n')
-        for atomLineNum in range(len(stringWithPDBContent)):
-            atomLine = stringWithPDBContent[atomLineNum]
+        for atomLine in stringWithPDBContent:
             if not atomLine.startswith("ATOM") and not atomLine.startswith("HETATM"):
                 continue
             if type == self._typeCM:
@@ -316,10 +308,12 @@ cdef class PDB:
             else:
                 # HUGE optimisation (not to create an atom each time ~ 2e-5 s/atom)
                 if resname != "" and not atomLine[17:20].strip() == resname:
-                    # optimisation
                     continue
                 if atomname != "" and not atomLine[12:16].strip() == atomname:
-                    # optimisation
+                    continue
+                if chain != "" and not atomLine[21:22].strip() == chain:
+                    continue
+                if resnum != "" and not atomLine[22:26].strip() == resnum:
                     continue
 
             atom = Atom(atomLine)
