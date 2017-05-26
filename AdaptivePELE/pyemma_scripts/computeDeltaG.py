@@ -182,24 +182,27 @@ def main(trajWildcard, reweightingT=1000):
             histogram += current_hist
 
     nRows, nCols, nDepth = histogram.shape
+    pseudo = False
     for i in range(numberOfClusters):
         histogramCluster = histograms[i]
-        # Add "pseudocounts" to try to fill the holes that lead to volume
-        # underestimation compared to Matlab script for free energies
-        # histogramTotal = histogram.copy()
-        # for x, y, z in zip(*np.where(histogramCluster)):
-        #     upBound = max(x-1, 0)
-        #     lowBound = min(x+2, nRows)
-        #     leftBound = max(0, y-1)
-        #     rightBound = min(y+2, nCols)
-        #     topBound = max(z-1, 0)
-        #     botBound = min(z+2, nDepth)
-        #     signsCluster = np.sign(histogramCluster[upBound:lowBound, leftBound:rightBound, topBound:botBound])
-        #     signs = np.sign(histogramTotal[upBound:lowBound, leftBound:rightBound, topBound:botBound])
-        #     histogramCluster[upBound:lowBound, leftBound:rightBound, topBound:botBound] += (1-signsCluster)*d/8  # + signsCluster*d/2
-        #     histogramTotal[upBound:lowBound, leftBound:rightBound, topBound:botBound] += (1-signsCluster)  # + signs * d/2
-        # histogramTotal = histogramTotal[histogramCluster > 0]
-        histogramTotal = histogram[histogramCluster > 0]
+        if pseudo:
+            # Add "pseudocounts" to try to fill the holes that lead to volume
+            # underestimation compared to Matlab script for free energies
+            histogramTotal = histogram.copy()
+            for x, y, z in zip(*np.where(histogramCluster)):
+                upBound = max(x-1, 0)
+                lowBound = min(x+2, nRows)
+                leftBound = max(0, y-1)
+                rightBound = min(y+2, nCols)
+                topBound = max(z-1, 0)
+                botBound = min(z+2, nDepth)
+                signsCluster = np.sign(histogramCluster[upBound:lowBound, leftBound:rightBound, topBound:botBound])
+                signs = np.sign(histogramTotal[upBound:lowBound, leftBound:rightBound, topBound:botBound])
+                histogramCluster[upBound:lowBound, leftBound:rightBound, topBound:botBound] += (1-signsCluster)*d/8  # + signsCluster*d/2
+                histogramTotal[upBound:lowBound, leftBound:rightBound, topBound:botBound] += (1-signsCluster)  # + signs * d/2
+            histogramTotal = histogramTotal[histogramCluster > 0]
+        else:
+            histogramTotal = histogram[histogramCluster > 0]
         histogramCluster = histogramCluster[histogramCluster > 0]
         microstateVolume[i] = (histogramCluster/histogramTotal).sum() * d**3
 

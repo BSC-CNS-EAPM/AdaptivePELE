@@ -106,7 +106,7 @@ def _cleanupFiles(trajWildcard):
     _rmFiles("clustering_object.pkl")
     _rmFiles("MSM_object.pkl")
     _rmFiles("discretized/traj_*")
-    #_rmFiles("discretized/clusterCenter*")
+    _rmFiles("discretized/clusterCenter*")
     _rmFiles(trajWildcard)
 
 def _setVariablesForFirstIteration(useAllTrajInFirstRun, i, ntrajs):
@@ -199,12 +199,12 @@ def estimateDG(parameters):
 if __name__ == "__main__":
     parameters = Parameters(ntrajs=None,
                             length=None,
-                            lagtime=400,
-                            nclusters=100,
+                            lagtime=25,
+                            nclusters=50,
                             nruns=10,
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,
                             trajWildcard="traj_*",
-                            folderWithTraj="MSM_0/rawData",
+                            folderWithTraj="rawData",
                             lagtimes=[1,10,25,50,100,250,500,1000])
     estimateDG(parameters)
