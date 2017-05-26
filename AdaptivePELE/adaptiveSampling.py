@@ -7,6 +7,7 @@ import time
 import glob
 import argparse
 import networkx as nx
+import atexit
 from AdaptivePELE.constants import blockNames, constants
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.utilities import utilities
@@ -29,6 +30,12 @@ def parseArgs():
 def expandInitialStructuresWildcard(initialStructuresWildcard):
     """
         Returns the initial structures after expanding the initial structures wildcard
+
+        :param initialStructureWildcard: Wildcard that matches the initial structures
+        :type initialStructureWildcard: str
+
+        :return totalInitialStructures: The expanded initial structures
+        :rtype: list of str
     """
     totalInitialStructures = []
     for initialStructureWildcard in initialStructuresWildcard:
@@ -38,11 +45,17 @@ def expandInitialStructuresWildcard(initialStructuresWildcard):
 
 
 def checkSymmetryDict(clusteringBlock, initialStructures, resname):
-    """ Check if the symmetries dictionary is valid for the system
+    """
+        Check if the symmetries dictionary is valid for the ligand
 
-        clusteringBlock [In] Block with the clustering-related parameters
-        initialStructures [In] List of the initial structures
-        resname [In] Residue name of the ligand in the system pdb
+        :param clusteringBlock: JSON block with the clustering-related parameters
+        :type clusteringBlock: json
+        :param initialStructures: List with initial structures
+        :type initialStructures: list
+        :param resname: Residue name of the ligand in the system pdb
+        :type resname: str
+
+        :raise AssertionError: If atoms are not found in the structure
      """
     symmetries = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.symmetries, {})
     for structure in initialStructures:
@@ -53,17 +66,23 @@ def checkSymmetryDict(clusteringBlock, initialStructures, resname):
 
 def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries):
     """
-        Correct the RMSD for symmetries in the reports. New reports are stored
-        in the fixedReport_i where i is the number of the report
+        Adds a new column in the report file with the RMSD that takes into account symmetries.
+        New reports are stored in the fixedReport_i where i is the number of the report
 
-        outputPath [In] Path where to find the trajectories
-        resname [In] Residue name of the ligand in the pdb
-        nativeStructure [In] Path to the native structure pdb
-        symmetries [In] Dictionary containg the symmetries of the ligand
+        :param outputPath: Path where trajectories are found
+        :type outputPath: str
+        :param resname: Residue name of the ligand in the pdb
+        :type resname: str
+        :param nativeStructure: Path to the native structure pdb
+        :type nativeStructure: str
+        :param symmetries: Dictionary containg the symmetries of the ligand
+        :type symmetries: dict
+
+        :raise IndexError: If original report file not found in output folder
     """
-    outputFilename = "fixedReport_%d"
-    trajName = "*traj*.pdb"
-    reportName = "*report_%d"
+    outputFilename = "fixedReport_%d" #move to constants?
+    trajName = "*traj*.pdb" #move to constants?
+    reportName = "*report_%d" #move to constants?
     trajs = glob.glob(os.path.join(outputPath, trajName))
     nativePDB = atomset.PDB()
     nativePDB.initialise(str(nativeStructure), resname=resname)
@@ -85,12 +104,14 @@ def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries):
 
 def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, iteration):
     """
-       Copy the initial structures from a certain iteration
+        Copies the initial structures from a certain iteration
 
-       initialStructures [In] Name of the initial structures to copy
-       tmpInitialStructuresTemplate [In] Template with the name of the initial
-       strutctures
-       iteration [In] Number of epoch
+        :param initialStructures: Name of the initial structures to copy
+        :type initialStructures: list of str
+        :param tmpInitialStructuresTemplate: Template with the name of the initial strutctures
+        :type tmpInitialStructuresTemplate: str
+        :param iteration: Epoch number
+        :type iteration: int
     """
 
     for i, name in enumerate(initialStructures):
@@ -99,12 +120,17 @@ def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, itera
 
 def createMultipleComplexesFilenames(numberOfSnapshots, tmpInitialStructuresTemplate, iteration):
     """
-       Create the string to substitute the complexes in the pele control file
+        Creates the string to substitute the complexes in the PELE control file
 
-       numberOfSnapshots [In] Number of complexes to write
-       tmpInitialStructuresTemplate [In] Template with the name of the initial
-       strutctures
-       iteration [In] Number of epoch
+        :param numberOfSnapshots: Number of complexes to write
+        :type numberOfSnapshots: int
+        :param tmpInitialStructuresTemplate: Template with the name of the initial strutctures
+        :type tmpInitialStructuresTemplate: str
+        :param iteration: Epoch number
+        :type iteration: int
+
+        :returns: jsonString to be substituted in PELE control file
+        :rtype: str
     """
     jsonString = "\n"
     for i in range(numberOfSnapshots-1):
@@ -113,14 +139,15 @@ def createMultipleComplexesFilenames(numberOfSnapshots, tmpInitialStructuresTemp
     return jsonString
 
 
-def generateSnapshotSelectionStringLastRound(currentEpoch, epochOutputPathTempletized):
-    """ Generate the template for the name of the trajectories in the current
-        epoch
-        currentEpoch [In] Epoch number
-        epochOutputPathTempletized [In] Template for the path where the
-        trajectories of any epoch are stored
+def generateTrajectorySelectionString(epoch, epochOutputPathTempletized):
     """
-    return " \"" + os.path.join(epochOutputPathTempletized % currentEpoch, constants.trajectoryBasename) + "\""
+        Generates the template for the name of the trajectories in a given epoch
+        :param Poch: Epoch number
+        :type epoch: int
+        :param epochOutputPathTempletized: Templetized path where the trajectories of any epoch are stored
+        :type epochOutputPathTempletized: str
+    """
+    return "[\"" + os.path.join(epochOutputPathTempletized % epoch, constants.trajectoryBasename) + "\"]"
 
 
 def findFirstRun(outputPath, clusteringOutputObject):
@@ -128,8 +155,13 @@ def findFirstRun(outputPath, clusteringOutputObject):
         Find the last epoch that was properly simulated and clusterized and
         and return the first epoch to run in case of restart
 
-        outputPath [In] Simulation output path
-        clusteringOutputObject [In] Templetized name of the clustering object
+        :param outputPath: Simulation output path
+        :type outputPath: str
+        :param clusteringOutputObject: Templetized name of the clustering object
+        :type clusteringOutputObject: str
+
+        :return: Current epoch
+        :rtype: int 
     """
 
     folderWithSimulationData = outputPath
@@ -154,9 +186,11 @@ def checkIntegrityClusteringObject(objectPath):
     """
         Test wheter the found clustering object to reload is a valid object
 
-        :param objectPath: Path to the clustering object
-        :param objectPath: str
-        :returns: bool -- True if the clustering object found is valid
+        :param objectPath: Clustering objec path
+        :type objectPath: str
+
+        :returns: True if the clustering object found is valid
+        :rtype: bool
     """
     try:
         utilities.readClusteringObject(objectPath)
@@ -170,8 +204,8 @@ def loadParams(jsonParams):
         Read the control file in JSON format and extract the blocks of simulation,
         general parameters, clustering and spawning
 
-        jsonParams [In] Control file in JSON format from where the parameters
-        will be read
+        :param jsonParams: Control file in JSON format from where the parameters will be read
+        :type jsonParams: json str
     """
     jsonFile = open(jsonParams, 'r').read()
     parsedJSON = json.loads(jsonFile)
@@ -183,20 +217,31 @@ def loadParams(jsonParams):
 def saveInitialControlFile(jsonParams, originalControlFile):
     """ Save the control file jsonParams in originalControlFile
 
-        jsonParams [In] Input control file in JSON format
-        originalControlFile [In] Path where to save the control file"""
+        :param jsonParams: Input control file in JSON format
+        :type jsonParams: str
+        :param originalControlFile: Path where to save the control file
+        :type originalControlFile: str
+    """
     file = open(originalControlFile, 'w')
     jsonFile = open(jsonParams, 'r').read()
     file.write(jsonFile)
 
 
 def needToRecluster(oldClusteringMethod, newClusteringMethod):
-    """ Check if the parameters have changed in a restart and we need to redo
-        the clustering
+    """ 
+        Check if the parameters have changed in a restart and we need to redo
+        the clustering. In particular: type of clustering, theshold calculator
+        or distance
 
-        oldClusteringMethod [In] clusteringMethod in the previous simulation
-        newClusteringMethod [In] clusteringMethod specified in the restart simulation
+        :param oldClusteringMethod: Clustering in a previous simulation before the restart
+        :type oldClusteringMethod: :py:class:`.Clustering`
+        :param newClusteringMethod: Clustering in the restarted simulation
+        :type newClusteringMethod: :py:class:`.Clustering`
+
+        :returns: If clustering needs to be redone
+        :rtype: bool
     """
+
     # Check 1: change of type
     if oldClusteringMethod.type != newClusteringMethod.type:
         return True
@@ -207,50 +252,59 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return oldClusteringMethod.thresholdCalculator != newClusteringMethod.thresholdCalculator or\
                 abs(oldClusteringMethod.contactThresholdDistance - newClusteringMethod.contactThresholdDistance) > 1e-7
 
-    # Check 3: Change of nClusters in contactMapAgglomerative
-    if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMapAgglomerative:
-        return oldClusteringMethod.nclusters != newClusteringMethod.nclusters
 
+def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
+    """
+        Cluster the trajecotories of a given epoch
 
-def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, processorsToClusterMapping):
-    """ Cluster the trajecotories of a given epoch into the clusteringMethod
-        object
-        clusteringMethod [In] Object that holds all the clustering-related
-        information
-        epoch [In] Number of the epoch to cluster
-        epochOutputPathTempletized [In] Path where to find the trajectories"""
+        :param clusteringMethod: Clustering object
+        :type clusteringMethod: :py:class:`.Clustering` 
+        :param epoch: Number of the epoch to cluster
+        :type epoch: int
+        :param epochOutputPathTempletized: Path where to find the trajectories
+        :type epochOutputPathTempletized: str
+"""
 
-    snapshotsJSONSelectionString = generateSnapshotSelectionStringLastRound(epoch, epochOutputPathTempletized)
-    snapshotsJSONSelectionString = "[" + snapshotsJSONSelectionString + "]"
+    snapshotsJSONSelectionString = generateTrajectorySelectionString(epoch, epochOutputPathTempletized)
     paths = eval(snapshotsJSONSelectionString)
     if len(glob.glob(paths[-1])) == 0:
-        sys.exit("No more trajectories to cluster")
+        sys.exit("No trajectories to cluster! Matching path:%s"%paths[-1])
     clusteringMethod.cluster(paths)
 
 
 def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner):
-    """ Cluster the epoch until finalEpoch into the clusteringMethod
+    """
+        Cluster all previous epochs using the clusteringMethod object
 
-        clusteringMethod [In] Object that holds all the clustering-related
-        information
-        finalEpoch [In] Number of the final epoch to cluster (Not included)
-        epochOutputPathTempletized [In] Path where to find the trajectories"""
+        :param clusteringMethod: Clustering object
+        :type clusteringMethod: :py:class:`.Clustering`
+        :param finalEpoch: Last epoch to cluster (not included)
+        :type finalEpoch: int
+        :param epochOutputPathTempletized: Path where to find the trajectories
+        :type epochOutputPathTempletized: str
+        :param simulationRunner: Simulation runner object
+"""
     for i in range(finalEpoch):
-        simulationRunner.readMappingFromDisk(epochOutputPathTempletized % i)
-        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized, simulationRunner.processorsToClusterMapping)
+        simulationRunner.readMappingFromDisk(epochOutputPathTempletized % i) #TODO: ask joan
+        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized)
 
 
-def getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner):
+def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner):
     """
         It reads the previous clustering method, and, if there are changes,
         it reclusters the previous trajectories. Returns the clustering object to use
 
-        firstRun [In] New epoch to run
-        outputPathConstants [In] Contains outputPath-related constants
-        clusteringBlock [In] Contains the new clustering block
-        spawningParams [In] Contains spawning params, to know what reportFile and column to read
+        :param firstRun: New epoch to run
+        :type firstRun: int
+        :param outputPathConstants: Contains outputPath-related constants
+        :type outputPathConstants: :py:class:`.OutputPathConstants`
+        :param clusteringBlock: Contains the new clustering block
+        :type clusteringBlock: json
+        :param spawningParams: Spawning params, to know what reportFile and column to read
+        :type spawningParams: :py:class:`.SpawningParams`
 
-        returns clusteringMethod, the clustering method to use in the adaptive sampling simulation
+        :returns clusteringMethod: The clustering method to use in the adaptive sampling simulation
+        :rtype: :py:class:`.Clustering`
     """
 
     lastClusteringEpoch = firstRun - 1
@@ -278,21 +332,30 @@ def getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, s
 def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock,
                                                          spawningParams, spawningCalculator, simulationRunner):
     """
-        It reads the previous clustering method, and, if there are changes,
-        it reclusters the previous trajectories. Returns the clustering object to use,
+        It reads the previous clustering method, and if there are changes (clustering method or related to thresholds),
+        reclusters the previous trajectories. Returns the clustering object to use,
         and the initial structure filenames as strings
 
-        firstRun [In] New epoch to run
-        outputPathConstants [In] Contains outputPath-related constants
-        clusteringBlock [In] Contains the new clustering block
-        spawningParams [In] Spawning params
-        spawningCalculator [In] Spawning calculator object
-        simulationRunner [In] Simulation runner object
+        :param firstRun: New epoch to run
+        :type firstRun: int
+        :param outputPathConstants: Contains outputPath-related constants
+        :type outputPathConstants: str
+        :param clusteringBlock: Contains the new clustering block
+        :type clusteringBlock: json
+        :param spawningParams: Spawning params
+        :type spawningParams: :py:class:`.SpawningParams`
+        :param spawningCalculator: Spawning calculator object
+        :type spawningCalculator: :py:class:`.SpawningCalculator`
+        :param simulationRunner: :py:class:`.SimulationRunner` Simulation runner object
+        :type simulationRunner: :py:class:`.SimulationRunner`
 
-        returns clusteringMethod, the clustering method to use in the adaptive sampling simulation
-        returns initialStructuresAsString, the initial structures filenames in a string
+        :returns: (clusteringMethod, initialStructuresAsString): 
+
+        **clusteringMethod** (:py:class:`.Clustering`) The clustering method to use in the adaptive sampling simulation
+        **initialStructuresAsString** (str) The initial structures filenames
     """
-    clusteringMethod = getWorkingClusteringObject(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner)
+
+    clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner)
 
     if not hasattr(clusteringMethod, "conformationNetwork"):
         clusteringMethod.epoch = firstRun
@@ -312,16 +375,23 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
         Build the clustering object and copies initial structures from control file.
         Returns the clustering object to use and the initial structures filenames as string
 
-        debug [In] Whether to delete or not the previous simulation
-        outputPath [In] Simulation output path
-        controlFile [In] Adaptive sampling control file
-        outputPathConstants [In] Contains outputPath-related constants
-        clusteringBlock [In] Contains the new clustering block
-        spawningParams [In] Spawning params
-        initialStructures [In] Control file initial structures
+        :param debug: In debug, it will not remove the simulations
+        :type debug: bool
+        :param outputPath: Simulation output path
+        :type outputPath: str
+        :param controlFile: Adaptive sampling control file
+        :type controlFile: str
+        :param outputPathConstants: Contains outputPath-related constants
+        :type outputPathConstants: :py:class:`.OutputPathConstants`
+        :param clusteringBlock: Contains the new clustering block
+        :type clusteringBlock: json
+        :param spawningParams: Spawning params
+        :type spawningParams: :py:class:`.SpawningParams`
+        :param initialStructures: Control file initial structures
+        :type initialStructures: list
 
-        returns clusteringMethod, the clustering method to use in the adaptive sampling simulation
-        returns initialStructuresAsString, the initial structures filenames in a string
+        **clusteringMethod** (:py:class:`.Clustering`) The clustering method to use in the adaptive sampling simulation
+        **initialStructuresAsString** (str) The initial structures filenames
     """
     if not debug:
         shutil.rmtree(outputPath)
@@ -340,34 +410,25 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
     return clusteringMethod, initialStructuresAsString, initialClusters
 
 
-def preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControlFileDictionary):
+def preparePeleControlFile(epoch, outputPathConstants, simulationRunner, peleControlFileDictionary):
     """
-        Substitute the parameters in the pele control file specified with the
+        Substitute the parameters in the PELE control file specified with the
         provided in the control file
 
-        i [In] Epoch number
-        outputPathConstants [In] Object that has as attributes constant related
-        to the outputPath that will be used to create the working control file
-        simulationRunner [In] Simulation runner object
-        peleControlFileDictionary [In] Dictonary containing the values of the
-        parameters to substitute in the control file
+        :param epoch: Epoch number
+        :type epoch: int
+        :param outputPathConstants: Object that has as attributes constant related to the outputPath that will be used to create the working control file
+        :type outputPathConstants: :py:class:`.OutputPathConstants`
+        :param simulationRunner: Simulation runner object
+        :type simulationRunner: `.SimulationRunner`
+        :param peleControlFileDictionary: Dictonary containing the values of the parameters to substitute in the control file
+        :type peleControlFileDictionary: dict
     """
-    outputDir = outputPathConstants.epochOutputPathTempletized % i
+    outputDir = outputPathConstants.epochOutputPathTempletized % epoch
     utilities.makeFolder(outputDir)
     peleControlFileDictionary["OUTPUT_PATH"] = outputDir
-    peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + i*simulationRunner.parameters.processors
-    simulationRunner.makeWorkingControlFile(outputPathConstants.tmpControlFilename % i, peleControlFileDictionary)
-
-
-def distributeAmongClusters(sortedNodes, clusteringMethod, nProcessors):
-    degeneracy = np.zeros_like(clusteringMethod.clusters.clusters)
-    nStates = len(sortedNodes)
-    degPerState = nProcessors/nStates
-    for state in sortedNodes:
-        degeneracy[state] = degPerState
-    extraProc = nProcessors - nStates*degPerState
-    degeneracy[sortedNodes[:extraProc]] += 1
-    return degeneracy
+    peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + epoch*simulationRunner.parameters.processors
+    simulationRunner.makeWorkingControlFile(outputPathConstants.tmpControlFilename % epoch, peleControlFileDictionary)
 
 
 def main(jsonParams):
@@ -387,7 +448,6 @@ def main(jsonParams):
     runnerbuilder = simulationrunner.RunnerBuilder()
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
 
-    clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
     restart = generalParams[blockNames.GeneralParams.restart]
     debug = generalParams[blockNames.GeneralParams.debug]
     outputPath = generalParams[blockNames.GeneralParams.outputPath]
@@ -399,8 +459,8 @@ def main(jsonParams):
     print "================================"
     print "            PARAMS              "
     print "================================"
-    print "Restarting simulations", generalParams[blockNames.GeneralParams.restart]
-    print "Debug:", generalParams[blockNames.GeneralParams.debug]
+    print "Restarting simulations", restart
+    print "Debug:", debug
 
     print "Iterations: %d, Mpi processors: %d, Pele steps: %d" % (simulationRunner.parameters.iterations, simulationRunner.parameters.processors, simulationRunner.parameters.peleSteps)
 
@@ -409,19 +469,18 @@ def main(jsonParams):
     print "SimulationType:", simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY[simulationRunner.type]
     if simulationRunner.hasExitCondition():
         print "Exit condition:", simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY[simulationRunner.parameters.exitCondition.type]
-    print "Clustering method:", clusteringType
+    print "Clustering method:", clusteringBlock[blockNames.ClusteringTypes.type]
 
     print "Output path: ", outputPath
     print "Initial Structures: ", initialStructuresWildcard
     print "================================\n\n"
 
-    print "wildcard", initialStructuresWildcard
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
     checkSymmetryDict(clusteringBlock, initialStructures, resname)
 
     outputPathConstants = constants.OutputPathConstants(outputPath)
 
-    # if not debug: atexit.register(utilities.cleanup, outputPathConstants.tmpFolder)
+    if not debug: atexit.register(utilities.cleanup, outputPathConstants.tmpFolder)
 
     utilities.makeFolder(outputPath)
     utilities.makeFolder(outputPathConstants.tmpFolder)
@@ -454,7 +513,7 @@ def main(jsonParams):
 
         print "Clustering..."
         startTime = time.time()
-        clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, simulationRunner.processorsToClusterMapping)
+        clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized)
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
@@ -490,8 +549,6 @@ def main(jsonParams):
         if simulationRunner.hasExitCondition() and simulationRunner.checkExitCondition(clusteringMethod):
             print "Simulation exit condition met at iteration %d" % i
             break
-    # utilities.cleanup
-    # utilities.cleanup(outputPathConstants.tmpFolder)
 
 if __name__ == '__main__':
     args = parseArgs()
