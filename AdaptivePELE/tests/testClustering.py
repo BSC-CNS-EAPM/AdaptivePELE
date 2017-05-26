@@ -15,7 +15,7 @@ class clusteringTest(unittest.TestCase):
         trajNames = ["tests/data/aspirin_data/traj*"]
 
         # function to test
-        clusteringInstance.cluster(trajNames, range(8))
+        clusteringInstance.cluster(trajNames)
 
         # assertion
         allClusters = clusteringInstance.clusters.clusters
@@ -114,7 +114,7 @@ class clusteringTest(unittest.TestCase):
         trajNames = ["tests/data/aspirin_data/traj*"]
 
         # function to test
-        clusteringInstance.cluster(trajNames, range(8))
+        clusteringInstance.cluster(trajNames)
         # assertion
         allClusters = clusteringInstance.clusters.clusters
         clusteringInstance.clusters.printClusters()

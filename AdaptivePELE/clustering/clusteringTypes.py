@@ -2,12 +2,10 @@ from AdaptivePELE.constants import blockNames
 
 
 class CLUSTERING_TYPES:
-    contacts, contactMapAffinity, contactMapAgglomerative, contactMapAccumulative, lastSnapshot = range(5)
+    contacts, contactMapAccumulative, lastSnapshot = range(3)
 
 CLUSTERING_TYPE_TO_STRING_DICTIONARY = {
     CLUSTERING_TYPES.contacts: blockNames.ClusteringTypes.contacts,
-    CLUSTERING_TYPES.contactMapAffinity: blockNames.ClusteringTypes.contactMapAffinity,
-    CLUSTERING_TYPES.contactMapAgglomerative: blockNames.ClusteringTypes.contactMapAgglomerative,
     CLUSTERING_TYPES.contactMapAccumulative: blockNames.ClusteringTypes.contactMapAccumulative,
     CLUSTERING_TYPES.lastSnapshot: blockNames.ClusteringTypes.lastSnapshot
 }

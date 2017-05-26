@@ -149,17 +149,18 @@ class SpawningCalculator:
         """
         tmpInitialStructuresTemplate = outputPathConstants.tmpInitialStructuresTemplate
         counts = 0
+        procMapping = []
         for i, cluster in enumerate(clustering.clusters.clusters):
             for j in range(int(degeneracyOfRepresentatives[i])):
                 outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
                 print 'Writing to ', outputFilename, 'cluster', i
                 # cluster.writePDB(outputFilename)
-                cluster.writeSpawningStructure(outputFilename)
+                procMapping.append(cluster.writeSpawningStructure(outputFilename))
 
                 counts += 1
 
         print "counts & cluster centers", counts, np.where(np.array(degeneracyOfRepresentatives) > 0)[0].size
-        return counts
+        return counts, procMapping
 
     def divideTrajAccordingToWeights(self, weights, trajToDistribute):
         """

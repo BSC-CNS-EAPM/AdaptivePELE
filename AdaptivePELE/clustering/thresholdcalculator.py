@@ -6,6 +6,13 @@ import numpy as np
 #make test
 class ThresholdCalculatorBuilder():
     def build(self, clusteringBlock):
+        """
+            Bulid the selecte thresholdCaulcualtor object
+
+            :param clusteringBlock: Parameters block corresponding to the threshold calculator
+            :type clusteringBlock: dict
+            :returns: object -- thresholdCalculator object selected
+        """
         try:
             thresholdCalculatorBlock = clusteringBlock[blockNames.ClusteringTypes.thresholdCalculator]
         except KeyError:
@@ -60,14 +67,26 @@ class ThresholdCalculatorConstant(ThresholdCalculator):
         self.value = value
 
     def calculate(self, contacts):
+        """
+            Calculate the threshold value of a cluster. In this case it is constant,
+            the contacts ratio is only passed for compatibility purposes
+
+            :param contacts: Contact ratio
+            :type contacts: float
+            :returns: float -- threshold value of the cluster
+        """
         return self.value
 
     def __eq__(self, other):
         return self.type == other.type and self.value == other.value
 
     def getMaxThreshold(self):
-        """ Method that returns the maximum treshold possible, required for new
-            distance-ordered clustering(in early development)"""
+        """
+            Method that returns the maximum treshold possible, required for new
+            distance-ordered clustering(in early development)
+
+            :returns: float -- Maximum threshold possible
+        """
         return self.value
 
 
@@ -82,6 +101,14 @@ class ThresholdCalculatorHeaviside(ThresholdCalculator):
         self.values = values
 
     def calculate(self, contacts):
+        """
+            Calculate the threshold value of a cluster according to the contacts ratio
+            and the selected conditions and values
+
+            :param contacts: Contact ratio
+            :type contacts: float
+            :returns: float -- threshold value of the cluster
+        """
         for i in range(len(self.conditions)):
             #change, so that whole condition is in array
             if contacts > self.conditions[i]:
@@ -90,8 +117,12 @@ class ThresholdCalculatorHeaviside(ThresholdCalculator):
         return self.values[-1]
 
     def getMaxThreshold(self):
-        """ Method that returns the maximum treshold possible, required for new
-            distance-ordered clustering(in early development)"""
+        """
+            Method that returns the maximum treshold possible, required for new
+            distance-ordered clustering(in early development)
+
+            :returns: float -- Maximum threshold possible
+        """
         return max(self.values)
 
     def __eq__(self, other):
