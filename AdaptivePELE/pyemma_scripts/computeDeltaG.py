@@ -173,6 +173,7 @@ def main(trajWildcard, reweightingT=1000):
     nRows, nCols, nDepth = histogram.shape
     for i in range(numberOfClusters):
         histogramCluster = histograms[i]
+        """
         histogramTotal = histogram.copy()
         for x, y, z in zip(*np.where(histogramCluster)):
             upBound = max(x-1, 0)
@@ -183,8 +184,9 @@ def main(trajWildcard, reweightingT=1000):
             botBound = min(z+2, nDepth)
             histogramCluster[upBound:lowBound, leftBound:rightBound, topBound:botBound] += 1
             histogramTotal[upBound:lowBound, leftBound:rightBound, topBound:botBound] += 1
-        histogramTotal = histogramTotal[histogramCluster > 0]
-        # histogramTotal = histogram[histogramCluster > 0]
+        """
+        #histogramTotal = histogramTotal[histogramCluster > 0]
+        histogramTotal = histogram[histogramCluster > 0]
         histogramCluster = histogramCluster[histogramCluster > 0]
         microstateVolume[i] = (histogramCluster/histogramTotal).sum() * d**3
 

@@ -10,7 +10,7 @@ from AdaptivePELE.pyemma_scripts import computeDeltaG
 
 
 class Parameters:
-    def __init__(self, ntrajs, length, lagtime, nclusters, nruns, useAllTrajInFirstRun, computeDetailedBalance, trajWildcard, folderWithTraj, lagtimes=[]):
+    def __init__(self, ntrajs, length, lagtime, nclusters, nruns, useAllTrajInFirstRun, computeDetailedBalance, trajWildcard, folderWithTraj, lagtimes=[], skipFirstSteps=0):
         #If ntrajs/length = None, all trajs/lengths will be used
         self.trajWildcard = trajWildcard
         self.folderWithTraj = folderWithTraj
@@ -22,6 +22,7 @@ class Parameters:
         self.useAllTrajInFirstRun = useAllTrajInFirstRun
         self.computeDetailedBalance = computeDetailedBalance
         self.lagtimes = lagtimes
+        self.skipFirstSteps = skipFirstSteps
 
 def _rm(filename):
     try:
@@ -45,7 +46,11 @@ def _prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryBa
     sr.makeWorkingControlFile(workingControlFile, controlFileDictionary)
     """
 
-    string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"lagtime\":%d, \"itsOutput\":\"its.png\", \"lagtimes\":%s}"%(trajectoryFolder, trajectoryBasename, clusters, lagtime, lagtimes)
+    workingFolder = os.path.split(trajectoryFolder)[0]
+    try:
+        string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"lagtime\":%d, \"itsOutput\":\"its.png\", \"lagtimes\":%s}"%(workingFolder, trajectoryBasename, clusters, lagtime, lagtimes)
+    except:
+        string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"itsOutput\":\"its.png\", \"lagtimes\":%s}"%(workingFolder, trajectoryBasename, clusters, lagtimes)
     with open(workingControlFile, 'w') as f:
         f.write(string)
 
@@ -64,7 +69,7 @@ def _getDstName(bootstrap, i, trajFile):
     else:
         return os.path.split(trajFile)[-1]
 
-def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=True):
+def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=True, skipFirstSteps=0):
     """
         Function that copies trajectories that match "fileWildcard" into the current directory.
         It may copy a subset and a part of them (length)
@@ -73,6 +78,7 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
         length: trajectory length to consider, if None, the full trajectory will be considered
         ntrajs: number of trajs to consider. If None, a number equal to the total  will be considered
         bootstrap: bootstrap ntrajs from the original
+        skipFirstSteps: Skip first trajectory steps
 
         Returns: writenFiles, in order to ease a posterior cleanup
 
@@ -97,7 +103,9 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
         else:
             traj = np.loadtxt(trajFile)
             try:
-                np.savetxt(dst, traj[:length+1,:], fmt="%d\t%.4f\t%.4f\t%.4f")
+                trimmedTraj = traj[skipFirstSteps:length+1,:]
+                if len(trimmedTraj) > 0:
+                    np.savetxt(dst, trimmedTraj, fmt="%d\t%.4f\t%.4f\t%.4f")
             except:
                 sys.exit("There is a problem with %s"%trajFile)
     return writenFiles
@@ -168,7 +176,7 @@ def estimateDG(parameters):
 
         bootstrap, nWorkingTrajs = _setVariablesForFirstIteration(parameters.useAllTrajInFirstRun, i, parameters.ntrajs)
 
-        copiedFiles = copyWorkingTrajectories(origFilesWildcard, parameters.length, nWorkingTrajs, bootstrap)
+        copiedFiles = copyWorkingTrajectories(origFilesWildcard, parameters.length, nWorkingTrajs, bootstrap, parameters.skipFirstSteps)
 
         _constructMSM(workingControlFile)
 
@@ -199,12 +207,13 @@ def estimateDG(parameters):
 if __name__ == "__main__":
     parameters = Parameters(ntrajs=None,
                             length=None,
-                            lagtime=400,
+                            lagtime=25,
                             nclusters=100,
                             nruns=10,
+                            skipFirstSteps = 0,
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,
                             trajWildcard="traj_*",
-                            folderWithTraj="MSM_0/rawData",
+                            folderWithTraj="rawData",
                             lagtimes=[1,10,25,50,100,250,500,1000])
     estimateDG(parameters)
