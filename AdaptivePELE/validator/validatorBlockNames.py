@@ -128,20 +128,11 @@ class SimulationParams:
 
 class clusteringTypes:
     types = {
-        "contacts": {
+        "rmsd": {
             "ligandResname": "basestring",
             "contactThresholdDistance": "numbers.Real",
         },
-        "contactMapAffinity": {
-            "ligandResname": "basestring",
-            "contactThresholdDistance": "numbers.Real",
-        },
-        "contactMapAgglomerative": {
-            "ligandResname": "basestring",
-            "contactThresholdDistance": "numbers.Real",
-            "nclusters": "numbers.Real"
-        },
-        "contactMapAccumulative": {
+        "contactMap": {
             "ligandResname": "basestring",
             "contactThresholdDistance": "numbers.Real",
             "similarityEvaluator": "basestring"
@@ -152,10 +143,8 @@ class clusteringTypes:
         }
     }
     params = {
-        "contacts": "basestring",
-        "contactMapAffinity": "basestring",
-        "contactMapAgglomerative": "basestring",
-        "contactMapAccumaltive": "basestring",
+        "rmsd": "basestring",
+        "contactMap": "basestring",
         "lastSnapshot": "basestring",
         "ligandResname": "basestring",
         "contactThresholdDistance": "numbers.Real",
