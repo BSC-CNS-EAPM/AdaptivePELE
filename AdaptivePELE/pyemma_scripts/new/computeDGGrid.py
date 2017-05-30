@@ -45,12 +45,12 @@ def main():
     lagtime = 25
     clusters = 100
 
-    ilengths = 1000
-    flengths = 2000
+    ilengths = 200
+    flengths = 4000
     dlengths = 200
     lengths = range(ilengths, flengths, dlengths)
     itrajs = 32-1
-    ftrajs = 127*2
+    ftrajs = 256
     dtrajs = 32
     ntrajs = range(itrajs, ftrajs, dtrajs)
     nruns = 10
