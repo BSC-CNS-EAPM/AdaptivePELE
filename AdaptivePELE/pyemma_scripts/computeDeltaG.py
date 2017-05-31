@@ -5,6 +5,7 @@ import sys
 import argparse
 from scipy.ndimage import filters
 from pyemma.coordinates.clustering import AssignCenters
+from AdaptivePELE.pyemma_scripts import runMarkovChainModel as run
 import itertools
 
 """
@@ -81,11 +82,19 @@ def main(trajWildcard, reweightingT=1000):
     allClusters = np.loadtxt("discretized/clusterCenters.dat")
 
     MSMObject = helper.loadMSM('MSM_object.pkl')
-    pi = MSMObject.stationary_distribution
-    np.savetxt("stationaryDist_small.dat", pi)
-
-
-    r = allClusters[MSMObject.connected_sets[0]]
+    if len(allClusters) == MSMObject.stationary_distribution.size:
+        pi = MSMObject.stationary_distribution
+        r = allClusters[MSMObject.connected_sets[0]]
+    else:
+        ######################
+        # Reconstruct stationary distribution with pseudocounts to ensure
+        # connectivity
+        counts = MSMObject.count_matrix_full
+        counts += 1/float(counts.shape[0])
+        trans = run.buildRevTransitionMatrix(counts)
+        eiv, eic = run.getSortedEigen(trans)
+        pi = run.getStationaryDistr(eic[:, 0])
+        r = allClusters
 
 
     #filename = "output.txt"
