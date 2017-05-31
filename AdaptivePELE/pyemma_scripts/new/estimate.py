@@ -40,11 +40,11 @@ class MSM:
         self.check_connectivity()
         self.saveMSM(self.MSM_object)
 
-    def computePCCA(numberOfPCCAclusters):
+    def computePCCA(self, numberOfPCCAclusters):
         self.numPCCA = numberOfPCCAclusters
-        self.MSM_object.pcca(numPCCA)
+        self.MSM_object.pcca(self.numPCCA)
 
-    def runCKTest(mlags):
+    def runCKTest(self, mlags):
         self._performCKTest(self.error)
 
     def getMSM_object(self):
@@ -86,8 +86,13 @@ class MSM:
             if self.error == False: itsErrors = None
             elif self.error == True: itsErrors = "bayes"
             if not self.lagtimes == [] and not self.lagtimes is None:
+                # workaround to get new its plot at each iteration, the
+                # plot_implied_timescales function is calling plt.gca() and
+                # recovers the previous plot's axes, by creating a new figure
+                # gca gets a set of empty axes and plots are fine
+                plt.figure()
                 its_object = msm.its(self.dtrajs, lags=self.lagtimes, errors=itsErrors)
-                its_plot = mplt.plot_implied_timescales(its_object, outfile=self.itsOutput, nits=self.numberOfITS) 
+                its_plot = mplt.plot_implied_timescales(its_object, outfile=self.itsOutput, nits=self.numberOfITS)
                 plt.savefig("its.png")
             if not self.lagtime is None: return self.lagtime
             while True:

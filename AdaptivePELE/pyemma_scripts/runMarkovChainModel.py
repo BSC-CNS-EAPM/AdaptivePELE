@@ -93,7 +93,7 @@ def buildRevTransitionMatrix(C):
 
     T = np.zeros(C.shape)
     for it in range(iterations):
-        if it != 0 and it % 10 == 0: print it
+        # if it != 0 and it % 10 == 0: print it
         for i in range(n):
             X[i,i] = C[i,i] * (x[i] - X[i,i]) / (c[i] - C[i,i])
         x = X.sum(axis=1)
@@ -104,7 +104,7 @@ def buildRevTransitionMatrix(C):
                 z = -(C[i,j] + C[j,i])*(x[i] - X[i,j])*(x[j] - X[i,j])
                 X[i,j] = X[j,i] = (-b + np.sqrt(b**2 - 4*a*z))/(2*a)
         x = X.sum(axis=1)
-            
+
 
     for i in range(n):
         for j in range(n):
@@ -120,7 +120,7 @@ def runSimulation(P, steps, startingPosition):
     traj[0] = position
     for step in range(steps):
         prob = P[position]
-        position=choice(range(n), p=prob) 
+        position=choice(range(n), p=prob)
         traj[step] = position
 
     return traj
@@ -218,14 +218,14 @@ def plotEigenvalEvolutionInTau(trajs, taus, n):
     ax.set_yscale('log')
     valuesToPlot = n-1
     for i in range(1,valuesToPlot):
-        ax.plot(taus, allEigenvals[:,i]) 
+        ax.plot(taus, allEigenvals[:,i])
     plt.figure(2)
     for i in range(1,valuesToPlot):
-        plt.plot(taus, -taus/np.log(allEigenvals[:,i])) 
+        plt.plot(taus, -taus/np.log(allEigenvals[:,i]))
 
 def main():
     numberOfStates = 6
-    steps = 50 
+    steps = 50
     numberOfSimulations = 60000
     #taus = np.array([1,10,20,50,100,200,500])
     #taus = np.array([1])

@@ -6,7 +6,7 @@ class clusteringTest(unittest.TestCase):
     def testCluster(self):
         # preparation
         clusteringBuilder = clustering.ClusteringBuilder()
-        clusteringParams = {"type": "contacts",
+        clusteringParams = {"type": "rmsd",
                             "params": {"ligandResname": "AIN",
                                        "contactThresholdDistance": 8}}
         clusteringInstance = clusteringBuilder.buildClustering(clusteringParams,
@@ -33,7 +33,7 @@ class clusteringTest(unittest.TestCase):
 
     def _test_cluster_sklearn_affinity(self):
         # preparation
-        clusteringParams = {"type": "contactMapAffinity",
+        clusteringParams = {"type": "contactMap",
                             "params": {"ligandResname": "AIN",
                                        "contactThresholdDistance": 8}}
         clusteringBuilder = clustering.ClusteringBuilder()
@@ -65,7 +65,7 @@ class clusteringTest(unittest.TestCase):
     def _test_cluster_sklearn_agglomerative(self):
         # preparation
         nclusters = 2
-        clusteringParams = {"type": "contactMapAgglomerative",
+        clusteringParams = {"type": "contactMap",
                             "params": {"ligandResname": "AIN",
                                        "contactThresholdDistance": 8,
                                        "nclusters": nclusters}}
@@ -97,7 +97,7 @@ class clusteringTest(unittest.TestCase):
 
     def test_cluster_accumulative(self):
         # preparation
-        clusteringParams = {"type": "contactMapAccumulative",
+        clusteringParams = {"type": "contactMap",
                             "params": {"ligandResname": "AIN",
                                        "contactThresholdDistance": 8,
                                        "similarityEvaluator": "correlation"},

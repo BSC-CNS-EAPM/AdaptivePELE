@@ -247,10 +247,12 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return True
 
     # Check 2: Change of thresholdCalculator and thresholdDistance
-    if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contacts or\
-       oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative:
+    if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.rmsd or\
+       oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMap:
         return oldClusteringMethod.thresholdCalculator != newClusteringMethod.thresholdCalculator or\
                 abs(oldClusteringMethod.contactThresholdDistance - newClusteringMethod.contactThresholdDistance) > 1e-7
+
+    #TODO: add similarityEvaluator check for contactMap clustering
 
 
 def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):

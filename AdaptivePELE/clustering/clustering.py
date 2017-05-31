@@ -1056,7 +1056,7 @@ class ContactsClustering(Clustering):
         Clustering.__init__(self, resname, reportBaseFilename,
                            columnOfReportFile, contactThresholdDistance,
                             altSelection=altSelection)
-        self.type = clusteringTypes.CLUSTERING_TYPES.contacts
+        self.type = clusteringTypes.CLUSTERING_TYPES.rmsd
         self.thresholdCalculator = thresholdCalculator
         self.symmetries = symmetries
         self.clusteringEvaluator = ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
@@ -1127,7 +1127,7 @@ class ContactMapAccumulativeClustering(Clustering):
         Clustering.__init__(self, resname, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance,
                             altSelection=altSelection)
-        self.type = clusteringTypes.CLUSTERING_TYPES.contactMapAccumulative
+        self.type = clusteringTypes.CLUSTERING_TYPES.contactMap
         self.thresholdCalculator = thresholdCalculator
         self.similarityEvaluator = similarityEvaluator
         self.symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries)
@@ -1252,7 +1252,7 @@ class ClusteringBuilder:
         except KeyError as err:
             err.message += ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
-        if clusteringType == blockNames.ClusteringTypes.contacts:
+        if clusteringType == blockNames.ClusteringTypes.rmsd:
             symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries, [])
 
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
@@ -1266,7 +1266,7 @@ class ClusteringBuilder:
             return SequentialLastSnapshotClustering(resname, reportBaseFilename,
                                                     columnOfReportFile,
                                                     contactThresholdDistance)
-        elif clusteringType == blockNames.ClusteringTypes.contactMapAccumulative:
+        elif clusteringType == blockNames.ClusteringTypes.contactMap:
             symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries,[])
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)

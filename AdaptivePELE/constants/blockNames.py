@@ -1,10 +1,8 @@
 class ClusteringTypes:
     type = "type"
     params = "params"
-    contacts = "contacts"
-    contactMapAffinity = "contactMapAffinity"
-    contactMapAgglomerative = "contactMapAgglomerative"
-    contactMapAccumulative = "contactMapAccumulative"
+    rmsd = "rmsd"
+    contactMap = "contactMap"
     lastSnapshot = "lastSnapshot"
     thresholdCalculator = "thresholdCalculator"
     ligandResname = "ligandResname"

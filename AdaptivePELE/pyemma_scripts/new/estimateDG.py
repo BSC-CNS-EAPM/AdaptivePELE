@@ -74,15 +74,21 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
         Function that copies trajectories that match "fileWildcard" into the current directory.
         It may copy a subset and a part of them (length)
 
-        fileWildcard: wildcard to match original files
-        length: trajectory length to consider, if None, the full trajectory will be considered
-        ntrajs: number of trajs to consider. If None, a number equal to the total  will be considered
-        bootstrap: bootstrap ntrajs from the original
-        skipFirstSteps: Skip first trajectory steps
-
-        Returns: writenFiles, in order to ease a posterior cleanup
-
         Warning! If not using bootstrap, it uses all the trajectories
+
+        :param fileWildcard: Wildcard to match original files
+        :type fileWildcard: str
+        :param length: Trajectory length to consider, if None (default value), the full trajectory will be considered
+        :type length: int
+        :param ntrajs: Number of trajs to consider. If None (default value), a number equal to the total  will be considered
+        :type ntrajs: int
+        :param bootstrap: Bootstrap ntrajs from the original (default is True)
+        :type bootstrap: bool
+        :param skipFirstSteps: Skip first trajectory steps (default value is 0)
+        :type skipFirstSteps: int
+
+        :returns: list -- writenFiles, in order to ease a posterior cleanup
+
     """
     allFiles = glob.glob(fileWildcard)
 
@@ -216,4 +222,4 @@ if __name__ == "__main__":
                             trajWildcard="traj_*",
                             folderWithTraj="rawData",
                             lagtimes=[1,10,25,50,100,250,500,1000])
-    estimateDG(parameters, useExistingClusterCenters=False)
+    estimateDG(parameters, cleanupClusterCentersAtStart=False)
