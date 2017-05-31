@@ -1,11 +1,10 @@
 import numpy as np
+import helper
 import glob
 import sys
 import argparse
-import cPickle
 from scipy.ndimage import filters
 from pyemma.coordinates.clustering import AssignCenters
-from AdaptivePELE.pyemma_scripts import runMarkovChainModel as run
 import itertools
 
 """
@@ -75,28 +74,25 @@ def reweightProbabilities(T, Torig, origProb):
 
     return correction1 * correction2 * origProb
 
-def loadMSM(MSMFile):
-    with open(MSMFile) as MSMfile:
-        MSM_object = cPickle.load(MSMfile)
-    return MSM_object
 
 def main(trajWildcard, reweightingT=1000):
+    #clusteringObject = helper.loadMSM('clustering_object.pkl')
+    #allClusters = clusteringObject.clustercenters
     allClusters = np.loadtxt("discretized/clusterCenters.dat")
 
-    MSMObject = loadMSM('MSM_object.pkl')
-    if len(allClusters) == MSMObject.stationary_distribution.size:
-        pi = MSMObject.stationary_distribution
-        r = allClusters[MSMObject.connected_sets[0]]
-    else:
-        ######################
-        # Reconstruct stationary distribution with pseudocounts to ensure
-        # connectivity
-        counts = MSMObject.count_matrix_full
-        counts += 1/float(counts.shape[0])
-        trans = run.buildRevTransitionMatrix(counts)
-        eiv, eic = run.getSortedEigen(trans)
-        pi = run.getStationaryDistr(eic[:, 0])
-        r = allClusters
+    MSMObject = helper.loadMSM('MSM_object.pkl')
+    pi = MSMObject.stationary_distribution
+    np.savetxt("stationaryDist_small.dat", pi)
+
+
+    r = allClusters[MSMObject.connected_sets[0]]
+
+
+    #filename = "output.txt"
+    #data = np.loadtxt(filename)
+
+    #r = data[:,0:3]
+    #pi = data[:,3]
 
     d = 0.75
 

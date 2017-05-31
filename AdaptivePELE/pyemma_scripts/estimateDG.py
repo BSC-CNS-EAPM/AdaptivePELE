@@ -6,7 +6,7 @@ import checkDetailedBalance
 import ownBuildMSM
 import sys
 from AdaptivePELE.simulation import simulationrunner
-from AdaptivePELE.pyemma_scripts import computeDeltaG
+import computeDeltaG
 
 
 class Parameters:
@@ -103,25 +103,24 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
     for i,trajFile in enumerate(trajFiles):
         dst = _getDstName(bootstrap, i, trajFile)
         writenFiles.append(dst)
-
+        traj = np.loadtxt(trajFile)
         if length is None:
-            shutil.copyfile(trajFile, dst)
-        else:
-            traj = np.loadtxt(trajFile)
-            try:
-                trimmedTraj = traj[skipFirstSteps:length+1,:]
-                if len(trimmedTraj) > 0:
-                    np.savetxt(dst, trimmedTraj, fmt="%d\t%.4f\t%.4f\t%.4f")
-            except:
-                sys.exit("There is a problem with %s"%trajFile)
+            length = -2 #so that later eveything is copied
+        try:
+            trimmedTraj = traj[skipFirstSteps:length+1,:]
+            if len(trimmedTraj) > 0:
+                np.savetxt(dst, trimmedTraj, fmt="%d\t%.4f\t%.4f\t%.4f")
+        except:
+            sys.exit("There is a problem with %s"%trajFile)
     return writenFiles
 
-def _cleanupFiles(trajWildcard):
+def _cleanupFiles(trajWildcard, cleanupClusterCenters=True):
     _rmFiles("clustering_object.pkl")
     _rmFiles("MSM_object.pkl")
     _rmFiles("discretized/traj_*")
-    _rmFiles("discretized/clusterCenter*")
     _rmFiles(trajWildcard)
+    if cleanupClusterCenters: 
+        _rmFiles("discretized/clusterCenter*")
 
 def _setVariablesForFirstIteration(useAllTrajInFirstRun, i, ntrajs):
     if useAllTrajInFirstRun and i == 0:
@@ -142,6 +141,7 @@ def _copyMSMDataFromRun(i):
     shutil.copyfile("volumeOfClusters.dat", "volumeOfClusters_%d.dat"%i)
     shutil.copyfile("clusters.pdb", "clusters_%d.pdb" % i)
     shutil.copyfile("pmf_xyzg.dat", "pmf_xyzg_%d.dat" % i)
+    shutil.copyfile("MSM_object.pkl", "MSM_object_%d.pkl" % i)
     if i == 0:
         try:
             shutil.copyfile("db_frobenius.eps", "db_frobenius_%d.eps"%i)
@@ -161,7 +161,7 @@ def _getMeanAndStdFromList(l, accessFunction=lambda x:x):
     return np.mean(values), np.std(values)
 
 
-def estimateDG(parameters):
+def estimateDG(parameters, cleanupClusterCentersAtStart=False):
     """
         Estimates the absolute binding free energy using the parameters in the Parameters object.
 
@@ -177,9 +177,9 @@ def estimateDG(parameters):
 
     deltaGs = []
     detailedBalance = []
-    for i in range(parameters.nruns):
-        _cleanupFiles(parameters.trajWildcard)
+    _cleanupFiles(parameters.trajWildcard, cleanupClusterCentersAtStart)
 
+    for i in range(parameters.nruns):
         bootstrap, nWorkingTrajs = _setVariablesForFirstIteration(parameters.useAllTrajInFirstRun, i, parameters.ntrajs)
 
         copiedFiles = copyWorkingTrajectories(origFilesWildcard, parameters.length, nWorkingTrajs, bootstrap, parameters.skipFirstSteps)
@@ -196,7 +196,7 @@ def estimateDG(parameters):
 
         _copyMSMDataFromRun(i)
 
-    _cleanupFiles(parameters.trajWildcard)
+        _cleanupFiles(parameters.trajWildcard, True)
 
     #PLOT RESULTS
     #FIX TO WORK WITH NONES
@@ -213,13 +213,13 @@ def estimateDG(parameters):
 if __name__ == "__main__":
     parameters = Parameters(ntrajs=None,
                             length=None,
-                            lagtime=25,
-                            nclusters=25,
-                            nruns=1,
+                            lagtime=250,
+                            nclusters=100,
+                            nruns=10,
                             skipFirstSteps = 0,
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,
                             trajWildcard="traj_*",
                             folderWithTraj="rawData",
                             lagtimes=[1,10,25,50,100,250,500,1000])
-    estimateDG(parameters)
+    estimateDG(parameters, cleanupClusterCentersAtStart=False)
