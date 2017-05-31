@@ -6,7 +6,7 @@ import checkDetailedBalance
 import ownBuildMSM
 import sys
 from AdaptivePELE.simulation import simulationrunner
-from AdaptivePELE.pyemma_scripts import computeDeltaG
+import computeDeltaG
 
 
 class Parameters:
