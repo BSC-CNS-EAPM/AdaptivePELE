@@ -86,25 +86,30 @@ class SpawningParams:
         self.maxEpsilonWindow = None
         self.metricWeights = None
         self.alpha = None
+        self.nclusters = None #number of clusters to consider in epsilon
 
     def buildSpawningParameters(self, spawningBlock):
         spawningParamsBlock = spawningBlock[blockNames.SpawningParams.params]
         spawningType = spawningBlock[blockNames.StringSpawningTypes.type]
+
         # Params general to all
         # Params specific to epsilon related spawning
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon:
             self.epsilon = spawningParamsBlock[blockNames.SpawningParams.epsilon]
-            self.temperature = spawningParamsBlock[blockNames.SpawningParams.temperature]
+            self.nclusters = spawningParamsBlock.get(blockNames.SpawningParams.nclusters, 5)
             self.metricWeights = spawningParamsBlock.get(blockNames.SpawningParams.metricWeights,
                                                          blockNames.SpawningParams.linear)
+
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon or\
                 spawningType == blockNames.StringSpawningTypes.fast or \
                 spawningType == blockNames.StringSpawningTypes.simulatedAnnealing or \
                 spawningType == blockNames.StringSpawningTypes.UCB:
+            self.temperature = spawningParamsBlock.get(blockNames.SpawningParams.temperature,1000)
             self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
+
         if spawningType == blockNames.StringSpawningTypes.variableEpsilon:
             self.varEpsilonType = spawningParamsBlock[blockNames.SpawningParams.varEpsilonType]
             self.maxEpsilon = spawningParamsBlock[blockNames.SpawningParams.maxEpsilon]
@@ -115,6 +120,7 @@ class SpawningParams:
                 self.period = spawningParamsBlock.get(blockNames.SpawningParams.period, self.variationWindow)
                 self.period += np.sign(np.abs(self.variationWindow-self.period))
                 # Add one epoch to the total lenght of the variation in the case of periodic variation to leave a step between variation periods
+
         if spawningType == blockNames.StringSpawningTypes.UCB:
             self.alpha = spawningParamsBlock.get(blockNames.SpawningParams.alpha, 8.0)
 
@@ -131,7 +137,7 @@ class SpawningCalculator:
         pass
 
     @abstractmethod
-    def calculate(self, clusters, trajToDivide, clusteringParams, currentEpoch=None):
+    def calculate(self, clusters, trajToDivide, spawningParams, currentEpoch=None):
         pass
 
     @abstractmethod
@@ -245,9 +251,9 @@ class IndependentRunsCalculator(SpawningCalculator):
         self.calculator = SameWeightDegeneracyCalculator()
         self.type = spawningTypes.SPAWNING_TYPES.independent
 
-    def calculate(self, clusters, trajToDistribute, clusteringParams,
+    def calculate(self, clusters, trajToDistribute, spawningParams,
                   currentEpoch=None):
-        return self.calculator.calculate(clusters, trajToDistribute, clusteringParams, currentEpoch)
+        return self.calculator.calculate(clusters, trajToDistribute, spawningParams, currentEpoch)
 
     def log(self):
         pass
@@ -283,7 +289,7 @@ class SameWeightDegeneracyCalculator(SpawningCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.sameWeight
 
     # TODO: Don't back on pele, so that density calculator can be used
-    def calculate(self, clusters, trajToDistribute, clusteringParams,
+    def calculate(self, clusters, trajToDistribute, spawningParams,
                   currentEpoch=None):
         """
             We back on PELE to split equal trajectories
@@ -309,7 +315,7 @@ class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
     def log(self):
         pass
 
-    def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
+    def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
         sizes = self.getSizes(clusters)
         densities = self.calculateDensities(clusters)
 
@@ -327,6 +333,7 @@ class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
 class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
     """
         It uses epsilon * numTraj trajectories proportional to their energy and the rest inversely proportional to each cluster's population
+        We only consider the nclusters with best metric
     """
 
     def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
@@ -346,19 +353,20 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         if self.degeneracyMetricProportional is not None:
             print "[SpawningLog] Metric prop:    %s" % str(self.degeneracyMetricProportional)
 
-    def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
-        trajToMetricProportional = int(clusteringParams.epsilon * trajToDistribute)
+    def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
+        trajToMetricProportional = int(spawningParams.epsilon * trajToDistribute)
         trajToInverselyProportional = trajToDistribute - trajToMetricProportional
 
-        self.degeneracyInverselyProportional = self.inverselyProportionalCalculator.calculate(clusters, trajToInverselyProportional, clusteringParams)
-        self.degeneracyMetricProportional = self.divideProcessorsMetricProportional(clusters, trajToMetricProportional, clusteringParams.temperature, clusteringParams.metricWeights)
+        self.degeneracyInverselyProportional = self.inverselyProportionalCalculator.calculate(clusters, trajToInverselyProportional, spawningParams)
+        self.degeneracyMetricProportional = self.divideProcessorsMetricProportional(clusters, trajToMetricProportional, spawningParams)
 
         self.degeneracyTotal = np.array(self.degeneracyInverselyProportional) + np.array(self.degeneracyMetricProportional)
         return self.degeneracyTotal
 
-    def divideProcessorsMetricProportional(self, clusters, trajToDistribute, T,
-                                           metricWeights=blockNames.SpawningParams.linear):
+    def divideProcessorsMetricProportional(self, clusters, trajToDistribute, spawningParams):
+
         metrics = self.getMetrics(clusters)
+
         if isinstance(metrics, list): metrics = np.array(metrics)
 
         """
@@ -368,7 +376,11 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         """
         maximumValue = np.max(metrics)
         shiftedMetrics = np.subtract(metrics, maximumValue)
+        bestClusters = shiftedMetrics.argsort()
 
+        shiftedMetrics[bestClusters[spawningParams.nclusters:]] = 0 #only consider best ones
+
+        metricWeights = spawningParams.metricWeights
         if metricWeights == blockNames.SpawningParams.linear:
 
             # all shiftedMetrics <= 0, sum(shiftedMetrics) < 0 => weights >= 0
@@ -378,6 +390,7 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
                 weights = (1.*shiftedMetrics)/sum(shiftedMetrics)
 
         elif metricWeights == blockNames.SpawningParams.boltzmann:
+            T = spawningParams.temperature
             kbT = 0.001987*T
             if abs(shiftedMetrics.sum()) < 1e-8:
                 weights = np.ones(len(metrics))/len(metrics)
@@ -407,38 +420,38 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         epsilon_file.write("Iteration\tEpsilon\n")
         epsilon_file.close()
 
-    def linearVariation(self, clusteringParams, currentEpoch):
+    def linearVariation(self, spawningParams, currentEpoch):
         if currentEpoch == 0:
-            clusteringParams.epsilon = clusteringParams.minEpsilon
+            spawningParams.epsilon = spawningParams.minEpsilon
             return
 
-        middleWindow = int(clusteringParams.period/2)
-        leftWindow = int(clusteringParams.maxEpsilonWindow/2)
+        middleWindow = int(spawningParams.period/2)
+        leftWindow = int(spawningParams.maxEpsilonWindow/2)
         rightWindow = leftWindow+middleWindow
-        if currentEpoch == clusteringParams.period-1:
+        if currentEpoch == spawningParams.period-1:
             # Avoid negative epsilon for minEpsilon = 0
             return
-        rateEpsilonVariation = [(clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(middleWindow-leftWindow), (clusteringParams.maxEpsilon-clusteringParams.minEpsilon)/(clusteringParams.period-rightWindow-1)]
-        clusteringParams.epsilon += return_sign(currentEpoch, leftWindow,
+        rateEpsilonVariation = [(spawningParams.maxEpsilon-spawningParams.minEpsilon)/(middleWindow-leftWindow), (spawningParams.maxEpsilon-spawningParams.minEpsilon)/(spawningParams.period-rightWindow-1)]
+        spawningParams.epsilon += return_sign(currentEpoch, leftWindow,
                                                 middleWindow, rightWindow) * rateEpsilonVariation[currentEpoch > middleWindow]
 
-    def contactsVariation(self, clusters, clusteringParams):
+    def contactsVariation(self, clusters, spawningParams):
         if self.maxContacts is None:
             self.maxContacts = reduce(max, [cluster.contacts for cluster in clusters])
         maxContacts = reduce(max, [cluster.contacts for cluster in clusters])
-        if clusteringParams.epsilon < clusteringParams.maxEpsilon:
-            clusteringParams.epsilon += calculateContactsVar(maxContacts-self.maxContacts, clusteringParams.maxEpsilon)
+        if spawningParams.epsilon < spawningParams.maxEpsilon:
+            spawningParams.epsilon += calculateContactsVar(maxContacts-self.maxContacts, spawningParams.maxEpsilon)
         self.maxContacts = maxContacts
 
-    def calculateEpsilonValue(self, clusteringParams, currentEpoch, clusters):
-        if clusteringParams.varEpsilonType == blockNames.VariableEpsilonTypes.linearVariation:
-            if currentEpoch is None or clusteringParams.variationWindow < currentEpoch:
-                clusteringParams.epsilon = clusteringParams.minEpsilon
+    def calculateEpsilonValue(self, spawningParams, currentEpoch, clusters):
+        if spawningParams.varEpsilonType == blockNames.VariableEpsilonTypes.linearVariation:
+            if currentEpoch is None or spawningParams.variationWindow < currentEpoch:
+                spawningParams.epsilon = spawningParams.minEpsilon
                 return
-            self.linearVariation(clusteringParams,
-                                 (currentEpoch % clusteringParams.period))
-        elif clusteringParams.varEpsilonType == blockNames.VariableEpsilonTypes.contactsVariation:
-            self.contactsVariation(clusters, clusteringParams)
+            self.linearVariation(spawningParams,
+                                 (currentEpoch % spawningParams.period))
+        elif spawningParams.varEpsilonType == blockNames.VariableEpsilonTypes.contactsVariation:
+            self.contactsVariation(clusters, spawningParams)
         else:
             sys.exit("Unknown epsilon variation type! Choices are: " +
                      str(spawningTypes.EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY.values()))
@@ -448,10 +461,10 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         epsilon_file.write("%d\t%f\n" % (epoch, epsilon))
         epsilon_file.close()
 
-    def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
-        self.calculateEpsilonValue(clusteringParams, currentEpoch, clusters)
-        self.logVariableEpsilon(clusteringParams.epsilon, currentEpoch)
-        return self.epsilonDegeneracyCalculator.calculate(clusters, trajToDistribute, clusteringParams, currentEpoch)
+    def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
+        self.calculateEpsilonValue(spawningParams, currentEpoch, clusters)
+        self.logVariableEpsilon(spawningParams.epsilon, currentEpoch)
+        return self.epsilonDegeneracyCalculator.calculate(clusters, trajToDistribute, spawningParams, currentEpoch)
 
 
 class SimulatedAnnealingCalculator(SpawningCalculator):
@@ -470,7 +483,7 @@ class SimulatedAnnealingCalculator(SpawningCalculator):
         else:
             return T
 
-    def calculate(self, clusters, trajToDistribute, clusteringParams,
+    def calculate(self, clusters, trajToDistribute, spawningParams,
                   currentEpoch):
 
         metrics = self.getMetrics(clusters)
@@ -478,7 +491,7 @@ class SimulatedAnnealingCalculator(SpawningCalculator):
         minimumValue = np.min(metrics)
         shiftedMetrics = np.subtract(metrics, minimumValue)
 
-        T = self.computeTemperature(clusteringParams, currentEpoch)
+        T = self.computeTemperature(spawningParams, currentEpoch)
         kbT = 0.001987*T
         weights = np.exp(-shiftedMetrics/kbT)
         weights /= sum(weights)
@@ -517,7 +530,7 @@ class FASTDegeneracyCalculator(DensitySpawningCalculator):
         metrics = self.getMetrics(clusters)
         return self.normaliseArray(metrics)
 
-    def calculate(self, clusters, trajToDivide, clusteringParams, currentEpoch=None):
+    def calculate(self, clusters, trajToDivide, spawningParams, currentEpoch=None):
         normalisedSizes = self.calculateNormalisedSizes(clusters)
         normalisedMetrics = self.calculateNormalisedMetrics(clusters)
 
@@ -543,7 +556,7 @@ class UCBCalculator(DensitySpawningCalculator):
     def log(self):
         pass
 
-    def calculate(self, clusters, trajToDistribute, clusteringParams, currentEpoch=None):
+    def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
         self.epoch += 1
         sizes = np.array(self.getSizes(clusters))
         densities = self.calculateDensities(clusters)
@@ -580,10 +593,10 @@ class UCBCalculator(DensitySpawningCalculator):
         argweights = self.prevMetrics.argsort()
         weights_trimmed = np.zeros(len(sizes))
         weights_trimmed[argweights[-trajToDistribute:]] = self.prevMetrics[argweights[-trajToDistribute:]]
-        # values = weights_trimmed+clusteringParams.alpha*np.sqrt((1/sizes))
-        # values = self.beta*weights_trimmed**2+clusteringParams.alpha*(1/sizes**2)
-        values = self.beta*weights_trimmed**2+clusteringParams.alpha*(1/sizes)
-        # values = self.beta*weights_trimmed**2+(clusteringParams.alpha/((np.log2(currentEpoch+2))**(1/4.0)))*(1/sizes)
+        # values = weights_trimmed+spawningParams.alpha*np.sqrt((1/sizes))
+        # values = self.beta*weights_trimmed**2+spawningParams.alpha*(1/sizes**2)
+        values = self.beta*weights_trimmed**2+spawningParams.alpha*(1/sizes)
+        # values = self.beta*weights_trimmed**2+(spawningParams.alpha/((np.log2(currentEpoch+2))**(1/4.0)))*(1/sizes)
         # minVal = np.min(values)
         # if minVal < 0:
         #     # if there is a negative value shift all the values so that the min
