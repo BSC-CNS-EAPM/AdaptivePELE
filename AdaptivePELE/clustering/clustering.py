@@ -255,7 +255,7 @@ class AltStructures:
         limit = len(self.altStructPQ)
         del self.altStructPQ[self.limitSize-limit:]
 
-    def addStructure(self, PDB, threshold, resname, contactThreshold, similarityEvaluator, trajPosition):
+    def addStructure(self, PDB, threshold, resname, resnum, resChain, contactThreshold, similarityEvaluator, trajPosition):
         """
             Perform a subclustering, with sub-clusters of size threshold/2
 
@@ -263,8 +263,12 @@ class AltStructures:
             :type PDB: :py:class:`.PDB`
             :param threshold: Size of the cluster
             :type threshold: float
-            :param resname: Name of the ligand in the structure pdb
+            :param resname: String containing the three letter name of the ligand in the pdb
             :type resname: str
+            :param resnum: Integer containing the residue number of the ligand in the pdb
+            :type resnum: int
+            :param resChain: String containing the chain name of the ligand in the pdb
+            :type resChain: str
             :param contactThreshold: Distance at which to atoms are considered in contact
             :type contactThreshold: float
             :param similarityEvaluator: Object that determinates the similarity between two structures
@@ -276,7 +280,7 @@ class AltStructures:
         """
         i = 0
         for priority, subCluster in self.altStructPQ:
-            isSimilar, distance = similarityEvaluator.isElement(PDB, subCluster, resname, contactThreshold)
+            isSimilar, distance = similarityEvaluator.isElement(PDB, subCluster, resname, resnum, resChain, contactThreshold)
             if distance < subCluster.threshold/2.0:
                 subCluster.addElement([])
                 del self.altStructPQ[i]
@@ -512,7 +516,7 @@ class ContactsClusteringEvaluator:
         self.contacts = state.get('contacts')
         self.contactMap = state.get('contactMap')
 
-    def isElement(self, pdb, cluster, resname, contactThresholdDistance):
+    def isElement(self, pdb, cluster, resname, resnum, resChain, contactThresholdDistance):
         """
             Evaluate wether a conformation is a member of a cluster
 
@@ -520,8 +524,12 @@ class ContactsClusteringEvaluator:
             :type pdb: :py:class:`.PDB`
             :param cluster: Cluster to compare
             :type cluster: :py:class:`.Cluster`
-            :param resname: Name of the ligand in the pdb
-            :type rename: str
+            :param resname: String containing the three letter name of the ligand in the pdb
+            :type resname: str
+            :param resnum: Integer containing the residue number of the ligand in the pdb
+            :type resnum: int
+            :param resChain: String containing the chain name of the ligand in the pdb
+            :type resChain: str
             :param contactThreshold: Distance between two atoms to be considered in contact (default 8)
             :type contactThreshold: float
             :returns: bool, float -- Whether the structure belong to the cluster and the distance between them
@@ -537,19 +545,23 @@ class ContactsClusteringEvaluator:
         self.contactMap = None
         self.contacts = None
 
-    def checkAttributes(self, pdb, resname, contactThresholdDistance):
+    def checkAttributes(self, pdb, resname, resnum, resChain, contactThresholdDistance):
         """
             Check wether all attributes are set for this iteration
 
             :param pdb: Structure to compare
             :type pdb: :py:class:`.PDB`
-            :param resname: Name of the ligand in the pdb
-            :type rename: str
+            :param resname: String containing the three letter name of the ligand in the pdb
+            :type resname: str
+            :param resnum: Integer containing the residue number of the ligand in the pdb
+            :type resnum: int
+            :param resChain: String containing the chain name of the ligand in the pdb
+            :type resChain: str
             :param contactThreshold: Distance between two atoms to be considered in contact (default 8)
             :type contactThreshold: float
         """
         if self.contacts is None:
-            self.contacts = pdb.countContacts(resname, contactThresholdDistance)
+            self.contacts = pdb.countContacts(resname, resnum, resChain, contactThresholdDistance)
 
     def getInnerLimit(self, cluster):
         """
@@ -598,7 +610,7 @@ class CMClusteringEvaluator:
         self.contacts = state.get('contacts')
         self.contactMap = state.get('contactMap')
 
-    def isElement(self, pdb, cluster, resname, contactThresholdDistance):
+    def isElement(self, pdb, cluster, resname, resnum, resChain, contactThresholdDistance):
         """
             Evaluate wether a conformation is a member of a cluster
 
@@ -606,14 +618,18 @@ class CMClusteringEvaluator:
             :type pdb: :py:class:`.PDB`
             :param cluster: Cluster to compare
             :type cluster: :py:class:`.Cluster`
-            :param resname: Name of the ligand in the pdb
-            :type rename: str
+            :param resname: String containing the three letter name of the ligand in the pdb
+            :type resname: str
+            :param resnum: Integer containing the residue number of the ligand in the pdb
+            :type resnum: int
+            :param resChain: String containing the chain name of the ligand in the pdb
+            :type resChain: str
             :param contactThreshold: Distance between two atoms to be considered in contact (default 8)
             :type contactThreshold: float
             :returns: bool, float -- Whether the structure belong to the cluster and the distance between them
         """
         if self.contactMap is None:
-            self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
+            self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, resnum, resChain, contactThresholdDistance)
             # self.contactMap, foo = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             # self.contacts = pdb.countContacts(resname, 8)  # contactThresholdDistance)
         distance = self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster.contactMap, self.symmetryEvaluator)
@@ -627,19 +643,23 @@ class CMClusteringEvaluator:
         self.contactMap = None
         self.contacts = None
 
-    def checkAttributes(self, pdb, resname, contactThresholdDistance):
+    def checkAttributes(self, pdb, resname, resnum, resChain, contactThresholdDistance):
         """
             Check wether all attributes are set for this iteration
 
             :param pdb: Structure to compare
             :type pdb: :py:class:`.PDB`
-            :param resname: Name of the ligand in the pdb
-            :type rename: str
+            :param resname: String containing the three letter name of the ligand in the pdb
+            :type resname: str
+            :param resnum: Integer containing the residue number of the ligand in the pdb
+            :type resnum: int
+            :param resChain: String containing the chain name of the ligand in the pdb
+            :type resChain: str
             :param contactThreshold: Distance between two atoms to be considered in contact (default 8)
             :type contactThreshold: float
         """
         if self.contactMap is None:
-            self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
+            self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, resnum, resChain, contactThresholdDistance)
             # self.contactMap, foo = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             # self.contacts = pdb.countContacts(resname, 8)  # contactThresholdDistance)
 
@@ -681,7 +701,7 @@ class CMClusteringEvaluator:
 
 
 class Clustering:
-    def __init__(self, resname=None, reportBaseFilename=None,
+    def __init__(self, resname="", resnum=0, resChain="", reportBaseFilename=None,
                  columnOfReportFile=None, contactThresholdDistance=8,
                  altSelection=False):
         """
@@ -690,6 +710,10 @@ class Clustering:
 
             :param resname: String containing the three letter name of the ligand in the pdb
             :type resname: str
+            :param resnum: Integer containing the residue number of the ligand in the pdb
+            :type resnum: int
+            :param resChain: String containing the chain name of the ligand in the pdb
+            :type resChain: str
             :param reportBaseFilename: Name of the file that contains the metrics of the snapshots to cluster
             :type reportBaseFilename: str
             :param columnOfReportFile: Column of the report file that contain the metric of interest
@@ -706,6 +730,8 @@ class Clustering:
         else:
             self.reportBaseFilename = None
         self.resname = resname
+        self.resnum = resnum
+        self.resChain = resChain
         self.col = columnOfReportFile
         self.contactThresholdDistance = contactThresholdDistance
         self.symmetries = []
@@ -719,8 +745,9 @@ class Clustering:
         # changed
         state = {"type": self.type, "clusters": self.clusters,
                  "reportBaseFilename": self.reportBaseFilename,
-                 "resname": self.resname, "col": self.col, "epoch": self.epoch,
-                 "symmetries": self.symmetries,
+                 "resname": self.resname, "resnum": self.resnum,
+                 "resChain": self.resChain, "col": self.col,
+                 "epoch": self.epoch, "symmetries": self.symmetries,
                  "conformationNetwork": self.conformationNetwork,
                  "contactThresholdDistance": self.contactThresholdDistance,
                  "altSelection": self.altSelection}
@@ -732,6 +759,8 @@ class Clustering:
         self.clusters = state['clusters']
         self.reportBaseFilename = state.get('reportBaseFilename')
         self.resname = state.get('resname')
+        self.resnum = state.get('resnum')
+        self.resChain = state.get('resChain')
         self.col = state.get('col')
         self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
         self.symmetries = state.get('symmetries', [])
@@ -781,6 +810,8 @@ class Clustering:
         return self.clusters == other.clusters\
             and self.reportBaseFilename == other.reportBaseFilename\
             and self.resname == other.resname\
+            and self.resnum == other.resnum\
+            and self.resChain == other.resChain\
             and self.col == other.col
 
     def cluster(self, paths):
@@ -877,7 +908,7 @@ class Clustering:
             :returns: int -- Cluster to which the snapshot belongs
         """
         pdb = atomset.PDB()
-        pdb.initialise(snapshot, resname=self.resname)
+        pdb.initialise(snapshot, resname=self.resname, resnum=self.resnum, chain=self.resChain )
         self.clusteringEvaluator.cleanContactMap()
         for clusterNum, cluster in enumerate(self.clusters.clusters):
             scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
@@ -885,10 +916,11 @@ class Clustering:
                 continue
 
             isSimilar, dist = self.clusteringEvaluator.isElement(pdb, cluster,
-                                                                 self.resname, self.contactThresholdDistance)
+                                                                 self.resname, self.resnum,
+                                                                 self.resChain, self.contactThresholdDistance)
             if isSimilar:
                 if dist > cluster.threshold/2:
-                    cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.contactThresholdDistance, self.clusteringEvaluator, trajPosition=(self.epoch, trajNum, snapshotNum))
+                    cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.resnum, self.resChain, self.contactThresholdDistance, self.clusteringEvaluator, trajPosition=(self.epoch, trajNum, snapshotNum))
                 cluster.addElement(metrics)
                 if origCluster is None:
                     origCluster = clusterNum
@@ -898,7 +930,8 @@ class Clustering:
         # if made it here, the snapshot was not added into any cluster
         # Check if contacts and contactMap are set (depending on which kind
         # of clustering)
-        self.clusteringEvaluator.checkAttributes(pdb, self.resname, self.contactThresholdDistance)
+        self.clusteringEvaluator.checkAttributes(pdb, self.resname, self.resnum,
+                                                 self.resChain, self.contactThresholdDistance)
         contacts = self.clusteringEvaluator.contacts
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
         contactsPerAtom = float(contacts)/numberOfLigandAtoms
@@ -1020,7 +1053,7 @@ class Clustering:
 
 
 class ContactsClustering(Clustering):
-    def __init__(self, thresholdCalculator, resname=None,
+    def __init__(self, thresholdCalculator, resname="", resnum=0, resChain="",
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8, symmetries=[], altSelection=False):
         """
@@ -1028,12 +1061,15 @@ class ContactsClustering(Clustering):
             than certain threshold. This threshold is assigned according to the
             ratio of number of contacts over the number of heavy atoms of the ligand
 
+            :param resname: String containing the three letter name of the ligand in the pdb
+            :type resname: str
+            :param resnum: Integer containing the residue number of the ligand in the pdb
+            :type resnum: int
+            :param resChain: String containing the chain name of the ligand in the pdb
+            :type resChain: str
             :param thresholdCalculator: ThresholdCalculator object that calculate the
                 threshold according to the contacts ratio
             :type thresholdCalculator: :py:class:`.ThresholdCalculator`
-            :param resname: String containing the three letter name of the ligand
-                in the pdb
-            :type resname: str
             :param reportBaseFilename: Name of the file that contains the metrics of
                 the snapshots to cluster
             :type reportBaseFilename: str
@@ -1048,8 +1084,10 @@ class ContactsClustering(Clustering):
             :param altSelection: Flag that controls wether to use the alternative structures (default 8)
             :type altSelection: bool
         """
-        Clustering.__init__(self, resname, reportBaseFilename,
-                           columnOfReportFile, contactThresholdDistance,
+        Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain,
+                            reportBaseFilename=reportBaseFilename,
+                            columnOfReportFile=columnOfReportFile,
+                            contactThresholdDistance=contactThresholdDistance,
                             altSelection=altSelection)
         self.type = clusteringTypes.CLUSTERING_TYPES.rmsd
         self.thresholdCalculator = thresholdCalculator
@@ -1062,7 +1100,9 @@ class ContactsClustering(Clustering):
         # changed
         state = {"type": self.type, "clusters": self.clusters,
                  "reportBaseFilename": self.reportBaseFilename,
-                 "resname": self.resname, "col": self.col, "epoch": self.epoch,
+                 "resname": self.resname, "resnum": self.resnum,
+                 "resChain": self.resChain, "col": self.col,
+                 "epoch": self.epoch,
                  "symmetries": self.symmetries,
                  "conformationNetwork": self.conformationNetwork,
                  "contactThresholdDistance": self.contactThresholdDistance,
@@ -1077,6 +1117,8 @@ class ContactsClustering(Clustering):
         self.clusters = state['clusters']
         self.reportBaseFilename = state.get('reportBaseFilename')
         self.resname = state.get('resname')
+        self.resnum = state.get('resnum')
+        self.resChain = state.get('resChain')
         self.col = state.get('col')
         self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
         self.symmetries = state.get('symmetries', [])
@@ -1090,7 +1132,8 @@ class ContactsClustering(Clustering):
 
 
 class ContactMapAccumulativeClustering(Clustering):
-    def __init__(self, thresholdCalculator, similarityEvaluator, resname=None,
+    def __init__(self, thresholdCalculator, similarityEvaluator, resname="",
+                 resnum=0, resChain="",
                  reportBaseFilename=None, columnOfReportFile=None,
                  contactThresholdDistance=8, symmetries=[], altSelection=False):
         """ Cluster together all snapshots that have similar enough contactMaps.
@@ -1102,9 +1145,12 @@ class ContactMapAccumulativeClustering(Clustering):
             :param similarityEvaluator: object that calculates the similarity
                 between two contact maps
             :type similarityEvaluator: object
-            :param resname: String containing the three letter name of the ligand
-                in the pdb
+            :param resname: String containing the three letter name of the ligand in the pdb
             :type resname: str
+            :param resnum: Integer containing the residue number of the ligand in the pdb
+            :type resnum: int
+            :param resChain: String containing the chain name of the ligand in the pdb
+            :type resChain: str
             :param reportBaseFilename: Name of the file that contains the metrics of
                 the snapshots to cluster
             :type reportBaseFilename: str
@@ -1119,7 +1165,7 @@ class ContactMapAccumulativeClustering(Clustering):
             :param altSelection: Flag that controls wether to use the alternative structures (default 8)
             :type altSelection: bool
         """
-        Clustering.__init__(self, resname, reportBaseFilename,
+        Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain, reportBaseFilename,
                             columnOfReportFile, contactThresholdDistance,
                             altSelection=altSelection)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMap
@@ -1134,8 +1180,9 @@ class ContactMapAccumulativeClustering(Clustering):
         # changed
         state = {"type": self.type, "clusters": self.clusters,
                  "reportBaseFilename": self.reportBaseFilename,
-                 "resname": self.resname, "col": self.col, "epoch": self.epoch,
-                 "symmetries": self.symmetries,
+                 "resname": self.resname, "resnum": self.resnum,
+                 "resChain": self.resChain, "col": self.col,
+                 "epoch": self.epoch, "symmetries": self.symmetries,
                  "conformationNetwork": self.conformationNetwork,
                  "contactThresholdDistance": self.contactThresholdDistance,
                  "altSelection": self.altSelection,
@@ -1151,6 +1198,8 @@ class ContactMapAccumulativeClustering(Clustering):
         self.clusters = state['clusters']
         self.reportBaseFilename = state.get('reportBaseFilename')
         self.resname = state.get('resname')
+        self.resnum = state.get('resnum')
+        self.resChain = state.get('resChain')
         self.col = state.get('col')
         self.contactThresholdDistance = state.get('contactThresholdDistance', 8)
         self.symmetries = state.get('symmetries', [])
@@ -1211,8 +1260,9 @@ class SequentialLastSnapshotClustering(Clustering):
             :returns: int -- Cluster to which the snapshot belongs
         """
         pdb = atomset.PDB()
-        pdb.initialise(snapshot, resname=self.resname)
-        contacts = pdb.countContacts(self.resname,
+        pdb.initialise(snapshot, resname=self.resname, resnum=self.resnum,
+                       chain=self.resChain)
+        contacts = pdb.countContacts(self.resname, self.resnum, self.resChain,
                                      self.contactThresholdDistance)
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
         contactsPerAtom = float(contacts)/numberOfLigandAtoms
@@ -1240,27 +1290,30 @@ class ClusteringBuilder:
         """
         paramsBlock = clusteringBlock[blockNames.ClusteringTypes.params]
         try:
-            resname = str(paramsBlock[blockNames.ClusteringTypes.ligandResname].upper())
             clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
             contactThresholdDistance = paramsBlock[blockNames.ClusteringTypes.contactThresholdDistance]
             altSelection = paramsBlock.get(blockNames.ClusteringTypes.alternativeStructure, False)
         except KeyError as err:
             err.message += ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
+        resname = str(paramsBlock.get(blockNames.ClusteringTypes.ligandResname].upper(), ""))
+        resnum = int(paramsBlock.get(blockNames.ClusteringTypes.ligandResnum], 0))
+        resChain = str(paramsBlock.get(blockNames.ClusteringTypes.ligandChain].upper(), ""))
         if clusteringType == blockNames.ClusteringTypes.rmsd:
             symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries, [])
 
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
-            return ContactsClustering(thresholdCalculator, resname,
-                                      reportBaseFilename, columnOfReportFile,
-                                      contactThresholdDistance, symmetries,
+            return ContactsClustering(thresholdCalculator, resname=resname, resnume=resnum, resChain=resChain,
+                                      reportBaseFilename=reportBaseFilename, columnOfReportFile=columnOfReportFile,
+                                      contactThresholdDistance=contactThresholdDistance, symmetries=symmetries,
                                       altSelection=altSelection)
         elif clusteringType == blockNames.ClusteringTypes.lastSnapshot:
 
-            return SequentialLastSnapshotClustering(resname, reportBaseFilename,
-                                                    columnOfReportFile,
-                                                    contactThresholdDistance)
+            return SequentialLastSnapshotClustering(resname=resname, resnum=resnum, resChain=resChain,
+                                                    reportBaseFilename=reportBaseFilename,
+                                                    columnOfReportFile=columnOfReportFile,
+                                                    contactThresholdDistance=contactThresholdDistance)
         elif clusteringType == blockNames.ClusteringTypes.contactMap:
             symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries,[])
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
@@ -1271,9 +1324,10 @@ class ClusteringBuilder:
                 raise ValueError("No similarity Evaluator specified!!")
             similarityBuilder = similarityEvaluatorBuilder()
             similarityEvaluator = similarityBuilder.build(similarityEvaluatorType)
-            return ContactMapAccumulativeClustering(thresholdCalculator, similarityEvaluator, resname,
-                                                    reportBaseFilename, columnOfReportFile,
-                                                    contactThresholdDistance, symmetries, altSelection)
+            return ContactMapAccumulativeClustering(thresholdCalculator, similarityEvaluator, resname=resname,
+                                                    resnum=resnum, resChain=resChain,
+                                                    reportBaseFilename=reportBaseFilename, columnOfReportFile=columnOfReportFile,
+                                                    contactThresholdDistance=contactThresholdDistance, symmetries=symmetries, altSelection=altSelection)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))

@@ -129,16 +129,13 @@ class SimulationParams:
 class clusteringTypes:
     types = {
         "rmsd": {
-            "ligandResname": "basestring",
             "contactThresholdDistance": "numbers.Real",
         },
         "contactMap": {
-            "ligandResname": "basestring",
             "contactThresholdDistance": "numbers.Real",
             "similarityEvaluator": "basestring"
         },
         "lastSnapshot": {
-            "ligandResname": "basestring",
             "contactThresholdDistance": "numbers.Real",
         }
     }
@@ -147,6 +144,8 @@ class clusteringTypes:
         "contactMap": "basestring",
         "lastSnapshot": "basestring",
         "ligandResname": "basestring",
+        "ligandResnum": "numbers.Real",
+        "ligandChain": "basestring",
         "contactThresholdDistance": "numbers.Real",
         "similarityEvaluator": "basestring",
         "symmetries": "list",
