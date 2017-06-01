@@ -5,6 +5,7 @@ import os
 import AdaptivePELE.adaptiveSampling as adaptiveSampling
 import AdaptivePELE.atomset.atomset as atomset
 from AdaptivePELE.clustering import clustering
+import socket
 
 
 class TestadaptiveSampling(unittest.TestCase):
@@ -129,40 +130,31 @@ class TestadaptiveSampling(unittest.TestCase):
             cluster.elements = elements[i]
             cluster.contacts = 0
             goldenClusters.append(cluster)
-        try:
-            self.integrationTest(controlFile, goldenPath, outputPath, goldenClusters)
-        except SystemExit as e:
-            if "No trajectories to cluster!" in e.message:
-                # Catch error for not having PELE installed
-                print ("Warning! There was a sysExit in test3, this is usually "
-                    "caused by not having PELE installed, so it can be ignored "
-                    "if the test are not running on MareNostrum or life")
-                shutil.rmtree(outputPath)
-                shutil.rmtree("tmp_tests_data_3ptb_data_Test3/")
-            else:
-                raise e
+        name = socket.gethostname()
+        if "bsccv" not in name and "login" not in name:
+            print "Some integration can't be run due to not having PELE  installed"
+            return True
+        self.integrationTest(controlFile, goldenPath, outputPath, goldenClusters)
+        shutil.rmtree(outputPath)
+        shutil.rmtree("tmp_tests_data_3ptb_data_Test3/")
 
     def testRestartEmptyClustering(self):
         controlFile = "tests/data/3ptb_data/restartTest.conf"
         outputPath = "tests/data/3ptb_data/RestartTest"
         tmpFolder = "tmp_" + outputPath.replace("/", "_")
         clusteringObjectPath = os.path.join(outputPath, "2", "clustering", "object.pkl")
+        if not os.path.exists(os.path.join(outputPath, "1", "clustering")):
+            os.makedirs(os.path.join(outputPath, "1", "clustering"))
         shutil.copy("tests/data/3ptb_data/object_test_bk.pkl", os.path.join(outputPath, "1", "clustering", "object.pkl"))
-
-        try:
-            # Function to test --> integration test
-            adaptiveSampling.main(controlFile)
-            # Assertions
-            self.assertTrue(adaptiveSampling.checkIntegrityClusteringObject(clusteringObjectPath))
-        except SystemExit as e:
-            if "No trajectories to cluster!" in e.message:
-                # Catch error for not having PELE installed
-                print ("Warning! There was a sysExit in test3, this is usually "
-                    "caused by not having PELE installed, so it can be ignored "
-                    "if the test are not running on MareNostrum or life")
-            else:
-                # Remove clustering object from the simulation and create and empty one
-                open(clusteringObjectPath, "w").close()
-                raise e
+        name = socket.gethostname()
+        if "bsccv" not in name and "login" not in name:
+            print "Some integration can't be run due to not having PELE  installed"
+            return True
+        # Function to test --> integration test
+        adaptiveSampling.main(controlFile)
+        # Assertions
+        self.assertTrue(adaptiveSampling.checkIntegrityClusteringObject(clusteringObjectPath))
+        # Remove clustering object from the simulation and create and empty one
+        open(clusteringObjectPath, "w").close()
         # cleanup
         shutil.rmtree(tmpFolder)
