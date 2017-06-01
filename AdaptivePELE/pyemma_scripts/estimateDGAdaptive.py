@@ -24,14 +24,14 @@ for i, folder in enumerate(sortedFolders[initialEpoch:]):
     parameters = estimateDG.Parameters(ntrajs=trajsPerEpoch*(epoch+1),
                             length=None,
                             lagtime=25,
-                            lagtimes=[1, 10],
+                            lagtimes=[1, 10, 25],
                             nclusters=100,
                             nruns=10,
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,
                             trajWildcard="traj_*",
                             folderWithTraj="rawData")
-    dG, stdDg, db, stdDb = estimateDG.estimateDG(parameters, useExistingClusterCenters=False)
+    dG, stdDg, db, stdDb = estimateDG.estimateDG(parameters, cleanupClusterCentersAtStart=False)
     print "FINAL RESULTS EPOCH %d: dG: %f +- %f, asymmetric fluxes: %f +- %f" % (epoch, dG, stdDg, db, stdDb)
     resultsEpoch.append([dG, stdDg, db, stdDb])
     with open(resultsFile, "a") as f:
