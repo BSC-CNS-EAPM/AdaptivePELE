@@ -157,7 +157,7 @@ AcceptedSteps    Energy    Binding Energy
 0    -541.572    0.0149288    
 [Parameter change]  Task: 1, Step: 1, Pele::parameters -> {anmFrequency: 10000, minimizationRegionRadius: 10}
 [Parameter change]  Task: 1, Step: 1, Perturbation::parameters -> {translationRange: 2}
-[Parameter change]  Task: 1, Step: 1, Perturbation::parameters -> {rotationScalingFactor: 0.1}
+[Parameter change]  Task: 1, Step: 1, Perturbation::parameters -> {rotationScalingFactor: 0.05}
 
 
 [New Step] Step: 1
@@ -182,67 +182,67 @@ beginning: atomSet is too far
 Current trial energy: -541.615 best: -541.615
 Current trial energy: -541.615 best: -541.615
 Current trial energy: -541.615 best: -541.615
-Best trial: 1 out of 3
+Best trial: 3 out of 3
 atomSet is too far
-Perturbation Ef: -541.615 Ei: -541.572 dE: -0.0430073 dt: 0.002796 s
+Perturbation Ef: -541.615 Ei: -541.572 dE: -0.0430073 dt: 0.002945 s
 Perturbed AtomSet is too far, skipping ANM...
 Perturbed AtomSet is too far, skipping relax side chain prediction and minimization...
 Perturbed AtomSet is too far, skipping relax minimization...
 Perturbed AtomSet is too far, skipping metropolis update...
 
-Metropolis Ef: -541.572 Ei: -541.572 dE: -0.000138039 Probability: 1 Accepted Step: true
-[Energy] Task: 1, Step: 1, Final energy:  -541.572
+Metropolis Ef: -541.57 Ei: -541.572 dE: 0.00230269 Probability: 0.998842 Accepted Step: true
+[Energy] Task: 1, Step: 1, Final energy:  -541.57
 Accepted!
-Total step time: 0.005532 s
+Total step time: 0.008618 s
 
 
 Value of metrics after Step 1
 AcceptedSteps    Energy    Binding Energy    
-1    -541.572    0.0147908    
+1    -541.57    0.0172315    
 [Parameter change]  Task: 1, Step: 1, Pele::parameters -> {anmFrequency: 10000, minimizationRegionRadius: 10}
 [Parameter change]  Task: 1, Step: 1, Perturbation::parameters -> {translationRange: 0.75}
 [Parameter change]  Task: 1, Step: 1, Perturbation::parameters -> {rotationScalingFactor: 0.05}
 
 
 [New Step] Step: 2
-[Energy] Task: 1, Step: 2, Initial energy:  -541.572
-ENERGY BOND: 9.163173452257301
-ENERGY BOND SGB: 826.3008566737119
-ENERGY ANGLE: 5.238468043948155
+[Energy] Task: 1, Step: 2, Initial energy:  -541.57
+ENERGY BOND: 9.163173452257377
+ENERGY BOND SGB: 826.300856673712
+ENERGY ANGLE: 5.238468043948158
 ENERGY ANGLE SGB: -401.1699735398344
-ENERGY TORSION: 7.705635663867954
+ENERGY TORSION: 7.705635663867832
 ENERGY 14: 115.5234867411504
-ENERGY 14 SGB: -121.9828682064186
-ENERGY NBOND: -127.2355026342612
-ENERGY NBOND SGB: 107.5803395639069
+ENERGY 14 SGB: -121.9828682064185
+ENERGY NBOND: -126.1360161331681
+ENERGY NBOND SGB: 106.4832937875095
 ENERGY CONSTRAINTS: 0
-ENERGY VACUUM + SGB + CONSTRAINTS: 421.1236157583285
+ENERGY VACUUM + SGB + CONSTRAINTS: 421.1260564830242
 ENERGY NON POLAR: 6.885711465339707
 ENERGY SELF: -969.5813942333375
-ENERGY VACUUM + SGB + CONSTRAINTS + SELF + NON POLAR: -541.5720670096694
+ENERGY VACUUM + SGB + CONSTRAINTS + SELF + NON POLAR: -541.5696262849735
 
 Perturbation:
 beginning: atomSet is too far
 Current trial energy: -541.615 best: -541.615
 Current trial energy: -541.615 best: -541.615
 Current trial energy: -541.615 best: -541.615
-Best trial: 1 out of 3
+Best trial: 3 out of 3
 atomSet is too far
-Perturbation Ef: -541.615 Ei: -541.572 dE: -0.0428692 dt: 0.002863 s
+Perturbation Ef: -541.615 Ei: -541.57 dE: -0.04531 dt: 0.00288 s
 Perturbed AtomSet is too far, skipping ANM...
 Perturbed AtomSet is too far, skipping relax side chain prediction and minimization...
 Perturbed AtomSet is too far, skipping relax minimization...
 Perturbed AtomSet is too far, skipping metropolis update...
 
-Metropolis Ef: -541.572 Ei: -541.572 dE: 0.000119024 Probability: 0.99994 Accepted Step: true
-[Energy] Task: 1, Step: 2, Final energy:  -541.572
+Metropolis Ef: -541.569 Ei: -541.57 dE: 0.000397865 Probability: 0.9998 Accepted Step: true
+[Energy] Task: 1, Step: 2, Final energy:  -541.569
 Accepted!
-Total step time: 0.004944 s
+Total step time: 0.00495 s
 
 
 Value of metrics after Step 2
 AcceptedSteps    Energy    Binding Energy    
-2    -541.572    0.0149098    
-[Parameter change]  Task: 1, Step: 2, Pele::parameters -> {anmFrequency: 1, minimizationRegionRadius: 1000}
+2    -541.569    0.0176293    
+[Parameter change]  Task: 1, Step: 2, Pele::parameters -> {anmFrequency: 10000, minimizationRegionRadius: 10}
 [Parameter change]  Task: 1, Step: 2, Perturbation::parameters -> {translationRange: 2}
-[Parameter change]  Task: 1, Step: 2, Perturbation::parameters -> {rotationScalingFactor: 0.1}
+[Parameter change]  Task: 1, Step: 2, Perturbation::parameters -> {rotationScalingFactor: 0.05}

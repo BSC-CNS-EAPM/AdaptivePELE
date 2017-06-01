@@ -184,12 +184,12 @@ def findFirstRun(outputPath, clusteringOutputObject):
 
 def checkIntegrityClusteringObject(objectPath):
     """
-        Test wheter the found clustering object to reload is a valid object
+        Test whether the found clustering object to reload is a valid object
 
-        :param objectPath: Clustering objec path
+        :param objectPath: Clustering object path
         :type objectPath: str
 
-        :returns: True if the clustering object found is valid
+        :returns: True if the found clustering object is valid
         :rtype: bool
     """
     try:
@@ -287,7 +287,7 @@ def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletiz
         :param simulationRunner: Simulation runner object
 """
     for i in range(finalEpoch):
-        simulationRunner.readMappingFromDisk(epochOutputPathTempletized % i) #TODO: ask joan
+        simulationRunner.readMappingFromDisk(epochOutputPathTempletized % i)
         clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized)
 
 

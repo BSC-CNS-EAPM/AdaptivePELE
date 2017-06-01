@@ -18,11 +18,6 @@ try:
     NETWORK = True
 except ImportError:
     NETWORK = False
-# import socket
-# if "bsccv" not in socket.gethostname():
-#     from sklearn.cluster import AffinityPropagation
-#     from sklearn.cluster import AgglomerativeClustering
-#     from sklearn.cluster import KMeans
 
 
 class Clusters:
