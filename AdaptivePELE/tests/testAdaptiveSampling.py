@@ -161,8 +161,8 @@ class TestadaptiveSampling(unittest.TestCase):
                     "caused by not having PELE installed, so it can be ignored "
                     "if the test are not running on MareNostrum or life")
             else:
+                # Remove clustering object from the simulation and create and empty one
+                open(clusteringObjectPath, "w").close()
                 raise e
-        # Remove clustering object from the simulation and create and empty one
-        open(clusteringObjectPath, "w").close()
         # cleanup
         shutil.rmtree(tmpFolder)

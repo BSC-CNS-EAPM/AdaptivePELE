@@ -1165,8 +1165,10 @@ class ContactMapAccumulativeClustering(Clustering):
             :param altSelection: Flag that controls wether to use the alternative structures (default 8)
             :type altSelection: bool
         """
-        Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain, reportBaseFilename,
-                            columnOfReportFile, contactThresholdDistance,
+        Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain,
+                            reportBaseFilename=reportBaseFilename,
+                            columnOfReportFile=columnOfReportFile,
+                            contactThresholdDistance=contactThresholdDistance,
                             altSelection=altSelection)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMap
         self.thresholdCalculator = thresholdCalculator
@@ -1296,15 +1298,15 @@ class ClusteringBuilder:
         except KeyError as err:
             err.message += ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
-        resname = str(paramsBlock.get(blockNames.ClusteringTypes.ligandResname].upper(), ""))
-        resnum = int(paramsBlock.get(blockNames.ClusteringTypes.ligandResnum], 0))
-        resChain = str(paramsBlock.get(blockNames.ClusteringTypes.ligandChain].upper(), ""))
+        resname = str(paramsBlock.get(blockNames.ClusteringTypes.ligandResname, "")).upper()
+        resnum = int(paramsBlock.get(blockNames.ClusteringTypes.ligandResnum, 0))
+        resChain = str(paramsBlock.get(blockNames.ClusteringTypes.ligandChain, "")).upper()
         if clusteringType == blockNames.ClusteringTypes.rmsd:
             symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries, [])
 
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
-            return ContactsClustering(thresholdCalculator, resname=resname, resnume=resnum, resChain=resChain,
+            return ContactsClustering(thresholdCalculator, resname=resname, resnum=resnum, resChain=resChain,
                                       reportBaseFilename=reportBaseFilename, columnOfReportFile=columnOfReportFile,
                                       contactThresholdDistance=contactThresholdDistance, symmetries=symmetries,
                                       altSelection=altSelection)
