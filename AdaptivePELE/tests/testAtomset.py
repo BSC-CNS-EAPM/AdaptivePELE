@@ -181,6 +181,47 @@ END   \n"
         self.assertEqual(pdb.pdb, pdbContent)
         self.assertEqual(pdb.atoms, goldenAtomsDict)
 
+    def testPDB_sel_resnum(self):
+        # preparation
+        pdb = atomset.PDB()
+
+        # function to test
+        pdb.initialise("tests/data/pdb_test2.pdb", resnum=2)
+
+        # assertion
+        pdbContent = "ATOM      1  N   ASN A   1       7.920  22.268   9.257  1.00 15.18           N1+\n\
+ATOM      2  CA  CYS B   1       8.394  20.916   9.575  1.00 16.24           C  \n\
+ATOM      3  CA  ASN B   1       7.870  19.937   8.524  1.00 16.63           C  \n\
+ATOM      4  O   ASN A   2       7.030  20.308   7.700  1.00 16.13           O  \n\
+ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  \n"
+        atom2 = atomset.Atom("ATOM      4  O   ASN A   2       7.030  20.308   7.700  1.00 16.13           O  ")
+        atom3 = atomset.Atom("ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  ")
+        goldenAtomsDict = {atom2.id: atom2, atom3.id: atom3}
+
+        self.assertEqual(pdb.pdb, pdbContent)
+        self.assertEqual(pdb.atoms, goldenAtomsDict)
+
+    def testPDB_sel_chain(self):
+        # preparation
+        pdb = atomset.PDB()
+
+        # function to test
+        pdb.initialise("tests/data/pdb_test2.pdb", chain="B")
+
+        # assertion
+        pdbContent = "ATOM      1  N   ASN A   1       7.920  22.268   9.257  1.00 15.18           N1+\n\
+ATOM      2  CA  CYS B   1       8.394  20.916   9.575  1.00 16.24           C  \n\
+ATOM      3  CA  ASN B   1       7.870  19.937   8.524  1.00 16.63           C  \n\
+ATOM      4  O   ASN A   2       7.030  20.308   7.700  1.00 16.13           O  \n\
+ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  \n"
+
+        atom2 = atomset.Atom("ATOM      2  CA  CYS B   1       8.394  20.916   9.575 1.00 16.24           C  ")
+        atom3 = atomset.Atom("ATOM      3  CA  ASN B   1       7.870  19.937   8.524 1.00 16.63           C  ")
+        goldenAtomsDict = {atom2.id: atom2, atom3.id: atom3}
+
+        self.assertEqual(pdb.pdb, pdbContent)
+        self.assertEqual(pdb.atoms, goldenAtomsDict)
+
     def testPDB_COM(self):
         # preparation
         pdb = atomset.PDB()

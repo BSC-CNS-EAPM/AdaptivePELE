@@ -267,7 +267,7 @@ cdef class PDB:
         self.totalMass = state['totalMass']
         self.pdb = state['pdb']
 
-    def initialise(self, str PDBstr, bint heavyAtoms=True, str resname="", str atomname="", str type="ALL", str chain="", str resnum =""):
+    def initialise(self, str PDBstr, bint heavyAtoms=True, str resname="", str atomname="", str type="ALL", str chain="", int resnum = 0):
         """
             Load the information from a PDB file or a string with the PDB
             contents
@@ -282,13 +282,21 @@ cdef class PDB:
             :type atomname: str
             :param type: type of atoms to select: may be ALL, PROTEIN or HETERO
             :type type: str
+            :param chain: Chain name to select from the pdb (will only select the atoms with that name)
+            :type chain: str
+            :param resnum: Residue number to select from the pdb (will only select the atoms with that name)
+            :type atomname: int
             :raises: ValueError if the pdb contained no atoms
         """
         cdef object PDBContent
         cdef list stringWithPDBContent
         cdef int atomLineNum
-        cdef str atomName, resName, atomLine
+        cdef str atomName, resName, atomLine, resnumStr
         cdef Atom atom
+        if resnum == 0:
+            resnumStr = ""
+        else:
+            resnumStr = str(resnum)
         PDBContent = StringIO.StringIO(readPDB(PDBstr))  # Using StringIO
         # creates a buffer that can handle a pdb file or a string containing
         # the PDB
@@ -313,7 +321,7 @@ cdef class PDB:
                     continue
                 if chain != "" and not atomLine[21:22].strip() == chain:
                     continue
-                if resnum != "" and not atomLine[22:26].strip() == resnum:
+                if resnumStr != "" and not atomLine[22:26].strip() == resnumStr:
                     continue
 
             atom = Atom(atomLine)
