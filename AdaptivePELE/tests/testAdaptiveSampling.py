@@ -143,12 +143,12 @@ class TestadaptiveSampling(unittest.TestCase):
         clusteringObjectPath = os.path.join(outputPath, "2", "clustering", "object.pkl")
         if not os.path.exists(os.path.join(outputPath, "1", "clustering")):
             os.makedirs(os.path.join(outputPath, "1", "clustering"))
-        shutil.copy("tests/data/3ptb_data/object_test_bk.pkl", os.path.join(outputPath, "1", "clustering", "object.pkl"))
         name = socket.gethostname()
         if "bsccv" not in name and "login" not in name:
             print "Some integration can't be run due to not having PELE  installed"
             return True
         # Function to test --> integration test
+        shutil.copy("tests/data/3ptb_data/object_test_bk.pkl", os.path.join(outputPath, "1", "clustering", "object.pkl"))
         adaptiveSampling.main(controlFile)
         # Assertions
         self.assertTrue(adaptiveSampling.checkIntegrityClusteringObject(clusteringObjectPath))
