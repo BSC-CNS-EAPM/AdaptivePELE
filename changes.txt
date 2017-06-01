@@ -1,6 +1,13 @@
 Behavior changes from previous version:
     *) Added script to reconstruct precise path to a given snapshot
     (writePrecisePathToSnapshot.py)
+    *) Added possibility of chain and resnum selection in PDB
+    *) Change names of clustering in control file 
+    *) Added scripts to calculate free energies in pyemma_scripts
+    *) Added new parameter to control the number of clusters considered in
+    epsilon scoring
 
 Bug fixes:
     *) Minor bug fixes in scripts to calculate free energies
+    *) Fixed bug of incorrect trajectory selection in estimateDG
+    *) Fixed bug of multiple its plot not visible (bug due to pyemma)
