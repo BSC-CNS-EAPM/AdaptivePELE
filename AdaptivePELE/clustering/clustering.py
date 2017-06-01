@@ -1165,8 +1165,10 @@ class ContactMapAccumulativeClustering(Clustering):
             :param altSelection: Flag that controls wether to use the alternative structures (default 8)
             :type altSelection: bool
         """
-        Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain, reportBaseFilename=reportBaseFilename,
-                            columnOfReportFile=columnOfReportFile, contactThresholdDistance=contactThresholdDistance,
+        Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain,
+                            reportBaseFilename=reportBaseFilename,
+                            columnOfReportFile=columnOfReportFile,
+                            contactThresholdDistance=contactThresholdDistance,
                             altSelection=altSelection)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMap
         self.thresholdCalculator = thresholdCalculator
