@@ -455,7 +455,7 @@ cdef class PDB:
         fileHandle.write(self.pdb)
         fileHandle.close()
 
-    def countContacts(self, str ligandResname, int contactThresholdDistance):
+    def countContacts(self, str ligandResname, int contactThresholdDistance, int ligandResnum=0, str ligandChain=""):
         """
             Count the number of alpha carbons that are in contact with the
             protein (i.e. less than contactThresholdDistance Amstrogms away)
@@ -472,7 +472,7 @@ cdef class PDB:
         cdef PDB ligandPDB, alphaCarbonsPDB
 
         ligandPDB = PDB()
-        ligandPDB.initialise(self.pdb, resname=ligandResname, heavyAtoms=True)
+        ligandPDB.initialise(self.pdb, resname=ligandResname, resnum=ligandResnum, chain=ligandChain, heavyAtoms=True)
 
         alphaCarbonsPDB = PDB()
         alphaCarbonsPDB.initialise(self.pdb, type=self._typeProtein,

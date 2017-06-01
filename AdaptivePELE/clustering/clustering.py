@@ -561,7 +561,7 @@ class ContactsClusteringEvaluator:
             :type contactThreshold: float
         """
         if self.contacts is None:
-            self.contacts = pdb.countContacts(resname, resnum, resChain, contactThresholdDistance)
+            self.contacts = pdb.countContacts(resname, contactThresholdDistance, resnum, resChain)
 
     def getInnerLimit(self, cluster):
         """
@@ -629,7 +629,7 @@ class CMClusteringEvaluator:
             :returns: bool, float -- Whether the structure belong to the cluster and the distance between them
         """
         if self.contactMap is None:
-            self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, resnum, resChain, contactThresholdDistance)
+            self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance, resnum, resChain)
             # self.contactMap, foo = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             # self.contacts = pdb.countContacts(resname, 8)  # contactThresholdDistance)
         distance = self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster.contactMap, self.symmetryEvaluator)
@@ -659,7 +659,7 @@ class CMClusteringEvaluator:
             :type contactThreshold: float
         """
         if self.contactMap is None:
-            self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, resnum, resChain, contactThresholdDistance)
+            self.contactMap, self.contacts = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance, resnum, resChain)
             # self.contactMap, foo = self.symmetryEvaluator.createContactMap(pdb, resname, contactThresholdDistance)
             # self.contacts = pdb.countContacts(resname, 8)  # contactThresholdDistance)
 
@@ -1165,8 +1165,8 @@ class ContactMapAccumulativeClustering(Clustering):
             :param altSelection: Flag that controls wether to use the alternative structures (default 8)
             :type altSelection: bool
         """
-        Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain, reportBaseFilename,
-                            columnOfReportFile, contactThresholdDistance,
+        Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain, reportBaseFilename=reportBaseFilename,
+                            columnOfReportFile=columnOfReportFile, contactThresholdDistance=contactThresholdDistance,
                             altSelection=altSelection)
         self.type = clusteringTypes.CLUSTERING_TYPES.contactMap
         self.thresholdCalculator = thresholdCalculator
@@ -1262,8 +1262,7 @@ class SequentialLastSnapshotClustering(Clustering):
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname, resnum=self.resnum,
                        chain=self.resChain)
-        contacts = pdb.countContacts(self.resname, self.resnum, self.resChain,
-                                     self.contactThresholdDistance)
+        contacts = pdb.countContacts(self.resname, self.contactThresholdDistance, self.resnum, self.resChain)
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
         contactsPerAtom = float(contacts)/numberOfLigandAtoms
 
@@ -1296,15 +1295,15 @@ class ClusteringBuilder:
         except KeyError as err:
             err.message += ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
-        resname = str(paramsBlock.get(blockNames.ClusteringTypes.ligandResname].upper(), ""))
-        resnum = int(paramsBlock.get(blockNames.ClusteringTypes.ligandResnum], 0))
-        resChain = str(paramsBlock.get(blockNames.ClusteringTypes.ligandChain].upper(), ""))
+        resname = str(paramsBlock.get(blockNames.ClusteringTypes.ligandResname, "")).upper()
+        resnum = int(paramsBlock.get(blockNames.ClusteringTypes.ligandResnum, 0))
+        resChain = str(paramsBlock.get(blockNames.ClusteringTypes.ligandChain, "")).upper()
         if clusteringType == blockNames.ClusteringTypes.rmsd:
             symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries, [])
 
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
-            return ContactsClustering(thresholdCalculator, resname=resname, resnume=resnum, resChain=resChain,
+            return ContactsClustering(thresholdCalculator, resname=resname, resnum=resnum, resChain=resChain,
                                       reportBaseFilename=reportBaseFilename, columnOfReportFile=columnOfReportFile,
                                       contactThresholdDistance=contactThresholdDistance, symmetries=symmetries,
                                       altSelection=altSelection)

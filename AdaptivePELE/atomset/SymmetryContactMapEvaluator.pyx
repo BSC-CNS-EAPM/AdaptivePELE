@@ -33,7 +33,7 @@ cdef class SymmetryContactMapEvaluator:
         self.ligandList = state.get('ligandList', [])
         self.proteinList = state.get('proteinList', [])
 
-    def createContactMap(self, atomset.PDB PDB, str ligandResname, int ligandResnum, str ligandResChain, int contactThresholdDistance):
+    def createContactMap(self, atomset.PDB PDB, str ligandResname, int contactThresholdDistance, int ligandResnum=0, str ligandResChain=""):
         """
             Create the contact map of the protein and ligand. The contact map is
             a boolean matrix that has as many rows as the number of ligand heavy
@@ -53,11 +53,11 @@ cdef class SymmetryContactMapEvaluator:
             :returns: int -- The number of alpha carbons in contact with the ligand
         """
         if self.symToRowMap:
-            return self.buildContactMap(PDB, ligandResname, ligandResnum, ligandResChain, contactThresholdDistance)
+            return self.buildContactMap(PDB, ligandResname, contactThresholdDistance, ligandResnum, ligandResChain)
         else:
-            return self.buildContactMapWithRowMap(PDB, ligandResname, ligandResnum, ligandResChain, contactThresholdDistance)
+            return self.buildContactMapWithRowMap(PDB, ligandResname, contactThresholdDistance, ligandResnum, ligandResChain)
 
-    def buildContactMapWithRowMap(self, atomset.PDB PDBobj, str ligandResname, int ligandResnum, str ligandResChain, int contactThresholdDistance):
+    def buildContactMapWithRowMap(self, atomset.PDB PDBobj, str ligandResname, int contactThresholdDistance, int ligandResnum=0, str ligandResChain=""):
         """
             Create a map that relates symmetric atoms in the ligand to row
             indices in the contactMap matrix and the contact map of the protein
@@ -120,7 +120,7 @@ cdef class SymmetryContactMapEvaluator:
                     contacts.update([proteinAtomID])
         return contactMap.view(np.bool), len(contacts)
 
-    def buildContactMap(self, atomset.PDB PDBobj, str ligandResname, int ligandResnum, str ligandResChain, int contactThresholdDistance):
+    def buildContactMap(self, atomset.PDB PDBobj, str ligandResname, int contactThresholdDistance, int ligandResnum=0, str ligandResChain=""):
         """
             Create the contact map of the protein and ligand. The contact map is
             a boolean matrix that has as many rows as the number of ligand heavy

@@ -32,4 +32,4 @@ AdaptivePELE/*.pyc
 *.sw[op]
 AdaptivePELE/tmp_tests_data_3ptb_data_Test3/
 AdaptivePELE/tests/data/3ptb_data/Test3/
-AdaptivePELE/tests/data/3ptb_data/RestartTest
+AdaptivePELE/tests/data/3ptb_data/RestartTest/*/logFile*

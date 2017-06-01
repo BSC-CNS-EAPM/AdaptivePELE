@@ -488,11 +488,15 @@ def main(jsonParams):
     utilities.makeFolder(outputPathConstants.tmpFolder)
     saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
 
-    firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject)
+    startFromScratch = False
+    if restart:
+        firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject)
+        if firstRun == 0:
+            startFromScratch = True
+        else:
+            clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner)
 
-    if restart and firstRun != 0:
-        clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner)
-    else:
+    if startFromScratch or not restart:
         firstRun = 0  # if restart false, but there were previous simulations
         clusteringMethod, initialStructuresAsString, initialClusters = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
 

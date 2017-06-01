@@ -31,70 +31,6 @@ class clusteringTest(unittest.TestCase):
         self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
         self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
 
-    def _test_cluster_sklearn_affinity(self):
-        # preparation
-        clusteringParams = {"type": "contactMap",
-                            "params": {"ligandResname": "AIN",
-                                       "contactThresholdDistance": 8}}
-        clusteringBuilder = clustering.ClusteringBuilder()
-        reportCol = 3
-        clusteringInstance = clusteringBuilder.buildClustering(clusteringParams,
-                                                               "ain_report", reportCol)
-
-        trajNames = ["tests/data/aspirin_data/traj*"]
-
-        # function to test
-        clusteringInstance.cluster(trajNames)
-
-        # assertion
-        # Testing is diffrent now, previous assertions won't work
-        # TODO: create new assertion for the new algorithm
-        allClusters = clusteringInstance.clusters.clusters
-        goldenNumberOfClusters = 2
-        goldenEnergyCluster1 = -8424.8
-        goldenEnergyCluster2 = -8453.29
-        goldenElementsCluster1 = 2
-        goldenElementsCluster2 = 1
-
-        self.assertEqual(len(allClusters), goldenNumberOfClusters)
-        self.assertAlmostEqual(allClusters[0].metrics[reportCol], goldenEnergyCluster1, 2)
-        self.assertAlmostEqual(allClusters[1].metrics[reportCol], goldenEnergyCluster2, 2)
-        self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
-        self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
-
-    def _test_cluster_sklearn_agglomerative(self):
-        # preparation
-        nclusters = 2
-        clusteringParams = {"type": "contactMap",
-                            "params": {"ligandResname": "AIN",
-                                       "contactThresholdDistance": 8,
-                                       "nclusters": nclusters}}
-        clusteringBuilder = clustering.ClusteringBuilder()
-        reportCol = 3
-        clusteringInstance = clusteringBuilder.buildClustering(clusteringParams,
-                                                               "ain_report", reportCol)
-
-        trajNames = ["tests/data/aspirin_data/traj*"]
-
-        # function to test
-        clusteringInstance.cluster(trajNames)
-
-        # assertion
-        # Testing is diffrent now, previous assertions won't work
-        # TODO: create new assertion for the new algorithm
-        allClusters = clusteringInstance.clusters.clusters
-        goldenNumberOfClusters = nclusters
-        goldenEnergyCluster1 = -8424.8
-        goldenEnergyCluster2 = -8453.29
-        goldenElementsCluster1 = 2
-        goldenElementsCluster2 = 1
-
-        self.assertEqual(len(allClusters), goldenNumberOfClusters)
-        self.assertAlmostEqual(allClusters[0].metrics[reportCol], goldenEnergyCluster1, 2)
-        self.assertAlmostEqual(allClusters[1].metrics[reportCol], goldenEnergyCluster2, 2)
-        self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
-        self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
-
     def test_cluster_accumulative(self):
         # preparation
         clusteringParams = {"type": "contactMap",
@@ -117,7 +53,6 @@ class clusteringTest(unittest.TestCase):
         clusteringInstance.cluster(trajNames)
         # assertion
         allClusters = clusteringInstance.clusters.clusters
-        clusteringInstance.clusters.printClusters()
         # goldenNumberOfClusters = 3
         # goldenEnergyCluster1 = -8421.5
         # goldenEnergyCluster2 = -8424.8
