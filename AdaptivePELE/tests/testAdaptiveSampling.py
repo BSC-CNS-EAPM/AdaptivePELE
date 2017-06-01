@@ -135,8 +135,6 @@ class TestadaptiveSampling(unittest.TestCase):
             print "Some integration can't be run due to not having PELE  installed"
             return True
         self.integrationTest(controlFile, goldenPath, outputPath, goldenClusters)
-        shutil.rmtree(outputPath)
-        shutil.rmtree("tmp_tests_data_3ptb_data_Test3/")
 
     def testRestartEmptyClustering(self):
         controlFile = "tests/data/3ptb_data/restartTest.conf"
