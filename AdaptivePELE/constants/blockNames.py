@@ -78,6 +78,7 @@ class SpawningParams:
     linear = "linear"
     boltzmann = "boltzmann"
     alpha = "alpha"
+    nclusters = "n"
 
 
 class SpawningDensity:

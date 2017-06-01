@@ -184,7 +184,7 @@ Current trial energy: -541.615 best: -541.615
 Current trial energy: -541.615 best: -541.615
 Best trial: 3 out of 3
 atomSet is too far
-Perturbation Ef: -541.615 Ei: -541.572 dE: -0.0430073 dt: 0.002945 s
+Perturbation Ef: -541.615 Ei: -541.572 dE: -0.0430073 dt: 0.002806 s
 Perturbed AtomSet is too far, skipping ANM...
 Perturbed AtomSet is too far, skipping relax side chain prediction and minimization...
 Perturbed AtomSet is too far, skipping relax minimization...
@@ -193,7 +193,7 @@ Perturbed AtomSet is too far, skipping metropolis update...
 Metropolis Ef: -541.57 Ei: -541.572 dE: 0.00230269 Probability: 0.998842 Accepted Step: true
 [Energy] Task: 1, Step: 1, Final energy:  -541.57
 Accepted!
-Total step time: 0.008618 s
+Total step time: 0.00603 s
 
 
 Value of metrics after Step 1
@@ -228,7 +228,7 @@ Current trial energy: -541.615 best: -541.615
 Current trial energy: -541.615 best: -541.615
 Best trial: 3 out of 3
 atomSet is too far
-Perturbation Ef: -541.615 Ei: -541.57 dE: -0.04531 dt: 0.00288 s
+Perturbation Ef: -541.615 Ei: -541.57 dE: -0.04531 dt: 0.002717 s
 Perturbed AtomSet is too far, skipping ANM...
 Perturbed AtomSet is too far, skipping relax side chain prediction and minimization...
 Perturbed AtomSet is too far, skipping relax minimization...
@@ -237,7 +237,7 @@ Perturbed AtomSet is too far, skipping metropolis update...
 Metropolis Ef: -541.569 Ei: -541.57 dE: 0.000397865 Probability: 0.9998 Accepted Step: true
 [Energy] Task: 1, Step: 2, Final energy:  -541.569
 Accepted!
-Total step time: 0.00495 s
+Total step time: 0.004902 s
 
 
 Value of metrics after Step 2

@@ -95,6 +95,7 @@ class TestSpawningCalculator(unittest.TestCase):
         params = spawning.SpawningParams()
         params.epsilon = 0.5
         params.metricWeights = "linear"
+        params.nclusters = 100
 
         clusters = clustering.Clusters()
         sizes = [6, 2, 3, 1]
@@ -114,6 +115,7 @@ class TestSpawningCalculator(unittest.TestCase):
         params = spawning.SpawningParams()
         params.epsilon = 0.5
         params.metricWeights = "linear"
+        params.nclusters = 100
 
         clusters = clustering.Clusters()
         sizes = [6, 2, 3, 1]
@@ -173,6 +175,7 @@ class TestSpawningCalculator(unittest.TestCase):
         params.metricWeights = "linear"
         params_test = {}
         params.period = params_test.get("period", params.variationWindow)
+        params.nclusters = 100
         params.period += np.sign(np.abs(params.variationWindow-params.period))
         rateVariation = 0.25/3
         clusters = clustering.Clusters()
@@ -208,6 +211,7 @@ class TestSpawningCalculator(unittest.TestCase):
         params.variationWindow = 20
         params.maxEpsilonWindow = 1
         params.metricWeights = "linear"
+        params.nclusters = 100
         params_test = {"period": 8}
         params.period = params_test.get("period", params.variationWindow)
         params.period += np.sign(np.abs(params.variationWindow-params.period))

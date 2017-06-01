@@ -36,7 +36,8 @@ class SpawningParams:
         "maxEpsilonWindow": "numbers.Real",
         "period": "numbers.Real",
         "alpha": "numbers.Real",
-        "metricWeights": "basestring"
+        "metricWeights": "basestring",
+        "n": "numbers.Real"
     }
     types = {
         "sameWeight": {},
