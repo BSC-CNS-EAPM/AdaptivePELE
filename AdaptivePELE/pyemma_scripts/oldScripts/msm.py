@@ -30,9 +30,6 @@ def calculatePCCA(MSM_object, numPCCA):
     MSM_object.pcca(numPCCA)
     return MSM_object
 
-def is_connected(MSM_object):
-    """ Check if the MSM created is connected"""
-    return MSM.analysis.is_connected(MSM_object.transition_matrix)
 
 def ChapmanKolmogorovTest(MSM_object, nsets,memberships=None, error_estimation=False, mlags=2):
     """ Perform the ChapmanKolmogorov test to validate the MSM"""

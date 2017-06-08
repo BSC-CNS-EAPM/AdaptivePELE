@@ -78,10 +78,9 @@ class MSM:
             self.lagtime = self.calculateITS() #keep calculating until convergence is reached
         else:
             its_object = msm.calculateITS(self.dtrajs, self.lagtimes, self.itsErrors)
-            plot_its = msm.plotITS(its_object, self.itsOutput, self.numberOfITS) 
+            plot_its = msm.plotITS(its_object, self.itsOutput, self.numberOfITS)
         if self.MSM_object is None:
             self.createMSM(self.lagtime)
-        self.check_connectivity()
         #self.PCCA(self.numPCCA)
         print "Saving MSM object..."
         helper.saveMSM(self.MSM_object)
@@ -108,18 +107,6 @@ class MSM:
         # PCCA
         print "Calculating PCCA cluster with %d sets..." % numPCCA
         self.MSM_object = msm.calculatePCCA(self.MSM_object, numPCCA)
-
-    def check_connectivity(self):
-        # connectivity
-        print "Checking connectivity of the MSM..."
-        if msm.is_connected(self.MSM_object):
-            print "The MSM estimated is fully connected"
-        else:
-            print "The MSM estimated is not fully connected"
-            unconnected_sets = self.MSM_object.connected_sets
-            print "The MSM estimated has %d connected sets with sizes:" % len(unconnected_sets)
-            for index, uncon_set in enumerate(unconnected_sets):
-                print "Set %d has %d elements" % (index, uncon_set.size)
 
     def createMSM(self, lagtime):
         # estimation
