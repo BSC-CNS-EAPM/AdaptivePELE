@@ -28,16 +28,19 @@ def readParams(control_file):
     numberOfITS = params.get("numberOfITS", -1)
     errors = params.get("errors", False)
     mlags = params.get("mlags", None)
+    clusterCountsThreshold = params.get("clusterCountsThreshold", 0)
 
-    return trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, errors, mlags, lagtime
+    return trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, errors, mlags, lagtime, clusterCountsThreshold
 
 def main(control_file):
 
     # parameters
-    trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, errors, mlags, lagtime = readParams(control_file)
+    trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, errors, mlags, lagtime, clusterCountsThreshold = readParams(control_file)
 
     # program
     clusteringObject = cluster.Cluster(numClusters, trajectoryFolder, trajectoryBasename, alwaysCluster=False)
+    clusteringObject.clusterTrajectories()
+    clusteringObject.eliminateLowPopulatedClusters(clusterCountsThreshold)
     calculateMSM = estimate.MSM(error=False, dtrajs=clusteringObject.dtrajs)
     calculateMSM.estimate(lagtime=lagtime, lagtimes=lagtimes, numberOfITS=numberOfITS)
 

@@ -10,7 +10,7 @@ import computeDeltaG
 
 
 class Parameters:
-    def __init__(self, ntrajs, length, lagtime, nclusters, nruns, useAllTrajInFirstRun, computeDetailedBalance, trajWildcard, folderWithTraj, lagtimes=[], skipFirstSteps=0):
+    def __init__(self, ntrajs, length, lagtime, nclusters, nruns, useAllTrajInFirstRun, computeDetailedBalance, trajWildcard, folderWithTraj, lagtimes=[], skipFirstSteps=0, clusterCountsThreshold=0):
         #If ntrajs/length = None, all trajs/lengths will be used
         self.trajWildcard = trajWildcard
         self.folderWithTraj = folderWithTraj
@@ -23,6 +23,7 @@ class Parameters:
         self.computeDetailedBalance = computeDetailedBalance
         self.lagtimes = lagtimes
         self.skipFirstSteps = skipFirstSteps
+        self.clusterCountsThreshold = clusterCountsThreshold
 
 def _rm(filename):
     try:
@@ -35,7 +36,7 @@ def _rmFiles(trajWildcard):
     for f in allfiles:
         _rm(f)
 
-def _prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryBasename, workingControlFile, lagtimes):
+def _prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryBasename, workingControlFile, lagtimes, clusterCountsThreshold=0):
     """
     #Unused alternative #1, need of a templetized control file
     simulationParameters = simulationrunner.SimulationParameters()
@@ -48,9 +49,9 @@ def _prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryBa
 
     workingFolder = os.path.split(trajectoryFolder)[0]
     try:
-        string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"lagtime\":%d, \"itsOutput\":\"its.png\", \"lagtimes\":%s}"%(workingFolder, trajectoryBasename, clusters, lagtime, lagtimes)
+        string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"lagtime\":%d, \"itsOutput\":\"its.png\", \"lagtimes\":%s, \"clusterCountsThreshold\":%d}"%(workingFolder, trajectoryBasename, clusters, lagtime, lagtimes, clusterCountsThreshold)
     except:
-        string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"itsOutput\":\"its.png\", \"lagtimes\":%s}"%(workingFolder, trajectoryBasename, clusters, lagtimes)
+        string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"itsOutput\":\"its.png\", \"lagtimes\":%s, \"clusterCountsThreshold\":%d}"%(workingFolder, trajectoryBasename, clusters, lagtimes, clusterCountsThreshold)
     with open(workingControlFile, 'w') as f:
         f.write(string)
 
@@ -173,11 +174,11 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
     workingControlFile = "control_MSM.conf"
     origFilesWildcard = os.path.join(parameters.folderWithTraj, parameters.trajWildcard)
 
-    _prepareWorkingControlFile(parameters.lagtime, parameters.nclusters, parameters.folderWithTraj, parameters.trajWildcard, workingControlFile, parameters.lagtimes)
+    _prepareWorkingControlFile(parameters.lagtime, parameters.nclusters, parameters.folderWithTraj, parameters.trajWildcard, workingControlFile, parameters.lagtimes, parameters.clusterCountsThreshold)
 
     deltaGs = []
     detailedBalance = []
-    _cleanupFiles(parameters.trajWildcard, cleanupClusterCentersAtStart)
+    #_cleanupFiles(parameters.trajWildcard, cleanupClusterCentersAtStart)
 
     for i in range(parameters.nruns):
         bootstrap, nWorkingTrajs = _setVariablesForFirstIteration(parameters.useAllTrajInFirstRun, i, parameters.ntrajs)
@@ -196,7 +197,7 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 
         _copyMSMDataFromRun(i)
 
-        _cleanupFiles(parameters.trajWildcard, True)
+        #_cleanupFiles(parameters.trajWildcard, True)
 
     #PLOT RESULTS
     #FIX TO WORK WITH NONES
@@ -213,13 +214,14 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 if __name__ == "__main__":
     parameters = Parameters(ntrajs=None,
                             length=None,
-                            lagtime=250,
+                            lagtime=25,
                             nclusters=100,
-                            nruns=10,
+                            nruns=1,
                             skipFirstSteps = 0,
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,
                             trajWildcard="traj_*",
                             folderWithTraj="rawData",
-                            lagtimes=[1,10,25,50,100,250,500,1000])
+                            lagtimes=[1,10,25,50,100,250,500,1000],
+                            clusterCountsThreshold=500)
     estimateDG(parameters, cleanupClusterCentersAtStart=False)
