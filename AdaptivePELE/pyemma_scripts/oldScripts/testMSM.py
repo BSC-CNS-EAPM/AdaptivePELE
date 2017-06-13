@@ -17,8 +17,8 @@ or test different pyemma methods
     #TODO: Define blocks with tasks to make the program more modular
 
     ### parameters
-trajectoryFolder = "test/MSM2" 
-trajectoryBasename = "*traj_*" 
+trajectoryFolder = "test/MSM2"
+trajectoryBasename = "*traj_*"
 
 numClusters = 100
 
@@ -109,16 +109,6 @@ else:
     print "Estimating MSM with lagtime %d..."%lagtime
     MSM_object = msm.estimateMSM(cl.dtrajs, lagtime)
 
-    #connectivity
-    print "Checking connectivity of the MSM..."
-    if msm.is_connected(MSM_object):
-        print "The MSM estimated is fully connected"
-    else:
-        print "The MSM estimated is not fully connected"
-        unconnected_sets = get_connected_sets(MSM_object)
-        print "The MSM estimated has %d connected sets with sizes:" % len(unconnected_sets)
-        for index, uncon_set in enumerate(unconnected_sets):
-            print "Set %d has %d elements" % (index, uncon_set.size)
 
     #PCCA
     print "Calculating PCCA cluster with %d sets..."%numPCCA

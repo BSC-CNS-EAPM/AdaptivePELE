@@ -97,7 +97,6 @@ def main(trajWildcard, reweightingT=1000):
         eiv, eic = run.getSortedEigen(trans)
         pi = run.getStationaryDistr(eic[:, 0])
         r = allClusters
-
     d = 0.75
 
     originalFilenames = glob.glob(trajWildcard)

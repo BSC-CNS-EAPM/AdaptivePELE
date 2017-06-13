@@ -10,7 +10,7 @@ import msm
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.pyemma_scripts import revTransitionMatrix #cython implementation
+from AdaptivePELE.pyemma_scripts import revTransitionMatrix #cython implementation
 
 def readJSON(controlFile):
     with open(controlFile, "r") as f:
@@ -48,7 +48,7 @@ def getStationaryDistributionAndTransitionMatrix(dTrajs, nclusters, lagtime):
     pi = markov.getStationaryDistr(eigenvec[:,0])
 
     return pi, T
-    
+
 
 def makeRandomSampleOfNtrajs(X, ntrajs=None, length=None):
     if ntrajs:
@@ -65,7 +65,7 @@ def makeRandomSampleOfNtrajs(X, ntrajs=None, length=None):
             except:
                 import sys
                 sys.exit("There is a problem with the trajectory!")
-            
+
     return Xsample
 
 def makeRandomSampleOfdtrajs(dtrajs, ntrajs=None, length=None):
@@ -83,7 +83,7 @@ def makeRandomSampleOfdtrajs(dtrajs, ntrajs=None, length=None):
             except:
                 import sys
                 sys.exit("There is a problem with the trajectory!")
-            
+
     return Xsample
 
 def assignTrajectories(goldenMSMClusterCenters, X):
@@ -124,7 +124,7 @@ def readDTrajOrAssign(filename, goldenMSMClusterCenters, X):
 def buildDTraj(trajectoryFolder, trajectoryBasename, disctrajFolder, filename="golden_dtraj.npy"):
     """
         Builds discretized trajectories.
-        If it finds g_dtraj.npy, it builds them reading the file. 
+        If it finds g_dtraj.npy, it builds them reading the file.
         Otherwise, it reads X, reads cluster centers, and assigns them using the Voronoi of EMMA.
     """
     clusterCenters = os.path.join(disctrajFolder, "discretized/clusterCenters.dat")
@@ -156,7 +156,7 @@ def main(controlFile):
         if controlFile == "rm":
             os.remove("golden_dtraj.npy")
             os.remove("c_dtraj.npy")
-        
+
     #Deprecated, to avoid dependencies on pyemma
     #refTransition, refStationaryDist, lagtime = getTransitionMatrix(trajectoryFolder, trajectoryBasename, numClusters, lagtimes, itsOutput, numberOfITS, itsErrors, lagtime, stride)
 
@@ -185,7 +185,7 @@ def main(controlFile):
             #only trying different traj lengths if sampleSize is defined in control file
             shortestTrajSize = min([len(i) for i in X])
             lowerLimit = 2*lagtime
-            
+
             if maxlength is None:
                 maxlength = shortestTrajSize
             if dlength is None:
@@ -218,7 +218,7 @@ def main(controlFile):
             if not seq:
                 currentEpochFolder = os.path.join(trajectoryFolder2, str(ntrajs))
                 currentX,unused = trajectories.loadCOMFiles(currentEpochFolder, trajectoryBasename)
-                X.extend(currentX) 
+                X.extend(currentX)
 
             if not ntrajs % 25:
                 print "Starting loop for sample of %d trajs" % ntrajs
