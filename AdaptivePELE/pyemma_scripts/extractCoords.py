@@ -16,25 +16,29 @@ class Constants:
         self.reportName = '*report_'
         self.outputTrajectoryFolder = "%s/repeatedExtractedCoordinates"
         self.ligandTrajectoryBasename = "traj_ligand_%s.pdb"
+        self.gatherTrajsFolder = "allTrajs"
+        self.gatherTrajsFilename = os.path.join(self.gatherTrajsFolder, "traj_%s_%s.dat")
 
 
 def parseArguments():
-    desc = "Extracts coordinates in <currentFolder>/extractedCoordinates/coord*.\
+    desc = "Program that extracts residue coordinates for a posterior MSM analysis.\
             It either extracts the resname COM coordinates or those of an atomId, depending on the input.\
-            It then fills the rejected steps, which is not done by PELE in repeatExtractedCoordinates.\
-            It automatically detects whether it is an adaptive or a sequential PELE run looking for folders\
+            It then fills the rejected steps, which is not done by PELE.\
+            Finally, trajectories are gathered together in the same allTrajs folder.\
+            It automatically detects whether it is an adaptive or a sequential PELE run by looking for folders\
             with numeric names."
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("-f", "--folderWithTrajs", default = ".",
                         help="Folder with trajectories (or epochs)")
     parser.add_argument("-atomId", default="", help="serial:atomName:resname, e.g. 2048:C1:AIN")
     parser.add_argument("-resname", default="", help="Ligand resname")
-    parser.add_argument("-s", "--enforceSequential", action="store_true", help="Enforce the consideration as sequential run")
+    parser.add_argument("-s", "--enforceSequential", action="store_true", help="Force the consideration as sequential run (non-adaptive)")
+    parser.add_argument("--setNum", type=int, default=0, help="Sets the number to appear in gathered trajectory in order to avoid clashes between different sequential runs. Ignored in adaptive runs.")
     parser.add_argument("-w", "--writeLigandTrajectory", action="store_true", help="It writes a traj_ligand_XXX.pdb file with the ligand coordinates. The user must delete the original trajectory (if wanted)")
-    parser.add_argument("-t", "--totalSteps", type=int, default=0, help="Total number of steps in traj")
+    parser.add_argument("-t", "--totalSteps", type=int, default=0, help="Total number of steps in traj. Equivalent to epoch length in adaptive runs")
     # parser.add_argument("-f", nargs='+', help="Files to get coordinates")
     args = parser.parse_args()
-    return args.folderWithTrajs, args.atomId, args.resname, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps
+    return args.folderWithTrajs, args.atomId, args.resname, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum
 
 
 def loadAllResnameAtomsInPdb(filename, resname):
@@ -191,13 +195,27 @@ def repeatExtractedSnapshotsInFolder(folder, constants, totalSteps):
     for inputTrajectory in inputTrajectories:
         repeatExtractedSnapshotsInTrajectory(inputTrajectory, constants)
 
+def makeGatheredTrajsFolder(constants):
+    if not os.path.exists(constants.gatherTrajsFolder):
+        os.makedirs(constants.gatherTrajsFolder)
 
-def main(folder=".", atomId="", resname="", totalSteps=0, enforceSequential=False, writeLigandTrajectory=True):
+def gatherTrajs(constants, folder, setNum):
+    trajectoriesFilenames = os.path.join(constants.outputTrajectoryFolder%folder, constants.baseExtractedTrajectoryName + "*")
+    trajectories = glob.glob(trajectoriesFilenames)
+    for inputTrajectory in trajectories:
+        trajectoryNumber = extractFilenumber(os.path.split(inputTrajectory)[1])
+        if folder != ".": #if not sequential
+            setNum = folder
+        shutil.copyfile(inputTrajectory, constants.gatherTrajsFilename%(setNum, trajectoryNumber))
+
+def main(folder=".", atomId="", resname="", totalSteps=0, enforceSequential=0, writeLigandTrajectory=True, setNum=0):
     constants = Constants()
 
     resname = parseResname(atomId, resname)
 
     folderWithTrajs = folder
+
+    makeGatheredTrajsFolder(constants)
 
     if enforceSequential:
         folders = ["."]
@@ -213,8 +231,10 @@ def main(folder=".", atomId="", resname="", totalSteps=0, enforceSequential=Fals
         writeFilenamesExtractedCoordinates(pathFolder, resname, atomId, writeLigandTrajectory, constants)
         print "Repeating snapshots from folder %s" % folder
         repeatExtractedSnapshotsInFolder(pathFolder, constants, totalSteps)
+        print "Gathering trajs in %s" % constants.gatherTrajsFolder
+        gatherTrajs(constants, folder, setNum)
 
 
 if __name__ == "__main__":
-    folder, atomId, resname, enforceSequential, writeLigandTrajectory, totalSteps = parseArguments()
-    main(folder, atomId, resname, totalSteps, enforceSequential, writeLigandTrajectory)
+    folder, atomId, resname, enforceSequential, writeLigandTrajectory, totalSteps, setNum = parseArguments()
+    main(folder, atomId, resname, totalSteps, enforceSequential, writeLigandTrajectory, setNum)
