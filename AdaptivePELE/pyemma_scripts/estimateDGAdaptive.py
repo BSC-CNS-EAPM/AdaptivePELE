@@ -30,7 +30,8 @@ for i, folder in enumerate(sortedFolders[initialEpoch:]):
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,
                             trajWildcard="traj_*",
-                            folderWithTraj="rawData")
+                            folderWithTraj="rawData",
+                            clusterCountsThreshold=10)
     dG, stdDg, db, stdDb = estimateDG.estimateDG(parameters, cleanupClusterCentersAtStart=False)
     print "FINAL RESULTS EPOCH %d: dG: %f +- %f, asymmetric fluxes: %f +- %f" % (epoch, dG, stdDg, db, stdDb)
     resultsEpoch.append([dG, stdDg, db, stdDb])
