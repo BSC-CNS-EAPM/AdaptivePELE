@@ -7,7 +7,7 @@ import glob
 import shutil
 import os
 
-releaseName = "v0.1"
+releaseName = "v1.3"
 releaseFolder = "/gpfs/projects/bsc72/adaptiveSampling/bin"
 toOmit = ["pyemma", "tests", "runAllTests.py", "os", "sys", "TODO.txt", "Data", "Documents", "DataLocal", "epsilon_values.txt", "makeRelease.py", ".git", ".gitignore"]
 
