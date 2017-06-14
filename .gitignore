@@ -3,7 +3,6 @@ AdaptivePELE/*/*.sw[op]
 AdaptivePELE/pyemma_scripts/new/*.pyc
 AdaptivePELE/pyemma/discretized
 AdaptivePELE/pyemma_scripts/*.log
-AdaptivePELE/pyemma_scripts/*.txt
 AdaptivePELE/pyemma_scripts/*.png
 AdaptivePELE/pyemma_scripts/*.pkl
 AdaptivePELE/pyemma_scripts/*.pdb
