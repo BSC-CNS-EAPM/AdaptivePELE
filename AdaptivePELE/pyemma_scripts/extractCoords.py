@@ -8,6 +8,7 @@ import glob
 from AdaptivePELE.atomset import atomset
 import re
 import numpy as np
+import shutil
 
 class Constants:
     def __init__(self):
@@ -30,7 +31,8 @@ def parseArguments():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("-f", "--folderWithTrajs", default = ".",
                         help="Folder with trajectories (or epochs)")
-    parser.add_argument("-atomId", default="", help="serial:atomName:resname, e.g. 2048:C1:AIN")
+    #parser.add_argument("-atomId", action=AtomIdAction, help="serial:atomName:resname, e.g. 2048:C1:AIN")
+    parser.add_argument("-atomIds", nargs='*', help="serial:atomName:resname, e.g. 2048:C1:AIN. May contain more than one atomId")
     parser.add_argument("-resname", default="", help="Ligand resname")
     parser.add_argument("-s", "--enforceSequential", action="store_true", help="Force the consideration as sequential run (non-adaptive)")
     parser.add_argument("--setNum", type=int, default=0, help="Sets the number to appear in gathered trajectory in order to avoid clashes between different sequential runs. Ignored in adaptive runs.")
@@ -38,8 +40,8 @@ def parseArguments():
     parser.add_argument("-t", "--totalSteps", type=int, default=0, help="Total number of steps in traj. Equivalent to epoch length in adaptive runs")
     # parser.add_argument("-f", nargs='+', help="Files to get coordinates")
     args = parser.parse_args()
-    return args.folderWithTrajs, args.atomId, args.resname, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum
 
+    return args.folderWithTrajs, args.atomIds, args.resname, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum
 
 def loadAllResnameAtomsInPdb(filename, resname):
     fileContent = open(filename).read()
@@ -69,12 +71,18 @@ def getPDBCOM(allCoordinates, resname):
         COMs.append(pdb.extractCOM())
     return COMs
 
-def getAtomCoord(allCoordinates, resname, atomId):
+def getAtomCoord(allCoordinates, resname, atomIds):
     coords = []
+    #If ever need to speed this up, build a Trajectory class that inherits from PDB
+    #and loads the atom according to the position in the snapshot, rather than looking
+    #for the atom
     for coordinates in allCoordinates:
         pdb = atomset.PDB()
         pdb.initialise(coordinates, resname=resname, heavyAtoms=True)
-        coords.append(pdb.getAtom(atomId).getAtomCoords())
+        snapshotcoords = []
+        for atomId in atomIds:
+            snapshotcoords.extend(pdb.getAtom(atomId).getAtomCoords())
+        coords.append(snapshotcoords)
     return coords
 
 def writeToFile(COMs, outputFilename):
@@ -85,7 +93,7 @@ def writeToFile(COMs, outputFilename):
                 f.write(str(line[i]) + ' ')
             f.write(str(line[-1]) + '\n')
 
-def writeFilenameExtractedCoordinates(filename, resname, atomId, pathFolder, writeLigandTrajectory, constants):
+def writeFilenameExtractedCoordinates(filename, resname, atomIds, pathFolder, writeLigandTrajectory, constants):
     allCoordinates = loadAllResnameAtomsInPdb(filename, resname)
     if writeLigandTrajectory:
         outputFilename = os.path.join(pathFolder, constants.ligandTrajectoryBasename%extractFilenumber(filename))
@@ -93,8 +101,8 @@ def writeFilenameExtractedCoordinates(filename, resname, atomId, pathFolder, wri
             f.write("\nENDMDL\n".join(allCoordinates))
 
     # because of the way it's split, the last element is empty
-    if atomId != "":
-        coords = getAtomCoord(allCoordinates[:-1], resname, atomId)
+    if not atomIds is None:
+        coords = getAtomCoord(allCoordinates[:-1], resname, atomIds)
     else:
         coords = getPDBCOM(allCoordinates[:-1], resname)
 
@@ -102,22 +110,29 @@ def writeFilenameExtractedCoordinates(filename, resname, atomId, pathFolder, wri
                                        constants.baseExtractedTrajectoryName)
     writeToFile(coords, outputFilename % pathFolder)
 
-def writeFilenamesExtractedCoordinates(pathFolder, resname, atomId, writeLigandTrajectory, constants):
+def writeFilenamesExtractedCoordinates(pathFolder, resname, atomIds, writeLigandTrajectory, constants):
     if not os.path.exists(constants.extractedTrajectoryFolder % pathFolder):
         os.makedirs(constants.extractedTrajectoryFolder % pathFolder)
 
-    originalPDBfiles = glob.glob(pathFolder+'/*trajec*.pdb')
+    originalPDBfiles = glob.glob(pathFolder+'/*traj*.pdb')
     for filename in originalPDBfiles:
-        writeFilenameExtractedCoordinates(filename, resname, atomId, pathFolder, writeLigandTrajectory, constants)
+        writeFilenameExtractedCoordinates(filename, resname, atomIds, pathFolder, writeLigandTrajectory, constants)
 
-def parseResname(atomId, resname):
-    if atomId == "" and resname == "":
+def parseResname(atomIds, resname):
+    if not atomIds is None and len(atomIds) > 0:
+        differentResnames = set([atomId.split(":")[-1] for atomId in atomIds])
+
+        if len(differentResnames) > 1:
+            sys.exit("Error! Different resnames provided in atomIds!")
+        elif len(differentResnames) == 1:
+            extractedResname = differentResnames.pop()
+
+    if (atomIds is None or len(atomIds) == 0) and resname == "":
         sys.exit("Either resname or atomId should be provided")
     elif resname == "":
-        resname = atomId.split(":")[-1] #the atom Id last element is the resname
-    elif atomId != "":
-        resnameInAtomId = atomId.split(":")[-1] #the atom Id last element is the resname
-        if resnameInAtomId != resname:
+        resname = extractedResname #the atom Id last element is the resname
+    elif not atomIds is None and len(atomIds) > 0:
+        if extractedResname != resname:
             sys.exit("Residue name in resname and atomId do not match!")
     return resname
 
@@ -208,14 +223,16 @@ def gatherTrajs(constants, folder, setNum):
             setNum = folder
         shutil.copyfile(inputTrajectory, constants.gatherTrajsFilename%(setNum, trajectoryNumber))
 
-def main(folder=".", atomId="", resname="", totalSteps=0, enforceSequential=0, writeLigandTrajectory=True, setNum=0):
+def main(folder=".", atomIds=[""], resname="", totalSteps=0, enforceSequential=0, writeLigandTrajectory=True, setNum=0):
     constants = Constants()
 
-    resname = parseResname(atomId, resname)
+    resname = parseResname(atomIds, resname)
 
     folderWithTrajs = folder
 
     makeGatheredTrajsFolder(constants)
+
+    #change atomId for list
 
     if enforceSequential:
         folders = ["."]
@@ -228,7 +245,7 @@ def main(folder=".", atomId="", resname="", totalSteps=0, enforceSequential=0, w
     for folder in folders:
         pathFolder = os.path.join(folderWithTrajs, folder)
         print "Extracting coords from folder %s" % folder
-        writeFilenamesExtractedCoordinates(pathFolder, resname, atomId, writeLigandTrajectory, constants)
+        writeFilenamesExtractedCoordinates(pathFolder, resname, atomIds, writeLigandTrajectory, constants)
         print "Repeating snapshots from folder %s" % folder
         repeatExtractedSnapshotsInFolder(pathFolder, constants, totalSteps)
         print "Gathering trajs in %s" % constants.gatherTrajsFolder
@@ -236,5 +253,5 @@ def main(folder=".", atomId="", resname="", totalSteps=0, enforceSequential=0, w
 
 
 if __name__ == "__main__":
-    folder, atomId, resname, enforceSequential, writeLigandTrajectory, totalSteps, setNum = parseArguments()
-    main(folder, atomId, resname, totalSteps, enforceSequential, writeLigandTrajectory, setNum)
+    folder, atomIds, resname, enforceSequential, writeLigandTrajectory, totalSteps, setNum = parseArguments()
+    main(folder, atomIds, resname, totalSteps, enforceSequential, writeLigandTrajectory, setNum)
