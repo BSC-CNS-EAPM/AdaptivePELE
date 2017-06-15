@@ -23,6 +23,7 @@ class Cluster:
         self.numClusters = numClusters
         self.trajectoryFolder = trajectoryFolder
         self.trajectoryBasename = trajectoryBasename
+        self.x = []
 
     
     def cluster(self, trajectories):
@@ -79,6 +80,7 @@ class Cluster:
             print "Removing %d clusters due with less than %d counts" % (clustersToDelete.shape[0], clusterCountsThreshold)
             self.clusterCenters = np.delete(self.clusterCenters, clustersToDelete, axis=0)
             self._writeClusterCenters(self.clusterCenters, self.clusterCentersFile)
+            self.dtrajs = self.assignNewTrajecories(self.x)
 
     def _writeClusterCenters(self, clusterCenters, outputFilename):
         np.savetxt(outputFilename, clusterCenters, fmt="%.5f %.5f %.5f")
