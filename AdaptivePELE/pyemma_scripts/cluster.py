@@ -80,10 +80,7 @@ class Cluster:
             print "Removing %d clusters due with less than %d counts" % (clustersToDelete.shape[0], clusterCountsThreshold)
             self.clusterCenters = np.delete(self.clusterCenters, clustersToDelete, axis=0)
             self._writeClusterCenters(self.clusterCenters, self.clusterCentersFile)
-<<<<<<< HEAD
             self.dtrajs = self.assignNewTrajecories(self.x)
-=======
->>>>>>> 0b6d3029b1a1d2ba3269d1ea0546fca5cbc44e4e
 
     def _writeClusterCenters(self, clusterCenters, outputFilename):
         np.savetxt(outputFilename, clusterCenters, fmt="%.5f %.5f %.5f")
