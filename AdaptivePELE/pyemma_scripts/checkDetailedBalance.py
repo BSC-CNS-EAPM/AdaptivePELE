@@ -1,5 +1,5 @@
 import glob
-import math 
+import math
 import os
 import numpy
 import argparse
@@ -15,9 +15,9 @@ TRAJECTORY_MATCHING_PATTERN = "*.disctraj"
 def parseArguments():
     desc = "Program that analyses a column of data, printing different statistical values and a histogram if desired."
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("-f", default='discretized', help="Folder with cluster contents") 
-    parser.add_argument("-t", "--threshold", default=0, type=float, help="If Cij < threshold and Cji < threshold, Cij = Cji = 0") 
-    parser.add_argument("-l", "--lagtime", default=1, type=int, help="Lagtime") 
+    parser.add_argument("-f", default='discretized', help="Folder with cluster contents")
+    parser.add_argument("-t", "--threshold", default=0, type=float, help="If Cij < threshold and Cji < threshold, Cij = Cji = 0")
+    parser.add_argument("-l", "--lagtime", default=1, type=int, help="Lagtime")
     parser.add_argument("-p", "--printFigs", action=store_true)
     args = parser.parse_args()
 
@@ -83,7 +83,7 @@ def computePopulationsAndTransitionProbabilities(folder, countsThreshold, lagtim
     counts, countMatrix = computeCountsAndCountMatrixRemovingNoise(folder, countsThreshold, lagtime)
 
     """
-    countMatrix = np.array(transitions)    
+    countMatrix = np.array(transitions)
     sparseCountMatrix = sparse.csr_matrix(countMatrix)
     sparseInString = sparseCountMatrix.__str__()
     outputFile = open("countMatrix.dat", "w")
@@ -111,14 +111,14 @@ def plotMatrix(figureNumber, titleString, matrix, cmap=''):
     ax = fig.add_subplot(111)
     ax.set_aspect('equal')
     plt.title(titleString, fontsize=20)
-    if cmap != '': 
+    if cmap != '':
         cax=plt.pcolor(matrix, alpha=0.9, cmap=cmap)
     else:
         cax = plt.pcolor(matrix, alpha=0.9)
 
     #add colorbar if does not exist
     #if exists, remove previous, and add new one
-    if len(plt.gcf().axes) > 1: 
+    if len(plt.gcf().axes) > 1:
            # if so, then the last axes must be the colorbar.
            # we get its extent
            pts = plt.gcf().axes[-1].get_position().get_points()
@@ -131,7 +131,7 @@ def plotMatrix(figureNumber, titleString, matrix, cmap=''):
            # and add a colorbar to it
            cbar = plt.colorbar(cax=cax)
            cbar.ax.set_ylabel(label)
-           # unfortunately the aspect is different between the initial call to colorbar 
+           # unfortunately the aspect is different between the initial call to colorbar
            #   without cax argument. Try to reset it (but still it's somehow different)
            cbar.ax.set_aspect(20)
     else:
@@ -183,7 +183,7 @@ def main(folder, countsThreshold, lagtime, printFigs=False):
         #plotMatrix(2, r'$P_{ij}$', transitions, cmap)
         plotMatrix(3, r'$\pi_i P_{ij}$', detailedBalanceComponents,cmap)
         #plt.savefig("db_flux.eps")
-    
+
     detailedBalanceComponentsAbsoluteDifference = numpy.absolute(detailedBalanceComponents - detailedBalanceComponents.T) / 2. #factor 2 to avoid the metric to go from 0 to 2, but from 0 to 1
     detailedBalanceComponentsAverage = numpy.multiply(detailedBalanceComponents + detailedBalanceComponents.T, 0.5)
     frobeniusAvg = linalg.norm(detailedBalanceComponentsAbsoluteDifference) / linalg.norm(detailedBalanceComponentsAverage)
@@ -204,4 +204,4 @@ def main(folder, countsThreshold, lagtime, printFigs=False):
 
 if __name__ == '__main__':
     folder, countsThreshold, lagtime, printFigs  = parseArguments()
-    main(folder, countsThreshold, lagtime, printFigs) 
+    main(folder, countsThreshold, lagtime, printFigs)

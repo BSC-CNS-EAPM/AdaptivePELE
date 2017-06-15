@@ -120,7 +120,7 @@ def _cleanupFiles(trajWildcard, cleanupClusterCenters=True):
     _rmFiles("MSM_object.pkl")
     _rmFiles("discretized/traj_*")
     _rmFiles(trajWildcard)
-    if cleanupClusterCenters: 
+    if cleanupClusterCenters:
         _rmFiles("discretized/clusterCenter*")
 
 def _setVariablesForFirstIteration(useAllTrajInFirstRun, i, ntrajs):
@@ -178,7 +178,7 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 
     deltaGs = []
     detailedBalance = []
-    #_cleanupFiles(parameters.trajWildcard, cleanupClusterCentersAtStart)
+    _cleanupFiles(parameters.trajWildcard, cleanupClusterCentersAtStart)
 
     for i in range(parameters.nruns):
         bootstrap, nWorkingTrajs = _setVariablesForFirstIteration(parameters.useAllTrajInFirstRun, i, parameters.ntrajs)
@@ -197,7 +197,7 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 
         _copyMSMDataFromRun(i)
 
-        #_cleanupFiles(parameters.trajWildcard, True)
+        _cleanupFiles(parameters.trajWildcard, True)
 
     #PLOT RESULTS
     #FIX TO WORK WITH NONES
@@ -214,7 +214,7 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 if __name__ == "__main__":
     parameters = Parameters(ntrajs=None,
                             length=None,
-                            lagtime=25,
+                            lagtime=450,
                             nclusters=100,
                             nruns=1,
                             skipFirstSteps = 0,
@@ -223,5 +223,5 @@ if __name__ == "__main__":
                             trajWildcard="traj_*",
                             folderWithTraj="rawData",
                             lagtimes=[1,10,25,50,100,250,500,1000],
-                            clusterCountsThreshold=500)
+                            clusterCountsThreshold=25)
     estimateDG(parameters, cleanupClusterCentersAtStart=False)
