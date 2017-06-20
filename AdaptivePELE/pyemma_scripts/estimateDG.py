@@ -110,7 +110,7 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
         try:
             trimmedTraj = traj[skipFirstSteps:length+1,:]
             if len(trimmedTraj) > 0:
-                np.savetxt(dst, trimmedTraj, fmt="%d\t%.4f\t%.4f\t%.4f")
+                np.savetxt(dst, trimmedTraj, fmt="%.4f", delimiter="\t")
         except:
             sys.exit("There is a problem with %s"%trajFile)
     return writenFiles
@@ -178,7 +178,7 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 
     deltaGs = []
     detailedBalance = []
-    #_cleanupFiles(parameters.trajWildcard, cleanupClusterCentersAtStart)
+    _cleanupFiles(parameters.trajWildcard, cleanupClusterCentersAtStart)
 
     for i in range(parameters.nruns):
         bootstrap, nWorkingTrajs = _setVariablesForFirstIteration(parameters.useAllTrajInFirstRun, i, parameters.ntrajs)
@@ -197,7 +197,7 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 
         _copyMSMDataFromRun(i)
 
-        #_cleanupFiles(parameters.trajWildcard, True)
+        _cleanupFiles(parameters.trajWildcard, True)
 
     #PLOT RESULTS
     #FIX TO WORK WITH NONES
@@ -216,12 +216,12 @@ if __name__ == "__main__":
                             length=None,
                             lagtime=25,
                             nclusters=100,
-                            nruns=1,
+                            nruns=10,
                             skipFirstSteps = 0,
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,
                             trajWildcard="traj_*",
                             folderWithTraj="rawData",
                             lagtimes=[1,10,25,50,100,250,500,1000],
-                            clusterCountsThreshold=500)
-    estimateDG(parameters, cleanupClusterCentersAtStart=False)
+                            clusterCountsThreshold=50)
+    estimateDG(parameters, cleanupClusterCentersAtStart=True)
