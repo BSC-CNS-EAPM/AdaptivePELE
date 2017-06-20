@@ -37,7 +37,6 @@ class MSM:
         print "Using lagtime = ", self.lagtime
         self.buildMSM()
         np.savetxt(self.stationaryDistributionFilename, self.MSM_object.pi)
-        self.check_connectivity()
         self.saveMSM(self.MSM_object)
 
     def computePCCA(self, numberOfPCCAclusters):
@@ -64,18 +63,6 @@ class MSM:
         self.plotChapmanKolmogorovTest(CKObject)
         plt.show()
 
-
-    def check_connectivity(self):
-        # connectivity
-        print "Checking connectivity of the MSM..."
-        if msm.analysis.is_connected(self.MSM_object.transition_matrix):
-            print "The MSM estimated is fully connected"
-        else:
-            print "The MSM estimated is not fully connected"
-            unconnected_sets = self.MSM_object.connected_sets
-            print "The MSM estimated has %d connected sets with sizes:" % len(unconnected_sets)
-            for index, uncon_set in enumerate(unconnected_sets):
-                print "Set %d has %d elements" % (index, uncon_set.size)
 
     def _calculateITS(self):
         is_converged = False
