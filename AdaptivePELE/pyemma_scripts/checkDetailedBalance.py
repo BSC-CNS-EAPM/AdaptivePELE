@@ -151,10 +151,6 @@ def main(folder, countsThreshold, lagtime, printFigs=False):
     populations, transitions = computePopulationsAndTransitionProbabilities(folder, countsThreshold, lagtime)
 
 
-    #from pyemma_scripts import helper
-    #msm = helper.loadMSM("MSM_object.pkl")
-    #populations = msm.stationary_distribution[:]
-
     if printFigs:
         cmap = matplotlib.cm.coolwarm
         cmap.set_bad('w',1.)

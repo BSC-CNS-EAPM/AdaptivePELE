@@ -5,7 +5,7 @@ import argparse
 import cPickle
 from scipy.ndimage import filters
 from pyemma.coordinates.clustering import AssignCenters
-from AdaptivePELE.pyemma_scripts import runMarkovChainModel as run
+import runMarkovChainModel as run
 import itertools
 
 """
