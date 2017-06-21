@@ -76,22 +76,11 @@ class NullDensityCalculator(DensityCalculator):
 
 
 class ContinuousDensityCalculator(DensityCalculator):
-    limit = {8: 1.0, 6: 0.4, 4: 0.1, 10: 4.0}
-    slope = {8: 4.0, 6: 10.0, 4: 40.0, 10: 2.0}
-
     def __init__(self):
         DensityCalculator.__init__(self)
         self.type = densitycalculatortypes.DENSITY_CALCULATOR_TYPES.continuous
 
     def calculate(self, contacts, contactThreshold):
-        # if contacts > 2.0:
-        #     return 32
-        # else:
-        #     return 8.76571*contacts**2-2.44857*contacts+0.28829
-        # if contacts > self.limit[contactThreshold]:
-        #     return 8
-        # else:
-        #     return 64.0/(-self.slope[contactThreshold]*contacts+6)**3
         if contacts > 1.0:
             return 8
         else:

@@ -229,7 +229,7 @@ class SpawningCalculator:
 from abc import ABCMeta, abstractmethod
 class DensitySpawningCalculator(SpawningCalculator):
     """
-        Subclass of Spawning calculator, that ensures the definition of a density calculator.
+        Subclass of Spawning calculator that ensures the definition of a density calculator.
     """
 
     def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
