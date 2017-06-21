@@ -43,19 +43,16 @@ class SpawningParams:
         "inverselyProportional": {},
         "epsilon": {
             "epsilon": "numbers.Real",
-            "T": "numbers.Real",
             "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
         },
         "FAST": {
             "epsilon": "numbers.Real",
-            "T": "numbers.Real",
             "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
         },
         "variableEpsilon": {
             "epsilon": "numbers.Real",
-            "T": "numbers.Real",
             "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
             "varEpsilonType": "basestring",
