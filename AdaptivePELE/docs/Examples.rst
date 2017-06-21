@@ -1,6 +1,23 @@
 AdaptivePELE Overview
 ==========================
 
+
+Installation
+------------
+
+In order to have a running copy of AdaptivePELE, you need to install and compile cython files in the base folder with::
+
+    cd AdaptivePELE
+    python setup.py build_ext --inplace
+
+Also, if AdaptivePELE was not installed in a typical library directory, a common option is to add it to your local PYTHONPATH::
+
+    export PYTHONPATH=<location_of_AdaptivePELE>
+
+
+Overview
+--------
+
 This page tries to give an overview of AdaptivePELE, enough to get it
 up and running. The program aims to enhance the exploration of standard
 molecular simulations by iteratively running short simulations, 
@@ -9,9 +26,7 @@ in *interesting* regions using the multi-armed bandit as a framework.
 The algorithm can be summarized in the flow diagram shown below:
 
 .. image:: adaptiveDiagram.png
-    :width: 900px
     :align: center
-    :height: 900px
     :alt: image trouble
 
 AdaptivePELE is a Python program called with a parameter: the control 
@@ -84,6 +99,20 @@ Currently, there are two implemented simulation types:
 * **test**. The test type has no real use outside of testing. 
 
 We plan to implement an MD type in future versions.
+
+
+Templetized PELE control file
+.............................
+
+In order to run adaptivePELE, PELE's control file needs to be slightly modified. In particular:
+
+* **MultipleComplexes"**: AdaptivePELE requieres the use of multiple complexes: ``"MultipleComplex": [ $COMPLEXES ]``
+
+* **seed**: The seed needs to be templetized: ``"seed": $SEED``
+
+* **outputPath**: The output path needs to be changed for: ``"reportPath": "$OUTPUT_PATH/report"``
+
+* **numberOfPeleSteps**: The number of pele steps needs to be templetized as ``"numberOfPeleSteps": $PELE_STEPS``
 
 parameters
 ..........
@@ -299,7 +328,7 @@ parameters
 
 * **metricWeights** (*string*, default=linear): Selects how to distribute the weights of the cluster according to its metric, two options: linear (proportional to metric) or Boltzmann weigths (proportional to exp(-metric/T). Needs to define the temperature **T**.
 
-* **T** (*float*, mandatory with Boltzmann metric weights): Temperature, only used for Boltzmann weights
+* **T** (*float*, default=1000): Temperature, only used for Boltzmann weights
 
 The following parameters are mandatory for **variableEpsilon**:
 
@@ -315,6 +344,7 @@ Examples
 ..........
 
 ::
+
     "spawning" : {
         "type" : "inverselyProportional",
         "params" : {
@@ -322,7 +352,9 @@ Examples
         }
     }
 
+
 ::
+
     "spawning" : {
         "type" : "epsilon",
         "params" : {
@@ -344,12 +376,117 @@ Example 1
 
 The first example makes use of default parameters (used in the AdaptivePELE paper).
 
+::
+
+    {
+        "generalParams" : {
+            "restart": false,
+            "outputPath":"example1",
+            "nativeStructure" : "native.pdb",
+            "initialStructures" : ["initial1.pdb", "initial2.pdb"]
+        },
+
+        "simulation": {
+            "type" : "pele",
+            "params" : {
+                "iterations" : 25,
+                "processors" : 128,
+                "peleSteps" : 4,
+                "seed": 30689,
+                "controlFile" : "templetizedPELEControlFile.conf"
+                
+            }
+        },
+
+        "clustering" : {
+            "type" : "rmsd",
+            "params" : {
+                "ligandResname" : "AEN"
+            }
+        },
+
+        "spawning" : {
+            "type" : "inverselyProportional",
+            "params" : {
+                "reportFilename" : "report"
+            }
+        }
+    }
+
 
 To summarize, below there is a screenshot of a simple functional control file:
 
 Example 2
 .........
 
-A more complete (altough not comprehensible) example would look like (clicking
-in the image will show a larger version of the image):
+A more complete (although not so comprehensible) example::
 
+    {
+        "generalParams" : {
+            "restart": true,
+            "debug" : false,
+            "outputPath":"example2",
+            "writeAllClusteringStructures": false,
+            "nativeStructure" : "native.pdb",
+            "initialStructures" : ["initial1.pdb", "initial2.pdb"]
+        },
+
+        "spawning" : {
+            "type" : "epsilon",
+            "params" : {
+                "reportFilename" : "report",
+                "metricColumnInReport" : 5,
+                "epsilon":0.1
+            },
+            "density" : {
+                "type" : "null"
+            }
+        },
+
+        "simulation": {
+            "type" : "pele",
+            "params" : {
+                "executable" : "PELE++/bin/rev12025/Pele_rev12025_mpi",
+                "data" : "PELE++/data/rev12025/Data",
+                "documents" : "PELE++/Documents/rev12025",
+                "iterations" : 25,
+                "processors" : 51,
+                "peleSteps" : 4,
+                "seed": 30689,
+                "controlFile" : "/gpfs/scratch/bsc72/bsc72755/adaptiveSampling/data/3ptb/3ptb_a_1000.conf"
+                
+            }
+        },
+
+        "clustering" : {
+            "type" : "rmsd",
+            "params" : {
+                "ligandResname" : "AEN",
+                "contactThresholdDistance" : 8, 
+                "symmetries": [{"3225:C3:AEN":"3227:C5:AEN","3224:C2:AEN":"3228:C6:AEN"}, {"3230:N1:AEN": "3231:N2:AEN"}]
+            },
+            "thresholdCalculator" : {
+                "type" : "heaviside",
+                "params" : {
+                    "values" : [2, 3, 4, 5],
+                    "conditions": [1.0, 0.75, 0.5]
+                }
+            }
+        }
+
+    }
+
+
+Output
+------
+
+Each epoch's output is redirected to a different folder, with a name corresponding to the epoch. For example, if we run three epochs, we will have three folders named
+0, 1, and 2.
+
+Aside from the regular simulation program output, within each folder, it creates a clustering directory with the clustering summary information, and 
+eventually the cluster center pdb files, and the clustering object. This clustering object is used to restart simulations, and only that of the last
+finished epoch is kept for disk usage optimization. 
+Note that if we change a clustering parameter in a restart run, AdaptivePELE will recluster all the snapshots, which will fail if previous trajectories are not present.
+
+
+In order to analyse trajectories
