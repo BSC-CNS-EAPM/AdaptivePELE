@@ -1,5 +1,5 @@
-AdaptivePELE Overview
-==========================
+User Manual
+===========
 
 
 Installation
@@ -56,7 +56,20 @@ Control file outline
 generalParams block
 -------------------
 
-The general parameters block has five mandatory fields:
+These parameters control the general aspects of the simulation, such as the initial structures or the output path.
+For example, if you consider that a simulation did not explore the energy landscape sufficiently, 
+it can be automatically resumed. In this case, if you change the clustering parameters from the previous run,
+it will need the trajectory files to recluster all snapshots. Otherwise, it is enough with the automatically 
+handled clustering objects.
+If you want to test the effect of using a particular cluster threshold or spawning parameter (see below),
+using debug=true may be a great option.
+
+
+
+Parameters
+..........
+
+The general parameters block has five possible fields:
 
 * **restart** (*boolean*, default=True): This parameter specifies whether you want to
   continue a previous simulation or not. It requires the last epoch's clustering object, 
@@ -104,7 +117,7 @@ We plan to implement an MD type in future versions.
 Templetized PELE control file
 .............................
 
-In order to run adaptivePELE, PELE's control file needs to be slightly modified. In particular:
+In order to run adaptivePELE, PELE control file needs to be templetized. In particular:
 
 * **MultipleComplexes"**: AdaptivePELE requieres the use of multiple complexes: ``"MultipleComplex": [ $COMPLEXES ]``
 
@@ -117,7 +130,7 @@ In order to run adaptivePELE, PELE's control file needs to be slightly modified.
 parameters
 ..........
 
-In the PELE type the following parameters are mandatory:
+When using PELE as a propagator, the following parameters are mandatory:
 
 * **iterations** (*integer*, mandatory): Number of adaptive sampling iterations to run
 * **processors** (*integer*, mandatory): Number of processors to use with PELE
@@ -130,6 +143,8 @@ Optionally, you can also use the following parameters:
 * **data** (*string*, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE
 * **documents** (*string*, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE
 * **executable** (*string*, default=MareNostrum or Life cluster path): Path to the Pele executable folder, it is already
+
+Additionally, the block may have an exit condition that stops the execution:
 
 * **exitCondition** (*dict*, default=None): Block that specifies an exit condition for the simulation.
   Currently only the metric type is implemented, this type accepts a
@@ -240,8 +255,10 @@ parameters
   that are symmetrical in the ligand
 * **similarityEvaluator** (*string*, mandatory)  Name of the method to evaluate the similarity
   of contactMaps, only available and mandatory in the contactMap clustering
+* **alternativeStructure** (*bool*, default=False): It stores alternative spawning structures within each cluster to be used in the spawning (see below). Any two pairs of alternative structures within a cluster are separated a minimum distance of cluster_threshold_distance/2.
 
-
+Example
+.......
 
 A typical setting of the rmsd clustering is::
 
@@ -290,7 +307,7 @@ There are several implemented strategies:
 
 * **inverselyProportional**: Distributes the processors with a weight that is inversely proportional to the cluster population.
 
-* **epsilon**: An **epsilon** fraction of processors are distributed proportionally to the value of a metric, and the rest are inverselyProportional distributed.  A param **n** can be specified to only consider the *n* clusters with best metric.
+* **epsilon**: An *epsilon* fraction of processors are distributed proportionally to the value of a metric, and the rest are inverselyProportional distributed.  A param **n** can be specified to only consider the *n* clusters with best metric.
 
 * **variableEpsilon**: Equivalent to epsilon, with an epsilon value changing over time
 
@@ -489,4 +506,4 @@ finished epoch is kept for disk usage optimization.
 Note that if we change a clustering parameter in a restart run, AdaptivePELE will recluster all the snapshots, which will fail if previous trajectories are not present.
 
 
-In order to analyse trajectories
+In order to analyse trajectories, 
