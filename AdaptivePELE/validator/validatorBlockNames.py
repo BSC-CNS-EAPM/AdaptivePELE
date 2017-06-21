@@ -9,9 +9,7 @@ class GeneralParams:
     mandatory = {
         "restart": "bool",
         "outputPath": "basestring",
-        "initialStructures": "list",
-        "debug": "bool",
-        "writeAllClusteringStructures": "bool"
+        "initialStructures": "list"
     }
     params = {
         "restart": "bool",
@@ -130,19 +128,17 @@ class SimulationParams:
 class clusteringTypes:
     types = {
         "rmsd": {
-            "contactThresholdDistance": "numbers.Real",
         },
         "contactMap": {
-            "contactThresholdDistance": "numbers.Real",
             "similarityEvaluator": "basestring"
         },
         "lastSnapshot": {
-            "contactThresholdDistance": "numbers.Real",
         }
     }
     params = {
         "rmsd": "basestring",
         "contactMap": "basestring",
+        "contactThresholdDistance": "numbers.Real",
         "lastSnapshot": "basestring",
         "ligandResname": "basestring",
         "ligandResnum": "numbers.Real",
