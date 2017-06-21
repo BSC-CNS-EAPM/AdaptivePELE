@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="AdaptivePELE  documentation" href="index.html"/>
         <link rel="prev" title="validator Package" href="AdaptivePELE.validator.html"/> 
 
@@ -61,7 +63,7 @@
             
             
               <div class="version">
-                v1.2
+                v1.3
               </div>
             
           
@@ -84,11 +86,30 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE Package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">AdaptivePELE Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#general-params">general Params</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#simulation-params">simulation Params</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#clustering-params">clustering Params</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#spawning-params">spawning Params</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">AdaptivePELE Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#control-file-outline">Control file outline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generalparams-block">generalParams block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simulation-block">simulation block</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#parameters">parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#clustering-block">clustering block</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#thresholdcalculator">thresholdCalculator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rmsd-clustering">rmsd clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contactmap-clustering">contactMap clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#spawning-block">spawning block</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#density-calculator">density calculator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#control-file-examples">Control File Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-1">Example 1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-2">Example 2</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -113,7 +134,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -129,7 +150,7 @@
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/Examples.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/Examples.rst.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -141,116 +162,222 @@
             
   <div class="section" id="adaptivepele-overview">
 <h1>AdaptivePELE Overview<a class="headerlink" href="#adaptivepele-overview" title="Permalink to this headline">¶</a></h1>
-<p>This page will try to give you an overview of the program, enough to get you
-up and running. Adaptive sampling is called with a control file as a
-parameters. The control file is a json document that
-contains 4 sections: general parameters, simulation parameters, clustering
+<p>This page tries to give an overview of AdaptivePELE, enough to get it
+up and running. The program aims to enhance the exploration of standard
+molecular simulations by iteratively running short simulations,
+assessing the exploration with a clustering, and spawning new trajectories
+in <em>interesting</em> regions using the multi-armed bandit as a framework.
+The algorithm can be summarized in the flow diagram shown below:</p>
+<a class="reference internal image-reference" href="_images/adaptiveDiagram.png"><img alt="image trouble" class="align-center" src="_images/adaptiveDiagram.png" style="width: 900px; height: 900px;" /></a>
+<p>AdaptivePELE is a Python program called with a parameter: the control
+file, a JSON document that permits tuning its behavior. It contains 4 blocks:
+the general parameters, simulation parameters, clustering
 parameters and spawning parameters. The first block refers to general
-parameters of the adaptive run, while the other three blocks configure the
-three steps of an adaptive sampling run, first run a propagation algorithm
-(simulation), then cluster the trajectories obtained (clustering) and finally
-select the best point to start the next iteration (spawning). This structure
-can be summarized in the flow diagram shown below:</p>
-<img alt="image trouble" class="align-center" src="_images/adaptiveDiagram.png" style="width: 900px; height: 900px;" />
-<div class="section" id="general-params">
-<h2>general Params<a class="headerlink" href="#general-params" title="Permalink to this headline">¶</a></h2>
+parameters such as the output path, initial structures, or whether to restart (resume) a simulation.
+The other three blocks configure the three iterative steps of an adaptive run, and have a
+<code class="docutils literal"><span class="pre">{&quot;type&quot;:str,</span> <span class="pre">&quot;params&quot;:{}}</span></code> structure. Namely, the <strong>simulation</strong> block
+chooses and tunes the propagation algorithm, typically PELE, the <strong>clustering</strong> block tunes the clustering method,
+cluster sizes... and the <strong>spawning</strong> block selects the strategy to choose the most interesting
+structures.</p>
+<div class="section" id="control-file-outline">
+<h2>Control file outline<a class="headerlink" href="#control-file-outline" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{},</span>
+    <span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:{}},</span>
+    <span class="s2">&quot;clustering&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:{}},</span>
+    <span class="s2">&quot;spawning&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:{}}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="generalparams-block">
+<h2>generalParams block<a class="headerlink" href="#generalparams-block" title="Permalink to this headline">¶</a></h2>
 <p>The general parameters block has five mandatory fields:</p>
 <ul class="simple">
-<li>restart: <em>boolean</em> (true or false) This parameter specifies wether you want to
-continue a previous simulation or not</li>
-<li>debug: <em>boolean</em> Run adaptive in debug mode, without calling
-any propagation algorithm</li>
-<li>outputPath: <em>string</em> The path where the results of the simulation will be
+<li><strong>restart</strong> (<em>boolean</em>, default=True): This parameter specifies whether you want to
+continue a previous simulation or not. It requires the last epoch&#8217;s clustering object,
+which is stored as a binary file to optimize disk usage.</li>
+<li><strong>debug</strong> (<em>boolean</em>, default=False): Run adaptive in debug mode, without calling
+any propagation algorithm. Typically used to tinker with the clustering/spawning.</li>
+<li><strong>outputPath</strong> (<em>string</em>, mandatory): The path where the results of the simulation will be
 written</li>
-<li>initialStructures: <em>list</em> The path(s) to the intial structure(s)</li>
-<li>writeAllClusteringStructures: <em>boolean</em> Wether to write all the structures of
-the clusters</li>
+<li><strong>initialStructures</strong> (<em>list</em>, mandatory): The path(s) to the intial structure(s)</li>
+<li><strong>writeAllClusteringStructures</strong> (<em>boolean</em>, default=False): Whether to write all the cluster
+center structures as pdbs. Setting it to True is inneficient, and cluster center structures
+can still be recovered from the binary clustering object.</li>
 </ul>
 <p>Additionaly, it can also have a nativeStructure parameter, a string containing
 the path to the native structure. This structure will only be used to correct
 the RMSD in case of symmetries. The symmetries will also have to be specified
-(see <a class="reference internal" href="#clustering-params">clustering Params</a>).</p>
+(see <a class="reference internal" href="#clustering-block">clustering block</a>).</p>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+    <span class="s2">&quot;debug&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+    <span class="s2">&quot;outputPath&quot;</span><span class="p">:</span><span class="s2">&quot;simulationOutput&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;nativeStructure&quot;</span> <span class="p">:</span> <span class="s2">&quot;nativeStructure.pdb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;initialStructures&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;initial1.pdb&quot;</span><span class="p">,</span> <span class="s2">&quot;initial2.pdb&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
 </div>
-<div class="section" id="simulation-params">
-<h2>simulation Params<a class="headerlink" href="#simulation-params" title="Permalink to this headline">¶</a></h2>
-<p>Currently there are two implemented simulation types, PELE and test. The test
-type has no real use outside of testing. In futures version we plan to
-implement an MD type.</p>
+</div>
+<div class="section" id="simulation-block">
+<h2>simulation block<a class="headerlink" href="#simulation-block" title="Permalink to this headline">¶</a></h2>
+<p>Currently, there are two implemented simulation types:</p>
+<ul class="simple">
+<li><strong>pele</strong>. <a class="reference external" href="https://pele.bsc.es/pele.wt">PELE</a> is a great tool to efficiently explore the energy landscape. Parameters have been optimized for its use.</li>
+<li><strong>test</strong>. The test type has no real use outside of testing.</li>
+</ul>
+<p>We plan to implement an MD type in future versions.</p>
+<div class="section" id="parameters">
+<h3>parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
 <p>In the PELE type the following parameters are mandatory:</p>
 <ul class="simple">
-<li>iterations: <em>integer</em> Number of adaptive sampling iterations to run</li>
-<li>processors: <em>integer</em> Number of processors to use with PELE</li>
-<li>peleSteps: <em>integer</em> Number of PELE steps in a iteration</li>
-<li>seed: <em>integer</em> Seed for the random number generator</li>
-<li>controlFile: <em>string</em> Path to the PELE control file templetized for use with
-adaptive</li>
+<li><strong>iterations</strong> (<em>integer</em>, mandatory): Number of adaptive sampling iterations to run</li>
+<li><strong>processors</strong> (<em>integer</em>, mandatory): Number of processors to use with PELE</li>
+<li><strong>peleSteps</strong> (<em>integer</em>, mandatory):  Number of PELE steps in a epoch (iteration)</li>
+<li><strong>seed</strong> (<em>integer</em>, mandatory): Seed for the random number generator</li>
+<li><strong>controlFile</strong> (<em>string</em>, mandatory): Path to the templetized PELE control file (see below)</li>
 </ul>
 <p>Optionally, you can also use the following parameters:</p>
-<ul class="simple">
-<li>data: <em>string</em> Path to the Data folder needed for PELE, it is already
-included and should not be modified an specific version of PELE has to be
-used</li>
-<li>documents: <em>string</em> Path to the Documents folder needed for PELE, it is already
-included and should not be modified an specific version of PELE has to be
-used</li>
-<li>executable: <em>string</em> Path to the Pele executable folder, it is already
-included and should not be modified an specific version of PELE has to be
-used</li>
-<li>exitCondition: <em>dict</em> Block which specifies an exit condition for adaptive
-sampling. Currently only the metric type is implemented, this type accepts a
+<ul>
+<li><p class="first"><strong>data</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE</p>
+</li>
+<li><p class="first"><strong>documents</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE</p>
+</li>
+<li><p class="first"><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder, it is already</p>
+</li>
+<li><p class="first"><strong>exitCondition</strong> (<em>dict</em>, default=None): Block that specifies an exit condition for the simulation.
+Currently only the metric type is implemented, this type accepts a
 <em>metricCol</em> which represents a column in the report file and a <em>exitValue</em>
 which represents a value. The simulation will terminate after the metric
-written in the <em>metricCol</em> reaches a value smaller than <em>exitValue</em></li>
-</ul>
-<p>An example of the exit condition block that would terminate the program after a
-trajectory reaches a value of less than 2 for the fourth column of the report
-file would look like:</p>
-<img alt="image trouble" class="align-center" src="_images/exitCond.png" style="width: 500px; height: 200px;" />
+written in the <em>metricCol</em> reaches a value smaller than <em>exitValue</em>. An example of the exit condition block
+that would terminate the program after a trajectory reaches a value of less than 2 for the fifth column
+(4th starting to count from 0) of the report file would look like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;exitCondition&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;metric&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;metricCol&quot;</span> <span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;exitValue&quot;</span> <span class="p">:</span> <span class="mf">2.0</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 </div>
-<div class="section" id="clustering-params">
-<h2>clustering Params<a class="headerlink" href="#clustering-params" title="Permalink to this headline">¶</a></h2>
-<p>Currently there are two functional types of clustering, Contacts Clustering and
-ContactMap Accumulative Clustering. Both follow the same strategy, they cluster
-the trajectories generated at the end of every trajectory with the previous
-trajectory.</p>
-<p>The Contacts Clustering does that by RMSD, that is, if the RMSD
-between two conformations is less than a certain threshold, the conformation is
-added to the cluster. The thresholds are usually assigned as a function of the
-ratio between the number of contacts of the ligand and the number of heavy
-atoms of the ligand. An atom of the ligand is considered to be in contact with
-an atom of the protein if the distance between them is less than a certain
-threshold. Two functions for the threshold calculator are implemented, <em>constant</em>
-which gives a constant value to all clusters and <em>heaviside</em> which creates a
-step function with steps at the points specified (See next image for an example
-of use).</p>
-<p>The ContactMap Accumulative Clustering does the same
-except that instead of the RMSD it uses the similarity between the contact maps
-of the two conformations. The contactMap is a boolean matrix with the protein
-atoms (or a subset of them) as columns and the ligand atoms (usually only the
-heavy atoms) as rows. The entries are only true if the specific ligand and
-receptor atoms are close enough (less than a contactTreshold). Currently there
-are three methods implemented to evaluate the similarity of contactMaps,
-<em>Jaccard</em> which calulates the Jaccard Index (<a class="reference external" href="https://en.wikipedia.org/wiki/Jaccard_index">Wikipedia page</a>),
-<em>correlation</em>, which calculates the correlation between the two matrices and
-<em>distance</em>, which evaluates the similarity of two contactMaps by calculating the
-ratio of the number of differences over the average of elements in the contacts
-maps.</p>
-<p>The following parameters are mandatory for the clustering block:</p>
+</li>
+</ul>
+<p>Example of simulation block:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;pele&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;iterations&quot;</span> <span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+        <span class="s2">&quot;processors&quot;</span> <span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="s2">&quot;peleSteps&quot;</span> <span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">30689</span><span class="p">,</span>
+        <span class="s2">&quot;controlFile&quot;</span> <span class="p">:</span> <span class="s2">&quot;templetizedPELEControlFile.conf&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="clustering-block">
+<h2>clustering block<a class="headerlink" href="#clustering-block" title="Permalink to this headline">¶</a></h2>
+<p>Currently there are two functional types of clustering:</p>
 <ul class="simple">
-<li>ligandResname: <em>string</em> Residue name of the ligand in the PDB</li>
-<li>contactThresholdDistance: <em>float</em> Minimum distance at which two atoms have to
+<li><strong>rmsd</strong>, which solely uses the ligand rmsd</li>
+<li><strong>contactMap</strong>, which uses a protein-ligand contact map matrix</li>
+</ul>
+<p>These clusterings are based on the leader algorithm, an extremely fast clustering method that in the
+worst case makes <em>kN</em> comparisons, where <em>N</em> is the number of snapshots to cluster and <em>k</em> the number of existing clusters.
+The procedure is as follows. Given some clusters, a conformation is said to belong to a cluster
+when it differs in less than a certain metric threshold (e.g. ligand RMSD)
+to the corresponding cluster center. Cluster centers are always compared in the same order, and,
+if there is no similar cluster, it generates a new one.</p>
+<p>Aside form the speed, a big advantage of using this method
+is that it permits the user to define different criteria in different regions.
+This way, we can optimize the number of clusters, giving more importance to regions with more interactions,
+potentially being more metastable.</p>
+<p>In order to measure the potential metastability,
+we use the ratio of the number of protein-ligand heavy atom contacts over the number of ligand heavy atoms, <em>r</em>.
+Two atoms are considered to be in contact if the distance between
+them is less than a certain <strong>contactThreshold</strong> (8Å by default). Although these values depend on the particular
+protein-ligand geometry and ligand size, this measure is more ligand-independent compared to the overall
+number of contacts and a value of 1 typically indicates that the ligand is on the surface entering a protein pocket.
+We encourage the use of default parameters with very few exceptions such as in the study
+of the diffusion of ions or tiny molecules (e.g. a oxygen molecule).</p>
+<div class="section" id="thresholdcalculator">
+<h3>thresholdCalculator<a class="headerlink" href="#thresholdcalculator" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>constant</strong>, where all clusters have the same threshold. A sound value may be 3Å.</li>
+<li><strong>heaviside</strong> (default), where thesholds (values) are assigned according to a set of step functions that
+vary according to a ratio of protein-ligand contacts and ligand size , <em>r</em>, (conditions, see below). The values and conditions
+of change are defined with two lists. The condition list is iterated until <em>r</em> &gt; condition[i], and the used
+threshold is values[i]. If r &lt;= conditions[i] for all i, it returns the last element in values.
+Thresholds typically vary from 5Å in the bulk to 2Å in protein pockets. This method is preferred, as it
+optimizes the number of clusters, giving more importance to regions with more contacts and interactions,
+where metastability occurs. Default values: [2,3,4,5], default conditions: [1, 0.75, 0.5].</li>
+</ul>
+</div>
+<div class="section" id="rmsd-clustering">
+<h3>rmsd clustering<a class="headerlink" href="#rmsd-clustering" title="Permalink to this headline">¶</a></h3>
+<p>In the <strong>rmsd</strong> clustering, if the RMSD between two ligand conformations is less than
+a certain threshold, the conformation is added to the cluster, and otherwise, a new cluster
+is generated.</p>
+</div>
+<div class="section" id="contactmap-clustering">
+<h3>contactMap clustering<a class="headerlink" href="#contactmap-clustering" title="Permalink to this headline">¶</a></h3>
+<p>The <strong>contactMap</strong> uses the similarity between protein-ligand contact maps.
+The contact map is a boolean matrix with the protein
+atoms (or a subset of them, typically one or two per residue) as columns and
+ligand atoms (typically only heavy atoms) as rows, and a value of True indicates a contact.
+There are currently three implemented methods to evaluate the similarity of contactMaps:</p>
+<ul class="simple">
+<li><strong>Jaccard</strong>, which calulates the Jaccard Index (<a class="reference external" href="https://en.wikipedia.org/wiki/Jaccard_index">Wikipedia page</a>). The recommended values using the heaviside threshold calculator are [0.375, 0.5, 0.55, 0.7] for the conditions [1, 0.75 , 0.5].</li>
+<li><strong>correlation</strong>, which calculates the correlation between the two matrices and</li>
+<li><strong>distance</strong>, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.</li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h3>parameters<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>ligandResname</strong> (<em>string</em>, default=&#8221;&#8221;): Ligand residue name in the PDB (if necessary)</li>
+<li><strong>ligandChain</strong> (<em>string</em>, default=&#8221;&#8221;): Ligand chain (if necessary)</li>
+<li><strong>ligandResnum</strong> (<em>int</em>, default=0): Ligand residue number (if necessary). If 0 or not specified, it is ignored. The ligand ought to be univoquely identified with any combination of this and the two former parameters</li>
+<li><strong>contactThresholdDistance</strong> (<em>float</em>, default=8): Maximum distance at which two atoms have to
 be separated to be considered in contact</li>
-</ul>
-<p>Optionally, the following parameters can be specified:</p>
-<ul class="simple">
-<li>symmetries: <em>list</em> List of groups of key:value maps with the names of atoms
+<li><strong>symmetries</strong> (<em>list</em>, default=[]) List of symmetry groups of key:value maps with the names of atoms
 that are symmetrical in the ligand</li>
-<li>similarityEvaluator: <em>string</em>  Name of the method to evaluate the similarity
-of contactMaps, only available for ContactMap Accumulative Clustering</li>
+<li><strong>similarityEvaluator</strong> (<em>string</em>, mandatory)  Name of the method to evaluate the similarity
+of contactMaps, only available and mandatory in the contactMap clustering</li>
 </ul>
-<p>A typical setting of the thresholdCalculator for the contacts clustering might
-look like:</p>
-<img alt="image trouble" class="align-center" src="_images/thresholdCalculator.png" style="width: 700px; height: 400px;" />
+<p>A typical setting of the rmsd clustering is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;clustering&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ligandResname&quot;</span> <span class="p">:</span> <span class="s2">&quot;AEN&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;contactThresholdDistance&quot;</span> <span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s2">&quot;symmetries&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;3225:C3:AEN&quot;</span><span class="p">:</span><span class="s2">&quot;3227:C5:AEN&quot;</span><span class="p">,</span><span class="s2">&quot;3224:C2:AEN&quot;</span><span class="p">:</span><span class="s2">&quot;3228:C6:AEN&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;3230:N1:AEN&quot;</span><span class="p">:</span> <span class="s2">&quot;3231:N2:AEN&quot;</span><span class="p">}]</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;thresholdCalculator&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;heaviside&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;values&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+            <span class="s2">&quot;conditions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>which, given the default options, is equivalent to:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;clustering&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ligandResname&quot;</span> <span class="p">:</span> <span class="s2">&quot;AEN&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;symmetries&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;3225:C3:AEN&quot;</span><span class="p">:</span><span class="s2">&quot;3227:C5:AEN&quot;</span><span class="p">,</span><span class="s2">&quot;3224:C2:AEN&quot;</span><span class="p">:</span><span class="s2">&quot;3228:C6:AEN&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;3230:N1:AEN&quot;</span><span class="p">:</span> <span class="s2">&quot;3231:N2:AEN&quot;</span><span class="p">}]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <p>In this exemple, clusters having a contacts ration greater than 1 have a
 treshold of 2, those with contacts ratio between 1 and 0.75 have a treshold of
 3, between 0.75 and 0.5 a threshold of 4 and the rest have a threshold size of
@@ -258,55 +385,64 @@ treshold of 2, those with contacts ratio between 1 and 0.75 have a treshold of
 the cluster size will be smaller and therefore those regions will be more
 finely discretized.</p>
 </div>
-<div class="section" id="spawning-params">
-<h2>spawning Params<a class="headerlink" href="#spawning-params" title="Permalink to this headline">¶</a></h2>
-<p>Finally, Adaptive Sampling distributes the number of processors available over
-the clusters obtained. This process is called spawning. There are several
-strategies for this process, currently four are implemented:</p>
-<ol class="arabic simple">
-<li><em>sameWeight</em>: Distributes the processors uniformly over all clusters</li>
-<li><em>inverselyProportional</em>: Distributes the processors with a weight that is
-inversely proportional to the cluster population</li>
-<li><em>epsilon</em>: Does the same that inverselyProportional, except for a fraction of
-the processors, that are distributed according to the value of a certain metric</li>
-<li><em>variableEpsilon</em>: Does the same that epsilon, except that the fraction of
-processors changes over time</li>
-</ol>
-<p>The first two method take no parameters, the last two accept the following
-parameters:</p>
+</div>
+<div class="section" id="spawning-block">
+<h2>spawning block<a class="headerlink" href="#spawning-block" title="Permalink to this headline">¶</a></h2>
+<p>Finally, trajectories are spawned in different <em>interesting</em> clusters, according to a reward function.
+There are several implemented strategies:</p>
 <ul class="simple">
-<li>reportFilename: <em>string</em> Name of the files that contain the metrics of the
-trajectories</li>
-<li>metricColumnInReport: <em>integer</em> Column of the report file that contains the
-metric of interest (zero indexed)</li>
-<li>epsilon: <em>float</em> The fraction of the processors that will be assigned
-according to the metric selected</li>
-<li>metricWeights: <em>string</em> Selects how to distribute the weights of the cluster
-according to its metric, two options: linear(default) or Boltzmann weigths</li>
-<li>T: <em>float</em> Temperature, only used for Boltzmann weights</li>
+<li><strong>sameWeight</strong>: Uniformly distributes the processors over all clusters</li>
+<li><strong>inverselyProportional</strong>: Distributes the processors with a weight that is inversely proportional to the cluster population.</li>
+<li><strong>epsilon</strong>: An <strong>epsilon</strong> fraction of processors are distributed proportionally to the value of a metric, and the rest are inverselyProportional distributed.  A param <strong>n</strong> can be specified to only consider the <em>n</em> clusters with best metric.</li>
+<li><strong>variableEpsilon</strong>: Equivalent to epsilon, with an epsilon value changing over time</li>
+<li><strong>independent</strong>: Trajectories are run independently, as in the original PELE. It may be useful to restart simulations or to use the analysis scripts built for AdaptivePELE.</li>
+<li><strong>UCB</strong>: Upper confidence bound.</li>
+<li><strong>FAST</strong>: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).</li>
 </ul>
-<p>The following parameters are mandatory for <em>variableEpsilon</em>:</p>
+<p>According to our experience, the best strategies are <strong>inverselyProportional</strong> and <strong>epsilon</strong>, guided with either PELE binding energy or the RMSD to the bound pose if available.</p>
+<div class="section" id="density-calculator">
+<h3>density calculator<a class="headerlink" href="#density-calculator" title="Permalink to this headline">¶</a></h3>
+<p>Each cluster is assigned a relative density of points compared to other clusters.
+Again, and in analogy to the threshold calculator, the aim is to give more emphasis to interesting regions.
+There are two types of density calculators:</p>
 <ul class="simple">
-<li>varEpsilonType: <em>string</em> Select the type of variation for the epsilon value.
-At the moment only a linear variation is implemented</li>
-<li>maxEpsilon: <em>float</em> Maximum value for epsilon</li>
-<li>minEpsilon: <em>float</em> Minimum value for epsilon</li>
-<li>variationWindow: <em>integer</em> Last iteration over which to change the epsilon
-value</li>
-<li>maxEpsilonWindow: <em>integer</em> Number of iteration with epsilon=maxEpsilon</li>
-<li>period: <em>integer</em> Perio of the variation (in number of iterations)</li>
+<li><strong>constant</strong> (or <strong>null</strong>, default), which assigns the same density to all the clusters regardless of the number of contacts</li>
+<li><strong>heaviside</strong>, which assigns different densities using a heaviside function, much like the thresholdCalculator (values and conditions are mandatory)</li>
+<li><strong>continuous</strong>, which assings increasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 8, otherwise, density = 64.0/(-4 <strong>r</strong> + 6)^3</li>
 </ul>
-<p>Similarly than with the cluster threshold, a density for each cluster can be
-assigned as a function of the contacts ratio. There are two types of density
-calculators, <em>null</em> and <em>heaviside</em>. The first assigns a constant density of 1
-to all cluster (it is the default option), meanwhile, the second assigns
-different densities using a heaviside function, much like the
-thresholdCalculator.</p>
+</div>
+<div class="section" id="id2">
+<h3>parameters<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. &#8220;report&#8221;.</li>
+<li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (zero indexed)</li>
+<li><strong>epsilon</strong> (<em>float</em>, mandatory in <strong>epsilon</strong> spawning): The fraction of the processors that will be assigned according to the selected metric</li>
+<li><strong>metricWeights</strong> (<em>string</em>, default=linear): Selects how to distribute the weights of the cluster according to its metric, two options: linear (proportional to metric) or Boltzmann weigths (proportional to exp(-metric/T). Needs to define the temperature <strong>T</strong>.</li>
+<li><strong>T</strong> (<em>float</em>, mandatory with Boltzmann metric weights): Temperature, only used for Boltzmann weights</li>
+</ul>
+<p>The following parameters are mandatory for <strong>variableEpsilon</strong>:</p>
+<ul class="simple">
+<li><strong>varEpsilonType</strong> (<em>string</em>,default=linear): Selects the type of variation for the epsilon value. At the moment only a linear variation is implemented</li>
+<li><strong>maxEpsilon</strong> (<em>float</em>): Maximum value for epsilon</li>
+<li><strong>minEpsilon</strong> (<em>float</em>): Minimum value for epsilon</li>
+<li><strong>variationWindow</strong> (<em>integer</em>): Last iteration over which to change the epsilon value</li>
+<li><strong>maxEpsilonWindow</strong> (<em>integer</em>): Number of iteration with epsilon=maxEpsilon</li>
+<li><strong>period</strong> (<em>integer</em>) Variation period (in number of iterations)</li>
+</ul>
+</div>
+</div>
+<div class="section" id="control-file-examples">
+<h2>Control File Examples<a class="headerlink" href="#control-file-examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="example-1">
+<h3>Example 1<a class="headerlink" href="#example-1" title="Permalink to this headline">¶</a></h3>
+<p>The first example makes use of default parameters (used in the AdaptivePELE paper).</p>
 <p>To summarize, below there is a screenshot of a simple functional control file:</p>
-<img alt="image trouble" class="align-center" src="_images/shortControlFile.png" style="width: 700px; height: 400px;" />
+</div>
+<div class="section" id="example-2">
+<h3>Example 2<a class="headerlink" href="#example-2" title="Permalink to this headline">¶</a></h3>
 <p>A more complete (altough not comprehensible) example would look like (clicking
 in the image will show a larger version of the image):</p>
-<img alt="image trouble" class="align-center" src="_images/longControlFile.png" style="width: 900px; height: 900px;" />
+</div>
 </div>
 </div>
 
@@ -327,7 +463,7 @@ in the image will show a larger version of the image):</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Daniel Lecina, Joan Francesc Gilabert.
+        &copy; Copyright 2017, Daniel Lecina, Joan Francesc Gilabert.
 
     </p>
   </div>
@@ -348,7 +484,7 @@ in the image will show a larger version of the image):</p>
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'',
+            URL_ROOT:'./',
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

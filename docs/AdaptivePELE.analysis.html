@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="AdaptivePELE  documentation" href="index.html"/>
         <link rel="up" title="AdaptivePELE Package" href="AdaptivePELE.html"/>
         <link rel="next" title="atomset Package" href="AdaptivePELE.atomset.html"/>
@@ -63,7 +65,7 @@
             
             
               <div class="version">
-                v1.2
+                v1.3
               </div>
             
           
@@ -86,16 +88,16 @@
             
                 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE Package</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><tt class="docutils literal"><span class="pre">adaptiveSampling</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><tt class="docutils literal"><span class="pre">automateRoundsAdaptive</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="">analysis Package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.correctRMSD"><tt class="docutils literal"><span class="pre">correctRMSD</span></tt> Module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.foldersFirstBindingEvent"><tt class="docutils literal"><span class="pre">foldersFirstBindingEvent</span></tt> Module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.generateGnuplotFile"><tt class="docutils literal"><span class="pre">generateGnuplotFile</span></tt> Module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.makePNGs"><tt class="docutils literal"><span class="pre">makePNGs</span></tt> Module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.numberOfOwnClusters"><tt class="docutils literal"><span class="pre">numberOfOwnClusters</span></tt> Module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.writeClusteringStructures"><tt class="docutils literal"><span class="pre">writeClusteringStructures</span></tt> Module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">analysis Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.correctRMSD"><code class="docutils literal"><span class="pre">correctRMSD</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.foldersFirstBindingEvent"><code class="docutils literal"><span class="pre">foldersFirstBindingEvent</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.generateGnuplotFile"><code class="docutils literal"><span class="pre">generateGnuplotFile</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.makePNGs"><code class="docutils literal"><span class="pre">makePNGs</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.numberOfOwnClusters"><code class="docutils literal"><span class="pre">numberOfOwnClusters</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.writeClusteringStructures"><code class="docutils literal"><span class="pre">writeClusteringStructures</span></code> Module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.atomset.html">atomset Package</a></li>
@@ -131,7 +133,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -149,7 +151,7 @@
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/AdaptivePELE.analysis.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/AdaptivePELE.analysis.rst.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -162,145 +164,143 @@
   <div class="section" id="analysis-package">
 <h1>analysis Package<a class="headerlink" href="#analysis-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-AdaptivePELE.analysis.correctRMSD">
-<span id="correctrmsd-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">correctRMSD</span></tt> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.correctRMSD" title="Permalink to this headline">¶</a></h2>
+<span id="correctrmsd-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">correctRMSD</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.correctRMSD" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.analysis.correctRMSD.extendReportWithRmsd">
-<tt class="descclassname">AdaptivePELE.analysis.correctRMSD.</tt><tt class="descname">extendReportWithRmsd</tt><big>(</big><em>reportFile</em>, <em>rmsds</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#extendReportWithRmsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.extendReportWithRmsd" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">extendReportWithRmsd</code><span class="sig-paren">(</span><em>reportFile</em>, <em>rmsds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#extendReportWithRmsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.extendReportWithRmsd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.correctRMSD.main">
-<tt class="descclassname">AdaptivePELE.analysis.correctRMSD.</tt><tt class="descname">main</tt><big>(</big><em>controlFile</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">main</code><span class="sig-paren">(</span><em>controlFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.correctRMSD.parseArguments">
-<tt class="descclassname">AdaptivePELE.analysis.correctRMSD.</tt><tt class="descname">parseArguments</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.parseArguments" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">parseArguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.parseArguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.correctRMSD.readControlFile">
-<tt class="descclassname">AdaptivePELE.analysis.correctRMSD.</tt><tt class="descname">readControlFile</tt><big>(</big><em>controlFile</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#readControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.readControlFile" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">readControlFile</code><span class="sig-paren">(</span><em>controlFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#readControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.readControlFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-AdaptivePELE.analysis.foldersFirstBindingEvent">
-<span id="foldersfirstbindingevent-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">foldersFirstBindingEvent</span></tt> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.foldersFirstBindingEvent" title="Permalink to this headline">¶</a></h2>
+<span id="foldersfirstbindingevent-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">foldersFirstBindingEvent</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.foldersFirstBindingEvent" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.analysis.foldersFirstBindingEvent.main">
-<tt class="descclassname">AdaptivePELE.analysis.foldersFirstBindingEvent.</tt><tt class="descname">main</tt><big>(</big><em>folders</em>, <em>column</em>, <em>threshold</em>, <em>stepsPerEpoch</em>, <em>sequential</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/foldersFirstBindingEvent.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.foldersFirstBindingEvent.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.foldersFirstBindingEvent.</code><code class="descname">main</code><span class="sig-paren">(</span><em>folders</em>, <em>column</em>, <em>threshold</em>, <em>stepsPerEpoch</em>, <em>sequential</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/foldersFirstBindingEvent.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.foldersFirstBindingEvent.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.foldersFirstBindingEvent.parseArguments">
-<tt class="descclassname">AdaptivePELE.analysis.foldersFirstBindingEvent.</tt><tt class="descname">parseArguments</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/foldersFirstBindingEvent.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.foldersFirstBindingEvent.parseArguments" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.foldersFirstBindingEvent.</code><code class="descname">parseArguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/foldersFirstBindingEvent.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.foldersFirstBindingEvent.parseArguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-AdaptivePELE.analysis.generateGnuplotFile">
-<span id="generategnuplotfile-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">generateGnuplotFile</span></tt> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.generateGnuplotFile" title="Permalink to this headline">¶</a></h2>
+<span id="generategnuplotfile-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">generateGnuplotFile</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.generateGnuplotFile" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.analysis.generateGnuplotFile.generateForLoopString">
-<tt class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</tt><tt class="descname">generateForLoopString</tt><big>(</big><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#generateForLoopString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generateForLoopString" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">generateForLoopString</code><span class="sig-paren">(</span><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#generateForLoopString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generateForLoopString" title="Permalink to this definition">¶</a></dt>
 <dd><p>TotalNumberOfSteps -&gt; not only considering steps in current epoch, but steps with all previous epochs</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.generateGnuplotFile.generateNestedString">
-<tt class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</tt><tt class="descname">generateNestedString</tt><big>(</big><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#generateNestedString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generateNestedString" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">generateNestedString</code><span class="sig-paren">(</span><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#generateNestedString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generateNestedString" title="Permalink to this definition">¶</a></dt>
 <dd><p>TotalNumberOfSteps -&gt; not only considering steps in current epoch, but steps with all previous epochs</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.generateGnuplotFile.generatePrintString">
-<tt class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</tt><tt class="descname">generatePrintString</tt><big>(</big><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#generatePrintString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generatePrintString" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">generatePrintString</code><span class="sig-paren">(</span><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#generatePrintString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generatePrintString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.generateGnuplotFile.parseArguments">
-<tt class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</tt><tt class="descname">parseArguments</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.parseArguments" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">parseArguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.parseArguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-AdaptivePELE.analysis.makePNGs">
-<span id="makepngs-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">makePNGs</span></tt> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.makePNGs" title="Permalink to this headline">¶</a></h2>
+<span id="makepngs-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">makePNGs</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.makePNGs" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.analysis.makePNGs.buildGnuplotString">
-<tt class="descclassname">AdaptivePELE.analysis.makePNGs.</tt><tt class="descname">buildGnuplotString</tt><big>(</big><em>title</em>, <em>outputFilename</em>, <em>params</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/makePNGs.html#buildGnuplotString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.makePNGs.buildGnuplotString" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.makePNGs.</code><code class="descname">buildGnuplotString</code><span class="sig-paren">(</span><em>title</em>, <em>outputFilename</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/makePNGs.html#buildGnuplotString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.makePNGs.buildGnuplotString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-AdaptivePELE.analysis.numberOfOwnClusters">
-<span id="numberofownclusters-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">numberOfOwnClusters</span></tt> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.numberOfOwnClusters" title="Permalink to this headline">¶</a></h2>
+<span id="numberofownclusters-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">numberOfOwnClusters</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.numberOfOwnClusters" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfOwnClusters.buildClustersPerValue">
-<tt class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</tt><tt class="descname">buildClustersPerValue</tt><big>(</big><em>clustersPerEpoch</em>, <em>numberOfEpochs</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#buildClustersPerValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.buildClustersPerValue" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</code><code class="descname">buildClustersPerValue</code><span class="sig-paren">(</span><em>clustersPerEpoch</em>, <em>numberOfEpochs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#buildClustersPerValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.buildClustersPerValue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns dictionary with lists for the different values. The length of the list is equal to the number of &#8220;clustering/summary.txt&#8221; files found</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfOwnClusters.findDifferentClustersForAllEpochs">
-<tt class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</tt><tt class="descname">findDifferentClustersForAllEpochs</tt><big>(</big><em>column</em>, <em>templetizedClusteringSummaryFile</em>, <em>numberOfEpochs</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#findDifferentClustersForAllEpochs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.findDifferentClustersForAllEpochs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</code><code class="descname">findDifferentClustersForAllEpochs</code><span class="sig-paren">(</span><em>column</em>, <em>templetizedClusteringSummaryFile</em>, <em>numberOfEpochs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#findDifferentClustersForAllEpochs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.findDifferentClustersForAllEpochs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list with dictionaries for all epochs. The dictionary has the set of different values (according to column) and their number</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfOwnClusters.findDifferentClustersInEpoch">
-<tt class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</tt><tt class="descname">findDifferentClustersInEpoch</tt><big>(</big><em>column</em>, <em>summaryFile</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#findDifferentClustersInEpoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.findDifferentClustersInEpoch" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</code><code class="descname">findDifferentClustersInEpoch</code><span class="sig-paren">(</span><em>column</em>, <em>summaryFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#findDifferentClustersInEpoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.findDifferentClustersInEpoch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dictionary with the set of different elements in column and the number of elements in this epoch</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfOwnClusters.getAllDifferentValues">
-<tt class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</tt><tt class="descname">getAllDifferentValues</tt><big>(</big><em>clustersPerEpoch</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#getAllDifferentValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.getAllDifferentValues" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</code><code class="descname">getAllDifferentValues</code><span class="sig-paren">(</span><em>clustersPerEpoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#getAllDifferentValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.getAllDifferentValues" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfOwnClusters.getClusteringSummaryContent">
-<tt class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</tt><tt class="descname">getClusteringSummaryContent</tt><big>(</big><em>file</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#getClusteringSummaryContent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.getClusteringSummaryContent" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</code><code class="descname">getClusteringSummaryContent</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#getClusteringSummaryContent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.getClusteringSummaryContent" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfOwnClusters.getNumberOfClustersPerEpochForGivenColumn">
-<tt class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</tt><tt class="descname">getNumberOfClustersPerEpochForGivenColumn</tt><big>(</big><em>column</em>, <em>templetizedClusteringSummaryFile</em>, <em>folder</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#getNumberOfClustersPerEpochForGivenColumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.getNumberOfClustersPerEpochForGivenColumn" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</code><code class="descname">getNumberOfClustersPerEpochForGivenColumn</code><span class="sig-paren">(</span><em>column</em>, <em>templetizedClusteringSummaryFile</em>, <em>folder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#getNumberOfClustersPerEpochForGivenColumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.getNumberOfClustersPerEpochForGivenColumn" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfOwnClusters.getTotalNumberOfClustersPerEpoch">
-<tt class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</tt><tt class="descname">getTotalNumberOfClustersPerEpoch</tt><big>(</big><em>templetizedClusteringSummaryFile</em>, <em>folder</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#getTotalNumberOfClustersPerEpoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.getTotalNumberOfClustersPerEpoch" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</code><code class="descname">getTotalNumberOfClustersPerEpoch</code><span class="sig-paren">(</span><em>templetizedClusteringSummaryFile</em>, <em>folder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#getTotalNumberOfClustersPerEpoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.getTotalNumberOfClustersPerEpoch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfOwnClusters.main">
-<tt class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfOwnClusters.plotClustersPerValue">
-<tt class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</tt><tt class="descname">plotClustersPerValue</tt><big>(</big><em>clustersPerValue</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#plotClustersPerValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.plotClustersPerValue" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</code><code class="descname">plotClustersPerValue</code><span class="sig-paren">(</span><em>clustersPerValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#plotClustersPerValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.plotClustersPerValue" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfOwnClusters.plotContactsHistogram">
-<tt class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</tt><tt class="descname">plotContactsHistogram</tt><big>(</big><em>folder</em>, <em>templetizedClusteringSummaryFile</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#plotContactsHistogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.plotContactsHistogram" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</code><code class="descname">plotContactsHistogram</code><span class="sig-paren">(</span><em>folder</em>, <em>templetizedClusteringSummaryFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#plotContactsHistogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.plotContactsHistogram" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfOwnClusters.printHelp">
-<tt class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</tt><tt class="descname">printHelp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#printHelp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.printHelp" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfOwnClusters.</code><code class="descname">printHelp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfOwnClusters.html#printHelp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfOwnClusters.printHelp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-AdaptivePELE.analysis.writeClusteringStructures">
-<span id="writeclusteringstructures-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">writeClusteringStructures</span></tt> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.writeClusteringStructures" title="Permalink to this headline">¶</a></h2>
+<span id="writeclusteringstructures-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">writeClusteringStructures</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.writeClusteringStructures" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.analysis.writeClusteringStructures.parseArgs">
-<tt class="descclassname">AdaptivePELE.analysis.writeClusteringStructures.</tt><tt class="descname">parseArgs</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/analysis/writeClusteringStructures.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.writeClusteringStructures.parseArgs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.writeClusteringStructures.</code><code class="descname">parseArgs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/writeClusteringStructures.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.writeClusteringStructures.parseArgs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <div class="toctree-wrapper compound">
-<ul class="simple">
-</ul>
 </div>
 </div>
 </div>
@@ -324,7 +324,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Daniel Lecina, Joan Francesc Gilabert.
+        &copy; Copyright 2017, Daniel Lecina, Joan Francesc Gilabert.
 
     </p>
   </div>
@@ -345,7 +345,7 @@
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'',
+            URL_ROOT:'./',
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

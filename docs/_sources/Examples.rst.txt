@@ -311,30 +311,6 @@ The following parameters are mandatory for **variableEpsilon**:
 * **period** (*integer*) Variation period (in number of iterations)
 
 
-Examples
-..........
-
-::
-    "spawning" : {
-        "type" : "inverselyProportional",
-        "params" : {
-            "reportFilename" : "report"
-        }
-    }
-
-::
-    "spawning" : {
-        "type" : "epsilon",
-        "params" : {
-            "reportFilename" : "report",
-            "metricColumnInReport" : 5,
-            "epsilon" : 0.25
-        },
-        "density" : {
-            "type" : "continuous"
-        }
-    }
-
 
 Control File Examples
 ---------------------

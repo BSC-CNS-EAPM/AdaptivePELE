@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="AdaptivePELE  documentation" href="index.html"/>
         <link rel="up" title="AdaptivePELE Package" href="AdaptivePELE.html"/>
         <link rel="next" title="validator Package" href="AdaptivePELE.validator.html"/>
@@ -63,7 +65,7 @@
             
             
               <div class="version">
-                v1.2
+                v1.3
               </div>
             
           
@@ -86,17 +88,17 @@
             
                 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE Package</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><tt class="docutils literal"><span class="pre">adaptiveSampling</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><tt class="docutils literal"><span class="pre">automateRoundsAdaptive</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.analysis.html">analysis Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.atomset.html">atomset Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.clustering.html">clustering Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.simulation.html">simulation Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.spawning.html">spawning Package</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="">utilities Package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.clusteringUtilities"><tt class="docutils literal"><span class="pre">clusteringUtilities</span></tt> Module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.utilities"><tt class="docutils literal"><span class="pre">utilities</span></tt> Module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">utilities Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.clusteringUtilities"><code class="docutils literal"><span class="pre">clusteringUtilities</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.utilities"><code class="docutils literal"><span class="pre">utilities</span></code> Module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.validator.html">validator Package</a></li>
@@ -127,7 +129,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -145,7 +147,7 @@
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/AdaptivePELE.utilities.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/AdaptivePELE.utilities.rst.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -158,10 +160,10 @@
   <div class="section" id="utilities-package">
 <h1>utilities Package<a class="headerlink" href="#utilities-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-AdaptivePELE.utilities.clusteringUtilities">
-<span id="clusteringutilities-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">clusteringUtilities</span></tt> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.clusteringUtilities" title="Permalink to this headline">¶</a></h2>
+<span id="clusteringutilities-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">clusteringUtilities</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.clusteringUtilities" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.utilities.clusteringUtilities.writeStructures">
-<tt class="descclassname">AdaptivePELE.utilities.clusteringUtilities.</tt><tt class="descname">writeStructures</tt><big>(</big><em>clusteringObject</em>, <em>listStructures</em>, <em>checker=&lt;function &lt;lambda&gt; at 0x22b4848&gt;</em>, <em>outputPath='cluster.pdb'</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/utilities/clusteringUtilities.html#writeStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.clusteringUtilities.writeStructures" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.utilities.clusteringUtilities.</code><code class="descname">writeStructures</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>listStructures</em>, <em>checker=&lt;function &lt;lambda&gt;&gt;</em>, <em>outputPath='cluster.pdb'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/clusteringUtilities.html#writeStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.clusteringUtilities.writeStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function that prints all clusters in listStructures so that checker evaluates to true</p>
 <p>clusteringObject [In] Clustering object with clusters to print
 checker [In] Lambda function with the checker that should evaluate to True for intersted structures
@@ -170,25 +172,63 @@ outputPath [In] Output cluster pdb filename</p>
 
 </div>
 <div class="section" id="module-AdaptivePELE.utilities.utilities">
-<span id="utilities-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">utilities</span></tt> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.utilities" title="Permalink to this headline">¶</a></h2>
+<span id="utilities-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">utilities</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.utilities" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.assertSymmetriesDict">
-<tt class="descclassname">AdaptivePELE.utilities.utilities.</tt><tt class="descname">assertSymmetriesDict</tt><big>(</big><em>symmetries</em>, <em>PDB</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#assertSymmetriesDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.assertSymmetriesDict" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">assertSymmetriesDict</code><span class="sig-paren">(</span><em>symmetries</em>, <em>PDB</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#assertSymmetriesDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.assertSymmetriesDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts the symmetry list in a PDB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>symmetries</strong> (<em>list of str</em>) &#8211; List of symmetry groups</li>
+<li><strong>PDB</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) &#8211; PDB object to check symmetry list against</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>AssertionError</strong> &#8211; If an atom is not found in the structure</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.calculateContactMapEigen">
-<tt class="descclassname">AdaptivePELE.utilities.utilities.</tt><tt class="descname">calculateContactMapEigen</tt><big>(</big><em>contactMap</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#calculateContactMapEigen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.calculateContactMapEigen" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">calculateContactMapEigen</code><span class="sig-paren">(</span><em>contactMap</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#calculateContactMapEigen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.calculateContactMapEigen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates eigenvectors and values of an extended contact map</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contactMap</strong> (<em>np.array</em>) &#8211; Contact map</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(eiv, eic)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>eiv</strong> (numpy.ndarray) eigenvalues
+<strong>eic</strong> (numpy.ndarray) eigenvectors</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.cleanup">
-<tt class="descclassname">AdaptivePELE.utilities.utilities.</tt><tt class="descname">cleanup</tt><big>(</big><em>tmpFolder</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">cleanup</code><span class="sig-paren">(</span><em>tmpFolder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove folder if exists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tmpFolder</strong> (<em>str</em>) &#8211; Folder to remove</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.getRMSD">
-<tt class="descclassname">AdaptivePELE.utilities.utilities.</tt><tt class="descname">getRMSD</tt><big>(</big><em>traj</em>, <em>nativePDB</em>, <em>resname</em>, <em>symmetries</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getRMSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getRMSD" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getRMSD</code><span class="sig-paren">(</span><em>traj</em>, <em>nativePDB</em>, <em>resname</em>, <em>symmetries</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getRMSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getRMSD" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the RMSD of a trajectory, given a native and symmetries</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -214,27 +254,81 @@ outputPath [In] Output cluster pdb filename</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.getSnapshots">
-<tt class="descclassname">AdaptivePELE.utilities.utilities.</tt><tt class="descname">getSnapshots</tt><big>(</big><em>trajectoryFile</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getSnapshots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getSnapshots" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getSnapshots</code><span class="sig-paren">(</span><em>trajectoryFile</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getSnapshots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getSnapshots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the snapshots</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>trajectoryFile</strong> (<em>str</em>) &#8211; Trajectory filename</li>
+<li><strong>verbose</strong> (<em>bool</em>) &#8211; Add verbose to snapshots</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Snapshots with information</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.getTrajNum">
-<tt class="descclassname">AdaptivePELE.utilities.utilities.</tt><tt class="descname">getTrajNum</tt><big>(</big><em>trajFilename</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getTrajNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getTrajNum" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getTrajNum</code><span class="sig-paren">(</span><em>trajFilename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getTrajNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getTrajNum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the trajectory number</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajFilename</strong> (<em>str</em>) &#8211; Trajectory filename</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Trajectory number</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.makeFolder">
-<tt class="descclassname">AdaptivePELE.utilities.utilities.</tt><tt class="descname">makeFolder</tt><big>(</big><em>outputDir</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#makeFolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.makeFolder" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">makeFolder</code><span class="sig-paren">(</span><em>outputDir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#makeFolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.makeFolder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes folder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>outputDir</strong> (<em>str</em>) &#8211; Folder filename</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.readClusteringObject">
-<tt class="descclassname">AdaptivePELE.utilities.utilities.</tt><tt class="descname">readClusteringObject</tt><big>(</big><em>clusteringObjectPath</em><big>)</big><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readClusteringObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readClusteringObject" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">readClusteringObject</code><span class="sig-paren">(</span><em>clusteringObjectPath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readClusteringObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readClusteringObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads and returns a clustering object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusteringObjectPath</strong> (<em>str</em>) &#8211; Clustering object path</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>EOFError</strong> &#8211; If the object is empty</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">clusteringObject</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <div class="toctree-wrapper compound">
-<ul class="simple">
-</ul>
 </div>
 </div>
 </div>
@@ -258,7 +352,7 @@ outputPath [In] Output cluster pdb filename</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Daniel Lecina, Joan Francesc Gilabert.
+        &copy; Copyright 2017, Daniel Lecina, Joan Francesc Gilabert.
 
     </p>
   </div>
@@ -279,7 +373,7 @@ outputPath [In] Output cluster pdb filename</p>
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'',
+            URL_ROOT:'./',
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
