@@ -29,19 +29,26 @@ The algorithm can be summarized in the flow diagram shown below:
     :align: center
     :alt: image trouble
 
+
+Control file outline
+--------------------
+
 AdaptivePELE is a Python program called with a parameter: the control 
-file, a JSON document that permits tuning its behavior. It contains 4 blocks: 
+file.
+
+::
+
+    python -m AdaptivePELE.adaptiveSampling controlFile.conf
+
+The control file is a JSON document that permits tuning its behavior. It contains 4 blocks: 
 the general parameters, simulation parameters, clustering
 parameters and spawning parameters. The first block refers to general
 parameters such as the output path, initial structures, or whether to restart (resume) a simulation. 
 The other three blocks configure the three iterative steps of an adaptive run, and have a 
-``{"type":str, "params":{}}`` structure. Namely, the **simulation** block 
+``{"type":str, "params":{}, "optionalClasses":{}}`` structure. Namely, the **simulation** block 
 chooses and tunes the propagation algorithm, typically PELE, the **clustering** block tunes the clustering method,
 cluster sizes... and the **spawning** block selects the strategy to choose the most interesting
 structures. 
-
-Control file outline
---------------------
 
 ::
 
@@ -497,13 +504,34 @@ A more complete (although not so comprehensible) example::
 Output
 ------
 
-Each epoch's output is redirected to a different folder, with a name corresponding to the epoch. For example, if we run three epochs, we will have three folders named
+The output for each epoch is redirected to a different folder, with a name that matches the epoch number. For example, if we run three epochs, we will have three folders named
 0, 1, and 2.
-
-Aside from the regular simulation program output, within each folder, it creates a clustering directory with the clustering summary information, and 
-eventually the cluster center pdb files, and the clustering object. This clustering object is used to restart simulations, and only that of the last
+Aside from the regular simulation program output each directory contains a clustering subdirectory with the clustering summary information, and 
+eventually, the cluster center pdb files and the clustering object. This clustering object is used to restart simulations, and only that of the last
 finished epoch is kept for disk usage optimization. 
-Note that if we change a clustering parameter in a restart run, AdaptivePELE will recluster all the snapshots, which will fail if previous trajectories are not present.
+If we change a clustering parameter in a restart run, AdaptivePELE will recluster all the snapshots, which will fail if previous trajectories are not present.
 
 
-In order to analyse trajectories, 
+Analysis
+........
+
+In order to analyse simulation results, a bunch of scripts are provided in ``AdaptivePELE/analysis``. Get help to run them with: ``python <script> -h``
+
+Example to print column 5 evolution with gnuplot::
+
+    python -m AdaptivePELE.analysis.plotAdaptive 4 2 5 report_ -rmsd | gnuplot -persist
+
+It prints the evolution of column 5 (e.g. RMSD) in report_* files with lines (-rmsd) in epochs of 4 steps.
+
+Example to print BE against RMSD with gnuplot::
+
+    python -m AdaptivePELE.analysis.plotAdaptive 4 5 6 report_ -be | gnuplot -persist
+
+It prints the column 6 against column 5 with points (-be). Epoch length is ignored in this case
+
+To plot the evolution of the number of clusters along the simulation::
+
+    python -m AdaptivePELE.analysis.numberOfClusters -filename "plot"
+
+It shows the evolution of the total number of clusters, and the number of clusters divided in different densities and cluster thresholds.
+It also prints a histogram with the ratio of counts *r* (see above). When ``-filename`` is provided, it saves the plots as png files.

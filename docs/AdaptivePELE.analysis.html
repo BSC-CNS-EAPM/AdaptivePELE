@@ -34,9 +34,9 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="AdaptivePELE  documentation" href="index.html"/>
-        <link rel="up" title="AdaptivePELE Package" href="AdaptivePELE.html"/>
+        <link rel="up" title="AdaptivePELE – Package Description" href="AdaptivePELE.html"/>
         <link rel="next" title="atomset Package" href="AdaptivePELE.atomset.html"/>
-        <link rel="prev" title="AdaptivePELE Package" href="AdaptivePELE.html"/> 
+        <link rel="prev" title="AdaptivePELE – Package Description" href="AdaptivePELE.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -87,7 +87,8 @@
             
             
                 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE Package</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
@@ -95,7 +96,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.correctRMSD"><code class="docutils literal"><span class="pre">correctRMSD</span></code> Module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.foldersFirstBindingEvent"><code class="docutils literal"><span class="pre">foldersFirstBindingEvent</span></code> Module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.generateGnuplotFile"><code class="docutils literal"><span class="pre">generateGnuplotFile</span></code> Module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.makePNGs"><code class="docutils literal"><span class="pre">makePNGs</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#makepngs-module"><code class="docutils literal"><span class="pre">makePNGs</span></code> Module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.numberOfOwnClusters"><code class="docutils literal"><span class="pre">numberOfOwnClusters</span></code> Module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.writeClusteringStructures"><code class="docutils literal"><span class="pre">writeClusteringStructures</span></code> Module</a></li>
 </ul>
@@ -110,7 +111,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Examples.html">AdaptivePELE Overview</a></li>
 </ul>
 
             
@@ -145,7 +145,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-        <li><a href="AdaptivePELE.html">AdaptivePELE Package</a> &raquo;</li>
+        <li><a href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a> &raquo;</li>
       
     <li>analysis Package</li>
     <li class="wy-breadcrumbs-aside">
@@ -203,34 +203,29 @@
 <span id="generategnuplotfile-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">generateGnuplotFile</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.generateGnuplotFile" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.analysis.generateGnuplotFile.generateForLoopString">
-<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">generateForLoopString</code><span class="sig-paren">(</span><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#generateForLoopString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generateForLoopString" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">generateForLoopString</code><span class="sig-paren">(</span><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generateForLoopString" title="Permalink to this definition">¶</a></dt>
 <dd><p>TotalNumberOfSteps -&gt; not only considering steps in current epoch, but steps with all previous epochs</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.generateGnuplotFile.generateNestedString">
-<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">generateNestedString</code><span class="sig-paren">(</span><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#generateNestedString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generateNestedString" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">generateNestedString</code><span class="sig-paren">(</span><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generateNestedString" title="Permalink to this definition">¶</a></dt>
 <dd><p>TotalNumberOfSteps -&gt; not only considering steps in current epoch, but steps with all previous epochs</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.generateGnuplotFile.generatePrintString">
-<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">generatePrintString</code><span class="sig-paren">(</span><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#generatePrintString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generatePrintString" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">generatePrintString</code><span class="sig-paren">(</span><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.generatePrintString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.generateGnuplotFile.parseArguments">
-<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">parseArguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/generateGnuplotFile.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.parseArguments" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.generateGnuplotFile.</code><code class="descname">parseArguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.analysis.generateGnuplotFile.parseArguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
-<div class="section" id="module-AdaptivePELE.analysis.makePNGs">
-<span id="makepngs-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">makePNGs</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.makePNGs" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="AdaptivePELE.analysis.makePNGs.buildGnuplotString">
-<code class="descclassname">AdaptivePELE.analysis.makePNGs.</code><code class="descname">buildGnuplotString</code><span class="sig-paren">(</span><em>title</em>, <em>outputFilename</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/makePNGs.html#buildGnuplotString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.makePNGs.buildGnuplotString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="makepngs-module">
+<h2><code class="xref py py-mod docutils literal"><span class="pre">makePNGs</span></code> Module<a class="headerlink" href="#makepngs-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-AdaptivePELE.analysis.numberOfOwnClusters">
 <span id="numberofownclusters-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">numberOfOwnClusters</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.numberOfOwnClusters" title="Permalink to this headline">¶</a></h2>
@@ -315,7 +310,7 @@
         <a href="AdaptivePELE.atomset.html" class="btn btn-neutral float-right" title="atomset Package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="AdaptivePELE.html" class="btn btn-neutral" title="AdaptivePELE Package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="AdaptivePELE.html" class="btn btn-neutral" title="AdaptivePELE – Package Description" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
