@@ -10,16 +10,14 @@ def parseArguments():
             "It MUST be run from the root epoch folder (i.e., where it can find the folders 0/, 1/, 2/, ... lastEpoch/"\
             "To be run for example like: \">python generateGnuplotFile.py | gnuplot -persist\""
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("steps", type=int, default=25, help="Pele steps per run") 
+    parser.add_argument("steps", type=int, default=4, help="Pele steps per run") 
     parser.add_argument("xcol", type=int, default=2, help="xcol") 
     parser.add_argument("ycol", type=int, default=4, help="ycol") 
     parser.add_argument("filename", type=str, default="report_", help="Report filename") 
     parser.add_argument("-be", action="store_true", help="Points")
     parser.add_argument("-rmsd", action="store_true", help="Lines")
-    parser.add_argument("-l", "--line", action="store_true", help="Return gnuplot line")
-    parser.add_argument("--gnuplot", default="gnuplot", help="Gnuplot program location")
     args = parser.parse_args()
-    return args.steps, args.xcol, args.ycol, args.filename, args.be, args.rmsd, args.line, args.gnuplot
+    return args.steps, args.xcol, args.ycol, args.filename, args.be, args.rmsd
 
 def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRun, printWithLines, totalNumberOfSteps=False, replotFirst=False):
     """
@@ -31,7 +29,7 @@ def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRu
 
 
     dictionary = {'reportName':reportName, 'col2':column2, 'numberOfEpochs':numberOfEpochs, 'withLines':''}
-    
+
     #runs of epoch 0, assumed constant
     numberOfRunsPerEpoch=len( glob.glob( os.path.join(str(0), reportName+"*") ) )
     dictionary['runsPerEpoch'] = numberOfRunsPerEpoch
@@ -98,14 +96,12 @@ def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint):
         printWithLines = False
         totalNumberOfSteps=False
 
-    representativeReportName='clustering/reports'
-
-    gnuplotString = "plot for [j=0:%(numberOfEpochs)d-1] for [i=1:%(runsPerEpoch)d] \"\".j.\"/%(reportName)s\".i u %(col1)s:%(col2)d lt 6 lc palette frac j/%(numberOfEpochs)d. notitle %(withLines)s"
+    gnuplotString = "plot for [i=1:%(runsPerEpoch)d] for [j=0:%(numberOfEpochs)d-1] \'\'.j.\'/%(reportName)s\'.i u %(col1)s:%(col2)d lt 6 lc palette frac j/%(numberOfEpochs)d. notitle %(withLines)s"
     return generateNestedString(gnuplotString, reportName, xcol, ycol, stepsPerRun, printWithLines, totalNumberOfSteps, False)
 
 
 if __name__ == "__main__":
-    stepsPerRun, xcol, ycol, filename, be, rmsd, line, gnuplot = parseArguments()
+    stepsPerRun, xcol, ycol, filename, be, rmsd = parseArguments()
     #VARIABLES TO SET WHEN PRINTING
     if be:
         kindOfPrint = "PRINT_BE_RMSD"
@@ -113,12 +109,4 @@ if __name__ == "__main__":
         kindOfPrint = "PRINT_RMSD_STEPS"
 
     printLine = generatePrintString(stepsPerRun, xcol, ycol, filename, kindOfPrint)
-    if line:
-        print printLine
-    else:
-        command = " echo \'%s\' | %s -persist" % (printLine, gnuplot)
-        print command
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
-        (out, err) = proc.communicate()
-        if out: print out
-        if err: print err
+    print printLine
