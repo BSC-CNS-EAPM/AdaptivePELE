@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>AdaptivePELE Overview &mdash; AdaptivePELE  documentation</title>
+  <title>User Manual &mdash; AdaptivePELE  documentation</title>
   
 
   
@@ -34,7 +34,8 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="AdaptivePELE  documentation" href="index.html"/>
-        <link rel="prev" title="validator Package" href="AdaptivePELE.validator.html"/> 
+        <link rel="next" title="AdaptivePELE – Package Description" href="AdaptivePELE.html"/>
+        <link rel="prev" title="Welcome to AdaptivePELE’s documentation!" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -85,24 +86,31 @@
             
             
                 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE Package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">AdaptivePELE Overview</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Manual</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#control-file-outline">Control file outline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#generalparams-block">generalParams block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generalparams-block">generalParams block</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#parameters">Parameters</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#simulation-block">simulation block</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#parameters">parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#templetized-pele-control-file">Templetized PELE control file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#clustering-block">clustering block</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#thresholdcalculator">thresholdCalculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rmsd-clustering">rmsd clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contactmap-clustering">contactMap clustering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id1">parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#spawning-block">spawning block</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#density-calculator">density calculator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id2">parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#control-file-examples">Control File Examples</a><ul>
@@ -110,8 +118,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#example-2">Example 2</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#output">Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#analysis">Analysis</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a></li>
 </ul>
 
             
@@ -146,7 +159,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>AdaptivePELE Overview</li>
+    <li>User Manual</li>
     <li class="wy-breadcrumbs-aside">
       
           
@@ -160,27 +173,46 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="adaptivepele-overview">
-<h1>AdaptivePELE Overview<a class="headerlink" href="#adaptivepele-overview" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="user-manual">
+<h1>User Manual<a class="headerlink" href="#user-manual" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>In order to have a running copy of AdaptivePELE, you need to install and compile cython files in the base folder with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">AdaptivePELE</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">inplace</span>
+</pre></div>
+</div>
+<p>Also, if AdaptivePELE was not installed in a typical library directory, a common option is to add it to your local PYTHONPATH:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=&lt;</span><span class="n">location_of_AdaptivePELE</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>This page tries to give an overview of AdaptivePELE, enough to get it
 up and running. The program aims to enhance the exploration of standard
 molecular simulations by iteratively running short simulations,
 assessing the exploration with a clustering, and spawning new trajectories
 in <em>interesting</em> regions using the multi-armed bandit as a framework.
 The algorithm can be summarized in the flow diagram shown below:</p>
-<a class="reference internal image-reference" href="_images/adaptiveDiagram.png"><img alt="image trouble" class="align-center" src="_images/adaptiveDiagram.png" style="width: 900px; height: 900px;" /></a>
+<img alt="image trouble" class="align-center" src="_images/adaptiveDiagram.png" />
+</div>
+<div class="section" id="control-file-outline">
+<h2>Control file outline<a class="headerlink" href="#control-file-outline" title="Permalink to this headline">¶</a></h2>
 <p>AdaptivePELE is a Python program called with a parameter: the control
-file, a JSON document that permits tuning its behavior. It contains 4 blocks:
+file.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">adaptiveSampling</span> <span class="n">controlFile</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>The control file is a JSON document that permits tuning its behavior. It contains 4 blocks:
 the general parameters, simulation parameters, clustering
 parameters and spawning parameters. The first block refers to general
 parameters such as the output path, initial structures, or whether to restart (resume) a simulation.
 The other three blocks configure the three iterative steps of an adaptive run, and have a
-<code class="docutils literal"><span class="pre">{&quot;type&quot;:str,</span> <span class="pre">&quot;params&quot;:{}}</span></code> structure. Namely, the <strong>simulation</strong> block
+<code class="docutils literal"><span class="pre">{&quot;type&quot;:str,</span> <span class="pre">&quot;params&quot;:{},</span> <span class="pre">&quot;optionalClasses&quot;:{}}</span></code> structure. Namely, the <strong>simulation</strong> block
 chooses and tunes the propagation algorithm, typically PELE, the <strong>clustering</strong> block tunes the clustering method,
 cluster sizes... and the <strong>spawning</strong> block selects the strategy to choose the most interesting
 structures.</p>
-<div class="section" id="control-file-outline">
-<h2>Control file outline<a class="headerlink" href="#control-file-outline" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{},</span>
     <span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:{}},</span>
@@ -192,7 +224,16 @@ structures.</p>
 </div>
 <div class="section" id="generalparams-block">
 <h2>generalParams block<a class="headerlink" href="#generalparams-block" title="Permalink to this headline">¶</a></h2>
-<p>The general parameters block has five mandatory fields:</p>
+<p>These parameters control the general aspects of the simulation, such as the initial structures or the output path.
+For example, if you consider that a simulation did not explore the energy landscape sufficiently,
+it can be automatically resumed. In this case, if you change the clustering parameters from the previous run,
+it will need the trajectory files to recluster all snapshots. Otherwise, it is enough with the automatically
+handled clustering objects.
+If you want to test the effect of using a particular cluster threshold or spawning parameter (see below),
+using debug=true may be a great option.</p>
+<div class="section" id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<p>The general parameters block has five possible fields:</p>
 <ul class="simple">
 <li><strong>restart</strong> (<em>boolean</em>, default=True): This parameter specifies whether you want to
 continue a previous simulation or not. It requires the last epoch&#8217;s clustering object,
@@ -221,6 +262,7 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 </pre></div>
 </div>
 </div>
+</div>
 <div class="section" id="simulation-block">
 <h2>simulation block<a class="headerlink" href="#simulation-block" title="Permalink to this headline">¶</a></h2>
 <p>Currently, there are two implemented simulation types:</p>
@@ -229,9 +271,19 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <li><strong>test</strong>. The test type has no real use outside of testing.</li>
 </ul>
 <p>We plan to implement an MD type in future versions.</p>
-<div class="section" id="parameters">
-<h3>parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
-<p>In the PELE type the following parameters are mandatory:</p>
+<div class="section" id="templetized-pele-control-file">
+<h3>Templetized PELE control file<a class="headerlink" href="#templetized-pele-control-file" title="Permalink to this headline">¶</a></h3>
+<p>In order to run adaptivePELE, PELE control file needs to be templetized. In particular:</p>
+<ul class="simple">
+<li><strong>MultipleComplexes&#8221;</strong>: AdaptivePELE requieres the use of multiple complexes: <code class="docutils literal"><span class="pre">&quot;MultipleComplex&quot;:</span> <span class="pre">[</span> <span class="pre">$COMPLEXES</span> <span class="pre">]</span></code></li>
+<li><strong>seed</strong>: The seed needs to be templetized: <code class="docutils literal"><span class="pre">&quot;seed&quot;:</span> <span class="pre">$SEED</span></code></li>
+<li><strong>outputPath</strong>: The output path needs to be changed for: <code class="docutils literal"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/report&quot;</span></code></li>
+<li><strong>numberOfPeleSteps</strong>: The number of pele steps needs to be templetized as <code class="docutils literal"><span class="pre">&quot;numberOfPeleSteps&quot;:</span> <span class="pre">$PELE_STEPS</span></code></li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h3>parameters<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>When using PELE as a propagator, the following parameters are mandatory:</p>
 <ul class="simple">
 <li><strong>iterations</strong> (<em>integer</em>, mandatory): Number of adaptive sampling iterations to run</li>
 <li><strong>processors</strong> (<em>integer</em>, mandatory): Number of processors to use with PELE</li>
@@ -240,13 +292,13 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <li><strong>controlFile</strong> (<em>string</em>, mandatory): Path to the templetized PELE control file (see below)</li>
 </ul>
 <p>Optionally, you can also use the following parameters:</p>
+<ul class="simple">
+<li><strong>data</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE</li>
+<li><strong>documents</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE</li>
+<li><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder, it is already</li>
+</ul>
+<p>Additionally, the block may have an exit condition that stops the execution:</p>
 <ul>
-<li><p class="first"><strong>data</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE</p>
-</li>
-<li><p class="first"><strong>documents</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE</p>
-</li>
-<li><p class="first"><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder, it is already</p>
-</li>
 <li><p class="first"><strong>exitCondition</strong> (<em>dict</em>, default=None): Block that specifies an exit condition for the simulation.
 Currently only the metric type is implemented, this type accepts a
 <em>metricCol</em> which represents a column in the report file and a <em>exitValue</em>
@@ -337,8 +389,8 @@ There are currently three implemented methods to evaluate the similarity of cont
 <li><strong>distance</strong>, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.</li>
 </ul>
 </div>
-<div class="section" id="id1">
-<h3>parameters<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>parameters<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><strong>ligandResname</strong> (<em>string</em>, default=&#8221;&#8221;): Ligand residue name in the PDB (if necessary)</li>
 <li><strong>ligandChain</strong> (<em>string</em>, default=&#8221;&#8221;): Ligand chain (if necessary)</li>
@@ -349,7 +401,11 @@ be separated to be considered in contact</li>
 that are symmetrical in the ligand</li>
 <li><strong>similarityEvaluator</strong> (<em>string</em>, mandatory)  Name of the method to evaluate the similarity
 of contactMaps, only available and mandatory in the contactMap clustering</li>
+<li><strong>alternativeStructure</strong> (<em>bool</em>, default=False): It stores alternative spawning structures within each cluster to be used in the spawning (see below). Any two pairs of alternative structures within a cluster are separated a minimum distance of cluster_threshold_distance/2.</li>
 </ul>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
 <p>A typical setting of the rmsd clustering is:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;clustering&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">,</span>
@@ -393,7 +449,7 @@ There are several implemented strategies:</p>
 <ul class="simple">
 <li><strong>sameWeight</strong>: Uniformly distributes the processors over all clusters</li>
 <li><strong>inverselyProportional</strong>: Distributes the processors with a weight that is inversely proportional to the cluster population.</li>
-<li><strong>epsilon</strong>: An <strong>epsilon</strong> fraction of processors are distributed proportionally to the value of a metric, and the rest are inverselyProportional distributed.  A param <strong>n</strong> can be specified to only consider the <em>n</em> clusters with best metric.</li>
+<li><strong>epsilon</strong>: An <em>epsilon</em> fraction of processors are distributed proportionally to the value of a metric, and the rest are inverselyProportional distributed.  A param <strong>n</strong> can be specified to only consider the <em>n</em> clusters with best metric.</li>
 <li><strong>variableEpsilon</strong>: Equivalent to epsilon, with an epsilon value changing over time</li>
 <li><strong>independent</strong>: Trajectories are run independently, as in the original PELE. It may be useful to restart simulations or to use the analysis scripts built for AdaptivePELE.</li>
 <li><strong>UCB</strong>: Upper confidence bound.</li>
@@ -411,14 +467,14 @@ There are two types of density calculators:</p>
 <li><strong>continuous</strong>, which assings increasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 8, otherwise, density = 64.0/(-4 <strong>r</strong> + 6)^3</li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h3>parameters<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>parameters<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. &#8220;report&#8221;.</li>
 <li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (zero indexed)</li>
 <li><strong>epsilon</strong> (<em>float</em>, mandatory in <strong>epsilon</strong> spawning): The fraction of the processors that will be assigned according to the selected metric</li>
 <li><strong>metricWeights</strong> (<em>string</em>, default=linear): Selects how to distribute the weights of the cluster according to its metric, two options: linear (proportional to metric) or Boltzmann weigths (proportional to exp(-metric/T). Needs to define the temperature <strong>T</strong>.</li>
-<li><strong>T</strong> (<em>float</em>, mandatory with Boltzmann metric weights): Temperature, only used for Boltzmann weights</li>
+<li><strong>T</strong> (<em>float</em>, default=1000): Temperature, only used for Boltzmann weights</li>
 </ul>
 <p>The following parameters are mandatory for <strong>variableEpsilon</strong>:</p>
 <ul class="simple">
@@ -430,18 +486,162 @@ There are two types of density calculators:</p>
 <li><strong>period</strong> (<em>integer</em>) Variation period (in number of iterations)</li>
 </ul>
 </div>
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;inverselyProportional&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;epsilon&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;metricColumnInReport&quot;</span> <span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="s2">&quot;epsilon&quot;</span> <span class="p">:</span> <span class="mf">0.25</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;density&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;continuous&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="control-file-examples">
 <h2>Control File Examples<a class="headerlink" href="#control-file-examples" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="example-1">
 <h3>Example 1<a class="headerlink" href="#example-1" title="Permalink to this headline">¶</a></h3>
 <p>The first example makes use of default parameters (used in the AdaptivePELE paper).</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+        <span class="s2">&quot;outputPath&quot;</span><span class="p">:</span><span class="s2">&quot;example1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;nativeStructure&quot;</span> <span class="p">:</span> <span class="s2">&quot;native.pdb&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;initialStructures&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;initial1.pdb&quot;</span><span class="p">,</span> <span class="s2">&quot;initial2.pdb&quot;</span><span class="p">]</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;pele&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;iterations&quot;</span> <span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+            <span class="s2">&quot;processors&quot;</span> <span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
+            <span class="s2">&quot;peleSteps&quot;</span> <span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">30689</span><span class="p">,</span>
+            <span class="s2">&quot;controlFile&quot;</span> <span class="p">:</span> <span class="s2">&quot;templetizedPELEControlFile.conf&quot;</span>
+
+        <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;clustering&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;ligandResname&quot;</span> <span class="p">:</span> <span class="s2">&quot;AEN&quot;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;inverselyProportional&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <p>To summarize, below there is a screenshot of a simple functional control file:</p>
 </div>
 <div class="section" id="example-2">
 <h3>Example 2<a class="headerlink" href="#example-2" title="Permalink to this headline">¶</a></h3>
-<p>A more complete (altough not comprehensible) example would look like (clicking
-in the image will show a larger version of the image):</p>
+<p>A more complete (although not so comprehensible) example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+        <span class="s2">&quot;debug&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+        <span class="s2">&quot;outputPath&quot;</span><span class="p">:</span><span class="s2">&quot;example2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;writeAllClusteringStructures&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+        <span class="s2">&quot;nativeStructure&quot;</span> <span class="p">:</span> <span class="s2">&quot;native.pdb&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;initialStructures&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;initial1.pdb&quot;</span><span class="p">,</span> <span class="s2">&quot;initial2.pdb&quot;</span><span class="p">]</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;epsilon&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;metricColumnInReport&quot;</span> <span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;epsilon&quot;</span><span class="p">:</span><span class="mf">0.1</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;density&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;null&quot;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;pele&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;executable&quot;</span> <span class="p">:</span> <span class="s2">&quot;PELE++/bin/rev12025/Pele_rev12025_mpi&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span> <span class="p">:</span> <span class="s2">&quot;PELE++/data/rev12025/Data&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;documents&quot;</span> <span class="p">:</span> <span class="s2">&quot;PELE++/Documents/rev12025&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;iterations&quot;</span> <span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+            <span class="s2">&quot;processors&quot;</span> <span class="p">:</span> <span class="mi">51</span><span class="p">,</span>
+            <span class="s2">&quot;peleSteps&quot;</span> <span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">30689</span><span class="p">,</span>
+            <span class="s2">&quot;controlFile&quot;</span> <span class="p">:</span> <span class="s2">&quot;/gpfs/scratch/bsc72/bsc72755/adaptiveSampling/data/3ptb/3ptb_a_1000.conf&quot;</span>
+
+        <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;clustering&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;ligandResname&quot;</span> <span class="p">:</span> <span class="s2">&quot;AEN&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;contactThresholdDistance&quot;</span> <span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+            <span class="s2">&quot;symmetries&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;3225:C3:AEN&quot;</span><span class="p">:</span><span class="s2">&quot;3227:C5:AEN&quot;</span><span class="p">,</span><span class="s2">&quot;3224:C2:AEN&quot;</span><span class="p">:</span><span class="s2">&quot;3228:C6:AEN&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;3230:N1:AEN&quot;</span><span class="p">:</span> <span class="s2">&quot;3231:N2:AEN&quot;</span><span class="p">}]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;thresholdCalculator&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;heaviside&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;values&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+                <span class="s2">&quot;conditions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="output">
+<h2>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h2>
+<p>The output for each epoch is redirected to a different folder, with a name that matches the epoch number. For example, if we run three epochs, we will have three folders named
+0, 1, and 2.
+Aside from the regular simulation program output each directory contains a clustering subdirectory with the clustering summary information, and
+eventually, the cluster center pdb files and the clustering object. This clustering object is used to restart simulations, and only that of the last
+finished epoch is kept for disk usage optimization.
+If we change a clustering parameter in a restart run, AdaptivePELE will recluster all the snapshots, which will fail if previous trajectories are not present.</p>
+<div class="section" id="analysis">
+<h3>Analysis<a class="headerlink" href="#analysis" title="Permalink to this headline">¶</a></h3>
+<p>In order to analyse simulation results, a bunch of scripts are provided in <code class="docutils literal"><span class="pre">AdaptivePELE/analysis</span></code>. Get help to run them with: <code class="docutils literal"><span class="pre">python</span> <span class="pre">&lt;script&gt;</span> <span class="pre">-h</span></code></p>
+<p>Example to print column 5 evolution with gnuplot:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">2</span> <span class="mi">5</span> <span class="n">report_</span> <span class="o">-</span><span class="n">rmsd</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
+</pre></div>
+</div>
+<p>It prints the evolution of column 5 (e.g. RMSD) in report_* files with lines (-rmsd) in epochs of 4 steps.</p>
+<p>Example to print BE against RMSD with gnuplot:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span> <span class="n">report_</span> <span class="o">-</span><span class="n">be</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
+</pre></div>
+</div>
+<p>It prints the column 6 against column 5 with points (-be). Epoch length is ignored in this case</p>
+<p>To plot the evolution of the number of clusters along the simulation:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">numberOfClusters</span> <span class="o">-</span><span class="n">filename</span> <span class="s2">&quot;plot&quot;</span>
+</pre></div>
+</div>
+<p>It shows the evolution of the total number of clusters, and the number of clusters divided in different densities and cluster thresholds.
+It also prints a histogram with the ratio of counts <em>r</em> (see above). When <code class="docutils literal"><span class="pre">-filename</span></code> is provided, it saves the plots as png files.</p>
 </div>
 </div>
 </div>
@@ -453,8 +653,10 @@ in the image will show a larger version of the image):</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="AdaptivePELE.html" class="btn btn-neutral float-right" title="AdaptivePELE – Package Description" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="AdaptivePELE.validator.html" class="btn btn-neutral" title="validator Package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to AdaptivePELE’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

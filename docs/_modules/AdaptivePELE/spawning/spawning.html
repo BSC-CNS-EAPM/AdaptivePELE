@@ -85,8 +85,8 @@
             
             
                 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">AdaptivePELE Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a></li>
 </ul>
 
             
@@ -283,7 +283,7 @@
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="SpawningCalculator.writeSpawningInitialStructures"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures">[docs]</a>    <span class="k">def</span> <span class="nf">writeSpawningInitialStructures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span><span class="p">,</span> <span class="n">clustering</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write initial structures for the next iteriation</span>
+        <span class="sd">&quot;&quot;&quot; Write initial structures for the next iteration</span>
 
 <span class="sd">            outputPathConstants [In] Output constants that depend on the path</span>
 <span class="sd">            degeneracyOfRepresentatives [In] Array with the degeneracy of each</span>
@@ -298,7 +298,6 @@
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">degeneracyOfRepresentatives</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
                 <span class="n">outputFilename</span> <span class="o">=</span> <span class="n">tmpInitialStructuresTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="n">counts</span><span class="p">)</span>
                 <span class="nb">print</span> <span class="s1">&#39;Writing to &#39;</span><span class="p">,</span> <span class="n">outputFilename</span><span class="p">,</span> <span class="s1">&#39;cluster&#39;</span><span class="p">,</span> <span class="n">i</span>
-                <span class="c1"># cluster.writePDB(outputFilename)</span>
                 <span class="n">procMapping</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">writeSpawningStructure</span><span class="p">(</span><span class="n">outputFilename</span><span class="p">))</span>
 
                 <span class="n">counts</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -397,7 +396,7 @@
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="IndependentRunsCalculator.writeSpawningInitialStructures"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures">[docs]</a>    <span class="k">def</span> <span class="nf">writeSpawningInitialStructures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span><span class="p">,</span> <span class="n">clustering</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write last trajectory structure as initial one for the next iteriation</span>
+        <span class="sd">&quot;&quot;&quot; Write last trajectory structure as initial one for the next iteration</span>
 
 <span class="sd">            outputPathConstants [In] Output constants that depend on the path</span>
 <span class="sd">            degeneracyOfRepresentatives [In] Array with the degeneracy of each</span>
