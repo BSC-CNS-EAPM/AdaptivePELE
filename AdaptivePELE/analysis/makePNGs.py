@@ -3,14 +3,18 @@ import subprocess
 import pdb
 import glob
 import generateGnuplotFile
+import argparse
 
-"""
-    Instructions:
-        Keys in "folders", "titles" and "outputFilenames" should match (could be avoided with simple refactor...)
-        Keys are: "#steps_#processors", #steps is important for the plots
+def parseArguments():
+    desc = "It makes two PNG images with RMSD-steps and BE-RMSD for a set of different adaptive runs\n\n"\
+            "Instructions:\n"\
+            "-------------\n"\
+            "Keys in \"folders\", \"titles\" and \"outputFilenames\" dictionaries should match (could be avoided with simple refactor...)\n"\
+            "Keys are: \"#steps_#processors\", #steps is important for the plots"\
+            "Change params to match simulation.\n"
+    parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawTextHelpFormatter)
+    args = parser.parse_args()
 
-        Change params to match simulation.
-"""
 
 folders = {"4_512":"PRprog_4_512"} #, "4_64":"3ptb_4_64", "4_128":"3ptb_4_128"}
 
@@ -61,6 +65,8 @@ def buildGnuplotString(title, outputFilename, params):
 
     return gnuplotFileStringContent%dictionary
 
+
+parseArguments()
 
 for key, folder in folders.iteritems():
     print "Folder: ", folder

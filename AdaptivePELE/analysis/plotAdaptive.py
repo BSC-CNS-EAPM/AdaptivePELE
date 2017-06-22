@@ -2,7 +2,7 @@ import os
 import argparse
 import glob
 import types
-
+import subprocess
 
 
 def parseArguments():
@@ -16,8 +16,10 @@ def parseArguments():
     parser.add_argument("filename", type=str, default="report_", help="Report filename") 
     parser.add_argument("-be", action="store_true", help="Points")
     parser.add_argument("-rmsd", action="store_true", help="Lines")
+    parser.add_argument("-l", "--line", action="store_true", help="Return gnuplot line")
+    parser.add_argument("--gnuplot", default="gnuplot", help="Gnuplot program location")
     args = parser.parse_args()
-    return args.steps, args.xcol, args.ycol, args.filename, args.be, args.rmsd
+    return args.steps, args.xcol, args.ycol, args.filename, args.be, args.rmsd, args.line, args.gnuplot
 
 def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRun, printWithLines, totalNumberOfSteps=False, replotFirst=False):
     """
@@ -103,11 +105,20 @@ def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint):
 
 
 if __name__ == "__main__":
-    stepsPerRun, xcol, ycol, filename, be, rmsd = parseArguments()
+    stepsPerRun, xcol, ycol, filename, be, rmsd, line, gnuplot = parseArguments()
     #VARIABLES TO SET WHEN PRINTING
     if be:
         kindOfPrint = "PRINT_BE_RMSD"
     elif rmsd:
         kindOfPrint = "PRINT_RMSD_STEPS"
 
-    print generatePrintString(stepsPerRun, xcol, ycol, filename, kindOfPrint)
+    printLine = generatePrintString(stepsPerRun, xcol, ycol, filename, kindOfPrint)
+    if line:
+        print printLine
+    else:
+        command = " echo \'%s\' | %s -persist" % (printLine, gnuplot)
+        print command
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+        (out, err) = proc.communicate()
+        if out: print out
+        if err: print err
