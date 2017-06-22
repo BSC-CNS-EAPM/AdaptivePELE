@@ -1,5 +1,5 @@
-AdaptivePELE Package
-========================
+AdaptivePELE -- Package Description
+===================================
 
 .. automodule:: AdaptivePELE.__init__
     :members:

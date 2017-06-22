@@ -2,7 +2,7 @@ import os
 import argparse
 import glob
 import types
-
+import subprocess
 
 
 def parseArguments():
@@ -10,7 +10,7 @@ def parseArguments():
             "It MUST be run from the root epoch folder (i.e., where it can find the folders 0/, 1/, 2/, ... lastEpoch/"\
             "To be run for example like: \">python generateGnuplotFile.py | gnuplot -persist\""
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("steps", type=int, default=25, help="Pele steps per run") 
+    parser.add_argument("steps", type=int, default=4, help="Pele steps per run") 
     parser.add_argument("xcol", type=int, default=2, help="xcol") 
     parser.add_argument("ycol", type=int, default=4, help="ycol") 
     parser.add_argument("filename", type=str, default="report_", help="Report filename") 
@@ -29,7 +29,7 @@ def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRu
 
 
     dictionary = {'reportName':reportName, 'col2':column2, 'numberOfEpochs':numberOfEpochs, 'withLines':''}
-    
+
     #runs of epoch 0, assumed constant
     numberOfRunsPerEpoch=len( glob.glob( os.path.join(str(0), reportName+"*") ) )
     dictionary['runsPerEpoch'] = numberOfRunsPerEpoch
@@ -96,9 +96,7 @@ def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint):
         printWithLines = False
         totalNumberOfSteps=False
 
-    representativeReportName='clustering/reports'
-
-    gnuplotString = "plot for [j=0:%(numberOfEpochs)d-1] for [i=1:%(runsPerEpoch)d] \"\".j.\"/%(reportName)s\".i u %(col1)s:%(col2)d lt 6 lc palette frac j/%(numberOfEpochs)d. notitle %(withLines)s"
+    gnuplotString = "plot for [i=1:%(runsPerEpoch)d] for [j=0:%(numberOfEpochs)d-1] \'\'.j.\'/%(reportName)s\'.i u %(col1)s:%(col2)d lt 6 lc palette frac j/%(numberOfEpochs)d. notitle %(withLines)s"
     return generateNestedString(gnuplotString, reportName, xcol, ycol, stepsPerRun, printWithLines, totalNumberOfSteps, False)
 
 
@@ -110,4 +108,5 @@ if __name__ == "__main__":
     elif rmsd:
         kindOfPrint = "PRINT_RMSD_STEPS"
 
-    print generatePrintString(stepsPerRun, xcol, ycol, filename, kindOfPrint)
+    printLine = generatePrintString(stepsPerRun, xcol, ycol, filename, kindOfPrint)
+    print printLine

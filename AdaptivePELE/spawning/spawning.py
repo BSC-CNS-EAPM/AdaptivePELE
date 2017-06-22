@@ -145,7 +145,7 @@ class SpawningCalculator:
         pass
 
     def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration):
-        """ Write initial structures for the next iteriation
+        """ Write initial structures for the next iteration
 
             outputPathConstants [In] Output constants that depend on the path
             degeneracyOfRepresentatives [In] Array with the degeneracy of each
@@ -160,7 +160,6 @@ class SpawningCalculator:
             for j in range(int(degeneracyOfRepresentatives[i])):
                 outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
                 print 'Writing to ', outputFilename, 'cluster', i
-                # cluster.writePDB(outputFilename)
                 procMapping.append(cluster.writeSpawningStructure(outputFilename))
 
                 counts += 1
@@ -259,7 +258,7 @@ class IndependentRunsCalculator(SpawningCalculator):
         pass
 
     def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration):
-        """ Write last trajectory structure as initial one for the next iteriation
+        """ Write last trajectory structure as initial one for the next iteration
 
             outputPathConstants [In] Output constants that depend on the path
             degeneracyOfRepresentatives [In] Array with the degeneracy of each

@@ -464,7 +464,7 @@ class Cluster:
 
     def writeSpawningStructure(self, path):
         """
-            Write the pdb of the chones structure to spawn
+            Write the pdb of the chosen structure to spawn
 
             :param path: Filename of the file to write
             :type path: str

@@ -14,8 +14,9 @@ def printHelp():
     desc = "Program that prints the number of clusters throughout an adaptive sampling simulation. "\
             "It must be run in the root folder. "
     parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("-filename", type=str, default="", help="Output filename") 
     args = parser.parse_args()
-    return args
+    return args.filename
 
 
 def getClusteringSummaryContent(file):
@@ -123,7 +124,9 @@ def plotContactsHistogram(folder, templetizedClusteringSummaryFile):
     plt.hist(allContacts)
 
 def main():
-    printHelp()
+    filename = printHelp()
+
+    print "FILENAME", filename
 
     #Params
     clusteringFileDensityColumn = 5
@@ -143,21 +146,25 @@ def main():
 
     plt.figure(1)
     plt.plot(totalNumberOfClustersPerEpoch, label="All clusters")
+    if filename != "":
+        plt.savefig("%s_total.png" % filename)
 
     plotClustersPerValue(clustersPerDensityValue)
     plt.legend(loc=2)
-    # plt.title("n=64, different thresholds, variable density")
-    # plt.savefig("../3ptb_4_64_numberOfClusters_density_corner.png")
+    if filename != "":
+        plt.savefig("%s_density.png" % filename)
 
     plt.figure(2)
     plt.plot(totalNumberOfClustersPerEpoch, label="All clusters")
     plotClustersPerValue(clustersPerThresholdValue)
     plt.legend(loc=2)
-    # plt.title("n=64, different thresholds, variable density")
-    # plt.savefig("set2.png")
+    if filename != "":
+        plt.savefig("%s_threshold.png" % filename)
 
     plt.figure(3)
     plotContactsHistogram(folder, templetizedClusteringSummaryFile)
+    if filename != "":
+        plt.savefig("%s_hist.png" % filename)
 
     plt.show()
 
