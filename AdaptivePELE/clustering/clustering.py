@@ -998,6 +998,7 @@ class Clustering:
             :param column: Column of the metric that defines the best cluster,
                 if not specified, the cluster metric is chosen
             :type column: int
+            :returns optimalCluster: int -- Number of cluster with the optimal metric
         """
         optimalMetric = 100
         optimalMetricIndex = 0
