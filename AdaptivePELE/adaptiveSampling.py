@@ -450,11 +450,11 @@ def main(jsonParams):
     runnerbuilder = simulationrunner.RunnerBuilder()
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
 
-    restart = generalParams[blockNames.GeneralParams.restart]
-    debug = generalParams[blockNames.GeneralParams.debug]
+    restart = generalParams.get(blockNames.GeneralParams.restart, True)
+    debug = generalParams.get(blockNames.GeneralParams.debug, False)
     outputPath = generalParams[blockNames.GeneralParams.outputPath]
     initialStructuresWildcard = generalParams[blockNames.GeneralParams.initialStructures]
-    writeAll = generalParams[blockNames.GeneralParams.writeAllClustering]
+    writeAll = generalParams.get(blockNames.GeneralParams.writeAllClustering, False)
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
     resname = str(clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.ligandResname])
 
