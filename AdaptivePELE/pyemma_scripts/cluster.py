@@ -77,9 +77,10 @@ class Cluster:
 
         clustersToDelete = np.argwhere(counts < clusterCountsThreshold)
         if clustersToDelete.shape[0] > 0:
-            print "Removing %d clusters due with less than %d counts" % (clustersToDelete.shape[0], clusterCountsThreshold)
+            print "Removing %d clusters due to a small number of counts (less than %d)" % (clustersToDelete.shape[0], clusterCountsThreshold)
             self.clusterCenters = np.delete(self.clusterCenters, clustersToDelete, axis=0)
             self._writeClusterCenters(self.clusterCenters, self.clusterCentersFile)
+            print "Reassigning trajectories"
             self.dtrajs = self.assignNewTrajecories(self.x)
 
     def _writeClusterCenters(self, clusterCenters, outputFilename):

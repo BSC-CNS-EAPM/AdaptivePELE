@@ -11,8 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 4
 
-   AdaptivePELE
    Examples
+   AdaptivePELE
 
 
 Indices and tables

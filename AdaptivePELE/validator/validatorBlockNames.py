@@ -9,9 +9,7 @@ class GeneralParams:
     mandatory = {
         "restart": "bool",
         "outputPath": "basestring",
-        "initialStructures": "list",
-        "debug": "bool",
-        "writeAllClusteringStructures": "bool"
+        "initialStructures": "list"
     }
     params = {
         "restart": "bool",
@@ -45,19 +43,16 @@ class SpawningParams:
         "inverselyProportional": {},
         "epsilon": {
             "epsilon": "numbers.Real",
-            "T": "numbers.Real",
             "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
         },
         "FAST": {
             "epsilon": "numbers.Real",
-            "T": "numbers.Real",
             "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
         },
         "variableEpsilon": {
             "epsilon": "numbers.Real",
-            "T": "numbers.Real",
             "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
             "varEpsilonType": "basestring",
@@ -130,19 +125,17 @@ class SimulationParams:
 class clusteringTypes:
     types = {
         "rmsd": {
-            "contactThresholdDistance": "numbers.Real",
         },
         "contactMap": {
-            "contactThresholdDistance": "numbers.Real",
             "similarityEvaluator": "basestring"
         },
         "lastSnapshot": {
-            "contactThresholdDistance": "numbers.Real",
         }
     }
     params = {
         "rmsd": "basestring",
         "contactMap": "basestring",
+        "contactThresholdDistance": "numbers.Real",
         "lastSnapshot": "basestring",
         "ligandResname": "basestring",
         "ligandResnum": "numbers.Real",

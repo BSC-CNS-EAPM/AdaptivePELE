@@ -464,7 +464,7 @@ class Cluster:
 
     def writeSpawningStructure(self, path):
         """
-            Write the pdb of the chones structure to spawn
+            Write the pdb of the chosen structure to spawn
 
             :param path: Filename of the file to write
             :type path: str
@@ -998,6 +998,7 @@ class Clustering:
             :param column: Column of the metric that defines the best cluster,
                 if not specified, the cluster metric is chosen
             :type column: int
+            :returns optimalCluster: int -- Number of cluster with the optimal metric
         """
         optimalMetric = 100
         optimalMetricIndex = 0
@@ -1292,7 +1293,7 @@ class ClusteringBuilder:
         paramsBlock = clusteringBlock[blockNames.ClusteringTypes.params]
         try:
             clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
-            contactThresholdDistance = paramsBlock[blockNames.ClusteringTypes.contactThresholdDistance]
+            contactThresholdDistance = paramsBlock.get(blockNames.ClusteringTypes.contactThresholdDistance, 8)
             altSelection = paramsBlock.get(blockNames.ClusteringTypes.alternativeStructure, False)
         except KeyError as err:
             err.message += ": Need to provide mandatory parameter in clustering block"

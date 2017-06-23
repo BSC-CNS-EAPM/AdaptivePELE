@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="AdaptivePELE  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -61,7 +63,7 @@
             
             
               <div class="version">
-                v1.2
+                v1.3
               </div>
             
           
@@ -83,8 +85,8 @@
             
             
                 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">AdaptivePELE Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a></li>
 </ul>
 
             
@@ -134,24 +136,22 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.clustering.clusteringTypes</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="kn">import</span> <span class="n">blockNames</span>
+<span></span><span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
 
 
 <div class="viewcode-block" id="CLUSTERING_TYPES"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clusteringTypes.CLUSTERING_TYPES">[docs]</a><span class="k">class</span> <span class="nc">CLUSTERING_TYPES</span><span class="p">:</span>
-    <span class="n">contacts</span><span class="p">,</span> <span class="n">contactMapAffinity</span><span class="p">,</span> <span class="n">contactMapAgglomerative</span><span class="p">,</span> <span class="n">contactMapAccumulative</span><span class="p">,</span> <span class="n">lastSnapshot</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-</div>
+    <span class="n">rmsd</span><span class="p">,</span> <span class="n">contactMap</span><span class="p">,</span> <span class="n">lastSnapshot</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
+
 <span class="n">CLUSTERING_TYPE_TO_STRING_DICTIONARY</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contacts</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">contacts</span><span class="p">,</span>
-    <span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMapAffinity</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">contactMapAffinity</span><span class="p">,</span>
-    <span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMapAgglomerative</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">contactMapAgglomerative</span><span class="p">,</span>
-    <span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMapAccumulative</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">contactMapAccumulative</span><span class="p">,</span>
+    <span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">rmsd</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">rmsd</span><span class="p">,</span>
+    <span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMap</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">contactMap</span><span class="p">,</span>
     <span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">lastSnapshot</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">lastSnapshot</span>
 <span class="p">}</span>
 
 
 <div class="viewcode-block" id="SIMILARITY_TYPES"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clusteringTypes.SIMILARITY_TYPES">[docs]</a><span class="k">class</span> <span class="nc">SIMILARITY_TYPES</span><span class="p">:</span>
-    <span class="n">differenceDistance</span><span class="p">,</span> <span class="n">Jaccard</span><span class="p">,</span> <span class="n">correlation</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-</div>
+    <span class="n">differenceDistance</span><span class="p">,</span> <span class="n">Jaccard</span><span class="p">,</span> <span class="n">correlation</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
+
 <span class="n">SIMILARITY_TYPES_TO_STRING_DICTIONARY</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">SIMILARITY_TYPES</span><span class="o">.</span><span class="n">differenceDistance</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">differenceDistance</span><span class="p">,</span>
     <span class="n">SIMILARITY_TYPES</span><span class="o">.</span><span class="n">Jaccard</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">Jaccard</span><span class="p">,</span>
@@ -168,7 +168,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Daniel Lecina, Joan Francesc Gilabert.
+        &copy; Copyright 2017, Daniel Lecina, Joan Francesc Gilabert.
 
     </p>
   </div>

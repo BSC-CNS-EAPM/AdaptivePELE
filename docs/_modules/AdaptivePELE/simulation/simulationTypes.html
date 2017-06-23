@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -31,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="AdaptivePELE  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -61,7 +63,7 @@
             
             
               <div class="version">
-                v1.2
+                v1.3
               </div>
             
           
@@ -83,8 +85,8 @@
             
             
                 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">AdaptivePELE Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a></li>
 </ul>
 
             
@@ -134,12 +136,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.simulation.simulationTypes</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="kn">import</span> <span class="n">blockNames</span>
+<span></span><span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
 
 
 <div class="viewcode-block" id="SIMULATION_TYPE"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationTypes.SIMULATION_TYPE">[docs]</a><span class="k">class</span> <span class="nc">SIMULATION_TYPE</span><span class="p">:</span>
-    <span class="n">PELE</span><span class="p">,</span> <span class="n">MD</span><span class="p">,</span> <span class="n">TEST</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-</div>
+    <span class="n">PELE</span><span class="p">,</span> <span class="n">MD</span><span class="p">,</span> <span class="n">TEST</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
+
 <span class="n">SIMULATION_TYPE_TO_STRING_DICTIONARY</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">SIMULATION_TYPE</span><span class="o">.</span><span class="n">PELE</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationType</span><span class="o">.</span><span class="n">pele</span><span class="p">,</span>
     <span class="n">SIMULATION_TYPE</span><span class="o">.</span><span class="n">MD</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationType</span><span class="o">.</span><span class="n">md</span><span class="p">,</span>
@@ -148,8 +150,8 @@
 
 
 <div class="viewcode-block" id="EXITCONDITION_TYPE"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationTypes.EXITCONDITION_TYPE">[docs]</a><span class="k">class</span> <span class="nc">EXITCONDITION_TYPE</span><span class="p">:</span>
-    <span class="n">METRIC</span><span class="p">,</span> <span class="n">CLUSTERING</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</div>
+    <span class="n">METRIC</span><span class="p">,</span> <span class="n">CLUSTERING</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></div>
+
 <span class="n">EXITCONDITION_TYPE_TO_STRING_DICTIONARY</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">EXITCONDITION_TYPE</span><span class="o">.</span><span class="n">METRIC</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ExitConditionType</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span>
     <span class="n">EXITCONDITION_TYPE</span><span class="o">.</span><span class="n">CLUSTERING</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ExitConditionType</span><span class="o">.</span><span class="n">clustering</span>
@@ -165,7 +167,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Daniel Lecina, Joan Francesc Gilabert.
+        &copy; Copyright 2017, Daniel Lecina, Joan Francesc Gilabert.
 
     </p>
   </div>
