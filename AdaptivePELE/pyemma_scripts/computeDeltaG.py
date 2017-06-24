@@ -104,7 +104,7 @@ def main(trajWildcard, reweightingT=1000):
 
     originalCoordinates = []
     for i, originalFilename in enumerate(originalFilenames):
-        trajOriginalCoordinates = list(np.loadtxt(originalFilename, usecols=(1,2,3)))
+        trajOriginalCoordinates = list(np.loadtxt(originalFilename)[:,1:])
         if np.random.random() < 0.0:
             # Add artificial neighbours to improve volume estimation, set
             # randomly since its very slow
@@ -113,8 +113,9 @@ def main(trajWildcard, reweightingT=1000):
             trajOriginalCoordinates.extend(list(itertools.chain.from_iterable(newCoords)))
         originalCoordinates.append(np.array(trajOriginalCoordinates))
 
-    maxval = 3*[-np.inf]
-    minval = 3*[np.inf]
+    dimensions = r.shape[1]
+    maxval = dimensions*[-np.inf]
+    minval = dimensions*[np.inf]
     for coord in originalCoordinates:
         cmaxval = coord.max(axis=0)
         cminval = coord.min(axis=0)
