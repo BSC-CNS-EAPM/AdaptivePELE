@@ -47,7 +47,7 @@ def _prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryBa
     sr.makeWorkingControlFile(workingControlFile, controlFileDictionary)
     """
 
-    workingFolder = os.path.split(trajectoryFolder)[0]
+    workingFolder = os.path.split(trajectoryFolder)[0] #note that we assume a workingFolder/origTrajs structure (typically origTrajs=rawData)
     try:
         string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"lagtime\":%d, \"itsOutput\":\"its.png\", \"lagtimes\":%s, \"clusterCountsThreshold\":%d}"%(workingFolder, trajectoryBasename, clusters, lagtime, lagtimes, clusterCountsThreshold)
     except:
