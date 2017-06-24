@@ -8,7 +8,7 @@ import scipy
 class Cluster:
     def __init__(self, numClusters, trajectoryFolder, trajectoryBasename, stride=1, alwaysCluster=True):
         """
-            alwaysCluster: clusterize regardless of wether discretized/clusterCenters.dat exists or not
+            alwaysCluster: clusterize regardless of whether discretized/clusterCenters.dat exists or not
         """
 
         self.discretizedFolder = "discretized"
@@ -40,7 +40,7 @@ class Cluster:
 
     def clusterTrajectories(self):
         print "Loading trajectories..."
-        self.x, self.trajFilenames = loadCOMFiles(self.trajectoryFolder, self.trajectoryBasename)
+        self.x, self.trajFilenames = loadTrajFiles(self.trajectoryFolder, self.trajectoryBasename)
 
         # cluster & assign
         if self.alwaysCluster or not os.path.exists(self.clusterCentersFile):
@@ -84,7 +84,7 @@ class Cluster:
             self.dtrajs = self.assignNewTrajecories(self.x)
 
     def _writeClusterCenters(self, clusterCenters, outputFilename):
-        np.savetxt(outputFilename, clusterCenters, fmt="%.5f %.5f %.5f")
+        np.savetxt(outputFilename, clusterCenters, fmt="%.5f")
 
     def _writeDtrajs(self, filenames, dtrajs, filenameTemplate="%s.disctraj"):
         for filename, dtraj in zip(filenames, dtrajs):
@@ -97,14 +97,15 @@ class Cluster:
 #Standalone functions
 """
 
-def loadCOMFiles(trajectoryFolder, trajectory_basename):
+def loadTrajFiles(trajectoryFolder, trajectory_basename):
     trajectoryBasename = os.path.join(trajectoryFolder, trajectory_basename)
 
     # load traj
     files = glob.glob(trajectoryBasename)
     x = len(files)*[0]
     for i, file in enumerate(files):
-        currentX = np.loadtxt(file, usecols=(1, 2, 3))
+        currentX = np.loadtxt(file)[:,1:]
+        print currentX
         x[i] = currentX
     if not x:
         raise ValueError("Didn't find any trajectory files in the specified path!!!")

@@ -25,18 +25,18 @@ class Parameters:
         self.skipFirstSteps = skipFirstSteps
         self.clusterCountsThreshold = clusterCountsThreshold
 
-def _rm(filename):
+def __rm(filename):
     try:
         os.remove(filename)
     except OSError:
         pass
 
-def _rmFiles(trajWildcard):
+def __rmFiles(trajWildcard):
     allfiles = glob.glob(trajWildcard)
     for f in allfiles:
-        _rm(f)
+        __rm(f)
 
-def _prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryBasename, workingControlFile, lagtimes, clusterCountsThreshold=0):
+def __prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryBasename, workingControlFile, lagtimes, clusterCountsThreshold=0):
     """
     #Unused alternative #1, need of a templetized control file
     simulationParameters = simulationrunner.SimulationParameters()
@@ -55,14 +55,14 @@ def _prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryBa
     with open(workingControlFile, 'w') as f:
         f.write(string)
 
-def _constructMSM(workingControlFile):
+def __constructMSM(workingControlFile):
     ownBuildMSM.main(workingControlFile)
 
-def _computeDG(trajWildcard):
+def __computeDG(trajWildcard):
     deltaGLine = computeDeltaG.main(trajWildcard)
     return deltaGLine
 
-def _getDstName(bootstrap, i, trajFile):
+def __getDstName(bootstrap, i, trajFile):
     # Equiv lambda
     # getDstName = lambda bootstrap, i, trajFile: "traj_.%d.dat"%i if bootstrap else os.path.split(trajFile)[-1]
     if bootstrap:
@@ -102,7 +102,7 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
 
     writenFiles = []
     for i,trajFile in enumerate(trajFiles):
-        dst = _getDstName(bootstrap, i, trajFile)
+        dst = __getDstName(bootstrap, i, trajFile)
         writenFiles.append(dst)
         traj = np.loadtxt(trajFile)
         if length is None:
@@ -115,15 +115,15 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
             sys.exit("There is a problem with %s"%trajFile)
     return writenFiles
 
-def _cleanupFiles(trajWildcard, cleanupClusterCenters=True):
-    _rmFiles("clustering_object.pkl")
-    _rmFiles("MSM_object.pkl")
-    _rmFiles("discretized/traj_*")
-    _rmFiles(trajWildcard)
+def __cleanupFiles(trajWildcard, cleanupClusterCenters=True):
+    __rmFiles("clustering_object.pkl")
+    __rmFiles("MSM_object.pkl")
+    __rmFiles("discretized/traj_*")
+    __rmFiles(trajWildcard)
     if cleanupClusterCenters:
-        _rmFiles("discretized/clusterCenter*")
+        __rmFiles("discretized/clusterCenter*")
 
-def _setVariablesForFirstIteration(useAllTrajInFirstRun, i, ntrajs):
+def __setVariablesForFirstIteration(useAllTrajInFirstRun, i, ntrajs):
     if useAllTrajInFirstRun and i == 0:
         bootstrap = False
         nWorkingTrajs = None # Not necessary, just to make it explicit that all of them are used
@@ -133,7 +133,7 @@ def _setVariablesForFirstIteration(useAllTrajInFirstRun, i, ntrajs):
 
     return bootstrap, nWorkingTrajs
 
-def _copyMSMDataFromRun(i):
+def __copyMSMDataFromRun(i):
     try: #it may not exist
         shutil.copyfile("its.png", "its_%d.png"%i)
     except IOError:
@@ -151,13 +151,13 @@ def _copyMSMDataFromRun(i):
         except:
             pass
 
-def _printList(l, label):
+def __printList(l, label):
     print label
     print "====="
     for el in l:
         print el
 
-def _getMeanAndStdFromList(l, accessFunction=lambda x:x):
+def __getMeanAndStdFromList(l, accessFunction=lambda x:x):
     values = [float(accessFunction(element)) for element in l]
     return np.mean(values), np.std(values)
 
@@ -174,20 +174,20 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
     workingControlFile = "control_MSM.conf"
     origFilesWildcard = os.path.join(parameters.folderWithTraj, parameters.trajWildcard)
 
-    _prepareWorkingControlFile(parameters.lagtime, parameters.nclusters, parameters.folderWithTraj, parameters.trajWildcard, workingControlFile, parameters.lagtimes, parameters.clusterCountsThreshold)
+    __prepareWorkingControlFile(parameters.lagtime, parameters.nclusters, parameters.folderWithTraj, parameters.trajWildcard, workingControlFile, parameters.lagtimes, parameters.clusterCountsThreshold)
 
     deltaGs = []
     detailedBalance = []
-    _cleanupFiles(parameters.trajWildcard, cleanupClusterCentersAtStart)
+    __cleanupFiles(parameters.trajWildcard, cleanupClusterCentersAtStart)
 
     for i in range(parameters.nruns):
-        bootstrap, nWorkingTrajs = _setVariablesForFirstIteration(parameters.useAllTrajInFirstRun, i, parameters.ntrajs)
+        bootstrap, nWorkingTrajs = __setVariablesForFirstIteration(parameters.useAllTrajInFirstRun, i, parameters.ntrajs)
 
         copiedFiles = copyWorkingTrajectories(origFilesWildcard, parameters.length, nWorkingTrajs, bootstrap, parameters.skipFirstSteps)
 
-        _constructMSM(workingControlFile)
+        __constructMSM(workingControlFile)
 
-        deltaG = _computeDG(parameters.trajWildcard)
+        deltaG = __computeDG(parameters.trajWildcard)
 
         deltaGs.append(deltaG)
 
@@ -195,18 +195,18 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
             avgAsymmetricFlux = checkDetailedBalance.main(folder="discretized", countsThreshold=0, lagtime=parameters.lagtime, printFigs=False)
             detailedBalance.append(avgAsymmetricFlux)
 
-        _copyMSMDataFromRun(i)
+        __copyMSMDataFromRun(i)
 
-        _cleanupFiles(parameters.trajWildcard, True)
+        __cleanupFiles(parameters.trajWildcard, True)
 
     #PLOT RESULTS
     #FIX TO WORK WITH NONES
     #print "clusters: %d, ntrajs: %d, trajLength: %d, lagtime: %d"%(parameters.nclusters, parameters.ntrajs, parameters.length, parameters.lagtime)
-    _printList(deltaGs, "dG")
-    meanDG, stdDG = _getMeanAndStdFromList(deltaGs, lambda element: element.split()[1])
+    __printList(deltaGs, "dG")
+    meanDG, stdDG = __getMeanAndStdFromList(deltaGs, lambda element: element.split()[1])
     print "dG = %f +- %f"%(meanDG, stdDG)
-    _printList(detailedBalance, "Asymmetric fluxes (see D.Lecina PhD thesis for more info)")
-    meanDB, stdDB = _getMeanAndStdFromList(detailedBalance) #DB from detailed balance
+    __printList(detailedBalance, "Asymmetric fluxes (see D.Lecina PhD thesis for more info)")
+    meanDB, stdDB = __getMeanAndStdFromList(detailedBalance) #DB from detailed balance
     print "Asymmetric flux = %f +- %f"%(meanDB, stdDB)
 
     return meanDG, stdDG, meanDB, stdDB
@@ -214,14 +214,14 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 if __name__ == "__main__":
     parameters = Parameters(ntrajs=None,
                             length=None,
-                            lagtime=400,
+                            lagtime=25,
                             nclusters=100,
-                            nruns=10,
+                            nruns=1,
                             skipFirstSteps = 0,
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,
                             trajWildcard="traj_*",
                             folderWithTraj="rawData",
                             lagtimes=[1,10,25,50,100,250,500,1000],
-                            clusterCountsThreshold=25)
+                            clusterCountsThreshold=0)
     estimateDG(parameters, cleanupClusterCentersAtStart=True)
