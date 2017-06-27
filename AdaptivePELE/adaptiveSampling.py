@@ -198,6 +198,19 @@ def checkIntegrityClusteringObject(objectPath):
     except EOFError:
         return False
 
+def __unicodeToStr(data):
+    #convert dict
+    if isinstance(data, dict):
+        return { __unicodeToStr(key): __unicodeToStr(value) for key, value in data.iteritems() }
+    #convert list
+    if isinstance(data, list):
+        print data
+        return [ __unicodeToStr(val) for val in data ]
+    #convert unicode to str
+    if isinstance(data, unicode):
+        return data.encode('utf-8')
+
+    return data
 
 def loadParams(jsonParams):
     """
@@ -208,7 +221,7 @@ def loadParams(jsonParams):
         :type jsonParams: json str
     """
     jsonFile = open(jsonParams, 'r').read()
-    parsedJSON = json.loads(jsonFile)
+    parsedJSON = json.loads(jsonFile, object_hook=__unicodeToStr)
 
     return parsedJSON[blockNames.ControlFileParams.generalParams], parsedJSON[blockNames.ControlFileParams.spawningBlockname],\
         parsedJSON[blockNames.ControlFileParams.simulationBlockname], parsedJSON[blockNames.ControlFileParams.clusteringBlockname]
