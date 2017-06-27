@@ -161,7 +161,7 @@ def findFirstRun(outputPath, clusteringOutputObject):
         :type clusteringOutputObject: str
 
         :return: Current epoch
-        :rtype: int 
+        :rtype: int
     """
 
     folderWithSimulationData = outputPath
@@ -241,7 +241,7 @@ def saveInitialControlFile(jsonParams, originalControlFile):
 
 
 def needToRecluster(oldClusteringMethod, newClusteringMethod):
-    """ 
+    """
         Check if the parameters have changed in a restart and we need to redo
         the clustering. In particular: type of clustering, theshold calculator
         or distance
@@ -273,7 +273,7 @@ def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
         Cluster the trajecotories of a given epoch
 
         :param clusteringMethod: Clustering object
-        :type clusteringMethod: :py:class:`.Clustering` 
+        :type clusteringMethod: :py:class:`.Clustering`
         :param epoch: Number of the epoch to cluster
         :type epoch: int
         :param epochOutputPathTempletized: Path where to find the trajectories
@@ -364,16 +364,13 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
         :param simulationRunner: :py:class:`.SimulationRunner` Simulation runner object
         :type simulationRunner: :py:class:`.SimulationRunner`
 
-        :returns: (clusteringMethod, initialStructuresAsString): 
+        :returns: (clusteringMethod, initialStructuresAsString):
 
         **clusteringMethod** (:py:class:`.Clustering`) The clustering method to use in the adaptive sampling simulation
         **initialStructuresAsString** (str) The initial structures filenames
     """
 
     clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner)
-
-    if not hasattr(clusteringMethod, "conformationNetwork"):
-        clusteringMethod.epoch = firstRun
 
     degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
     spawningCalculator.log()
