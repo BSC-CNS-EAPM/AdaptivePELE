@@ -468,6 +468,8 @@ class Cluster:
 
             :param path: Filename of the file to write
             :type path: str
+            :returns int, int, int: Tuple of (epoch, trajectory, snapshot) that permit
+                identifying the structure added
         """
         if not self.altSelection or self.altStructure.sizePQ() == 0:
             print "cluster center"
@@ -766,7 +768,7 @@ class Clustering:
         self.symmetries = state.get('symmetries', [])
         self.altSelection = state.get('altSelection', False)
         self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
-        self.epoch = state.get('metricCol', -1)
+        self.epoch = state.get('epoch', -1)
 
     def setCol(self, col):
         """
@@ -1125,7 +1127,7 @@ class ContactsClustering(Clustering):
         self.symmetries = state.get('symmetries', [])
         self.altSelection = state.get('altSelection', False)
         self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
-        self.epoch = state.get('metricCol', -1)
+        self.epoch = state.get('epoch', -1)
         self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant())
         if isinstance(self.symmetries, dict):
             self.symmetries = [self.symmetries]
@@ -1208,7 +1210,7 @@ class ContactMapAccumulativeClustering(Clustering):
         self.symmetries = state.get('symmetries', [])
         self.altSelection = state.get('altSelection', False)
         self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
-        self.epoch = state.get('metricCol', -1)
+        self.epoch = state.get('epoch', -1)
         self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant(value=0.3))
         self.similarityEvaluator = state.get('similariyEvaluator', JaccardEvaluator())
         self.symmetryEvaluator = state.get('symmetryEvaluator', sym.SymmetryContactMapEvaluator(self.symmetries))
