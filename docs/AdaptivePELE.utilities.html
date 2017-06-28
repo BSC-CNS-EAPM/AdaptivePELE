@@ -34,7 +34,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="AdaptivePELE  documentation" href="index.html"/>
-        <link rel="up" title="AdaptivePELE Package" href="AdaptivePELE.html"/>
+        <link rel="up" title="AdaptivePELE – Package Description" href="AdaptivePELE.html"/>
         <link rel="next" title="validator Package" href="AdaptivePELE.validator.html"/>
         <link rel="prev" title="spawning Package" href="AdaptivePELE.spawning.html"/> 
 
@@ -87,7 +87,8 @@
             
             
                 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE Package</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
@@ -106,7 +107,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Examples.html">AdaptivePELE Overview</a></li>
 </ul>
 
             
@@ -141,13 +141,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-        <li><a href="AdaptivePELE.html">AdaptivePELE Package</a> &raquo;</li>
+        <li><a href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a> &raquo;</li>
       
     <li>utilities Package</li>
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/AdaptivePELE.utilities.rst.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/AdaptivePELE.utilities.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -164,10 +164,21 @@
 <dl class="function">
 <dt id="AdaptivePELE.utilities.clusteringUtilities.writeStructures">
 <code class="descclassname">AdaptivePELE.utilities.clusteringUtilities.</code><code class="descname">writeStructures</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>listStructures</em>, <em>checker=&lt;function &lt;lambda&gt;&gt;</em>, <em>outputPath='cluster.pdb'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/clusteringUtilities.html#writeStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.clusteringUtilities.writeStructures" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that prints all clusters in listStructures so that checker evaluates to true</p>
-<p>clusteringObject [In] Clustering object with clusters to print
-checker [In] Lambda function with the checker that should evaluate to True for intersted structures
-outputPath [In] Output cluster pdb filename</p>
+<dd><p>Print all clusters in listStructures that meet the condition specified
+by the checker</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object with clusters to print</li>
+<li><strong>checker</strong> (<em>function</em>) &#8211; Lambda function with the checker that should evaluate to True for intersted structures</li>
+<li><strong>outputPath</strong> (<em>str</em>) &#8211; Output cluster pdb filename</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -204,12 +215,10 @@ outputPath [In] Output cluster pdb filename</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contactMap</strong> (<em>np.array</em>) &#8211; Contact map</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(eiv, eic)</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(numpy.ndarray, numpy.ndarray) &#8211; eigenvalues, eigenvectors</td>
 </tr>
 </tbody>
 </table>
-<p><strong>eiv</strong> (numpy.ndarray) eigenvalues
-<strong>eic</strong> (numpy.ndarray) eigenvectors</p>
 </dd></dl>
 
 <dl class="function">
@@ -242,10 +251,7 @@ outputPath [In] Output cluster pdb filename</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">rmsds</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.array</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.array &#8211; Array with the rmsd values of the trajectory</p>
 </td>
 </tr>
 </tbody>
@@ -266,10 +272,7 @@ outputPath [In] Output cluster pdb filename</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Snapshots with information</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; Snapshots with information</p>
 </td>
 </tr>
 </tbody>
@@ -286,9 +289,7 @@ outputPath [In] Output cluster pdb filename</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajFilename</strong> (<em>str</em>) &#8211; Trajectory filename</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Trajectory number</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Trajectory number</td>
 </tr>
 </tbody>
 </table>
@@ -320,9 +321,7 @@ outputPath [In] Output cluster pdb filename</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>EOFError</strong> &#8211; If the object is empty</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">clusteringObject</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a> &#8211; clusteringObject</td>
 </tr>
 </tbody>
 </table>

@@ -30,14 +30,36 @@ class SimulationRunner:
         pass
 
     def hasExitCondition(self):
+        """
+            Check if an exit condition has been set
+
+            :returns: bool -- True if an exit condition is set
+        """
         return self.parameters.exitCondition is not None
 
     def checkExitCondition(self, clustering):
+        """
+            Check if the exit condition has been met
+
+            :param clustering: Clustering object
+            :type clustering: :py:class:`.Clustering`
+
+            :returns: bool -- True if the exit condition is met
+        """
         if self.parameters.exitCondition:
             return self.parameters.exitCondition.checkExitCondition(clustering)
         return False
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary):
+        """
+            Substitute the values in the templetized control file
+
+            :param workingControlFilename: Name of the template control file
+            :type workingControlFilename: str
+            :param dictionary: Dictonary containing the parameters to substitute
+                in the control file
+            :type dictionary: dict
+        """
         inputFile = open(self.parameters.templetizedControlFile, "r")
         inputFileContent = inputFile.read()
         inputFile.close()
@@ -51,15 +73,37 @@ class SimulationRunner:
         outputFile.close()
 
     def updateMappingProcessors(self, mapping):
+        """
+            Update the value of the processorsToClusterMapping, a list with the
+            snapshot from which the trajectories will start in the next iteration
+
+            :param mapping: List with the snapshot from which the trajectories
+                will start in the next iteration
+            :type mapping: list
+        """
         self.processorsToClusterMapping = mapping[1:]+[mapping[0]]
 
     def writeMappingToDisk(self, epochDir):
+        """
+            Write the processorsToClusterMapping to disk
+
+            :param epochDir: Name of the folder where to write the
+                processorsToClusterMapping
+            :type epochDir: str
+        """
         if len(self.processorsToClusterMapping) == 0:
             return
         with open(epochDir+"/processorMapping.txt", "w") as f:
             f.write(':'.join(map(str, self.processorsToClusterMapping)))
 
     def readMappingFromDisk(self, epochDir):
+        """
+            Read the processorsToClusterMapping from disk
+
+            :param epochDir: Name of the folder where to write the
+                processorsToClusterMapping
+            :type epochDir: str
+        """
         try:
             with open(epochDir+"/processorMapping.txt") as f:
                 self.processorsToClusterMapping = map(int, f.read().rstrip().split(':'))
@@ -67,6 +111,9 @@ class SimulationRunner:
             sys.stderr.write("WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
 
     def setZeroMapping(self):
+        """
+            Set the processorsToClusterMapping to zero
+        """
         self.processorsToClusterMapping = [0 for i in xrange(1, self.parameters.processors)]
 
 
@@ -76,12 +123,21 @@ class PeleSimulation(SimulationRunner):
         self.type = simulationTypes.SIMULATION_TYPE.PELE
 
     def createSymbolicLinks(self):
+        """
+            Create symbolic links to Data and Documents folder if they don't exist
+        """
         if not os.path.islink("Data"):
             os.system("ln -s " + self.parameters.dataFolder + " Data")
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.documentsFolder + " Documents")
 
     def runSimulation(self, runningControlFile=""):
+        """
+            Run a short PELE simulation
+
+            :param runningControlFile: PELE control file to run
+            :type runningControlFile: str
+        """
         self.createSymbolicLinks()
 
         toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
@@ -109,6 +165,9 @@ class TestSimulation(SimulationRunner):
         self.parameters = parameters
 
     def runSimulation(self, runningControlFile=""):
+        """
+            Copy file to test the rest of the AdaptivePELE procedure
+        """
         if not self.copied:
             if os.path.exists(self.parameters.destination):
                 shutil.rmtree(self.parameters.destination)
@@ -121,6 +180,16 @@ class TestSimulation(SimulationRunner):
 
 class ExitConditionBuilder:
     def build(self, exitConditionBlock):
+        """
+            Build the selected exit condition object
+
+            :param exitConditionBlock: Block of the control file
+                corresponding to the exit condition
+            :type exitConditionBlock: dict
+
+            :returns: :py:class:`.MetricExitCondition` -- MetricExitCondition object
+                selected
+        """
         exitConditionType = exitConditionBlock[blockNames.ExitConditionType.type]
         exitConditionParams = exitConditionBlock[blockNames.SimulationParams.params]
         if exitConditionType == blockNames.ExitConditionType.metric:
@@ -141,6 +210,15 @@ class ClusteringExitCondition:
         self.type = simulationTypes.EXITCONDITION_TYPE.CLUSTERING
 
     def checkExitCondition(self, clustering):
+        """
+            Iterate over all unchecked cluster and check if the exit condtion
+            is met
+
+            :param clustering: Clustering object
+            :type clustering: :py:class:`.Clustering`
+
+            :returns: bool -- Returns True if the exit condition has been met
+        """
         newClusterNum = clustering.getNumberClusters()
         clusterDiff = newClusterNum - self.clusterNum
         self.clusterNum = newClusterNum
@@ -154,8 +232,14 @@ class MetricExitCondition:
         self.type = simulationTypes.EXITCONDITION_TYPE.METRIC
 
     def checkExitCondition(self, clustering):
-        """ Iterate over all unchecked cluster and check if the exit condtion
+        """
+            Iterate over all unchecked cluster and check if the exit condtion
             is met
+
+            :param clustering: Clustering object
+            :type clustering: :py:class:`.Clustering`
+
+            :returns: bool -- Returns True if the exit condition has been met
         """
         for cluster in clustering.clusters.clusters:
             metric = cluster.getMetricFromColumn(self.metricCol)
@@ -167,6 +251,16 @@ class MetricExitCondition:
 class RunnerBuilder:
 
     def build(self, simulationRunnerBlock):
+        """
+            Build the selected  SimulationRunner object
+
+            :param simulationRunnerBlock: Block of the control file
+                corresponding to the simulation step
+            :type simulationRunnerBlock: dict
+
+            :returns: :py:class:`.SimulationRunner` -- SimulationRunner object
+                selected
+        """
         simulationType = simulationRunnerBlock[blockNames.SimulationType.type]
         paramsBlock = simulationRunnerBlock[blockNames.SimulationParams.params]
         params = SimulationParameters()

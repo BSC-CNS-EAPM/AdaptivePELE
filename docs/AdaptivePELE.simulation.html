@@ -34,7 +34,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="AdaptivePELE  documentation" href="index.html"/>
-        <link rel="up" title="AdaptivePELE Package" href="AdaptivePELE.html"/>
+        <link rel="up" title="AdaptivePELE – Package Description" href="AdaptivePELE.html"/>
         <link rel="next" title="spawning Package" href="AdaptivePELE.spawning.html"/>
         <link rel="prev" title="clustering Package" href="AdaptivePELE.clustering.html"/> 
 
@@ -87,7 +87,8 @@
             
             
                 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE Package</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
@@ -106,7 +107,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Examples.html">AdaptivePELE Overview</a></li>
 </ul>
 
             
@@ -141,13 +141,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-        <li><a href="AdaptivePELE.html">AdaptivePELE Package</a> &raquo;</li>
+        <li><a href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a> &raquo;</li>
       
     <li>simulation Package</li>
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/AdaptivePELE.simulation.rst.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/AdaptivePELE.simulation.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -205,7 +205,19 @@
 <dd><dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.ClusteringExitCondition.checkExitCondition">
 <code class="descname">checkExitCondition</code><span class="sig-paren">(</span><em>clustering</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#ClusteringExitCondition.checkExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.ClusteringExitCondition.checkExitCondition" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Iterate over all unchecked cluster and check if the exit condtion
+is met</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; Returns True if the exit condition has been met</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -215,7 +227,20 @@
 <dd><dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.ExitConditionBuilder.build">
 <code class="descname">build</code><span class="sig-paren">(</span><em>exitConditionBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#ExitConditionBuilder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.ExitConditionBuilder.build" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build the selected exit condition object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>exitConditionBlock</strong> (<em>dict</em>) &#8211; Block of the control file
+corresponding to the exit condition</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.simulation.simulationrunner.MetricExitCondition" title="AdaptivePELE.simulation.simulationrunner.MetricExitCondition"><code class="xref py py-class docutils literal"><span class="pre">MetricExitCondition</span></code></a> &#8211; MetricExitCondition object
+selected</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -227,6 +252,16 @@
 <code class="descname">checkExitCondition</code><span class="sig-paren">(</span><em>clustering</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MetricExitCondition.checkExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MetricExitCondition.checkExitCondition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate over all unchecked cluster and check if the exit condtion
 is met</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; Returns True if the exit condition has been met</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -238,12 +273,22 @@ is met</p>
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.createSymbolicLinks">
 <code class="descname">createSymbolicLinks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.createSymbolicLinks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.createSymbolicLinks" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create symbolic links to Data and Documents folder if they don&#8217;t exist</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation">
 <code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Run a short PELE simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>runningControlFile</strong> (<em>str</em>) &#8211; PELE control file to run</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -253,7 +298,20 @@ is met</p>
 <dd><dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.RunnerBuilder.build">
 <code class="descname">build</code><span class="sig-paren">(</span><em>simulationRunnerBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#RunnerBuilder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.RunnerBuilder.build" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build the selected  SimulationRunner object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>simulationRunnerBlock</strong> (<em>dict</em>) &#8211; Block of the control file
+corresponding to the simulation step</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a> &#8211; SimulationRunner object
+selected</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -268,22 +326,66 @@ is met</p>
 <dd><dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.checkExitCondition">
 <code class="descname">checkExitCondition</code><span class="sig-paren">(</span><em>clustering</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.checkExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.checkExitCondition" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Check if the exit condition has been met</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if the exit condition is met</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.hasExitCondition">
 <code class="descname">hasExitCondition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.hasExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.hasExitCondition" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Check if an exit condition has been set</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if an exit condition is set</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.makeWorkingControlFile">
 <code class="descname">makeWorkingControlFile</code><span class="sig-paren">(</span><em>workingControlFilename</em>, <em>dictionary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.makeWorkingControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.makeWorkingControlFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Substitute the values in the templetized control file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>workingControlFilename</strong> (<em>str</em>) &#8211; Name of the template control file</li>
+<li><strong>dictionary</strong> (<em>dict</em>) &#8211; Dictonary containing the parameters to substitute
+in the control file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.readMappingFromDisk">
 <code class="descname">readMappingFromDisk</code><span class="sig-paren">(</span><em>epochDir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.readMappingFromDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.readMappingFromDisk" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read the processorsToClusterMapping from disk</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) &#8211; Name of the folder where to write the
+processorsToClusterMapping</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation">
@@ -293,17 +395,39 @@ is met</p>
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.setZeroMapping">
 <code class="descname">setZeroMapping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.setZeroMapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.setZeroMapping" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set the processorsToClusterMapping to zero</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.updateMappingProcessors">
 <code class="descname">updateMappingProcessors</code><span class="sig-paren">(</span><em>mapping</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.updateMappingProcessors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.updateMappingProcessors" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Update the value of the processorsToClusterMapping, a list with the
+snapshot from which the trajectories will start in the next iteration</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mapping</strong> (<em>list</em>) &#8211; List with the snapshot from which the trajectories
+will start in the next iteration</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.writeMappingToDisk">
 <code class="descname">writeMappingToDisk</code><span class="sig-paren">(</span><em>epochDir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.writeMappingToDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.writeMappingToDisk" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Write the processorsToClusterMapping to disk</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) &#8211; Name of the folder where to write the
+processorsToClusterMapping</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -320,7 +444,8 @@ is met</p>
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation">
 <code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#TestSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Copy file to test the rest of the AdaptivePELE procedure</p>
+</dd></dl>
 
 </dd></dl>
 

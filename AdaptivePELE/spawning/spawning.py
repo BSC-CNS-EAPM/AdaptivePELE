@@ -12,7 +12,21 @@ from AdaptivePELE.utilities import utilities
 
 
 def return_sign(i, m, n, r):
-    """ Helper function, creates a three-piece step function"""
+    """
+        Helper function, creates a three-piece step function
+
+        :param i: Value to compare
+        :type i: int
+        :param m: Middle value
+        :type m: int
+        :param n: Left extreme value
+        :type n: int
+        :param r: Right extreme value
+        :type r: int
+
+        :returns: int -- Three-piece sign
+    """
+
     if i <= n-m:
         return 1
     elif i <= r:
@@ -22,7 +36,16 @@ def return_sign(i, m, n, r):
 
 
 def calculateContactsVar(deltaR, epsMax):
-    """ """
+    """
+        Calculate the variation of epsilon according to the contact ratio
+
+        :param deltaR: Change in contact ratio
+        :type deltaR: float
+        :param epsMax: Maximum value of epsilon
+        :type epsMax: float
+
+        :returns: float -- Epsilon variation
+    """
     if deltaR < 0.1:
         return 0
     elif deltaR > 1.0:
@@ -34,6 +57,17 @@ def calculateContactsVar(deltaR, epsMax):
 class SpawningAlgorithmBuilder:
 
     def build(self, spawningBlock):
+        """
+            Build the selected spawning calculator and spawning params objects
+
+            :param spawningBlock: Block of the control file with the spawning
+                parameters
+            :type spawningBlock: dict
+
+            :returns: :py:class:`.SpawningCalculator`,
+                :py:class:`.SpawningParams` -- SpawningCalculator and
+                SpawningParams objects
+        """
         spawningCalculatorBuilder = SpawningBuilder()
         spawningCalculator = spawningCalculatorBuilder.buildSpawningCalculator(spawningBlock)
 
@@ -46,7 +80,16 @@ class SpawningAlgorithmBuilder:
 class SpawningBuilder:
 
     def buildSpawningCalculator(self, spawningBlock):
+        """
+            Build the selected spawning calculator object
 
+            :param spawningBlock: Block of the control file with the spawning
+                parameters
+            :type spawningBlock: dict
+
+            :returns: :py:class:`.SpawningCalculator` -- SpawningCalculator
+                object
+        """
         densityBuilder = densitycalculator.DensityCalculatorBuilder()
         densityCalculator = densityBuilder.build(spawningBlock)
 
@@ -89,6 +132,15 @@ class SpawningParams:
         self.nclusters = None #number of clusters to consider in epsilon
 
     def buildSpawningParameters(self, spawningBlock):
+        """
+            Build the selected spawning params objects
+
+            :param spawningBlock: Block of the control file with the spawning
+                parameters
+            :type spawningBlock: dict
+
+            :returns: :py:class:`.SpawningParams` -- SpawningParams object
+        """
         spawningParamsBlock = spawningBlock[blockNames.SpawningParams.params]
         spawningType = spawningBlock[blockNames.StringSpawningTypes.type]
 
@@ -142,16 +194,27 @@ class SpawningCalculator:
 
     @abstractmethod
     def log(self):
+        """
+            Log spawning information
+        """
         pass
 
     def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration):
-        """ Write initial structures for the next iteration
+        """
+            Write initial structures for the next iteration
 
-            outputPathConstants [In] Output constants that depend on the path
-            degeneracyOfRepresentatives [In] Array with the degeneracy of each
-            cluster (i.e the number of processors that will be assigned to it)
-            clustering [In] clustering object
-            iteration [In] Number of epoch
+            :param outputPathConstants: Output constants that depend on the path
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param degeneracyOfRepresentatives: Array with the degeneracy of
+                each cluster (number of processors that will start from that state)
+            :type degeneracyOfRepresentatives: np.Array
+            :param clustering: Clustering object
+            :type clustering: :py:class:`.Clustering`
+            :param iteration: Number of epoch
+            :type iteration: int
+
+            :returns: int, list -- number of processors, list with the
+                snapshot from which the trajectories will start in the next iteration
         """
         tmpInitialStructuresTemplate = outputPathConstants.tmpInitialStructuresTemplate
         counts = 0
@@ -169,7 +232,16 @@ class SpawningCalculator:
 
     def divideTrajAccordingToWeights(self, weights, trajToDistribute):
         """
-            weights must be normalized (i.e. sum(weights) = 1)
+            Distribute the trajectories among the clusters according to their
+            weight. Weights must be normalized (i.e. sum(weights) = 1)
+
+            :param weights: Weight of each cluster
+            :type weights: np.Array
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+
+            :returns: list -- List with the number of processors allocated to
+                each cluster
         """
         degeneracy = []
         for i, weight in enumerate(weights):
@@ -189,7 +261,16 @@ class SpawningCalculator:
 
     def divideProportionalToArray(self, array, trajToDistribute):
         """
-            Divides "trajToDistribute" proportionally to the values in "array"
+            Distribute the trajectories among the clusters according to the
+            values of an array.
+
+            :param Array: Weight of each cluster
+            :type Array: np.Array
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+
+            :returns: list -- List with the number of processors allocated to
+                each cluster
         """
         if isinstance(array, list): array = np.array(array)
         weights = array/sum(array)
@@ -197,7 +278,16 @@ class SpawningCalculator:
 
     def divideInverselyProportionalToArray(self, array, trajToDistribute):
         """
-            Divides "trajToDistribute" inversely proportional to the values in "array"
+            Distribute the trajectories among the clusters inversely proportional
+            to the values of an array.
+
+            :param Array: Weight of each cluster
+            :type Array: np.Array
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+
+            :returns: list -- List with the number of processors allocated to
+                each cluster
         """
         if isinstance(array, list): array = np.array(array)
         weights = 1./array
@@ -214,12 +304,28 @@ class SpawningCalculator:
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
 
     def getMetrics(self, clusters):
+        """
+            Get the metric of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+
+            :returns: np.Array -- Array containing the metric of the clusters
+        """
         metrics = np.zeros(len(clusters))
         for i, cluster in enumerate(clusters):
             metrics[i] = cluster.getMetric()
         return metrics
 
     def getSizes(self, clusters):
+        """
+            Get the size of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+
+            :returns: np.Array -- Array containing the size of the clusters
+        """
         sizes = np.zeros(len(clusters))
         for i, cluster in enumerate(clusters):
             sizes[i] = cluster.elements
@@ -237,6 +343,14 @@ class DensitySpawningCalculator(SpawningCalculator):
         self.densityCalculator = densityCalculator
 
     def calculateDensities(self, clusters):
+        """
+            Calculate the densities of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+
+            :returns: np.Array -- Array containing the density of the clusters
+        """
         densities = np.zeros(len(clusters))
         for i, cluster in enumerate(clusters):
             contacts = cluster.getContacts()
@@ -252,20 +366,46 @@ class IndependentRunsCalculator(SpawningCalculator):
 
     def calculate(self, clusters, trajToDistribute, spawningParams,
                   currentEpoch=None):
+        """
+            Calculate the degeneracy of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
         return self.calculator.calculate(clusters, trajToDistribute, spawningParams, currentEpoch)
 
     def log(self):
+        """
+            Log spawning information
+        """
         pass
 
     def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration):
-        """ Write last trajectory structure as initial one for the next iteration
-
-            outputPathConstants [In] Output constants that depend on the path
-            degeneracyOfRepresentatives [In] Array with the degeneracy of each
-            cluster (i.e the number of processors that will be assigned to it)
-            clustering [In] clustering object
-            iteration [In] Number of epoch
         """
+            Write last trajectory structure as initial one for the next iteration
+
+            :param outputPathConstants: Output constants that depend on the path
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param degeneracyOfRepresentatives: Array with the degeneracy of
+                each cluster (number of processors that will start from that state)
+            :type degeneracyOfRepresentatives: np.Array
+            :param clustering: Clustering object
+            :type clustering: :py:class:`.Clustering`
+            :param iteration: Number of epoch
+            :type iteration: int
+
+            :returns: int, list -- number of processors, list with the
+                snapshot from which the trajectories will start in the next iteration
+        """
+        # TODO: Add processors mapping
         trajWildcard = os.path.join(outputPathConstants.epochOutputPathTempletized, constants.trajectoryBasename)
         trajectories = glob.glob(trajWildcard%(iteration-1))
         for trajectory in trajectories:
@@ -291,7 +431,19 @@ class SameWeightDegeneracyCalculator(SpawningCalculator):
     def calculate(self, clusters, trajToDistribute, spawningParams,
                   currentEpoch=None):
         """
+            Calculate the degeneracy of the clusters
             We back on PELE to split equal trajectories
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
         """
         numClusters = len(clusters)
         trajToDistribute = min(trajToDistribute, numClusters)
@@ -302,6 +454,9 @@ class SameWeightDegeneracyCalculator(SpawningCalculator):
         return degeneracy
 
     def log(self):
+        """
+            Log spawning information
+        """
         pass
 
 
@@ -312,9 +467,26 @@ class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.inverselyProportional
 
     def log(self):
+        """
+            Log spawning information
+        """
         pass
 
     def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
+        """
+            Calculate the degeneracy of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
         sizes = self.getSizes(clusters)
         densities = self.calculateDensities(clusters)
 
@@ -345,6 +517,9 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
 
     # TODO add possibility for different pipes
     def log(self):
+        """
+            Log spawning information
+        """
         if self.degeneracyTotal is not None:
             print "[SpawningLog] Total: %s" % str(self.degeneracyTotal)
         if self.degeneracyInverselyProportional is not None:
@@ -353,6 +528,20 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
             print "[SpawningLog] Metric prop:    %s" % str(self.degeneracyMetricProportional)
 
     def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
+        """
+            Calculate the degeneracy of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
         trajToMetricProportional = int(spawningParams.epsilon * trajToDistribute)
         trajToInverselyProportional = trajToDistribute - trajToMetricProportional
 
@@ -363,6 +552,20 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         return self.degeneracyTotal
 
     def divideProcessorsMetricProportional(self, clusters, trajToDistribute, spawningParams):
+        """
+            Distribute the trajectories among the clusters according to their
+            metric.
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param weights: Weight of each cluster
+            :type weights: np.Array
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+
+            :returns: list -- List with the number of processors allocated to
+                each cluster
+        """
 
         metrics = self.getMetrics(clusters)
 
@@ -420,6 +623,14 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         epsilon_file.close()
 
     def linearVariation(self, spawningParams, currentEpoch):
+        """
+            Calculate linear variation of epsilon with respect to the iteraetion
+
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+        """
         if currentEpoch == 0:
             spawningParams.epsilon = spawningParams.minEpsilon
             return
@@ -435,6 +646,14 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
                                                 middleWindow, rightWindow) * rateEpsilonVariation[currentEpoch > middleWindow]
 
     def contactsVariation(self, clusters, spawningParams):
+        """
+            Calculate the variation of epsilon according to the contacts ratio
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+        """
         if self.maxContacts is None:
             self.maxContacts = reduce(max, [cluster.contacts for cluster in clusters])
         maxContacts = reduce(max, [cluster.contacts for cluster in clusters])
@@ -443,6 +662,16 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         self.maxContacts = maxContacts
 
     def calculateEpsilonValue(self, spawningParams, currentEpoch, clusters):
+        """
+            Calculate variation of epsilon according to the selected parameters
+
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+        """
         if spawningParams.varEpsilonType == blockNames.VariableEpsilonTypes.linearVariation:
             if currentEpoch is None or spawningParams.variationWindow < currentEpoch:
                 spawningParams.epsilon = spawningParams.minEpsilon
@@ -456,11 +685,28 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
                      str(spawningTypes.EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY.values()))
 
     def logVariableEpsilon(self, epsilon, epoch):
+        """
+            Log spawning information
+        """
         epsilon_file = open("epsilon_values.txt", "a")
         epsilon_file.write("%d\t%f\n" % (epoch, epsilon))
         epsilon_file.close()
 
     def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
+        """
+            Calculate the degeneracy of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
         self.calculateEpsilonValue(spawningParams, currentEpoch, clusters)
         self.logVariableEpsilon(spawningParams.epsilon, currentEpoch)
         return self.epsilonDegeneracyCalculator.calculate(clusters, trajToDistribute, spawningParams, currentEpoch)
@@ -473,6 +719,9 @@ class SimulatedAnnealingCalculator(SpawningCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.simulatedAnnealing
 
     def log(self):
+        """
+            Log spawning information
+        """
         pass
 
     def computeTemperature(self, params, epoch):
@@ -484,7 +733,20 @@ class SimulatedAnnealingCalculator(SpawningCalculator):
 
     def calculate(self, clusters, trajToDistribute, spawningParams,
                   currentEpoch):
+        """
+            Calculate the degeneracy of the clusters
 
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
         metrics = self.getMetrics(clusters)
 
         minimumValue = np.min(metrics)
@@ -530,6 +792,20 @@ class FASTDegeneracyCalculator(DensitySpawningCalculator):
         return self.normaliseArray(metrics)
 
     def calculate(self, clusters, trajToDivide, spawningParams, currentEpoch=None):
+        """
+            Calculate the degeneracy of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
         normalisedSizes = self.calculateNormalisedSizes(clusters)
         normalisedMetrics = self.calculateNormalisedMetrics(clusters)
 
@@ -538,6 +814,9 @@ class FASTDegeneracyCalculator(DensitySpawningCalculator):
         return self.divideProportionalToArray(weight, trajToDivide)
 
     def log(self):
+        """
+            Log spawning information
+        """
         pass
 
 
@@ -553,9 +832,26 @@ class UCBCalculator(DensitySpawningCalculator):
         self.epoch = np.array([0.0])
 
     def log(self):
+        """
+            Log spawning information
+        """
         pass
 
     def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
+        """
+            Calculate the degeneracy of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
         self.epoch += 1
         sizes = np.array(self.getSizes(clusters))
         densities = self.calculateDensities(clusters)
