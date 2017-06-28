@@ -1,9 +1,17 @@
+"""
+    Write specified cluster representative structures to pdb
+"""
 from AdaptivePELE.utilities import clusteringUtilities
 import argparse
 import math
 
 
 def parseArgs():
+    """
+        Parse command line arguments
+
+        :returns: object -- Object containing command line options
+    """
     parser = argparse.ArgumentParser(description="Write the requested cluster "
                                      "structures from a clustering object")
     parser.add_argument('clObject', type=str)

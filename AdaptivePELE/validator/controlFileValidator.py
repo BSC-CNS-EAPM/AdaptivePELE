@@ -7,6 +7,14 @@ import sys
 
 
 def validate(control_file):
+    """
+        Validate an AdaptivePELE control file to ensure that there are no errors
+
+        :param controlFile: Adaptive sampling control file
+        :type controlFile: str
+
+        :raise ValueError: If a error is found in the control file
+    """
     isCorrect = True
     with open(control_file, 'r') as f:
         jsonFile = f.read()
@@ -50,6 +58,20 @@ def validate(control_file):
 
 
 def validateBlock(blockName, controlFileBlock):
+    """
+        Validate the a block of the control file to ensure that
+        there are no errors. Raise a warning if an error is found.
+
+        :param blockName: Dictionary containing the parameters and possible
+            types for the block
+        :type blockName: dict
+        :param controlFileBlock: Dictionary containing the parameters specified
+            in the control file for the block
+        :type controlFileBlock: dict
+
+        :returns: bool -- Wheter and error has been found in a block
+            block
+    """
     isCorrect = True
     blockType = controlFileBlock["type"]
     # Check if type selected is valid
@@ -130,6 +152,20 @@ def validateBlock(blockName, controlFileBlock):
 
 
 def validateGeneralBlock(blockName, controlFileBlock):
+    """
+        Validate the generalParams block of the control file to ensure that
+        there are no errors. Raise a warning if an error is found.
+
+        :param blockName: Dictionary containing the parameters and possible
+            types for the block
+        :type blockName: dict
+        :param controlFileBlock: Dictionary containing the parameters specified
+         in the control file for the block
+        :type controlFileBlock: dict
+
+        :returns: bool -- Wheter and error has been found in the generalParams
+            block
+    """
     isCorrect = True
     for key,value in blockName.mandatory.iteritems():
         try:
