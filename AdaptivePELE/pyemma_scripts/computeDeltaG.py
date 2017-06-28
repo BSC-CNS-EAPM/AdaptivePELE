@@ -44,7 +44,7 @@ def writePDB(pmf_xyzg, title="clusters.pdb"):
         x = ("%.3f"%line[0]).rjust(8)
         y = ("%.3f"%line[1]).rjust(8)
         z = ("%.3f"%line[2]).rjust(8)
-        g = ("%.3f"%line[3]).rjust(8)
+        g = ("%.3f"%line[-1]).rjust(8)
 
         content += templateLine%(number, number3, x, y, z, g)
     f = open(title, 'w')
@@ -92,6 +92,7 @@ def main(trajWildcard, reweightingT=1000):
         ######################
         # Reconstruct stationary distribution with pseudocounts to ensure
         # connectivity
+        print "Adding pseudocounts to enforce connectivity"
         counts = MSMObject.count_matrix_full
         counts += 1/float(counts.shape[0])
         trans = run.buildRevTransitionMatrix(counts)
@@ -106,7 +107,7 @@ def main(trajWildcard, reweightingT=1000):
     for i, originalFilename in enumerate(originalFilenames):
         trajOriginalCoordinates = list(np.loadtxt(originalFilename)[:,1:])
         if np.random.random() < 0.0:
-            # Add artificial neighbours to improve volume estimation, set
+            # Add artificial points nearby to improve volume estimation, set
             # randomly since its very slow
             sys.stderr.write("Introducing artificial neighbours\n")
             newCoords = map(expandTrajs, trajOriginalCoordinates)
@@ -157,12 +158,6 @@ def main(trajWildcard, reweightingT=1000):
             trajCoords = trajOriginalCoordinates[belongingFrames, :]
             trajCoords = trajCoords.flatten().tolist()
 
-            """
-            if allCoords.size == 0:
-                allCoords = np.copy(trajCoords)
-            else:
-                allCoords = np.vstack((allCoords, trajCoords))
-            """
             allCoords.extend(trajCoords)
 
         allCoords = np.reshape(allCoords, (-1,3))
