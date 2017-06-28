@@ -34,8 +34,7 @@ def expandInitialStructuresWildcard(initialStructuresWildcard):
         :param initialStructureWildcard: Wildcard that matches the initial structures
         :type initialStructureWildcard: str
 
-        :return totalInitialStructures: The expanded initial structures
-        :rtype: list of str
+        :return: list of str -- The expanded initial structures
     """
     totalInitialStructures = []
     for initialStructureWildcard in initialStructuresWildcard:
@@ -129,8 +128,7 @@ def createMultipleComplexesFilenames(numberOfSnapshots, tmpInitialStructuresTemp
         :param iteration: Epoch number
         :type iteration: int
 
-        :returns: jsonString to be substituted in PELE control file
-        :rtype: str
+        :returns: str -- jsonString to be substituted in PELE control file
     """
     jsonString = "\n"
     for i in range(numberOfSnapshots-1):
@@ -142,10 +140,14 @@ def createMultipleComplexesFilenames(numberOfSnapshots, tmpInitialStructuresTemp
 def generateTrajectorySelectionString(epoch, epochOutputPathTempletized):
     """
         Generates the template for the name of the trajectories in a given epoch
+
         :param Poch: Epoch number
         :type epoch: int
         :param epochOutputPathTempletized: Templetized path where the trajectories of any epoch are stored
         :type epochOutputPathTempletized: str
+
+        :returns: str -- Template for the name of the trajectories in a given
+            epoch
     """
     return "[\"" + os.path.join(epochOutputPathTempletized % epoch, constants.trajectoryBasename) + "\"]"
 
@@ -160,8 +162,7 @@ def findFirstRun(outputPath, clusteringOutputObject):
         :param clusteringOutputObject: Templetized name of the clustering object
         :type clusteringOutputObject: str
 
-        :return: Current epoch
-        :rtype: int
+        :return: int -- Current epoch
     """
 
     folderWithSimulationData = outputPath
@@ -189,8 +190,7 @@ def checkIntegrityClusteringObject(objectPath):
         :param objectPath: Clustering object path
         :type objectPath: str
 
-        :returns: True if the found clustering object is valid
-        :rtype: bool
+        :returns: bool -- True if the found clustering object is valid
     """
     try:
         utilities.readClusteringObject(objectPath)
@@ -251,8 +251,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         :param newClusteringMethod: Clustering in the restarted simulation
         :type newClusteringMethod: :py:class:`.Clustering`
 
-        :returns: If clustering needs to be redone
-        :rtype: bool
+        :returns: bool -- If clustering needs to be redone
     """
 
     # Check 1: change of type
@@ -318,8 +317,8 @@ def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConsta
         :param spawningParams: Spawning params, to know what reportFile and column to read
         :type spawningParams: :py:class:`.SpawningParams`
 
-        :returns clusteringMethod: The clustering method to use in the adaptive sampling simulation
-        :rtype: :py:class:`.Clustering`
+        :returns: :py:class:`.Clustering` -- The clustering method to use in the
+            adaptive sampling simulation
     """
 
     lastClusteringEpoch = firstRun - 1
@@ -364,10 +363,7 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
         :param simulationRunner: :py:class:`.SimulationRunner` Simulation runner object
         :type simulationRunner: :py:class:`.SimulationRunner`
 
-        :returns: (clusteringMethod, initialStructuresAsString):
-
-        **clusteringMethod** (:py:class:`.Clustering`) The clustering method to use in the adaptive sampling simulation
-        **initialStructuresAsString** (str) The initial structures filenames
+        :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames
     """
 
     clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner)
@@ -402,8 +398,7 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
         :param initialStructures: Control file initial structures
         :type initialStructures: list
 
-        **clusteringMethod** (:py:class:`.Clustering`) The clustering method to use in the adaptive sampling simulation
-        **initialStructuresAsString** (str) The initial structures filenames
+        :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames
     """
     if not debug:
         shutil.rmtree(outputPath)
@@ -447,7 +442,7 @@ def main(jsonParams):
     """
         Main body of the adaptive sampling program.
 
-        :params jsonParams: A string with the name of the control file to use
+        :param jsonParams: A string with the name of the control file to use
         :type jsonParams: str
     """
 

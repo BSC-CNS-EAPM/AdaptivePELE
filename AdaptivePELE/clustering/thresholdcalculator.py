@@ -11,7 +11,7 @@ class ThresholdCalculatorBuilder():
 
             :param clusteringBlock: Parameters block corresponding to the threshold calculator
             :type clusteringBlock: dict
-            :returns: object -- thresholdCalculator object selected
+            :returns: :py:class:`.ThresholdCalculator` -- thresholdCalculator object selected
         """
         try:
             thresholdCalculatorBlock = clusteringBlock[blockNames.ClusteringTypes.thresholdCalculator]

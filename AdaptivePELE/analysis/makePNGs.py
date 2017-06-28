@@ -15,82 +15,82 @@ def parseArguments():
     parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawTextHelpFormatter)
     args = parser.parse_args()
 
+if __name__ == "__main__":
+    folders = {"4_512":"PRprog_4_512"} #, "4_64":"3ptb_4_64", "4_128":"3ptb_4_128"}
 
-folders = {"4_512":"PRprog_4_512"} #, "4_64":"3ptb_4_64", "4_128":"3ptb_4_128"}
+    subfoldersWildcard = "inversely_*"
+    subfoldersWildcard = "be_epsilon_*"
 
-subfoldersWildcard = "inversely_*"
-subfoldersWildcard = "be_epsilon_*"
+    titles = { "4_512":"n=32, 4 steps, %s"} #, "4_64":"n=64, 4 steps, %s", "4_128":"n=128, 4 steps, %s"}
 
-titles = { "4_512":"n=32, 4 steps, %s"} #, "4_64":"n=64, 4 steps, %s", "4_128":"n=128, 4 steps, %s"}
+    outputFilenames = { "4_512":"512_4_%s"} #, "4_64":"64_4_%s", "4_128":"128_4_%s"}
 
-outputFilenames = { "4_512":"512_4_%s"} #, "4_64":"64_4_%s", "4_128":"128_4_%s"}
-
-params = {"stepsCol" : 2,
-        "RMSDCol" : 5,
-        "BECol" : 6,
-        "reportFilename" : "report_"}
-
-
-gplFolder = "/gpfs/scratch/bsc72/bsc72755/adaptiveSampling/simulation"
-tmpFolder = "/tmp"
-
-tmpPlotFile = os.path.join(tmpFolder, "tmp.gpl")
-
-gnuplot = "$SCRATCH/software/gnuplot/bin/gnuplot"
+    params = {"stepsCol" : 2,
+            "RMSDCol" : 5,
+            "BECol" : 6,
+            "reportFilename" : "report_"}
 
 
-def buildGnuplotString(title, outputFilename, params):
-    gnuplotFileStringContent = """\
-    set term png\n\
-    set title "%(plotTitle)s"\n\
-    set output "rmsd_steps_%(outputFilename)s.png"\n\
-    %(rmsdStepsPringString)s\n\
-    \n\
-    set output "be_rmsd_%(outputFilename)s.png\n\
-    %(beRmsdPrintString)s\n
-    """
+    gplFolder = "/gpfs/scratch/bsc72/bsc72755/adaptiveSampling/simulation"
+    tmpFolder = "/tmp"
 
-    stepsPerRun = params["stepsPerRun"]
-    stepsCol = params["stepsCol"]
-    RMSDCol = params["RMSDCol"]
-    BECol = params["BECol"]
-    reportFilename = params["reportFilename"]
+    tmpPlotFile = os.path.join(tmpFolder, "tmp.gpl")
 
-    rmsdStepsPrintString = generateGnuplotFile.generatePrintString(stepsPerRun, stepsCol, RMSDCol, reportFilename, "PRINT_RMSD_STEPS")
-    beRmsdPrintString = generateGnuplotFile.generatePrintString(stepsPerRun, RMSDCol, BECol, reportFilename, "PRINT_BE_RMSD")
-    dictionary = {"plotTitle":title,
-                    "outputFilename":outputFilename,
-                    "rmsdStepsPringString":rmsdStepsPrintString,
-                    "beRmsdPrintString":beRmsdPrintString}
-
-    return gnuplotFileStringContent%dictionary
+    gnuplot = "$SCRATCH/software/gnuplot/bin/gnuplot"
 
 
-parseArguments()
+    def buildGnuplotString(title, outputFilename, params):
+        gnuplotFileStringContent = """\
+        set term png\n\
+        set title "%(plotTitle)s"\n\
+        set output "rmsd_steps_%(outputFilename)s.png"\n\
+        %(rmsdStepsPringString)s\n\
+        \n\
+        set output "be_rmsd_%(outputFilename)s.png\n\
+        %(beRmsdPrintString)s\n
+        """
 
-for key, folder in folders.iteritems():
-    print "Folder: ", folder
-    try:
-        os.chdir(folder)
-    except:
-        continue
+        stepsPerRun = params["stepsPerRun"]
+        stepsCol = params["stepsCol"]
+        RMSDCol = params["RMSDCol"]
+        BECol = params["BECol"]
+        reportFilename = params["reportFilename"]
 
-    params["stepsPerRun"] = int(key.split("_")[0])
+        rmsdStepsPrintString = generateGnuplotFile.generatePrintString(stepsPerRun, stepsCol, RMSDCol, reportFilename, "PRINT_RMSD_STEPS")
+        beRmsdPrintString = generateGnuplotFile.generatePrintString(stepsPerRun, RMSDCol, BECol, reportFilename, "PRINT_BE_RMSD")
+        dictionary = {"plotTitle":title,
+                        "outputFilename":outputFilename,
+                        "rmsdStepsPringString":rmsdStepsPrintString,
+                        "beRmsdPrintString":beRmsdPrintString}
 
-    subfolders = glob.glob(subfoldersWildcard)
-    print subfolders
-    for subfolder in subfolders:
-        os.chdir(subfolder)
+        return gnuplotFileStringContent%dictionary
 
-        gnuplotFileContent = buildGnuplotString(titles[key]%subfolder, outputFilenames[key]%subfolder, params)
 
-        with open(tmpPlotFile, "w") as f:
-            f.write(gnuplotFileContent)
+    parseArguments()
 
-        proc = subprocess.Popen("%s %s"%(gnuplot, tmpPlotFile), stdout=subprocess.PIPE, shell=True)
-        (out, err) = proc.communicate()
-        if out: print out
-        if err: print err
+    for key, folder in folders.iteritems():
+        print "Folder: ", folder
+        try:
+            os.chdir(folder)
+        except:
+            continue
+
+        params["stepsPerRun"] = int(key.split("_")[0])
+
+        subfolders = glob.glob(subfoldersWildcard)
+        print subfolders
+        for subfolder in subfolders:
+            os.chdir(subfolder)
+
+            gnuplotFileContent = buildGnuplotString(titles[key]%subfolder, outputFilenames[key]%subfolder, params)
+
+            with open(tmpPlotFile, "w") as f:
+                f.write(gnuplotFileContent)
+
+            proc = subprocess.Popen("%s %s"%(gnuplot, tmpPlotFile), stdout=subprocess.PIPE, shell=True)
+            (out, err) = proc.communicate()
+            if out: print out
+            if err: print err
+            os.chdir("..")
+
         os.chdir("..")
-
-    os.chdir("..")

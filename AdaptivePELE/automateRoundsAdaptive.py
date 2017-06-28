@@ -5,6 +5,13 @@ import os
 
 
 def automateSimulation(args):
+    """
+        Run multiple AdaptivePELE simulation with the same parameters, changing
+        only the seed
+
+        :param args: Object containing the command line arguments
+        :type args: object
+    """
     controlFile = args.controlFile
     numSimulations = args.numSimulations
     nProcessors = args.nProcessors
@@ -34,6 +41,9 @@ def automateSimulation(args):
 
 
 def parseArguments():
+    """
+        Parse the command line arguments
+    """
     parser = argparse.ArgumentParser(description="Automate the process "
                                      "of repeating simulations")
     parser.add_argument('controlFile', type=str)
@@ -47,6 +57,9 @@ def parseArguments():
 
 
 def main():
+    """
+        Run the multiple simulations
+    """
     args = parseArguments()
     automateSimulation(args)
 

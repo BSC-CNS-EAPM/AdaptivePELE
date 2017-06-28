@@ -183,7 +183,7 @@ class ConformationNetwork:
 
             :param clusterLeave: End point of the pathway to reconstruct
             :type clusterLeave: int
-            :returns pathway: list -- List of snapshots conforming a pathway
+            :returns: list -- List of snapshots conforming a pathway
         """
         pathway = []
         nodeLabel = clusterLeave
@@ -272,7 +272,7 @@ class AltStructures:
             :param contactThreshold: Distance at which to atoms are considered in contact
             :type contactThreshold: float
             :param similarityEvaluator: Object that determinates the similarity between two structures
-            :type similarityEvaluator: object
+            :type similarityEvaluator: :py:class:`.SimilarityEvaluator`
             :param trajPosition: Tuple of (epoch, trajectory, snapshot) that permit
                 identifying the structure added
             :type trajPosition: int, int, int
@@ -1000,7 +1000,7 @@ class Clustering:
             :param column: Column of the metric that defines the best cluster,
                 if not specified, the cluster metric is chosen
             :type column: int
-            :returns optimalCluster: int -- Number of cluster with the optimal metric
+            :returns: int -- Number of cluster with the optimal metric
         """
         optimalMetric = 100
         optimalMetricIndex = 0
@@ -1290,7 +1290,7 @@ class ClusteringBuilder:
             :param columnOfReportFile: Column of the report file that contain the
                 metric of interest
             :type columnOfReportFile: int
-            :returns: object -- Clustering object selected
+            :returns: :py:class:`.Clustering` -- Clustering object selected
         """
         paramsBlock = clusteringBlock[blockNames.ClusteringTypes.params]
         try:
@@ -1344,7 +1344,7 @@ class similarityEvaluatorBuilder:
 
             :param similarityEvaluatorType: Type of similarityEvaluator chosen
             :type similarityEvaluatorType: str
-            :returns: object -- SimilarityEvaluator object selected
+            :returns: :py:class:`.SimilarityEvaluator` -- SimilarityEvaluator object selected
         """
         if similarityEvaluatorType == blockNames.ClusteringTypes.differenceDistance:
             return differenceDistanceEvaluator()

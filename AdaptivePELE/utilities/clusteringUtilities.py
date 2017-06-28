@@ -5,11 +5,15 @@ import utilities
 
 def writeStructures(clusteringObject, listStructures, checker=lambda x: True, outputPath="cluster.pdb"):
     """
-        Function that prints all clusters in listStructures so that checker evaluates to true
+        Print all clusters in listStructures that meet the condition specified
+        by the checker
 
-        clusteringObject [In] Clustering object with clusters to print
-        checker [In] Lambda function with the checker that should evaluate to True for intersted structures
-        outputPath [In] Output cluster pdb filename
+        :param clusteringObject: Clustering object with clusters to print
+        :type clusteringObject: :py:class:`.Clustering`
+        :param checker: Lambda function with the checker that should evaluate to True for intersted structures
+        :type checker: function
+        :param outputPath: Output cluster pdb filename
+        :type outputPath: str
     """
     with open(clusteringObject, "rb") as f:
         clObject = pickle.load(f)

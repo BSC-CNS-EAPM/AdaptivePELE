@@ -38,8 +38,7 @@ def getSnapshots(trajectoryFile, verbose=False):
         :param verbose: Add verbose to snapshots
         :type verbose: bool
 
-        :returns: Snapshots with information
-        :rtype: str
+        :returns: str -- Snapshots with information
     """
     inputFile = open(trajectoryFile, "r")
     inputFileContent = inputFile.read()
@@ -60,8 +59,7 @@ def getTrajNum(trajFilename):
         :param trajFilename: Trajectory filename
         :type trajFilename: str
 
-        :returns: Trajectory number
-        :rtype: int
+        :returns: int -- Trajectory number
     """
     return int(trajFilename.split("_")[-1][:-4])
 
@@ -73,9 +71,7 @@ def calculateContactMapEigen(contactMap):
         :param contactMap: Contact map
         :type contactMap: np.array
 
-        :returns: (eiv, eic) 
-        **eiv** (numpy.ndarray) eigenvalues
-        **eic** (numpy.ndarray) eigenvectors
+        :returns: (numpy.ndarray, numpy.ndarray) -- eigenvalues, eigenvectors
     """
     nLig, nCA = contactMap.shape
     extendedCM = np.zeros((nLig+nCA, nLig+nCA))
@@ -117,8 +113,7 @@ def getRMSD(traj, nativePDB, resname, symmetries):
         :param symmetries: Symmetries dictionary list with independent symmetry groups
         :type symmetries: list of dict
 
-        :return: rmsds
-        :rtype: np.array
+        :return: np.array -- Array with the rmsd values of the trajectory
     """
 
     snapshots = getSnapshots(traj)
@@ -142,8 +137,7 @@ def readClusteringObject(clusteringObjectPath):
 
         :raise EOFError: If the object is empty
 
-        :return: clusteringObject
-        :rtype: :py:class:`.Clustering`
+        :returns: :py:class:`.Clustering` -- clusteringObject
     """
     with open(clusteringObjectPath, 'rb') as f:
         try:
