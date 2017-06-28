@@ -1,11 +1,17 @@
+"""
+    Create two PNG images with RMSD-MC steps and BE-RMSD for a set of different
+    adaptive runs
+"""
 import os
 import subprocess
-import pdb
 import glob
-import generateGnuplotFile
+import plotAdaptive
 import argparse
 
 def parseArguments():
+    """
+        Parse command line arguments
+    """
     desc = "It makes two PNG images with RMSD-steps and BE-RMSD for a set of different adaptive runs\n\n"\
             "Instructions:\n"\
             "-------------\n"\
@@ -56,8 +62,8 @@ if __name__ == "__main__":
         BECol = params["BECol"]
         reportFilename = params["reportFilename"]
 
-        rmsdStepsPrintString = generateGnuplotFile.generatePrintString(stepsPerRun, stepsCol, RMSDCol, reportFilename, "PRINT_RMSD_STEPS")
-        beRmsdPrintString = generateGnuplotFile.generatePrintString(stepsPerRun, RMSDCol, BECol, reportFilename, "PRINT_BE_RMSD")
+        rmsdStepsPrintString = plotAdaptive.generatePrintString(stepsPerRun, stepsCol, RMSDCol, reportFilename, "PRINT_RMSD_STEPS")
+        beRmsdPrintString = plotAdaptive.generatePrintString(stepsPerRun, RMSDCol, BECol, reportFilename, "PRINT_BE_RMSD")
         dictionary = {"plotTitle":title,
                         "outputFilename":outputFilename,
                         "rmsdStepsPringString":rmsdStepsPrintString,

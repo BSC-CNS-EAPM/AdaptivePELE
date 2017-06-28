@@ -6,14 +6,22 @@ import subprocess
 
 
 def parseArguments():
+    """
+        Parse command line arguments
+
+        :returns: int, int, int, str, bool, bool -- Number of steps per epoch,
+            column to plot in the X axis, column to plot in the Y axis, name of
+            the files containing the simulation data, whether to plot the data
+            as points, wether to plot the data as lines
+    """
     desc = "Generates output for gnuplot\n"\
             "It MUST be run from the root epoch folder (i.e., where it can find the folders 0/, 1/, 2/, ... lastEpoch/"\
             "To be run for example like: \">python generateGnuplotFile.py | gnuplot -persist\""
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("steps", type=int, default=4, help="Pele steps per run") 
-    parser.add_argument("xcol", type=int, default=2, help="xcol") 
-    parser.add_argument("ycol", type=int, default=4, help="ycol") 
-    parser.add_argument("filename", type=str, default="report_", help="Report filename") 
+    parser.add_argument("steps", type=int, default=4, help="Pele steps per run")
+    parser.add_argument("xcol", type=int, default=2, help="xcol")
+    parser.add_argument("ycol", type=int, default=4, help="ycol")
+    parser.add_argument("filename", type=str, default="report_", help="Report filename")
     parser.add_argument("-be", action="store_true", help="Points")
     parser.add_argument("-rmsd", action="store_true", help="Lines")
     args = parser.parse_args()
@@ -21,7 +29,25 @@ def parseArguments():
 
 def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRun, printWithLines, totalNumberOfSteps=False, replotFirst=False):
     """
-        TotalNumberOfSteps -> not only considering steps in current epoch, but steps with all previous epochs
+        Generate a string to be passed to gnuplot
+
+        :param gnuplotString: Template string for gnuplot
+        :type gnuplotString: str
+        :param reportName: Name of the files containing the simulation data
+        :type reportName: str
+        :param column1: Column to plot in the X axis
+        :type column1: int
+        :param column2: Column to plot in the Y axis
+        :type column2: int
+        :param stepsPerRun: Number of steps per epoch,
+        :type stepsPerRun: int
+        :param TotalNumberOfSteps: Not only considering steps in current epoch,
+            but steps with all previous epochs
+        :type TotalNumberOfSteps: bool
+        :param replotFirst: Deprecated parameter
+        :type replotFirst: bool
+
+        :returns: str -- String to plot using gnuplot
     """
     allFolders = os.listdir('.')
     epochFolders = [epoch for epoch in allFolders if epoch.isdigit()]
@@ -44,6 +70,8 @@ def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRu
         else:
             dictionary['col1'] = str(column1)
     elif type(column1) == types.LambdaType:
+        # FIXME: Not sure when this case would happen but `i` is not a defined
+        # variable
         dictionary['col1'] = "(" + str(column1(i)) + ")"
 
     return gnuplotString % dictionary + "\n"
@@ -51,7 +79,27 @@ def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRu
 
 def generateForLoopString(gnuplotString, reportName, column1, column2, stepsPerRun, printWithLines, totalNumberOfSteps=False, replotFirst=False):
     """
-        TotalNumberOfSteps -> not only considering steps in current epoch, but steps with all previous epochs
+        Generate a string to be passed to gnuplot
+
+        :param gnuplotString: Template string for gnuplot
+        :type gnuplotString: str
+        :param reportName: Name of the files containing the simulation data
+        :type reportName: str
+        :param column1: Column to plot in the X axis
+        :type column1: int
+        :param column2: Column to plot in the Y axis
+        :type column2: int
+        :param stepsPerRun: Number of steps per epoch,
+        :type stepsPerRun: int
+        :param printWithLines:  Wether the plot should use solid lines
+        :type printWithLines: bool
+        :param TotalNumberOfSteps: Not only considering steps in current epoch,
+            but steps with all previous epochs
+        :type TotalNumberOfSteps: bool
+        :param replotFirst:
+        :type replotFirst: bool
+
+        :returns: str -- String to plot using gnuplot
     """
     allFolders = os.listdir('.')
     epochFolders = [epoch for epoch in allFolders if epoch.isdigit()]
@@ -88,7 +136,22 @@ def generateForLoopString(gnuplotString, reportName, column1, column2, stepsPerR
 
 
 def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint):
+    """
+        Generate a template string to use with gnuplot
 
+        :param stepsPerRun: Number of steps per epoch,
+        :type stepsPerRun: int
+        :param xcol: Column to plot in the X axis
+        :type xcol: int
+        :param ycol: Column to plot in the Y axis
+        :type ycol: int
+        :param reportName: Name of the files containing the simulation data
+        :type reportName: str
+        :param kindOfPrint:  Kind of lines to plot (solid or points)
+        :type kindOfPrint: bool
+
+        :returns: str -- String to plot using gnuplot
+    """
     if kindOfPrint == "PRINT_RMSD_STEPS":
         printWithLines = True
         totalNumberOfSteps=True

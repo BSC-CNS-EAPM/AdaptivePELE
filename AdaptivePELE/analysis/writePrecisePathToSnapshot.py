@@ -1,3 +1,7 @@
+"""
+    Recreate the trajectory fragments to the led to the discovery of a snapshot,
+    specified by the tuple (epoch, trajectory, snapshot) and write as a pdb file
+"""
 import os
 import sys
 import argparse
@@ -7,6 +11,13 @@ from AdaptivePELE.utilities import utilities
 
 
 def parseArguments():
+    """
+        Parse the command-line options
+
+        :returns: :py:class:`.Clustering`, int, int, int, str -- Clustering
+            object, number of trajectory, number of snapshot, number of epoch,
+            output path where to write the files
+    """
     desc = "Write the information related to the conformation network to file\n"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("clusteringObject", type=str, help="Path to the clustering object")

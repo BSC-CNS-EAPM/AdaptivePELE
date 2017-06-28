@@ -7,6 +7,16 @@ import argparse
 import json
 
 def extendReportWithRmsd(reportFile, rmsds):
+    """
+        Extend a previous report file with corrected rmsd values
+
+        :param reportFile: Report file to be corrected
+        :type reportFile: np.ndarray
+        :param rmsds: Rmsd corrected values
+        :type rmsds: np.ndarray
+
+        :returns: np.ndarray -- Extended report file with corrected rmsd values
+    """
     newShape = reportFile.shape
     fixedReport = np.zeros((newShape[0], newShape[1]+1))
     fixedReport[:,:-1] = reportFile
@@ -14,6 +24,11 @@ def extendReportWithRmsd(reportFile, rmsds):
     return fixedReport
 
 def parseArguments():
+    """
+        Parse the command-line options
+
+        :returns: object -- Object containing the options passed
+    """
     desc = "Program that fixes RMSD symmetries of a PELE report file."\
             "Control file is a JSON file that contains \"resname\", \"native\", "\
             "symmetries, and, optionally, the column to substitute in report. "\
@@ -31,6 +46,15 @@ def parseArguments():
     return  args.controlFile
 
 def readControlFile(controlFile):
+    """
+        Extract parameters from controlFile
+
+        :param controlFile: Control file
+        :type controlFile: str
+        :returns: str, str, list, int -- Name of the ligand in the pdb, filename
+            containing the native structure, list of the symmetry groups, column
+            corresponding to the rmsd in the report file
+    """
     jsonFile = open(controlFile, 'r').read()
     parsedJSON = json.loads(jsonFile)
     resname = parsedJSON["resname"]
@@ -44,6 +68,13 @@ def readControlFile(controlFile):
     return resname, nativeFilename, symmetries, rmsdColInReport
 
 def main(controlFile):
+    """
+        Calculate the corrected rmsd values of conformation taking into account
+        molecule symmetries
+
+        :param controlFile: Control file
+        :type controlFile: str
+    """
     #Constants
     folder = "."
     outputFilename = "fixedReport_%d"
