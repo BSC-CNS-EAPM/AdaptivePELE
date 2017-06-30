@@ -214,9 +214,9 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 if __name__ == "__main__":
     parameters = Parameters(ntrajs=None,
                             length=None,
-                            lagtime=25,
+                            lagtime=250,
                             nclusters=100,
-                            nruns=1,
+                            nruns=5,
                             skipFirstSteps = 0,
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,

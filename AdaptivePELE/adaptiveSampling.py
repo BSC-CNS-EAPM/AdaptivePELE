@@ -6,7 +6,6 @@ import json
 import time
 import glob
 import argparse
-import networkx as nx
 import atexit
 from AdaptivePELE.constants import blockNames, constants
 from AdaptivePELE.atomset import atomset
