@@ -1,4 +1,4 @@
-import os
+import os 
 import numpy as np
 import estimateDG
 import shutil
@@ -41,8 +41,19 @@ def saveResultsFileBckp(outputFilename):
     except IOError:
         pass
 
+def plotIsocostLines(extent, minCost, maxCost, steps=10):
+    #d = (maxCost - minCost) / steps
+    #costs = np.arange(minCost, maxCost, d)
+    minCost = np.log10(minCost)
+    maxCost = np.log10(maxCost)
+    costs = np.logspace(minCost, maxCost, num=steps)
+    for cost in costs:
+        x = np.arange(extent[0], extent[1], 1)
+        y = cost / x
+        plt.plot(x,y, color="black")
+
 def main():
-    lagtime = 25
+    lagtime = 100
     clusters = 100
 
     ilengths = 200
@@ -50,7 +61,7 @@ def main():
     dlengths = 200
     lengths = range(ilengths, flengths, dlengths)
     itrajs = 32-1
-    ftrajs = 256
+    ftrajs = 255
     dtrajs = 32
     ntrajs = range(itrajs, ftrajs, dtrajs)
     nruns = 10
@@ -83,11 +94,15 @@ def main():
 
 
     extent = [itrajs+1-dtrajs/2,ftrajs+dtrajs/2,ilengths-dlengths/2,flengths+dlengths/2] # +1 for aesthetical purposes
+    extent = [itrajs+1,ftrajs+1-dtrajs,ilengths,flengths-dlengths] # +1 for aesthetical purposes
     plt.figure(1)
+    plotIsocostLines(extent, (ilengths+dlengths)*(itrajs+dtrajs), (flengths-dlengths)*(ftrajs-dtrajs), 6)
     plt.imshow(results, interpolation="nearest", origin="lower", aspect="auto", extent=extent)
     plt.colorbar()
     plt.figure(2)
+    plotIsocostLines(extent, (ilengths+dlengths)*(itrajs+dtrajs), (flengths-dlengths)*(ftrajs-dtrajs), 6)
     plt.imshow(results, interpolation="bilinear", origin="lower", aspect="auto", extent=extent)
+    #plt.imshow(results, interpolation="bilinear", origin="lower", aspect="auto", extent=extent, vmin=-7, vmax=-5)
     plt.colorbar()
     plt.show()
 
