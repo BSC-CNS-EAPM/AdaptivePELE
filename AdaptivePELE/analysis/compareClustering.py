@@ -147,7 +147,6 @@ def getMetastableClusters3(clustering, numClusters=5):
     finalMetInd = metInd
     return np.argsort(finalMetInd)[-1:-numClusters-1:-1]
 
-nclusters = 80
 thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
 thresholdCalculator = thresholdCalculatorBuilder.build({
         "thresholdCalculator": {
@@ -211,15 +210,15 @@ densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
 #         }
 #    }
 # )
-# densityCalculator = densityCalculatorBuilder.build({})
-densityCalculator = densityCalculatorBuilder.build({
-    "density": {
-        "type": "continuous"
-    }
-})
+densityCalculator = densityCalculatorBuilder.build({})
+# densityCalculator = densityCalculatorBuilder.build({
+#     "density": {
+#         "type": "continuous"
+#     }
+# })
 spawnParams = spawning.SpawningParams()
 spawnParams.buildSpawningParameters({
-    "type": "epsilon",
+    "type": "inverselyProportional",
     "params": {
         "epsilon": 0.0,
         "T": 1000,
@@ -228,13 +227,13 @@ spawnParams.buildSpawningParameters({
         }
     })
 contactThresholdDistance = 8
-resname = "DAJ"
-nEpochs = 21
+resname = "AEN"
+nEpochs = 24
 altSel = False
-ntrajs = 32
+ntrajs = 51
 ClCont = clustering.ContactsClustering(thresholdCalculator, resname=resname,
                                        reportBaseFilename="report",
-                                       columnOfReportFile=6,
+                                       columnOfReportFile=5,
                                        contactThresholdDistance=contactThresholdDistance,
                                        symmetries=[], altSelection=altSel)
 ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
@@ -244,9 +243,9 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
                                                     columnOfReportFile=4,
                                                     contactThresholdDistance=contactThresholdDistance,
                                                     altSelection=altSel)
-# spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
+spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 # spawningObject = spawning.UCBCalculator(densityCalculator)
-spawningObject = spawning.EpsilonDegeneracyCalculator(densityCalculator)
+# spawningObject = spawning.EpsilonDegeneracyCalculator(densityCalculator)
 # ClAcc.clusterInitialStructures(["/home/jgilaber/PR/PR_prog_initial_adaptive.pdb"])
 # ClCont.clusterInitialStructures(["/home/jgilaber/4DAJ/4DAJ_initial_adaptive.pdb"])
 # processorMapping = [0 for i in xrange(ntrajs-1)]
@@ -269,8 +268,8 @@ for i in range(nEpochs):
     # paths_report = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/report*"%i]
     # path = ["/home/jgilaber/PR/PR_simulation_network/%d/traj*"%i]
     # paths_report = ["/home/jgilaber/PR/PR_simulation_network/%d/report*"%i]
-    path = ["/home/jgilaber/4DAJ/4DAJ_4_32/%d/traj*"%i]
-    paths_report = ["/home/jgilaber/4DAJ/4DAJ_4_32/%d/report*"%i]
+    path = ["/home/jgilaber/debugPathReconst/%d/traj*"%i]
+    paths_report = ["/home/jgilaber/debugPathReconst/%d/report*"%i]
     trajs = clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:
@@ -293,9 +292,8 @@ for i in range(nEpochs):
             nProc += 1
     assert nProc == ntrajs-1
     processorMapping = clusterList[1:]+[clusterList[0]]
-    if i < 20:
-        with open("%d/processorMapping.txt"%(i+1), "w") as f:
-            f.write(':'.join(map(str, processorMapping)))
+    with open("%d/processorMapping.txt"%(i+1), "w") as f:
+        f.write(':'.join(map(str, processorMapping)))
     ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
     os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
     # sortedNodes = getMetastableClusters(ClCont, 10)

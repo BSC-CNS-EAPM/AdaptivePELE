@@ -22,22 +22,22 @@ C = msmObj.count_matrix_full
 
 notFinish = True
 while notFinish:
-    i = int(raw_input('Enter state:'))
+    i = int(raw_input('Enter state: '))
     inout(i)
 
-    print "Leaving guys..."
+    print "\nLeaving guys..."
     print C[i,:].argsort()[-10:]
     print C[i,C[i,:].argsort()[-10:]]
 
-    print "Entering guys..."
+    print "\nEntering guys..."
     print C[:,i].argsort()[-10:]
     print C[C[:,i].argsort()[-10:],i]
 
     #compute transitions up & transitions down 
-    computeTransitionsUpDown = (str(raw_input('Enter "y" to compute transitions to a set of states and the conjugate'))i.lower() == 'y')
+    computeTransitionsUpDown = (str(raw_input('\nEnter "y" to compute transitions to a set of states and the conjugate: ')).lower() == 'y')
     if computeTransitionsUpDown == True:
-            down = np.array([int(j) for j in str(raw_input('Enter set of states:')).split()])
+            down = np.array([int(j) for j in str(raw_input('\nEnter set of states:')).split()])
             print down
             updown(i,down)
     
-    notFinish = not bool(raw_input("Press a key other than ENTER to finish "))
+    notFinish = not bool(raw_input("\nPress a key other than ENTER to finish "))
