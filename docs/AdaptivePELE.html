@@ -140,7 +140,7 @@
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/AdaptivePELE.rst.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/AdaptivePELE.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -163,7 +163,7 @@ Returns the clustering object to use and the initial structures filenames as str
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>debug</strong> (<em>bool</em>) &#8211; In debug, it will not remove the simulations</li>
 <li><strong>outputPath</strong> (<em>str</em>) &#8211; Simulation output path</li>
 <li><strong>controlFile</strong> (<em>str</em>) &#8211; Adaptive sampling control file</li>
@@ -174,10 +174,11 @@ Returns the clustering object to use and the initial structures filenames as str
 </ul>
 </td>
 </tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>, str &#8211; The clustering method to use in the adaptive sampling simulation and the initial structures filenames</p>
+</td>
+</tr>
 </tbody>
 </table>
-<p><strong>clusteringMethod</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) The clustering method to use in the adaptive sampling simulation
-<strong>initialStructuresAsString</strong> (str) The initial structures filenames</p>
 </dd></dl>
 
 <dl class="function">
@@ -200,13 +201,11 @@ and the initial structure filenames as strings</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(clusteringMethod, initialStructuresAsString):</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>, str &#8211; The clustering method to use in the adaptive sampling simulation and the initial structures filenames</p>
 </td>
 </tr>
 </tbody>
 </table>
-<p><strong>clusteringMethod</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) The clustering method to use in the adaptive sampling simulation
-<strong>initialStructuresAsString</strong> (str) The initial structures filenames</p>
 </dd></dl>
 
 <dl class="function">
@@ -219,9 +218,7 @@ and the initial structure filenames as strings</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>objectPath</strong> (<em>str</em>) &#8211; Clustering object path</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the found clustering object is valid</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if the found clustering object is valid</td>
 </tr>
 </tbody>
 </table>
@@ -322,10 +319,7 @@ and the initial structure filenames as strings</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">jsonString to be substituted in PELE control file</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; jsonString to be substituted in PELE control file</p>
 </td>
 </tr>
 </tbody>
@@ -342,10 +336,7 @@ and the initial structure filenames as strings</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>initialStructureWildcard</strong> (<em>str</em>) &#8211; Wildcard that matches the initial structures</td>
 </tr>
-<tr class="field-even field"><th class="field-name" colspan="2">Return totalInitialStructures:</th></tr>
-<tr class="field-even field"><td>&#160;</td><td class="field-body">The expanded initial structures</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of str</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of str &#8211; The expanded initial structures</td>
 </tr>
 </tbody>
 </table>
@@ -366,10 +357,7 @@ and return the first epoch to run in case of restart</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Current epoch</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; Current epoch</p>
 </td>
 </tr>
 </tbody>
@@ -403,11 +391,23 @@ New reports are stored in the fixedReport_i where i is the number of the report<
 <dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.generateTrajectorySelectionString">
 <code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">generateTrajectorySelectionString</code><span class="sig-paren">(</span><em>epoch</em>, <em>epochOutputPathTempletized</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#generateTrajectorySelectionString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.generateTrajectorySelectionString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates the template for the name of the trajectories in a given epoch
-:param Poch: Epoch number
-:type epoch: int
-:param epochOutputPathTempletized: Templetized path where the trajectories of any epoch are stored
-:type epochOutputPathTempletized: str</p>
+<dd><p>Generates the template for the name of the trajectories in a given epoch</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>Poch</strong> &#8211; Epoch number</li>
+<li><strong>epochOutputPathTempletized</strong> (<em>str</em>) &#8211; Templetized path where the trajectories of any epoch are stored</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; Template for the name of the trajectories in a given
+epoch</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -427,11 +427,8 @@ it reclusters the previous trajectories. Returns the clustering object to use</p
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name" colspan="2">Returns clusteringMethod:</th></tr>
-<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first">The clustering method to use in the adaptive sampling simulation</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a> &#8211; The clustering method to use in the
+adaptive sampling simulation</p>
 </td>
 </tr>
 </tbody>
@@ -461,8 +458,7 @@ general parameters, clustering and spawning</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Params jsonParams:</th></tr>
-<tr class="field-odd field"><td>&#160;</td><td class="field-body">A string with the name of the control file to use</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jsonParams</strong> (<em>str</em>) &#8211; A string with the name of the control file to use</td>
 </tr>
 </tbody>
 </table>
@@ -484,10 +480,7 @@ or distance</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">If clustering needs to be redone</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool &#8211; If clustering needs to be redone</p>
 </td>
 </tr>
 </tbody>
@@ -544,17 +537,29 @@ provided in the control file</p>
 <dl class="function">
 <dt id="AdaptivePELE.automateRoundsAdaptive.automateSimulation">
 <code class="descclassname">AdaptivePELE.automateRoundsAdaptive.</code><code class="descname">automateSimulation</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/automateRoundsAdaptive.html#automateSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.automateRoundsAdaptive.automateSimulation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Run multiple AdaptivePELE simulation with the same parameters, changing
+only the seed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>object</em>) &#8211; Object containing the command line arguments</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.automateRoundsAdaptive.main">
 <code class="descclassname">AdaptivePELE.automateRoundsAdaptive.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/automateRoundsAdaptive.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.automateRoundsAdaptive.main" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Run the multiple simulations</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.automateRoundsAdaptive.parseArguments">
 <code class="descclassname">AdaptivePELE.automateRoundsAdaptive.</code><code class="descname">parseArguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/automateRoundsAdaptive.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.automateRoundsAdaptive.parseArguments" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Parse the command line arguments</p>
+</dd></dl>
 
 </div>
 <div class="section" id="subpackages">
@@ -564,10 +569,11 @@ provided in the control file</p>
 <li class="toctree-l1"><a class="reference internal" href="AdaptivePELE.analysis.html">analysis Package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.correctRMSD"><code class="docutils literal"><span class="pre">correctRMSD</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.foldersFirstBindingEvent"><code class="docutils literal"><span class="pre">foldersFirstBindingEvent</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.generateGnuplotFile"><code class="docutils literal"><span class="pre">generateGnuplotFile</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.analysis.html#makepngs-module"><code class="docutils literal"><span class="pre">makePNGs</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.numberOfOwnClusters"><code class="docutils literal"><span class="pre">numberOfOwnClusters</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.writeClusteringStructures"><code class="docutils literal"><span class="pre">writeClusteringStructures</span></code> Module</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.makePNGs"><code class="docutils literal"><span class="pre">makePNGs</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.numberOfClusters"><code class="docutils literal"><span class="pre">numberOfClusters</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.plotAdaptive"><code class="docutils literal"><span class="pre">plotAdaptive</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.writeClusteringStructures"><code class="docutils literal"><span class="pre">writeClusteringStructures</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.writePrecisePathToSnapshot"><code class="docutils literal"><span class="pre">writePrecisePathToSnapshot</span></code> Module</a><ul class="simple">
 </ul>
 </li>
 </ul>

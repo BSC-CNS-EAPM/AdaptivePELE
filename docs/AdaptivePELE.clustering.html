@@ -149,7 +149,7 @@
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/AdaptivePELE.clustering.rst.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/AdaptivePELE.clustering.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -184,8 +184,8 @@ from encoded as tuples (priority, PDB).</p>
 <li><strong>resnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
 <li><strong>resChain</strong> (<em>str</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
 <li><strong>contactThreshold</strong> (<em>float</em>) &#8211; Distance at which to atoms are considered in contact</li>
-<li><strong>similarityEvaluator</strong> (<em>object</em>) &#8211; Object that determinates the similarity between two structures</li>
-<li><strong>trajPosition</strong> (<em>int</em><em>, </em><em>int</em><em>, </em><em>int</em>) &#8211; Tuple of (epoch, trajectory, snapshot) that permit
+<li><strong>similarityEvaluator</strong> (<code class="xref py py-class docutils literal"><span class="pre">SimilarityEvaluator</span></code>) &#8211; Object that determinates the similarity between two structures</li>
+<li><strong>trajPosition</strong> (<em>int, int, int</em>) &#8211; Tuple of (epoch, trajectory, snapshot) that permit
 identifying the structure added</li>
 </ul>
 </td>
@@ -353,7 +353,7 @@ a contactMap(sometimes) and a metric</p>
 <li><strong>density</strong> (<em>float</em>) &#8211; Density of the cluster</li>
 <li><strong>contactThreshold</strong> (<em>float</em>) &#8211; Distance between two atoms to be considered in contact (default 8)</li>
 <li><strong>altSelection</strong> (<em>bool</em>) &#8211; Flag that controls wether to use the alternative structures (default 8)</li>
-<li><strong>trajPosition</strong> (<em>int</em><em>, </em><em>int</em><em>, </em><em>int</em>) &#8211; Tuple of (epoch, trajectory, snapshot) that permit
+<li><strong>trajPosition</strong> (<em>int, int, int</em>) &#8211; Tuple of (epoch, trajectory, snapshot) that permit
 identifying the structure added</li>
 </ul>
 </td>
@@ -455,6 +455,10 @@ identifying the structure added</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) &#8211; Filename of the file to write</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Returns int, int, int:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Tuple of (epoch, trajectory, snapshot) that permit
+identifying the structure added</td>
 </tr>
 </tbody>
 </table>
@@ -567,6 +571,8 @@ considered in contact(default 8)</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>column</strong> (<em>int</em>) &#8211; Column of the metric that defines the best cluster,
 if not specified, the cluster metric is chosen</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Number of cluster with the optimal metric</td>
 </tr>
 </tbody>
 </table>
@@ -697,7 +703,7 @@ metric of interest</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">object &#8211; Clustering object selected</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a> &#8211; Clustering object selected</p>
 </td>
 </tr>
 </tbody>
@@ -827,7 +833,7 @@ stored using the networkx package[1]</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>node</strong> (<em>int</em>) &#8211; Name of the node</li>
-<li><strong>kwargs</strong> (<em>keyword arguments</em><em>, </em><em>optional</em>) &#8211; Set or change attributes using key=value.</li>
+<li><strong>kwargs</strong> (<em>keyword arguments, optional</em>) &#8211; Set or change attributes using key=value.</li>
 </ul>
 </td>
 </tr>
@@ -846,8 +852,7 @@ discovered</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusterLeave</strong> (<em>int</em>) &#8211; End point of the pathway to reconstruct</td>
 </tr>
-<tr class="field-even field"><th class="field-name" colspan="2">Returns pathway:</th></tr>
-<tr class="field-even field"><td>&#160;</td><td class="field-body">list &#8211; List of snapshots conforming a pathway</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List of snapshots conforming a pathway</td>
 </tr>
 </tbody>
 </table>
@@ -1217,7 +1222,7 @@ False otherwise</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>similarityEvaluatorType</strong> (<em>str</em>) &#8211; Type of similarityEvaluator chosen</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">object &#8211; SimilarityEvaluator object selected</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">SimilarityEvaluator</span></code> &#8211; SimilarityEvaluator object selected</td>
 </tr>
 </tbody>
 </table>
@@ -1294,7 +1299,7 @@ False otherwise</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusteringBlock</strong> (<em>dict</em>) &#8211; Parameters block corresponding to the threshold calculator</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">object &#8211; thresholdCalculator object selected</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator" title="AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator"><code class="xref py py-class docutils literal"><span class="pre">ThresholdCalculator</span></code></a> &#8211; thresholdCalculator object selected</td>
 </tr>
 </tbody>
 </table>

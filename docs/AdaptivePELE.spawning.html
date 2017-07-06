@@ -149,7 +149,7 @@
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/AdaptivePELE.spawning.rst.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/AdaptivePELE.spawning.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -170,7 +170,23 @@
 <dl class="method">
 <dt id="AdaptivePELE.spawning.densitycalculator.ContinuousDensityCalculator.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>contacts</em>, <em>contactThreshold</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/densitycalculator.html#ContinuousDensityCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.densitycalculator.ContinuousDensityCalculator.calculate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calcuate the density value according to the contact ratio</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>contacts</strong> (<em>float</em>) &#8211; Contacts ratio</li>
+<li><strong>contactThreshold</strong> (<em>float</em>) &#8211; Deprecated parameter</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; Density value for the value of the contacts ratio</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -190,7 +206,18 @@
 <dd><dl class="method">
 <dt id="AdaptivePELE.spawning.densitycalculator.DensityCalculatorBuilder.build">
 <code class="descname">build</code><span class="sig-paren">(</span><em>spawningBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/densitycalculator.html#DensityCalculatorBuilder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.densitycalculator.DensityCalculatorBuilder.build" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build the DensityCalculator object according to the parameters selcted</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>spawningBlock</strong> (<em>dict</em>) &#8211; Spawning block of the control file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.spawning.densitycalculator.DensityCalculator" title="AdaptivePELE.spawning.densitycalculator.DensityCalculator"><code class="xref py py-class docutils literal"><span class="pre">DensityCalculator</span></code></a> &#8211; DensityCalculator object selected</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -201,7 +228,23 @@
 <dl class="method">
 <dt id="AdaptivePELE.spawning.densitycalculator.DensityCalculatorHeaviside.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>contacts</em>, <em>contactThreshold</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/densitycalculator.html#DensityCalculatorHeaviside.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.densitycalculator.DensityCalculatorHeaviside.calculate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calcuate the density value according to the contact ratio</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>contacts</strong> (<em>float</em>) &#8211; Contacts ratio</li>
+<li><strong>contactThreshold</strong> (<em>float</em>) &#8211; Deprecated parameter</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; Density value for the value of the contacts ratio</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -212,7 +255,24 @@
 <dl class="method">
 <dt id="AdaptivePELE.spawning.densitycalculator.NullDensityCalculator.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>contacts</em>, <em>contactThreshold</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/densitycalculator.html#NullDensityCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.densitycalculator.NullDensityCalculator.calculate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calcuate the density value according to the contact ratio, in this
+case is always one</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>contacts</strong> (<em>float</em>) &#8211; Contacts ratio</li>
+<li><strong>contactThreshold</strong> (<em>float</em>) &#8211; Deprecated parameter</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; Density value for the value of the contacts ratio</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -250,7 +310,18 @@
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.DensitySpawningCalculator.calculateDensities">
 <code class="descname">calculateDensities</code><span class="sig-paren">(</span><em>clusters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#DensitySpawningCalculator.calculateDensities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.DensitySpawningCalculator.calculateDensities" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate the densities of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.Array &#8211; Array containing the density of the clusters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -263,17 +334,55 @@ We only consider the nclusters with best metric</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>spawningParams</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#EpsilonDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate the degeneracy of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Object containing the parameters of the spawning</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) &#8211; Current iteration number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List containing the degeneracy of the clusters</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.divideProcessorsMetricProportional">
 <code class="descname">divideProcessorsMetricProportional</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>spawningParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#EpsilonDegeneracyCalculator.divideProcessorsMetricProportional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.divideProcessorsMetricProportional" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Distribute the trajectories among the clusters according to their
+metric.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</li>
+<li><strong>weights</strong> (<em>np.Array</em>) &#8211; Weight of each cluster</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with the number of processors allocated to
+each cluster</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.log">
 <code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#EpsilonDegeneracyCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.log" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Log spawning information</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -284,7 +393,25 @@ We only consider the nclusters with best metric</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDivide</em>, <em>spawningParams</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#FASTDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate the degeneracy of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Object containing the parameters of the spawning</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) &#8211; Current iteration number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List containing the degeneracy of the clusters</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.calculateNormalisedMetrics">
@@ -299,7 +426,8 @@ We only consider the nclusters with best metric</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.log">
 <code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#FASTDegeneracyCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.log" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Log spawning information</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.normaliseArray">
@@ -315,22 +443,55 @@ We only consider the nclusters with best metric</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.IndependentRunsCalculator.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>spawningParams</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#IndependentRunsCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.IndependentRunsCalculator.calculate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate the degeneracy of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Object containing the parameters of the spawning</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) &#8211; Current iteration number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List containing the degeneracy of the clusters</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.IndependentRunsCalculator.log">
 <code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#IndependentRunsCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.IndependentRunsCalculator.log" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Log spawning information</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures">
 <code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#IndependentRunsCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write last trajectory structure as initial one for the next iteration</p>
-<p>outputPathConstants [In] Output constants that depend on the path
-degeneracyOfRepresentatives [In] Array with the degeneracy of each
-cluster (i.e the number of processors that will be assigned to it)
-clustering [In] clustering object
-iteration [In] Number of epoch</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Output constants that depend on the path</li>
+<li><strong>degeneracyOfRepresentatives</strong> (<em>np.Array</em>) &#8211; Array with the degeneracy of
+each cluster (number of processors that will start from that state)</li>
+<li><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object</li>
+<li><strong>iteration</strong> (<em>int</em>) &#8211; Number of epoch</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int, list &#8211; number of processors, list with the
+snapshot from which the trajectories will start in the next iteration</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -342,12 +503,31 @@ iteration [In] Number of epoch</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>spawningParams</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#InverselyProportionalToPopulationCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator.calculate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate the degeneracy of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Object containing the parameters of the spawning</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) &#8211; Current iteration number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List containing the degeneracy of the clusters</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator.log">
 <code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#InverselyProportionalToPopulationCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator.log" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Log spawning information</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -358,13 +538,32 @@ iteration [In] Number of epoch</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>spawningParams</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SameWeightDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
-<dd><p>We back on PELE to split equal trajectories</p>
+<dd><p>Calculate the degeneracy of the clusters
+We back on PELE to split equal trajectories</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Object containing the parameters of the spawning</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) &#8211; Current iteration number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List containing the degeneracy of the clusters</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator.log">
 <code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SameWeightDegeneracyCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator.log" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Log spawning information</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -375,7 +574,25 @@ iteration [In] Number of epoch</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>spawningParams</em>, <em>currentEpoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SimulatedAnnealingCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator.calculate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate the degeneracy of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Object containing the parameters of the spawning</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) &#8211; Current iteration number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List containing the degeneracy of the clusters</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator.computeTemperature">
@@ -385,7 +602,8 @@ iteration [In] Number of epoch</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator.log">
 <code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SimulatedAnnealingCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator.log" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Log spawning information</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -395,7 +613,21 @@ iteration [In] Number of epoch</p>
 <dd><dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningAlgorithmBuilder.build">
 <code class="descname">build</code><span class="sig-paren">(</span><em>spawningBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningAlgorithmBuilder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningAlgorithmBuilder.build" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build the selected spawning calculator and spawning params objects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>spawningBlock</strong> (<em>dict</em>) &#8211; Block of the control file with the spawning
+parameters</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">SpawningCalculator</span></code></a>,
+<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a> &#8211; SpawningCalculator and
+SpawningParams objects</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -405,7 +637,20 @@ iteration [In] Number of epoch</p>
 <dd><dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningBuilder.buildSpawningCalculator">
 <code class="descname">buildSpawningCalculator</code><span class="sig-paren">(</span><em>spawningBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningBuilder.buildSpawningCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningBuilder.buildSpawningCalculator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build the selected spawning calculator object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>spawningBlock</strong> (<em>dict</em>) &#8211; Block of the control file with the spawning
+parameters</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">SpawningCalculator</span></code></a> &#8211; SpawningCalculator
+object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -422,45 +667,133 @@ Spawning is the way in which we split the different explorers at the begining of
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.divideInverselyProportionalToArray">
 <code class="descname">divideInverselyProportionalToArray</code><span class="sig-paren">(</span><em>array</em>, <em>trajToDistribute</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.divideInverselyProportionalToArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.divideInverselyProportionalToArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Divides &#8220;trajToDistribute&#8221; inversely proportional to the values in &#8220;array&#8221;</p>
+<dd><p>Distribute the trajectories among the clusters inversely proportional
+to the values of an array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>Array</strong> (<em>np.Array</em>) &#8211; Weight of each cluster</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with the number of processors allocated to
+each cluster</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.divideProportionalToArray">
 <code class="descname">divideProportionalToArray</code><span class="sig-paren">(</span><em>array</em>, <em>trajToDistribute</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.divideProportionalToArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.divideProportionalToArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Divides &#8220;trajToDistribute&#8221; proportionally to the values in &#8220;array&#8221;</p>
+<dd><p>Distribute the trajectories among the clusters according to the
+values of an array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>Array</strong> (<em>np.Array</em>) &#8211; Weight of each cluster</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with the number of processors allocated to
+each cluster</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.divideTrajAccordingToWeights">
 <code class="descname">divideTrajAccordingToWeights</code><span class="sig-paren">(</span><em>weights</em>, <em>trajToDistribute</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.divideTrajAccordingToWeights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.divideTrajAccordingToWeights" title="Permalink to this definition">¶</a></dt>
-<dd><p>weights must be normalized (i.e. sum(weights) = 1)</p>
+<dd><p>Distribute the trajectories among the clusters according to their
+weight. Weights must be normalized (i.e. sum(weights) = 1)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>weights</strong> (<em>np.Array</em>) &#8211; Weight of each cluster</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with the number of processors allocated to
+each cluster</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.getMetrics">
 <code class="descname">getMetrics</code><span class="sig-paren">(</span><em>clusters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.getMetrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.getMetrics" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the metric of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.Array &#8211; Array containing the metric of the clusters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.getSizes">
 <code class="descname">getSizes</code><span class="sig-paren">(</span><em>clusters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.getSizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.getSizes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the size of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.Array &#8211; Array containing the size of the clusters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.log">
 <code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.log" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Log spawning information</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures">
 <code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write initial structures for the next iteration</p>
-<p>outputPathConstants [In] Output constants that depend on the path
-degeneracyOfRepresentatives [In] Array with the degeneracy of each
-cluster (i.e the number of processors that will be assigned to it)
-clustering [In] clustering object
-iteration [In] Number of epoch</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Output constants that depend on the path</li>
+<li><strong>degeneracyOfRepresentatives</strong> (<em>np.Array</em>) &#8211; Array with the degeneracy of
+each cluster (number of processors that will start from that state)</li>
+<li><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object</li>
+<li><strong>iteration</strong> (<em>int</em>) &#8211; Number of epoch</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int, list &#8211; number of processors, list with the
+snapshot from which the trajectories will start in the next iteration</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -471,7 +804,19 @@ iteration [In] Number of epoch</p>
 <dd><dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningParams.buildSpawningParameters">
 <code class="descname">buildSpawningParameters</code><span class="sig-paren">(</span><em>spawningBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningParams.buildSpawningParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningParams.buildSpawningParameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build the selected spawning params objects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>spawningBlock</strong> (<em>dict</em>) &#8211; Block of the control file with the spawning
+parameters</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a> &#8211; SpawningParams object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -482,12 +827,31 @@ iteration [In] Number of epoch</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.UCBCalculator.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>spawningParams</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#UCBCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.UCBCalculator.calculate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate the degeneracy of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Object containing the parameters of the spawning</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) &#8211; Current iteration number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List containing the degeneracy of the clusters</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.UCBCalculator.log">
 <code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#UCBCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.UCBCalculator.log" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Log spawning information</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -498,39 +862,131 @@ iteration [In] Number of epoch</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>spawningParams</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#VariableEpsilonDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate the degeneracy of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) &#8211; Number of processors to distribute</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Object containing the parameters of the spawning</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) &#8211; Current iteration number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List containing the degeneracy of the clusters</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculateEpsilonValue">
 <code class="descname">calculateEpsilonValue</code><span class="sig-paren">(</span><em>spawningParams</em>, <em>currentEpoch</em>, <em>clusters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#VariableEpsilonDegeneracyCalculator.calculateEpsilonValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculateEpsilonValue" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate variation of epsilon according to the selected parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Object containing the parameters of the spawning</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) &#8211; Current iteration number</li>
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.contactsVariation">
 <code class="descname">contactsVariation</code><span class="sig-paren">(</span><em>clusters</em>, <em>spawningParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#VariableEpsilonDegeneracyCalculator.contactsVariation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.contactsVariation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate the variation of epsilon according to the contacts ratio</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) &#8211; Existing clusters</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Object containing the parameters of the spawning</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.linearVariation">
 <code class="descname">linearVariation</code><span class="sig-paren">(</span><em>spawningParams</em>, <em>currentEpoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#VariableEpsilonDegeneracyCalculator.linearVariation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.linearVariation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate linear variation of epsilon with respect to the iteraetion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Object containing the parameters of the spawning</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) &#8211; Current iteration number</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.logVariableEpsilon">
 <code class="descname">logVariableEpsilon</code><span class="sig-paren">(</span><em>epsilon</em>, <em>epoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#VariableEpsilonDegeneracyCalculator.logVariableEpsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.logVariableEpsilon" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Log spawning information</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.spawning.spawning.calculateContactsVar">
 <code class="descclassname">AdaptivePELE.spawning.spawning.</code><code class="descname">calculateContactsVar</code><span class="sig-paren">(</span><em>deltaR</em>, <em>epsMax</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#calculateContactsVar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.calculateContactsVar" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate the variation of epsilon according to the contact ratio</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>deltaR</strong> (<em>float</em>) &#8211; Change in contact ratio</li>
+<li><strong>epsMax</strong> (<em>float</em>) &#8211; Maximum value of epsilon</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; Epsilon variation</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.spawning.spawning.return_sign">
 <code class="descclassname">AdaptivePELE.spawning.spawning.</code><code class="descname">return_sign</code><span class="sig-paren">(</span><em>i</em>, <em>m</em>, <em>n</em>, <em>r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#return_sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.return_sign" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function, creates a three-piece step function</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>i</strong> (<em>int</em>) &#8211; Value to compare</li>
+<li><strong>m</strong> (<em>int</em>) &#8211; Middle value</li>
+<li><strong>n</strong> (<em>int</em>) &#8211; Left extreme value</li>
+<li><strong>r</strong> (<em>int</em>) &#8211; Right extreme value</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; Three-piece sign</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
