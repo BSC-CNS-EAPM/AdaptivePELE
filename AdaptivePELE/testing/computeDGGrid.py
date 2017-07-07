@@ -53,6 +53,8 @@ def plotIsocostLines(extent, minCost, maxCost, steps=10):
         plt.plot(x,y, color="black")
 
 def main():
+    #plt.style.use('ggplot')
+
     lagtime = 100
     clusters = 100
 
@@ -93,16 +95,15 @@ def main():
     #results = np.load("results.npy")
 
 
-    extent = [itrajs+1-dtrajs/2,ftrajs+dtrajs/2,ilengths-dlengths/2,flengths+dlengths/2] # +1 for aesthetical purposes
-    extent = [itrajs+1,ftrajs+1-dtrajs,ilengths,flengths-dlengths] # +1 for aesthetical purposes
+    extent = [itrajs+1-dtrajs/2,ftrajs+dtrajs/2,ilengths-dlengths/2,flengths-dlengths/2] # +1 for aesthetical purposes
     plt.figure(1)
     plotIsocostLines(extent, (ilengths+dlengths)*(itrajs+dtrajs), (flengths-dlengths)*(ftrajs-dtrajs), 6)
     plt.imshow(results, interpolation="nearest", origin="lower", aspect="auto", extent=extent)
+    #plt.imshow(results, interpolation="nearest", origin="lower", aspect="auto", extent=extent, vmin=-7, vmax=-5)
     plt.colorbar()
     plt.figure(2)
     plotIsocostLines(extent, (ilengths+dlengths)*(itrajs+dtrajs), (flengths-dlengths)*(ftrajs-dtrajs), 6)
     plt.imshow(results, interpolation="bilinear", origin="lower", aspect="auto", extent=extent)
-    #plt.imshow(results, interpolation="bilinear", origin="lower", aspect="auto", extent=extent, vmin=-7, vmax=-5)
     plt.colorbar()
     plt.show()
 
