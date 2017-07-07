@@ -17,14 +17,6 @@ analysis Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`generateGnuplotFile` Module
----------------------------------
-
-.. automodule:: AdaptivePELE.analysis.generateGnuplotFile
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`makePNGs` Module
 ----------------------
 
@@ -33,10 +25,18 @@ analysis Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`numberOfOwnClusters` Module
+:mod:`numberOfClusters` Module
 ---------------------------------
 
-.. automodule:: AdaptivePELE.analysis.numberOfOwnClusters
+.. automodule:: AdaptivePELE.analysis.numberOfClusters
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`plotAdaptive` Module
+--------------------------
+
+.. automodule:: AdaptivePELE.analysis.plotAdaptive
     :members:
     :undoc-members:
     :show-inheritance:
@@ -49,4 +49,12 @@ analysis Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`writePrecisePathToSnapshot` Module
+----------------------------------------
+
+.. automodule:: AdaptivePELE.analysis.writePrecisePathToSnapshot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+ 
 .. toctree::

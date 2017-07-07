@@ -131,20 +131,15 @@ def main(trajWildcard, reweightingT=1000):
                         np.ceil(maxval[i]) + d*(int((maxval[i] - np.ceil(maxval[i]))/d) + 1),
             d) for i in range(3)])
 
-    """
-    bins = [np.arange(np.floor(minval[i]),
-                        np.ceil(maxval[i]),
-            d) for i in range(3)]
-    """
 
     numberOfClusters = r.shape[0]
+    print "Number of clusters", numberOfClusters
+
+
     histogram = np.array([])
     histogramFreq = np.array([])
     histograms = []
-
     microstateVolume = np.zeros(numberOfClusters)
-
-    print "Number of clusters", numberOfClusters
 
 
     #dtrajs = clusteringObject.assign(originalCoordinates)
@@ -155,7 +150,7 @@ def main(trajWildcard, reweightingT=1000):
         for j,(trajOriginalCoordinates,dtraj) in enumerate(zip(originalCoordinates, dtrajs)):
             assert dtraj.shape[0] == trajOriginalCoordinates.shape[0]
             belongingFrames = np.argwhere(dtraj==i)
-            trajCoords = trajOriginalCoordinates[belongingFrames, :]
+            trajCoords = trajOriginalCoordinates[belongingFrames, :3]
             trajCoords = trajCoords.flatten().tolist()
 
             allCoords.extend(trajCoords)
