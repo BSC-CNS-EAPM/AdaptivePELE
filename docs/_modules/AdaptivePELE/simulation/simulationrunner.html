@@ -168,14 +168,36 @@
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="SimulationRunner.hasExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.hasExitCondition">[docs]</a>    <span class="k">def</span> <span class="nf">hasExitCondition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Check if an exit condition has been set</span>
+
+<span class="sd">            :returns: bool -- True if an exit condition is set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">exitCondition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="SimulationRunner.checkExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.checkExitCondition">[docs]</a>    <span class="k">def</span> <span class="nf">checkExitCondition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clustering</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Check if the exit condition has been met</span>
+
+<span class="sd">            :param clustering: Clustering object</span>
+<span class="sd">            :type clustering: :py:class:`.Clustering`</span>
+
+<span class="sd">            :returns: bool -- True if the exit condition is met</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">exitCondition</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">exitCondition</span><span class="o">.</span><span class="n">checkExitCondition</span><span class="p">(</span><span class="n">clustering</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="SimulationRunner.makeWorkingControlFile"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.makeWorkingControlFile">[docs]</a>    <span class="k">def</span> <span class="nf">makeWorkingControlFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workingControlFilename</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Substitute the values in the templetized control file</span>
+
+<span class="sd">            :param workingControlFilename: Name of the template control file</span>
+<span class="sd">            :type workingControlFilename: str</span>
+<span class="sd">            :param dictionary: Dictonary containing the parameters to substitute</span>
+<span class="sd">                in the control file</span>
+<span class="sd">            :type dictionary: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">inputFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">templetizedControlFile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
         <span class="n">inputFileContent</span> <span class="o">=</span> <span class="n">inputFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">inputFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -189,15 +211,37 @@
         <span class="n">outputFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SimulationRunner.updateMappingProcessors"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.updateMappingProcessors">[docs]</a>    <span class="k">def</span> <span class="nf">updateMappingProcessors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapping</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Update the value of the processorsToClusterMapping, a list with the</span>
+<span class="sd">            snapshot from which the trajectories will start in the next iteration</span>
+
+<span class="sd">            :param mapping: List with the snapshot from which the trajectories</span>
+<span class="sd">                will start in the next iteration</span>
+<span class="sd">            :type mapping: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processorsToClusterMapping</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">+</span><span class="p">[</span><span class="n">mapping</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span></div>
 
 <div class="viewcode-block" id="SimulationRunner.writeMappingToDisk"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.writeMappingToDisk">[docs]</a>    <span class="k">def</span> <span class="nf">writeMappingToDisk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epochDir</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Write the processorsToClusterMapping to disk</span>
+
+<span class="sd">            :param epochDir: Name of the folder where to write the</span>
+<span class="sd">                processorsToClusterMapping</span>
+<span class="sd">            :type epochDir: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processorsToClusterMapping</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">epochDir</span><span class="o">+</span><span class="s2">&quot;/processorMapping.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">processorsToClusterMapping</span><span class="p">)))</span></div>
 
 <div class="viewcode-block" id="SimulationRunner.readMappingFromDisk"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.readMappingFromDisk">[docs]</a>    <span class="k">def</span> <span class="nf">readMappingFromDisk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epochDir</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Read the processorsToClusterMapping from disk</span>
+
+<span class="sd">            :param epochDir: Name of the folder where to write the</span>
+<span class="sd">                processorsToClusterMapping</span>
+<span class="sd">            :type epochDir: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">epochDir</span><span class="o">+</span><span class="s2">&quot;/processorMapping.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">processorsToClusterMapping</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">))</span>
@@ -205,6 +249,9 @@
             <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SimulationRunner.setZeroMapping"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.setZeroMapping">[docs]</a>    <span class="k">def</span> <span class="nf">setZeroMapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Set the processorsToClusterMapping to zero</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processorsToClusterMapping</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">)]</span></div></div>
 
 
@@ -214,12 +261,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">simulationTypes</span><span class="o">.</span><span class="n">SIMULATION_TYPE</span><span class="o">.</span><span class="n">PELE</span>
 
 <div class="viewcode-block" id="PeleSimulation.createSymbolicLinks"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.createSymbolicLinks">[docs]</a>    <span class="k">def</span> <span class="nf">createSymbolicLinks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Create symbolic links to Data and Documents folder if they don&#39;t exist</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="s2">&quot;Data&quot;</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ln -s &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">dataFolder</span> <span class="o">+</span> <span class="s2">&quot; Data&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="s2">&quot;Documents&quot;</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ln -s &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">documentsFolder</span> <span class="o">+</span> <span class="s2">&quot; Documents&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PeleSimulation.runSimulation"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation">[docs]</a>    <span class="k">def</span> <span class="nf">runSimulation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runningControlFile</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Run a short PELE simulation</span>
+
+<span class="sd">            :param runningControlFile: PELE control file to run</span>
+<span class="sd">            :type runningControlFile: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">createSymbolicLinks</span><span class="p">()</span>
 
         <span class="n">toRun</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mpirun -np &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="n">runningControlFile</span><span class="p">]</span>
@@ -247,6 +303,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
 
 <div class="viewcode-block" id="TestSimulation.runSimulation"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation">[docs]</a>    <span class="k">def</span> <span class="nf">runSimulation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runningControlFile</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Copy file to test the rest of the AdaptivePELE procedure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">copied</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">destination</span><span class="p">):</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">destination</span><span class="p">)</span>
@@ -259,6 +318,16 @@
 
 <div class="viewcode-block" id="ExitConditionBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.ExitConditionBuilder">[docs]</a><span class="k">class</span> <span class="nc">ExitConditionBuilder</span><span class="p">:</span>
 <div class="viewcode-block" id="ExitConditionBuilder.build"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.ExitConditionBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exitConditionBlock</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Build the selected exit condition object</span>
+
+<span class="sd">            :param exitConditionBlock: Block of the control file</span>
+<span class="sd">                corresponding to the exit condition</span>
+<span class="sd">            :type exitConditionBlock: dict</span>
+
+<span class="sd">            :returns: :py:class:`.MetricExitCondition` -- MetricExitCondition object</span>
+<span class="sd">                selected</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">exitConditionType</span> <span class="o">=</span> <span class="n">exitConditionBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ExitConditionType</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
         <span class="n">exitConditionParams</span> <span class="o">=</span> <span class="n">exitConditionBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">exitConditionType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ExitConditionType</span><span class="o">.</span><span class="n">metric</span><span class="p">:</span>
@@ -279,6 +348,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">simulationTypes</span><span class="o">.</span><span class="n">EXITCONDITION_TYPE</span><span class="o">.</span><span class="n">CLUSTERING</span>
 
 <div class="viewcode-block" id="ClusteringExitCondition.checkExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.ClusteringExitCondition.checkExitCondition">[docs]</a>    <span class="k">def</span> <span class="nf">checkExitCondition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clustering</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Iterate over all unchecked cluster and check if the exit condtion</span>
+<span class="sd">            is met</span>
+
+<span class="sd">            :param clustering: Clustering object</span>
+<span class="sd">            :type clustering: :py:class:`.Clustering`</span>
+
+<span class="sd">            :returns: bool -- Returns True if the exit condition has been met</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">newClusterNum</span> <span class="o">=</span> <span class="n">clustering</span><span class="o">.</span><span class="n">getNumberClusters</span><span class="p">()</span>
         <span class="n">clusterDiff</span> <span class="o">=</span> <span class="n">newClusterNum</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterNum</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clusterNum</span> <span class="o">=</span> <span class="n">newClusterNum</span>
@@ -292,8 +370,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">simulationTypes</span><span class="o">.</span><span class="n">EXITCONDITION_TYPE</span><span class="o">.</span><span class="n">METRIC</span>
 
 <div class="viewcode-block" id="MetricExitCondition.checkExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MetricExitCondition.checkExitCondition">[docs]</a>    <span class="k">def</span> <span class="nf">checkExitCondition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clustering</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Iterate over all unchecked cluster and check if the exit condtion</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Iterate over all unchecked cluster and check if the exit condtion</span>
 <span class="sd">            is met</span>
+
+<span class="sd">            :param clustering: Clustering object</span>
+<span class="sd">            :type clustering: :py:class:`.Clustering`</span>
+
+<span class="sd">            :returns: bool -- Returns True if the exit condition has been met</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">clustering</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">:</span>
             <span class="n">metric</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">getMetricFromColumn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span><span class="p">)</span>
@@ -305,6 +389,16 @@
 <div class="viewcode-block" id="RunnerBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.RunnerBuilder">[docs]</a><span class="k">class</span> <span class="nc">RunnerBuilder</span><span class="p">:</span>
 
 <div class="viewcode-block" id="RunnerBuilder.build"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.RunnerBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulationRunnerBlock</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Build the selected  SimulationRunner object</span>
+
+<span class="sd">            :param simulationRunnerBlock: Block of the control file</span>
+<span class="sd">                corresponding to the simulation step</span>
+<span class="sd">            :type simulationRunnerBlock: dict</span>
+
+<span class="sd">            :returns: :py:class:`.SimulationRunner` -- SimulationRunner object</span>
+<span class="sd">                selected</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">simulationType</span> <span class="o">=</span> <span class="n">simulationRunnerBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationType</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
         <span class="n">paramsBlock</span> <span class="o">=</span> <span class="n">simulationRunnerBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">SimulationParameters</span><span class="p">()</span>

@@ -145,6 +145,16 @@
 <span class="kn">import</span> <span class="nn">json</span>
 
 <div class="viewcode-block" id="extendReportWithRmsd"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.correctRMSD.extendReportWithRmsd">[docs]</a><span class="k">def</span> <span class="nf">extendReportWithRmsd</span><span class="p">(</span><span class="n">reportFile</span><span class="p">,</span> <span class="n">rmsds</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extend a previous report file with corrected rmsd values</span>
+
+<span class="sd">        :param reportFile: Report file to be corrected</span>
+<span class="sd">        :type reportFile: np.ndarray</span>
+<span class="sd">        :param rmsds: Rmsd corrected values</span>
+<span class="sd">        :type rmsds: np.ndarray</span>
+
+<span class="sd">        :returns: np.ndarray -- Extended report file with corrected rmsd values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">newShape</span> <span class="o">=</span> <span class="n">reportFile</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">fixedReport</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">newShape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">newShape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">fixedReport</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">reportFile</span>
@@ -152,6 +162,11 @@
     <span class="k">return</span> <span class="n">fixedReport</span></div>
 
 <div class="viewcode-block" id="parseArguments"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.correctRMSD.parseArguments">[docs]</a><span class="k">def</span> <span class="nf">parseArguments</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse the command-line options</span>
+
+<span class="sd">        :returns: object -- Object containing the options passed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">desc</span> <span class="o">=</span> <span class="s2">&quot;Program that fixes RMSD symmetries of a PELE report file.&quot;</span>\
             <span class="s2">&quot;Control file is a JSON file that contains </span><span class="se">\&quot;</span><span class="s2">resname</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="s2">native</span><span class="se">\&quot;</span><span class="s2">, &quot;</span>\
             <span class="s2">&quot;symmetries, and, optionally, the column to substitute in report. &quot;</span>\
@@ -169,6 +184,15 @@
     <span class="k">return</span>  <span class="n">args</span><span class="o">.</span><span class="n">controlFile</span></div>
 
 <div class="viewcode-block" id="readControlFile"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.correctRMSD.readControlFile">[docs]</a><span class="k">def</span> <span class="nf">readControlFile</span><span class="p">(</span><span class="n">controlFile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract parameters from controlFile</span>
+
+<span class="sd">        :param controlFile: Control file</span>
+<span class="sd">        :type controlFile: str</span>
+<span class="sd">        :returns: str, str, list, int -- Name of the ligand in the pdb, filename</span>
+<span class="sd">            containing the native structure, list of the symmetry groups, column</span>
+<span class="sd">            corresponding to the rmsd in the report file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">jsonFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">controlFile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="n">parsedJSON</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonFile</span><span class="p">)</span>
     <span class="n">resname</span> <span class="o">=</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="s2">&quot;resname&quot;</span><span class="p">]</span>
@@ -182,6 +206,13 @@
     <span class="k">return</span> <span class="n">resname</span><span class="p">,</span> <span class="n">nativeFilename</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">rmsdColInReport</span></div>
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.correctRMSD.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">controlFile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the corrected rmsd values of conformation taking into account</span>
+<span class="sd">        molecule symmetries</span>
+
+<span class="sd">        :param controlFile: Control file</span>
+<span class="sd">        :type controlFile: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#Constants</span>
     <span class="n">folder</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>
     <span class="n">outputFilename</span> <span class="o">=</span> <span class="s2">&quot;fixedReport_</span><span class="si">%d</span><span class="s2">&quot;</span>

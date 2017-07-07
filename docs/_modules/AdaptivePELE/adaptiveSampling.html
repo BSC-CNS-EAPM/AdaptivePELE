@@ -144,7 +144,6 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
 <span class="kn">import</span> <span class="nn">atexit</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span><span class="p">,</span> <span class="n">constants</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">atomset</span>
@@ -172,8 +171,7 @@
 <span class="sd">        :param initialStructureWildcard: Wildcard that matches the initial structures</span>
 <span class="sd">        :type initialStructureWildcard: str</span>
 
-<span class="sd">        :return totalInitialStructures: The expanded initial structures</span>
-<span class="sd">        :rtype: list of str</span>
+<span class="sd">        :return: list of str -- The expanded initial structures</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">totalInitialStructures</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">initialStructureWildcard</span> <span class="ow">in</span> <span class="n">initialStructuresWildcard</span><span class="p">:</span>
@@ -267,8 +265,7 @@
 <span class="sd">        :param iteration: Epoch number</span>
 <span class="sd">        :type iteration: int</span>
 
-<span class="sd">        :returns: jsonString to be substituted in PELE control file</span>
-<span class="sd">        :rtype: str</span>
+<span class="sd">        :returns: str -- jsonString to be substituted in PELE control file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">jsonString</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numberOfSnapshots</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
@@ -280,10 +277,14 @@
 <div class="viewcode-block" id="generateTrajectorySelectionString"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.generateTrajectorySelectionString">[docs]</a><span class="k">def</span> <span class="nf">generateTrajectorySelectionString</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">epochOutputPathTempletized</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates the template for the name of the trajectories in a given epoch</span>
+
 <span class="sd">        :param Poch: Epoch number</span>
 <span class="sd">        :type epoch: int</span>
 <span class="sd">        :param epochOutputPathTempletized: Templetized path where the trajectories of any epoch are stored</span>
 <span class="sd">        :type epochOutputPathTempletized: str</span>
+
+<span class="sd">        :returns: str -- Template for the name of the trajectories in a given</span>
+<span class="sd">            epoch</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="s2">&quot;[</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">trajectoryBasename</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">]&quot;</span></div>
 
@@ -298,8 +299,7 @@
 <span class="sd">        :param clusteringOutputObject: Templetized name of the clustering object</span>
 <span class="sd">        :type clusteringOutputObject: str</span>
 
-<span class="sd">        :return: Current epoch</span>
-<span class="sd">        :rtype: int </span>
+<span class="sd">        :return: int -- Current epoch</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">folderWithSimulationData</span> <span class="o">=</span> <span class="n">outputPath</span>
@@ -327,8 +327,7 @@
 <span class="sd">        :param objectPath: Clustering object path</span>
 <span class="sd">        :type objectPath: str</span>
 
-<span class="sd">        :returns: True if the found clustering object is valid</span>
-<span class="sd">        :rtype: bool</span>
+<span class="sd">        :returns: bool -- True if the found clustering object is valid</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">utilities</span><span class="o">.</span><span class="n">readClusteringObject</span><span class="p">(</span><span class="n">objectPath</span><span class="p">)</span>
@@ -336,6 +335,19 @@
     <span class="k">except</span> <span class="ne">EOFError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
+<span class="k">def</span> <span class="nf">__unicodeToStr</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="c1">#convert dict</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="n">__unicodeToStr</span><span class="p">(</span><span class="n">key</span><span class="p">):</span> <span class="n">__unicodeToStr</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span> <span class="p">}</span>
+    <span class="c1">#convert list</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="nb">print</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="p">[</span> <span class="n">__unicodeToStr</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">]</span>
+    <span class="c1">#convert unicode to str</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">unicode</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span>
 
 <div class="viewcode-block" id="loadParams"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.loadParams">[docs]</a><span class="k">def</span> <span class="nf">loadParams</span><span class="p">(</span><span class="n">jsonParams</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -346,7 +358,7 @@
 <span class="sd">        :type jsonParams: json str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">jsonFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">jsonParams</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-    <span class="n">parsedJSON</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonFile</span><span class="p">)</span>
+    <span class="n">parsedJSON</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonFile</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="n">__unicodeToStr</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ControlFileParams</span><span class="o">.</span><span class="n">generalParams</span><span class="p">],</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ControlFileParams</span><span class="o">.</span><span class="n">spawningBlockname</span><span class="p">],</span>\
         <span class="n">parsedJSON</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ControlFileParams</span><span class="o">.</span><span class="n">simulationBlockname</span><span class="p">],</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ControlFileParams</span><span class="o">.</span><span class="n">clusteringBlockname</span><span class="p">]</span></div>
@@ -366,7 +378,7 @@
 
 
 <div class="viewcode-block" id="needToRecluster"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.needToRecluster">[docs]</a><span class="k">def</span> <span class="nf">needToRecluster</span><span class="p">(</span><span class="n">oldClusteringMethod</span><span class="p">,</span> <span class="n">newClusteringMethod</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; </span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the parameters have changed in a restart and we need to redo</span>
 <span class="sd">        the clustering. In particular: type of clustering, theshold calculator</span>
 <span class="sd">        or distance</span>
@@ -376,8 +388,7 @@
 <span class="sd">        :param newClusteringMethod: Clustering in the restarted simulation</span>
 <span class="sd">        :type newClusteringMethod: :py:class:`.Clustering`</span>
 
-<span class="sd">        :returns: If clustering needs to be redone</span>
-<span class="sd">        :rtype: bool</span>
+<span class="sd">        :returns: bool -- If clustering needs to be redone</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Check 1: change of type</span>
@@ -398,7 +409,7 @@
 <span class="sd">        Cluster the trajecotories of a given epoch</span>
 
 <span class="sd">        :param clusteringMethod: Clustering object</span>
-<span class="sd">        :type clusteringMethod: :py:class:`.Clustering` </span>
+<span class="sd">        :type clusteringMethod: :py:class:`.Clustering`</span>
 <span class="sd">        :param epoch: Number of the epoch to cluster</span>
 <span class="sd">        :type epoch: int</span>
 <span class="sd">        :param epochOutputPathTempletized: Path where to find the trajectories</span>
@@ -443,8 +454,8 @@
 <span class="sd">        :param spawningParams: Spawning params, to know what reportFile and column to read</span>
 <span class="sd">        :type spawningParams: :py:class:`.SpawningParams`</span>
 
-<span class="sd">        :returns clusteringMethod: The clustering method to use in the adaptive sampling simulation</span>
-<span class="sd">        :rtype: :py:class:`.Clustering`</span>
+<span class="sd">        :returns: :py:class:`.Clustering` -- The clustering method to use in the</span>
+<span class="sd">            adaptive sampling simulation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">lastClusteringEpoch</span> <span class="o">=</span> <span class="n">firstRun</span> <span class="o">-</span> <span class="mi">1</span>
@@ -489,16 +500,10 @@
 <span class="sd">        :param simulationRunner: :py:class:`.SimulationRunner` Simulation runner object</span>
 <span class="sd">        :type simulationRunner: :py:class:`.SimulationRunner`</span>
 
-<span class="sd">        :returns: (clusteringMethod, initialStructuresAsString): </span>
-
-<span class="sd">        **clusteringMethod** (:py:class:`.Clustering`) The clustering method to use in the adaptive sampling simulation</span>
-<span class="sd">        **initialStructuresAsString** (str) The initial structures filenames</span>
+<span class="sd">        :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">clusteringMethod</span> <span class="o">=</span> <span class="n">getWorkingClusteringObjectAndReclusterIfNecessary</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="s2">&quot;conformationNetwork&quot;</span><span class="p">):</span>
-        <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">firstRun</span>
 
     <span class="n">degeneracyOfRepresentatives</span> <span class="o">=</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">firstRun</span><span class="p">)</span>
     <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
@@ -530,8 +535,7 @@
 <span class="sd">        :param initialStructures: Control file initial structures</span>
 <span class="sd">        :type initialStructures: list</span>
 
-<span class="sd">        **clusteringMethod** (:py:class:`.Clustering`) The clustering method to use in the adaptive sampling simulation</span>
-<span class="sd">        **initialStructuresAsString** (str) The initial structures filenames</span>
+<span class="sd">        :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
@@ -575,7 +579,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Main body of the adaptive sampling program.</span>
 
-<span class="sd">        :params jsonParams: A string with the name of the control file to use</span>
+<span class="sd">        :param jsonParams: A string with the name of the control file to use</span>
 <span class="sd">        :type jsonParams: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

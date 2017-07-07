@@ -143,6 +143,13 @@
 
 
 <div class="viewcode-block" id="automateSimulation"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.automateRoundsAdaptive.automateSimulation">[docs]</a><span class="k">def</span> <span class="nf">automateSimulation</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run multiple AdaptivePELE simulation with the same parameters, changing</span>
+<span class="sd">        only the seed</span>
+
+<span class="sd">        :param args: Object containing the command line arguments</span>
+<span class="sd">        :type args: object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">controlFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">controlFile</span>
     <span class="n">numSimulations</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">numSimulations</span>
     <span class="n">nProcessors</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">nProcessors</span>
@@ -172,6 +179,9 @@
 
 
 <div class="viewcode-block" id="parseArguments"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.automateRoundsAdaptive.parseArguments">[docs]</a><span class="k">def</span> <span class="nf">parseArguments</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse the command line arguments</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Automate the process &quot;</span>
                                      <span class="s2">&quot;of repeating simulations&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;controlFile&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
@@ -185,6 +195,9 @@
 
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.automateRoundsAdaptive.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the multiple simulations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
     <span class="n">automateSimulation</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
 
