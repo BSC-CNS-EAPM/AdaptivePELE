@@ -42,7 +42,7 @@ def saveResultsFileBckp(outputFilename):
         pass
 
 def main():
-    lagtime = 25
+    lagtime = 100
     clusters = 100
 
     ilengths = 200
