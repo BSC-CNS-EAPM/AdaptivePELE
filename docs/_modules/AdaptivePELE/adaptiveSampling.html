@@ -299,7 +299,7 @@
 <span class="sd">        :type clusteringOutputObject: str</span>
 
 <span class="sd">        :return: Current epoch</span>
-<span class="sd">        :rtype: int </span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">folderWithSimulationData</span> <span class="o">=</span> <span class="n">outputPath</span>
@@ -336,6 +336,19 @@
     <span class="k">except</span> <span class="ne">EOFError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
+<span class="k">def</span> <span class="nf">__unicodeToStr</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="c1">#convert dict</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="n">__unicodeToStr</span><span class="p">(</span><span class="n">key</span><span class="p">):</span> <span class="n">__unicodeToStr</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span> <span class="p">}</span>
+    <span class="c1">#convert list</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="nb">print</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="p">[</span> <span class="n">__unicodeToStr</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">]</span>
+    <span class="c1">#convert unicode to str</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">unicode</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span>
 
 <div class="viewcode-block" id="loadParams"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.loadParams">[docs]</a><span class="k">def</span> <span class="nf">loadParams</span><span class="p">(</span><span class="n">jsonParams</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -346,7 +359,7 @@
 <span class="sd">        :type jsonParams: json str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">jsonFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">jsonParams</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-    <span class="n">parsedJSON</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonFile</span><span class="p">)</span>
+    <span class="n">parsedJSON</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonFile</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="n">__unicodeToStr</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ControlFileParams</span><span class="o">.</span><span class="n">generalParams</span><span class="p">],</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ControlFileParams</span><span class="o">.</span><span class="n">spawningBlockname</span><span class="p">],</span>\
         <span class="n">parsedJSON</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ControlFileParams</span><span class="o">.</span><span class="n">simulationBlockname</span><span class="p">],</span> <span class="n">parsedJSON</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ControlFileParams</span><span class="o">.</span><span class="n">clusteringBlockname</span><span class="p">]</span></div>
@@ -366,7 +379,7 @@
 
 
 <div class="viewcode-block" id="needToRecluster"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.needToRecluster">[docs]</a><span class="k">def</span> <span class="nf">needToRecluster</span><span class="p">(</span><span class="n">oldClusteringMethod</span><span class="p">,</span> <span class="n">newClusteringMethod</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; </span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the parameters have changed in a restart and we need to redo</span>
 <span class="sd">        the clustering. In particular: type of clustering, theshold calculator</span>
 <span class="sd">        or distance</span>
@@ -398,7 +411,7 @@
 <span class="sd">        Cluster the trajecotories of a given epoch</span>
 
 <span class="sd">        :param clusteringMethod: Clustering object</span>
-<span class="sd">        :type clusteringMethod: :py:class:`.Clustering` </span>
+<span class="sd">        :type clusteringMethod: :py:class:`.Clustering`</span>
 <span class="sd">        :param epoch: Number of the epoch to cluster</span>
 <span class="sd">        :type epoch: int</span>
 <span class="sd">        :param epochOutputPathTempletized: Path where to find the trajectories</span>
@@ -489,16 +502,13 @@
 <span class="sd">        :param simulationRunner: :py:class:`.SimulationRunner` Simulation runner object</span>
 <span class="sd">        :type simulationRunner: :py:class:`.SimulationRunner`</span>
 
-<span class="sd">        :returns: (clusteringMethod, initialStructuresAsString): </span>
+<span class="sd">        :returns: (clusteringMethod, initialStructuresAsString):</span>
 
 <span class="sd">        **clusteringMethod** (:py:class:`.Clustering`) The clustering method to use in the adaptive sampling simulation</span>
 <span class="sd">        **initialStructuresAsString** (str) The initial structures filenames</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">clusteringMethod</span> <span class="o">=</span> <span class="n">getWorkingClusteringObjectAndReclusterIfNecessary</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="s2">&quot;conformationNetwork&quot;</span><span class="p">):</span>
-        <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">firstRun</span>
 
     <span class="n">degeneracyOfRepresentatives</span> <span class="o">=</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">firstRun</span><span class="p">)</span>
     <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
