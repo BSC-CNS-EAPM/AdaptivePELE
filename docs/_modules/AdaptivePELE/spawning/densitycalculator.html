@@ -143,6 +143,14 @@
 
 <div class="viewcode-block" id="DensityCalculatorBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.densitycalculator.DensityCalculatorBuilder">[docs]</a><span class="k">class</span> <span class="nc">DensityCalculatorBuilder</span><span class="p">():</span>
 <div class="viewcode-block" id="DensityCalculatorBuilder.build"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.densitycalculator.DensityCalculatorBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spawningBlock</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Build the DensityCalculator object according to the parameters selcted</span>
+
+<span class="sd">            :param spawningBlock: Spawning block of the control file</span>
+<span class="sd">            :type spawningBlock: dict</span>
+
+<span class="sd">            :returns: :py:class:`.DensityCalculator` -- DensityCalculator object selected</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">densityBlock</span> <span class="o">=</span> <span class="n">spawningBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">density</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -194,6 +202,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">values</span>
 
 <div class="viewcode-block" id="DensityCalculatorHeaviside.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.densitycalculator.DensityCalculatorHeaviside.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contacts</span><span class="p">,</span> <span class="n">contactThreshold</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calcuate the density value according to the contact ratio</span>
+
+<span class="sd">            :param contacts: Contacts ratio</span>
+<span class="sd">            :type contacts: float</span>
+<span class="sd">            :param contactThreshold: Deprecated parameter</span>
+<span class="sd">            :type contactThreshold: float</span>
+
+<span class="sd">            :returns: float -- Density value for the value of the contacts ratio</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">)):</span>
             <span class="c1"># change, so that whole condition is in array</span>
             <span class="k">if</span> <span class="n">contacts</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
@@ -210,6 +228,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">densitycalculatortypes</span><span class="o">.</span><span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">null</span>
 
 <div class="viewcode-block" id="NullDensityCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.densitycalculator.NullDensityCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contacts</span><span class="p">,</span> <span class="n">contactThreshold</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calcuate the density value according to the contact ratio, in this</span>
+<span class="sd">            case is always one</span>
+
+<span class="sd">            :param contacts: Contacts ratio</span>
+<span class="sd">            :type contacts: float</span>
+<span class="sd">            :param contactThreshold: Deprecated parameter</span>
+<span class="sd">            :type contactThreshold: float</span>
+
+<span class="sd">            :returns: float -- Density value for the value of the contacts ratio</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">1.</span></div></div>
 
 
@@ -219,6 +248,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">densitycalculatortypes</span><span class="o">.</span><span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">continuous</span>
 
 <div class="viewcode-block" id="ContinuousDensityCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.densitycalculator.ContinuousDensityCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contacts</span><span class="p">,</span> <span class="n">contactThreshold</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calcuate the density value according to the contact ratio</span>
+
+<span class="sd">            :param contacts: Contacts ratio</span>
+<span class="sd">            :type contacts: float</span>
+<span class="sd">            :param contactThreshold: Deprecated parameter</span>
+<span class="sd">            :type contactThreshold: float</span>
+
+<span class="sd">            :returns: float -- Density value for the value of the contacts ratio</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">contacts</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">8</span>
         <span class="k">else</span><span class="p">:</span>

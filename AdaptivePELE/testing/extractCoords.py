@@ -146,8 +146,7 @@ def buildFullTrajectory(steps, trajectory, totalSteps, inputTrajectory):
             try:
                 repeated = steps[i+1] - steps[i]
             except IndexError:
-                print "sth wrong in trajectory %s. This is likely to
-                disagreement between report and trajecotry files. Please, fix it manually"%inputTrajectory
+                print "sth wrong in trajectory %s. This is likely to disagreement between report and trajecotry files. Please, fix it manually"%inputTrajectory
                 sthWrongInTraj = True
                 break
 
