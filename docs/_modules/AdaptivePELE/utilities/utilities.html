@@ -176,8 +176,7 @@
 <span class="sd">        :param verbose: Add verbose to snapshots</span>
 <span class="sd">        :type verbose: bool</span>
 
-<span class="sd">        :returns: Snapshots with information</span>
-<span class="sd">        :rtype: str</span>
+<span class="sd">        :returns: str -- Snapshots with information</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">inputFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
     <span class="n">inputFileContent</span> <span class="o">=</span> <span class="n">inputFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -198,8 +197,7 @@
 <span class="sd">        :param trajFilename: Trajectory filename</span>
 <span class="sd">        :type trajFilename: str</span>
 
-<span class="sd">        :returns: Trajectory number</span>
-<span class="sd">        :rtype: int</span>
+<span class="sd">        :returns: int -- Trajectory number</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">trajFilename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">4</span><span class="p">])</span></div>
 
@@ -211,9 +209,7 @@
 <span class="sd">        :param contactMap: Contact map</span>
 <span class="sd">        :type contactMap: np.array</span>
 
-<span class="sd">        :returns: (eiv, eic) </span>
-<span class="sd">        **eiv** (numpy.ndarray) eigenvalues</span>
-<span class="sd">        **eic** (numpy.ndarray) eigenvectors</span>
+<span class="sd">        :returns: (numpy.ndarray, numpy.ndarray) -- eigenvalues, eigenvectors</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">nLig</span><span class="p">,</span> <span class="n">nCA</span> <span class="o">=</span> <span class="n">contactMap</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">extendedCM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nLig</span><span class="o">+</span><span class="n">nCA</span><span class="p">,</span> <span class="n">nLig</span><span class="o">+</span><span class="n">nCA</span><span class="p">))</span>
@@ -255,8 +251,7 @@
 <span class="sd">        :param symmetries: Symmetries dictionary list with independent symmetry groups</span>
 <span class="sd">        :type symmetries: list of dict</span>
 
-<span class="sd">        :return: rmsds</span>
-<span class="sd">        :rtype: np.array</span>
+<span class="sd">        :return: np.array -- Array with the rmsd values of the trajectory</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">snapshots</span> <span class="o">=</span> <span class="n">getSnapshots</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
@@ -280,8 +275,7 @@
 
 <span class="sd">        :raise EOFError: If the object is empty</span>
 
-<span class="sd">        :return: clusteringObject</span>
-<span class="sd">        :rtype: :py:class:`.Clustering`</span>
+<span class="sd">        :returns: :py:class:`.Clustering` -- clusteringObject</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">clusteringObjectPath</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>

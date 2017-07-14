@@ -145,6 +145,14 @@
 
 
 <div class="viewcode-block" id="validate"><a class="viewcode-back" href="../../../AdaptivePELE.validator.html#AdaptivePELE.validator.controlFileValidator.validate">[docs]</a><span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">control_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate an AdaptivePELE control file to ensure that there are no errors</span>
+
+<span class="sd">        :param controlFile: Adaptive sampling control file</span>
+<span class="sd">        :type controlFile: str</span>
+
+<span class="sd">        :raise ValueError: If a error is found in the control file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">isCorrect</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">control_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">jsonFile</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -188,6 +196,20 @@
 
 
 <div class="viewcode-block" id="validateBlock"><a class="viewcode-back" href="../../../AdaptivePELE.validator.html#AdaptivePELE.validator.controlFileValidator.validateBlock">[docs]</a><span class="k">def</span> <span class="nf">validateBlock</span><span class="p">(</span><span class="n">blockName</span><span class="p">,</span> <span class="n">controlFileBlock</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate the a block of the control file to ensure that</span>
+<span class="sd">        there are no errors. Raise a warning if an error is found.</span>
+
+<span class="sd">        :param blockName: Dictionary containing the parameters and possible</span>
+<span class="sd">            types for the block</span>
+<span class="sd">        :type blockName: dict</span>
+<span class="sd">        :param controlFileBlock: Dictionary containing the parameters specified</span>
+<span class="sd">            in the control file for the block</span>
+<span class="sd">        :type controlFileBlock: dict</span>
+
+<span class="sd">        :returns: bool -- Wheter and error has been found in a block</span>
+<span class="sd">            block</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">isCorrect</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">blockType</span> <span class="o">=</span> <span class="n">controlFileBlock</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
     <span class="c1"># Check if type selected is valid</span>
@@ -268,6 +290,20 @@
 
 
 <div class="viewcode-block" id="validateGeneralBlock"><a class="viewcode-back" href="../../../AdaptivePELE.validator.html#AdaptivePELE.validator.controlFileValidator.validateGeneralBlock">[docs]</a><span class="k">def</span> <span class="nf">validateGeneralBlock</span><span class="p">(</span><span class="n">blockName</span><span class="p">,</span> <span class="n">controlFileBlock</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate the generalParams block of the control file to ensure that</span>
+<span class="sd">        there are no errors. Raise a warning if an error is found.</span>
+
+<span class="sd">        :param blockName: Dictionary containing the parameters and possible</span>
+<span class="sd">            types for the block</span>
+<span class="sd">        :type blockName: dict</span>
+<span class="sd">        :param controlFileBlock: Dictionary containing the parameters specified</span>
+<span class="sd">         in the control file for the block</span>
+<span class="sd">        :type controlFileBlock: dict</span>
+
+<span class="sd">        :returns: bool -- Wheter and error has been found in the generalParams</span>
+<span class="sd">            block</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">isCorrect</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">blockName</span><span class="o">.</span><span class="n">mandatory</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
         <span class="k">try</span><span class="p">:</span>

@@ -150,7 +150,21 @@
 
 
 <div class="viewcode-block" id="return_sign"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.return_sign">[docs]</a><span class="k">def</span> <span class="nf">return_sign</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Helper function, creates a three-piece step function&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function, creates a three-piece step function</span>
+
+<span class="sd">        :param i: Value to compare</span>
+<span class="sd">        :type i: int</span>
+<span class="sd">        :param m: Middle value</span>
+<span class="sd">        :type m: int</span>
+<span class="sd">        :param n: Left extreme value</span>
+<span class="sd">        :type n: int</span>
+<span class="sd">        :param r: Right extreme value</span>
+<span class="sd">        :type r: int</span>
+
+<span class="sd">        :returns: int -- Three-piece sign</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="o">-</span><span class="n">m</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">1</span>
     <span class="k">elif</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">r</span><span class="p">:</span>
@@ -160,7 +174,16 @@
 
 
 <div class="viewcode-block" id="calculateContactsVar"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.calculateContactsVar">[docs]</a><span class="k">def</span> <span class="nf">calculateContactsVar</span><span class="p">(</span><span class="n">deltaR</span><span class="p">,</span> <span class="n">epsMax</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the variation of epsilon according to the contact ratio</span>
+
+<span class="sd">        :param deltaR: Change in contact ratio</span>
+<span class="sd">        :type deltaR: float</span>
+<span class="sd">        :param epsMax: Maximum value of epsilon</span>
+<span class="sd">        :type epsMax: float</span>
+
+<span class="sd">        :returns: float -- Epsilon variation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">deltaR</span> <span class="o">&lt;</span> <span class="mf">0.1</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">0</span>
     <span class="k">elif</span> <span class="n">deltaR</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
@@ -172,6 +195,17 @@
 <div class="viewcode-block" id="SpawningAlgorithmBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningAlgorithmBuilder">[docs]</a><span class="k">class</span> <span class="nc">SpawningAlgorithmBuilder</span><span class="p">:</span>
 
 <div class="viewcode-block" id="SpawningAlgorithmBuilder.build"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningAlgorithmBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spawningBlock</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Build the selected spawning calculator and spawning params objects</span>
+
+<span class="sd">            :param spawningBlock: Block of the control file with the spawning</span>
+<span class="sd">                parameters</span>
+<span class="sd">            :type spawningBlock: dict</span>
+
+<span class="sd">            :returns: :py:class:`.SpawningCalculator`,</span>
+<span class="sd">                :py:class:`.SpawningParams` -- SpawningCalculator and</span>
+<span class="sd">                SpawningParams objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spawningCalculatorBuilder</span> <span class="o">=</span> <span class="n">SpawningBuilder</span><span class="p">()</span>
         <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">spawningCalculatorBuilder</span><span class="o">.</span><span class="n">buildSpawningCalculator</span><span class="p">(</span><span class="n">spawningBlock</span><span class="p">)</span>
 
@@ -184,7 +218,16 @@
 <div class="viewcode-block" id="SpawningBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningBuilder">[docs]</a><span class="k">class</span> <span class="nc">SpawningBuilder</span><span class="p">:</span>
 
 <div class="viewcode-block" id="SpawningBuilder.buildSpawningCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningBuilder.buildSpawningCalculator">[docs]</a>    <span class="k">def</span> <span class="nf">buildSpawningCalculator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spawningBlock</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Build the selected spawning calculator object</span>
 
+<span class="sd">            :param spawningBlock: Block of the control file with the spawning</span>
+<span class="sd">                parameters</span>
+<span class="sd">            :type spawningBlock: dict</span>
+
+<span class="sd">            :returns: :py:class:`.SpawningCalculator` -- SpawningCalculator</span>
+<span class="sd">                object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">densityBuilder</span> <span class="o">=</span> <span class="n">densitycalculator</span><span class="o">.</span><span class="n">DensityCalculatorBuilder</span><span class="p">()</span>
         <span class="n">densityCalculator</span> <span class="o">=</span> <span class="n">densityBuilder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">spawningBlock</span><span class="p">)</span>
 
@@ -227,6 +270,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nclusters</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1">#number of clusters to consider in epsilon</span>
 
 <div class="viewcode-block" id="SpawningParams.buildSpawningParameters"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams.buildSpawningParameters">[docs]</a>    <span class="k">def</span> <span class="nf">buildSpawningParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spawningBlock</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Build the selected spawning params objects</span>
+
+<span class="sd">            :param spawningBlock: Block of the control file with the spawning</span>
+<span class="sd">                parameters</span>
+<span class="sd">            :type spawningBlock: dict</span>
+
+<span class="sd">            :returns: :py:class:`.SpawningParams` -- SpawningParams object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spawningParamsBlock</span> <span class="o">=</span> <span class="n">spawningBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
         <span class="n">spawningType</span> <span class="o">=</span> <span class="n">spawningBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
 
@@ -280,16 +332,27 @@
 
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="SpawningCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Log spawning information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="SpawningCalculator.writeSpawningInitialStructures"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures">[docs]</a>    <span class="k">def</span> <span class="nf">writeSpawningInitialStructures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span><span class="p">,</span> <span class="n">clustering</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write initial structures for the next iteration</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Write initial structures for the next iteration</span>
 
-<span class="sd">            outputPathConstants [In] Output constants that depend on the path</span>
-<span class="sd">            degeneracyOfRepresentatives [In] Array with the degeneracy of each</span>
-<span class="sd">            cluster (i.e the number of processors that will be assigned to it)</span>
-<span class="sd">            clustering [In] clustering object</span>
-<span class="sd">            iteration [In] Number of epoch</span>
+<span class="sd">            :param outputPathConstants: Output constants that depend on the path</span>
+<span class="sd">            :type outputPathConstants: :py:class:`.OutputPathConstants`</span>
+<span class="sd">            :param degeneracyOfRepresentatives: Array with the degeneracy of</span>
+<span class="sd">                each cluster (number of processors that will start from that state)</span>
+<span class="sd">            :type degeneracyOfRepresentatives: np.Array</span>
+<span class="sd">            :param clustering: Clustering object</span>
+<span class="sd">            :type clustering: :py:class:`.Clustering`</span>
+<span class="sd">            :param iteration: Number of epoch</span>
+<span class="sd">            :type iteration: int</span>
+
+<span class="sd">            :returns: int, list -- number of processors, list with the</span>
+<span class="sd">                snapshot from which the trajectories will start in the next iteration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">tmpInitialStructuresTemplate</span> <span class="o">=</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span>
         <span class="n">counts</span> <span class="o">=</span> <span class="mi">0</span>
@@ -307,7 +370,16 @@
 
 <div class="viewcode-block" id="SpawningCalculator.divideTrajAccordingToWeights"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.divideTrajAccordingToWeights">[docs]</a>    <span class="k">def</span> <span class="nf">divideTrajAccordingToWeights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            weights must be normalized (i.e. sum(weights) = 1)</span>
+<span class="sd">            Distribute the trajectories among the clusters according to their</span>
+<span class="sd">            weight. Weights must be normalized (i.e. sum(weights) = 1)</span>
+
+<span class="sd">            :param weights: Weight of each cluster</span>
+<span class="sd">            :type weights: np.Array</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+
+<span class="sd">            :returns: list -- List with the number of processors allocated to</span>
+<span class="sd">                each cluster</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">degeneracy</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">weights</span><span class="p">):</span>
@@ -327,7 +399,16 @@
 
 <div class="viewcode-block" id="SpawningCalculator.divideProportionalToArray"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.divideProportionalToArray">[docs]</a>    <span class="k">def</span> <span class="nf">divideProportionalToArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Divides &quot;trajToDistribute&quot; proportionally to the values in &quot;array&quot;</span>
+<span class="sd">            Distribute the trajectories among the clusters according to the</span>
+<span class="sd">            values of an array.</span>
+
+<span class="sd">            :param Array: Weight of each cluster</span>
+<span class="sd">            :type Array: np.Array</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+
+<span class="sd">            :returns: list -- List with the number of processors allocated to</span>
+<span class="sd">                each cluster</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span> <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="n">array</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
@@ -335,7 +416,16 @@
 
 <div class="viewcode-block" id="SpawningCalculator.divideInverselyProportionalToArray"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.divideInverselyProportionalToArray">[docs]</a>    <span class="k">def</span> <span class="nf">divideInverselyProportionalToArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Divides &quot;trajToDistribute&quot; inversely proportional to the values in &quot;array&quot;</span>
+<span class="sd">            Distribute the trajectories among the clusters inversely proportional</span>
+<span class="sd">            to the values of an array.</span>
+
+<span class="sd">            :param Array: Weight of each cluster</span>
+<span class="sd">            :type Array: np.Array</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+
+<span class="sd">            :returns: list -- List with the number of processors allocated to</span>
+<span class="sd">                each cluster</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span> <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="n">array</span>
@@ -352,12 +442,28 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">divideTrajAccordingToWeights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpawningCalculator.getMetrics"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.getMetrics">[docs]</a>    <span class="k">def</span> <span class="nf">getMetrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get the metric of the clusters</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+
+<span class="sd">            :returns: np.Array -- Array containing the metric of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clusters</span><span class="p">):</span>
             <span class="n">metrics</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">getMetric</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">metrics</span></div>
 
 <div class="viewcode-block" id="SpawningCalculator.getSizes"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.getSizes">[docs]</a>    <span class="k">def</span> <span class="nf">getSizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get the size of the clusters</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+
+<span class="sd">            :returns: np.Array -- Array containing the size of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clusters</span><span class="p">):</span>
             <span class="n">sizes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">elements</span>
@@ -375,6 +481,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">densityCalculator</span> <span class="o">=</span> <span class="n">densityCalculator</span>
 
 <div class="viewcode-block" id="DensitySpawningCalculator.calculateDensities"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.DensitySpawningCalculator.calculateDensities">[docs]</a>    <span class="k">def</span> <span class="nf">calculateDensities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the densities of the clusters</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+
+<span class="sd">            :returns: np.Array -- Array containing the density of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">densities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clusters</span><span class="p">):</span>
             <span class="n">contacts</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">getContacts</span><span class="p">()</span>
@@ -390,20 +504,46 @@
 
 <div class="viewcode-block" id="IndependentRunsCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.IndependentRunsCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span>
                   <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the degeneracy of the clusters</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+
+<span class="sd">            :returns: list -- List containing the degeneracy of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculator</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IndependentRunsCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.IndependentRunsCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Log spawning information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="IndependentRunsCalculator.writeSpawningInitialStructures"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures">[docs]</a>    <span class="k">def</span> <span class="nf">writeSpawningInitialStructures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span><span class="p">,</span> <span class="n">clustering</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write last trajectory structure as initial one for the next iteration</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Write last trajectory structure as initial one for the next iteration</span>
 
-<span class="sd">            outputPathConstants [In] Output constants that depend on the path</span>
-<span class="sd">            degeneracyOfRepresentatives [In] Array with the degeneracy of each</span>
-<span class="sd">            cluster (i.e the number of processors that will be assigned to it)</span>
-<span class="sd">            clustering [In] clustering object</span>
-<span class="sd">            iteration [In] Number of epoch</span>
+<span class="sd">            :param outputPathConstants: Output constants that depend on the path</span>
+<span class="sd">            :type outputPathConstants: :py:class:`.OutputPathConstants`</span>
+<span class="sd">            :param degeneracyOfRepresentatives: Array with the degeneracy of</span>
+<span class="sd">                each cluster (number of processors that will start from that state)</span>
+<span class="sd">            :type degeneracyOfRepresentatives: np.Array</span>
+<span class="sd">            :param clustering: Clustering object</span>
+<span class="sd">            :type clustering: :py:class:`.Clustering`</span>
+<span class="sd">            :param iteration: Number of epoch</span>
+<span class="sd">            :type iteration: int</span>
+
+<span class="sd">            :returns: int, list -- number of processors, list with the</span>
+<span class="sd">                snapshot from which the trajectories will start in the next iteration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: Add processors mapping</span>
         <span class="n">trajWildcard</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">trajectoryBasename</span><span class="p">)</span>
         <span class="n">trajectories</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">trajWildcard</span><span class="o">%</span><span class="p">(</span><span class="n">iteration</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">trajectory</span> <span class="ow">in</span> <span class="n">trajectories</span><span class="p">:</span>
@@ -429,7 +569,19 @@
 <div class="viewcode-block" id="SameWeightDegeneracyCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span>
                   <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the degeneracy of the clusters</span>
 <span class="sd">            We back on PELE to split equal trajectories</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+
+<span class="sd">            :returns: list -- List containing the degeneracy of the clusters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">numClusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
         <span class="n">trajToDistribute</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">numClusters</span><span class="p">)</span>
@@ -440,6 +592,9 @@
         <span class="k">return</span> <span class="n">degeneracy</span></div>
 
 <div class="viewcode-block" id="SameWeightDegeneracyCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Log spawning information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
 
 
@@ -450,9 +605,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">inverselyProportional</span>
 
 <div class="viewcode-block" id="InverselyProportionalToPopulationCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Log spawning information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="InverselyProportionalToPopulationCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the degeneracy of the clusters</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+
+<span class="sd">            :returns: list -- List containing the degeneracy of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sizes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSizes</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
         <span class="n">densities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculateDensities</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
 
@@ -483,6 +655,9 @@
 
     <span class="c1"># TODO add possibility for different pipes</span>
 <div class="viewcode-block" id="EpsilonDegeneracyCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Log spawning information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">degeneracyTotal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">print</span> <span class="s2">&quot;[SpawningLog] Total: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degeneracyTotal</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">degeneracyInverselyProportional</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -491,6 +666,20 @@
             <span class="nb">print</span> <span class="s2">&quot;[SpawningLog] Metric prop:    </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degeneracyMetricProportional</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EpsilonDegeneracyCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the degeneracy of the clusters</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+
+<span class="sd">            :returns: list -- List containing the degeneracy of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">trajToMetricProportional</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">spawningParams</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">*</span> <span class="n">trajToDistribute</span><span class="p">)</span>
         <span class="n">trajToInverselyProportional</span> <span class="o">=</span> <span class="n">trajToDistribute</span> <span class="o">-</span> <span class="n">trajToMetricProportional</span>
 
@@ -501,6 +690,20 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">degeneracyTotal</span></div>
 
 <div class="viewcode-block" id="EpsilonDegeneracyCalculator.divideProcessorsMetricProportional"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.divideProcessorsMetricProportional">[docs]</a>    <span class="k">def</span> <span class="nf">divideProcessorsMetricProportional</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Distribute the trajectories among the clusters according to their</span>
+<span class="sd">            metric.</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param weights: Weight of each cluster</span>
+<span class="sd">            :type weights: np.Array</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+
+<span class="sd">            :returns: list -- List with the number of processors allocated to</span>
+<span class="sd">                each cluster</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMetrics</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
 
@@ -558,6 +761,14 @@
         <span class="n">epsilon_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 <div class="viewcode-block" id="VariableEpsilonDegeneracyCalculator.linearVariation"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.linearVariation">[docs]</a>    <span class="k">def</span> <span class="nf">linearVariation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate linear variation of epsilon with respect to the iteraetion</span>
+
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">currentEpoch</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">spawningParams</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="n">spawningParams</span><span class="o">.</span><span class="n">minEpsilon</span>
             <span class="k">return</span>
@@ -573,6 +784,14 @@
                                                 <span class="n">middleWindow</span><span class="p">,</span> <span class="n">rightWindow</span><span class="p">)</span> <span class="o">*</span> <span class="n">rateEpsilonVariation</span><span class="p">[</span><span class="n">currentEpoch</span> <span class="o">&gt;</span> <span class="n">middleWindow</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="VariableEpsilonDegeneracyCalculator.contactsVariation"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.contactsVariation">[docs]</a>    <span class="k">def</span> <span class="nf">contactsVariation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the variation of epsilon according to the contacts ratio</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxContacts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">maxContacts</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="nb">max</span><span class="p">,</span> <span class="p">[</span><span class="n">cluster</span><span class="o">.</span><span class="n">contacts</span> <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">])</span>
         <span class="n">maxContacts</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="nb">max</span><span class="p">,</span> <span class="p">[</span><span class="n">cluster</span><span class="o">.</span><span class="n">contacts</span> <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">])</span>
@@ -581,6 +800,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">maxContacts</span> <span class="o">=</span> <span class="n">maxContacts</span></div>
 
 <div class="viewcode-block" id="VariableEpsilonDegeneracyCalculator.calculateEpsilonValue"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculateEpsilonValue">[docs]</a>    <span class="k">def</span> <span class="nf">calculateEpsilonValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="p">,</span> <span class="n">clusters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate variation of epsilon according to the selected parameters</span>
+
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">spawningParams</span><span class="o">.</span><span class="n">varEpsilonType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">VariableEpsilonTypes</span><span class="o">.</span><span class="n">linearVariation</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">currentEpoch</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">spawningParams</span><span class="o">.</span><span class="n">variationWindow</span> <span class="o">&lt;</span> <span class="n">currentEpoch</span><span class="p">:</span>
                 <span class="n">spawningParams</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="n">spawningParams</span><span class="o">.</span><span class="n">minEpsilon</span>
@@ -594,11 +823,28 @@
                      <span class="nb">str</span><span class="p">(</span><span class="n">spawningTypes</span><span class="o">.</span><span class="n">EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div>
 
 <div class="viewcode-block" id="VariableEpsilonDegeneracyCalculator.logVariableEpsilon"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.logVariableEpsilon">[docs]</a>    <span class="k">def</span> <span class="nf">logVariableEpsilon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Log spawning information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">epsilon_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;epsilon_values.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
         <span class="n">epsilon_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">))</span>
         <span class="n">epsilon_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="VariableEpsilonDegeneracyCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the degeneracy of the clusters</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+
+<span class="sd">            :returns: list -- List containing the degeneracy of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">calculateEpsilonValue</span><span class="p">(</span><span class="n">spawningParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="p">,</span> <span class="n">clusters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logVariableEpsilon</span><span class="p">(</span><span class="n">spawningParams</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilonDegeneracyCalculator</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="p">)</span></div></div>
@@ -611,6 +857,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">simulatedAnnealing</span>
 
 <div class="viewcode-block" id="SimulatedAnnealingCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Log spawning information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="SimulatedAnnealingCalculator.computeTemperature"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator.computeTemperature">[docs]</a>    <span class="k">def</span> <span class="nf">computeTemperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
@@ -622,7 +871,20 @@
 
 <div class="viewcode-block" id="SimulatedAnnealingCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span>
                   <span class="n">currentEpoch</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the degeneracy of the clusters</span>
 
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+
+<span class="sd">            :returns: list -- List containing the degeneracy of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMetrics</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
 
         <span class="n">minimumValue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
@@ -668,6 +930,20 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">normaliseArray</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FASTDegeneracyCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDivide</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the degeneracy of the clusters</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+
+<span class="sd">            :returns: list -- List containing the degeneracy of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">normalisedSizes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculateNormalisedSizes</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
         <span class="n">normalisedMetrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculateNormalisedMetrics</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
 
@@ -676,6 +952,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">divideProportionalToArray</span><span class="p">(</span><span class="n">weight</span><span class="p">,</span> <span class="n">trajToDivide</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FASTDegeneracyCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Log spawning information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
 
 
@@ -691,9 +970,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
 
 <div class="viewcode-block" id="UCBCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.UCBCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Log spawning information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="UCBCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.UCBCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the degeneracy of the clusters</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+
+<span class="sd">            :returns: list -- List containing the degeneracy of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getSizes</span><span class="p">(</span><span class="n">clusters</span><span class="p">))</span>
         <span class="n">densities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculateDensities</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
