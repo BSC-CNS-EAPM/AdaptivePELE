@@ -41,8 +41,8 @@ def getShortestPath(clustering, numClusters=5):
         return shortPath[-1:-numClusters-1:-1]
 
 def getMetastableClusters(clustering, numClusters=5):
-    betweenness = nx.betweenness_centrality(clustering.conformationNetwork, weight='transition')
-    conf = clustering.conformationNetwork
+    conf = clustering.conformationNetwork.network
+    betweenness = nx.betweenness_centrality(conf, weight='transition')
     b2 = np.array([betweenness[i] for i in xrange(len(betweenness))])
     thresholds = [cluster.threshold for cluster in clustering.clusters.clusters]
     metInd = np.zeros_like(thresholds, dtype=np.float)
@@ -70,12 +70,13 @@ def getMetastableClusters(clustering, numClusters=5):
     return np.argsort(finalMetInd)[-1:-numClusters-1:-1]
 
 def getMetastableClusters2(clustering, numClusters=5):
-    betweenness = nx.betweenness_centrality(clustering.conformationNetwork, weight='transition')
+    conf = clustering.conformationNetwork.network
+    betweenness = nx.betweenness_centrality(conf, weight='transition')
     b2 = np.array([betweenness[i] for i in xrange(len(betweenness))])
     return np.argsort(b2)[-1:-numClusters-1:-1]
 
 def getMetastableClusters5(clustering, numClusters=5):
-    conf = clustering.conformationNetwork
+    conf = clustering.conformationNetwork.network
     thresholds = [cluster.threshold for cluster in clustering.clusters.clusters]
     minThres = min(thresholds)
     volume = np.zeros(len(thresholds))
@@ -89,7 +90,7 @@ def getMetastableClusters5(clustering, numClusters=5):
     return np.argsort(volume)[:numClusters+1]
 
 def getMetastableClusters4(clustering, numClusters=5):
-    conf = clustering.conformationNetwork
+    conf = clustering.conformationNetwork.network
     metrics = [cluster.getMetricFromColumn(4) for cluster in clustering.clusters.clusters]
     indexes = np.zeros_like(metrics)
     outInd = np.zeros_like(metrics)
@@ -120,8 +121,7 @@ def getMetastableClusters4(clustering, numClusters=5):
 
 
 def getMetastableClusters3(clustering, numClusters=5):
-    betweenness = nx.betweenness_centrality(clustering.conformationNetwork, weight='transition')
-    conf = clustering.conformationNetwork
+    conf = clustering.conformationNetwork.network
     thresholds = [cluster.threshold for cluster in clustering.clusters.clusters]
     metInd = np.zeros_like(thresholds, dtype=np.float)
     for node in conf.nodes_iter():
@@ -211,11 +211,11 @@ densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
 #    }
 # )
 densityCalculator = densityCalculatorBuilder.build({})
-# densityCalculator = densityCalculatorBuilder.build({
-#     "density": {
-#         "type": "continuous"
-#     }
-# })
+densityCalculator = densityCalculatorBuilder.build({
+    "density": {
+        "type": "continuous"
+    }
+})
 spawnParams = spawning.SpawningParams()
 spawnParams.buildSpawningParameters({
     "type": "inverselyProportional",
@@ -226,14 +226,23 @@ spawnParams.buildSpawningParameters({
         "metricColumnInReport": 5
         }
     })
+spawnParams.buildSpawningParameters({
+    "type": "epsilon",
+    "params": {
+        "epsilon": 0.0,
+        "T": 1000,
+        "reportFilename": "report",
+        "metricColumnInReport": 4
+        }
+    })
 contactThresholdDistance = 8
-resname = "AEN"
-nEpochs = 24
+resname = "DAJ"
+nEpochs = 21
 altSel = False
-ntrajs = 51
+ntrajs = 32
 ClCont = clustering.ContactsClustering(thresholdCalculator, resname=resname,
                                        reportBaseFilename="report",
-                                       columnOfReportFile=5,
+                                       columnOfReportFile=4,
                                        contactThresholdDistance=contactThresholdDistance,
                                        symmetries=[], altSelection=altSel)
 ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
@@ -243,19 +252,19 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
                                                     columnOfReportFile=4,
                                                     contactThresholdDistance=contactThresholdDistance,
                                                     altSelection=altSel)
-spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
+# spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 # spawningObject = spawning.UCBCalculator(densityCalculator)
-# spawningObject = spawning.EpsilonDegeneracyCalculator(densityCalculator)
+spawningObject = spawning.EpsilonDegeneracyCalculator(densityCalculator)
 # ClAcc.clusterInitialStructures(["/home/jgilaber/PR/PR_prog_initial_adaptive.pdb"])
 # ClCont.clusterInitialStructures(["/home/jgilaber/4DAJ/4DAJ_initial_adaptive.pdb"])
 # processorMapping = [0 for i in xrange(ntrajs-1)]
-# if not os.path.exists("mappings"):
-#     os.makedirs("mappings")
-# if not os.path.exists("results"):
-#     os.makedirs("results")
+if not os.path.exists("mappings"):
+    os.makedirs("mappings")
+if not os.path.exists("results"):
+    os.makedirs("results")
 # fw = open("clusters.txt", "w")
 # fw2 = open("clustersBet.txt", "w")
-# fw3 = open("clustersInd.txt", "w")
+fw3 = open("clustersInd.txt", "w")
 # fw4 = open("clustersIndNew.txt", "w")
 # fw5 = open("clustersVol.txt", "w")
 # fw6 = open("clustersVisit.txt", "w")
@@ -268,8 +277,8 @@ for i in range(nEpochs):
     # paths_report = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/report*"%i]
     # path = ["/home/jgilaber/PR/PR_simulation_network/%d/traj*"%i]
     # paths_report = ["/home/jgilaber/PR/PR_simulation_network/%d/report*"%i]
-    path = ["/home/jgilaber/debugPathReconst/%d/traj*"%i]
-    paths_report = ["/home/jgilaber/debugPathReconst/%d/report*"%i]
+    path = ["/home/jgilaber/4DAJ/4DAJ_4_32/%d/traj*"%i]
+    paths_report = ["/home/jgilaber/4DAJ/4DAJ_4_32/%d/report*"%i]
     trajs = clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:
@@ -283,25 +292,27 @@ for i in range(nEpochs):
     endTimeCont = time.time()
     sys.stderr.write("Total time of clustering contacts, epoch %d: %.6f\n"%(i,endTimeCont-startTimeCont))
     sys.stderr.write("Number of clusters contacts epoch %d: %d\n"%(i,len(ClCont.clusters.clusters)))
-    degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, ntrajs-1, spawnParams)
+    invTrajs = (ntrajs - 1)/2
+    centTrajs = ntrajs - 1- invTrajs
+    degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, invTrajs, spawnParams)
     nProc = 0
     clusterList = []
-    for icl in xrange(len(ClCont.clusters.clusters)):
-        for j in range(int(degeneraciesCont[icl])):
-            clusterList.append(ClCont.clusters.clusters[icl].trajPosition)
-            nProc += 1
-    assert nProc == ntrajs-1
-    processorMapping = clusterList[1:]+[clusterList[0]]
-    with open("%d/processorMapping.txt"%(i+1), "w") as f:
-        f.write(':'.join(map(str, processorMapping)))
+    # for icl in xrange(len(ClCont.clusters.clusters)):
+    #     for j in range(int(degeneraciesCont[icl])):
+    #         clusterList.append(ClCont.clusters.clusters[icl].trajPosition)
+    #         nProc += 1
+    # assert nProc == ntrajs-1
+    # processorMapping = clusterList[1:]+[clusterList[0]]
+    # with open("%d/processorMapping.txt"%(i+1), "w") as f:
+    #     f.write(':'.join(map(str, processorMapping)))
     ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
     os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
-    # sortedNodes = getMetastableClusters(ClCont, 10)
-    # sortedNodes = set(sortedNodes)
-    # print sortedNodes
-    # for node in sortedNodes:
-    #     cluster = ClCont.getCluster(node)
-    #     fw.write("%d\t%.3f\n" % (i*4, cluster.getMetricFromColumn(4)))
+    sortedNodes = getMetastableClusters2(ClCont, centTrajs)
+    sortedNodes = set(sortedNodes).union(set([num for num, cl in enumerate(degeneraciesCont) if cl]))
+    print sortedNodes
+    for node in sortedNodes:
+        cluster = ClCont.getCluster(node)
+        fw3.write("%d\t%.3f\n" % (i*4, cluster.getMetricFromColumn(4)))
 
     # startTimeAcc = time.time()
     # ClAcc.cluster(path, processorMapping)

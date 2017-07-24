@@ -213,9 +213,9 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
         fw.write("Number of clusters %d\n" % parameters.nclusters)
         fw.write("\n")
         fw.write("=====\n")
-        fw.write("dG")
+        fw.write("dG\n")
         for el in deltaGs:
-            fw.write("%.3f\n" % el)
+            fw.write("%s\n" % el)
         fw.write("=====\n")
         fw.write("Asymmetric fluxes (see D.Lecina PhD thesis for more info)\n")
         for el in detailedBalance:
