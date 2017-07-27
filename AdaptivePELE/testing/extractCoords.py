@@ -136,16 +136,17 @@ def parseResname(atomIds, resname):
             sys.exit("Residue name in resname and atomId do not match!")
     return resname
 
-def buildFullTrajectory(steps, trajectory, totalSteps):
+def buildFullTrajectory(steps, trajectory, totalSteps, inputTrajectory):
     completeTrajectory = []
     counter = 0
     if len(trajectory) > 0:
         sthWrongInTraj = False
+        print inputTrajectory
         for i in range(len(trajectory) - 1):
             try:
                 repeated = steps[i+1] - steps[i]
-            except:
-                print "sth wrong in trajectory %s. Please, fix it manually"%inputTrajectory
+            except IndexError:
+                print "sth wrong in trajectory %s. This is likely to disagreement between report and trajecotry files. Please, fix it manually"%inputTrajectory
                 sthWrongInTraj = True
                 break
 
@@ -190,7 +191,7 @@ def repeatExtractedSnapshotsInTrajectory(inputTrajectory, constants):
 
     acceptedSteps = np.loadtxt(reportFile, dtype='int', comments='#', usecols=(1,))
 
-    fullTrajectory = buildFullTrajectory(acceptedSteps, trajectory, totalSteps)
+    fullTrajectory = buildFullTrajectory(acceptedSteps, trajectory, totalSteps, inputTrajectory)
 
     if len(fullTrajectory) > 0:
         outputFilename = os.path.join(constants.outputTrajectoryFolder%origDataFolder, constants.baseExtractedTrajectoryName + trajectoryNumber + '.dat')

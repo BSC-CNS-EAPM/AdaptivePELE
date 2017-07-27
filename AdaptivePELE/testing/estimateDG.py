@@ -208,6 +208,21 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
     __printList(detailedBalance, "Asymmetric fluxes (see D.Lecina PhD thesis for more info)")
     meanDB, stdDB = __getMeanAndStdFromList(detailedBalance) #DB from detailed balance
     print "Asymmetric flux = %f +- %f"%(meanDB, stdDB)
+    with open("results_summary.txt", "w") as fw:
+        fw.write("Lagtime %d\n" % parameters.lagtime)
+        fw.write("Number of clusters %d\n" % parameters.nclusters)
+        fw.write("\n")
+        fw.write("=====\n")
+        fw.write("dG\n")
+        for el in deltaGs:
+            fw.write("%s\n" % el)
+        fw.write("=====\n")
+        fw.write("Asymmetric fluxes (see D.Lecina PhD thesis for more info)\n")
+        for el in detailedBalance:
+            fw.write("%.3f\n" % el)
+        fw.write("\n")
+        fw.write("dG = %f +- %f\n"%(meanDG, stdDG))
+        fw.write("Asymmetric flux = %f +- %f\n"%(meanDB, stdDB))
 
     return meanDG, stdDG, meanDB, stdDB
 
@@ -215,8 +230,8 @@ if __name__ == "__main__":
     parameters = Parameters(ntrajs=None,
                             length=None,
                             lagtime=250,
-                            nclusters=100,
-                            nruns=5,
+                            nclusters=400,
+                            nruns=10,
                             skipFirstSteps = 0,
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,
