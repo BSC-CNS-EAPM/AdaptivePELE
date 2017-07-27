@@ -45,7 +45,7 @@ def computeCountsAndCountMatrix(trajectories, numberOfClusters, lagtime=1):
     populations = numpy.zeros(numberOfClusters)
 
     for trajectoryFilename in trajectories:
-        dtraj = np.loadtxt(trajectoryFilename, dtype=int)
+        dtraj = np.loadtxt(trajectoryFilename, dtype=int, ndmin=1)
         #can be done much faster with sparse matrices (see runMarkovChain script)
         for i in range(len(dtraj) - lagtime):
             fromCluster = dtraj[i]
