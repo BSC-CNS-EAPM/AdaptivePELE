@@ -33,7 +33,17 @@ class MSM:
         self.lagtimes = lagtimes
         self.numberOfITS = numberOfITS
         print "LAGTIME", self.lagtime
-        self.lagtime = self._calculateITS() #keep calculating until convergence is reached
+        try:
+            self.lagtime = self._calculateITS() #keep calculating until convergence is reached
+        except Exception as err:
+            #FIXME: Add proper error handling and not a broad exception, this
+            # error should happen only when running in the MN computing queues
+            # as they don't have an active X window (I guess?)
+            if "connect to display" in err.message:
+                print "ITS plots not saved because of MN error"
+                pass
+            else:
+                raise err
         print "Using lagtime = ", self.lagtime
         self.buildMSM()
         np.savetxt(self.stationaryDistributionFilename, self.MSM_object.pi)
