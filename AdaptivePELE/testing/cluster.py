@@ -104,7 +104,7 @@ def loadTrajFiles(trajectoryFolder, trajectory_basename):
     files = glob.glob(trajectoryBasename)
     x = len(files)*[0]
     for i, file in enumerate(files):
-        currentX = np.loadtxt(file)[:,1:]
+        currentX = np.loadtxt(file, ndmin=2)[:,1:]
         x[i] = currentX
     if not x:
         raise ValueError("Didn't find any trajectory files in the specified path!!!")

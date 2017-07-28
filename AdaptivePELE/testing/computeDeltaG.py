@@ -105,7 +105,7 @@ def main(trajWildcard, reweightingT=1000):
 
     originalCoordinates = []
     for i, originalFilename in enumerate(originalFilenames):
-        trajOriginalCoordinates = list(np.loadtxt(originalFilename)[:,1:])
+        trajOriginalCoordinates = list(np.loadtxt(originalFilename, ndmin=2)[:,1:])
         if np.random.random() < 0.0:
             # Add artificial points nearby to improve volume estimation, set
             # randomly since its very slow
