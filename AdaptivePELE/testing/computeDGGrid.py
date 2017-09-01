@@ -63,7 +63,7 @@ def main():
     dlengths = 200
     lengths = range(ilengths, flengths, dlengths)
     itrajs = 32-1
-    ftrajs = 255
+    ftrajs = 1008
     dtrajs = 32
     ntrajs = range(itrajs, ftrajs, dtrajs)
     nruns = 10
