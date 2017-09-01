@@ -107,7 +107,7 @@ def main():
     plt.imshow(results, interpolation="bilinear", origin="lower", aspect="auto", extent=extent)
     plt.colorbar()
     plt.savefig("dgGrid_1008_4000_finer.png")
-    # plt.show()
+    plt.show()
 
 
 if __name__ == "__main__":

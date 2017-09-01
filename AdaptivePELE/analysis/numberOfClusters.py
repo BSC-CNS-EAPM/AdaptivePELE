@@ -3,6 +3,8 @@ machine = socket.gethostname()
 import matplotlib
 if machine == "bsccv03":
    matplotlib.use('wxagg')
+elif 'login' in machine:
+    matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -267,7 +269,6 @@ def main():
     plotContactsHistogram(folder, templetizedClusteringSummaryFile)
     if filename != "":
         plt.savefig("%s_hist.png" % filename)
-
     plt.show()
 
 if __name__ == "__main__":
