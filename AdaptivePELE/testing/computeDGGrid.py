@@ -53,7 +53,7 @@ def plotIsocostLines(extent, minCost, maxCost, steps=10):
         plt.plot(x,y, color="black")
 
 def main():
-    #plt.style.use('ggplot')
+    plt.style.use('ggplot')
 
     lagtime = 100
     clusters = 100
@@ -101,10 +101,12 @@ def main():
     plt.imshow(results, interpolation="nearest", origin="lower", aspect="auto", extent=extent)
     #plt.imshow(results, interpolation="nearest", origin="lower", aspect="auto", extent=extent, vmin=-7, vmax=-5)
     plt.colorbar()
+    plt.savefig("dgGrid_1008_4000_rough.png")
     plt.figure(2)
     plotIsocostLines(extent, (ilengths+dlengths)*(itrajs+dtrajs), (flengths-dlengths)*(ftrajs-dtrajs), 6)
     plt.imshow(results, interpolation="bilinear", origin="lower", aspect="auto", extent=extent)
     plt.colorbar()
+    plt.savefig("dgGrid_1008_4000_finer.png")
     plt.show()
 
 

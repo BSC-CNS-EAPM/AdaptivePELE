@@ -18,7 +18,7 @@ def parseArguments():
     parser.add_argument("-f", default='discretized', help="Folder with cluster contents")
     parser.add_argument("-t", "--threshold", default=0, type=float, help="If Cij < threshold and Cji < threshold, Cij = Cji = 0")
     parser.add_argument("-l", "--lagtime", default=1, type=int, help="Lagtime")
-    parser.add_argument("-p", "--printFigs", action=store_true)
+    parser.add_argument("-p", "--printFigs", action="store_true")
     args = parser.parse_args()
 
     return args.f, args.threshold, args.lagtime, args.printFigs
@@ -45,7 +45,7 @@ def computeCountsAndCountMatrix(trajectories, numberOfClusters, lagtime=1):
     populations = numpy.zeros(numberOfClusters)
 
     for trajectoryFilename in trajectories:
-        dtraj = np.loadtxt(trajectoryFilename, dtype=int)
+        dtraj = np.loadtxt(trajectoryFilename, dtype=int, ndmin=1)
         #can be done much faster with sparse matrices (see runMarkovChain script)
         for i in range(len(dtraj) - lagtime):
             fromCluster = dtraj[i]
@@ -190,10 +190,10 @@ def main(folder, countsThreshold, lagtime, printFigs=False):
     maskedDetailedbalanceComponentsRelativeDifference = numpy.ma.array(detailedbalanceComponentsRelativeDifference, mask = numpy.isnan(detailedbalanceComponentsRelativeDifference))
 
     if printFigs:
-        plotMatrix(4, r'$|\pi_i P_{ij} - \pi_j P_{ji}|$', detailedBalanceComponentsAbsoluteDifference,cmap)
-        #plt.savefig("db_abs_diff.eps")
-        plotMatrix(5, r'$|\pi_i P_{ij} - \pi_j P_{ji}|/ (2\langle \pi_i P_{ij} \rangle)$', maskedDetailedbalanceComponentsRelativeDifference, cmap)
-        #plt.savefig("db_frobenius.eps")
+        plotMatrix(4, r'$|F_{ij} - F_{ji}|$', detailedBalanceComponentsAbsoluteDifference,cmap)
+        plt.savefig("db_abs_diff.eps")
+        plotMatrix(5, r'$M(F)$', maskedDetailedbalanceComponentsRelativeDifference, cmap)
+        plt.savefig("db_frobenius.eps")
 
     return frobeniusAvg
 

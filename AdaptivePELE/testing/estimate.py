@@ -33,7 +33,17 @@ class MSM:
         self.lagtimes = lagtimes
         self.numberOfITS = numberOfITS
         print "LAGTIME", self.lagtime
-        self.lagtime = self._calculateITS() #keep calculating until convergence is reached
+        try:
+            self.lagtime = self._calculateITS() #keep calculating until convergence is reached
+        except Exception as err:
+            # This error should happen only when running in the MN computing queues
+            # with the tkinter matplotlib backend, to avoid it set the default
+            # backend to pdf
+            if "connect to display" in err.message:
+                print "ITS plots not saved because of MN error"
+                pass
+            else:
+                raise err
         print "Using lagtime = ", self.lagtime
         self.buildMSM()
         np.savetxt(self.stationaryDistributionFilename, self.MSM_object.pi)
