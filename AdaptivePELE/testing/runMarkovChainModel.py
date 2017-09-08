@@ -195,6 +195,10 @@ def getStationaryDistr(lowestEigenvector):
     absStationary = np.abs(lowestEigenvector)
     return absStationary / absStationary.sum()
 
+def getStationaryDistrFromTransition(transitionMatrix):
+    eiv, eic = getSortedEigen(transitionMatrix)
+    return getStationaryDistr(eic[:,0])
+
 def getRelativeEntropy(goldenStationary, goldenT, T):
     return np.dot(goldenStationary, goldenT*np.log(goldenT/T)).sum()
 

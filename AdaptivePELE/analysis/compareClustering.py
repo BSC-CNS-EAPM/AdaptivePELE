@@ -152,7 +152,7 @@ thresholdCalculator = thresholdCalculatorBuilder.build({
         "thresholdCalculator": {
             "type": "heaviside",
             "params": {
-                "values": [2, 3, 4, 5],
+                "values": [3, 4, 5, 6],
                 "conditions": [1, 0.75, 0.5]
             }
         }
@@ -236,8 +236,8 @@ spawnParams.buildSpawningParameters({
         }
     })
 contactThresholdDistance = 8
-resname = "DAJ"
-nEpochs = 21
+resname = "UI1"
+nEpochs = 22
 altSel = False
 ntrajs = 32
 ClCont = clustering.ContactsClustering(thresholdCalculator, resname=resname,
@@ -277,8 +277,8 @@ for i in range(nEpochs):
     # paths_report = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/report*"%i]
     # path = ["/home/jgilaber/PR/PR_simulation_network/%d/traj*"%i]
     # paths_report = ["/home/jgilaber/PR/PR_simulation_network/%d/report*"%i]
-    path = ["/home/jgilaber/4DAJ/4DAJ_4_32/%d/traj*"%i]
-    paths_report = ["/home/jgilaber/4DAJ/4DAJ_4_32/%d/report*"%i]
+    path = ["/home/jgilaber/1o3p_buildPath/1sqa_adaptive_expl/%d/traj*"%i]
+    paths_report = ["/home/jgilaber/1o3p_buildPath/1sqa_adaptive_expl/%d/report*"%i]
     trajs = clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:
@@ -307,12 +307,12 @@ for i in range(nEpochs):
     #     f.write(':'.join(map(str, processorMapping)))
     ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
     os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
-    sortedNodes = getMetastableClusters2(ClCont, centTrajs)
-    sortedNodes = set(sortedNodes).union(set([num for num, cl in enumerate(degeneraciesCont) if cl]))
-    print sortedNodes
-    for node in sortedNodes:
-        cluster = ClCont.getCluster(node)
-        fw3.write("%d\t%.3f\n" % (i*4, cluster.getMetricFromColumn(4)))
+    # sortedNodes = getMetastableClusters2(ClCont, centTrajs)
+    # sortedNodes = set(sortedNodes).union(set([num for num, cl in enumerate(degeneraciesCont) if cl]))
+    # print sortedNodes
+    # for node in sortedNodes:
+    #     cluster = ClCont.getCluster(node)
+    #     fw3.write("%d\t%.3f\n" % (i*4, cluster.getMetricFromColumn(4)))
 
     # startTimeAcc = time.time()
     # ClAcc.cluster(path, processorMapping)
