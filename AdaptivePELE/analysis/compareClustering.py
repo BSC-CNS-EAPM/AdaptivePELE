@@ -5,6 +5,7 @@ import numpy as np
 import networkx as nx
 from AdaptivePELE.clustering import clustering, thresholdcalculator
 from AdaptivePELE.spawning import spawning, densitycalculator
+from AdaptivePELE.analysis import plot3DNetwork as net3D
 
 
 def getUnvisitedPath(clustering, numClusters=5):
@@ -152,7 +153,7 @@ thresholdCalculator = thresholdCalculatorBuilder.build({
         "thresholdCalculator": {
             "type": "heaviside",
             "params": {
-                "values": [3, 4, 5, 6],
+                "values": [2, 3, 4, 5],
                 "conditions": [1, 0.75, 0.5]
             }
         }
@@ -236,8 +237,8 @@ spawnParams.buildSpawningParameters({
         }
     })
 contactThresholdDistance = 8
-resname = "UI1"
-nEpochs = 22
+resname = "655"
+nEpochs = 34
 altSel = False
 ntrajs = 32
 ClCont = clustering.ContactsClustering(thresholdCalculator, resname=resname,
@@ -262,12 +263,15 @@ if not os.path.exists("mappings"):
     os.makedirs("mappings")
 if not os.path.exists("results"):
     os.makedirs("results")
+if not os.path.exists("networkEpochs"):
+    os.makedirs("networkEpochs")
 # fw = open("clusters.txt", "w")
 # fw2 = open("clustersBet.txt", "w")
 fw3 = open("clustersInd.txt", "w")
 # fw4 = open("clustersIndNew.txt", "w")
 # fw5 = open("clustersVol.txt", "w")
 # fw6 = open("clustersVisit.txt", "w")
+nModel = 1
 for i in range(nEpochs):
     # path =["trajs/%d/run_traj*"%i]
     # paths_report = ["trajs/%d/run_report*"%i]
@@ -277,8 +281,8 @@ for i in range(nEpochs):
     # paths_report = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/report*"%i]
     # path = ["/home/jgilaber/PR/PR_simulation_network/%d/traj*"%i]
     # paths_report = ["/home/jgilaber/PR/PR_simulation_network/%d/report*"%i]
-    path = ["/home/jgilaber/1o3p_buildPath/1sqa_adaptive_expl/%d/traj*"%i]
-    paths_report = ["/home/jgilaber/1o3p_buildPath/1sqa_adaptive_expl/%d/report*"%i]
+    path = ["/home/jgilaber/1o3p_buildPath/1o3p_adaptive_expl_sameR/%d/traj*"%i]
+    paths_report = ["/home/jgilaber/1o3p_buildPath/1o3p_adaptive_expl_sameR/%d/report*"%i]
     trajs = clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:
@@ -305,6 +309,15 @@ for i in range(nEpochs):
     # processorMapping = clusterList[1:]+[clusterList[0]]
     # with open("%d/processorMapping.txt"%(i+1), "w") as f:
     #     f.write(':'.join(map(str, processorMapping)))
+    fNet = open("networkEpochs/network3d_%d.pdb" % nModel, "w")
+    metrics = [cl.getMetricFromColumn(4) for cl in ClCont.clusterIterator()]
+    Xn, Yn, Zn = net3D.getCoords(ClCont)
+    fNet.write("MODEL %d\n" % nModel)
+    fNet = net3D.writePDB(Xn, Yn, Zn, metrics, fNet)
+    fNet = net3D.writeConnectionsPDB(ClCont.conformationNetwork.network, fNet)
+    fNet.write("ENDMDL\n")
+    fNet.close()
+    nModel += 1
     ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
     os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
     # sortedNodes = getMetastableClusters2(ClCont, centTrajs)
@@ -371,3 +384,4 @@ for i in range(nEpochs):
     # for node in path:
     #     cluster = ClAcc.getCluster(node)
     #     fw6.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
+fNet.close()
