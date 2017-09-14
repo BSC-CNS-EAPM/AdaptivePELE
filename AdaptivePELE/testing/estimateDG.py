@@ -5,8 +5,9 @@ import glob
 import checkDetailedBalance
 import ownBuildMSM
 import sys
-from AdaptivePELE.simulation import simulationrunner
+import matplotlib.pyplot as plt
 import computeDeltaG
+from AdaptivePELE.simulation import simulationrunner
 
 
 class Parameters:
@@ -199,6 +200,10 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 
         __cleanupFiles(parameters.trajWildcard, True)
 
+        # Close all open matplotlib windows, apparently the its plot open a lot
+        # of windows that are not closed, which consumes a lot of memory (not
+        # sure how much exactly)
+        plt.close("all")
     #PLOT RESULTS
     #FIX TO WORK WITH NONES
     #print "clusters: %d, ntrajs: %d, trajLength: %d, lagtime: %d"%(parameters.nclusters, parameters.ntrajs, parameters.length, parameters.lagtime)
