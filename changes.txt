@@ -1,20 +1,6 @@
 Behavior changes from previous version:
-    *) Added script to reconstruct precise path to a given snapshot
-    (writePrecisePathToSnapshot.py)
-    *) Added possibility of chain and resnum selection in PDB
-    
-    *) Change names of clustering in control file 
-    *) Added scripts to calculate free energies in pyemma_scripts
-    *) Added new parameter to control the number of clusters considered in
-    epsilon scoring
-    *) Added script to build pdb files from extractedCoordinates files
-    *) Added pathwayRMSD script
-    *) Added default values for some params such as restart, debug, writeClusteringStructures,...
-    *) Now we are able to read extracted traj with more than 3 coordinate (for multiple atom clustering)
-    *) Now atom label changed in clusters.pdb, in order to ease cluster identification
+    *) Added scripts plot3DNetwork, plotSpawningClusters for better
+    visualization of simulations
 
 Bug fixes:
-    *) Minor bug fixes in scripts to calculate free energies
-    *) Fixed bug of incorrect trajectory selection in estimateDG
-    *) Fixed bug of multiple its plot not visible (bug due to pyemma)
-    *) Fixed bug in symmetries. Now reading json as str not unicodes. It was not working since we used cython compiled files
+    *) Fixed minor bug in controlFileValidator

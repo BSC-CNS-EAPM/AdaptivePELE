@@ -33,7 +33,7 @@ def main():
     numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit() and
         os.path.isfile(templateSummary % int(epoch))])
 
-    clustering = np.loadtxt(templateSummary % 0)
+    clustering = np.loadtxt(templateSummary % (numberOfEpochs-1))
     clustersThres = list(set(clustering[:,4]))
     clustersThres.sort(reverse=True)
     spawningPerThres = np.zeros((numberOfEpochs, len(clustersThres)))
@@ -41,7 +41,6 @@ def main():
         clustering = np.loadtxt(templateSummary % i)
         for j, threshold in enumerate(clustersThres):
             spawningPerThres[i, j] = clustering[clustering[:,4]==threshold, 2].sum()
-
     plt.plot(spawningPerThres)
     plt.legend(labels=map(lambda x: "Cluster size %d" % x, clustersThres),
                loc="best")

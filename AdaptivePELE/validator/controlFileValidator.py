@@ -19,9 +19,9 @@ def validate(control_file):
     with open(control_file, 'r') as f:
         jsonFile = f.read()
     try:
-        print jsonFile
         parsedJSON = json.loads(jsonFile)
     except ValueError:
+        print jsonFile
         raise ValueError("Invalid JSON file!")
 
     for block in dir(validatorBlockNames.ControlFileParams):
@@ -46,13 +46,15 @@ def validate(control_file):
                 blockCorrect = validateBlock(block_obj,
                                              parsedJSON[controlfile_obj])
                 isCorrect = isCorrect and blockCorrect
-            except KeyError:
+            except KeyError as err:
                 warnings.warn("Block %s not found in control file!" %
                               controlfile_obj)
                 isCorrect = False
+
     if isCorrect:
         print "Congratulations! No errors found in your control file!"
     else:
+        print jsonFile
         raise ValueError("There are errors in your control file!!!")
     return True
 
@@ -73,7 +75,12 @@ def validateBlock(blockName, controlFileBlock):
             block
     """
     isCorrect = True
-    blockType = controlFileBlock["type"]
+    try:
+        blockType = controlFileBlock["type"]
+    except KeyError:
+        isCorrect = False
+        warnings.warn("Missing mandatory parameter type in block")
+        
     # Check if type selected is valid
     if not isinstance(blockType, basestring):
         warnings.warn("Type for %s should be %s and instead is %s" %
@@ -126,8 +133,13 @@ def validateBlock(blockName, controlFileBlock):
                 warnings.warn("Type %s in %s not found." %
                               (err.message, block))
                 isCorrect = False
-            blockType = controlFileBlock[block]["type"]
-            if blockType not in types_dict:
+            try:
+                blockType = controlFileBlock[block]["type"]
+            except KeyError:
+                isCorrect = False
+                warnings.warn("Missing mandatory parameter type in block %s" %
+                        block)
+            if blockType not in types_dict: 
                 warnings.warn("Type %s in %s not found." %
                               (blockType, blockName.__name__))
                 isCorrect = False
