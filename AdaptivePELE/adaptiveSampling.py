@@ -203,7 +203,6 @@ def __unicodeToStr(data):
         return { __unicodeToStr(key): __unicodeToStr(value) for key, value in data.iteritems() }
     #convert list
     if isinstance(data, list):
-        print data
         return [ __unicodeToStr(val) for val in data ]
     #convert unicode to str
     if isinstance(data, unicode):
