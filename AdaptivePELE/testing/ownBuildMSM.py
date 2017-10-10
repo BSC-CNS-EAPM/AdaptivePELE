@@ -21,6 +21,7 @@ def readParams(control_file):
     trajectoryFolder = params["trajectoryFolder"]
     trajectoryBasename = params["trajectoryBasename"]
     numClusters = params["numClusters"]
+    stride = params.get("stride", 1)
     lagtimes = params.get("lagtimes", [])
     lagtime = params.get("lagtime", None)
     numPCCA = params.get("numPCCA", None)
@@ -30,15 +31,15 @@ def readParams(control_file):
     mlags = params.get("mlags", None)
     clusterCountsThreshold = params.get("clusterCountsThreshold", 0)
 
-    return trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, errors, mlags, lagtime, clusterCountsThreshold
+    return trajectoryFolder, trajectoryBasename, numClusters, stride, lagtimes, numPCCA, itsOutput, numberOfITS, errors, mlags, lagtime, clusterCountsThreshold
 
 def main(control_file):
 
     # parameters
-    trajectoryFolder, trajectoryBasename, numClusters, lagtimes, numPCCA, itsOutput, numberOfITS, errors, mlags, lagtime, clusterCountsThreshold = readParams(control_file)
+    trajectoryFolder, trajectoryBasename, numClusters, stride, lagtimes, numPCCA, itsOutput, numberOfITS, errors, mlags, lagtime, clusterCountsThreshold = readParams(control_file)
 
     # program
-    clusteringObject = cluster.Cluster(numClusters, trajectoryFolder, trajectoryBasename, alwaysCluster=False)
+    clusteringObject = cluster.Cluster(numClusters, trajectoryFolder, trajectoryBasename, alwaysCluster=False, stride=stride)
     clusteringObject.clusterTrajectories()
     clusteringObject.eliminateLowPopulatedClusters(clusterCountsThreshold)
     calculateMSM = estimate.MSM(error=False, dtrajs=clusteringObject.dtrajs)

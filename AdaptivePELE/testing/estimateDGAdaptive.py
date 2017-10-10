@@ -3,7 +3,7 @@ import os
 import estimateDG
 import numpy as np
 
-def main(trajsPerEpoch, lagtime, nclusters):
+def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1):
     allFolders = np.array(glob.glob("MSM_*"))
     epochs = [int(folder[4:]) for folder in allFolders]
     args = np.argsort(epochs)
@@ -22,16 +22,17 @@ def main(trajsPerEpoch, lagtime, nclusters):
         print epoch, folder
         os.chdir(folder)
         parameters = estimateDG.Parameters(ntrajs=trajsPerEpoch*(epoch+1),
-                                length=None,
-                                lagtime=lagtime,
-                                lagtimes=[1, 10, 25],
-                                nclusters=nclusters,
-                                nruns=10,
-                                useAllTrajInFirstRun=True,
-                                computeDetailedBalance=True,
-                                trajWildcard="traj_*",
-                                folderWithTraj="rawData",
-                                clusterCountsThreshold=0)
+                                           length=None,
+                                           lagtime=lagtime,
+                                           lagtimes=[1, 10, 25],
+                                           nclusters=nclusters,
+                                           nruns=10,
+                                           useAllTrajInFirstRun=True,
+                                           computeDetailedBalance=True,
+                                           trajWildcard="traj_*",
+                                           folderWithTraj="rawData",
+                                           clusterCountsThreshold=0,
+                                           clusteringStride=clusteringStride)
         dG, stdDg, db, stdDb = estimateDG.estimateDG(parameters, cleanupClusterCentersAtStart=True)
         print "FINAL RESULTS EPOCH %d: dG: %f +- %f, asymmetric fluxes: %f +- %f" % (epoch, dG, stdDg, db, stdDb)
         resultsEpoch.append([dG, stdDg, db, stdDb])
@@ -49,4 +50,5 @@ if __name__ == "__main__":
     trajsPerEpoch = 50
     lagtime = 50
     nclusters = 100
-    main(trajsPerEpoch, lagtime, nclusters)
+    clusteringStride = 10
+    main(trajsPerEpoch, lagtime, nclusters, clusteringStride=clusteringStride)

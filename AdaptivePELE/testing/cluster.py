@@ -25,7 +25,7 @@ class Cluster:
         self.trajectoryBasename = trajectoryBasename
         self.x = []
 
-    
+
     def cluster(self, trajectories):
         """ Cluster the trajectories into numClusters clusters using kmeans
         algorithm.
