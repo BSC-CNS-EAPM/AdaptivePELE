@@ -47,7 +47,7 @@ def getMetastableClusters(clustering, numClusters=5):
     b2 = np.array([betweenness[i] for i in xrange(len(betweenness))])
     thresholds = [cluster.threshold for cluster in clustering.clusters.clusters]
     metInd = np.zeros_like(thresholds, dtype=np.float)
-    for node in conf.nodes_iter():
+    for node in conf.nbunch_iter():
         if conf.degree(node) < 1:
             metInd[node] = 0.0
             continue
@@ -81,7 +81,7 @@ def getMetastableClusters5(clustering, numClusters=5):
     thresholds = [cluster.threshold for cluster in clustering.clusters.clusters]
     minThres = min(thresholds)
     volume = np.zeros(len(thresholds))
-    for node in conf.nodes_iter():
+    for node in conf.nbunch_iter():
         vol = 0.0
         for foo, target in conf.edges_iter(node):
             assert foo == node
@@ -98,7 +98,7 @@ def getMetastableClusters4(clustering, numClusters=5):
     inInd = np.zeros_like(metrics)
     with open("informationNetwork.csv", "w") as f:
         f.write("Node\tthreshold\tinDegree\toutDegree\tDegree\n")
-        for node in conf.nodes_iter():
+        for node in conf.nbunch_iter():
             outNeigh = 0.0
             inNeigh = 0.0
             countOut = 0
@@ -125,7 +125,7 @@ def getMetastableClusters3(clustering, numClusters=5):
     conf = clustering.conformationNetwork.network
     thresholds = [cluster.threshold for cluster in clustering.clusters.clusters]
     metInd = np.zeros_like(thresholds, dtype=np.float)
-    for node in conf.nodes_iter():
+    for node in conf.nbunch_iter():
         if conf.degree(node) < 1:
             metInd[node] = 0.0
             continue
@@ -237,8 +237,8 @@ spawnParams.buildSpawningParameters({
         }
     })
 contactThresholdDistance = 8
-resname = "655"
-nEpochs = 34
+resname = "UI1"
+nEpochs = 37
 altSel = False
 ntrajs = 32
 ClCont = clustering.ContactsClustering(thresholdCalculator, resname=resname,
@@ -281,8 +281,8 @@ for i in range(nEpochs):
     # paths_report = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/report*"%i]
     # path = ["/home/jgilaber/PR/PR_simulation_network/%d/traj*"%i]
     # paths_report = ["/home/jgilaber/PR/PR_simulation_network/%d/report*"%i]
-    path = ["/home/jgilaber/1o3p_buildPath/1o3p_adaptive_expl_sameR/%d/traj*"%i]
-    paths_report = ["/home/jgilaber/1o3p_buildPath/1o3p_adaptive_expl_sameR/%d/report*"%i]
+    path = ["/home/jgilaber/urokinases_free_energy/1sqa_adatpive_expl_from_1f5k/%d/traj*"%i]
+    paths_report = ["/home/jgilaber/urokinases_free_energy/1sqa_adatpive_expl_from_1f5k//%d/report*"%i]
     trajs = clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:

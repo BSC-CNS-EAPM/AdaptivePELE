@@ -38,9 +38,9 @@ def writePDB(X, Y, Z, metric, f):
 
 def writeConnectionsPDB(network, f):
     template = "CONECT%s%s%s%s%s%s%s%s%s%s              \n"
-    for node in network.nodes_iter():
+    for node in network.nbunch_iter():
         contents = [node]
-        for source, target in network.out_edges_iter(node):
+        for source, target in network.out_edges(node):
             contents.append(target)
             if len(contents) == 10:
                 f.write(template % tuple(map(lambda x: str(x).rjust(5), contents)))
