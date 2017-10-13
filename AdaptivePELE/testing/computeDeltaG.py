@@ -81,13 +81,10 @@ def loadMSM(MSMFile):
         MSM_object = cPickle.load(MSMfile)
     return MSM_object
 
-def main(trajWildcard, reweightingT=1000):
-    allClusters = np.loadtxt("discretized/clusterCenters.dat")
-
-    MSMObject = loadMSM('MSM_object.pkl')
+def ensure_connectivity(MSMObject, allClusters):
     if len(allClusters) == MSMObject.stationary_distribution.size:
         pi = MSMObject.stationary_distribution
-        r = allClusters[MSMObject.connected_sets[0]]
+        clusters = allClusters[MSMObject.connected_sets[0]]
     else:
         ######################
         # Reconstruct stationary distribution with pseudocounts to ensure
@@ -98,11 +95,10 @@ def main(trajWildcard, reweightingT=1000):
         trans = run.buildRevTransitionMatrix(counts)
         eiv, eic = run.getSortedEigen(trans)
         pi = run.getStationaryDistr(eic[:, 0])
-        r = allClusters
-    d = 0.75
+        clusters = allClusters
+    return pi, clusters
 
-    originalFilenames = glob.glob(trajWildcard)
-
+def gather_coordinates(originalFilenames):
     originalCoordinates = []
     for i, originalFilename in enumerate(originalFilenames):
         trajOriginalCoordinates = list(np.loadtxt(originalFilename, ndmin=2)[:,1:])
@@ -113,8 +109,13 @@ def main(trajWildcard, reweightingT=1000):
             newCoords = map(expandTrajs, trajOriginalCoordinates)
             trajOriginalCoordinates.extend(list(itertools.chain.from_iterable(newCoords)))
         originalCoordinates.append(np.array(trajOriginalCoordinates))
+    return originalCoordinates
 
-    dimensions = r.shape[1]
+def create_box(clusters, originalCoordinates, d):
+    """
+        Create the box discretization for the estimation of volumes
+    """
+    dimensions = clusters.shape[1]
     maxval = dimensions*[-np.inf]
     minval = dimensions*[np.inf]
     for coord in originalCoordinates:
@@ -130,21 +131,21 @@ def main(trajWildcard, reweightingT=1000):
     bins = np.array([np.arange(np.floor(minval[i]) + d*int((minval[i] - np.floor(minval[i]))/d),
                         np.ceil(maxval[i]) + d*(int((maxval[i] - np.ceil(maxval[i]))/d) + 1),
             d) for i in range(3)])
+    return bins
 
-
-    numberOfClusters = r.shape[0]
+def calculate_microstate_volumes(clusters, originalCoordinates, bins, d):
+    """
+        Estimate the clusters volumes using a cubic discretization of volumes
+    """
+    numberOfClusters = clusters.shape[0]
     print "Number of clusters", numberOfClusters
-
-
     histogram = np.array([])
     histogramFreq = np.array([])
     histograms = []
     microstateVolume = np.zeros(numberOfClusters)
 
-
     #dtrajs = clusteringObject.assign(originalCoordinates)
-    clusterCenters = r
-    dtrajs = assignNewTrajecories(originalCoordinates, clusterCenters)
+    dtrajs = assignNewTrajecories(originalCoordinates, clusters)
     for i in range(numberOfClusters):
         allCoords = []
         for j,(trajOriginalCoordinates,dtraj) in enumerate(zip(originalCoordinates, dtrajs)):
@@ -200,24 +201,17 @@ def main(trajWildcard, reweightingT=1000):
             histogramTotal = histogram[histogramCluster > 0]
         histogramCluster = histogramCluster[histogramCluster > 0]
         microstateVolume[i] = (histogramCluster/histogramTotal).sum() * d**3
+    return microstateVolume
 
-
-    np.savetxt("volumeOfClusters.dat", microstateVolume)
-
-    # microstateVolume = np.loadtxt("volumeOfClusters.dat")
-
-    #Torig = 1000
-    #Tnew = reweightingT
-    #newProb = reweightProbabilities(Tnew, Torig, pi)
-    #print Torig, Tnew
-    #print "normalization", np.sum(newProb)
-    newProb = pi
-
-
+def calculate_pmf(microstateVolume, pi):
+    """
+        Compute a potential of mean force given a stationary distribution
+        (probabilities) and cluster volumes
+    """
     kb = 0.0019872041
     T = 300
     beta = 1 / (kb * T)
-    gpmf = -kb*T*np.log(newProb/microstateVolume)
+    gpmf = -kb*T*np.log(pi/microstateVolume)
     print gpmf[gpmf == -np.inf]
     print gpmf[gpmf == np.inf]
     gpmf[gpmf == -np.inf] = np.inf #to avoid contribution later
@@ -236,58 +230,30 @@ def main(trajWildcard, reweightingT=1000):
         deltaG = deltaW - kb*T*np.log(bindingVolume/1661)
         string = "%.1f\t%.3f\t%.3f\t%.3f\t%.3f" % (upperGpmfValue, deltaG, deltaW, bindingVolume, -kb*T*np.log(bindingVolume/1661))
         print string
+    return gpmf, string
 
+def main(trajWildcard, reweightingT=1000):
+    allClusters = np.loadtxt("discretized/clusterCenters.dat")
+    MSMObject = loadMSM('MSM_object.pkl')
 
-    pmf_xyzg = np.hstack((r, np.expand_dims(gpmf,axis=1)))
+    pi, clusters = ensure_connectivity(MSMObject, allClusters)
+    # radius of the cube for volume determination
+    d = 0.75
+
+    originalFilenames = glob.glob(trajWildcard)
+    originalCoordinates = gather_coordinates(originalFilenames)
+
+    bins = create_box(clusters, originalCoordinates, d)
+    microstateVolume = calculate_microstate_volumes(clusters, originalCoordinates, bins, d)
+    np.savetxt("volumeOfClusters.dat", microstateVolume)
+
+    gpmf, string = calculate_pmf(microstateVolume, pi)
+
+    pmf_xyzg = np.hstack((clusters, np.expand_dims(gpmf,axis=1)))
     np.savetxt("pmf_xyzg.dat", pmf_xyzg)
 
     writePDB(pmf_xyzg)
     return string
-
-
-    #sys.exit()
-    """
-    """
-
-    gpmf = -kb*T*np.log(histogram)
-    gpmf -= gpmf.min()
-
-    #inExplorationRange = np.argwhere(gpmf != np.inf)
-    deltaW = -gpmf[gpmf != np.inf].max()
-
-    for indices in np.argwhere(gpmf != np.inf):
-        i = indices[0]
-        j = indices[1]
-        k = indices[2]
-        #print bins[0][i], bins[1][j], bins[2][k], gpmf[i,j,k]
-
-    upperGpmfValues = np.arange(0,-deltaW,0.5)
-    bindingVolumes = []
-    deltaGs = []
-    print "Delta G     Delta W     Binding Volume:     Binding Volume contribution"
-    for upperGpmfValue in upperGpmfValues:
-        bindingVolume = 0
-        for i,g in np.ndenumerate(gpmf[gpmf <= upperGpmfValue]):
-            bindingVolume += np.exp(-beta*g)
-        bindingVolume *= d**3
-
-        deltaG = deltaW - kb*T*np.log(bindingVolume/1661)
-
-        deltaGs.append(deltaG)
-        bindingVolumes.append(bindingVolume)
-
-        #np.savetxt("pmf_xyzg.dat", np.hstack((r, np.expand_dims(gpmf,axis=1))))
-
-        string = "%.3f\t%.3f\t%.3f\t%.3f" % (deltaG, deltaW, bindingVolume, -kb*T*np.log(bindingVolume/1661))
-        print string
-    return string
-
-    import matplotlib.pyplot as plt
-    plt.figure(1)
-    plt.plot(upperGpmfValues, deltaGs)
-    plt.figure(2)
-    plt.plot(upperGpmfValues, bindingVolumes)
-    plt.show()
 
 if __name__ == "__main__":
     trajWildcard, reweight = parseArgs()
