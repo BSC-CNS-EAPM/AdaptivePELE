@@ -114,7 +114,7 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
             if len(trimmedTraj) > 0:
                 np.savetxt(dst, trimmedTraj, fmt="%.4f", delimiter="\t")
         except:
-            sys.exit("There is a problem with %s"%trajFile)
+            sys.exit("There is a problem with %s" % trajFile)
     return writenFiles
 
 def __cleanupFiles(trajWildcard, cleanupClusterCenters=True):
