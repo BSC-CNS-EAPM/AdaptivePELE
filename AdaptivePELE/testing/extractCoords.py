@@ -174,7 +174,7 @@ def buildFullTrajectory(steps, trajectory, totalSteps, inputTrajectory):
 
     return completeTrajectory
 
-def repeatExtractedSnapshotsInTrajectory(inputTrajectory, constants):
+def repeatExtractedSnapshotsInTrajectory(inputTrajectory, constants, totalSteps):
     extractedTrajFolder, trajFilename = os.path.split(inputTrajectory)
     trajectoryNumber = re.sub('\.dat$', '', trajFilename)
     trajectoryNumber = re.sub(constants.baseExtractedTrajectoryName, '', trajectoryNumber)
@@ -209,7 +209,7 @@ def repeatExtractedSnapshotsInFolder(folder, constants, totalSteps):
 
     inputTrajectories = glob.glob(os.path.join(inputTrajectoryFolder, constants.baseExtractedTrajectoryName + '*'))
     for inputTrajectory in inputTrajectories:
-        repeatExtractedSnapshotsInTrajectory(inputTrajectory, constants)
+        repeatExtractedSnapshotsInTrajectory(inputTrajectory, constants, totalSteps)
 
 def makeGatheredTrajsFolder(constants):
     if not os.path.exists(constants.gatherTrajsFolder):
