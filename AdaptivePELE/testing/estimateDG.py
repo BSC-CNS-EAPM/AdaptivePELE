@@ -115,6 +115,9 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
                 np.savetxt(dst, trimmedTraj, fmt="%.4f", delimiter="\t")
         except:
             sys.exit("There is a problem with %s"%trajFile)
+    print "Boostraping trajectories", ntrajs, len(trajFiles), len(set(trajFiles))
+    # trajFiles.sort()
+    # print trajFiles
     return writenFiles
 
 def __cleanupFiles(trajWildcard, cleanupClusterCenters=True):
@@ -127,9 +130,11 @@ def __cleanupFiles(trajWildcard, cleanupClusterCenters=True):
 
 def __setVariablesForFirstIteration(useAllTrajInFirstRun, i, ntrajs):
     if useAllTrajInFirstRun and i == 0:
+        print "Not using bootstrap in iteration %d" % i
         bootstrap = False
         nWorkingTrajs = None # Not necessary, just to make it explicit that all of them are used
     else:
+        print "Using bootstrap in iteration %d" % i
         bootstrap = True
         nWorkingTrajs = ntrajs
 
@@ -220,6 +225,7 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
         fw.write("\n")
         fw.write("=====\n")
         fw.write("dG\n")
+        fw.write("bound    Delta G     Delta W     Binding Volume:     Binding Volume contribution\n")
         for el in deltaGs:
             fw.write("%s\n" % el)
         fw.write("=====\n")
