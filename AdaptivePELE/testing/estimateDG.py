@@ -241,14 +241,14 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 if __name__ == "__main__":
     parameters = Parameters(ntrajs=None,
                             length=None,
-                            lagtime=400,
-                            nclusters=400,
+                            lagtime=25,
+                            nclusters=100,
                             nruns=1,
                             skipFirstSteps = 0,
                             useAllTrajInFirstRun=True,
                             computeDetailedBalance=True,
                             trajWildcard="traj_*",
                             folderWithTraj="rawData",
-                            lagtimes=[1,10,25,50,100,250,500,1000],
-                            clusterCountsThreshold=0, clusteringStride=10)
+                            lagtimes=[1,10,25,50],
+                            clusterCountsThreshold=0, clusteringStride=1)
     estimateDG(parameters, cleanupClusterCentersAtStart=False)

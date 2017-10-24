@@ -33,7 +33,7 @@ class Cluster:
         """
         return coor.cluster_kmeans(data=trajectories, k=self.numClusters, max_iter=500, stride=self.stride)
 
-    def assignNewTrajecories(self, trajs):
+    def assignNewTrajectories(self, trajs):
         assign = AssignCenters(self.clusterCentersFile)
         dTrajs = assign.assign(trajs)
         return dTrajs
@@ -54,7 +54,7 @@ class Cluster:
         else:
             print "Assigning data (clustering exists)..."
             self.clusterCenters = np.loadtxt(self.clusterCentersFile)
-            self.dtrajs = self.assignNewTrajecories(self.x)
+            self.dtrajs = self.assignNewTrajectories(self.x)
 
         print "Writing clustering data..."
         self._writeDtrajs(self.trajFilenames, self.dtrajs, self.dTrajTemplateName)
@@ -81,7 +81,7 @@ class Cluster:
             self.clusterCenters = np.delete(self.clusterCenters, clustersToDelete, axis=0)
             self._writeClusterCenters(self.clusterCenters, self.clusterCentersFile)
             print "Reassigning trajectories"
-            self.dtrajs = self.assignNewTrajecories(self.x)
+            self.dtrajs = self.assignNewTrajectories(self.x)
 
     def _writeClusterCenters(self, clusterCenters, outputFilename):
         np.savetxt(outputFilename, clusterCenters, fmt="%.5f")
