@@ -490,7 +490,16 @@ class Cluster:
              and np.allclose(self.metrics, other.metrics)
 
 
-class ContactsClusteringEvaluator:
+class ClusteringEvaluator:
+    def cleanContactMap(self):
+        """
+            Clean the attributes to prepare for next iteration
+        """
+        self.contactMap = None
+        self.contacts = None
+
+
+class ContactsClusteringEvaluator(ClusteringEvaluator):
     def __init__(self, RMSDCalculator):
         """
             Helper object to carry out the RMSD clustering
@@ -539,14 +548,6 @@ class ContactsClusteringEvaluator:
         dist = self.RMSDCalculator.computeRMSD(cluster.pdb, pdb)
         return dist < cluster.threshold, dist
 
-    def cleanContactMap(self):
-        """
-            Clean the attributes to prepare for next iteration
-        """
-        # TODO: this should probaly set to a "private" method
-        self.contactMap = None
-        self.contacts = None
-
     def checkAttributes(self, pdb, resname, resnum, resChain, contactThresholdDistance):
         """
             Check wether all attributes are set for this iteration
@@ -576,7 +577,7 @@ class ContactsClusteringEvaluator:
         return cluster.threshold2
 
 
-class CMClusteringEvaluator:
+class CMClusteringEvaluator(ClusteringEvaluator):
     limitSlope = {8: 6, 6: 15, 4: 60, 10: 3}
     limitMax = {8: 2, 6: 0.8, 4: 0.2, 10: 4}
 
@@ -586,7 +587,7 @@ class CMClusteringEvaluator:
 
             :param similarityEvaluator: object that calculates the similarity
                 between two contact maps
-            :type similarityEvaluator: object
+            :type similarityEvaluator: :py:class:`.CMSimilarityEvaluator`
             :param symmetryEvaluator: object to introduce the symmetry  in the
                 contacts maps
             :type symmetryEvaluator: :py:class:`.SymmetryContactMapEvaluator`
@@ -637,13 +638,6 @@ class CMClusteringEvaluator:
         distance = self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster.contactMap, self.symmetryEvaluator)
         return distance < cluster.threshold, distance
 
-    def cleanContactMap(self):
-        """
-            Clean the attributes to prepare for next iteration
-        """
-        # TODO: this should probaly set to a "private" method
-        self.contactMap = None
-        self.contacts = None
 
     def checkAttributes(self, pdb, resname, resnum, resChain, contactThresholdDistance):
         """
@@ -1212,7 +1206,7 @@ class ContactMapAccumulativeClustering(Clustering):
         self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
         self.epoch = state.get('epoch', -1)
         self.thresholdCalculator = state.get('thresholdCalculator', thresholdcalculator.ThresholdCalculatorConstant(value=0.3))
-        self.similarityEvaluator = state.get('similariyEvaluator', JaccardEvaluator())
+        self.similarityEvaluator = state.get('similariyEvaluator', CMSimilarityEvaluator(blockNames.ClusteringTypes.Jaccard))
         self.symmetryEvaluator = state.get('symmetryEvaluator', sym.SymmetryContactMapEvaluator(self.symmetries))
         self.clusteringEvaluator = state.get('clusteringEvaluator', CMClusteringEvaluator(self.similarityEvaluator, self.symmetryEvaluator))
 
@@ -1346,22 +1340,21 @@ class similarityEvaluatorBuilder:
             :type similarityEvaluatorType: str
             :returns: :py:class:`.SimilarityEvaluator` -- SimilarityEvaluator object selected
         """
-        if similarityEvaluatorType == blockNames.ClusteringTypes.differenceDistance:
-            return differenceDistanceEvaluator()
-        elif similarityEvaluatorType == blockNames.ClusteringTypes.Jaccard:
-            return JaccardEvaluator()
-        elif similarityEvaluatorType == blockNames.ClusteringTypes.correlation:
-            return correlationEvaluator()
+        if similarityEvaluatorType in clusteringTypes.SIMILARITY_TYPES_NAMES:
+            return CMSimilarityEvaluator(similarityEvaluatorType)
         else:
             sys.exit("Unknown threshold calculator type! Choices are: " + str(clusteringTypes.SIMILARITY_TYPES_TO_STRING_DICTIONARY.values()))
 
-
-class differenceDistanceEvaluator:
+class CMSimilarityEvaluator:
     """
         Evaluate the similarity of two contactMaps by calculating the ratio of
         the number of differences over the average of elements in the contacts
-        maps
+        maps, their correlation or their Jaccard index, that is, the ratio
+        between the intersection of the two contact maps and their union
     """
+    def __init__(self, typeEvaluator):
+        self.typeEvaluator = typeEvaluator
+
     def isSimilarCluster(self, contactMap, clusterContactMap, symContactMapEvaluator):
         """
             Evaluate if two contactMaps are similar or not, return True if yes,
@@ -1375,51 +1368,14 @@ class differenceDistanceEvaluator:
             :type symContactMapEvaluator: :py:class:`.SymmetryContactMapEvaluator`
             :returns: float -- distance between contact maps
         """
-        return symContactMapEvaluator.evaluateDifferenceDistance(contactMap, clusterContactMap)
-
-
-class JaccardEvaluator:
-    """
-        Evaluate the similarity of two contactMaps by calculating the Jaccard
-        index, that is, the ratio between the intersection of the two contact
-        maps and their union
-    """
-    def isSimilarCluster(self, contactMap, clusterContactMap, symContactMapEvaluator):
-        """
-            Evaluate if two contactMaps are similar or not, return True if yes,
-            False otherwise
-
-            :param contactMap: contactMap of the structure to compare
-            :type contactMap: numpy.Array
-            :param contactMap: contactMap of the structure to compare
-            :type contactMap: numpy.Array
-            :param symContactMapEvaluator: Contact Map symmetry evaluator object
-            :type symContactMapEvaluator: :py:class:`.SymmetryContactMapEvaluator`
-            :returns: float -- distance between contact maps
-        """
-        return symContactMapEvaluator.evaluateJaccard(contactMap, clusterContactMap)
-
-
-class correlationEvaluator:
-    """
-        Evaluate the similarity of two contact maps by calculating their
-        correlation
-    """
-    def isSimilarCluster(self, contactMap, clusterContactMap, symContactMapEvaluator):
-        """
-            Evaluate if two contactMaps are similar or not, return True if yes,
-            False otherwise
-
-            :param contactMap: contactMap of the structure to compare
-            :type contactMap: numpy.Array
-            :param contactMap: contactMap of the structure to compare
-            :type contactMap: numpy.Array
-            :param symContactMapEvaluator: Contact Map symmetry evaluator object
-            :type symContactMapEvaluator: :py:class:`.SymmetryContactMapEvaluator`
-            :returns: float -- distance between contact maps
-        """
-        return symContactMapEvaluator.evaluateCorrelation(contactMap, clusterContactMap)
-
+        if self.typeEvaluator == blockNames.ClusteringTypes.correlation:
+            return symContactMapEvaluator.evaluateCorrelation(contactMap, clusterContactMap)
+        elif self.typeEvaluator == blockNames.ClusteringTypes.Jaccard:
+            return symContactMapEvaluator.evaluateJaccard(contactMap, clusterContactMap)
+        elif self.typeEvaluator == blockNames.ClusteringTypes.differenceDistance:
+            return symContactMapEvaluator.evaluateDifferenceDistance(contactMap, clusterContactMap)
+        else:
+            raise ValueError("Evaluator type %s not found!!" % self.typeEvaluator)
 
 def getAllTrajectories(paths):
     """

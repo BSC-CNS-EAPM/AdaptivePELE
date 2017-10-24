@@ -19,3 +19,7 @@ SIMILARITY_TYPES_TO_STRING_DICTIONARY = {
     SIMILARITY_TYPES.Jaccard: blockNames.ClusteringTypes.Jaccard,
     SIMILARITY_TYPES.correlation: blockNames.ClusteringTypes.correlation
 }
+
+SIMILARITY_TYPES_NAMES = set([blockNames.ClusteringTypes.differenceDistance,
+                              blockNames.ClusteringTypes.Jaccard,
+                              blockNames.ClusteringTypes.correlation])
