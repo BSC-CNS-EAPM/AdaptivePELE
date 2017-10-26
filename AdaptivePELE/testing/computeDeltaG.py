@@ -17,7 +17,7 @@ import itertools
         4) For the moment, it needs of a reweightingT, in order to do a histogram reweighting, but does not seem to work that well
 """
 
-def assignNewTrajecories(trajs, clusterCenters):
+def assignNewTrajectories(trajs, clusterCenters):
     assign = AssignCenters(clusterCenters)
     dTrajs = assign.assign(trajs)
     return dTrajs
@@ -145,7 +145,7 @@ def calculate_microstate_volumes(clusters, originalCoordinates, bins, d):
     microstateVolume = np.zeros(numberOfClusters)
 
     #dtrajs = clusteringObject.assign(originalCoordinates)
-    dtrajs = assignNewTrajecories(originalCoordinates, clusters)
+    dtrajs = assignNewTrajectories(originalCoordinates, clusters)
     for i in range(numberOfClusters):
         allCoords = []
         for j,(trajOriginalCoordinates,dtraj) in enumerate(zip(originalCoordinates, dtrajs)):
@@ -203,6 +203,47 @@ def calculate_microstate_volumes(clusters, originalCoordinates, bins, d):
         microstateVolume[i] = (histogramCluster/histogramTotal).sum() * d**3
     return microstateVolume
 
+def calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d):
+    """
+        Estimate the clusters volumes using a cubic discretization of volumes
+    """
+    numberOfClusters = clusters.shape[0]
+    print "Number of clusters", numberOfClusters
+
+    allCoords = []
+    # The coordinates array is built through lists in order to be able to
+    # process trajectories of different lenght
+    for coord in originalCoordinates:
+        allCoords.extend(coord.tolist())
+    allCoords = np.array(allCoords)
+
+    histogram, edges = np.histogramdd(allCoords, bins=bins)
+
+    centers_trajs = []
+    nRows, nCols, nDepth = histogram.shape
+    for i, matrix in enumerate(histogram):
+        centers_x = []
+        x_val = bins[0][i]
+        for j, row in enumerate(matrix):
+            y_val = bins[1][j]
+            indices, = np.nonzero(row)
+            if indices.size > 0:
+                init = indices[0]
+                end = indices[-1]
+                centers_x.extend([[x_val, y_val, bins[2][zi]] for zi in xrange(init, end+1)])
+        if len(centers_x):
+            centers_trajs.append(np.array(centers_x))
+
+    dtrajs = assignNewTrajectories(centers_trajs, clusters)
+    microstateVolume = np.zeros(numberOfClusters)
+    for traj in dtrajs:
+        counts, foo = np.histogram(traj, bins=np.arange(-0.5, numberOfClusters))
+        microstateVolume += counts
+    microstateVolume *= d**3
+    # provisional return for debugging and testing script
+    # return microstateVolume, centers_trajs, dtrajs
+    return microstateVolume
+
 def calculate_pmf(microstateVolume, pi):
     """
         Compute a potential of mean force given a stationary distribution
@@ -241,10 +282,12 @@ def main(trajWildcard, reweightingT=1000):
     d = 0.75
 
     originalFilenames = glob.glob(trajWildcard)
+    # originalFilenames = glob.glob("rawData/"+trajWildcard)
     originalCoordinates = gather_coordinates(originalFilenames)
 
     bins = create_box(clusters, originalCoordinates, d)
-    microstateVolume = calculate_microstate_volumes(clusters, originalCoordinates, bins, d)
+    # microstateVolume = calculate_microstate_volumes(clusters, originalCoordinates, bins, d)
+    microstateVolume = calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d)
     np.savetxt("volumeOfClusters.dat", microstateVolume)
 
     gpmf, string = calculate_pmf(microstateVolume, pi)
