@@ -4,6 +4,7 @@ import numpy as np
 # import pickle
 import cPickle as pickle
 from AdaptivePELE.atomset import RMSDCalculator
+from AdaptivePELE.testing import runMarkovChainModel as run
 import AdaptivePELE.atomset.atomset as atomset
 
 
@@ -144,3 +145,13 @@ def readClusteringObject(clusteringObjectPath):
             return pickle.load(f)
         except EOFError:
             raise EOFError("Empty clustering object!")
+
+def ensure_connectivity_msm(msm):
+    if msm.nstates_full == msm.nstates:
+        return msm.stationary_distribution
+    else:
+        counts = msm.count_matrix_full
+        counts += 1/float(counts.shape[0])
+        trans = run.buildRevTransitionMatrix(counts)
+        eiv, eic = run.getSortedEigen(trans)
+        return run.getStationaryDistr(eic[:, 0])
