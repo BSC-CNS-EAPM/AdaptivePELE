@@ -286,8 +286,11 @@ def main(trajWildcard, reweightingT=1000):
     originalCoordinates = gather_coordinates(originalFilenames)
 
     bins = create_box(clusters, originalCoordinates, d)
-    # microstateVolume = calculate_microstate_volumes(clusters, originalCoordinates, bins, d)
-    microstateVolume = calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d)
+    method = "new"
+    if method == "new":
+        microstateVolume = calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d)
+    else:
+        microstateVolume = calculate_microstate_volumes(clusters, originalCoordinates, bins, d)
     np.savetxt("volumeOfClusters.dat", microstateVolume)
 
     gpmf, string = calculate_pmf(microstateVolume, pi)
