@@ -160,7 +160,7 @@ thresholdCalculator = thresholdCalculatorBuilder.build({
 })
 # thresholdCalculator = thresholdCalculatorBuilder.build({})
 # Distance index
-# similarityEvaluator = clustering.differenceDistanceEvaluator()
+# similarityEvaluator = clustering.CMSimilarityEvaluator("differenceDistance")
 # thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
 #     "thresholdCalculator": {
 #         "type": "heaviside",
@@ -171,7 +171,7 @@ thresholdCalculator = thresholdCalculatorBuilder.build({
 #     }
 # })
 # Jaccard index
-similarityEvaluator = clustering.JaccardEvaluator()
+similarityEvaluator = clustering.CMSimilarityEvaluator("Jaccard")
 # thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
 #     "thresholdCalculator": {
 #         "type" : "heaviside",
@@ -191,7 +191,7 @@ thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
     }
 })
 # correlation
-# similarityEvaluator = clustering.correlationEvaluator()
+# similarityEvaluator = clustering.CMSimilarityEvaluator("correlation")
 # thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
 #     "thresholdCalculator": {
 #         "type": "constant",
@@ -236,11 +236,21 @@ spawnParams.buildSpawningParameters({
         "metricColumnInReport": 4
         }
     })
+spawnParams.buildSpawningParameters({
+    "type": "REAP",
+    "params": {
+        "epsilon": 0.0,
+        "T": 1000,
+        "reportFilename": "report",
+        "metricsInd": -1,
+        "metricColumnInReport": 4
+        }
+    })
 contactThresholdDistance = 8
 resname = "UI1"
-nEpochs = 37
+nEpochs = 35
 altSel = False
-ntrajs = 32
+ntrajs = 144
 ClCont = clustering.ContactsClustering(thresholdCalculator, resname=resname,
                                        reportBaseFilename="report",
                                        columnOfReportFile=4,
@@ -255,7 +265,8 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
                                                     altSelection=altSel)
 # spawningObject = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
 # spawningObject = spawning.UCBCalculator(densityCalculator)
-spawningObject = spawning.EpsilonDegeneracyCalculator(densityCalculator)
+# spawningObject = spawning.EpsilonDegeneracyCalculator(densityCalculator)
+spawningObject = spawning.REAPCalculator()
 # ClAcc.clusterInitialStructures(["/home/jgilaber/PR/PR_prog_initial_adaptive.pdb"])
 # ClCont.clusterInitialStructures(["/home/jgilaber/4DAJ/4DAJ_initial_adaptive.pdb"])
 # processorMapping = [0 for i in xrange(ntrajs-1)]
@@ -281,8 +292,8 @@ for i in range(nEpochs):
     # paths_report = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/report*"%i]
     # path = ["/home/jgilaber/PR/PR_simulation_network/%d/traj*"%i]
     # paths_report = ["/home/jgilaber/PR/PR_simulation_network/%d/report*"%i]
-    path = ["/home/jgilaber/urokinases_free_energy/1sqa_adatpive_expl_from_1f5k/%d/traj*"%i]
-    paths_report = ["/home/jgilaber/urokinases_free_energy/1sqa_adatpive_expl_from_1f5k//%d/report*"%i]
+    path = ["/home/jgilaber/urokinases_free_energy/1sqa_adaptive_expl_sameR/%d/traj*"%i]
+    paths_report = ["/home/jgilaber/urokinases_free_energy/1sqa_adaptive_expl_sameR/%d/report*"%i]
     trajs = clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:
@@ -296,28 +307,30 @@ for i in range(nEpochs):
     endTimeCont = time.time()
     sys.stderr.write("Total time of clustering contacts, epoch %d: %.6f\n"%(i,endTimeCont-startTimeCont))
     sys.stderr.write("Number of clusters contacts epoch %d: %d\n"%(i,len(ClCont.clusters.clusters)))
-    invTrajs = (ntrajs - 1)/2
-    centTrajs = ntrajs - 1- invTrajs
+    # invTrajs = (ntrajs - 1)/2
+    # centTrajs = ntrajs - 1- invTrajs
+    invTrajs = ntrajs-1
     degeneraciesCont = spawningObject.calculate(ClCont.clusters.clusters, invTrajs, spawnParams)
+    spawningObject.log()
     nProc = 0
     clusterList = []
-    # for icl in xrange(len(ClCont.clusters.clusters)):
-    #     for j in range(int(degeneraciesCont[icl])):
-    #         clusterList.append(ClCont.clusters.clusters[icl].trajPosition)
-    #         nProc += 1
-    # assert nProc == ntrajs-1
-    # processorMapping = clusterList[1:]+[clusterList[0]]
-    # with open("%d/processorMapping.txt"%(i+1), "w") as f:
-    #     f.write(':'.join(map(str, processorMapping)))
-    fNet = open("networkEpochs/network3d_%d.pdb" % nModel, "w")
-    metrics = [cl.getMetricFromColumn(4) for cl in ClCont.clusterIterator()]
-    Xn, Yn, Zn = net3D.getCoords(ClCont)
-    fNet.write("MODEL %d\n" % nModel)
-    fNet = net3D.writePDB(Xn, Yn, Zn, metrics, fNet)
-    fNet = net3D.writeConnectionsPDB(ClCont.conformationNetwork.network, fNet)
-    fNet.write("ENDMDL\n")
-    fNet.close()
-    nModel += 1
+    for icl in xrange(len(ClCont.clusters.clusters)):
+        for j in range(int(degeneraciesCont[icl])):
+            clusterList.append(ClCont.clusters.clusters[icl].trajPosition)
+            nProc += 1
+    assert nProc == ntrajs-1
+    processorMapping = clusterList[1:]+[clusterList[0]]
+    with open("%d/processorMapping.txt"%(i+1), "w") as f:
+        f.write(':'.join(map(str, processorMapping)))
+    # fNet = open("networkEpochs/network3d_%d.pdb" % nModel, "w")
+    # metrics = [cl.getMetricFromColumn(4) for cl in ClCont.clusterIterator()]
+    # Xn, Yn, Zn = net3D.getCoords(ClCont)
+    # fNet.write("MODEL %d\n" % nModel)
+    # fNet = net3D.writePDB(Xn, Yn, Zn, metrics, fNet)
+    # fNet = net3D.writeConnectionsPDB(ClCont.conformationNetwork.network, fNet)
+    # fNet.write("ENDMDL\n")
+    # fNet.close()
+    # nModel += 1
     ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
     os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
     # sortedNodes = getMetastableClusters2(ClCont, centTrajs)

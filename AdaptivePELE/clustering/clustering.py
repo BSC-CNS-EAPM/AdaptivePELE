@@ -877,7 +877,7 @@ class Clustering:
                                                                   degeneracy[i],
                                                                   cluster.contacts,
                                                                   cluster.threshold,
-                                                                  cluster.density,
+                                                                  cluster.density or 1.0,
                                                                   metric)
             summaryFile.write(writeString)
         summaryFile.close()

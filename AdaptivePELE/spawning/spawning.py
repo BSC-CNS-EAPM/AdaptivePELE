@@ -2,14 +2,17 @@ import math
 import sys
 import numpy as np
 import random
-from AdaptivePELE.constants import blockNames
+import scipy.optimize as optim
 import spawningTypes
 import densitycalculator
 import os
 import glob
+from AdaptivePELE.constants import blockNames
 from AdaptivePELE.constants import constants
 from AdaptivePELE.utilities import utilities
 
+def reward(x, rews):
+    return -(x[:,np.newaxis]*rews).sum()
 
 def return_sign(i, m, n, r):
     """
@@ -108,6 +111,8 @@ class SpawningBuilder:
             spawningCalculator = VariableEpsilonDegeneracyCalculator(densityCalculator)
         elif spawningTypeString == blockNames.StringSpawningTypes.UCB:
             spawningCalculator = UCBCalculator(densityCalculator)
+        elif spawningTypeString == blockNames.StringSpawningTypes.REAP:
+            spawningCalculator = REAPCalculator()
         else:
             sys.exit("Unknown spawning type! Choices are: " + str(spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
         return spawningCalculator
@@ -145,6 +150,7 @@ class SpawningParams:
         spawningType = spawningBlock[blockNames.StringSpawningTypes.type]
 
         # Params general to all
+
         # Params specific to epsilon related spawning
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon:
@@ -157,7 +163,8 @@ class SpawningParams:
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon or\
                 spawningType == blockNames.StringSpawningTypes.fast or \
                 spawningType == blockNames.StringSpawningTypes.simulatedAnnealing or \
-                spawningType == blockNames.StringSpawningTypes.UCB:
+                spawningType == blockNames.StringSpawningTypes.UCB or \
+                spawningType == blockNames.StringSpawningTypes.REAP:
             self.temperature = spawningParamsBlock.get(blockNames.SpawningParams.temperature,1000)
             self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
@@ -175,6 +182,9 @@ class SpawningParams:
 
         if spawningType == blockNames.StringSpawningTypes.UCB:
             self.alpha = spawningParamsBlock.get(blockNames.SpawningParams.alpha, 8.0)
+
+        if spawningType == blockNames.StringSpawningTypes.REAP:
+            self.metricInd = spawningParamsBlock.get(blockNames.SpawningParams.metricsInd, -1)
 
 
 from abc import ABCMeta, abstractmethod
@@ -905,3 +915,75 @@ class UCBCalculator(DensitySpawningCalculator):
         weights_trimmed = np.zeros(len(sizes))
         weights_trimmed[argweights[-trajToDistribute:]] = weights[argweights[-trajToDistribute:]]
         return self.divideProportionalToArray(weights_trimmed, trajToDistribute)
+
+class REAPCalculator(SpawningCalculator):
+    def __init__(self):
+        """
+            Spawning following the Reinforcement learning based Adaptive
+            samPling (REAP) (Shamsi et al., arXiv, Oct 2017), where the reward
+            given by the exploration on several reaction coordinates
+            is maximized
+        """
+        self.type = spawningTypes.SPAWNING_TYPES.REAP
+        self.weights = None
+        self.metricInd = None
+
+    def calculate(self, clusters, trajToDivide, spawningParams, currentEpoch=None):
+        """
+            Calculate the degeneracy of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
+        population = []
+        metrics = []
+        if self.metricInd is None:
+            if spawningParams.metricInd == -1:
+                self.metricInd = range(3, clusters[0].metrics.size)
+            else:
+                self.metricInd = spawningParams.metricInd
+        # Gather population and metrics data for all clusters
+        for cluster in clusters:
+            population.append(cluster.elements)
+            metrics.append([cluster.metrics[i] for i in self.metricInd])
+        self.degeneracy = np.zeros_like(population)
+        metrics = np.array(metrics).T
+        meanRew = np.mean(metrics, axis=1)
+        stdRew = np.std(metrics, axis=1)
+        # Filter top least populated clusters
+        argweights = np.argsort(population)
+        metrics = metrics[:,argweights[:trajToDivide]]
+        # Shift and scale all metrics to have mean 0 and std 1, so that the
+        # weight of each metric is not affected by its magnitued (i.e. binding
+        # energy ~ 10**2 while SASA <= 1)
+        rewProv = np.abs(metrics-meanRew[:,np.newaxis])/stdRew[:,np.newaxis]
+
+        # constraints so the weights have values between 0 and 1
+        eqcons = [lambda x, y: x.sum()-1]
+        neqcons = [lambda x,y: x]
+        if self.weights is None:
+            self.weights = np.ones(len(self.metricInd))/len(self.metricInd)
+        self.weights = optim.fmin_slsqp(reward, self.weights, args=(rewProv,), eqcons=eqcons, ieqcons=neqcons)
+        self.rewards = (self.weights[:, np.newaxis]*rewProv).sum(axis=0)
+        self.degeneracy[argweights[:trajToDivide]] = self.divideProportionalToArray(self.rewards, trajToDivide)
+        return self.degeneracy
+
+
+    def log(self):
+        """
+            Log spawning information
+        """
+        if self.degeneracy is not None:
+            print "[SpawningLog] Total: %s" % str(self.degeneracy)
+        print "Metric indices"
+        print self.metricInd
+        print "Spawning weights"
+        print self.weights

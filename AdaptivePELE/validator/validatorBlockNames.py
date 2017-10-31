@@ -35,6 +35,7 @@ class SpawningParams:
         "period": "numbers.Real",
         "alpha": "numbers.Real",
         "metricWeights": "basestring",
+        "metricsInd": "list",
         "n": "numbers.Real"
     }
     types = {
@@ -59,6 +60,10 @@ class SpawningParams:
             "maxEpsilon": "numbers.Real"
         },
         "UCB": {
+            "reportFilename": "basestring",
+            "metricColumnInReport": "numbers.Real"
+        },
+        "REAP": {
             "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real"
         }

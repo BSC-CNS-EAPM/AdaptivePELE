@@ -56,6 +56,7 @@ class StringSpawningTypes:
     # New parameters for variable epsilon(experimental)
     variableEpsilon = "variableEpsilon"
     UCB = "UCB"
+    REAP = "REAP"
 
 
 class SpawningParams:
@@ -79,6 +80,7 @@ class SpawningParams:
     boltzmann = "boltzmann"
     alpha = "alpha"
     nclusters = "n"
+    metricsInd = "metricsInd"
 
 
 class SpawningDensity:
