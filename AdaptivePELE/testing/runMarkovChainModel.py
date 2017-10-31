@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.random import choice
 import matplotlib.pyplot as plt
 import scipy
 from scipy import sparse, linalg
@@ -120,7 +119,7 @@ def runSimulation(P, steps, startingPosition):
     traj[0] = position
     for step in range(steps):
         prob = P[position]
-        position=choice(range(n), p=prob)
+        position=np.random.choice(range(n), p=prob)
         traj[step] = position
 
     return traj
