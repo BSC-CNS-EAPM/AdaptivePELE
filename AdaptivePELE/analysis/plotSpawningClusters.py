@@ -6,7 +6,8 @@ if machine == "bsccv03":
 elif 'login' in machine:
     matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
-plt.style.use("ggplot")
+if machine != "bsccv03":
+    plt.style.use("ggplot")
 import numpy as np
 import os
 import argparse
@@ -41,8 +42,8 @@ def main():
         clustering = np.loadtxt(templateSummary % i)
         for j, threshold in enumerate(clustersThres):
             spawningPerThres[i, j] = clustering[clustering[:,4]==threshold, 2].sum()
-    plt.plot(spawningPerThres)
-    plt.legend(labels=map(lambda x: "Cluster size %d" % x, clustersThres),
+    line_objects = plt.plot(spawningPerThres)
+    plt.legend(line_objects, tuple(["Cluster size %d" % x for x in clustersThres]),
                loc="best")
     plt.xlabel("Epoch")
     plt.ylabel("Number of spawned processors")
