@@ -967,11 +967,13 @@ class REAPCalculator(SpawningCalculator):
         rewProv = np.abs(metrics-meanRew[:,np.newaxis])/stdRew[:,np.newaxis]
 
         # constraints so the weights have values between 0 and 1
-        eqcons = [lambda x, y: x.sum()-1]
-        neqcons = [lambda x,y: x]
+        cons = ({'type': 'eq', 'fun': lambda x: np.array(x.sum()-1)})
+        bounds = [(0,1)]*len(self.metricInd)
+
         if self.weights is None:
             self.weights = np.ones(len(self.metricInd))/len(self.metricInd)
-        self.weights = optim.fmin_slsqp(reward, self.weights, args=(rewProv,), eqcons=eqcons, ieqcons=neqcons)
+        optimResult = optim.minimize(reward, self.weights, args=(rewProv,), method="SLSQP", constraints=cons, bounds=bounds)
+        self.weights = optimResult.x
         self.rewards = (self.weights[:, np.newaxis]*rewProv).sum(axis=0)
         self.degeneracy[argweights[:trajToDivide]] = self.divideProportionalToArray(self.rewards, trajToDivide)
         return self.degeneracy
