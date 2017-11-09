@@ -155,3 +155,7 @@ def ensure_connectivity_msm(msm):
         trans = run.buildRevTransitionMatrix(counts)
         eiv, eic = run.getSortedEigen(trans)
         return run.getStationaryDistr(eic[:, 0])
+
+def get_epoch_folders(path):
+    allFolders = os.listdir(path)
+    return [epoch for epoch in allFolders if epoch.isdigit()]
