@@ -252,7 +252,9 @@ def calculate_pmf(microstateVolume, pi):
     kb = 0.0019872041
     T = 300
     beta = 1 / (kb * T)
-    gpmf = -kb*T*np.log(pi/microstateVolume)
+    newDist = pi/microstateVolume
+    newDist /= newDist.sum()
+    gpmf = -kb*T*np.log(newDist)
     print gpmf[gpmf == -np.inf]
     print gpmf[gpmf == np.inf]
     gpmf[gpmf == -np.inf] = np.inf #to avoid contribution later
@@ -288,8 +290,10 @@ def main(trajWildcard, reweightingT=1000):
     bins = create_box(clusters, originalCoordinates, d)
     method = "new"
     if method == "new":
+        print "Using new volume estimation with radius %.2f" % d
         microstateVolume = calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d)
     else:
+        print "Using old volume estimation with radius %.2f" % d
         microstateVolume = calculate_microstate_volumes(clusters, originalCoordinates, bins, d)
     np.savetxt("volumeOfClusters.dat", microstateVolume)
 
