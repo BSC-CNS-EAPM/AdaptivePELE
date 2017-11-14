@@ -159,3 +159,20 @@ def ensure_connectivity_msm(msm):
 def get_epoch_folders(path):
     allFolders = os.listdir(path)
     return [epoch for epoch in allFolders if epoch.isdigit()]
+
+def write_PDB_clusters(pmf_xyzg, title="clusters.pdb"):
+    templateLine = "HETATM%s H%sCLT L 502    %s%s%s  0.75%s                H\n"
+
+    content = ""
+    for i, line in enumerate(pmf_xyzg):
+        number = str(i).rjust(5)
+        number3 = str(i).ljust(3)
+        x = ("%.3f" % line[0]).rjust(8)
+        y = ("%.3f" % line[1]).rjust(8)
+        z = ("%.3f" % line[2]).rjust(8)
+        g = 0
+        content += templateLine % (number, number3, x, y, z, g)
+
+    f = open(title, 'w')
+    f.write(content)
+    f.close()
