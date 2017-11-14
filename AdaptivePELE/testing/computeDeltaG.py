@@ -253,7 +253,7 @@ def calculate_pmf(microstateVolume, pi):
     T = 300
     beta = 1 / (kb * T)
     newDist = pi/microstateVolume
-    newDist /= newDist.sum()
+    newDist /= newDist[newDist != np.inf].sum()
     gpmf = -kb*T*np.log(newDist)
     print gpmf[gpmf == -np.inf]
     print gpmf[gpmf == np.inf]
@@ -264,6 +264,9 @@ def calculate_pmf(microstateVolume, pi):
     print "bound    Delta G     Delta W     Binding Volume:     Binding Volume contribution"
 
     upperGpmfValues = np.arange(0,-deltaW,0.5)
+
+    # Initialize string variable in case loop is not accessed
+    string = ""
 
     for upperGpmfValue in upperGpmfValues:
         bindingVolume = 0
