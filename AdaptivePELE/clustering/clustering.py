@@ -830,7 +830,15 @@ class Clustering:
                 metrics = np.loadtxt(reportFilename, ndmin=2)
 
                 for num, snapshot in enumerate(snapshots):
-                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col)
+                    try:
+                        origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col)
+                    except IndexError as e:
+                        message = (" This is usually caused by a mismatch between report files and trajectory files"
+                                      " which in turn is usually caused by some problem in writing the files, e.g. quota")
+
+                        # raise a new exception of the same type, with the same
+                        # traceback but with and added message
+                        raise type(e), type(e)(str(e) + message), sys.exc_info()[2]
             else:
                 for num, snapshot in enumerate(snapshots):
                     origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num)
