@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import numpy as np
 # import pickle
@@ -144,7 +145,8 @@ def readClusteringObject(clusteringObjectPath):
         try:
             return pickle.load(f)
         except EOFError:
-            raise EOFError("Empty clustering object!")
+            raise EOFError, EOFError("Empty clustering object!"), sys.exc_info()[2]
+
 
 def ensure_connectivity_msm(msm):
     if msm.nstates_full == msm.nstates:
@@ -153,12 +155,14 @@ def ensure_connectivity_msm(msm):
         counts = msm.count_matrix_full
         counts += 1/float(counts.shape[0])
         trans = run.buildRevTransitionMatrix(counts)
-        eiv, eic = run.getSortedEigen(trans)
+        _, eic = run.getSortedEigen(trans)
         return run.getStationaryDistr(eic[:, 0])
+
 
 def get_epoch_folders(path):
     allFolders = os.listdir(path)
     return [epoch for epoch in allFolders if epoch.isdigit()]
+
 
 def write_PDB_clusters(pmf_xyzg, title="clusters.pdb"):
     templateLine = "HETATM%s H%sCLT L 502    %s%s%s  0.75%s                H\n"
@@ -173,6 +177,5 @@ def write_PDB_clusters(pmf_xyzg, title="clusters.pdb"):
         g = 0
         content += templateLine % (number, number3, x, y, z, g)
 
-    f = open(title, 'w')
-    f.write(content)
-    f.close()
+    with open(title, 'w') as f:
+        f.write(content)
