@@ -38,7 +38,8 @@ def parseArgs():
 
 
 def writePDB(pmf_xyzg, title="clusters.pdb"):
-    templateLine = "HETATM%s  H%sCLT L 502    %s%s%s  0.75%s           H\n"
+    # templateLine = "HETATM%s  H%sCLT L 502    %s%s%s  0.75%s           H\n"
+    templateLine = "HETATM%s H%sCLT L 502    %s%s%s  0.75%s                H\n"
 
     content = ""
     for i, line in enumerate(pmf_xyzg):
