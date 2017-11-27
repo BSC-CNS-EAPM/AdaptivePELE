@@ -168,27 +168,30 @@ def get_epoch_folders(path):
 
 def gen_atom_name(index):
     if index == 0:
-        return chr(65)+"000"
+        return chr(65)+"0"
     else:
-        return chr(65+int(np.floor(np.log10(index))))+str(index % 999)
+        return chr(65+index/1000)+str(index % 1000)
 
 
 def write_PDB_clusters(pmf_xyzg, title="clusters.pdb", use_beta=False):
     templateLine = "HETATM%s %s CLT L 502    %s%s%s  0.75%s            H  \n"
 
     content = ""
+    names = []
     for i, line in enumerate(pmf_xyzg):
         number = str(i).rjust(5)
         # number3 = str(i).ljust(3)
         number3 = gen_atom_name(i).ljust(4)
+        names.append(number3)
         x = ("%.3f" % line[0]).rjust(8)
         y = ("%.3f" % line[1]).rjust(8)
         z = ("%.3f" % line[2]).rjust(8)
         if use_beta:
-            g = ("%.3f" % line[-1]).rjust(6)
+            g = ("%.2f" % line[-1]).rjust(6)
         else:
-            g = ("%.3f" % 0).rjust(6)
+            g = ("%.2f" % 0).rjust(6)
         content += templateLine % (number, number3, x, y, z, g)
 
     with open(title, 'w') as f:
         f.write(content)
+    return names
