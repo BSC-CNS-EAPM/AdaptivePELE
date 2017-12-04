@@ -167,10 +167,11 @@ def get_epoch_folders(path):
 
 
 def gen_atom_name(index):
-    if index == 0:
-        return chr(65)+"0"
-    else:
-        return chr(65+index/1000)+str(index % 1000)
+    # 6760 = 26*26*10
+    ind1 = index/6760
+    ind2 = (index % 6760)
+    ind3 = ind2 % 260
+    return chr(65+ind1)+chr(65+ind2/260)+chr(65+ind3/10)+str(ind3 % 10)
 
 
 def write_PDB_clusters(pmf_xyzg, title="clusters.pdb", use_beta=False):
