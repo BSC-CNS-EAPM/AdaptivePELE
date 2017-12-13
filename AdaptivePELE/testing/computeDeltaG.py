@@ -13,6 +13,7 @@ import argparse
 import cPickle
 from pyemma.coordinates.clustering import AssignCenters
 from AdaptivePELE.testing import runMarkovChainModel as run
+from AdaptivePELE.testing import utils
 import itertools
 
 
@@ -90,6 +91,11 @@ def loadMSM(MSMFile):
     return MSM_object
 
 
+def reestimate_transition_matrix(count_matrix):
+    count_matrix += 1/float(count_matrix.shape[0])
+    return utils.buildRevTransitionMatrix(count_matrix)
+
+
 def ensure_connectivity(MSMObject, allClusters):
     if len(allClusters) == MSMObject.stationary_distribution.size:
         pi = MSMObject.stationary_distribution
@@ -100,8 +106,7 @@ def ensure_connectivity(MSMObject, allClusters):
         # connectivity
         print "Adding pseudocounts to enforce connectivity"
         counts = MSMObject.count_matrix_full
-        counts += 1/float(counts.shape[0])
-        trans = run.buildRevTransitionMatrix(counts)
+        trans = reestimate_transition_matrix(counts)
         _, eic = run.getSortedEigen(trans)
         pi = run.getStationaryDistr(eic[:, 0])
         clusters = allClusters

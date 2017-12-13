@@ -1,6 +1,8 @@
 Behavior changes from previous version:
     *) Added scripts plot3DNetwork, plotSpawningClusters for better
     visualization of simulations
+    *) Moved buildRevTransitionMatrixFunction to Cython code (speed-up of up to
+    500 x)
 
 Bug fixes:
     *) Fixed minor bug in controlFileValidator
