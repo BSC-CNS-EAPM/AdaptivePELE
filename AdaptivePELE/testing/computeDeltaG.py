@@ -220,7 +220,7 @@ def calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d):
     # The coordinates array is built through lists in order to be able to
     # process trajectories of different lenght
     for coord in originalCoordinates:
-        allCoords.extend(coord.tolist())
+        allCoords.extend(coord[:, :3].tolist())
     allCoords = np.array(allCoords)
 
     histogram, _ = np.histogramdd(allCoords, bins=bins)
@@ -239,7 +239,7 @@ def calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d):
         if len(centers_x):
             centers_trajs.append(np.array(centers_x))
 
-    dtrajs = assignNewTrajectories(centers_trajs, clusters)
+    dtrajs = assignNewTrajectories(centers_trajs, clusters[:, :3])
     microstateVolume = np.zeros(numberOfClusters)
     for traj in dtrajs:
         counts, _ = np.histogram(traj, bins=np.arange(-0.5, numberOfClusters))
