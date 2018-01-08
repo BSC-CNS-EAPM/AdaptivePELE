@@ -17,7 +17,8 @@ class Constants:
         self.baseExtractedTrajectoryName = "coord_"
         self.reportName = '*report_'
         self.outputTrajectoryFolder = "%s/repeatedExtractedCoordinates"
-        self.ligandTrajectoryBasename = "traj_ligand_%s.pdb"
+        self.ligandTrajectoryFolder = "ligand_trajs"
+        self.ligandTrajectoryBasename = os.path.join(self.ligandTrajectoryFolder, "traj_ligand_%s.pdb")
         self.gatherTrajsFolder = "allTrajs"
         self.gatherTrajsFilename = os.path.join(self.gatherTrajsFolder, "traj_%s_%s.dat")
 
@@ -286,6 +287,8 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
     for folder_it in folders:
         pathFolder = os.path.join(folderWithTrajs, folder_it)
         print "Extracting coords from folder %s" % folder_it
+        if writeLigandTrajectory:
+            os.makedirs(os.path.join(pathFolder, constants.ligandTrajectoryFolder))
         writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, protein_CA)
         if not non_Repeat:
             print "Repeating snapshots from folder %s" % folder_it
