@@ -43,12 +43,16 @@ if __name__ == "__main__":
     # Strip out trailing backslash if present
     pathPrefix, epoch = os.path.split(epoch.rstrip("/"))
     sys.stderr.write("Creating pathway...\n")
-    while epoch != "0":
-        filename = glob.glob(os.path.join(pathPrefix,epoch,"*traj*_%d.pdb" % trajectory))
+    while True:
+        filename = glob.glob(os.path.join(pathPrefix, epoch, "*traj*_%d.pdb" % trajectory))
         snapshots = utilities.getSnapshots(filename[0])
         snapshots = snapshots[:snapshot+1]
         pathway.insert(0, snapshots)
-        procMapping  = open(os.path.join(pathPrefix, epoch, "processorMapping.txt")).read().rstrip().split(':')
+        if epoch == '0':
+            # Once we get to epoch 0, we just need to append the trajectory
+            # where the cluster was found and we can break out of the loop
+            break
+        procMapping = open(os.path.join(pathPrefix, epoch, "processorMapping.txt")).read().rstrip().split(':')
         epoch, trajectory, snapshot = map(int, procMapping[trajectory-1][1:-1].split(','))
         epoch = str(epoch)
     sys.stderr.write("Writing pathway...\n")
