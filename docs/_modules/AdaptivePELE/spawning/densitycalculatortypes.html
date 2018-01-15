@@ -86,7 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
 </ul>
 
             
@@ -138,13 +138,15 @@
   <h1>Source code for AdaptivePELE.spawning.densitycalculatortypes</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
 
+
 <div class="viewcode-block" id="DENSITY_CALCULATOR_TYPES"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.densitycalculatortypes.DENSITY_CALCULATOR_TYPES">[docs]</a><span class="k">class</span> <span class="nc">DENSITY_CALCULATOR_TYPES</span><span class="p">:</span>
-    <span class="n">null</span><span class="p">,</span> <span class="n">heaviside</span><span class="p">,</span> <span class="n">continuous</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
+    <span class="n">null</span><span class="p">,</span> <span class="n">heaviside</span><span class="p">,</span> <span class="n">continuous</span><span class="p">,</span> <span class="n">exitContinous</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span></div>
 
 <span class="n">DENSITY_CALCULATOR_TYPE_TO_STRING_DICTIONARY</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">heaviside</span> <span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">heaviside</span><span class="p">,</span>
-    <span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">null</span> <span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">null</span><span class="p">,</span>
-    <span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">continuous</span>
+    <span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">heaviside</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">heaviside</span><span class="p">,</span>
+    <span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">null</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">null</span><span class="p">,</span>
+    <span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">continuous</span><span class="p">,</span>
+    <span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">exitContinous</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">exitContinuous</span>
 <span class="p">}</span>
 </pre></div>
 

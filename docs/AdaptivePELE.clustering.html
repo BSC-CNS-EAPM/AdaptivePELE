@@ -88,7 +88,7 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
@@ -143,7 +143,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-        <li><a href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a> &raquo;</li>
+        <li><a href="AdaptivePELE.html">AdaptivePELE – Package Description</a> &raquo;</li>
       
     <li>clustering Package</li>
     <li class="wy-breadcrumbs-aside">
@@ -178,14 +178,14 @@ from encoded as tuples (priority, PDB).</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>PDB</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) &#8211; Structure to cluster</li>
-<li><strong>threshold</strong> (<em>float</em>) &#8211; Size of the cluster</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; String containing the three letter name of the ligand in the pdb</li>
-<li><strong>resnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>resChain</strong> (<em>str</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
-<li><strong>contactThreshold</strong> (<em>float</em>) &#8211; Distance at which to atoms are considered in contact</li>
-<li><strong>similarityEvaluator</strong> (<code class="xref py py-class docutils literal"><span class="pre">SimilarityEvaluator</span></code>) &#8211; Object that determinates the similarity between two structures</li>
-<li><strong>trajPosition</strong> (<em>int</em><em>, </em><em>int</em><em>, </em><em>int</em>) &#8211; Tuple of (epoch, trajectory, snapshot) that permit
+<li><strong>PDB</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) – Structure to cluster</li>
+<li><strong>threshold</strong> (<em>float</em>) – Size of the cluster</li>
+<li><strong>resname</strong> (<em>str</em>) – String containing the three letter name of the ligand in the pdb</li>
+<li><strong>resnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>resChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>contactThreshold</strong> (<em>float</em>) – Distance at which to atoms are considered in contact</li>
+<li><strong>similarityEvaluator</strong> (<code class="xref py py-class docutils literal"><span class="pre">SimilarityEvaluator</span></code>) – Object that determinates the similarity between two structures</li>
+<li><strong>trajPosition</strong> (<em>int</em><em>, </em><em>int</em><em>, </em><em>int</em>) – Tuple of (epoch, trajectory, snapshot) that permit
 identifying the structure added</li>
 </ul>
 </td>
@@ -202,10 +202,10 @@ identifying the structure added</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>centerPair</strong> (int, <a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) &#8211; Tuple with the population of the representative structure
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>centerPair</strong> (int, <a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) – Tuple with the population of the representative structure
 and the PDB of said structure</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>, tuple &#8211; PDB of the strucutre selected to spawn and tuple
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>, tuple – PDB of the strucutre selected to spawn and tuple
 consisting of (epoch, trajectory, snapshot)</td>
 </tr>
 </tbody>
@@ -227,7 +227,7 @@ elements than the limit in order to ensure efficiency</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Number of sub-clusters stored in the priority queue</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int – Number of sub-clusters stored in the priority queue</td>
 </tr>
 </tbody>
 </table>
@@ -238,15 +238,16 @@ elements than the limit in order to ensure efficiency</p>
 <dl class="class">
 <dt id="AdaptivePELE.clustering.clustering.CMClusteringEvaluator">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">CMClusteringEvaluator</code><span class="sig-paren">(</span><em>similarityEvaluator</em>, <em>symmetryEvaluator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#CMClusteringEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.CMClusteringEvaluator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper object to carry out the RMSD clustering</p>
+<dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.clustering.clustering.ClusteringEvaluator" title="AdaptivePELE.clustering.clustering.ClusteringEvaluator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.clustering.clustering.ClusteringEvaluator</span></code></a></p>
+<p>Helper object to carry out the RMSD clustering</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>similarityEvaluator</strong> (<em>object</em>) &#8211; object that calculates the similarity
+<li><strong>similarityEvaluator</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.CMSimilarityEvaluator" title="AdaptivePELE.clustering.clustering.CMSimilarityEvaluator"><code class="xref py py-class docutils literal"><span class="pre">CMSimilarityEvaluator</span></code></a>) – object that calculates the similarity
 between two contact maps</li>
-<li><strong>symmetryEvaluator</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator" title="AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator"><code class="xref py py-class docutils literal"><span class="pre">SymmetryContactMapEvaluator</span></code></a>) &#8211; object to introduce the symmetry  in the
+<li><strong>symmetryEvaluator</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator" title="AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator"><code class="xref py py-class docutils literal"><span class="pre">SymmetryContactMapEvaluator</span></code></a>) – object to introduce the symmetry  in the
 contacts maps</li>
 </ul>
 </td>
@@ -262,22 +263,16 @@ contacts maps</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pdb</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) &#8211; Structure to compare</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; String containing the three letter name of the ligand in the pdb</li>
-<li><strong>resnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>resChain</strong> (<em>str</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
-<li><strong>contactThreshold</strong> (<em>float</em>) &#8211; Distance between two atoms to be considered in contact (default 8)</li>
+<li><strong>pdb</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) – Structure to compare</li>
+<li><strong>resname</strong> (<em>str</em>) – String containing the three letter name of the ligand in the pdb</li>
+<li><strong>resnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>resChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>contactThreshold</strong> (<em>float</em>) – Distance between two atoms to be considered in contact (default 8)</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="AdaptivePELE.clustering.clustering.CMClusteringEvaluator.cleanContactMap">
-<code class="descname">cleanContactMap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#CMClusteringEvaluator.cleanContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.CMClusteringEvaluator.cleanContactMap" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clean the attributes to prepare for next iteration</p>
 </dd></dl>
 
 <dl class="method">
@@ -288,9 +283,9 @@ contacts maps</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) &#8211; Cluster to compare</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) – Cluster to compare</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; Threshold of the cluster</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float – Threshold of the cluster</td>
 </tr>
 </tbody>
 </table>
@@ -305,16 +300,16 @@ contacts maps</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pdb</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) &#8211; Structure to compare</li>
-<li><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) &#8211; Cluster to compare</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; String containing the three letter name of the ligand in the pdb</li>
-<li><strong>resnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>resChain</strong> (<em>str</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
-<li><strong>contactThreshold</strong> (<em>float</em>) &#8211; Distance between two atoms to be considered in contact (default 8)</li>
+<li><strong>pdb</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) – Structure to compare</li>
+<li><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) – Cluster to compare</li>
+<li><strong>resname</strong> (<em>str</em>) – String containing the three letter name of the ligand in the pdb</li>
+<li><strong>resnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>resChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>contactThreshold</strong> (<em>float</em>) – Distance between two atoms to be considered in contact (default 8)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool, float &#8211; Whether the structure belong to the cluster and the distance between them</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool, float – Whether the structure belong to the cluster and the distance between them</p>
 </td>
 </tr>
 </tbody>
@@ -334,6 +329,38 @@ contacts maps</li>
 </dd></dl>
 
 <dl class="class">
+<dt id="AdaptivePELE.clustering.clustering.CMSimilarityEvaluator">
+<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">CMSimilarityEvaluator</code><span class="sig-paren">(</span><em>typeEvaluator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#CMSimilarityEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.CMSimilarityEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the similarity of two contactMaps by calculating the ratio of
+the number of differences over the average of elements in the contacts
+maps, their correlation or their Jaccard index, that is, the ratio
+between the intersection of the two contact maps and their union</p>
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.CMSimilarityEvaluator.isSimilarCluster">
+<code class="descname">isSimilarCluster</code><span class="sig-paren">(</span><em>contactMap</em>, <em>clusterContactMap</em>, <em>symContactMapEvaluator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#CMSimilarityEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.CMSimilarityEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate if two contactMaps are similar or not, return True if yes,
+False otherwise</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>contactMap</strong> (<em>numpy.Array</em>) – contactMap of the structure to compare</li>
+<li><strong>contactMap</strong> – contactMap of the structure to compare</li>
+<li><strong>symContactMapEvaluator</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator" title="AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator"><code class="xref py py-class docutils literal"><span class="pre">SymmetryContactMapEvaluator</span></code></a>) – Contact Map symmetry evaluator object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float – distance between contact maps</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="AdaptivePELE.clustering.clustering.Cluster">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">Cluster</code><span class="sig-paren">(</span><em>pdb</em>, <em>thresholdRadius=None</em>, <em>contactMap=None</em>, <em>contacts=None</em>, <em>metrics=[]</em>, <em>metricCol=None</em>, <em>density=None</em>, <em>contactThreshold=8</em>, <em>altSelection=False</em>, <em>trajPosition=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>A cluster contains a representative structure(pdb), the number of
@@ -344,16 +371,16 @@ a contactMap(sometimes) and a metric</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pdb</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) &#8211; Pdb of the representative structure</li>
-<li><strong>thresholdRadius</strong> (<em>float</em>) &#8211; Threshold of the cluster</li>
-<li><strong>contactMap</strong> (<em>numpy.Array</em>) &#8211; The contact map of the ligand and the protein</li>
-<li><strong>contacts</strong> (<em>float</em>) &#8211; Ratio of the number of alpha carbons in contact with the ligand</li>
-<li><strong>metrics</strong> (<em>numpy.Array</em>) &#8211; Array of the metrics corresponding to the cluster</li>
-<li><strong>metricCol</strong> (<em>int</em>) &#8211; Column of the prefered metric</li>
-<li><strong>density</strong> (<em>float</em>) &#8211; Density of the cluster</li>
-<li><strong>contactThreshold</strong> (<em>float</em>) &#8211; Distance between two atoms to be considered in contact (default 8)</li>
-<li><strong>altSelection</strong> (<em>bool</em>) &#8211; Flag that controls wether to use the alternative structures (default 8)</li>
-<li><strong>trajPosition</strong> (<em>int</em><em>, </em><em>int</em><em>, </em><em>int</em>) &#8211; Tuple of (epoch, trajectory, snapshot) that permit
+<li><strong>pdb</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) – Pdb of the representative structure</li>
+<li><strong>thresholdRadius</strong> (<em>float</em>) – Threshold of the cluster</li>
+<li><strong>contactMap</strong> (<em>numpy.Array</em>) – The contact map of the ligand and the protein</li>
+<li><strong>contacts</strong> (<em>float</em>) – Ratio of the number of alpha carbons in contact with the ligand</li>
+<li><strong>metrics</strong> (<em>numpy.Array</em>) – Array of the metrics corresponding to the cluster</li>
+<li><strong>metricCol</strong> (<em>int</em>) – Column of the prefered metric</li>
+<li><strong>density</strong> (<em>float</em>) – Density of the cluster</li>
+<li><strong>contactThreshold</strong> (<em>float</em>) – Distance between two atoms to be considered in contact (default 8)</li>
+<li><strong>altSelection</strong> (<em>bool</em>) – Flag that controls wether to use the alternative structures (default 8)</li>
+<li><strong>trajPosition</strong> (<em>int</em><em>, </em><em>int</em><em>, </em><em>int</em>) – Tuple of (epoch, trajectory, snapshot) that permit
 identifying the structure added</li>
 </ul>
 </td>
@@ -368,7 +395,7 @@ identifying the structure added</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>metrics</strong> (<em>numpy.Array</em>) &#8211; Array of metrics of the new structure</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>metrics</strong> (<em>numpy.Array</em>) – Array of metrics of the new structure</td>
 </tr>
 </tbody>
 </table>
@@ -382,7 +409,7 @@ identifying the structure added</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; contact ratio of the cluster</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float – contact ratio of the cluster</td>
 </tr>
 </tbody>
 </table>
@@ -396,7 +423,7 @@ identifying the structure added</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; Value of the prefered metric</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float – Value of the prefered metric</td>
 </tr>
 </tbody>
 </table>
@@ -410,9 +437,9 @@ identifying the structure added</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>numcol</strong> (<em>int</em>) &#8211; Column of the desired metric</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>numcol</strong> (<em>int</em>) – Column of the desired metric</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; Value of the prefered metric</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float – Value of the prefered metric</td>
 </tr>
 </tbody>
 </table>
@@ -426,7 +453,7 @@ identifying the structure added</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>verbose</strong> (<em>bool</em>) &#8211; Flag to control the verbosity of the code (default is False)</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>verbose</strong> (<em>bool</em>) – Flag to control the verbosity of the code (default is False)</td>
 </tr>
 </tbody>
 </table>
@@ -440,7 +467,7 @@ identifying the structure added</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) &#8211; Filename of the file to write</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – Filename of the file to write</td>
 </tr>
 </tbody>
 </table>
@@ -454,7 +481,7 @@ identifying the structure added</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) &#8211; Filename of the file to write</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – Filename of the file to write</td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">Returns int, int, int:</th></tr>
 <tr class="field-even field"><td>&#160;</td><td class="field-body">Tuple of (epoch, trajectory, snapshot) that permit
@@ -476,12 +503,12 @@ contacts and accumulative inherit and use</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>resname</strong> (<em>str</em>) &#8211; String containing the three letter name of the ligand in the pdb</li>
-<li><strong>resnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>resChain</strong> (<em>str</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
-<li><strong>reportBaseFilename</strong> (<em>str</em>) &#8211; Name of the file that contains the metrics of the snapshots to cluster</li>
-<li><strong>columnOfReportFile</strong> (<em>int</em>) &#8211; Column of the report file that contain the metric of interest</li>
-<li><strong>contactThresholdDistance</strong> (<em>float</em>) &#8211; Distance at wich a ligand atom and a protein atom are
+<li><strong>resname</strong> (<em>str</em>) – String containing the three letter name of the ligand in the pdb</li>
+<li><strong>resnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>resChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>reportBaseFilename</strong> (<em>str</em>) – Name of the file that contains the metrics of the snapshots to cluster</li>
+<li><strong>columnOfReportFile</strong> (<em>int</em>) – Column of the report file that contain the metric of interest</li>
+<li><strong>contactThresholdDistance</strong> (<em>float</em>) – Distance at wich a ligand atom and a protein atom are
 considered in contact(default 8)</li>
 </ul>
 </td>
@@ -497,16 +524,16 @@ considered in contact(default 8)</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>trajNum</strong> (<em>int</em>) &#8211; Trajectory number</li>
-<li><strong>snapshot</strong> (<em>str</em>) &#8211; Snapshot to add</li>
-<li><strong>origCluster</strong> (<em>int</em>) &#8211; Cluster found in the previos snapshot</li>
-<li><strong>snapshotNum</strong> (<em>int</em>) &#8211; Number of snapshot in its trajectory</li>
-<li><strong>metrics</strong> (<em>numpy.Array</em>) &#8211; Array with the metrics of the snapshot</li>
-<li><strong>col</strong> (<em>int</em>) &#8211; Column of the desired metrics</li>
+<li><strong>trajNum</strong> (<em>int</em>) – Trajectory number</li>
+<li><strong>snapshot</strong> (<em>str</em>) – Snapshot to add</li>
+<li><strong>origCluster</strong> (<em>int</em>) – Cluster found in the previos snapshot</li>
+<li><strong>snapshotNum</strong> (<em>int</em>) – Number of snapshot in its trajectory</li>
+<li><strong>metrics</strong> (<em>numpy.Array</em>) – Array with the metrics of the snapshot</li>
+<li><strong>col</strong> (<em>int</em>) – Column of the desired metrics</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; Cluster to which the snapshot belongs</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Cluster to which the snapshot belongs</p>
 </td>
 </tr>
 </tbody>
@@ -521,7 +548,7 @@ considered in contact(default 8)</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>list</em>) &#8211; List of folders with the snapshots</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>list</em>) – List of folders with the snapshots</td>
 </tr>
 </tbody>
 </table>
@@ -541,7 +568,7 @@ considered in contact(default 8)</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a> &#8211; Cluster at clusterNum</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a> – Cluster at clusterNum</td>
 </tr>
 </tbody>
 </table>
@@ -555,7 +582,7 @@ considered in contact(default 8)</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Number of clusters</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int – Number of clusters</td>
 </tr>
 </tbody>
 </table>
@@ -569,10 +596,10 @@ considered in contact(default 8)</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>column</strong> (<em>int</em>) &#8211; Column of the metric that defines the best cluster,
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>column</strong> (<em>int</em>) – Column of the metric that defines the best cluster,
 if not specified, the cluster metric is chosen</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Number of cluster with the optimal metric</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – Number of cluster with the optimal metric</td>
 </tr>
 </tbody>
 </table>
@@ -586,7 +613,7 @@ if not specified, the cluster metric is chosen</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>col</strong> (<em>int</em>) &#8211; Column of the prefered column</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>col</strong> (<em>int</em>) – Column of the prefered column</td>
 </tr>
 </tbody>
 </table>
@@ -602,8 +629,8 @@ tab-separated file</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>path</strong> (<em>str</em>) &#8211; Path where to write the network</li>
-<li><strong>metricCol</strong> (<em>int</em>) &#8211; Column of the metric of interest</li>
+<li><strong>path</strong> (<em>str</em>) – Path where to write the network</li>
+<li><strong>metricCol</strong> (<em>int</em>) – Column of the metric of interest</li>
 </ul>
 </td>
 </tr>
@@ -620,7 +647,7 @@ tab-separated file</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) &#8211; Path where to write the network</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – Path where to write the network</td>
 </tr>
 </tbody>
 </table>
@@ -635,11 +662,11 @@ tab-separated file</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>outputPath</strong> (<em>str</em>) &#8211; Folder that will contain all the clustering information</li>
-<li><strong>degeneracy</strong> (<em>list</em>) &#8211; Degeneracy of each cluster. It must be in the same order
+<li><strong>outputPath</strong> (<em>str</em>) – Folder that will contain all the clustering information</li>
+<li><strong>degeneracy</strong> (<em>list</em>) – Degeneracy of each cluster. It must be in the same order
 as in the self.clusters list</li>
-<li><strong>outputObject</strong> (<em>str</em>) &#8211; Output name for the pickle object</li>
-<li><strong>writeAll</strong> (<em>bool</em>) &#8211; Wether to write pdb files for all cluster in addition
+<li><strong>outputObject</strong> (<em>str</em>) – Output name for the pickle object</li>
+<li><strong>writeAll</strong> (<em>bool</em>) – Wether to write pdb files for all cluster in addition
 of the summary</li>
 </ul>
 </td>
@@ -657,7 +684,7 @@ trajectory and  write it to a PDB file</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) &#8211; Path where to write the trajectory</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – Path where to write the trajectory</td>
 </tr>
 </tbody>
 </table>
@@ -672,8 +699,8 @@ trajectory and  write it to a PDB file</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pathway</strong> (<em>list</em>) &#8211; List of clusters that form the pathway</li>
-<li><strong>filename</strong> (<em>str</em>) &#8211; Path where to write the trajectory</li>
+<li><strong>pathway</strong> (<em>list</em>) – List of clusters that form the pathway</li>
+<li><strong>filename</strong> (<em>str</em>) – Path where to write the trajectory</li>
 </ul>
 </td>
 </tr>
@@ -695,19 +722,30 @@ trajectory and  write it to a PDB file</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>clusteringBlock</strong> (<em>dict</em>) &#8211; Parameters of the clustering process</li>
-<li><strong>reportBaseFilename</strong> (<em>str</em>) &#8211; Name of the file that contains the metrics of
+<li><strong>clusteringBlock</strong> (<em>dict</em>) – Parameters of the clustering process</li>
+<li><strong>reportBaseFilename</strong> (<em>str</em>) – Name of the file that contains the metrics of
 the snapshots to cluster</li>
-<li><strong>columnOfReportFile</strong> (<em>int</em>) &#8211; Column of the report file that contain the
+<li><strong>columnOfReportFile</strong> (<em>int</em>) – Column of the report file that contain the
 metric of interest</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a> &#8211; Clustering object selected</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a> – Clustering object selected</p>
 </td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AdaptivePELE.clustering.clustering.ClusteringEvaluator">
+<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">ClusteringEvaluator</code><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ClusteringEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ClusteringEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.ClusteringEvaluator.cleanContactMap">
+<code class="descname">cleanContactMap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ClusteringEvaluator.cleanContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ClusteringEvaluator.cleanContactMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean the attributes to prepare for next iteration</p>
 </dd></dl>
 
 </dd></dl>
@@ -723,7 +761,7 @@ metric of interest</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) &#8211; Cluster object to insert</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) – Cluster object to insert</td>
 </tr>
 </tbody>
 </table>
@@ -737,9 +775,9 @@ metric of interest</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusterNum</strong> (<em>int</em>) &#8211; Index of the cluster to retrieve</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusterNum</strong> (<em>int</em>) – Index of the cluster to retrieve</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a> &#8211; Cluster at position clusterNum</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a> – Cluster at position clusterNum</td>
 </tr>
 </tbody>
 </table>
@@ -753,7 +791,7 @@ metric of interest</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Number of clusters contained</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int – Number of clusters contained</td>
 </tr>
 </tbody>
 </table>
@@ -768,8 +806,8 @@ metric of interest</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>index</strong> (<em>int</em>) &#8211; Positions at which insert the cluster</li>
-<li><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) &#8211; Cluster object to insert</li>
+<li><strong>index</strong> (<em>int</em>) – Positions at which insert the cluster</li>
+<li><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) – Cluster object to insert</li>
 </ul>
 </td>
 </tr>
@@ -785,7 +823,7 @@ metric of interest</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>verbose</strong> (<em>bool</em>) &#8211; Flag to control the verbosity of the code (default is False)</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>verbose</strong> (<em>bool</em>) – Flag to control the verbosity of the code (default is False)</td>
 </tr>
 </tbody>
 </table>
@@ -814,8 +852,8 @@ stored using the networkx package[1]</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>source</strong> (<em>int</em>) &#8211; Name of the source node</li>
-<li><strong>target</strong> (<em>int</em>) &#8211; Name of the target node</li>
+<li><strong>source</strong> (<em>int</em>) – Name of the source node</li>
+<li><strong>target</strong> (<em>int</em>) – Name of the target node</li>
 </ul>
 </td>
 </tr>
@@ -832,8 +870,8 @@ stored using the networkx package[1]</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>node</strong> (<em>int</em>) &#8211; Name of the node</li>
-<li><strong>kwargs</strong> (<em>keyword arguments</em><em>, </em><em>optional</em>) &#8211; Set or change attributes using key=value.</li>
+<li><strong>node</strong> (<em>int</em>) – Name of the node</li>
+<li><strong>kwargs</strong> (<em>keyword arguments</em><em>, </em><em>optional</em>) – Set or change attributes using key=value.</li>
 </ul>
 </td>
 </tr>
@@ -850,9 +888,9 @@ discovered</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusterLeave</strong> (<em>int</em>) &#8211; End point of the pathway to reconstruct</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusterLeave</strong> (<em>int</em>) – End point of the pathway to reconstruct</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List of snapshots conforming a pathway</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list – List of snapshots conforming a pathway</td>
 </tr>
 </tbody>
 </table>
@@ -866,7 +904,7 @@ discovered</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) &#8211; Path where to write the network</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – Path where to write the network</td>
 </tr>
 </tbody>
 </table>
@@ -881,7 +919,7 @@ visualize it</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) &#8211; Path where to write the network</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – Path where to write the network</td>
 </tr>
 </tbody>
 </table>
@@ -900,21 +938,21 @@ This similarity can be calculated with different methods (see similariyEvaluator
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>thresholdCalculator</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator" title="AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator"><code class="xref py py-class docutils literal"><span class="pre">ThresholdCalculator</span></code></a>) &#8211; ThresholdCalculator object that calculate the
+<li><strong>thresholdCalculator</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator" title="AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator"><code class="xref py py-class docutils literal"><span class="pre">ThresholdCalculator</span></code></a>) – ThresholdCalculator object that calculate the
 threshold according to the contacts ratio</li>
-<li><strong>similarityEvaluator</strong> (<em>object</em>) &#8211; object that calculates the similarity
+<li><strong>similarityEvaluator</strong> (<em>object</em>) – object that calculates the similarity
 between two contact maps</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; String containing the three letter name of the ligand in the pdb</li>
-<li><strong>resnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>resChain</strong> (<em>str</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
-<li><strong>reportBaseFilename</strong> (<em>str</em>) &#8211; Name of the file that contains the metrics of
+<li><strong>resname</strong> (<em>str</em>) – String containing the three letter name of the ligand in the pdb</li>
+<li><strong>resnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>resChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>reportBaseFilename</strong> (<em>str</em>) – Name of the file that contains the metrics of
 the snapshots to cluster</li>
-<li><strong>columnOfReportFile</strong> (<em>int</em>) &#8211; Column of the report file that contain the
+<li><strong>columnOfReportFile</strong> (<em>int</em>) – Column of the report file that contain the
 metric of interest</li>
-<li><strong>contactThresholdDistance</strong> (<em>float</em>) &#8211; Distance at wich a ligand atom and a protein atom are
+<li><strong>contactThresholdDistance</strong> (<em>float</em>) – Distance at wich a ligand atom and a protein atom are
 considered in contact(default 8)</li>
-<li><strong>symmetries</strong> (<em>list</em>) &#8211; List of symmetric groups</li>
-<li><strong>altSelection</strong> (<em>bool</em>) &#8211; Flag that controls wether to use the alternative structures (default 8)</li>
+<li><strong>symmetries</strong> (<em>list</em>) – List of symmetric groups</li>
+<li><strong>altSelection</strong> (<em>bool</em>) – Flag that controls wether to use the alternative structures (default 8)</li>
 </ul>
 </td>
 </tr>
@@ -934,19 +972,19 @@ ratio of number of contacts over the number of heavy atoms of the ligand</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>resname</strong> (<em>str</em>) &#8211; String containing the three letter name of the ligand in the pdb</li>
-<li><strong>resnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>resChain</strong> (<em>str</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
-<li><strong>thresholdCalculator</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator" title="AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator"><code class="xref py py-class docutils literal"><span class="pre">ThresholdCalculator</span></code></a>) &#8211; ThresholdCalculator object that calculate the
+<li><strong>resname</strong> (<em>str</em>) – String containing the three letter name of the ligand in the pdb</li>
+<li><strong>resnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>resChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>thresholdCalculator</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator" title="AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator"><code class="xref py py-class docutils literal"><span class="pre">ThresholdCalculator</span></code></a>) – ThresholdCalculator object that calculate the
 threshold according to the contacts ratio</li>
-<li><strong>reportBaseFilename</strong> (<em>str</em>) &#8211; Name of the file that contains the metrics of
+<li><strong>reportBaseFilename</strong> (<em>str</em>) – Name of the file that contains the metrics of
 the snapshots to cluster</li>
-<li><strong>columnOfReportFile</strong> (<em>int</em>) &#8211; Column of the report file that contain the
+<li><strong>columnOfReportFile</strong> (<em>int</em>) – Column of the report file that contain the
 metric of interest</li>
-<li><strong>contactThresholdDistance</strong> (<em>float</em>) &#8211; Distance at wich a ligand atom and a protein atom are
+<li><strong>contactThresholdDistance</strong> (<em>float</em>) – Distance at wich a ligand atom and a protein atom are
 considered in contact(default 8)</li>
-<li><strong>symmetries</strong> (<em>list</em>) &#8211; List of symmetric groups</li>
-<li><strong>altSelection</strong> (<em>bool</em>) &#8211; Flag that controls wether to use the alternative structures (default 8)</li>
+<li><strong>symmetries</strong> (<em>list</em>) – List of symmetric groups</li>
+<li><strong>altSelection</strong> (<em>bool</em>) – Flag that controls wether to use the alternative structures (default 8)</li>
 </ul>
 </td>
 </tr>
@@ -957,12 +995,13 @@ considered in contact(default 8)</li>
 <dl class="class">
 <dt id="AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">ContactsClusteringEvaluator</code><span class="sig-paren">(</span><em>RMSDCalculator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ContactsClusteringEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper object to carry out the RMSD clustering</p>
+<dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.clustering.clustering.ClusteringEvaluator" title="AdaptivePELE.clustering.clustering.ClusteringEvaluator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.clustering.clustering.ClusteringEvaluator</span></code></a></p>
+<p>Helper object to carry out the RMSD clustering</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>RMSDCalculator</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.RMSDCalculator.RMSDCalculator" title="AdaptivePELE.atomset.RMSDCalculator.RMSDCalculator"><code class="xref py py-class docutils literal"><span class="pre">RMSDCalculator</span></code></a>) &#8211; object that calculates the RMSD between two
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>RMSDCalculator</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.RMSDCalculator.RMSDCalculator" title="AdaptivePELE.atomset.RMSDCalculator.RMSDCalculator"><code class="xref py py-class docutils literal"><span class="pre">RMSDCalculator</span></code></a>) – object that calculates the RMSD between two
 conformations</td>
 </tr>
 </tbody>
@@ -976,22 +1015,16 @@ conformations</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pdb</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) &#8211; Structure to compare</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; String containing the three letter name of the ligand in the pdb</li>
-<li><strong>resnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>resChain</strong> (<em>str</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
-<li><strong>contactThreshold</strong> (<em>float</em>) &#8211; Distance between two atoms to be considered in contact (default 8)</li>
+<li><strong>pdb</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) – Structure to compare</li>
+<li><strong>resname</strong> (<em>str</em>) – String containing the three letter name of the ligand in the pdb</li>
+<li><strong>resnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>resChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>contactThreshold</strong> (<em>float</em>) – Distance between two atoms to be considered in contact (default 8)</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator.cleanContactMap">
-<code class="descname">cleanContactMap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ContactsClusteringEvaluator.cleanContactMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator.cleanContactMap" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clean the attributes to prepare for next iteration</p>
 </dd></dl>
 
 <dl class="method">
@@ -1002,9 +1035,9 @@ conformations</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) &#8211; Cluster to compare</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) – Cluster to compare</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; Threshold of the cluster</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float – Threshold of the cluster</td>
 </tr>
 </tbody>
 </table>
@@ -1019,47 +1052,16 @@ conformations</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pdb</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) &#8211; Structure to compare</li>
-<li><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) &#8211; Cluster to compare</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; String containing the three letter name of the ligand in the pdb</li>
-<li><strong>resnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>resChain</strong> (<em>str</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
-<li><strong>contactThreshold</strong> (<em>float</em>) &#8211; Distance between two atoms to be considered in contact (default 8)</li>
+<li><strong>pdb</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) – Structure to compare</li>
+<li><strong>cluster</strong> (<a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a>) – Cluster to compare</li>
+<li><strong>resname</strong> (<em>str</em>) – String containing the three letter name of the ligand in the pdb</li>
+<li><strong>resnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>resChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>contactThreshold</strong> (<em>float</em>) – Distance between two atoms to be considered in contact (default 8)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool, float &#8211; Whether the structure belong to the cluster and the distance between them</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="AdaptivePELE.clustering.clustering.JaccardEvaluator">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">JaccardEvaluator</code><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#JaccardEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.JaccardEvaluator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate the similarity of two contactMaps by calculating the Jaccard
-index, that is, the ratio between the intersection of the two contact
-maps and their union</p>
-<dl class="method">
-<dt id="AdaptivePELE.clustering.clustering.JaccardEvaluator.isSimilarCluster">
-<code class="descname">isSimilarCluster</code><span class="sig-paren">(</span><em>contactMap</em>, <em>clusterContactMap</em>, <em>symContactMapEvaluator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#JaccardEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.JaccardEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate if two contactMaps are similar or not, return True if yes,
-False otherwise</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>contactMap</strong> (<em>numpy.Array</em>) &#8211; contactMap of the structure to compare</li>
-<li><strong>contactMap</strong> &#8211; contactMap of the structure to compare</li>
-<li><strong>symContactMapEvaluator</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator" title="AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator"><code class="xref py py-class docutils literal"><span class="pre">SymmetryContactMapEvaluator</span></code></a>) &#8211; Contact Map symmetry evaluator object</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; distance between contact maps</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool, float – Whether the structure belong to the cluster and the distance between them</p>
 </td>
 </tr>
 </tbody>
@@ -1081,12 +1083,12 @@ contacts and accumulative inherit and use</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>resname</strong> (<em>str</em>) &#8211; String containing the three letter name of the ligand in the pdb</li>
-<li><strong>resnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>resChain</strong> (<em>str</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
-<li><strong>reportBaseFilename</strong> (<em>str</em>) &#8211; Name of the file that contains the metrics of the snapshots to cluster</li>
-<li><strong>columnOfReportFile</strong> (<em>int</em>) &#8211; Column of the report file that contain the metric of interest</li>
-<li><strong>contactThresholdDistance</strong> (<em>float</em>) &#8211; Distance at wich a ligand atom and a protein atom are
+<li><strong>resname</strong> (<em>str</em>) – String containing the three letter name of the ligand in the pdb</li>
+<li><strong>resnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>resChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>reportBaseFilename</strong> (<em>str</em>) – Name of the file that contains the metrics of the snapshots to cluster</li>
+<li><strong>columnOfReportFile</strong> (<em>int</em>) – Column of the report file that contain the metric of interest</li>
+<li><strong>contactThresholdDistance</strong> (<em>float</em>) – Distance at wich a ligand atom and a protein atom are
 considered in contact(default 8)</li>
 </ul>
 </td>
@@ -1102,14 +1104,14 @@ considered in contact(default 8)</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>trajNum</strong> (<em>int</em>) &#8211; Trajectory number</li>
-<li><strong>snapshot</strong> (<em>str</em>) &#8211; Snapshot to add</li>
-<li><strong>metrics</strong> (<em>numpy.Array</em>) &#8211; Array with the metrics of the snapshot</li>
-<li><strong>col</strong> (<em>int</em>) &#8211; Column of the desired metrics</li>
+<li><strong>trajNum</strong> (<em>int</em>) – Trajectory number</li>
+<li><strong>snapshot</strong> (<em>str</em>) – Snapshot to add</li>
+<li><strong>metrics</strong> (<em>numpy.Array</em>) – Array with the metrics of the snapshot</li>
+<li><strong>col</strong> (<em>int</em>) – Column of the desired metrics</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; Cluster to which the snapshot belongs</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Cluster to which the snapshot belongs</p>
 </td>
 </tr>
 </tbody>
@@ -1124,68 +1126,7 @@ considered in contact(default 8)</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>list</em>) &#8211; List of folders with the snapshots</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="AdaptivePELE.clustering.clustering.correlationEvaluator">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">correlationEvaluator</code><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#correlationEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.correlationEvaluator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate the similarity of two contact maps by calculating their
-correlation</p>
-<dl class="method">
-<dt id="AdaptivePELE.clustering.clustering.correlationEvaluator.isSimilarCluster">
-<code class="descname">isSimilarCluster</code><span class="sig-paren">(</span><em>contactMap</em>, <em>clusterContactMap</em>, <em>symContactMapEvaluator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#correlationEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.correlationEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate if two contactMaps are similar or not, return True if yes,
-False otherwise</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>contactMap</strong> (<em>numpy.Array</em>) &#8211; contactMap of the structure to compare</li>
-<li><strong>contactMap</strong> &#8211; contactMap of the structure to compare</li>
-<li><strong>symContactMapEvaluator</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator" title="AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator"><code class="xref py py-class docutils literal"><span class="pre">SymmetryContactMapEvaluator</span></code></a>) &#8211; Contact Map symmetry evaluator object</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; distance between contact maps</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="AdaptivePELE.clustering.clustering.differenceDistanceEvaluator">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">differenceDistanceEvaluator</code><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#differenceDistanceEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.differenceDistanceEvaluator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate the similarity of two contactMaps by calculating the ratio of
-the number of differences over the average of elements in the contacts
-maps</p>
-<dl class="method">
-<dt id="AdaptivePELE.clustering.clustering.differenceDistanceEvaluator.isSimilarCluster">
-<code class="descname">isSimilarCluster</code><span class="sig-paren">(</span><em>contactMap</em>, <em>clusterContactMap</em>, <em>symContactMapEvaluator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#differenceDistanceEvaluator.isSimilarCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.differenceDistanceEvaluator.isSimilarCluster" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate if two contactMaps are similar or not, return True if yes,
-False otherwise</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>contactMap</strong> (<em>numpy.Array</em>) &#8211; contactMap of the structure to compare</li>
-<li><strong>contactMap</strong> &#8211; contactMap of the structure to compare</li>
-<li><strong>symContactMapEvaluator</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator" title="AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator"><code class="xref py py-class docutils literal"><span class="pre">SymmetryContactMapEvaluator</span></code></a>) &#8211; Contact Map symmetry evaluator object</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; distance between contact maps</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>list</em>) – List of folders with the snapshots</td>
 </tr>
 </tbody>
 </table>
@@ -1201,9 +1142,9 @@ False otherwise</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>str</em>) &#8211; The path where to find the trajectories</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>str</em>) – The path where to find the trajectories</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; A list with the names of all th trajectories in paths</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list – A list with the names of all th trajectories in paths</td>
 </tr>
 </tbody>
 </table>
@@ -1220,9 +1161,9 @@ False otherwise</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>similarityEvaluatorType</strong> (<em>str</em>) &#8211; Type of similarityEvaluator chosen</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>similarityEvaluatorType</strong> (<em>str</em>) – Type of similarityEvaluator chosen</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">SimilarityEvaluator</span></code> &#8211; SimilarityEvaluator object selected</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">SimilarityEvaluator</span></code> – SimilarityEvaluator object selected</td>
 </tr>
 </tbody>
 </table>
@@ -1297,9 +1238,9 @@ False otherwise</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusteringBlock</strong> (<em>dict</em>) &#8211; Parameters block corresponding to the threshold calculator</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusteringBlock</strong> (<em>dict</em>) – Parameters block corresponding to the threshold calculator</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator" title="AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator"><code class="xref py py-class docutils literal"><span class="pre">ThresholdCalculator</span></code></a> &#8211; thresholdCalculator object selected</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator" title="AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator"><code class="xref py py-class docutils literal"><span class="pre">ThresholdCalculator</span></code></a> – thresholdCalculator object selected</td>
 </tr>
 </tbody>
 </table>
@@ -1320,9 +1261,9 @@ the contacts ratio is only passed for compatibility purposes</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contacts</strong> (<em>float</em>) &#8211; Contact ratio</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contacts</strong> (<em>float</em>) – Contact ratio</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; threshold value of the cluster</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float – threshold value of the cluster</td>
 </tr>
 </tbody>
 </table>
@@ -1337,7 +1278,7 @@ distance-ordered clustering(in early development)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; Maximum threshold possible</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float – Maximum threshold possible</td>
 </tr>
 </tbody>
 </table>
@@ -1358,9 +1299,9 @@ and the selected conditions and values</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contacts</strong> (<em>float</em>) &#8211; Contact ratio</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contacts</strong> (<em>float</em>) – Contact ratio</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; threshold value of the cluster</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float – threshold value of the cluster</td>
 </tr>
 </tbody>
 </table>
@@ -1375,7 +1316,7 @@ distance-ordered clustering(in early development)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; Maximum threshold possible</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float – Maximum threshold possible</td>
 </tr>
 </tbody>
 </table>

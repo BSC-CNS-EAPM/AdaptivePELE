@@ -340,8 +340,6 @@ There are two types of density calculators:
 
 * **continuous**, which assings increasing densities for an increasing number of contacts. Default values, if **r** > 1, density = 8, otherwise, density = 64.0/(-4 **r** + 6)^3
 
-* **exitContinuous**, which assings decreasing densities for an increasing number of contacts. Default values, if **r** > 1, density = 1/8, otherwise, density = (-4 **r** + 6)^3/64.0
-
 
 parameters
 ..........
