@@ -38,6 +38,7 @@ class DensityCalculator:
     null = "null"
     constant = "constant"
     continuous = "continuous"
+    exitContinuous = "exitContinuous"
 
 
 class DensityCalculatorParams:

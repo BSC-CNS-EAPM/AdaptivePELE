@@ -83,3 +83,23 @@ class densityCalculatorTest(unittest.TestCase):
         # self.assertAlmostEqual(densityCalculator.calculate(0.5, 6), 8)
         # self.assertAlmostEqual(densityCalculator.calculate(0.05, 4), 1)
         # self.assertAlmostEqual(densityCalculator.calculate(0.2, 4), 8)
+
+
+    def testDensityCalculatorInverseContinuousParams(self):
+        spawningBlock = {
+            type: "irrelevant",
+            "density" : {
+                "type" : "exitContinuous"
+            }
+        }
+        densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
+        densityCalculator = densityCalculatorBuilder.build(spawningBlock)
+
+
+        self.assertAlmostEqual(densityCalculator.calculate(0.5, 8), 1)
+        self.assertAlmostEqual(densityCalculator.calculate(1.5, 8), 0.125)
+        self.assertAlmostEqual(densityCalculator.calculate(0.0, 8), 3.375)
+        self.assertAlmostEqual(densityCalculator.calculate(0.5, 6), 1)
+        self.assertAlmostEqual(densityCalculator.calculate(1.5, 6), 0.125)
+        self.assertAlmostEqual(densityCalculator.calculate(0.5, 4), 1)
+        self.assertAlmostEqual(densityCalculator.calculate(1.5, 4), 0.125)

@@ -73,6 +73,7 @@ class SpawningParams:
             "heaviside": "basestring",
             "null": "basestring",
             "constant": "basestring",
+            "exitContinuous": "basestring",
             "continuous": "basestring"
         },
         "params": {
@@ -81,6 +82,7 @@ class SpawningParams:
             "constant": "basestring",
             "values": "list",
             "conditions": "list",
+            "exitContinuous": "basestring",
             "continuous": "basestring"
         }
     }

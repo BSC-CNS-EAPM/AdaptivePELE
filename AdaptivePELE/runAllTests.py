@@ -1,10 +1,10 @@
 import unittest
-import tests.testSpawning as tSpawning
-import tests.testAtomset as tAtomset
-import tests.testClustering as tClustering
-import tests.testAdaptiveSampling as tAdaptive
-import tests.testThresholdcalculator as tThreshold
-import tests.testDensityCalculator as tDensity
+from AdaptivePELE.tests import testSpawning as tSpawning
+from AdaptivePELE.tests import testAtomset as tAtomset
+from AdaptivePELE.tests import testClustering as tClustering
+from AdaptivePELE.tests import testAdaptiveSampling as tAdaptive
+from AdaptivePELE.tests import testThresholdcalculator as tThreshold
+from AdaptivePELE.tests import testDensityCalculator as tDensity
 
 
 def main():
