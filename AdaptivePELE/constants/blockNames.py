@@ -117,6 +117,8 @@ class SimulationParams:
     metricCol = "metricCol"
     exitValue = "exitValue"
     trajectories = "trajectories"
+    boxCenter = "boxCenter"
+    boxRadius = "boxRadius"
 
 
 class ExitConditionType:

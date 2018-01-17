@@ -20,25 +20,22 @@ def parseArguments():
     """
     desc = "Write the information related to the conformation network to file\n"
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("clusteringObject", type=str, help="Path to the clustering object")
     parser.add_argument("trajectory", type=int, help="Trajectory number")
     parser.add_argument("snapshot", type=int, help="Snapshot to select (in accepted steps)")
     parser.add_argument("epoch", type=str, help="Path to the epoch to search the snapshot")
     parser.add_argument("-o", type=str, default=None, help="Output path where to write the files")
     args = parser.parse_args()
-    return args.clusteringObject, args.trajectory, args.snapshot, args.epoch, args.o
+    return args.trajectory, args.snapshot, args.epoch, args.o
 
 
 if __name__ == "__main__":
-    clusteringObject, trajectory, snapshot, epoch, outputPath = parseArguments()
+    trajectory, snapshot, epoch, outputPath = parseArguments()
     if outputPath is not None:
         outputPath = os.path.join(outputPath, "")
         if not os.path.exists(outputPath):
             os.makedirs(outputPath)
     else:
         outputPath = ""
-    sys.stderr.write("Reading clustering object...\n")
-    cl = utilities.readClusteringObject(clusteringObject)
     pathway = []
     # Strip out trailing backslash if present
     pathPrefix, epoch = os.path.split(epoch.rstrip("/"))
