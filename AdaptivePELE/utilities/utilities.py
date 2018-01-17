@@ -199,3 +199,9 @@ def write_PDB_clusters(pmf_xyzg, title="clusters.pdb", use_beta=False):
     with open(title, 'w') as f:
         f.write(content)
     return names
+
+
+def distanceCOM(coords1, coords2):
+    coords1 = np.array(coords1)
+    coords2 = np.array(coords2)
+    return np.linalg.norm(coords1-coords2)
