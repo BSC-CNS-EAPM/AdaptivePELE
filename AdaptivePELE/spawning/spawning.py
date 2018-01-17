@@ -41,6 +41,21 @@ def return_sign(i, m, n, r):
         return -1
 
 
+def getSizes(clusters):
+    """
+        Get the size of the clusters
+
+        :param clusters: Existing clusters
+        :type clusters: :py:class:`.Clusters`
+
+        :returns: np.Array -- Array containing the size of the clusters
+    """
+    sizes = np.zeros(len(clusters))
+    for i, cluster in enumerate(clusters):
+        sizes[i] = cluster.elements
+    return sizes
+
+
 def calculateContactsVar(deltaR, epsMax):
     """
         Calculate the variation of epsilon according to the contact ratio
@@ -231,7 +246,7 @@ class SpawningCalculator:
         counts = 0
         procMapping = []
         for i, cluster in enumerate(clustering.clusters.clusters):
-            for j in range(int(degeneracyOfRepresentatives[i])):
+            for _ in range(int(degeneracyOfRepresentatives[i])):
                 outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
                 print 'Writing to ', outputFilename, 'cluster', i
                 procMapping.append(cluster.writeSpawningStructure(outputFilename))
@@ -330,20 +345,6 @@ class SpawningCalculator:
             metrics[i] = cluster.getMetric()
         return metrics
 
-    def getSizes(self, clusters):
-        """
-            Get the size of the clusters
-
-            :param clusters: Existing clusters
-            :type clusters: :py:class:`.Clusters`
-
-            :returns: np.Array -- Array containing the size of the clusters
-        """
-        sizes = np.zeros(len(clusters))
-        for i, cluster in enumerate(clusters):
-            sizes[i] = cluster.elements
-        return sizes
-
 
 class DensitySpawningCalculator(SpawningCalculator):
     """
@@ -428,9 +429,8 @@ class IndependentRunsCalculator(SpawningCalculator):
             num = int(trajectory.split("_")[-1][:-4]) % len(trajectories)  # to start with 0
             outputFilename = outputPathConstants.tmpInitialStructuresTemplate % (iteration, num)
 
-            f = open(outputFilename, 'w')
-            f.write(lastSnapshot)
-            f.close()
+            with open(outputFilename, 'w') as f:
+                f.write(lastSnapshot)
 
         return len(trajectories)
 
@@ -501,7 +501,7 @@ class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
 
             :returns: list -- List containing the degeneracy of the clusters
         """
-        sizes = self.getSizes(clusters)
+        sizes = getSizes(clusters)
         densities = self.calculateDensities(clusters)
 
         if densities.any():
@@ -701,9 +701,8 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         """
             Log spawning information
         """
-        epsilon_file = open("epsilon_values.txt", "a")
-        epsilon_file.write("%d\t%f\n" % (epoch, epsilon))
-        epsilon_file.close()
+        with open("epsilon_values.txt", "a") as epsilon_file:
+            epsilon_file.write("%d\t%f\n" % (epoch, epsilon))
 
     def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
         """
@@ -793,7 +792,7 @@ class FASTDegeneracyCalculator(DensitySpawningCalculator):
         return normalisedArray
 
     def calculateNormalisedSizes(self, clusters):
-        sizes = self.getSizes(clusters)
+        sizes = getSizes(clusters)
 
         densities = self.calculateDensities(clusters)
         weightedSizes = sizes/densities
@@ -866,7 +865,7 @@ class UCBCalculator(DensitySpawningCalculator):
             :returns: list -- List containing the degeneracy of the clusters
         """
         self.epoch += 1
-        sizes = np.array(self.getSizes(clusters))
+        sizes = np.array(getSizes(clusters))
         densities = self.calculateDensities(clusters)
         metrics = np.array(self.getMetrics(clusters))
         # self.averageMetric = np.mean(metrics)
