@@ -4,16 +4,16 @@ machine = socket.getfqdn()
 
 print "MACHINE", machine
 if "bsccv" in machine:
-    PELE_EXECUTABLE  = "/data/EAPM/PELE/PELE++/bin/rev12025/Pele_rev12025_mpi"
-    DATA_FOLDER  = "/data/EAPM/PELE/PELE++/data/rev12025/Data"
-    DOCUMENTS_FOLDER  = "/data/EAPM/PELE/PELE++/Documents/rev12025"
+    PELE_EXECUTABLE  = "/data/EAPM/PELE/PELE++/bin/rev12360/Pele_rev12360_mpi"
+    DATA_FOLDER  = "/data/EAPM/PELE/PELE++/data/rev12360/Data"
+    DOCUMENTS_FOLDER  = "/data/EAPM/PELE/PELE++/Documents/rev12360"
 
     PYTHON = "/data2/apps/PYTHON/2.7.5/bin/python2.7"
 
 elif "mn.bsc" in machine:
-    PELE_EXECUTABLE  = "/gpfs/projects/bsc72/PELE++/bin/rev12025/Pele_rev12025_mpi"
-    DATA_FOLDER  = "/gpfs/projects/bsc72/PELE++/data/rev12025/Data"
-    DOCUMENTS_FOLDER  = "/gpfs/projects/bsc72/PELE++/Documents/rev12025"
+    PELE_EXECUTABLE  = "/gpfs/projects/bsc72/PELE++/bin/rev12360/Pele_rev12360_mpi"
+    DATA_FOLDER  = "/gpfs/projects/bsc72/PELE++/data/rev12360/Data"
+    DOCUMENTS_FOLDER  = "/gpfs/projects/bsc72/PELE++/Documents/rev12360"
     PYTHON = "python"
 
 elif "bsc.mn" in machine:
