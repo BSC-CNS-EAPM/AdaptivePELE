@@ -117,6 +117,7 @@ class SimulationParams:
         "seed": "numbers.Real",
         "peleSteps": "numbers.Real",
         "iterations": "numbers.Real",
+        "modeMovingBox": "basestring",
         "boxCenter": "bool",
         "boxRadius": "numbers.Real",
         "exitCondition": "dict"

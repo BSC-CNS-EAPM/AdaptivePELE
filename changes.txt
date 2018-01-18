@@ -4,6 +4,7 @@ Behavior changes from previous version:
     *) Moved buildRevTransitionMatrixFunction to Cython code (speed-up of up to
     500x)
     *) Added exitContinuous density for exit path simulations
+    *) Add possibility to change the simulation box at each epoch
 
 Bug fixes:
     *) Fixed minor bug in controlFileValidator

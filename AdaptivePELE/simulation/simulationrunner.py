@@ -21,6 +21,7 @@ class SimulationParameters:
         self.exitCondition = None
         self.boxCenter = None
         self.boxRadius = 20
+        self.modeMovingBox = None
 
 
 class SimulationRunner:
@@ -274,9 +275,9 @@ class RunnerBuilder:
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
+            parms.modeMovingBox = paramsBlock.get(blockNames.SimulationParams.modeMovingBox)
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
-            if params.boxCenter is not None:
-                params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()

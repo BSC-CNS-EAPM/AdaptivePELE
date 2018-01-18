@@ -36,6 +36,7 @@ def filterClustersAccordingToBox(simulationRunnerParams, clusteringObject):
         :type simulationRunnerParams: :py:class:`.SimulationParameters`
         :param clusteringObject: Clustering object
         :type clusteringObject: :py:class:`.Clustering`
+
         :returns list, list: -- list of the filtered clusters, list of bools flagging wether the cluster is selected or not
 
     """
@@ -74,13 +75,16 @@ def mergeFilteredClustersAccordingToBox(degeneracy, clustersFiltering):
     return np.array(newDegeneracy)
 
 
-def getNextIterationBox(clusteringObject):
+def getNextIterationBox(clusteringObject, simulationRunnerParams):
     """
         Select the box for the next epoch, currently selecting the COM of
         the cluster with max SASA
 
         :param clusteringObject: Clustering object
         :type clusteringObject: :py:class:`.Clustering`
+        :param simulationRunnerParams: :py:class:`.SimulationParameters` Simulation parameters object
+        :type simulationRunnerParams: :py:class:`.SimulationParameters`
+
         :returns str: -- string to be substitued in PELE control file
     """
     metrics = []
@@ -96,8 +100,13 @@ def getNextIterationBox(clusteringObject):
     elif len(possibleSASACols) > 1:
         print "WARNING! More than one possible SASA column is present!!"
     columnSASA = possibleSASACols[0]
-    maxSASAcluster = np.argmax(metrics[:, columnSASA])
-    return str(clusteringObject.getCluster(maxSASAcluster).pdb.getCOM())
+    if simulationRunnerParams.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxBinding:
+        SASAcluster = np.argmin(metrics[:, columnSASA])
+    elif simulationRunnerParams.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxUnBinding:
+        SASAcluster = np.argmax(metrics[:, columnSASA])
+    else:
+        raise ValueError("%s should be either binding or unbinding, but %s is provided!!!" % (blockNames.SimulationParams.modeMovingBox, simulationRunnerParams.modeMovingBox))
+    return str(clusteringObject.getCluster(SASAcluster).pdb.getCOM())
 
 
 def selectInitialBoxCenter(simulationRunner, initialStructuresAsString, resname):
@@ -607,7 +616,7 @@ def main(jsonParams):
         clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
 
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
-    if simulationRunner.parameters.boxCenter is not None:
+    if simulationRunner.parameters.modeMovingBox is None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = selectInitialBoxCenter(simulationRunner, initialStructuresAsString, resname)
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
@@ -631,8 +640,8 @@ def main(jsonParams):
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
-        if simulationRunner.parameters.boxCenter is not None:
-            simulationRunner.parameters.boxCenter = getNextIterationBox(clusteringMethod)
+        if simulationRunner.parameters.modeMovingBox is not None:
+            simulationRunner.parameters.boxCenter = getNextIterationBox(clusteringMethod, simulationRunner.parameters)
             clustersList, clustersFiltered = filterClustersAccordingToBox(simulationRunner.parameters, clusteringMethod)
         else:
             clustersList = clusteringMethod.clusters.clusters
@@ -640,7 +649,7 @@ def main(jsonParams):
         degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.parameters.processors-1, spawningParams, i)
         spawningCalculator.log()
 
-        if simulationRunner.parameters.boxCenter is not None:
+        if simulationRunner.parameters.modeMovingBox is not None:
             degeneracyOfRepresentatives = mergeFilteredClustersAccordingToBox(degeneracyOfRepresentatives, clustersFiltered)
         print "Degeneracy", degeneracyOfRepresentatives
         assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)

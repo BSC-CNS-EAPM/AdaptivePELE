@@ -117,6 +117,9 @@ class SimulationParams:
     metricCol = "metricCol"
     exitValue = "exitValue"
     trajectories = "trajectories"
+    modeMovingBox = "modeMovingBox"
+    modeMovingBoxBinding = "binding"
+    modeMovingBoxUnBinding = "unbinding"
     boxCenter = "boxCenter"
     boxRadius = "boxRadius"
 
