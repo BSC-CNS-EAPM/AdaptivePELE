@@ -280,6 +280,11 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <li><strong>outputPath</strong>: The output path needs to be changed for: <code class="docutils literal"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/report&quot;</span></code></li>
 <li><strong>numberOfPeleSteps</strong>: The number of pele steps needs to be templetized as <code class="docutils literal"><span class="pre">&quot;numberOfPeleSteps&quot;:</span> <span class="pre">$PELE_STEPS</span></code></li>
 </ul>
+<p>Optionally other fields might be templetized as well:</p>
+<ul class="simple">
+<li><strong>fixedCenter</strong>: The center of the simulation box is templetized as <code class="docutils literal"><span class="pre">&quot;fixedCenter&quot;:</span> <span class="pre">$BOX_CENTER</span></code></li>
+<li><strong>radius</strong>: The radius of the simulation box is templetized as <code class="docutils literal"><span class="pre">&quot;radius&quot;:</span> <span class="pre">$BOX_RADIUS</span></code></li>
+</ul>
 </div>
 <div class="section" id="id1">
 <h3>parameters<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
@@ -296,6 +301,9 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <li><strong>data</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE</li>
 <li><strong>documents</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE</li>
 <li><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder, it is already</li>
+<li><strong>modeMovingBox</strong> (<em>string</em>, default=None, possible values={<em>unbinding</em>, <em>bidning</em>}): Wether to dynamically set the center of the simulation box along an exit or entrance simulation</li>
+<li><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</li>
+<li><strong>boxRadius</strong> (<em>int</em>, default=20): Value of the simulation box radius</li>
 </ul>
 <p>Additionally, the block may have an exit condition that stops the execution:</p>
 <ul>

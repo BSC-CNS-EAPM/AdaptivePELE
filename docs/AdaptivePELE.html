@@ -343,6 +343,29 @@ and the initial structure filenames as strings</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.adaptiveSampling.filterClustersAccordingToBox">
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">filterClustersAccordingToBox</code><span class="sig-paren">(</span><em>simulationRunnerParams</em>, <em>clusteringObject</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#filterClustersAccordingToBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.filterClustersAccordingToBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the clusters to select only the ones whose representative
+structures will fit into the selected box</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>simulationRunnerParams</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a>) – <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a> Simulation parameters object</li>
+<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Returns list, list:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first last">– list of the filtered clusters, list of bools flagging wether the cluster is selected or not</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.findFirstRun">
 <code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">findFirstRun</code><span class="sig-paren">(</span><em>outputPath</em>, <em>clusteringOutputObject</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#findFirstRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.findFirstRun" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the last epoch that was properly simulated and clusterized and
@@ -411,6 +434,28 @@ epoch</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.adaptiveSampling.getNextIterationBox">
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">getNextIterationBox</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>simulationRunnerParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#getNextIterationBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.getNextIterationBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select the box for the next epoch, currently selecting the COM of
+the cluster with max SASA</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
+<li><strong>simulationRunnerParams</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a>) – <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a> Simulation parameters object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns str:</th><td class="field-body"><p class="first last">– string to be substitued in PELE control file</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.getWorkingClusteringObjectAndReclusterIfNecessary">
 <code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">getWorkingClusteringObjectAndReclusterIfNecessary</code><span class="sig-paren">(</span><em>firstRun</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>simulationRunner</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#getWorkingClusteringObjectAndReclusterIfNecessary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.getWorkingClusteringObjectAndReclusterIfNecessary" title="Permalink to this definition">¶</a></dt>
 <dd><p>It reads the previous clustering method, and, if there are changes,
@@ -459,6 +504,25 @@ general parameters, clustering and spawning</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jsonParams</strong> (<em>str</em>) – A string with the name of the control file to use</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.adaptiveSampling.mergeFilteredClustersAccordingToBox">
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">mergeFilteredClustersAccordingToBox</code><span class="sig-paren">(</span><em>degeneracy</em>, <em>clustersFiltering</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#mergeFilteredClustersAccordingToBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.mergeFilteredClustersAccordingToBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge the (possibly) partial degeneracy to obtain a complete list,
+the partial list comes from the clusters excluded by the moving box
+:param degeneracy: Degeneracy of the clusters
+:param degeneracy: list
+:param clustersFiltering: List of bools indicating whether a cluster was filtered or not
+:param clustersFiltering: list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns list:</th><td class="field-body">– complete list of cluster degeneracies</td>
 </tr>
 </tbody>
 </table>
@@ -525,6 +589,29 @@ provided in the control file</p>
 <li><strong>jsonParams</strong> (<em>str</em>) – Input control file in JSON format</li>
 <li><strong>originalControlFile</strong> (<em>str</em>) – Path where to save the control file</li>
 </ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.adaptiveSampling.selectInitialBoxCenter">
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">selectInitialBoxCenter</code><span class="sig-paren">(</span><em>simulationRunner</em>, <em>initialStructuresAsString</em>, <em>resname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#selectInitialBoxCenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.selectInitialBoxCenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select the coordinates of the first box, currently as the center of
+mass of the first initial structure provided</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a> Simulation runner object</li>
+<li><strong>initialStructuresAsString</strong> (<em>str</em>) – String containing the files of the initial structures</li>
+<li><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the system pdb</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns str:</th><td class="field-body"><p class="first last">– string to be substitued in PELE control file</p>
 </td>
 </tr>
 </tbody>
