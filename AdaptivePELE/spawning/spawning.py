@@ -927,6 +927,9 @@ class REAPCalculator(SpawningCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.REAP
         self.weights = None
         self.metricInd = None
+        # constraints so the weights have values between 0 and 1
+        self.cons = ({'type': 'eq', 'fun': lambda x: np.array(x.sum()-1)})
+        self.bounds = None
 
     def calculate(self, clusters, trajToDivide, spawningParams, currentEpoch=None):
         """
@@ -950,6 +953,8 @@ class REAPCalculator(SpawningCalculator):
                 self.metricInd = range(3, clusters[0].metrics.size)
             else:
                 self.metricInd = spawningParams.metricInd
+            self.bounds = [(0,1)]*len(self.metricInd)
+
         # Gather population and metrics data for all clusters
         for cluster in clusters:
             population.append(cluster.elements)
@@ -966,14 +971,13 @@ class REAPCalculator(SpawningCalculator):
         # energy ~ 10**2 while SASA <= 1)
         rewProv = np.abs(metrics-meanRew[:,np.newaxis])/stdRew[:,np.newaxis]
 
-        # constraints so the weights have values between 0 and 1
-        cons = ({'type': 'eq', 'fun': lambda x: np.array(x.sum()-1)})
-        bounds = [(0,1)]*len(self.metricInd)
-
         if self.weights is None:
             self.weights = np.ones(len(self.metricInd))/len(self.metricInd)
-        optimResult = optim.minimize(reward, self.weights, args=(rewProv,), method="SLSQP", constraints=cons, bounds=bounds)
-        self.weights = optimResult.x
+        else:
+            optimResult = optim.minimize(reward, self.weights, args=(rewProv,), 
+                                         method="SLSQP", constraints=self.cons, 
+                                         bounds=self.bounds)
+            self.weights = optimResult.x
         self.rewards = (self.weights[:, np.newaxis]*rewProv).sum(axis=0)
         self.degeneracy[argweights[:trajToDivide]] = self.divideProportionalToArray(self.rewards, trajToDivide)
         return self.degeneracy
