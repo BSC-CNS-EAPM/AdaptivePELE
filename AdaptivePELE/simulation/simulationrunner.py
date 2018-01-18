@@ -276,7 +276,7 @@ class RunnerBuilder:
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             if params.boxCenter is not None:
-                params.boxRadius = paramsBlock[blockNames.SimulationParams.boxRadius]
+                params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()

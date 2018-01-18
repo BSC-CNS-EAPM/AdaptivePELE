@@ -44,7 +44,7 @@ def filterClustersAccordingToBox(simulationRunnerParams, clusteringObject):
     clustersFiltered = []
     clustersSelected = []
     for cluster in clusteringObject.clusters.clusters:
-        if utilities.distanceCOM(box_center, cluster.getCOM()) < (box_radius-1):
+        if utilities.distanceCOM(box_center, cluster.pdb.getCOM()) < (box_radius-1):
             clustersFiltered.append(cluster)
             clustersSelected.append(True)
         else:
@@ -65,12 +65,13 @@ def mergeFilteredClustersAccordingToBox(degeneracy, clustersFiltering):
     """
     assert len(degeneracy) == sum(clustersFiltering)
     newDegeneracy = []
+    degeneracy = degeneracy.tolist()
     for filtered in clustersFiltering:
         if filtered:
             newDegeneracy.append(degeneracy.pop(0))
         else:
             newDegeneracy.append(0)
-    return newDegeneracy
+    return np.array(newDegeneracy)
 
 
 def getNextIterationBox(clusteringObject):
@@ -88,7 +89,7 @@ def getNextIterationBox(clusteringObject):
     metrics = np.array(metrics)
     maxMetrics = metrics.max(axis=0)
     minMetrics = metrics.min(axis=0)
-    possibleSASACols = [i for i in xrange(metrics.shape[1]) if np.abs(maxMetrics[i]-1) < 0.1 and np.abs(minMetrics[i]-0) < 0.1]
+    possibleSASACols = [i for i in xrange(metrics.shape[1]) if np.abs(maxMetrics[i]) < 1.05 and np.abs(minMetrics[i]) > 0]
     if len(possibleSASACols) == 0:
         raise ValueError("No possible SASA identified in metrics, please check"
                          " that SASA is computed in your simulation!!!!")
@@ -115,9 +116,9 @@ def selectInitialBoxCenter(simulationRunner, initialStructuresAsString, resname)
     """
     # This is a dictionary because it's prepared to be subtitued in the PELE
     # control files (i.e. JSON format)
-    initialStructuresDict = json.loads(initialStructuresAsString.split(","))
+    initialStructuresDict = json.loads(initialStructuresAsString.split(",")[0])
     PDBinitial = atomset.PDB()
-    PDBinitial.initialise(initialStructuresDict['files'][0]['path'], resname=resname)
+    PDBinitial.initialise(str(initialStructuresDict['files'][0]['path']), resname=resname)
     return repr(PDBinitial.getCOM())
 
 
@@ -642,6 +643,7 @@ def main(jsonParams):
         if simulationRunner.parameters.boxCenter is not None:
             degeneracyOfRepresentatives = mergeFilteredClustersAccordingToBox(degeneracyOfRepresentatives, clustersFiltered)
         print "Degeneracy", degeneracyOfRepresentatives
+        assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
