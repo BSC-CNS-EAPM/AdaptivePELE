@@ -93,7 +93,7 @@ def getNextIterationBox(clusteringObject, simulationRunnerParams):
     metrics = np.array(metrics)
     maxMetrics = metrics.max(axis=0)
     minMetrics = metrics.min(axis=0)
-    possibleSASACols = [i for i in xrange(metrics.shape[1]) if np.abs(maxMetrics[i]) < 1.05 and np.abs(minMetrics[i]) > 0]
+    possibleSASACols = [i for i in xrange(metrics.shape[1]) if maxMetrics[i] < 1.05 and minMetrics[i] > 0]
     if len(possibleSASACols) == 0:
         raise ValueError("No possible SASA identified in metrics, please check"
                          " that SASA is computed in your simulation!!!!")
@@ -616,7 +616,7 @@ def main(jsonParams):
         clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
 
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
-    if simulationRunner.parameters.modeMovingBox is None and simulationRunner.parameters.boxCenter is None:
+    if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = selectInitialBoxCenter(simulationRunner, initialStructuresAsString, resname)
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
