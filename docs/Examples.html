@@ -124,7 +124,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
 </ul>
 
             
@@ -211,7 +211,7 @@ parameters such as the output path, initial structures, or whether to restart (r
 The other three blocks configure the three iterative steps of an adaptive run, and have a
 <code class="docutils literal"><span class="pre">{&quot;type&quot;:str,</span> <span class="pre">&quot;params&quot;:{},</span> <span class="pre">&quot;optionalClasses&quot;:{}}</span></code> structure. Namely, the <strong>simulation</strong> block
 chooses and tunes the propagation algorithm, typically PELE, the <strong>clustering</strong> block tunes the clustering method,
-cluster sizes... and the <strong>spawning</strong> block selects the strategy to choose the most interesting
+cluster sizes… and the <strong>spawning</strong> block selects the strategy to choose the most interesting
 structures.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{},</span>
@@ -236,7 +236,7 @@ using debug=true may be a great option.</p>
 <p>The general parameters block has five possible fields:</p>
 <ul class="simple">
 <li><strong>restart</strong> (<em>boolean</em>, default=True): This parameter specifies whether you want to
-continue a previous simulation or not. It requires the last epoch&#8217;s clustering object,
+continue a previous simulation or not. It requires the last epoch’s clustering object,
 which is stored as a binary file to optimize disk usage.</li>
 <li><strong>debug</strong> (<em>boolean</em>, default=False): Run adaptive in debug mode, without calling
 any propagation algorithm. Typically used to tinker with the clustering/spawning.</li>
@@ -275,10 +275,15 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <h3>Templetized PELE control file<a class="headerlink" href="#templetized-pele-control-file" title="Permalink to this headline">¶</a></h3>
 <p>In order to run adaptivePELE, PELE control file needs to be templetized. In particular:</p>
 <ul class="simple">
-<li><strong>MultipleComplexes&#8221;</strong>: AdaptivePELE requieres the use of multiple complexes: <code class="docutils literal"><span class="pre">&quot;MultipleComplex&quot;:</span> <span class="pre">[</span> <span class="pre">$COMPLEXES</span> <span class="pre">]</span></code></li>
+<li><strong>MultipleComplexes”</strong>: AdaptivePELE requieres the use of multiple complexes: <code class="docutils literal"><span class="pre">&quot;MultipleComplex&quot;:</span> <span class="pre">[</span> <span class="pre">$COMPLEXES</span> <span class="pre">]</span></code></li>
 <li><strong>seed</strong>: The seed needs to be templetized: <code class="docutils literal"><span class="pre">&quot;seed&quot;:</span> <span class="pre">$SEED</span></code></li>
 <li><strong>outputPath</strong>: The output path needs to be changed for: <code class="docutils literal"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/report&quot;</span></code></li>
 <li><strong>numberOfPeleSteps</strong>: The number of pele steps needs to be templetized as <code class="docutils literal"><span class="pre">&quot;numberOfPeleSteps&quot;:</span> <span class="pre">$PELE_STEPS</span></code></li>
+</ul>
+<p>Optionally other fields might be templetized as well:</p>
+<ul class="simple">
+<li><strong>fixedCenter</strong>: The center of the simulation box is templetized as <code class="docutils literal"><span class="pre">&quot;fixedCenter&quot;:</span> <span class="pre">$BOX_CENTER</span></code></li>
+<li><strong>radius</strong>: The radius of the simulation box is templetized as <code class="docutils literal"><span class="pre">&quot;radius&quot;:</span> <span class="pre">$BOX_RADIUS</span></code></li>
 </ul>
 </div>
 <div class="section" id="id1">
@@ -296,6 +301,9 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <li><strong>data</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE</li>
 <li><strong>documents</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE</li>
 <li><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder, it is already</li>
+<li><strong>modeMovingBox</strong> (<em>string</em>, default=None, possible values={<em>unbinding</em>, <em>bidning</em>}): Wether to dynamically set the center of the simulation box along an exit or entrance simulation</li>
+<li><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</li>
+<li><strong>boxRadius</strong> (<em>int</em>, default=20): Value of the simulation box radius</li>
 </ul>
 <p>Additionally, the block may have an exit condition that stops the execution:</p>
 <ul>
@@ -392,8 +400,8 @@ There are currently three implemented methods to evaluate the similarity of cont
 <div class="section" id="id2">
 <h3>parameters<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><strong>ligandResname</strong> (<em>string</em>, default=&#8221;&#8221;): Ligand residue name in the PDB (if necessary)</li>
-<li><strong>ligandChain</strong> (<em>string</em>, default=&#8221;&#8221;): Ligand chain (if necessary)</li>
+<li><strong>ligandResname</strong> (<em>string</em>, default=”“): Ligand residue name in the PDB (if necessary)</li>
+<li><strong>ligandChain</strong> (<em>string</em>, default=”“): Ligand chain (if necessary)</li>
 <li><strong>ligandResnum</strong> (<em>int</em>, default=0): Ligand residue number (if necessary). If 0 or not specified, it is ignored. The ligand ought to be univoquely identified with any combination of this and the two former parameters</li>
 <li><strong>contactThresholdDistance</strong> (<em>float</em>, default=8): Maximum distance at which two atoms have to
 be separated to be considered in contact</li>
@@ -465,12 +473,13 @@ There are two types of density calculators:</p>
 <li><strong>constant</strong> (or <strong>null</strong>, default), which assigns the same density to all the clusters regardless of the number of contacts</li>
 <li><strong>heaviside</strong>, which assigns different densities using a heaviside function, much like the thresholdCalculator (values and conditions are mandatory)</li>
 <li><strong>continuous</strong>, which assings increasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 8, otherwise, density = 64.0/(-4 <strong>r</strong> + 6)^3</li>
+<li><strong>exitContinuous</strong>, which assings decreasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 1/8, otherwise, density = (-4 <strong>r</strong> + 6)^3/64.0</li>
 </ul>
 </div>
 <div class="section" id="id3">
 <h3>parameters<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. &#8220;report&#8221;.</li>
+<li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. “report”.</li>
 <li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (zero indexed)</li>
 <li><strong>epsilon</strong> (<em>float</em>, mandatory in <strong>epsilon</strong> spawning): The fraction of the processors that will be assigned according to the selected metric</li>
 <li><strong>metricWeights</strong> (<em>string</em>, default=linear): Selects how to distribute the weights of the cluster according to its metric, two options: linear (proportional to metric) or Boltzmann weigths (proportional to exp(-metric/T). Needs to define the temperature <strong>T</strong>.</li>

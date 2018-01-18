@@ -3,16 +3,19 @@ import sys
 import numpy as np
 import random
 import scipy.optimize as optim
-import spawningTypes
-import densitycalculator
 import os
 import glob
 from AdaptivePELE.constants import blockNames
 from AdaptivePELE.constants import constants
 from AdaptivePELE.utilities import utilities
+from AdaptivePELE.spawning import spawningTypes
+from AdaptivePELE.spawning import densitycalculator
+from abc import abstractmethod
+
 
 def reward(x, rews):
-    return -(x[:,np.newaxis]*rews).sum()
+    return -(x[:, np.newaxis]*rews).sum()
+
 
 def return_sign(i, m, n, r):
     """
@@ -36,6 +39,21 @@ def return_sign(i, m, n, r):
         return 0
     else:
         return -1
+
+
+def getSizes(clusters):
+    """
+        Get the size of the clusters
+
+        :param clusters: Existing clusters
+        :type clusters: :py:class:`.Clusters`
+
+        :returns: np.Array -- Array containing the size of the clusters
+    """
+    sizes = np.zeros(len(clusters))
+    for i, cluster in enumerate(clusters):
+        sizes[i] = cluster.elements
+    return sizes
 
 
 def calculateContactsVar(deltaR, epsMax):
@@ -134,7 +152,7 @@ class SpawningParams:
         self.maxEpsilonWindow = None
         self.metricWeights = None
         self.alpha = None
-        self.nclusters = None #number of clusters to consider in epsilon
+        self.nclusters = None  # number of clusters to consider in epsilon
 
     def buildSpawningParameters(self, spawningBlock):
         """
@@ -165,7 +183,7 @@ class SpawningParams:
                 spawningType == blockNames.StringSpawningTypes.simulatedAnnealing or \
                 spawningType == blockNames.StringSpawningTypes.UCB or \
                 spawningType == blockNames.StringSpawningTypes.REAP:
-            self.temperature = spawningParamsBlock.get(blockNames.SpawningParams.temperature,1000)
+            self.temperature = spawningParamsBlock.get(blockNames.SpawningParams.temperature, 1000)
             self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
 
@@ -187,7 +205,6 @@ class SpawningParams:
             self.metricInd = spawningParamsBlock.get(blockNames.SpawningParams.metricsInd, -1)
 
 
-from abc import ABCMeta, abstractmethod
 class SpawningCalculator:
     """
         The purpose of this abstract class is to contain the behaviour of the different strategies for the spawning.
@@ -195,8 +212,7 @@ class SpawningCalculator:
     """
 
     def __init__(self):
-        self.type = "BaseClass" #change for abstract attribute
-        pass
+        self.type = "BaseClass"  # change for abstract attribute
 
     @abstractmethod
     def calculate(self, clusters, trajToDivide, spawningParams, currentEpoch=None):
@@ -230,7 +246,7 @@ class SpawningCalculator:
         counts = 0
         procMapping = []
         for i, cluster in enumerate(clustering.clusters.clusters):
-            for j in range(int(degeneracyOfRepresentatives[i])):
+            for _ in range(int(degeneracyOfRepresentatives[i])):
                 outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
                 print 'Writing to ', outputFilename, 'cluster', i
                 procMapping.append(cluster.writeSpawningStructure(outputFilename))
@@ -282,7 +298,8 @@ class SpawningCalculator:
             :returns: list -- List with the number of processors allocated to
                 each cluster
         """
-        if isinstance(array, list): array = np.array(array)
+        if isinstance(array, list):
+            array = np.array(array)
         weights = array/sum(array)
         return self.divideTrajAccordingToWeights(weights, trajToDistribute)
 
@@ -299,13 +316,14 @@ class SpawningCalculator:
             :returns: list -- List with the number of processors allocated to
                 each cluster
         """
-        if isinstance(array, list): array = np.array(array)
+        if isinstance(array, list):
+            array = np.array(array)
         weights = 1./array
 
-        #Handle Nan cases
+        # Handle Nan cases
         weights[weights == np.inf] = 0
 
-        #Handle all Nan cases
+        # Handle all Nan cases
         if weights.any():
             weights /= sum(weights)
         else:
@@ -327,21 +345,7 @@ class SpawningCalculator:
             metrics[i] = cluster.getMetric()
         return metrics
 
-    def getSizes(self, clusters):
-        """
-            Get the size of the clusters
 
-            :param clusters: Existing clusters
-            :type clusters: :py:class:`.Clusters`
-
-            :returns: np.Array -- Array containing the size of the clusters
-        """
-        sizes = np.zeros(len(clusters))
-        for i, cluster in enumerate(clusters):
-            sizes[i] = cluster.elements
-        return sizes
-
-from abc import ABCMeta, abstractmethod
 class DensitySpawningCalculator(SpawningCalculator):
     """
         Subclass of Spawning calculator that ensures the definition of a density calculator.
@@ -367,6 +371,7 @@ class DensitySpawningCalculator(SpawningCalculator):
             cluster.density = self.densityCalculator.calculate(contacts, cluster.contactThreshold)
             densities[i] = cluster.density
         return densities
+
 
 class IndependentRunsCalculator(SpawningCalculator):
 
@@ -417,16 +422,15 @@ class IndependentRunsCalculator(SpawningCalculator):
         """
         # TODO: Add processors mapping
         trajWildcard = os.path.join(outputPathConstants.epochOutputPathTempletized, constants.trajectoryBasename)
-        trajectories = glob.glob(trajWildcard%(iteration-1))
+        trajectories = glob.glob(trajWildcard % (iteration-1))
         for trajectory in trajectories:
             lastSnapshot = utilities.getSnapshots(trajectory)[-1]
 
-            num = int(trajectory.split("_")[-1][:-4])%len(trajectories)  #to start with 0
+            num = int(trajectory.split("_")[-1][:-4]) % len(trajectories)  # to start with 0
             outputFilename = outputPathConstants.tmpInitialStructuresTemplate % (iteration, num)
 
-            f = open(outputFilename, 'w')
-            f.write(lastSnapshot)
-            f.close()
+            with open(outputFilename, 'w') as f:
+                f.write(lastSnapshot)
 
         return len(trajectories)
 
@@ -497,7 +501,7 @@ class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
 
             :returns: list -- List containing the degeneracy of the clusters
         """
-        sizes = self.getSizes(clusters)
+        sizes = getSizes(clusters)
         densities = self.calculateDensities(clusters)
 
         if densities.any():
@@ -579,18 +583,17 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
 
         metrics = self.getMetrics(clusters)
 
-        if isinstance(metrics, list): metrics = np.array(metrics)
+        if isinstance(metrics, list):
+            metrics = np.array(metrics)
 
-        """
-            Shift so that differences become larger.
-            Also, we can now merge positive & negative values
-            Alternatives: Boltzmann weights
-        """
+        # Shift so that differences become larger.
+        # Also, we can now merge positive & negative values
+        # Alternatives: Boltzmann weights
         maximumValue = np.max(metrics)
         shiftedMetrics = np.subtract(metrics, maximumValue)
         bestClusters = shiftedMetrics.argsort()
 
-        shiftedMetrics[bestClusters[spawningParams.nclusters:]] = 0 #only consider best ones
+        shiftedMetrics[bestClusters[spawningParams.nclusters:]] = 0  # only consider best ones
 
         metricWeights = spawningParams.metricWeights
         if metricWeights == blockNames.SpawningParams.linear:
@@ -653,7 +656,7 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
             return
         rateEpsilonVariation = [(spawningParams.maxEpsilon-spawningParams.minEpsilon)/(middleWindow-leftWindow), (spawningParams.maxEpsilon-spawningParams.minEpsilon)/(spawningParams.period-rightWindow-1)]
         spawningParams.epsilon += return_sign(currentEpoch, leftWindow,
-                                                middleWindow, rightWindow) * rateEpsilonVariation[currentEpoch > middleWindow]
+                                              middleWindow, rightWindow) * rateEpsilonVariation[currentEpoch > middleWindow]
 
     def contactsVariation(self, clusters, spawningParams):
         """
@@ -698,9 +701,8 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         """
             Log spawning information
         """
-        epsilon_file = open("epsilon_values.txt", "a")
-        epsilon_file.write("%d\t%f\n" % (epoch, epsilon))
-        epsilon_file.close()
+        with open("epsilon_values.txt", "a") as epsilon_file:
+            epsilon_file.write("%d\t%f\n" % (epoch, epsilon))
 
     def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
         """
@@ -742,7 +744,7 @@ class SimulatedAnnealingCalculator(SpawningCalculator):
             return T
 
     def calculate(self, clusters, trajToDistribute, spawningParams,
-                  currentEpoch):
+                  currentEpoch=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -790,7 +792,7 @@ class FASTDegeneracyCalculator(DensitySpawningCalculator):
         return normalisedArray
 
     def calculateNormalisedSizes(self, clusters):
-        sizes = self.getSizes(clusters)
+        sizes = getSizes(clusters)
 
         densities = self.calculateDensities(clusters)
         weightedSizes = sizes/densities
@@ -863,7 +865,7 @@ class UCBCalculator(DensitySpawningCalculator):
             :returns: list -- List containing the degeneracy of the clusters
         """
         self.epoch += 1
-        sizes = np.array(self.getSizes(clusters))
+        sizes = np.array(getSizes(clusters))
         densities = self.calculateDensities(clusters)
         metrics = np.array(self.getMetrics(clusters))
         # self.averageMetric = np.mean(metrics)
@@ -916,6 +918,7 @@ class UCBCalculator(DensitySpawningCalculator):
         weights_trimmed[argweights[-trajToDistribute:]] = weights[argweights[-trajToDistribute:]]
         return self.divideProportionalToArray(weights_trimmed, trajToDistribute)
 
+
 class REAPCalculator(SpawningCalculator):
     def __init__(self):
         """
@@ -965,11 +968,15 @@ class REAPCalculator(SpawningCalculator):
         stdRew = np.std(metrics, axis=1)
         # Filter top least populated clusters
         argweights = np.argsort(population)
-        metrics = metrics[:,argweights[:trajToDivide]]
+        metrics = metrics[:, argweights[:trajToDivide]]
         # Shift and scale all metrics to have mean 0 and std 1, so that the
         # weight of each metric is not affected by its magnitued (i.e. binding
         # energy ~ 10**2 while SASA <= 1)
-        rewProv = np.abs(metrics-meanRew[:,np.newaxis])/stdRew[:,np.newaxis]
+        rewProv = np.abs(metrics-meanRew[:, np.newaxis])/stdRew[:, np.newaxis]
+
+        # constraints so the weights have values between 0 and 1
+        cons = ({'type': 'eq', 'fun': lambda x: np.array(x.sum()-1)})
+        bounds = [(0, 1)]*len(self.metricInd)
 
         if self.weights is None:
             self.weights = np.ones(len(self.metricInd))/len(self.metricInd)
@@ -981,7 +988,6 @@ class REAPCalculator(SpawningCalculator):
         self.rewards = (self.weights[:, np.newaxis]*rewProv).sum(axis=0)
         self.degeneracy[argweights[:trajToDivide]] = self.divideProportionalToArray(self.rewards, trajToDivide)
         return self.degeneracy
-
 
     def log(self):
         """

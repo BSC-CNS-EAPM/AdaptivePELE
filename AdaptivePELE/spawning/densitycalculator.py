@@ -1,6 +1,14 @@
 from AdaptivePELE.constants import blockNames
-import densitycalculatortypes
+from abc import abstractmethod
+from AdaptivePELE.spawning import densitycalculatortypes
 import sys
+
+
+def continousDensity(contacts):
+    if contacts > 1.0:
+        return 8.0
+    else:
+        return 64.0/(-4*contacts+6)**3
 
 
 class DensityCalculatorBuilder():
@@ -20,14 +28,14 @@ class DensityCalculatorBuilder():
             return NullDensityCalculator()
 
         try:
-            type = densityBlock[blockNames.DensityCalculator.type]
+            density_type = densityBlock[blockNames.DensityCalculator.type]
         except KeyError:
             sys.exit("Density calculator must have a type")
 
-        if type == blockNames.DensityCalculator.null or type == blockNames.DensityCalculator.constant:
+        if density_type == blockNames.DensityCalculator.null or density_type == blockNames.DensityCalculator.constant:
             print "Using constant density"
             return NullDensityCalculator()
-        elif type == blockNames.DensityCalculator.heaviside:
+        elif density_type == blockNames.DensityCalculator.heaviside:
             try:
                 paramsBlock = densityBlock[blockNames.DensityCalculator.params]
                 values = paramsBlock[blockNames.DensityCalculatorParams.values]
@@ -36,12 +44,16 @@ class DensityCalculatorBuilder():
             except KeyError:
                 print "Using default parameters for Heaviside density calculator"
                 return DensityCalculatorHeaviside()
-        elif type == blockNames.DensityCalculator.continuous:
+        elif density_type == blockNames.DensityCalculator.continuous:
+            print "Using continuous density calculator"
             return ContinuousDensityCalculator()
+        elif density_type == blockNames.DensityCalculator.exitContinuous:
+            print "Using inverse continuous density calculator"
+            return ExitContinousDensityCalculator()
         else:
             sys.exit("Unknown density calculator type! Choices are: " + str(densitycalculatortypes.DENSITY_CALCULATOR_TYPE_TO_STRING_DICTIONARY.values()))
 
-from abc import ABCMeta, abstractmethod
+
 class DensityCalculator():
     def __init__(self):
         self.type = "BaseClass"
@@ -120,7 +132,13 @@ class ContinuousDensityCalculator(DensityCalculator):
 
             :returns: float -- Density value for the value of the contacts ratio
         """
-        if contacts > 1.0:
-            return 8
-        else:
-            return 64.0/(-4*contacts+6)**3
+        return continousDensity(contacts)
+
+
+class ExitContinousDensityCalculator(DensityCalculator):
+    def __init__(self):
+        DensityCalculator.__init__(self)
+        self.type = densitycalculatortypes.DENSITY_CALCULATOR_TYPES.exitContinous
+
+    def calculate(self, contacts, contactThreshold):
+        return 1.0/continousDensity(contacts)

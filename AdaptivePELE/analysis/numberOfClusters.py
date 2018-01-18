@@ -1,15 +1,17 @@
 import socket
-machine = socket.gethostname()
 import matplotlib
-if machine == "bsccv03":
-   matplotlib.use('wxagg')
-elif 'login' in machine:
-    matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 import collections
 import argparse
+machine = socket.gethostname()
+if machine == "bsccv03":
+    matplotlib.use('wxagg')
+elif 'login' in machine:
+    matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+if machine != "bsccv03":
+    plt.style.use("ggplot")
 
 
 def printHelp():
@@ -19,7 +21,7 @@ def printHelp():
         :returns: str -- Output filename ( if specified )
     """
     desc = "Program that prints the number of clusters throughout an adaptive sampling simulation. "\
-            "It must be run in the root folder. "
+           "It must be run in the root folder. "
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("-filename", type=str, default="", help="Output filename")
     args = parser.parse_args()
@@ -63,7 +65,7 @@ def getTotalNumberOfClustersPerEpoch(templetizedClusteringSummaryFile, folder):
             epoch
     """
     allFolders = os.listdir(folder)
-    numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit() and os.path.isfile(templetizedClusteringSummaryFile%int(epoch))])
+    numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit() and os.path.isfile(templetizedClusteringSummaryFile % int(epoch))])
 
     totalNumberOfClustersPerEpoch = []
     for epoch in range(numberOfEpochs):
@@ -73,6 +75,7 @@ def getTotalNumberOfClustersPerEpoch(templetizedClusteringSummaryFile, folder):
             totalNumberOfClustersPerEpoch.append(len(clusteringSummary))
 
     return totalNumberOfClustersPerEpoch
+
 
 def findDifferentClustersInEpoch(column, summaryFile):
     """
@@ -92,9 +95,10 @@ def findDifferentClustersInEpoch(column, summaryFile):
     if clusteringSummary != []:
         for line in clusteringSummary:
             value = line[column]
-            if not value in epochDictionary:
-                epochDictionary[value] = len(np.argwhere(clusteringSummary[:,column] == value))
+            if value not in epochDictionary:
+                epochDictionary[value] = len(np.argwhere(clusteringSummary[:, column] == value))
     return epochDictionary
+
 
 def findDifferentClustersForAllEpochs(column, templetizedClusteringSummaryFile, numberOfEpochs):
     """
@@ -115,11 +119,12 @@ def findDifferentClustersForAllEpochs(column, templetizedClusteringSummaryFile, 
     """
     clustersPerEpoch = []
     for epoch in range(numberOfEpochs):
-        summaryFile = templetizedClusteringSummaryFile%epoch
+        summaryFile = templetizedClusteringSummaryFile % epoch
         epochDictionary = findDifferentClustersInEpoch(column, summaryFile)
 
         clustersPerEpoch.append(epochDictionary)
     return clustersPerEpoch
+
 
 def getAllDifferentValues(clustersPerEpoch):
     """
@@ -134,9 +139,10 @@ def getAllDifferentValues(clustersPerEpoch):
     """
     allValues = set()
     for epochSummary in clustersPerEpoch:
-        for value, numClusters in epochSummary.iteritems():
+        for value in epochSummary:
             allValues.update([value])
     return allValues
+
 
 def buildClustersPerValue(clustersPerEpoch, numberOfEpochs):
     """
@@ -167,6 +173,7 @@ def buildClustersPerValue(clustersPerEpoch, numberOfEpochs):
 
     return clustersPerValue
 
+
 def getNumberOfClustersPerEpochForGivenColumn(column, templetizedClusteringSummaryFile, folder):
     """
         Get the number of clusters that have each value at each epoch
@@ -183,7 +190,7 @@ def getNumberOfClustersPerEpochForGivenColumn(column, templetizedClusteringSumma
             value
     """
     allFolders = os.listdir(folder)
-    numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit() and os.path.isfile(templetizedClusteringSummaryFile%int(epoch))])
+    numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit() and os.path.isfile(templetizedClusteringSummaryFile % int(epoch))])
 
     clustersPerEpoch = findDifferentClustersForAllEpochs(column, templetizedClusteringSummaryFile, numberOfEpochs)
 
@@ -215,11 +222,12 @@ def plotContactsHistogram(folder, templetizedClusteringSummaryFile):
         :type templetizedClusteringSummaryFile: str
     """
     allFolders = os.listdir(folder)
-    lastEpoch = len([epoch for epoch in allFolders if epoch.isdigit() and os.path.isfile(templetizedClusteringSummaryFile%int(epoch))]) - 1
-    lastSummary = templetizedClusteringSummaryFile%lastEpoch
+    lastEpoch = len([epoch for epoch in allFolders if epoch.isdigit() and os.path.isfile(templetizedClusteringSummaryFile % int(epoch))]) - 1
+    lastSummary = templetizedClusteringSummaryFile % lastEpoch
     contactsColumn = 3
     allContacts = np.loadtxt(lastSummary, usecols=(contactsColumn,), ndmin=1)
     plt.hist(allContacts)
+
 
 def main():
     """
@@ -232,7 +240,7 @@ def main():
 
     print "FILENAME", filename
 
-    #Params
+    # Params
     clusteringFileDensityColumn = 5
     clusteringFileThresholdColumn = 4
     clusteringFolder = "clustering"
@@ -242,7 +250,6 @@ def main():
 
     clusteringSummaryFile = os.path.join(clusteringFolder, summaryFile)
     templetizedClusteringSummaryFile = os.path.join("%d", clusteringSummaryFile)
-
 
     totalNumberOfClustersPerEpoch = getTotalNumberOfClustersPerEpoch(templetizedClusteringSummaryFile, folder)
     clustersPerDensityValue = getNumberOfClustersPerEpochForGivenColumn(clusteringFileDensityColumn, templetizedClusteringSummaryFile, folder)
@@ -254,6 +261,9 @@ def main():
         plt.savefig("%s_total.png" % filename)
 
     plotClustersPerValue(clustersPerDensityValue)
+    plt.title("Number of cluser per density value")
+    plt.xlabel("Epoch")
+    plt.ylabel("Number of clusters")
     plt.legend(loc=2)
     if filename != "":
         plt.savefig("%s_density.png" % filename)
@@ -261,12 +271,17 @@ def main():
     plt.figure(2)
     plt.plot(totalNumberOfClustersPerEpoch, label="All clusters")
     plotClustersPerValue(clustersPerThresholdValue)
+    plt.title("Number of cluser per threshold value")
+    plt.xlabel("Epoch")
+    plt.ylabel("Number of clusters")
     plt.legend(loc=2)
     if filename != "":
         plt.savefig("%s_threshold.png" % filename)
 
     plt.figure(3)
     plotContactsHistogram(folder, templetizedClusteringSummaryFile)
+    plt.title("Contact ratio distribution")
+    plt.xlabel("Contact ratio")
     if filename != "":
         plt.savefig("%s_hist.png" % filename)
     plt.show()

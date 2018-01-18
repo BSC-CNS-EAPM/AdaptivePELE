@@ -88,7 +88,7 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
@@ -146,7 +146,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-        <li><a href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a> &raquo;</li>
+        <li><a href="AdaptivePELE.html">AdaptivePELE – Package Description</a> &raquo;</li>
       
     <li>analysis Package</li>
     <li class="wy-breadcrumbs-aside">
@@ -175,12 +175,12 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>reportFile</strong> (<em>np.ndarray</em>) &#8211; Report file to be corrected</li>
-<li><strong>rmsds</strong> (<em>np.ndarray</em>) &#8211; Rmsd corrected values</li>
+<li><strong>reportFile</strong> (<em>np.ndarray</em>) – Report file to be corrected</li>
+<li><strong>rmsds</strong> (<em>np.ndarray</em>) – Rmsd corrected values</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.ndarray &#8211; Extended report file with corrected rmsd values</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.ndarray – Extended report file with corrected rmsd values</p>
 </td>
 </tr>
 </tbody>
@@ -196,7 +196,7 @@ molecule symmetries</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>controlFile</strong> (<em>str</em>) &#8211; Control file</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>controlFile</strong> (<em>str</em>) – Control file</td>
 </tr>
 </tbody>
 </table>
@@ -210,7 +210,7 @@ molecule symmetries</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">object &#8211; Object containing the options passed</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">object – Object containing the options passed</td>
 </tr>
 </tbody>
 </table>
@@ -224,9 +224,9 @@ molecule symmetries</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>controlFile</strong> (<em>str</em>) &#8211; Control file</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>controlFile</strong> (<em>str</em>) – Control file</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str, str, list, int &#8211; Name of the ligand in the pdb, filename
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str, str, list, int – Name of the ligand in the pdb, filename
 containing the native structure, list of the symmetry groups, column
 corresponding to the rmsd in the report file</td>
 </tr>
@@ -239,18 +239,18 @@ corresponding to the rmsd in the report file</td>
 <span id="foldersfirstbindingevent-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">foldersFirstBindingEvent</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.foldersFirstBindingEvent" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.analysis.foldersFirstBindingEvent.main">
-<code class="descclassname">AdaptivePELE.analysis.foldersFirstBindingEvent.</code><code class="descname">main</code><span class="sig-paren">(</span><em>folders</em>, <em>column</em>, <em>threshold</em>, <em>stepsPerEpoch</em>, <em>sequential</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/foldersFirstBindingEvent.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.foldersFirstBindingEvent.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.foldersFirstBindingEvent.</code><code class="descname">main</code><span class="sig-paren">(</span><em>folders</em>, <em>column</em>, <em>threshold</em>, <em>stepsPerEpoch</em>, <em>sequential</em>, <em>unbinding</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/foldersFirstBindingEvent.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.foldersFirstBindingEvent.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate first binding event statistics (mean, median, std)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>folders</strong> (<em>list</em>) &#8211; List of folders</li>
-<li><strong>column</strong> (<em>int</em>) &#8211; Column with binding event related metric</li>
-<li><strong>threshold</strong> (<em>float</em>) &#8211; Threshold for a binding event to be considered</li>
-<li><strong>stepsPerEpoch</strong> (<em>int</em>) &#8211; Number of steps per epoch to be consdidered</li>
-<li><strong>sequential</strong> (<em>bool</em>) &#8211; Whether the simulation to analyse is and adaptive or
+<li><strong>folders</strong> (<em>list</em>) – List of folders</li>
+<li><strong>column</strong> (<em>int</em>) – Column with binding event related metric</li>
+<li><strong>threshold</strong> (<em>float</em>) – Threshold for a binding event to be considered</li>
+<li><strong>stepsPerEpoch</strong> (<em>int</em>) – Number of steps per epoch to be consdidered</li>
+<li><strong>sequential</strong> (<em>bool</em>) – Whether the simulation to analyse is and adaptive or
 sequential simulation</li>
 </ul>
 </td>
@@ -267,7 +267,7 @@ sequential simulation</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list, int, float, int, bool &#8211; List of folders, column with
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list, int, float, int, bool – List of folders, column with
 binding event related metric, threshold for a binding event to be
 considered, number of steps per epoch to be consdidered, wether the
 simulation to analyse is and adaptive or sequential simulation</td>
@@ -299,14 +299,14 @@ adaptive runs</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>clustersPerEpoch</strong> (<em>list</em>) &#8211; List with dictionaries for all epochs. The dictionary
+<li><strong>clustersPerEpoch</strong> (<em>list</em>) – List with dictionaries for all epochs. The dictionary
 has the set of different values (according to column) and their
 number</li>
-<li><strong>numberOfEpochs</strong> (<em>int</em>) &#8211; Total number of epochs in the simulation</li>
+<li><strong>numberOfEpochs</strong> (<em>int</em>) – Total number of epochs in the simulation</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dict &#8211; Dictionary with the number of clusters that have each
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dict – Dictionary with the number of clusters that have each
 value</p>
 </td>
 </tr>
@@ -326,14 +326,14 @@ value</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>column</strong> (<em>int</em>) &#8211; Column of interest</li>
-<li><strong>templetizedClusteringSummaryFile</strong> (<em>str</em>) &#8211; Template name of the
+<li><strong>column</strong> (<em>int</em>) – Column of interest</li>
+<li><strong>templetizedClusteringSummaryFile</strong> (<em>str</em>) – Template name of the
 clustering summary file</li>
-<li><strong>numberOfEpochs</strong> (<em>int</em>) &#8211; Total number of epochs in the simulation</li>
+<li><strong>numberOfEpochs</strong> (<em>int</em>) – Total number of epochs in the simulation</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with dictionaries for all epochs. The dictionary
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with dictionaries for all epochs. The dictionary
 has the set of different values (according to column) and their
 number</p>
 </td>
@@ -354,12 +354,12 @@ number</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>column</strong> (<em>int</em>) &#8211; Column of interest</li>
-<li><strong>summaryFile</strong> (<em>str</em>) &#8211; Clustering summary file</li>
+<li><strong>column</strong> (<em>int</em>) – Column of interest</li>
+<li><strong>summaryFile</strong> (<em>str</em>) – Clustering summary file</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dict &#8211; Dictionary with the set of different elements in
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dict – Dictionary with the set of different elements in
 column and the number of elements in this epoch</p>
 </td>
 </tr>
@@ -375,11 +375,11 @@ column and the number of elements in this epoch</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustersPerEpoch</strong> (<em>list</em>) &#8211; List with dictionaries for all epochs. The dictionary
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustersPerEpoch</strong> (<em>list</em>) – List with dictionaries for all epochs. The dictionary
 has the set of different values (according to column) and their
 number</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">set &#8211; Set containing all values ocurring during a simulation</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">set – Set containing all values ocurring during a simulation</td>
 </tr>
 </tbody>
 </table>
@@ -393,9 +393,9 @@ number</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>summaryFile</strong> (<em>str</em>) &#8211; Clustering summary file</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>summaryFile</strong> (<em>str</em>) – Clustering summary file</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List with the contents of the clustering summary file</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list – List with the contents of the clustering summary file</td>
 </tr>
 </tbody>
 </table>
@@ -410,14 +410,14 @@ number</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>column</strong> (<em>int</em>) &#8211; Column of interest</li>
-<li><strong>templetizedClusteringSummaryFile</strong> (<em>str</em>) &#8211; Template name of the
+<li><strong>column</strong> (<em>int</em>) – Column of interest</li>
+<li><strong>templetizedClusteringSummaryFile</strong> (<em>str</em>) – Template name of the
 clustering summary file</li>
-<li><strong>folder</strong> (<em>str</em>) &#8211; Folder where the simulation data is stored</li>
+<li><strong>folder</strong> (<em>str</em>) – Folder where the simulation data is stored</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dict &#8211; Dictionary with the number of clusters that have each
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dict – Dictionary with the number of clusters that have each
 value</p>
 </td>
 </tr>
@@ -434,13 +434,13 @@ value</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>templetizedClusteringSummaryFile</strong> (<em>str</em>) &#8211; Template name of the
+<li><strong>templetizedClusteringSummaryFile</strong> (<em>str</em>) – Template name of the
 clustering summary file</li>
-<li><strong>folder</strong> (<em>str</em>) &#8211; Folder where the simulation data is stored</li>
+<li><strong>folder</strong> (<em>str</em>) – Folder where the simulation data is stored</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with the number of cluster in each simulation
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the number of cluster in each simulation
 epoch</p>
 </td>
 </tr>
@@ -470,7 +470,7 @@ epoch</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustersPerValue</strong> (<em>dict</em>) &#8211; Dictionary with the number of clusters that have each
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustersPerValue</strong> (<em>dict</em>) – Dictionary with the number of clusters that have each
 value</td>
 </tr>
 </tbody>
@@ -486,8 +486,8 @@ value</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>folder</strong> (<em>str</em>) &#8211; Folder where the simulation data is stored</li>
-<li><strong>templetizedClusteringSummaryFile</strong> (<em>str</em>) &#8211; Template name of the
+<li><strong>folder</strong> (<em>str</em>) – Folder where the simulation data is stored</li>
+<li><strong>templetizedClusteringSummaryFile</strong> (<em>str</em>) – Template name of the
 clustering summary file</li>
 </ul>
 </td>
@@ -504,7 +504,7 @@ clustering summary file</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str &#8211; Output filename ( if specified )</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str – Output filename ( if specified )</td>
 </tr>
 </tbody>
 </table>
@@ -522,19 +522,19 @@ clustering summary file</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>gnuplotString</strong> (<em>str</em>) &#8211; Template string for gnuplot</li>
-<li><strong>reportName</strong> (<em>str</em>) &#8211; Name of the files containing the simulation data</li>
-<li><strong>column1</strong> (<em>int</em>) &#8211; Column to plot in the X axis</li>
-<li><strong>column2</strong> (<em>int</em>) &#8211; Column to plot in the Y axis</li>
-<li><strong>stepsPerRun</strong> (<em>int</em>) &#8211; Number of steps per epoch,</li>
-<li><strong>printWithLines</strong> (<em>bool</em>) &#8211; Wether the plot should use solid lines</li>
-<li><strong>TotalNumberOfSteps</strong> (<em>bool</em>) &#8211; Not only considering steps in current epoch,
+<li><strong>gnuplotString</strong> (<em>str</em>) – Template string for gnuplot</li>
+<li><strong>reportName</strong> (<em>str</em>) – Name of the files containing the simulation data</li>
+<li><strong>column1</strong> (<em>int</em>) – Column to plot in the X axis</li>
+<li><strong>column2</strong> (<em>int</em>) – Column to plot in the Y axis</li>
+<li><strong>stepsPerRun</strong> (<em>int</em>) – Number of steps per epoch,</li>
+<li><strong>printWithLines</strong> (<em>bool</em>) – Wether the plot should use solid lines</li>
+<li><strong>TotalNumberOfSteps</strong> (<em>bool</em>) – Not only considering steps in current epoch,
 but steps with all previous epochs</li>
-<li><strong>replotFirst</strong> (<em>bool</em>) &#8211; </li>
+<li><strong>replotFirst</strong> (<em>bool</em>) – </li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; String to plot using gnuplot</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – String to plot using gnuplot</p>
 </td>
 </tr>
 </tbody>
@@ -550,18 +550,18 @@ but steps with all previous epochs</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>gnuplotString</strong> (<em>str</em>) &#8211; Template string for gnuplot</li>
-<li><strong>reportName</strong> (<em>str</em>) &#8211; Name of the files containing the simulation data</li>
-<li><strong>column1</strong> (<em>int</em>) &#8211; Column to plot in the X axis</li>
-<li><strong>column2</strong> (<em>int</em>) &#8211; Column to plot in the Y axis</li>
-<li><strong>stepsPerRun</strong> (<em>int</em>) &#8211; Number of steps per epoch,</li>
-<li><strong>TotalNumberOfSteps</strong> (<em>bool</em>) &#8211; Not only considering steps in current epoch,
+<li><strong>gnuplotString</strong> (<em>str</em>) – Template string for gnuplot</li>
+<li><strong>reportName</strong> (<em>str</em>) – Name of the files containing the simulation data</li>
+<li><strong>column1</strong> (<em>int</em>) – Column to plot in the X axis</li>
+<li><strong>column2</strong> (<em>int</em>) – Column to plot in the Y axis</li>
+<li><strong>stepsPerRun</strong> (<em>int</em>) – Number of steps per epoch,</li>
+<li><strong>TotalNumberOfSteps</strong> (<em>bool</em>) – Not only considering steps in current epoch,
 but steps with all previous epochs</li>
-<li><strong>replotFirst</strong> (<em>bool</em>) &#8211; Deprecated parameter</li>
+<li><strong>replotFirst</strong> (<em>bool</em>) – Deprecated parameter</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; String to plot using gnuplot</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – String to plot using gnuplot</p>
 </td>
 </tr>
 </tbody>
@@ -577,15 +577,15 @@ but steps with all previous epochs</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>stepsPerRun</strong> (<em>int</em>) &#8211; Number of steps per epoch,</li>
-<li><strong>xcol</strong> (<em>int</em>) &#8211; Column to plot in the X axis</li>
-<li><strong>ycol</strong> (<em>int</em>) &#8211; Column to plot in the Y axis</li>
-<li><strong>reportName</strong> (<em>str</em>) &#8211; Name of the files containing the simulation data</li>
-<li><strong>kindOfPrint</strong> (<em>bool</em>) &#8211; Kind of lines to plot (solid or points)</li>
+<li><strong>stepsPerRun</strong> (<em>int</em>) – Number of steps per epoch,</li>
+<li><strong>xcol</strong> (<em>int</em>) – Column to plot in the X axis</li>
+<li><strong>ycol</strong> (<em>int</em>) – Column to plot in the Y axis</li>
+<li><strong>reportName</strong> (<em>str</em>) – Name of the files containing the simulation data</li>
+<li><strong>kindOfPrint</strong> (<em>bool</em>) – Kind of lines to plot (solid or points)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; String to plot using gnuplot</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – String to plot using gnuplot</p>
 </td>
 </tr>
 </tbody>
@@ -600,7 +600,7 @@ but steps with all previous epochs</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int, int, int, str, bool, bool &#8211; Number of steps per epoch,
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int, int, int, str, bool, bool – Number of steps per epoch,
 column to plot in the X axis, column to plot in the Y axis, name of
 the files containing the simulation data, whether to plot the data
 as points, wether to plot the data as lines</td>
@@ -621,7 +621,7 @@ as points, wether to plot the data as lines</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">object &#8211; Object containing command line options</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">object – Object containing command line options</td>
 </tr>
 </tbody>
 </table>
@@ -640,7 +640,7 @@ specified by the tuple (epoch, trajectory, snapshot) and write as a pdb file</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>, int, int, int, str &#8211; Clustering
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>, int, int, int, str – Clustering
 object, number of trajectory, number of snapshot, number of epoch,
 output path where to write the files</td>
 </tr>

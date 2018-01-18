@@ -1,4 +1,3 @@
-import numpy as np
 import sys
 import shutil
 import os
@@ -7,6 +6,8 @@ import time
 import glob
 import argparse
 import atexit
+import ast
+import numpy as np
 from AdaptivePELE.constants import blockNames, constants
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.utilities import utilities
@@ -22,8 +23,112 @@ def parseArgs():
                                      "distribute the processors in order "
                                      "to optimize sampling")
     parser.add_argument('controlFile', type=str)
-    args = parser.parse_args()
-    return args
+    arg = parser.parse_args()
+    return arg
+
+
+def filterClustersAccordingToBox(simulationRunnerParams, clusteringObject):
+    """
+        Filter the clusters to select only the ones whose representative
+        structures will fit into the selected box
+
+        :param simulationRunnerParams: :py:class:`.SimulationParameters` Simulation parameters object
+        :type simulationRunnerParams: :py:class:`.SimulationParameters`
+        :param clusteringObject: Clustering object
+        :type clusteringObject: :py:class:`.Clustering`
+
+        :returns list, list: -- list of the filtered clusters, list of bools flagging wether the cluster is selected or not
+
+    """
+    box_center = ast.literal_eval(simulationRunnerParams.boxCenter)
+    box_radius = simulationRunnerParams.boxRadius
+    clustersFiltered = []
+    clustersSelected = []
+    for cluster in clusteringObject.clusters.clusters:
+        if utilities.distanceCOM(box_center, cluster.pdb.getCOM()) < (box_radius-1):
+            clustersFiltered.append(cluster)
+            clustersSelected.append(True)
+        else:
+            clustersSelected.append(False)
+    return clustersFiltered, clustersSelected
+
+
+def mergeFilteredClustersAccordingToBox(degeneracy, clustersFiltering):
+    """
+        Merge the (possibly) partial degeneracy to obtain a complete list,
+        the partial list comes from the clusters excluded by the moving box
+        :param degeneracy: Degeneracy of the clusters
+        :param degeneracy: list
+        :param clustersFiltering: List of bools indicating whether a cluster was filtered or not
+        :param clustersFiltering: list
+
+        :returns list: -- complete list of cluster degeneracies
+    """
+    assert len(degeneracy) == sum(clustersFiltering)
+    newDegeneracy = []
+    degeneracy = degeneracy.tolist()
+    for filtered in clustersFiltering:
+        if filtered:
+            newDegeneracy.append(degeneracy.pop(0))
+        else:
+            newDegeneracy.append(0)
+    return np.array(newDegeneracy)
+
+
+def getNextIterationBox(clusteringObject, simulationRunnerParams):
+    """
+        Select the box for the next epoch, currently selecting the COM of
+        the cluster with max SASA
+
+        :param clusteringObject: Clustering object
+        :type clusteringObject: :py:class:`.Clustering`
+        :param simulationRunnerParams: :py:class:`.SimulationParameters` Simulation parameters object
+        :type simulationRunnerParams: :py:class:`.SimulationParameters`
+
+        :returns str: -- string to be substitued in PELE control file
+    """
+    metrics = []
+    for cluster in clusteringObject.clusters.clusters:
+        metrics.append(cluster.metrics[3:])
+    metrics = np.array(metrics)
+    maxMetrics = metrics.max(axis=0)
+    minMetrics = metrics.min(axis=0)
+    possibleSASACols = [i for i in xrange(metrics.shape[1]) if np.abs(maxMetrics[i]) < 1.05 and np.abs(minMetrics[i]) > 0]
+    if len(possibleSASACols) == 0:
+        raise ValueError("No possible SASA identified in metrics, please check"
+                         " that SASA is computed in your simulation!!!!")
+    elif len(possibleSASACols) > 1:
+        print "WARNING! More than one possible SASA column is present!!"
+    columnSASA = possibleSASACols[0]
+    if simulationRunnerParams.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxBinding:
+        SASAcluster = np.argmin(metrics[:, columnSASA])
+    elif simulationRunnerParams.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxUnBinding:
+        SASAcluster = np.argmax(metrics[:, columnSASA])
+    else:
+        raise ValueError("%s should be either binding or unbinding, but %s is provided!!!" % (blockNames.SimulationParams.modeMovingBox, simulationRunnerParams.modeMovingBox))
+    return str(clusteringObject.getCluster(SASAcluster).pdb.getCOM())
+
+
+def selectInitialBoxCenter(simulationRunner, initialStructuresAsString, resname):
+    """
+        Select the coordinates of the first box, currently as the center of
+        mass of the first initial structure provided
+
+        :param simulationRunner: :py:class:`.SimulationRunner` Simulation runner object
+        :type simulationRunner: :py:class:`.SimulationRunner`
+        :param initialStructuresAsString: String containing the files of the initial structures
+        :type initialStructuresAsString: str
+        :param resname: Residue name of the ligand in the system pdb
+        :type resname: str
+
+        :returns str: -- string to be substitued in PELE control file
+    """
+    # This is a dictionary because it's prepared to be subtitued in the PELE
+    # control files (i.e. JSON format)
+    initialStructuresDict = json.loads(initialStructuresAsString.split(",")[0])
+    PDBinitial = atomset.PDB()
+    PDBinitial.initialise(str(initialStructuresDict['files'][0]['path']), resname=resname)
+    return repr(PDBinitial.getCOM())
 
 
 def expandInitialStructuresWildcard(initialStructuresWildcard):
@@ -78,9 +183,9 @@ def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries):
 
         :raise IndexError: If original report file not found in output folder
     """
-    outputFilename = "fixedReport_%d" #move to constants?
-    trajName = "*traj*.pdb" #move to constants?
-    reportName = "*report_%d" #move to constants?
+    outputFilename = "fixedReport_%d"  # move to constants?
+    trajName = "*traj*.pdb"  # move to constants?
+    reportName = "*report_%d"  # move to constants?
     trajs = glob.glob(os.path.join(outputPath, trajName))
     nativePDB = atomset.PDB()
     nativePDB.initialise(str(nativeStructure), resname=resname)
@@ -197,18 +302,20 @@ def checkIntegrityClusteringObject(objectPath):
     except EOFError:
         return False
 
+
 def __unicodeToStr(data):
-    #convert dict
+    # convert dict
     if isinstance(data, dict):
-        return { __unicodeToStr(key): __unicodeToStr(value) for key, value in data.iteritems() }
-    #convert list
+        return {__unicodeToStr(key): __unicodeToStr(value) for key, value in data.iteritems()}
+    # convert list
     if isinstance(data, list):
-        return [ __unicodeToStr(val) for val in data ]
-    #convert unicode to str
+        return [__unicodeToStr(val) for val in data]
+    # convert unicode to str
     if isinstance(data, unicode):
         return data.encode('utf-8')
 
     return data
+
 
 def loadParams(jsonParams):
     """
@@ -233,9 +340,10 @@ def saveInitialControlFile(jsonParams, originalControlFile):
         :param originalControlFile: Path where to save the control file
         :type originalControlFile: str
     """
-    file = open(originalControlFile, 'w')
-    jsonFile = open(jsonParams, 'r').read()
-    file.write(jsonFile)
+    with open(originalControlFile, 'w') as f:
+        with open(jsonParams, 'r') as fr:
+            jsonFile = fr.read()
+        f.write(jsonFile)
 
 
 def needToRecluster(oldClusteringMethod, newClusteringMethod):
@@ -262,7 +370,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return oldClusteringMethod.thresholdCalculator != newClusteringMethod.thresholdCalculator or\
                 abs(oldClusteringMethod.contactThresholdDistance - newClusteringMethod.contactThresholdDistance) > 1e-7
 
-    #TODO: add similarityEvaluator check for contactMap clustering
+    # TODO: add similarityEvaluator check for contactMap clustering
 
 
 def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
@@ -278,9 +386,9 @@ def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
 """
 
     snapshotsJSONSelectionString = generateTrajectorySelectionString(epoch, epochOutputPathTempletized)
-    paths = eval(snapshotsJSONSelectionString)
+    paths = ast.literal_eval(snapshotsJSONSelectionString)
     if len(glob.glob(paths[-1])) == 0:
-        sys.exit("No trajectories to cluster! Matching path:%s"%paths[-1])
+        sys.exit("No trajectories to cluster! Matching path:%s" % paths[-1])
     clusteringMethod.cluster(paths)
 
 
@@ -433,6 +541,9 @@ def preparePeleControlFile(epoch, outputPathConstants, simulationRunner, peleCon
     utilities.makeFolder(outputDir)
     peleControlFileDictionary["OUTPUT_PATH"] = outputDir
     peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + epoch*simulationRunner.parameters.processors
+    if simulationRunner.parameters.boxCenter is not None:
+        peleControlFileDictionary["BOX_RADIUS"] = simulationRunner.parameters.boxRadius
+        peleControlFileDictionary["BOX_CENTER"] = simulationRunner.parameters.boxCenter
     simulationRunner.makeWorkingControlFile(outputPathConstants.tmpControlFilename % epoch, peleControlFileDictionary)
 
 
@@ -485,7 +596,8 @@ def main(jsonParams):
 
     outputPathConstants = constants.OutputPathConstants(outputPath)
 
-    if not debug: atexit.register(utilities.cleanup, outputPathConstants.tmpFolder)
+    if not debug:
+        atexit.register(utilities.cleanup, outputPathConstants.tmpFolder)
 
     utilities.makeFolder(outputPath)
     utilities.makeFolder(outputPathConstants.tmpFolder)
@@ -501,9 +613,11 @@ def main(jsonParams):
 
     if startFromScratch or not restart:
         firstRun = 0  # if restart false, but there were previous simulations
-        clusteringMethod, initialStructuresAsString, initialClusters = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
+        clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
 
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
+    if simulationRunner.parameters.modeMovingBox is None and simulationRunner.parameters.boxCenter is None:
+        simulationRunner.parameters.boxCenter = selectInitialBoxCenter(simulationRunner, initialStructuresAsString, resname)
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i
@@ -526,10 +640,19 @@ def main(jsonParams):
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
-        degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, i)
-        spawningCalculator.log()
-        print "Degeneracy", degeneracyOfRepresentatives
+        if simulationRunner.parameters.modeMovingBox is not None:
+            simulationRunner.parameters.boxCenter = getNextIterationBox(clusteringMethod, simulationRunner.parameters)
+            clustersList, clustersFiltered = filterClustersAccordingToBox(simulationRunner.parameters, clusteringMethod)
+        else:
+            clustersList = clusteringMethod.clusters.clusters
 
+        degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.parameters.processors-1, spawningParams, i)
+        spawningCalculator.log()
+
+        if simulationRunner.parameters.modeMovingBox is not None:
+            degeneracyOfRepresentatives = mergeFilteredClustersAccordingToBox(degeneracyOfRepresentatives, clustersFiltered)
+        print "Degeneracy", degeneracyOfRepresentatives
+        assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,

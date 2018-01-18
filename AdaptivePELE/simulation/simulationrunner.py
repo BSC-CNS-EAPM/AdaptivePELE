@@ -1,9 +1,9 @@
 import time
 import os
 from AdaptivePELE.constants import constants, blockNames
+from AdaptivePELE.simulation import simulationTypes
 import subprocess
 import shutil
-import simulationTypes
 import string
 import sys
 
@@ -19,6 +19,9 @@ class SimulationParameters:
         self.peleSteps = 0
         self.seed = 0
         self.exitCondition = None
+        self.boxCenter = None
+        self.boxRadius = 20
+        self.modeMovingBox = None
 
 
 class SimulationRunner:
@@ -60,17 +63,15 @@ class SimulationRunner:
                 in the control file
             :type dictionary: dict
         """
-        inputFile = open(self.parameters.templetizedControlFile, "r")
-        inputFileContent = inputFile.read()
-        inputFile.close()
+        with open(self.parameters.templetizedControlFile, "r") as inputFile:
+            inputFileContent = inputFile.read()
 
         inputFileTemplate = string.Template(inputFileContent)
         outputFileContent = inputFileTemplate.substitute(dictionary)
 
-        outputFile = open(workingControlFilename, "w")
-        outputFileContent = outputFileContent.replace("'", '"')
-        outputFile.write(outputFileContent)
-        outputFile.close()
+        with open(workingControlFilename, "w") as outputFile:
+            outputFileContent = outputFileContent.replace("'", '"')
+            outputFile.write(outputFileContent)
 
     def updateMappingProcessors(self, mapping):
         """
@@ -114,7 +115,7 @@ class SimulationRunner:
         """
             Set the processorsToClusterMapping to zero
         """
-        self.processorsToClusterMapping = [0 for i in xrange(1, self.parameters.processors)]
+        self.processorsToClusterMapping = [0 for _ in xrange(1, self.parameters.processors)]
 
 
 class PeleSimulation(SimulationRunner):
@@ -224,6 +225,7 @@ class ClusteringExitCondition:
         self.clusterNum = newClusterNum
         return clusterDiff < 0.1*self.ntrajs
 
+
 class MetricExitCondition:
     def __init__(self, metricCol, metricValue):
         self.metricCol = metricCol
@@ -273,6 +275,9 @@ class RunnerBuilder:
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
+            parms.modeMovingBox = paramsBlock.get(blockNames.SimulationParams.modeMovingBox)
+            params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()

@@ -38,6 +38,7 @@ class DensityCalculator:
     null = "null"
     constant = "constant"
     continuous = "continuous"
+    exitContinuous = "exitContinuous"
 
 
 class DensityCalculatorParams:
@@ -116,6 +117,11 @@ class SimulationParams:
     metricCol = "metricCol"
     exitValue = "exitValue"
     trajectories = "trajectories"
+    modeMovingBox = "modeMovingBox"
+    modeMovingBoxBinding = "binding"
+    modeMovingBoxUnBinding = "unbinding"
+    boxCenter = "boxCenter"
+    boxRadius = "boxRadius"
 
 
 class ExitConditionType:

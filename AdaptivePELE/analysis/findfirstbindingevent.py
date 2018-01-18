@@ -6,15 +6,22 @@ import glob
 templetizedEpochFolder = "%d"
 
 
-def findTrajectoryFirstBindingEvent(metrics, thresholdValue):
-    firstBindingEvent = np.argmax(metrics[:,1] <= thresholdValue)
-    #argmax returns "0" if no argument matches
-    if metrics[firstBindingEvent,1] <= thresholdValue:
-        return metrics[firstBindingEvent,0]
+def findTrajectoryFirstBindingEvent(metrics, thresholdValue, unBinding=False):
+    if unBinding:
+        firstBindingEvent = np.argmax(metrics[:,1] >= thresholdValue)
+        if metrics[firstBindingEvent,1] >= thresholdValue:
+            return metrics[firstBindingEvent,0]
+        else:
+            return None
     else:
-        return None
+        #argmax returns "0" if no argument matches
+        firstBindingEvent = np.argmax(metrics[:,1] <= thresholdValue)
+        if metrics[firstBindingEvent,1] <= thresholdValue:
+            return metrics[firstBindingEvent,0]
+        else:
+            return None
 
-def findEpochFirstBindingEvent(thresholdValue, columnInReport, reportWildcard="*report_*"):
+def findEpochFirstBindingEvent(thresholdValue, columnInReport, reportWildcard="*report_*", unBinding=False):
     foundBindingEvent = False
     minNumberOfSteps = 1e10
 
@@ -22,14 +29,11 @@ def findEpochFirstBindingEvent(thresholdValue, columnInReport, reportWildcard="*
     for reportFile in reportFiles:
         metrics = np.loadtxt(reportFile, usecols=(1,columnInReport), ndmin=2)
         if metrics.shape[0] == 0: continue
-        firstBindingEvent = findTrajectoryFirstBindingEvent(metrics, thresholdValue)
-
-        if firstBindingEvent:
+        firstBindingEvent = findTrajectoryFirstBindingEvent(metrics, thresholdValue, unBinding=unBinding)
+        if firstBindingEvent is not None:
             foundBindingEvent = True
-            firstBindingEvent = firstBindingEvent
             if firstBindingEvent < minNumberOfSteps:
                 minNumberOfSteps = firstBindingEvent
-
     if foundBindingEvent:
         return minNumberOfSteps
     else:
@@ -41,14 +45,14 @@ def getAllSortedEpochs():
     epochFolders.sort()
     return epochFolders
 
-def findFirstBindingEvent(stepsPerEpoch, columnInReport, thresholdValue):
+def findFirstBindingEvent(stepsPerEpoch, columnInReport, thresholdValue, unBinding=False):
     epochFolders = getAllSortedEpochs()
 
     for epoch in epochFolders:
         os.chdir(str(epoch))
-        epochFirstBindingEvent = findEpochFirstBindingEvent(thresholdValue, columnInReport)
+        epochFirstBindingEvent = findEpochFirstBindingEvent(thresholdValue, columnInReport, unBinding=unBinding)
 
-        if epochFirstBindingEvent:
+        if epochFirstBindingEvent is not None:
             return epochFirstBindingEvent + epoch * stepsPerEpoch
 
         os.chdir("..")

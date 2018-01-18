@@ -73,6 +73,7 @@ class SpawningParams:
             "heaviside": "basestring",
             "null": "basestring",
             "constant": "basestring",
+            "exitContinuous": "basestring",
             "continuous": "basestring"
         },
         "params": {
@@ -81,28 +82,30 @@ class SpawningParams:
             "constant": "basestring",
             "values": "list",
             "conditions": "list",
+            "exitContinuous": "basestring",
             "continuous": "basestring"
         }
     }
 
 
 class SimulationParams:
-    types = {"pele": {
-                "processors": "numbers.Real",
-                "controlFile": "basestring",
-                "seed": "numbers.Real",
-                "peleSteps": "numbers.Real",
-                "iterations": "numbers.Real"
-    },
-             "test": {
-                "destination": "basestring",
-                "origin": "basestring",
-                "processors": "numbers.Real",
-                "seed": "numbers.Real",
-                "peleSteps": "numbers.Real",
-                "iterations": "numbers.Real"
-             },
-             "md": {}}
+    types = {
+        "pele": {
+            "processors": "numbers.Real",
+            "controlFile": "basestring",
+            "seed": "numbers.Real",
+            "peleSteps": "numbers.Real",
+            "iterations": "numbers.Real"
+            },
+        "test": {
+            "destination": "basestring",
+            "origin": "basestring",
+            "processors": "numbers.Real",
+            "seed": "numbers.Real",
+            "peleSteps": "numbers.Real",
+            "iterations": "numbers.Real"
+            },
+        "md": {}}
     params = {
         "executable": "basestring",
         "data": "basestring",
@@ -114,6 +117,9 @@ class SimulationParams:
         "seed": "numbers.Real",
         "peleSteps": "numbers.Real",
         "iterations": "numbers.Real",
+        "modeMovingBox": "basestring",
+        "boxCenter": "list",
+        "boxRadius": "numbers.Real",
         "exitCondition": "dict"
     }
     exitCondition = {
@@ -145,7 +151,6 @@ class clusteringTypes:
         "ligandResname": "basestring",
         "ligandResnum": "numbers.Real",
         "ligandChain": "basestring",
-        "contactThresholdDistance": "numbers.Real",
         "similarityEvaluator": "basestring",
         "symmetries": "list",
         "alternativeStructure": "bool",

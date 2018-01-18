@@ -115,7 +115,7 @@ cdef class SymmetryContactMapEvaluator:
                     contactMap[rowind, colind] = True
                 if proteinAtom.name == "CA" and dist2 < 64.0:
                     # Contact ratio will be always calculated using a contact
-                    # threshold of 8, so that tresholds and denisities are
+                    # threshold of 8, so that tresholds and densities are
                     # independent of the contact threshold of the contactMap
                     contacts.update([proteinAtomID])
         return contactMap.view(np.bool), len(contacts)

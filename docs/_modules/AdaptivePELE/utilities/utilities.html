@@ -86,7 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
 </ul>
 
             
@@ -137,11 +137,13 @@
             
   <h1>Source code for AdaptivePELE.utilities.utilities</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="c1"># import pickle</span>
 <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">RMSDCalculator</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.testing</span> <span class="k">import</span> <span class="n">runMarkovChainModel</span> <span class="k">as</span> <span class="n">run</span>
 <span class="kn">import</span> <span class="nn">AdaptivePELE.atomset.atomset</span> <span class="k">as</span> <span class="nn">atomset</span>
 
 
@@ -281,7 +283,66 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">EOFError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">EOFError</span><span class="p">(</span><span class="s2">&quot;Empty clustering object!&quot;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">EOFError</span><span class="p">,</span> <span class="ne">EOFError</span><span class="p">(</span><span class="s2">&quot;Empty clustering object!&quot;</span><span class="p">),</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ensure_connectivity_msm"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.ensure_connectivity_msm">[docs]</a><span class="k">def</span> <span class="nf">ensure_connectivity_msm</span><span class="p">(</span><span class="n">msm</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">msm</span><span class="o">.</span><span class="n">nstates_full</span> <span class="o">==</span> <span class="n">msm</span><span class="o">.</span><span class="n">nstates</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">msm</span><span class="o">.</span><span class="n">stationary_distribution</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">msm</span><span class="o">.</span><span class="n">count_matrix_full</span>
+        <span class="n">counts</span> <span class="o">+=</span> <span class="mi">1</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">trans</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">buildRevTransitionMatrix</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">eic</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">getSortedEigen</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">run</span><span class="o">.</span><span class="n">getStationaryDistr</span><span class="p">(</span><span class="n">eic</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="get_epoch_folders"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.get_epoch_folders">[docs]</a><span class="k">def</span> <span class="nf">get_epoch_folders</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">allFolders</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">folders</span> <span class="o">=</span> <span class="p">[</span><span class="n">epoch</span> <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">allFolders</span> <span class="k">if</span> <span class="n">epoch</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
+    <span class="n">folders</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">folders</span></div>
+
+
+<div class="viewcode-block" id="gen_atom_name"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.gen_atom_name">[docs]</a><span class="k">def</span> <span class="nf">gen_atom_name</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+    <span class="c1"># 6760 = 26*26*10</span>
+    <span class="c1"># The maximum number of unique ids generated by this method is 175760 =</span>
+    <span class="c1"># 26*26*26*10, however, remember that generally the maximum number of unique</span>
+    <span class="c1"># atoms that can be used with vmd is around 32000</span>
+    <span class="n">ind1</span> <span class="o">=</span> <span class="n">index</span><span class="o">/</span><span class="mi">6760</span>
+    <span class="n">ind2</span> <span class="o">=</span> <span class="p">(</span><span class="n">index</span> <span class="o">%</span> <span class="mi">6760</span><span class="p">)</span>
+    <span class="n">ind3</span> <span class="o">=</span> <span class="n">ind2</span> <span class="o">%</span> <span class="mi">260</span>
+    <span class="k">return</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind1</span><span class="p">)</span><span class="o">+</span><span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind2</span><span class="o">/</span><span class="mi">260</span><span class="p">)</span><span class="o">+</span><span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind3</span><span class="o">/</span><span class="mi">10</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ind3</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write_PDB_clusters"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.write_PDB_clusters">[docs]</a><span class="k">def</span> <span class="nf">write_PDB_clusters</span><span class="p">(</span><span class="n">pmf_xyzg</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;clusters.pdb&quot;</span><span class="p">,</span> <span class="n">use_beta</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">templateLine</span> <span class="o">=</span> <span class="s2">&quot;HETATM</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> CLT L 502    </span><span class="si">%s%s%s</span><span class="s2">  0.75</span><span class="si">%s</span><span class="s2">            H  </span><span class="se">\n</span><span class="s2">&quot;</span>
+
+    <span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pmf_xyzg</span><span class="p">):</span>
+        <span class="n">number</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="c1"># number3 = str(i).ljust(3)</span>
+        <span class="n">number3</span> <span class="o">=</span> <span class="n">gen_atom_name</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">number3</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_beta</span><span class="p">:</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">+=</span> <span class="n">templateLine</span> <span class="o">%</span> <span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">number3</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">names</span></div>
+
+
+<div class="viewcode-block" id="distanceCOM"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.distanceCOM">[docs]</a><span class="k">def</span> <span class="nf">distanceCOM</span><span class="p">(</span><span class="n">coords1</span><span class="p">,</span> <span class="n">coords2</span><span class="p">):</span>
+    <span class="n">coords1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords1</span><span class="p">)</span>
+    <span class="n">coords2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">coords1</span><span class="o">-</span><span class="n">coords2</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

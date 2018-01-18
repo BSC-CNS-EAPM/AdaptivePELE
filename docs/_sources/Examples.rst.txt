@@ -134,6 +134,12 @@ In order to run adaptivePELE, PELE control file needs to be templetized. In part
 
 * **numberOfPeleSteps**: The number of pele steps needs to be templetized as ``"numberOfPeleSteps": $PELE_STEPS``
 
+Optionally other fields might be templetized as well:
+
+* **fixedCenter**: The center of the simulation box is templetized as ``"fixedCenter": $BOX_CENTER``
+
+* **radius**: The radius of the simulation box is templetized as ``"radius": $BOX_RADIUS``  
+
 parameters
 ..........
 
@@ -150,6 +156,9 @@ Optionally, you can also use the following parameters:
 * **data** (*string*, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE
 * **documents** (*string*, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE
 * **executable** (*string*, default=MareNostrum or Life cluster path): Path to the Pele executable folder, it is already
+* **modeMovingBox** (*string*, default=None, possible values={*unbinding*, *bidning*}): Wether to dynamically set the center of the simulation box along an exit or entrance simulation
+* **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center
+* **boxRadius** (*int*, default=20): Value of the simulation box radius
 
 Additionally, the block may have an exit condition that stops the execution:
 
@@ -339,6 +348,8 @@ There are two types of density calculators:
 * **heaviside**, which assigns different densities using a heaviside function, much like the thresholdCalculator (values and conditions are mandatory)
 
 * **continuous**, which assings increasing densities for an increasing number of contacts. Default values, if **r** > 1, density = 8, otherwise, density = 64.0/(-4 **r** + 6)^3
+
+* **exitContinuous**, which assings decreasing densities for an increasing number of contacts. Default values, if **r** > 1, density = 1/8, otherwise, density = (-4 **r** + 6)^3/64.0
 
 
 parameters

@@ -1,16 +1,17 @@
 import socket
-machine = socket.gethostname()
 import matplotlib
+import numpy as np
+import os
+import argparse
+machine = socket.gethostname()
 if machine == "bsccv03":
-   matplotlib.use('wxagg')
+    matplotlib.use('wxagg')
 elif 'login' in machine:
     matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 if machine != "bsccv03":
     plt.style.use("ggplot")
-import numpy as np
-import os
-import argparse
+
 
 def printHelp():
     """
@@ -26,25 +27,27 @@ def printHelp():
     args = parser.parse_args()
     return args.filename
 
+
 def main():
     filename = printHelp()
     print "FILENAME", filename
     templateSummary = "%d/clustering/summary.txt"
     allFolders = os.listdir(".")
     numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit() and
-        os.path.isfile(templateSummary % int(epoch))])
+                          os.path.isfile(templateSummary % int(epoch))])
 
     clustering = np.loadtxt(templateSummary % (numberOfEpochs-1))
-    clustersThres = list(set(clustering[:,4]))
+    clustersThres = list(set(clustering[:, 4]))
     clustersThres.sort(reverse=True)
     spawningPerThres = np.zeros((numberOfEpochs, len(clustersThres)))
     for i in xrange(numberOfEpochs):
         clustering = np.loadtxt(templateSummary % i)
         for j, threshold in enumerate(clustersThres):
-            spawningPerThres[i, j] = clustering[clustering[:,4]==threshold, 2].sum()
+            spawningPerThres[i, j] = clustering[clustering[:, 4] == threshold, 2].sum()
     line_objects = plt.plot(spawningPerThres)
     plt.legend(line_objects, tuple(["Cluster size %d" % x for x in clustersThres]),
                loc="best")
+    plt.title("Processors spawned per epoch and cluster size")
     plt.xlabel("Epoch")
     plt.ylabel("Number of spawned processors")
     if filename != "":

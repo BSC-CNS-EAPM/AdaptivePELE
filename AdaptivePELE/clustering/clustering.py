@@ -4,13 +4,13 @@ import numpy as np
 import os
 import pickle
 # import cPickle as pickle
-import clusteringTypes
-import thresholdcalculator
 from AdaptivePELE.constants import blockNames
 import AdaptivePELE.atomset.atomset as atomset
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
 from AdaptivePELE.atomset import RMSDCalculator
+from AdaptivePELE.clustering import clusteringTypes
+from AdaptivePELE.clustering import thresholdcalculator
 from scipy import stats
 import heapq
 try:
@@ -30,7 +30,6 @@ class Clusters:
         # changed
         state = {"clusters": self.clusters}
         return state
-
 
     def __setstate__(self, state):
         # Restore instance attributes
@@ -362,7 +361,7 @@ class Cluster:
         state = {"pdb": self.pdb, "altStructure": self.altStructure,
                  "elements": self.elements, "threshold": self.threshold,
                  "densitiy": self.density, "contacts": self.contacts,
-                 "contactMap": self.contactMap,  "metrics": self.metrics,
+                 "contactMap": self.contactMap, "metrics": self.metrics,
                  "metricCol": self.metricCol, "threshold2": self.threshold2,
                  "contactThreshold": self.contactThreshold,
                  "altSelection": self.altSelection,
@@ -638,7 +637,6 @@ class CMClusteringEvaluator(ClusteringEvaluator):
         distance = self.similarityEvaluator.isSimilarCluster(self.contactMap, cluster.contactMap, self.symmetryEvaluator)
         return distance < cluster.threshold, distance
 
-
     def checkAttributes(self, pdb, resname, resnum, resChain, contactThresholdDistance):
         """
             Check wether all attributes are set for this iteration
@@ -784,7 +782,6 @@ class Clustering:
         """
         return self.clusters.getCluster(clusterNum)
 
-
     def clusterIterator(self):
         """
             Iterator over the clusters
@@ -830,7 +827,15 @@ class Clustering:
                 metrics = np.loadtxt(reportFilename, ndmin=2)
 
                 for num, snapshot in enumerate(snapshots):
-                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col)
+                    try:
+                        origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col)
+                    except IndexError as e:
+                        message = (" This is usually caused by a mismatch between report files and trajectory files"
+                                   " which in turn is usually caused by some problem in writing the files, e.g. quota")
+
+                        # raise a new exception of the same type, with the same
+                        # traceback but with and added message
+                        raise type(e), type(e)(str(e) + message), sys.exc_info()[2]
             else:
                 for num, snapshot in enumerate(snapshots):
                     origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num)
@@ -904,7 +909,7 @@ class Clustering:
             :returns: int -- Cluster to which the snapshot belongs
         """
         pdb = atomset.PDB()
-        pdb.initialise(snapshot, resname=self.resname, resnum=self.resnum, chain=self.resChain )
+        pdb.initialise(snapshot, resname=self.resname, resnum=self.resnum, chain=self.resChain)
         self.clusteringEvaluator.cleanContactMap()
         for clusterNum, cluster in enumerate(self.clusters.clusters):
             scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
@@ -955,7 +960,6 @@ class Clustering:
         # cluster, thus resulting in a more precise conformation network and
         # smoother pathways
         return clusterNum
-
 
     def writeClusterMetric(self, path, metricCol):
         """
@@ -1313,7 +1317,7 @@ class ClusteringBuilder:
                                                     columnOfReportFile=columnOfReportFile,
                                                     contactThresholdDistance=contactThresholdDistance)
         elif clusteringType == blockNames.ClusteringTypes.contactMap:
-            symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries,[])
+            symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries, [])
             thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
             thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
             try:
@@ -1344,6 +1348,7 @@ class similarityEvaluatorBuilder:
             return CMSimilarityEvaluator(similarityEvaluatorType)
         else:
             sys.exit("Unknown threshold calculator type! Choices are: " + str(clusteringTypes.SIMILARITY_TYPES_TO_STRING_DICTIONARY.values()))
+
 
 class CMSimilarityEvaluator:
     """
@@ -1376,6 +1381,7 @@ class CMSimilarityEvaluator:
             return symContactMapEvaluator.evaluateDifferenceDistance(contactMap, clusterContactMap)
         else:
             raise ValueError("Evaluator type %s not found!!" % self.typeEvaluator)
+
 
 def getAllTrajectories(paths):
     """

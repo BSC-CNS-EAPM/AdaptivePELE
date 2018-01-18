@@ -9,9 +9,14 @@ AdaptivePELE/build/
 AdaptivePELE/atomset/*.c
 AdaptivePELE/atomset/*.so
 AdaptivePELE/atomset/build
+AdaptivePELE/testing/*.c
+AdaptivePELE/testing/*.so
+AdaptivePELE/testing/build
 AdaptivePELE/Data
 AdaptivePELE/Documents
 AdaptivePELE/docs/_build
+AdaptivePELE/testing/*.c
+AdaptivePELE/testing/*.so
 .ropeproject
 build
 AdaptivePELE/*.pyc
