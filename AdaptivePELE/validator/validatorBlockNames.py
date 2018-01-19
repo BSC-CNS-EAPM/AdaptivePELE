@@ -120,6 +120,7 @@ class SimulationParams:
         "modeMovingBox": "basestring",
         "boxCenter": "list",
         "boxRadius": "numbers.Real",
+        "runEquilibration": "bool",
         "exitCondition": "dict"
     }
     exitCondition = {

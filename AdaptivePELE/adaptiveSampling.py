@@ -109,28 +109,6 @@ def getNextIterationBox(clusteringObject, simulationRunnerParams):
     return str(clusteringObject.getCluster(SASAcluster).pdb.getCOM())
 
 
-def selectInitialBoxCenter(simulationRunner, initialStructuresAsString, resname):
-    """
-        Select the coordinates of the first box, currently as the center of
-        mass of the first initial structure provided
-
-        :param simulationRunner: :py:class:`.SimulationRunner` Simulation runner object
-        :type simulationRunner: :py:class:`.SimulationRunner`
-        :param initialStructuresAsString: String containing the files of the initial structures
-        :type initialStructuresAsString: str
-        :param resname: Residue name of the ligand in the system pdb
-        :type resname: str
-
-        :returns str: -- string to be substitued in PELE control file
-    """
-    # This is a dictionary because it's prepared to be subtitued in the PELE
-    # control files (i.e. JSON format)
-    initialStructuresDict = json.loads(initialStructuresAsString.split(",")[0])
-    PDBinitial = atomset.PDB()
-    PDBinitial.initialise(str(initialStructuresDict['files'][0]['path']), resname=resname)
-    return repr(PDBinitial.getCOM())
-
-
 def expandInitialStructuresWildcard(initialStructuresWildcard):
     """
         Returns the initial structures after expanding the initial structures wildcard
@@ -333,7 +311,8 @@ def loadParams(jsonParams):
 
 
 def saveInitialControlFile(jsonParams, originalControlFile):
-    """ Save the control file jsonParams in originalControlFile
+    """
+        Save the adaptive control file jsonParams in originalControlFile
 
         :param jsonParams: Input control file in JSON format
         :type jsonParams: str
@@ -613,11 +592,13 @@ def main(jsonParams):
 
     if startFromScratch or not restart:
         firstRun = 0  # if restart false, but there were previous simulations
+        if simulationRunner.parameters.runEquilibration:
+            initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningParams.reportFilename, outputPath)
         clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
 
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
-        simulationRunner.parameters.boxCenter = selectInitialBoxCenter(simulationRunner, initialStructuresAsString, resname)
+        simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print "Iteration", i

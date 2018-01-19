@@ -122,6 +122,7 @@ class SimulationParams:
     modeMovingBoxUnBinding = "unbinding"
     boxCenter = "boxCenter"
     boxRadius = "boxRadius"
+    runEquilibration = "runEquilibration"
 
 
 class ExitConditionType:

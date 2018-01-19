@@ -1,11 +1,14 @@
 import time
 import os
-from AdaptivePELE.constants import constants, blockNames
-from AdaptivePELE.simulation import simulationTypes
+import json
 import subprocess
 import shutil
 import string
 import sys
+from AdaptivePELE.constants import constants, blockNames
+from AdaptivePELE.simulation import simulationTypes
+from AdaptivePELE.atomset import atomset
+from AdaptivePELE.utilities import utilities
 
 
 class SimulationParameters:
@@ -22,6 +25,9 @@ class SimulationParameters:
         self.boxCenter = None
         self.boxRadius = 20
         self.modeMovingBox = None
+        self.runEquilibration = False
+        self.destination = None
+        self.origin = None
 
 
 class SimulationRunner:
@@ -53,7 +59,7 @@ class SimulationRunner:
             return self.parameters.exitCondition.checkExitCondition(clustering)
         return False
 
-    def makeWorkingControlFile(self, workingControlFilename, dictionary):
+    def makeWorkingControlFile(self, workingControlFilename, dictionary, inputTemplate=None):
         """
             Substitute the values in the templetized control file
 
@@ -61,10 +67,15 @@ class SimulationRunner:
             :type workingControlFilename: str
             :param dictionary: Dictonary containing the parameters to substitute
                 in the control file
+            :param inputFileTemplate: Template control file
+            :type inputFileTemplate: str
             :type dictionary: dict
         """
-        with open(self.parameters.templetizedControlFile, "r") as inputFile:
-            inputFileContent = inputFile.read()
+        if inputTemplate is None:
+            with open(self.parameters.templetizedControlFile, "r") as inputFile:
+                inputFileContent = inputFile.read()
+        else:
+            inputFileContent = inputTemplate
 
         inputFileTemplate = string.Template(inputFileContent)
         outputFileContent = inputFileTemplate.substitute(dictionary)
@@ -132,6 +143,25 @@ class PeleSimulation(SimulationRunner):
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.documentsFolder + " Documents")
 
+    def selectInitialBoxCenter(self, initialStructuresAsString, resname):
+        """
+            Select the coordinates of the first box, currently as the center of
+            mass of the first initial structure provided
+
+            :param initialStructuresAsString: String containing the files of the initial structures
+            :type initialStructuresAsString: str
+            :param resname: Residue name of the ligand in the system pdb
+            :type resname: str
+
+            :returns str: -- string to be substitued in PELE control file
+        """
+        # This is a dictionary because it's prepared to be subtitued in the PELE
+        # control files (i.e. JSON format)
+        initialStructuresDict = json.loads(initialStructuresAsString.split(",")[0])
+        PDBinitial = atomset.PDB()
+        PDBinitial.initialise(str(initialStructuresDict['files'][0]['path']), resname=resname)
+        return repr(PDBinitial.getCOM())
+
     def runSimulation(self, runningControlFile=""):
         """
             Run a short PELE simulation
@@ -153,6 +183,48 @@ class PeleSimulation(SimulationRunner):
 
         endTime = time.time()
         print "PELE took %.2f sec" % (endTime - startTime)
+
+    def equilibrate(self, intialStructures, outputPathConstants, reportFilename, outputPath):
+        """
+            Run short simulation to equilibrate the system. It will run one
+            such simulation for every initial structure and select appropiate
+            structures to start the simulation
+
+            :param initialStructures: Name of the initial structures to copy
+            :type initialStructures: list of str
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param reportBaseFilename: Name of the file that contains the metrics of the snapshots to cluster
+            :type reportBaseFilename: str
+            :param outputPath: Path where trajectories are found
+            :type outputPath: str
+
+            :returns list: --  List with initial structures
+        """
+        newInitialStructures = []
+        equilibrationPeleDict = {"PELE_STEPS": 50}
+        with open(self.parameters.templetizedControlFile) as fc:
+            peleControlFile = fc.read()
+
+        templateNames = {ele[1]: '"$%s"' % ele[1] for ele in string.Template.pattern.findall(peleControlFile)}
+        templateNames.pop(["OUTPUT_PATH"], None)
+        peleControlFileDict = json.loads(string.Template(peleControlFile).safe_substitute(templateNames))
+        peleControlFileDict["commands"]["Perturbation"]["translationRange"] = 0.5
+        peleControlFileDict["commands"]["Perturbation"]["rotationScalingFactor"] = 0.01
+
+        for i, structure in enumerate(intialStructures):
+            equilibrationOutput = os.path.join(outputPath, "equilibration_%d" % (i+1))
+            equilibrationControlFile = outputPathConstants.tmpControlFilename % (i+1)
+            utilities.makeFolder(equilibrationOutput)
+            equilibrationPeleDict["OUTPUT_PATH"] = equilibrationOutput
+            equilibrationPeleDict["COMPLEXES"] = structure
+            print "Running equilibration for initial structure number %d" % (i+1)
+            self.makeWorkingControlFile(equilibrationControlFile, equilibrationPeleDict, json.dumps(peleControlFileDict, indent=4))
+            self.runSimulation(equilibrationControlFile)
+            #TODO: Implement a selectEquilibratedStructure procedure
+            # newInitialStructures.append(self.selectEquilibratedStructure())
+            newInitialStructures.append(structure)
+        return newInitialStructures
 
 
 class TestSimulation(SimulationRunner):
@@ -251,7 +323,6 @@ class MetricExitCondition:
 
 
 class RunnerBuilder:
-
     def build(self, simulationRunnerBlock):
         """
             Build the selected  SimulationRunner object
@@ -278,12 +349,13 @@ class RunnerBuilder:
             params.modeMovingBox = paramsBlock.get(blockNames.SimulationParams.modeMovingBox)
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
+            params.runEquilibration = paramsBlock.get(blockNames.SimulationParams.runEquilibration, False)
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()
                 params.exitCondition = exitConditionBuilder.build(exitConditionBlock)
 
-            SimulationRunner = PeleSimulation(params)
+            return PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
             pass
         elif simulationType == blockNames.SimulationType.test:
@@ -293,7 +365,6 @@ class RunnerBuilder:
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
-            SimulationRunner = TestSimulation(params)
+            return TestSimulation(params)
         else:
             sys.exit("Unknown simulation type! Choices are: " + str(simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))
-        return SimulationRunner
