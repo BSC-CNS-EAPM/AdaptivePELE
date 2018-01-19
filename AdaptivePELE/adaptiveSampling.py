@@ -93,7 +93,7 @@ def getNextIterationBox(clusteringObject, simulationRunnerParams):
     metrics = np.array(metrics)
     maxMetrics = metrics.max(axis=0)
     minMetrics = metrics.min(axis=0)
-    possibleSASACols = [i for i in xrange(metrics.shape[1]) if maxMetrics[i] < 1.05 and minMetrics[i] > 0]
+    possibleSASACols = [i for i in xrange(metrics.shape[1]) if maxMetrics[i] < 1.05 and minMetrics[i] >= 0]
     if len(possibleSASACols) == 0:
         raise ValueError("No possible SASA identified in metrics, please check"
                          " that SASA is computed in your simulation!!!!")
