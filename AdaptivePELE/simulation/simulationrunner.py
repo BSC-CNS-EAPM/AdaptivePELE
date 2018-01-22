@@ -184,6 +184,20 @@ class PeleSimulation(SimulationRunner):
         endTime = time.time()
         print "PELE took %.2f sec" % (endTime - startTime)
 
+    def getEquilibrationControlFile(self, peleControlFileDict):
+        """
+            Filter unnecessary parameters and return a minimal PELE control
+            file for equilibration runs
+
+            :param peleControlFileDict: Dictionary with pele control file options
+            :type peleControlFileDict: dict
+
+            :returns: dict -- Dictionary with pele control file options
+        """
+        peleControlFileDict["commands"][0]["Perturbation"]["translationRange"] = 0.5
+        peleControlFileDict["commands"][0]["Perturbation"]["rotationScalingFactor"] = 0.01
+        return peleControlFileDict
+
     def equilibrate(self, intialStructures, outputPathConstants, reportFilename, outputPath):
         """
             Run short simulation to equilibrate the system. It will run one
@@ -199,7 +213,7 @@ class PeleSimulation(SimulationRunner):
             :param outputPath: Path where trajectories are found
             :type outputPath: str
 
-            :returns list: --  List with initial structures
+            :returns: list --  List with initial structures
         """
         newInitialStructures = []
         equilibrationPeleDict = {"PELE_STEPS": 50}
@@ -209,8 +223,7 @@ class PeleSimulation(SimulationRunner):
         templateNames = {ele[1]: '"$%s"' % ele[1] for ele in string.Template.pattern.findall(peleControlFile)}
         templateNames.pop(["OUTPUT_PATH"], None)
         peleControlFileDict = json.loads(string.Template(peleControlFile).safe_substitute(templateNames))
-        peleControlFileDict["commands"]["Perturbation"]["translationRange"] = 0.5
-        peleControlFileDict["commands"]["Perturbation"]["rotationScalingFactor"] = 0.01
+        peleControlFileDict = self.getEquilibrationControlFile(peleControlFileDict)
 
         for i, structure in enumerate(intialStructures):
             equilibrationOutput = os.path.join(outputPath, "equilibration_%d" % (i+1))
