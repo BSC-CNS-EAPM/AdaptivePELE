@@ -191,6 +191,25 @@ class PeleSimulation(SimulationRunner):
         endTime = time.time()
         print "PELE took %.2f sec" % (endTime - startTime)
 
+    def getEquilibrationControlFile(self, peleControlFileDict):
+        """
+            Filter unnecessary parameters and return a minimal PELE control
+            file for equilibration runs
+
+            :param peleControlFileDict: Dictionary with pele control file options
+            :type peleControlFileDict: dict
+
+            :returns: dict -- Dictionary with pele control file options
+        """
+        # Set small rotations and translations
+        peleControlFileDict["commands"][0]["Perturbation"]["translationRange"] = 0.5
+        peleControlFileDict["commands"][0]["Perturbation"]["rotationScalingFactor"] = 0.01
+        # Remove dynamical changes in control file
+        peleControlFileDict["commands"][0]["PeleTasks"][0].pop("exitConditions", None)
+        peleControlFileDict["commands"][0]["PeleTasks"][0].pop("parametersChanges", None)
+
+        return peleControlFileDict
+
     def equilibrate(self, intialStructures, outputPathConstants, reportFilename, outputPath, resname):
         """
             Run short simulation to equilibrate the system. It will run one
@@ -208,7 +227,7 @@ class PeleSimulation(SimulationRunner):
             :param resname: Residue name of the ligand in the system pdb
             :type resname: str
 
-            :returns list: --  List with initial structures
+            :returns: list --  List with initial structures
         """
         newInitialStructures = []
         equilibrationPeleDict = {"PELE_STEPS": 50, "SEED": self.parameters.seed}
@@ -218,8 +237,7 @@ class PeleSimulation(SimulationRunner):
         templateNames = {ele[1]: '"$%s"' % ele[1] for ele in string.Template.pattern.findall(peleControlFile)}
         templateNames.pop("OUTPUT_PATH", None)
         peleControlFileDict = json.loads(string.Template(peleControlFile).safe_substitute(templateNames))
-        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["translationRange"] = 0.5
-        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["rotationScalingFactor"] = 0.01
+        peleControlFileDict = self.getEquilibrationControlFile(peleControlFileDict)
 
         for i, structure in enumerate(intialStructures):
             equilibrationOutput = os.path.join(outputPath, "equilibration_%d" % (i+1))
@@ -236,10 +254,10 @@ class PeleSimulation(SimulationRunner):
             for key, value in templateNames.iteritems():
                 # Remove double quote around template keys, so that PELE
                 # understands the options
-                peleControlString.replace(value, '$%s' % key) 
+                peleControlString.replace(value, '$%s' % key)
             self.makeWorkingControlFile(equilibrationControlFile, equilibrationPeleDict, )
             self.runSimulation(equilibrationControlFile)
-            #TODO: Implement a selectEquilibratedStructure procedure
+            # TODO: Implement a selectEquilibratedStructure procedure
             # newInitialStructures.append(self.selectEquilibratedStructure())
             newInitialStructures.append(structure)
         return newInitialStructures
