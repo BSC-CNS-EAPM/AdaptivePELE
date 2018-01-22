@@ -199,25 +199,6 @@ def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, itera
         shutil.copyfile(name, tmpInitialStructuresTemplate % (iteration, i))
 
 
-def createMultipleComplexesFilenames(numberOfSnapshots, tmpInitialStructuresTemplate, iteration):
-    """
-        Creates the string to substitute the complexes in the PELE control file
-
-        :param numberOfSnapshots: Number of complexes to write
-        :type numberOfSnapshots: int
-        :param tmpInitialStructuresTemplate: Template with the name of the initial strutctures
-        :type tmpInitialStructuresTemplate: str
-        :param iteration: Epoch number
-        :type iteration: int
-
-        :returns: str -- jsonString to be substituted in PELE control file
-    """
-    jsonString = "\n"
-    for i in range(numberOfSnapshots-1):
-        jsonString += constants.inputFileTemplate % (tmpInitialStructuresTemplate % (iteration, i)) + ",\n"
-    jsonString += constants.inputFileTemplate % (tmpInitialStructuresTemplate % (iteration, numberOfSnapshots-1))
-    return jsonString
-
 
 def generateTrajectorySelectionString(epoch, epochOutputPathTempletized):
     """
@@ -457,13 +438,13 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
     spawningCalculator.log()
     print "Degeneracy", degeneracyOfRepresentatives
     seedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun)
-    initialStructuresAsString = createMultipleComplexesFilenames(seedingPoints, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
+    initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(seedingPoints, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
     simulationRunner.updateMappingProcessors(procMapping)
 
     return clusteringMethod, initialStructuresAsString
 
 
-def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, controlFile, outputPathConstants, clusteringBlock, spawningParams, initialStructures):
+def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, controlFile, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner):
     """
         Build the clustering object and copies initial structures from control file.
         Returns the clustering object to use and the initial structures filenames as string
@@ -482,6 +463,8 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
         :type spawningParams: :py:class:`.SpawningParams`
         :param initialStructures: Control file initial structures
         :type initialStructures: list
+        :param simulationRunner: :py:class:`.SimulationRunner` Simulation runner object
+        :type simulationRunner: :py:class:`.SimulationRunner`
 
         :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames
     """
@@ -492,7 +475,7 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
 
     firstRun = 0
     copyInitialStructures(initialStructures, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
-    initialStructuresAsString = createMultipleComplexesFilenames(len(initialStructures), outputPathConstants.tmpInitialStructuresTemplate, firstRun)
+    initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(len(initialStructures), outputPathConstants.tmpInitialStructuresTemplate, firstRun)
 
     clusteringBuilder = clustering.ClusteringBuilder()
     clusteringMethod = clusteringBuilder.buildClustering(clusteringBlock,
@@ -593,8 +576,8 @@ def main(jsonParams):
     if startFromScratch or not restart:
         firstRun = 0  # if restart false, but there were previous simulations
         if simulationRunner.parameters.runEquilibration:
-            initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningParams.reportFilename, outputPath)
-        clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures)
+            initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningParams.reportFilename, outputPath, resname)
+        clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner)
 
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
@@ -651,7 +634,7 @@ def main(jsonParams):
         if i != simulationRunner.parameters.iterations-1:
             numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1)
             simulationRunner.updateMappingProcessors(procMapping)
-            initialStructuresAsString = createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
+            initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
             peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
 
         if clusteringMethod.symmetries and nativeStructure:

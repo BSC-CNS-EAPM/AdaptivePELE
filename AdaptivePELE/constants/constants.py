@@ -35,6 +35,7 @@ class OutputPathConstants():
         self.clusteringOutputObject = ""
         self.tmpInitialStructuresTemplate = ""
         self.tmpControlFilename = ""
+        self.tmpInitialStructuresEquilibrationTemplate = ""
 
         self.buildConstants(outputPath)
 
@@ -53,5 +54,6 @@ class OutputPathConstants():
 
     def buildTmpFolderConstants(self, tmpFolder):
         self.tmpInitialStructuresTemplate = tmpFolder+"/initial_%d_%d.pdb"
+        self.tmpInitialStructuresEquilibrationTemplate = tmpFolder+"/initial_equilibration_%d.pdb"
         self.tmpControlFilename = tmpFolder+"/controlFile%d.conf"
 

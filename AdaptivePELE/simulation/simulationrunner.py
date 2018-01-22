@@ -157,9 +157,16 @@ class PeleSimulation(SimulationRunner):
         """
         # This is a dictionary because it's prepared to be subtitued in the PELE
         # control files (i.e. JSON format)
-        initialStructuresDict = json.loads(initialStructuresAsString.split(",")[0])
+        try:
+            initialStructuresDict = json.loads(initialStructuresAsString.split(",")[0])
+            initialStruct = str(initialStructuresDict['files'][0]['path'])
+        except ValueError:
+            # If a json valid string is not passed, interpret the input string
+            # as a path to a file
+            initialStruct = initialStructuresAsString
+
         PDBinitial = atomset.PDB()
-        PDBinitial.initialise(str(initialStructuresDict['files'][0]['path']), resname=resname)
+        PDBinitial.initialise(initialStruct, resname=resname)
         return repr(PDBinitial.getCOM())
 
     def runSimulation(self, runningControlFile=""):
@@ -198,7 +205,7 @@ class PeleSimulation(SimulationRunner):
         peleControlFileDict["commands"][0]["Perturbation"]["rotationScalingFactor"] = 0.01
         return peleControlFileDict
 
-    def equilibrate(self, intialStructures, outputPathConstants, reportFilename, outputPath):
+    def equilibrate(self, intialStructures, outputPathConstants, reportFilename, outputPath, resname):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure and select appropiate
@@ -212,16 +219,18 @@ class PeleSimulation(SimulationRunner):
             :type reportBaseFilename: str
             :param outputPath: Path where trajectories are found
             :type outputPath: str
+            :param resname: Residue name of the ligand in the system pdb
+            :type resname: str
 
             :returns: list --  List with initial structures
         """
         newInitialStructures = []
-        equilibrationPeleDict = {"PELE_STEPS": 50}
+        equilibrationPeleDict = {"PELE_STEPS": 50, "SEED": self.parameters.seed}
         with open(self.parameters.templetizedControlFile) as fc:
             peleControlFile = fc.read()
 
         templateNames = {ele[1]: '"$%s"' % ele[1] for ele in string.Template.pattern.findall(peleControlFile)}
-        templateNames.pop(["OUTPUT_PATH"], None)
+        templateNames.pop("OUTPUT_PATH", None)
         peleControlFileDict = json.loads(string.Template(peleControlFile).safe_substitute(templateNames))
         peleControlFileDict = self.getEquilibrationControlFile(peleControlFileDict)
 
@@ -229,15 +238,52 @@ class PeleSimulation(SimulationRunner):
             equilibrationOutput = os.path.join(outputPath, "equilibration_%d" % (i+1))
             equilibrationControlFile = outputPathConstants.tmpControlFilename % (i+1)
             utilities.makeFolder(equilibrationOutput)
+            shutil.copyfile(structure, outputPathConstants.tmpInitialStructuresEquilibrationTemplate % (i+1))
+            initialStructureString = self.createMultipleComplexesFilenames(1, outputPathConstants.tmpInitialStructuresEquilibrationTemplate, i+1, equilibration=True)
             equilibrationPeleDict["OUTPUT_PATH"] = equilibrationOutput
-            equilibrationPeleDict["COMPLEXES"] = structure
+            equilibrationPeleDict["COMPLEXES"] = initialStructureString
+            equilibrationPeleDict["BOX_CENTER"] = self.selectInitialBoxCenter(structure, resname)
+            equilibrationPeleDict["BOX_RADIUS"] = self.parameters.boxRadius
             print "Running equilibration for initial structure number %d" % (i+1)
-            self.makeWorkingControlFile(equilibrationControlFile, equilibrationPeleDict, json.dumps(peleControlFileDict, indent=4))
+            peleControlString = json.dumps(peleControlFileDict, indent=4)
+            for key, value in templateNames.iteritems():
+                # Remove double quote around template keys, so that PELE
+                # understands the options
+                peleControlString.replace(value, '$%s' % key)
+            self.makeWorkingControlFile(equilibrationControlFile, equilibrationPeleDict, )
             self.runSimulation(equilibrationControlFile)
-            #TODO: Implement a selectEquilibratedStructure procedure
+            # TODO: Implement a selectEquilibratedStructure procedure
             # newInitialStructures.append(self.selectEquilibratedStructure())
             newInitialStructures.append(structure)
         return newInitialStructures
+
+    def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
+        """
+            Creates the string to substitute the complexes in the PELE control file
+
+            :param numberOfSnapshots: Number of complexes to write
+            :type numberOfSnapshots: int
+            :param tmpInitialStructuresTemplate: Template with the name of the initial strutctures
+            :type tmpInitialStructuresTemplate: str
+            :param iteration: Epoch number
+            :type iteration: int
+            :param equilibration: Flag to mark wether the complexes are part of an
+            equilibration run
+            :type equilibration: bool
+
+            :returns: str -- jsonString to be substituted in PELE control file
+        """
+        jsonString = ["\n"]
+        for i in range(numberOfSnapshots-1):
+            if equilibration:
+                jsonString.append(constants.inputFileTemplate % (tmpInitialStructuresTemplate % (iteration)) + ",\n")
+            else:
+                jsonString.append(constants.inputFileTemplate % (tmpInitialStructuresTemplate % (iteration, i)) + ",\n")
+        if equilibration:
+            jsonString.append(constants.inputFileTemplate % (tmpInitialStructuresTemplate % (iteration)))
+        else:
+            jsonString.append(constants.inputFileTemplate % (tmpInitialStructuresTemplate % (iteration, numberOfSnapshots-1)))
+        return "".join(jsonString)
 
 
 class TestSimulation(SimulationRunner):
