@@ -56,4 +56,5 @@ class OutputPathConstants():
         self.tmpInitialStructuresTemplate = tmpFolder+"/initial_%d_%d.pdb"
         self.tmpInitialStructuresEquilibrationTemplate = tmpFolder+"/initial_equilibration_%d.pdb"
         self.tmpControlFilename = tmpFolder+"/controlFile%d.conf"
+        self.tmpControlFilenameEqulibration = tmpFolder+"/controlFile_equilibration_%d.conf"
 

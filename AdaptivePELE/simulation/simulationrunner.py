@@ -241,7 +241,7 @@ class PeleSimulation(SimulationRunner):
 
         for i, structure in enumerate(intialStructures):
             equilibrationOutput = os.path.join(outputPath, "equilibration_%d" % (i+1))
-            equilibrationControlFile = outputPathConstants.tmpControlFilename % (i+1)
+            equilibrationControlFile = outputPathConstants.tmpControlFilenameEqulibration % (i+1)
             utilities.makeFolder(equilibrationOutput)
             shutil.copyfile(structure, outputPathConstants.tmpInitialStructuresEquilibrationTemplate % (i+1))
             initialStructureString = self.createMultipleComplexesFilenames(1, outputPathConstants.tmpInitialStructuresEquilibrationTemplate, i+1, equilibration=True)
@@ -255,7 +255,7 @@ class PeleSimulation(SimulationRunner):
                 # Remove double quote around template keys, so that PELE
                 # understands the options
                 peleControlString.replace(value, '$%s' % key)
-            self.makeWorkingControlFile(equilibrationControlFile, equilibrationPeleDict, )
+            self.makeWorkingControlFile(equilibrationControlFile, equilibrationPeleDict, peleControlString)
             self.runSimulation(equilibrationControlFile)
             # TODO: Implement a selectEquilibratedStructure procedure
             # newInitialStructures.append(self.selectEquilibratedStructure())
