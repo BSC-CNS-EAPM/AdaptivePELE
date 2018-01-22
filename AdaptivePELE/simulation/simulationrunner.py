@@ -201,8 +201,13 @@ class PeleSimulation(SimulationRunner):
 
             :returns: dict -- Dictionary with pele control file options
         """
+        # Set small rotations and translations
         peleControlFileDict["commands"][0]["Perturbation"]["translationRange"] = 0.5
         peleControlFileDict["commands"][0]["Perturbation"]["rotationScalingFactor"] = 0.01
+        # Remove dynamical changes in control file
+        peleControlFileDict["commands"][0]["PeleTasks"][0].pop("exitConditions", None)
+        peleControlFileDict["commands"][0]["PeleTasks"][0].pop("parametersChanges", None)
+
         return peleControlFileDict
 
     def equilibrate(self, intialStructures, outputPathConstants, reportFilename, outputPath, resname):
