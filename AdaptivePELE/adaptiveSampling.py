@@ -444,15 +444,13 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
     return clusteringMethod, initialStructuresAsString
 
 
-def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, controlFile, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner):
+def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, controlFile, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner):
     """
         Build the clustering object and copies initial structures from control file.
         Returns the clustering object to use and the initial structures filenames as string
 
         :param debug: In debug, it will not remove the simulations
         :type debug: bool
-        :param outputPath: Simulation output path
-        :type outputPath: str
         :param controlFile: Adaptive sampling control file
         :type controlFile: str
         :param outputPathConstants: Contains outputPath-related constants
@@ -468,9 +466,6 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath
 
         :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames
     """
-    if not debug:
-        shutil.rmtree(outputPath)
-    utilities.makeFolder(outputPath)
     saveInitialControlFile(controlFile, outputPathConstants.originalControlFile)
 
     firstRun = 0
@@ -575,10 +570,16 @@ def main(jsonParams):
 
     if startFromScratch or not restart:
         firstRun = 0  # if restart false, but there were previous simulations
+        # These two lines were previously inside the
+        # buildNewClusteringAndWriteInitialStructuresInNewSimulation function,
+        # however, the equilibration procedure has to be called in between
+        if not debug:
+            shutil.rmtree(outputPath)
+        utilities.makeFolder(outputPath)
+
         if simulationRunner.parameters.runEquilibration:
             initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningParams.reportFilename, outputPath, resname)
-        clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, outputPath, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner)
-
+        clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner)
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
