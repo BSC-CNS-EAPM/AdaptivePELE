@@ -79,7 +79,6 @@ class SimulationRunner:
 
         inputFileTemplate = string.Template(inputFileContent)
         outputFileContent = inputFileTemplate.substitute(dictionary)
-
         with open(workingControlFilename, "w") as outputFile:
             outputFileContent = outputFileContent.replace("'", '"')
             outputFile.write(outputFileContent)
@@ -202,8 +201,8 @@ class PeleSimulation(SimulationRunner):
             :returns: dict -- Dictionary with pele control file options
         """
         # Set small rotations and translations
-        peleControlFileDict["commands"][0]["Perturbation"]["translationRange"] = 0.5
-        peleControlFileDict["commands"][0]["Perturbation"]["rotationScalingFactor"] = 0.01
+        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["translationRange"] = 0.5
+        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["rotationScalingFactor"] = 0.01
         # Remove dynamical changes in control file
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("exitConditions", None)
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("parametersChanges", None)
@@ -248,13 +247,14 @@ class PeleSimulation(SimulationRunner):
             equilibrationPeleDict["OUTPUT_PATH"] = equilibrationOutput
             equilibrationPeleDict["COMPLEXES"] = initialStructureString
             equilibrationPeleDict["BOX_CENTER"] = self.selectInitialBoxCenter(structure, resname)
-            equilibrationPeleDict["BOX_RADIUS"] = self.parameters.boxRadius
+            equilibrationPeleDict["BOX_RADIUS"] = 2
             print "Running equilibration for initial structure number %d" % (i+1)
             peleControlString = json.dumps(peleControlFileDict, indent=4)
             for key, value in templateNames.iteritems():
                 # Remove double quote around template keys, so that PELE
                 # understands the options
-                peleControlString.replace(value, '$%s' % key)
+                peleControlString = peleControlString.replace(value, "$%s" % key)
+
             self.makeWorkingControlFile(equilibrationControlFile, equilibrationPeleDict, peleControlString)
             self.runSimulation(equilibrationControlFile)
             # TODO: Implement a selectEquilibratedStructure procedure
