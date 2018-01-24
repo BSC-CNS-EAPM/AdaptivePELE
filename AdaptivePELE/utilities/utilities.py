@@ -205,3 +205,20 @@ def distanceCOM(coords1, coords2):
     coords1 = np.array(coords1)
     coords2 = np.array(coords2)
     return np.linalg.norm(coords1-coords2)
+
+
+def getReportAndTrajectoryWildcard(JSONdict):
+    """
+        Extract the trajectory and report filename from the pele control file
+
+        :param JSONdict: Dictionary containing a parsed PELE control file
+        :type JSONdict: dict
+
+        :returns: str, str -- Report and trajectory wildcards
+    """
+
+    reportWildcard = os.path.split(JSONdict["commands"][0]["PELE_Output"]['reportPath'])[1]
+    trajWildcard = os.path.split(JSONdict["commands"][0]["PELE_Output"]['trajectoryPath'])[1]
+    trajWildcard = '_%d'.join(os.path.splitext(trajWildcard))
+    reportWildcard = '_%d'.join(os.path.splitext(reportWildcard))
+    return reportWildcard, trajWildcard

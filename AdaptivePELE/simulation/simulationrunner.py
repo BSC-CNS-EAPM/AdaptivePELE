@@ -5,9 +5,10 @@ import subprocess
 import shutil
 import string
 import sys
+import numpy as np
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
-from AdaptivePELE.atomset import atomset
+from AdaptivePELE.atomset import atomset, RMSDCalculator
 from AdaptivePELE.utilities import utilities
 
 
@@ -209,6 +210,34 @@ class PeleSimulation(SimulationRunner):
 
         return peleControlFileDict
 
+    def getMetricColumns(self, JSONdict):
+        """
+            Extract the column of a similarity distance (RMSD or distance) from the pele control file
+
+            :param JSONdict: Dictionary containing a parsed PELE control file
+            :type JSONdict: dict
+
+            :returns: int -- Column index of the similarity metric
+        """
+        hasRMSD = False
+        RMSDCol = None
+        distanceCol = None
+        hasDistance = False
+        for i, metricBlock in enumerate(JSONdict["commands"][0]["PeleTasks"][0]['metrics']):
+            if 'rmsd' in metricBlock['type'].lower():
+                hasRMSD = True
+                RMSDCol = i+4
+            elif 'distance' in metricBlock['type'].lower():
+                hasDistance = True
+                distanceCol = i+4
+        if hasRMSD:
+            return RMSDCol
+        elif hasDistance:
+            return distanceCol
+        else:
+            return None
+
+
     def equilibrate(self, intialStructures, outputPathConstants, reportFilename, outputPath, resname):
         """
             Run short simulation to equilibrate the system. It will run one
@@ -229,7 +258,7 @@ class PeleSimulation(SimulationRunner):
             :returns: list --  List with initial structures
         """
         newInitialStructures = []
-        equilibrationPeleDict = {"PELE_STEPS": 50, "SEED": self.parameters.seed}
+        equilibrationPeleDict = {"PELE_STEPS": 2, "SEED": self.parameters.seed}
         with open(self.parameters.templetizedControlFile) as fc:
             peleControlFile = fc.read()
 
@@ -237,6 +266,8 @@ class PeleSimulation(SimulationRunner):
         templateNames.pop("OUTPUT_PATH", None)
         peleControlFileDict = json.loads(string.Template(peleControlFile).safe_substitute(templateNames))
         peleControlFileDict = self.getEquilibrationControlFile(peleControlFileDict)
+        similarityColumn = self.getMetricColumns(peleControlFileDict)
+        reportWildcard, trajWildcard = utilities.getReportAndTrajectoryWildcard(peleControlFileDict)
 
         for i, structure in enumerate(intialStructures):
             equilibrationOutput = os.path.join(outputPath, "equilibration_%d" % (i+1))
@@ -257,10 +288,96 @@ class PeleSimulation(SimulationRunner):
 
             self.makeWorkingControlFile(equilibrationControlFile, equilibrationPeleDict, peleControlString)
             self.runSimulation(equilibrationControlFile)
-            # TODO: Implement a selectEquilibratedStructure procedure
-            # newInitialStructures.append(self.selectEquilibratedStructure())
-            newInitialStructures.append(structure)
+            # Extract report, trajnames, metrics columns from pele control file
+            reportNames = os.path.join(equilibrationOutput, reportWildcard)
+            trajNames = os.path.join(equilibrationOutput, trajWildcard)
+            newStructure = self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames)
+            newStructurePath  = os.path.join(equilibrationOutput, 'equilibration_struc_%d.pdb' % (i+1))
+            with open(newStructurePath, "w") as fw:
+                fw.write(newStructure)
+            newInitialStructures.append(newStructurePath)
         return newInitialStructures
+
+    def selectEquilibratedStructure(self, nTrajs, similarityColumn, resname, trajWildcard, reportWildcard):
+        """
+            Select a representative initial structure from the equilibration
+            run
+
+            :param nTrajs: Number of trajectories
+            :type nTrajs: int
+            :param similarityColumn: Column number of the similarity metric
+            (RMSD or distance)
+            :type similarityColumn: int
+            :param resname: Name of the ligand in the pdb
+            :type resname: str
+            :param trajWildcard: Templetized path to trajectory files"
+            :type trajWildcard: str
+            :param reportWildcard: Templetized path to report files"
+            :type reportWildcard: str
+
+            :returns: str -- Pdb snapshot of the representative structure
+        """
+        energyColumn = 3
+        values = []
+        indices = []
+        rowIndex = 0
+        if similarityColumn is None:
+            RMSDCalc = RMSDCalculator.RMSDCalculator()
+            initial = atomset.PDB()
+        else:
+            cols = sorted([energyColumn, similarityColumn])
+
+        for i in xrange(1, nTrajs):
+            indices.append(rowIndex)
+            report = np.loadtxt(reportWildcard % i)
+            if similarityColumn is None:
+                snapshots = utilities.getSnapshots(trajWildcard % i)
+                report_values = []
+                if i == 1:
+                    initial.initialise(snapshots.pop(0), resname=resname)
+                    report_values.append([0, report[0, energyColumn]])
+                    report = report[1:, :]
+                for j, snap in enumerate(snapshots):
+                    pdbConformation = atomset.PDB()
+                    pdbConformation.initialise(snap, resname=resname)
+                    report_values.append([RMSDCalc.computeRMSD(initial, pdbConformation), report[j, energyColumn]])
+            else:
+                report_values = report[:, cols]
+            values.extend(report_values)
+            rowIndex += len(report_values)
+
+        values = np.array(values)
+        if energyColumn > similarityColumn or similarityColumn is  None:
+            similarityColumn, energyColumn = range(2)
+        else:
+            energyColumn, similarityColumn = range(2)
+        maxEnergy = values.max(axis=0)[energyColumn]
+        # Substract the max value so all values will be negative (avoid sign problems)
+        values[:, energyColumn] -= maxEnergy
+        minEnergy = values.min(axis=0)[energyColumn]
+        # Normalize to the minimum value
+        values[:, energyColumn] /= minEnergy
+        freq, bins = np.histogram(values[:, similarityColumn])
+        freq = np.divide(freq, np.float(np.sum(freq)))
+        # Get center of the bins
+        centers = (bins[:-1]+bins[1:])/2.0
+        for row in values:
+            row[similarityColumn] = freq[np.argmin(np.abs(row[similarityColumn] - centers))]
+        distance = values.sum(axis=1)
+        indexSelected = np.argmax(distance)
+        # Get trajectory and snapshot number from the index selected 
+        trajNum = len(indices)-1
+        for i, index in enumerate(indices):
+            if index == indexSelected:
+                trajNum = i
+                break
+            elif indexSelected < index:
+                trajNum = i-1
+                break
+        snapshotNum = indexSelected-indices[trajNum]
+        # trajectories are 1-indexed
+        trajNum += 1
+        return utilities.getSnapshots(trajWildcard % trajNum)[snapshotNum]
 
     def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
         """
