@@ -42,8 +42,8 @@ def getSnapshots(trajectoryFile, verbose=False):
 
         :returns: str -- Snapshots with information
     """
-    inputFile = open(trajectoryFile, "r")
-    inputFileContent = inputFile.read()
+    with open(trajectoryFile, "r") as inputFile:
+        inputFileContent = inputFile.read()
 
     snapshots = inputFileContent.split("ENDMDL")[:-1]
     if not verbose:
