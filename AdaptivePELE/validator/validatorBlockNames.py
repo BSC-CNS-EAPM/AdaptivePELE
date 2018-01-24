@@ -129,7 +129,8 @@ class SimulationParams:
         },
         "params": {
             "metricCol": "int",
-            "exitValue": "numbers.Real"
+            "exitValue": "numbers.Real",
+            "condition": "basestring"
         }
     }
 

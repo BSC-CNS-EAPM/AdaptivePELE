@@ -123,6 +123,7 @@ class SimulationParams:
     boxCenter = "boxCenter"
     boxRadius = "boxRadius"
     runEquilibration = "runEquilibration"
+    condition = "condition"
 
 
 class ExitConditionType:

@@ -332,7 +332,10 @@ class ExitConditionBuilder:
         if exitConditionType == blockNames.ExitConditionType.metric:
             metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
             metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
-            return MetricExitCondition(metricCol, metricValue)
+            condition = exitConditionParams.get(blockNames.SimulationParams.condition, "<")
+            if condition not in [">", "<"]:
+                raise ValueError("In MetricExitCondition the parameter condition only accepts > or <, but %s was passed" % condition)
+            return MetricExitCondition(metricCol, metricValue, condition)
         elif exitConditionType == blockNames.ExitConditionType.clustering:
             ntrajs = exitConditionParams[blockNames.SimulationParams.trajectories]
             return ClusteringExitCondition(ntrajs)
@@ -363,11 +366,14 @@ class ClusteringExitCondition:
 
 
 class MetricExitCondition:
-    def __init__(self, metricCol, metricValue):
+    def __init__(self, metricCol, metricValue, condition):
         self.metricCol = metricCol
         self.metricValue = metricValue
-        self.lastCheckedCluster = 0
         self.type = simulationTypes.EXITCONDITION_TYPE.METRIC
+        if condition == ">":
+            self.condition = lambda x, y: x > y
+        else:
+            self.condition = lambda x, y: x < y
 
     def checkExitCondition(self, clustering):
         """
@@ -381,7 +387,8 @@ class MetricExitCondition:
         """
         for cluster in clustering.clusters.clusters:
             metric = cluster.getMetricFromColumn(self.metricCol)
-            if metric is not None and metric < self.metricValue:
+
+            if metric is not None and self.condition(metric, self.metricValue):
                 return True
         return False
 
