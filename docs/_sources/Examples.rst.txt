@@ -5,7 +5,7 @@ User Manual
 Installation
 ------------
 
-In order to have a running copy of AdaptivePELE, you need to install and compile cython files in the base folder with::
+In order to have a running copy of AdaptivePELE [APELE]_, you need to install and compile cython files in the base folder with::
 
     cd AdaptivePELE
     python setup.py build_ext --inplace
@@ -13,7 +13,6 @@ In order to have a running copy of AdaptivePELE, you need to install and compile
 Also, if AdaptivePELE was not installed in a typical library directory, a common option is to add it to your local PYTHONPATH::
 
     export PYTHONPATH=<location_of_AdaptivePELE>
-
 
 Overview
 --------
@@ -436,7 +435,7 @@ Control File Examples
 Example 1
 .........
 
-The first example makes use of default parameters (used in the AdaptivePELE paper).
+The first example makes use of default parameters (used in the AdaptivePELE paper [APELE]_).
 
 ::
 
@@ -573,3 +572,6 @@ To plot the evolution of the number of clusters along the simulation::
 
 It shows the evolution of the total number of clusters, and the number of clusters divided in different densities and cluster thresholds.
 It also prints a histogram with the ratio of counts *r* (see above). When ``-filename`` is provided, it saves the plots as png files.
+
+.. [APELE] Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, https://www.nature.com/articles/s41598-017-08445-5
+
