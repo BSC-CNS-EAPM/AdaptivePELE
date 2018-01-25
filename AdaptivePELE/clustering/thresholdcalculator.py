@@ -1,9 +1,10 @@
-from AdaptivePELE.constants import blockNames
-import thresholdcalculatortypes
 import sys
 import numpy as np
+from AdaptivePELE.constants import blockNames
+from AdaptivePELE.clustering import thresholdcalculatortypes
+from abc import abstractmethod
 
-#make test
+
 class ThresholdCalculatorBuilder():
     def build(self, clusteringBlock):
         """
@@ -16,15 +17,15 @@ class ThresholdCalculatorBuilder():
         try:
             thresholdCalculatorBlock = clusteringBlock[blockNames.ClusteringTypes.thresholdCalculator]
         except KeyError:
-            #Default value if no threshold calculator block was defined
+            # Default value if no threshold calculator block was defined
             return ThresholdCalculatorHeaviside()
 
         try:
-            type = thresholdCalculatorBlock[blockNames.ThresholdCalculator.type]
+            typeParam = thresholdCalculatorBlock[blockNames.ThresholdCalculator.type]
         except KeyError:
             sys.exit("Threshold calculator must have a type")
 
-        if type == blockNames.ThresholdCalculator.constant:
+        if typeParam == blockNames.ThresholdCalculator.constant:
             try:
                 paramsBlock = thresholdCalculatorBlock[blockNames.ThresholdCalculator.params]
                 value = paramsBlock[blockNames.ThresholdCalculatorParams.value]
@@ -32,7 +33,7 @@ class ThresholdCalculatorBuilder():
             except KeyError:
                 print "Using default parameters for constant threshold calculator"
                 return ThresholdCalculatorConstant()
-        elif type == blockNames.ThresholdCalculator.heaviside:
+        elif typeParam == blockNames.ThresholdCalculator.heaviside:
             try:
                 paramsBlock = thresholdCalculatorBlock[blockNames.ThresholdCalculator.params]
                 values = paramsBlock[blockNames.ThresholdCalculatorParams.values]
@@ -45,10 +46,9 @@ class ThresholdCalculatorBuilder():
             sys.exit("Unknown threshold calculator type! Choices are: " + str(thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPE_TO_STRING_DICTIONARY.values()))
 
 
-from abc import ABCMeta, abstractmethod
 class ThresholdCalculator():
     def __init__(self):
-        self.type = "BaseClass" #change for abstract attribute
+        self.type = "BaseClass"  # change for abstract attribute
 
     @abstractmethod
     def calculate(self, contacts):
@@ -61,8 +61,9 @@ class ThresholdCalculator():
     def __ne__(self, other):
         return not self.__eq__(other)
 
+
 class ThresholdCalculatorConstant(ThresholdCalculator):
-    def __init__(self, value = 2):
+    def __init__(self, value=2):
         self.type = thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.constant
         self.value = value
 
@@ -110,10 +111,10 @@ class ThresholdCalculatorHeaviside(ThresholdCalculator):
             :returns: float -- threshold value of the cluster
         """
         for i in range(len(self.conditions)):
-            #change, so that whole condition is in array
+            # change, so that whole condition is in array
             if contacts > self.conditions[i]:
                 return self.values[i]
-        #the way it's built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the "else" value
+        # the way it's built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the "else" value
         return self.values[-1]
 
     def getMaxThreshold(self):

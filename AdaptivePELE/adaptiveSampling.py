@@ -199,7 +199,6 @@ def copyInitialStructures(initialStructures, tmpInitialStructuresTemplate, itera
         shutil.copyfile(name, tmpInitialStructuresTemplate % (iteration, i))
 
 
-
 def generateTrajectorySelectionString(epoch, epochOutputPathTempletized):
     """
         Generates the template for the name of the trajectories in a given epoch
@@ -330,7 +329,9 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return oldClusteringMethod.thresholdCalculator != newClusteringMethod.thresholdCalculator or\
                 abs(oldClusteringMethod.contactThresholdDistance - newClusteringMethod.contactThresholdDistance) > 1e-7
 
-    # TODO: add similarityEvaluator check for contactMap clustering
+    # Check 3: Change of similarity Evaluator in contactMap clustering
+    if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMap:
+        return oldClusteringMethod.similarityEvaluator.typeEvaluator != newClusteringMethod.similarityEvaluator.typeEvaluator
 
 
 def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
@@ -363,6 +364,7 @@ def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletiz
         :param epochOutputPathTempletized: Path where to find the trajectories
         :type epochOutputPathTempletized: str
         :param simulationRunner: Simulation runner object
+        :type simulationRunner: :py:class:`.SimulationRunner`
 """
     for i in range(finalEpoch):
         simulationRunner.readMappingFromDisk(epochOutputPathTempletized % i)
