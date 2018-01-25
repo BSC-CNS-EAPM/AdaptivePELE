@@ -6,6 +6,8 @@ Behavior changes from previous version:
     *) Added exitContinuous density for exit path simulations
     *) Added possibility to change the simulation box at each epoch
     *) Added equilibration procedure
+    *) Added possibility to test metric greater than in metric exit condition
+    *) Added metricMultipleTrajectories exit condition
 
 Bug fixes:
     *) Fixed minor bug in controlFileValidator

@@ -4,6 +4,3 @@
 
 * I didnt use "__" for private methods, maybe use convention
 * Support for MD propagators
-* Add flexibility for exit condition ( > or < )
-* New exit condition where simulation exits after X processors have exceded a
-  metric value
