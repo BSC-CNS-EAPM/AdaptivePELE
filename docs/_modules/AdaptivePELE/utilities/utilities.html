@@ -180,8 +180,8 @@
 
 <span class="sd">        :returns: str -- Snapshots with information</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">inputFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
-    <span class="n">inputFileContent</span> <span class="o">=</span> <span class="n">inputFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inputFile</span><span class="p">:</span>
+        <span class="n">inputFileContent</span> <span class="o">=</span> <span class="n">inputFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
     <span class="n">snapshots</span> <span class="o">=</span> <span class="n">inputFileContent</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;ENDMDL&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">verbose</span><span class="p">:</span>
@@ -343,6 +343,35 @@
     <span class="n">coords1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords1</span><span class="p">)</span>
     <span class="n">coords2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords2</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">coords1</span><span class="o">-</span><span class="n">coords2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getReportAndTrajectoryWildcard"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getReportAndTrajectoryWildcard">[docs]</a><span class="k">def</span> <span class="nf">getReportAndTrajectoryWildcard</span><span class="p">(</span><span class="n">JSONdict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract the trajectory and report filename from the pele control file</span>
+
+<span class="sd">        :param JSONdict: Dictionary containing a parsed PELE control file</span>
+<span class="sd">        :type JSONdict: dict</span>
+
+<span class="sd">        :returns: str, str -- Report and trajectory wildcards</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">reportWildcard</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">JSONdict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PELE_Output&quot;</span><span class="p">][</span><span class="s1">&#39;reportPath&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">trajWildcard</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">JSONdict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PELE_Output&quot;</span><span class="p">][</span><span class="s1">&#39;trajectoryPath&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">trajWildcard</span> <span class="o">=</span> <span class="s1">&#39;_</span><span class="si">%d</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">trajWildcard</span><span class="p">))</span>
+    <span class="n">reportWildcard</span> <span class="o">=</span> <span class="s1">&#39;_</span><span class="si">%d</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">reportWildcard</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">reportWildcard</span><span class="p">,</span> <span class="n">trajWildcard</span></div>
+
+<div class="viewcode-block" id="getPELEControlFileDict"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getPELEControlFileDict">[docs]</a><span class="k">def</span> <span class="nf">getPELEControlFileDict</span><span class="p">(</span><span class="n">templetizedControlFile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse a PELE control file into a python dictionary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">templetizedControlFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">fc</span><span class="p">:</span>
+        <span class="n">peleControlFile</span> <span class="o">=</span> <span class="n">fc</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="n">templateNames</span> <span class="o">=</span> <span class="p">{</span><span class="n">ele</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="s1">&#39;&quot;$</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">ele</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">Template</span><span class="o">.</span><span class="n">pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">peleControlFile</span><span class="p">)}</span>
+    <span class="n">templateNames</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;OUTPUT_PATH&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="n">peleControlFile</span><span class="p">)</span><span class="o">.</span><span class="n">safe_substitute</span><span class="p">(</span><span class="n">templateNames</span><span class="p">)),</span> <span class="n">templateNames</span></div>
 </pre></div>
 
            </div>

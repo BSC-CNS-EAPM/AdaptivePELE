@@ -301,31 +301,61 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <li><strong>data</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE</li>
 <li><strong>documents</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE</li>
 <li><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder, it is already</li>
-<li><strong>modeMovingBox</strong> (<em>string</em>, default=None, possible values={<em>unbinding</em>, <em>bidning</em>}): Wether to dynamically set the center of the simulation box along an exit or entrance simulation</li>
+<li><strong>modeMovingBox</strong> (<em>string</em>, default=None, possible values={<em>unbinding</em>, <em>binding</em>}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation</li>
 <li><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</li>
 <li><strong>boxRadius</strong> (<em>int</em>, default=20): Value of the simulation box radius</li>
+<li><strong>runEquilibration</strong> (<em>bool</em>, default=False): Whether to run a short
+equilibration or burn-in simulation for each initial structure</li>
 </ul>
 <p>Additionally, the block may have an exit condition that stops the execution:</p>
 <ul>
 <li><p class="first"><strong>exitCondition</strong> (<em>dict</em>, default=None): Block that specifies an exit condition for the simulation.
-Currently only the metric type is implemented, this type accepts a
-<em>metricCol</em> which represents a column in the report file and a <em>exitValue</em>
-which represents a value. The simulation will terminate after the metric
-written in the <em>metricCol</em> reaches a value smaller than <em>exitValue</em>. An example of the exit condition block
-that would terminate the program after a trajectory reaches a value of less than 2 for the fifth column
-(4th starting to count from 0) of the report file would look like:</p>
+Currently two types are implemented: <em>metric</em> and
+<em>metricMultipleTrajectories</em>.</p>
+<ul>
+<li><p class="first"><strong>metric</strong> :
+this type accepts a <em>metricCol</em> which represents a column in the report file, an <em>exitValue</em>
+which represents a value for the metric and a <em>condition</em> parameter which can
+be either “&lt;” or “&gt;”, default value is “&lt;”. The simulation will terminate after the metric
+written in the <em>metricCol</em> reaches a value smaller or greater than <em>exitValue</em>, depending on the condition specified.
+An example of the exit condition block that would terminate the program after a trajectory reaches a value of less
+than 2 for the fifth column (4th starting to count from 0) of the report file would look like:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;exitCondition&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;metric&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;metricCol&quot;</span> <span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-        <span class="s2">&quot;exitValue&quot;</span> <span class="p">:</span> <span class="mf">2.0</span>
+        <span class="s2">&quot;exitValue&quot;</span> <span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="s2">&quot;condition&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>metricMultipleTrajectories</strong> :
+this type accepts a <em>metricCol</em> which represents a column in the report file, an <em>exitValue</em>
+which represents a value for the metric, a <em>condition</em> parameter which can
+be either “&lt;” or “&gt;”, default value is “&lt;” and a <em>numTrajs</em> parameter which determines how many independent trajectories
+have to meet the condition for the simulation to stop. The simulation will terminate after the metric
+written in the <em>metricCol</em> reaches a value smaller or greater than <em>exitValue</em>, depending on the condition specified for a
+number of trajectories greater or equal than <em>numTrajs</em>. An example of the exit condition block that would terminate the
+program after 10 trajectories reach a value of more than 2 for the fifth column (4th starting to count from 0) of the report
+file would look like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;exitCondition&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;metricMultipleTrajectories&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;metricCol&quot;</span> <span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;exitValue&quot;</span> <span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="s2">&quot;condition&quot;</span> <span class="p">:</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;numTrajs&quot;</span> <span class="p">:</span> <span class="mi">10</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 </li>
 </ul>
-<p>Example of simulation block:</p>
+</li>
+</ul>
+<p>Example of a minimal simulation block:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;pele&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
@@ -353,7 +383,7 @@ The procedure is as follows. Given some clusters, a conformation is said to belo
 when it differs in less than a certain metric threshold (e.g. ligand RMSD)
 to the corresponding cluster center. Cluster centers are always compared in the same order, and,
 if there is no similar cluster, it generates a new one.</p>
-<p>Aside form the speed, a big advantage of using this method
+<p>Aside from the speed, a big advantage of using this method
 is that it permits the user to define different criteria in different regions.
 This way, we can optimize the number of clusters, giving more importance to regions with more interactions,
 potentially being more metastable.</p>
@@ -393,7 +423,7 @@ ligand atoms (typically only heavy atoms) as rows, and a value of True indicates
 There are currently three implemented methods to evaluate the similarity of contactMaps:</p>
 <ul class="simple">
 <li><strong>Jaccard</strong>, which calulates the Jaccard Index (<a class="reference external" href="https://en.wikipedia.org/wiki/Jaccard_index">Wikipedia page</a>). The recommended values using the heaviside threshold calculator are [0.375, 0.5, 0.55, 0.7] for the conditions [1, 0.75 , 0.5].</li>
-<li><strong>correlation</strong>, which calculates the correlation between the two matrices and</li>
+<li><strong>correlation</strong>, which calculates the correlation between the two matrices</li>
 <li><strong>distance</strong>, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.</li>
 </ul>
 </div>

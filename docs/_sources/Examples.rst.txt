@@ -156,29 +156,56 @@ Optionally, you can also use the following parameters:
 * **data** (*string*, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE
 * **documents** (*string*, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE
 * **executable** (*string*, default=MareNostrum or Life cluster path): Path to the Pele executable folder, it is already
-* **modeMovingBox** (*string*, default=None, possible values={*unbinding*, *bidning*}): Wether to dynamically set the center of the simulation box along an exit or entrance simulation
+* **modeMovingBox** (*string*, default=None, possible values={*unbinding*, *binding*}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation
 * **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center
 * **boxRadius** (*int*, default=20): Value of the simulation box radius
+* **runEquilibration** (*bool*, default=False): Whether to run a short
+  equilibration or burn-in simulation for each initial structure  
 
 Additionally, the block may have an exit condition that stops the execution:
 
 * **exitCondition** (*dict*, default=None): Block that specifies an exit condition for the simulation.
-  Currently only the metric type is implemented, this type accepts a
-  *metricCol* which represents a column in the report file and a *exitValue*
-  which represents a value. The simulation will terminate after the metric
-  written in the *metricCol* reaches a value smaller than *exitValue*. An example of the exit condition block 
-  that would terminate the program after a trajectory reaches a value of less than 2 for the fifth column 
-  (4th starting to count from 0) of the report file would look like::
+  Currently two types are implemented: *metric* and
+  *metricMultipleTrajectories*.
 
-    "exitCondition" : {
-        "type" : "metric",
-        "params" : {
-            "metricCol" : 4,
-            "exitValue" : 2.0
+  * **metric** : 
+    this type accepts a *metricCol* which represents a column in the report file, an *exitValue* 
+    which represents a value for the metric and a *condition* parameter which can
+    be either "<" or ">", default value is "<". The simulation will terminate after the metric
+    written in the *metricCol* reaches a value smaller or greater than *exitValue*, depending on the condition specified. 
+    An example of the exit condition block that would terminate the program after a trajectory reaches a value of less 
+    than 2 for the fifth column (4th starting to count from 0) of the report file would look like::
+
+        "exitCondition" : {
+            "type" : "metric",
+            "params" : {
+                "metricCol" : 4,
+                "exitValue" : 2.0,
+                "condition" : "<"
+            }
         }
-    }
 
-Example of simulation block::
+  * **metricMultipleTrajectories** : 
+    this type accepts a *metricCol* which represents a column in the report file, an *exitValue* 
+    which represents a value for the metric, a *condition* parameter which can
+    be either "<" or ">", default value is "<" and a *numTrajs* parameter which determines how many independent trajectories
+    have to meet the condition for the simulation to stop. The simulation will terminate after the metric
+    written in the *metricCol* reaches a value smaller or greater than *exitValue*, depending on the condition specified for a
+    number of trajectories greater or equal than *numTrajs*. An example of the exit condition block that would terminate the 
+    program after 10 trajectories reach a value of more than 2 for the fifth column (4th starting to count from 0) of the report 
+    file would look like::
+
+        "exitCondition" : {
+            "type" : "metricMultipleTrajectories",
+            "params" : {
+                "metricCol" : 4,
+                "exitValue" : 2.0,
+                "condition" : ">",
+                "numTrajs" : 10
+            }
+        }
+
+Example of a minimal simulation block::
 
     "simulation": {
         "type" : "pele",
@@ -208,7 +235,7 @@ when it differs in less than a certain metric threshold (e.g. ligand RMSD)
 to the corresponding cluster center. Cluster centers are always compared in the same order, and,
 if there is no similar cluster, it generates a new one. 
 
-Aside form the speed, a big advantage of using this method 
+Aside from the speed, a big advantage of using this method 
 is that it permits the user to define different criteria in different regions.
 This way, we can optimize the number of clusters, giving more importance to regions with more interactions,
 potentially being more metastable.
@@ -255,7 +282,7 @@ There are currently three implemented methods to evaluate the similarity of cont
 
 * **Jaccard**, which calulates the Jaccard Index (`Wikipedia page <https://en.wikipedia.org/wiki/Jaccard_index>`_). The recommended values using the heaviside threshold calculator are [0.375, 0.5, 0.55, 0.7] for the conditions [1, 0.75 , 0.5].
 
-* **correlation**, which calculates the correlation between the two matrices and
+* **correlation**, which calculates the correlation between the two matrices
 
 * **distance**, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.
 

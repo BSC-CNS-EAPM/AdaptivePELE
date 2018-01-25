@@ -165,6 +165,25 @@
     <span class="k">return</span> <span class="n">arg</span></div>
 
 
+<div class="viewcode-block" id="checkMetricExitConditionMultipleTrajsinRestart"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.checkMetricExitConditionMultipleTrajsinRestart">[docs]</a><span class="k">def</span> <span class="nf">checkMetricExitConditionMultipleTrajsinRestart</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">outputFolder</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check the previous simulation data when restarting a simulation with a</span>
+<span class="sd">        multiple trajectory metric exit condition</span>
+
+<span class="sd">        :param firstRun: First epoch to be run in restart simulation</span>
+<span class="sd">        :type firstRun: int</span>
+<span class="sd">        :param outputFolder: Folder of the previous simulation data</span>
+<span class="sd">        :type outputFolder: str</span>
+<span class="sd">        :param simulationRunner: Simulation runner object</span>
+<span class="sd">        :type simulationRunner: :py:class:`.SimulationRunner`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">hasExitCondition</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">exitCondition</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ExitConditionType</span><span class="o">.</span><span class="n">metricMultipleTrajs</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">firstRun</span><span class="p">):</span>
+            <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">exitCondition</span><span class="o">.</span><span class="n">checkExitCondition</span><span class="p">(</span><span class="n">outputFolder</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="filterClustersAccordingToBox"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.filterClustersAccordingToBox">[docs]</a><span class="k">def</span> <span class="nf">filterClustersAccordingToBox</span><span class="p">(</span><span class="n">simulationRunnerParams</span><span class="p">,</span> <span class="n">clusteringObject</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter the clusters to select only the ones whose representative</span>
@@ -231,7 +250,7 @@
     <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
     <span class="n">maxMetrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">minMetrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">possibleSASACols</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">maxMetrics</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">1.05</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">minMetrics</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">possibleSASACols</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">maxMetrics</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">1.05</span> <span class="ow">and</span> <span class="n">minMetrics</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">possibleSASACols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No possible SASA identified in metrics, please check&quot;</span>
                          <span class="s2">&quot; that SASA is computed in your simulation!!!!&quot;</span><span class="p">)</span>
@@ -245,28 +264,6 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> should be either binding or unbinding, but </span><span class="si">%s</span><span class="s2"> is provided!!!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">modeMovingBox</span><span class="p">,</span> <span class="n">simulationRunnerParams</span><span class="o">.</span><span class="n">modeMovingBox</span><span class="p">))</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">clusteringObject</span><span class="o">.</span><span class="n">getCluster</span><span class="p">(</span><span class="n">SASAcluster</span><span class="p">)</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">getCOM</span><span class="p">())</span></div>
-
-
-<div class="viewcode-block" id="selectInitialBoxCenter"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.selectInitialBoxCenter">[docs]</a><span class="k">def</span> <span class="nf">selectInitialBoxCenter</span><span class="p">(</span><span class="n">simulationRunner</span><span class="p">,</span> <span class="n">initialStructuresAsString</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Select the coordinates of the first box, currently as the center of</span>
-<span class="sd">        mass of the first initial structure provided</span>
-
-<span class="sd">        :param simulationRunner: :py:class:`.SimulationRunner` Simulation runner object</span>
-<span class="sd">        :type simulationRunner: :py:class:`.SimulationRunner`</span>
-<span class="sd">        :param initialStructuresAsString: String containing the files of the initial structures</span>
-<span class="sd">        :type initialStructuresAsString: str</span>
-<span class="sd">        :param resname: Residue name of the ligand in the system pdb</span>
-<span class="sd">        :type resname: str</span>
-
-<span class="sd">        :returns str: -- string to be substitued in PELE control file</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># This is a dictionary because it&#39;s prepared to be subtitued in the PELE</span>
-    <span class="c1"># control files (i.e. JSON format)</span>
-    <span class="n">initialStructuresDict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">initialStructuresAsString</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">PDBinitial</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
-    <span class="n">PDBinitial</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">initialStructuresDict</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">]),</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="n">PDBinitial</span><span class="o">.</span><span class="n">getCOM</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="expandInitialStructuresWildcard"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.expandInitialStructuresWildcard">[docs]</a><span class="k">def</span> <span class="nf">expandInitialStructuresWildcard</span><span class="p">(</span><span class="n">initialStructuresWildcard</span><span class="p">):</span>
@@ -357,26 +354,6 @@
 
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">):</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tmpInitialStructuresTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span></div>
-
-
-<div class="viewcode-block" id="createMultipleComplexesFilenames"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.createMultipleComplexesFilenames">[docs]</a><span class="k">def</span> <span class="nf">createMultipleComplexesFilenames</span><span class="p">(</span><span class="n">numberOfSnapshots</span><span class="p">,</span> <span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates the string to substitute the complexes in the PELE control file</span>
-
-<span class="sd">        :param numberOfSnapshots: Number of complexes to write</span>
-<span class="sd">        :type numberOfSnapshots: int</span>
-<span class="sd">        :param tmpInitialStructuresTemplate: Template with the name of the initial strutctures</span>
-<span class="sd">        :type tmpInitialStructuresTemplate: str</span>
-<span class="sd">        :param iteration: Epoch number</span>
-<span class="sd">        :type iteration: int</span>
-
-<span class="sd">        :returns: str -- jsonString to be substituted in PELE control file</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">jsonString</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numberOfSnapshots</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-        <span class="n">jsonString</span> <span class="o">+=</span> <span class="n">constants</span><span class="o">.</span><span class="n">inputFileTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">tmpInitialStructuresTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span>
-    <span class="n">jsonString</span> <span class="o">+=</span> <span class="n">constants</span><span class="o">.</span><span class="n">inputFileTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">tmpInitialStructuresTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="n">numberOfSnapshots</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">jsonString</span></div>
 
 
 <div class="viewcode-block" id="generateTrajectorySelectionString"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.generateTrajectorySelectionString">[docs]</a><span class="k">def</span> <span class="nf">generateTrajectorySelectionString</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">epochOutputPathTempletized</span><span class="p">):</span>
@@ -471,7 +448,8 @@
 
 
 <div class="viewcode-block" id="saveInitialControlFile"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.saveInitialControlFile">[docs]</a><span class="k">def</span> <span class="nf">saveInitialControlFile</span><span class="p">(</span><span class="n">jsonParams</span><span class="p">,</span> <span class="n">originalControlFile</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Save the control file jsonParams in originalControlFile</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the adaptive control file jsonParams in originalControlFile</span>
 
 <span class="sd">        :param jsonParams: Input control file in JSON format</span>
 <span class="sd">        :type jsonParams: str</span>
@@ -506,9 +484,11 @@
     <span class="k">if</span> <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">rmsd</span> <span class="ow">or</span>\
        <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMap</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">thresholdCalculator</span> <span class="o">!=</span> <span class="n">newClusteringMethod</span><span class="o">.</span><span class="n">thresholdCalculator</span> <span class="ow">or</span>\
-                <span class="nb">abs</span><span class="p">(</span><span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span> <span class="o">-</span> <span class="n">newClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span></div>
+                <span class="nb">abs</span><span class="p">(</span><span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span> <span class="o">-</span> <span class="n">newClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span>
 
-    <span class="c1"># TODO: add similarityEvaluator check for contactMap clustering</span>
+    <span class="c1"># Check 3: Change of similarity Evaluator in contactMap clustering</span>
+    <span class="k">if</span> <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMap</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">similarityEvaluator</span><span class="o">.</span><span class="n">typeEvaluator</span> <span class="o">!=</span> <span class="n">newClusteringMethod</span><span class="o">.</span><span class="n">similarityEvaluator</span><span class="o">.</span><span class="n">typeEvaluator</span></div>
 
 
 <div class="viewcode-block" id="clusterEpochTrajs"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.clusterEpochTrajs">[docs]</a><span class="k">def</span> <span class="nf">clusterEpochTrajs</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">epochOutputPathTempletized</span><span class="p">):</span>
@@ -541,6 +521,7 @@
 <span class="sd">        :param epochOutputPathTempletized: Path where to find the trajectories</span>
 <span class="sd">        :type epochOutputPathTempletized: str</span>
 <span class="sd">        :param simulationRunner: Simulation runner object</span>
+<span class="sd">        :type simulationRunner: :py:class:`.SimulationRunner`</span>
 <span class="sd">&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">finalEpoch</span><span class="p">):</span>
         <span class="n">simulationRunner</span><span class="o">.</span><span class="n">readMappingFromDisk</span><span class="p">(</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
@@ -616,21 +597,19 @@
     <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
     <span class="nb">print</span> <span class="s2">&quot;Degeneracy&quot;</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span>
     <span class="n">seedingPoints</span><span class="p">,</span> <span class="n">procMapping</span> <span class="o">=</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">writeSpawningInitialStructures</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span><span class="p">,</span> <span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">firstRun</span><span class="p">)</span>
-    <span class="n">initialStructuresAsString</span> <span class="o">=</span> <span class="n">createMultipleComplexesFilenames</span><span class="p">(</span><span class="n">seedingPoints</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">firstRun</span><span class="p">)</span>
+    <span class="n">initialStructuresAsString</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">createMultipleComplexesFilenames</span><span class="p">(</span><span class="n">seedingPoints</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">firstRun</span><span class="p">)</span>
     <span class="n">simulationRunner</span><span class="o">.</span><span class="n">updateMappingProcessors</span><span class="p">(</span><span class="n">procMapping</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">initialStructuresAsString</span></div>
 
 
-<div class="viewcode-block" id="buildNewClusteringAndWriteInitialStructuresInNewSimulation"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInNewSimulation">[docs]</a><span class="k">def</span> <span class="nf">buildNewClusteringAndWriteInitialStructuresInNewSimulation</span><span class="p">(</span><span class="n">debug</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">controlFile</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">):</span>
+<div class="viewcode-block" id="buildNewClusteringAndWriteInitialStructuresInNewSimulation"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInNewSimulation">[docs]</a><span class="k">def</span> <span class="nf">buildNewClusteringAndWriteInitialStructuresInNewSimulation</span><span class="p">(</span><span class="n">debug</span><span class="p">,</span> <span class="n">controlFile</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build the clustering object and copies initial structures from control file.</span>
 <span class="sd">        Returns the clustering object to use and the initial structures filenames as string</span>
 
 <span class="sd">        :param debug: In debug, it will not remove the simulations</span>
 <span class="sd">        :type debug: bool</span>
-<span class="sd">        :param outputPath: Simulation output path</span>
-<span class="sd">        :type outputPath: str</span>
 <span class="sd">        :param controlFile: Adaptive sampling control file</span>
 <span class="sd">        :type controlFile: str</span>
 <span class="sd">        :param outputPathConstants: Contains outputPath-related constants</span>
@@ -641,17 +620,16 @@
 <span class="sd">        :type spawningParams: :py:class:`.SpawningParams`</span>
 <span class="sd">        :param initialStructures: Control file initial structures</span>
 <span class="sd">        :type initialStructures: list</span>
+<span class="sd">        :param simulationRunner: :py:class:`.SimulationRunner` Simulation runner object</span>
+<span class="sd">        :type simulationRunner: :py:class:`.SimulationRunner`</span>
 
 <span class="sd">        :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
-    <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
     <span class="n">saveInitialControlFile</span><span class="p">(</span><span class="n">controlFile</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">originalControlFile</span><span class="p">)</span>
 
     <span class="n">firstRun</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">copyInitialStructures</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">firstRun</span><span class="p">)</span>
-    <span class="n">initialStructuresAsString</span> <span class="o">=</span> <span class="n">createMultipleComplexesFilenames</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">),</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">firstRun</span><span class="p">)</span>
+    <span class="n">initialStructuresAsString</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">createMultipleComplexesFilenames</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">),</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">firstRun</span><span class="p">)</span>
 
     <span class="n">clusteringBuilder</span> <span class="o">=</span> <span class="n">clustering</span><span class="o">.</span><span class="n">ClusteringBuilder</span><span class="p">()</span>
     <span class="n">clusteringMethod</span> <span class="o">=</span> <span class="n">clusteringBuilder</span><span class="o">.</span><span class="n">buildClustering</span><span class="p">(</span><span class="n">clusteringBlock</span><span class="p">,</span>
@@ -748,14 +726,23 @@
             <span class="n">startFromScratch</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">initialStructuresAsString</span> <span class="o">=</span> <span class="n">buildNewClusteringAndWriteInitialStructuresInRestart</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">spawningCalculator</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">)</span>
+            <span class="n">checkMetricExitConditionMultipleTrajsinRestart</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">startFromScratch</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">restart</span><span class="p">:</span>
         <span class="n">firstRun</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># if restart false, but there were previous simulations</span>
-        <span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">initialStructuresAsString</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">buildNewClusteringAndWriteInitialStructuresInNewSimulation</span><span class="p">(</span><span class="n">debug</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">jsonParams</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">)</span>
+        <span class="c1"># These two lines were previously inside the</span>
+        <span class="c1"># buildNewClusteringAndWriteInitialStructuresInNewSimulation function,</span>
+        <span class="c1"># however, the equilibration procedure has to be called in between</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
+        <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">runEquilibration</span><span class="p">:</span>
+            <span class="n">initialStructures</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">equilibrate</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">spawningParams</span><span class="o">.</span><span class="n">reportFilename</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">resname</span><span class="p">)</span>
+        <span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">initialStructuresAsString</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">buildNewClusteringAndWriteInitialStructuresInNewSimulation</span><span class="p">(</span><span class="n">debug</span><span class="p">,</span> <span class="n">jsonParams</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">)</span>
     <span class="n">peleControlFileDictionary</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;COMPLEXES&quot;</span><span class="p">:</span> <span class="n">initialStructuresAsString</span><span class="p">,</span> <span class="s2">&quot;PELE_STEPS&quot;</span><span class="p">:</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">peleSteps</span><span class="p">}</span>
-    <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">modeMovingBox</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">boxCenter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">boxCenter</span> <span class="o">=</span> <span class="n">selectInitialBoxCenter</span><span class="p">(</span><span class="n">simulationRunner</span><span class="p">,</span> <span class="n">initialStructuresAsString</span><span class="p">,</span> <span class="n">resname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">modeMovingBox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">boxCenter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">boxCenter</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">selectInitialBoxCenter</span><span class="p">(</span><span class="n">initialStructuresAsString</span><span class="p">,</span> <span class="n">resname</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">iterations</span><span class="p">):</span>
         <span class="nb">print</span> <span class="s2">&quot;Iteration&quot;</span><span class="p">,</span> <span class="n">i</span>
@@ -808,7 +795,7 @@
         <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">iterations</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="n">numberOfSeedingPoints</span><span class="p">,</span> <span class="n">procMapping</span> <span class="o">=</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">writeSpawningInitialStructures</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span><span class="p">,</span> <span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">simulationRunner</span><span class="o">.</span><span class="n">updateMappingProcessors</span><span class="p">(</span><span class="n">procMapping</span><span class="p">)</span>
-            <span class="n">initialStructuresAsString</span> <span class="o">=</span> <span class="n">createMultipleComplexesFilenames</span><span class="p">(</span><span class="n">numberOfSeedingPoints</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">initialStructuresAsString</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">createMultipleComplexesFilenames</span><span class="p">(</span><span class="n">numberOfSeedingPoints</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">peleControlFileDictionary</span><span class="p">[</span><span class="s2">&quot;COMPLEXES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initialStructuresAsString</span>
 
         <span class="k">if</span> <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">symmetries</span> <span class="ow">and</span> <span class="n">nativeStructure</span><span class="p">:</span>
@@ -816,7 +803,7 @@
                                <span class="n">nativeStructure</span><span class="p">,</span> <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">symmetries</span><span class="p">)</span>
 
         <span class="c1"># check exit condition, if defined</span>
-        <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">hasExitCondition</span><span class="p">()</span> <span class="ow">and</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">checkExitCondition</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">hasExitCondition</span><span class="p">()</span> <span class="ow">and</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">checkExitCondition</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">):</span>
             <span class="nb">print</span> <span class="s2">&quot;Simulation exit condition met at iteration </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span>
             <span class="k">break</span></div>
 

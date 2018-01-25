@@ -301,7 +301,7 @@ class PeleSimulation(SimulationRunner):
             :param nTrajs: Number of trajectories
             :type nTrajs: int
             :param similarityColumn: Column number of the similarity metric
-            (RMSD or distance)
+                (RMSD or distance)
             :type similarityColumn: int
             :param resname: Name of the ligand in the pdb
             :type resname: str
@@ -385,7 +385,7 @@ class PeleSimulation(SimulationRunner):
             :param iteration: Epoch number
             :type iteration: int
             :param equilibration: Flag to mark wether the complexes are part of an
-            equilibration run
+                equilibration run
             :type equilibration: bool
 
             :returns: str -- jsonString to be substituted in PELE control file

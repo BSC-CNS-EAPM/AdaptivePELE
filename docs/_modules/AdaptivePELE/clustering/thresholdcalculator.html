@@ -136,12 +136,13 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.clustering.thresholdcalculator</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
-<span class="kn">import</span> <span class="nn">thresholdcalculatortypes</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.clustering</span> <span class="k">import</span> <span class="n">thresholdcalculatortypes</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span>
 
-<span class="c1">#make test</span>
+
 <div class="viewcode-block" id="ThresholdCalculatorBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculatorBuilder">[docs]</a><span class="k">class</span> <span class="nc">ThresholdCalculatorBuilder</span><span class="p">():</span>
 <div class="viewcode-block" id="ThresholdCalculatorBuilder.build"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculatorBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -154,15 +155,15 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">thresholdCalculatorBlock</span> <span class="o">=</span> <span class="n">clusteringBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">thresholdCalculator</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="c1">#Default value if no threshold calculator block was defined</span>
+            <span class="c1"># Default value if no threshold calculator block was defined</span>
             <span class="k">return</span> <span class="n">ThresholdCalculatorHeaviside</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="nb">type</span> <span class="o">=</span> <span class="n">thresholdCalculatorBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+            <span class="n">typeParam</span> <span class="o">=</span> <span class="n">thresholdCalculatorBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Threshold calculator must have a type&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">constant</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">typeParam</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">constant</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">paramsBlock</span> <span class="o">=</span> <span class="n">thresholdCalculatorBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculatorParams</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
@@ -170,7 +171,7 @@
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="nb">print</span> <span class="s2">&quot;Using default parameters for constant threshold calculator&quot;</span>
                 <span class="k">return</span> <span class="n">ThresholdCalculatorConstant</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">heaviside</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">typeParam</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">heaviside</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">paramsBlock</span> <span class="o">=</span> <span class="n">thresholdCalculatorBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
                 <span class="n">values</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ThresholdCalculatorParams</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
@@ -183,10 +184,9 @@
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown threshold calculator type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">thresholdcalculatortypes</span><span class="o">.</span><span class="n">THRESHOLD_CALCULATOR_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div></div>
 
 
-<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <div class="viewcode-block" id="ThresholdCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator">[docs]</a><span class="k">class</span> <span class="nc">ThresholdCalculator</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;BaseClass&quot;</span> <span class="c1">#change for abstract attribute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;BaseClass&quot;</span>  <span class="c1"># change for abstract attribute</span>
 
 <div class="viewcode-block" id="ThresholdCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator.calculate">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contacts</span><span class="p">):</span>
@@ -199,8 +199,9 @@
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
+
 <div class="viewcode-block" id="ThresholdCalculatorConstant"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculatorConstant">[docs]</a><span class="k">class</span> <span class="nc">ThresholdCalculatorConstant</span><span class="p">(</span><span class="n">ThresholdCalculator</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">thresholdcalculatortypes</span><span class="o">.</span><span class="n">THRESHOLD_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">constant</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 
@@ -248,10 +249,10 @@
 <span class="sd">            :returns: float -- threshold value of the cluster</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">)):</span>
-            <span class="c1">#change, so that whole condition is in array</span>
+            <span class="c1"># change, so that whole condition is in array</span>
             <span class="k">if</span> <span class="n">contacts</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="c1">#the way it&#39;s built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the &quot;else&quot; value</span>
+        <span class="c1"># the way it&#39;s built, it makes more sense to return this value, but, should check that len(value) = len(conditions) + 1 in order to return the &quot;else&quot; value</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="ThresholdCalculatorHeaviside.getMaxThreshold"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculatorHeaviside.getMaxThreshold">[docs]</a>    <span class="k">def</span> <span class="nf">getMaxThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

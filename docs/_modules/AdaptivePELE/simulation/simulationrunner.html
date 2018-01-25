@@ -138,12 +138,16 @@
   <h1>Source code for AdaptivePELE.simulation.simulationrunner</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">blockNames</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="k">import</span> <span class="n">simulationTypes</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">blockNames</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="k">import</span> <span class="n">simulationTypes</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">atomset</span><span class="p">,</span> <span class="n">RMSDCalculator</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span>
 
 
 <div class="viewcode-block" id="SimulationParameters"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters">[docs]</a><span class="k">class</span> <span class="nc">SimulationParameters</span><span class="p">:</span>
@@ -159,7 +163,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">exitCondition</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">boxCenter</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">boxRadius</span> <span class="o">=</span> <span class="mi">20</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">modeMovingBox</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modeMovingBox</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runEquilibration</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destination</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="SimulationRunner"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner">[docs]</a><span class="k">class</span> <span class="nc">SimulationRunner</span><span class="p">:</span>
@@ -178,7 +185,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">exitCondition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="SimulationRunner.checkExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.checkExitCondition">[docs]</a>    <span class="k">def</span> <span class="nf">checkExitCondition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clustering</span><span class="p">):</span>
+<div class="viewcode-block" id="SimulationRunner.checkExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.checkExitCondition">[docs]</a>    <span class="k">def</span> <span class="nf">checkExitCondition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clustering</span><span class="p">,</span> <span class="n">outputFolder</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Check if the exit condition has been met</span>
 
@@ -187,11 +194,12 @@
 
 <span class="sd">            :returns: bool -- True if the exit condition is met</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">exitCondition</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">exitCondition</span><span class="o">.</span><span class="n">checkExitCondition</span><span class="p">(</span><span class="n">clustering</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">exitCondition</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ExitConditionType</span><span class="o">.</span><span class="n">metricMultipleTrajs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">exitCondition</span><span class="o">.</span><span class="n">checkExitCondition</span><span class="p">(</span><span class="n">outputFolder</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">exitCondition</span><span class="o">.</span><span class="n">checkExitCondition</span><span class="p">(</span><span class="n">clustering</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SimulationRunner.makeWorkingControlFile"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.makeWorkingControlFile">[docs]</a>    <span class="k">def</span> <span class="nf">makeWorkingControlFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workingControlFilename</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
+<div class="viewcode-block" id="SimulationRunner.makeWorkingControlFile"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.makeWorkingControlFile">[docs]</a>    <span class="k">def</span> <span class="nf">makeWorkingControlFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workingControlFilename</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">,</span> <span class="n">inputTemplate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Substitute the values in the templetized control file</span>
 
@@ -199,14 +207,18 @@
 <span class="sd">            :type workingControlFilename: str</span>
 <span class="sd">            :param dictionary: Dictonary containing the parameters to substitute</span>
 <span class="sd">                in the control file</span>
+<span class="sd">            :param inputFileTemplate: Template control file</span>
+<span class="sd">            :type inputFileTemplate: str</span>
 <span class="sd">            :type dictionary: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">templetizedControlFile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inputFile</span><span class="p">:</span>
-            <span class="n">inputFileContent</span> <span class="o">=</span> <span class="n">inputFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">inputTemplate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">templetizedControlFile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inputFile</span><span class="p">:</span>
+                <span class="n">inputFileContent</span> <span class="o">=</span> <span class="n">inputFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">inputFileContent</span> <span class="o">=</span> <span class="n">inputTemplate</span>
 
         <span class="n">inputFileTemplate</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="n">inputFileContent</span><span class="p">)</span>
         <span class="n">outputFileContent</span> <span class="o">=</span> <span class="n">inputFileTemplate</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span>
-
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">workingControlFilename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outputFile</span><span class="p">:</span>
             <span class="n">outputFileContent</span> <span class="o">=</span> <span class="n">outputFileContent</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
             <span class="n">outputFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">outputFileContent</span><span class="p">)</span></div>
@@ -270,6 +282,32 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="s2">&quot;Documents&quot;</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ln -s &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">documentsFolder</span> <span class="o">+</span> <span class="s2">&quot; Documents&quot;</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="PeleSimulation.selectInitialBoxCenter"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectInitialBoxCenter">[docs]</a>    <span class="k">def</span> <span class="nf">selectInitialBoxCenter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialStructuresAsString</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Select the coordinates of the first box, currently as the center of</span>
+<span class="sd">            mass of the first initial structure provided</span>
+
+<span class="sd">            :param initialStructuresAsString: String containing the files of the initial structures</span>
+<span class="sd">            :type initialStructuresAsString: str</span>
+<span class="sd">            :param resname: Residue name of the ligand in the system pdb</span>
+<span class="sd">            :type resname: str</span>
+
+<span class="sd">            :returns str: -- string to be substitued in PELE control file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This is a dictionary because it&#39;s prepared to be subtitued in the PELE</span>
+        <span class="c1"># control files (i.e. JSON format)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">initialStructuresDict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">initialStructuresAsString</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">initialStruct</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">initialStructuresDict</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># If a json valid string is not passed, interpret the input string</span>
+            <span class="c1"># as a path to a file</span>
+            <span class="n">initialStruct</span> <span class="o">=</span> <span class="n">initialStructuresAsString</span>
+
+        <span class="n">PDBinitial</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
+        <span class="n">PDBinitial</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">initialStruct</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="n">PDBinitial</span><span class="o">.</span><span class="n">getCOM</span><span class="p">())</span></div>
+
 <div class="viewcode-block" id="PeleSimulation.runSimulation"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation">[docs]</a>    <span class="k">def</span> <span class="nf">runSimulation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runningControlFile</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Run a short PELE simulation</span>
@@ -290,7 +328,217 @@
             <span class="nb">print</span> <span class="n">err</span>
 
         <span class="n">endTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="nb">print</span> <span class="s2">&quot;PELE took </span><span class="si">%.2f</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">)</span></div></div>
+        <span class="nb">print</span> <span class="s2">&quot;PELE took </span><span class="si">%.2f</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PeleSimulation.getEquilibrationControlFile"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getEquilibrationControlFile">[docs]</a>    <span class="k">def</span> <span class="nf">getEquilibrationControlFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">peleControlFileDict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Filter unnecessary parameters and return a minimal PELE control</span>
+<span class="sd">            file for equilibration runs</span>
+
+<span class="sd">            :param peleControlFileDict: Dictionary with pele control file options</span>
+<span class="sd">            :type peleControlFileDict: dict</span>
+
+<span class="sd">            :returns: dict -- Dictionary with pele control file options</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Set small rotations and translations</span>
+        <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Perturbation&quot;</span><span class="p">][</span><span class="s2">&quot;parameters&quot;</span><span class="p">][</span><span class="s2">&quot;translationRange&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Perturbation&quot;</span><span class="p">][</span><span class="s2">&quot;parameters&quot;</span><span class="p">][</span><span class="s2">&quot;rotationScalingFactor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+        <span class="c1"># Remove dynamical changes in control file</span>
+        <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PeleTasks&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exitConditions&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PeleTasks&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;parametersChanges&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">peleControlFileDict</span></div>
+
+<div class="viewcode-block" id="PeleSimulation.getMetricColumns"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getMetricColumns">[docs]</a>    <span class="k">def</span> <span class="nf">getMetricColumns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">JSONdict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Extract the column of a similarity distance (RMSD or distance) from the pele control file</span>
+
+<span class="sd">            :param JSONdict: Dictionary containing a parsed PELE control file</span>
+<span class="sd">            :type JSONdict: dict</span>
+
+<span class="sd">            :returns: int -- Column index of the similarity metric</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hasRMSD</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">RMSDCol</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">distanceCol</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">hasDistance</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">metricBlock</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">JSONdict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PeleTasks&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;metrics&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="s1">&#39;rmsd&#39;</span> <span class="ow">in</span> <span class="n">metricBlock</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">hasRMSD</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">RMSDCol</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">4</span>
+            <span class="k">elif</span> <span class="s1">&#39;distance&#39;</span> <span class="ow">in</span> <span class="n">metricBlock</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">hasDistance</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">distanceCol</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">4</span>
+        <span class="k">if</span> <span class="n">hasRMSD</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RMSDCol</span>
+        <span class="k">elif</span> <span class="n">hasDistance</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">distanceCol</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="PeleSimulation.equilibrate"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate">[docs]</a>    <span class="k">def</span> <span class="nf">equilibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">reportFilename</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Run short simulation to equilibrate the system. It will run one</span>
+<span class="sd">            such simulation for every initial structure and select appropiate</span>
+<span class="sd">            structures to start the simulation</span>
+
+<span class="sd">            :param initialStructures: Name of the initial structures to copy</span>
+<span class="sd">            :type initialStructures: list of str</span>
+<span class="sd">            :param outputPathConstants: Contains outputPath-related constants</span>
+<span class="sd">            :type outputPathConstants: :py:class:`.OutputPathConstants`</span>
+<span class="sd">            :param reportBaseFilename: Name of the file that contains the metrics of the snapshots to cluster</span>
+<span class="sd">            :type reportBaseFilename: str</span>
+<span class="sd">            :param outputPath: Path where trajectories are found</span>
+<span class="sd">            :type outputPath: str</span>
+<span class="sd">            :param resname: Residue name of the ligand in the system pdb</span>
+<span class="sd">            :type resname: str</span>
+
+<span class="sd">            :returns: list --  List with initial structures</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">newInitialStructures</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">equilibrationPeleDict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;PELE_STEPS&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;SEED&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">seed</span><span class="p">}</span>
+        <span class="n">peleControlFileDict</span><span class="p">,</span> <span class="n">templateNames</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getPELEControlFileDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">templetizedControlFile</span><span class="p">)</span>
+        <span class="n">peleControlFileDict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEquilibrationControlFile</span><span class="p">(</span><span class="n">peleControlFileDict</span><span class="p">)</span>
+        <span class="n">similarityColumn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMetricColumns</span><span class="p">(</span><span class="n">peleControlFileDict</span><span class="p">)</span>
+        <span class="n">reportWildcard</span><span class="p">,</span> <span class="n">trajWildcard</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getReportAndTrajectoryWildcard</span><span class="p">(</span><span class="n">peleControlFileDict</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">structure</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">intialStructures</span><span class="p">):</span>
+            <span class="n">equilibrationOutput</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="s2">&quot;equilibration_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">equilibrationControlFile</span> <span class="o">=</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpControlFilenameEqulibration</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">equilibrationOutput</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresEquilibrationTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">initialStructureString</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createMultipleComplexesFilenames</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresEquilibrationTemplate</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">equilibration</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">equilibrationPeleDict</span><span class="p">[</span><span class="s2">&quot;OUTPUT_PATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">equilibrationOutput</span>
+            <span class="n">equilibrationPeleDict</span><span class="p">[</span><span class="s2">&quot;COMPLEXES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initialStructureString</span>
+            <span class="n">equilibrationPeleDict</span><span class="p">[</span><span class="s2">&quot;BOX_CENTER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectInitialBoxCenter</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">resname</span><span class="p">)</span>
+            <span class="n">equilibrationPeleDict</span><span class="p">[</span><span class="s2">&quot;BOX_RADIUS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="nb">print</span> <span class="s2">&quot;Running equilibration for initial structure number </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">peleControlString</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">peleControlFileDict</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">templateNames</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="c1"># Remove double quote around template keys, so that PELE</span>
+                <span class="c1"># understands the options</span>
+                <span class="n">peleControlString</span> <span class="o">=</span> <span class="n">peleControlString</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;$</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">makeWorkingControlFile</span><span class="p">(</span><span class="n">equilibrationControlFile</span><span class="p">,</span> <span class="n">equilibrationPeleDict</span><span class="p">,</span> <span class="n">peleControlString</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runSimulation</span><span class="p">(</span><span class="n">equilibrationControlFile</span><span class="p">)</span>
+            <span class="c1"># Extract report, trajnames, metrics columns from pele control file</span>
+            <span class="n">reportNames</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">equilibrationOutput</span><span class="p">,</span> <span class="n">reportWildcard</span><span class="p">)</span>
+            <span class="n">trajNames</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">equilibrationOutput</span><span class="p">,</span> <span class="n">trajWildcard</span><span class="p">)</span>
+            <span class="n">newStructure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectEquilibratedStructure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">,</span> <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">trajNames</span><span class="p">,</span> <span class="n">reportNames</span><span class="p">)</span>
+            <span class="n">newStructurePath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">equilibrationOutput</span><span class="p">,</span> <span class="s1">&#39;equilibration_struc_</span><span class="si">%d</span><span class="s1">.pdb&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">newStructurePath</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+                <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">newStructure</span><span class="p">)</span>
+            <span class="n">newInitialStructures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newStructurePath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">newInitialStructures</span></div>
+
+<div class="viewcode-block" id="PeleSimulation.selectEquilibratedStructure"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibratedStructure">[docs]</a>    <span class="k">def</span> <span class="nf">selectEquilibratedStructure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">,</span> <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">trajWildcard</span><span class="p">,</span> <span class="n">reportWildcard</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Select a representative initial structure from the equilibration</span>
+<span class="sd">            run</span>
+
+<span class="sd">            :param nTrajs: Number of trajectories</span>
+<span class="sd">            :type nTrajs: int</span>
+<span class="sd">            :param similarityColumn: Column number of the similarity metric</span>
+<span class="sd">                (RMSD or distance)</span>
+<span class="sd">            :type similarityColumn: int</span>
+<span class="sd">            :param resname: Name of the ligand in the pdb</span>
+<span class="sd">            :type resname: str</span>
+<span class="sd">            :param trajWildcard: Templetized path to trajectory files&quot;</span>
+<span class="sd">            :type trajWildcard: str</span>
+<span class="sd">            :param reportWildcard: Templetized path to report files&quot;</span>
+<span class="sd">            :type reportWildcard: str</span>
+
+<span class="sd">            :returns: str -- Pdb snapshot of the representative structure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">energyColumn</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">rowIndex</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">similarityColumn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">RMSDCalc</span> <span class="o">=</span> <span class="n">RMSDCalculator</span><span class="o">.</span><span class="n">RMSDCalculator</span><span class="p">()</span>
+            <span class="n">initial</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">energyColumn</span><span class="p">,</span> <span class="n">similarityColumn</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
+            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rowIndex</span><span class="p">)</span>
+            <span class="n">report</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">reportWildcard</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">similarityColumn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                <span class="n">report_values</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">initial</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshots</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
+                    <span class="n">report_values</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">report</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">energyColumn</span><span class="p">]])</span>
+                    <span class="n">report</span> <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span>
+                <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">snap</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">):</span>
+                    <span class="n">pdbConformation</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
+                    <span class="n">pdbConformation</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snap</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
+                    <span class="n">report_values</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">RMSDCalc</span><span class="o">.</span><span class="n">computeRMSD</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">pdbConformation</span><span class="p">),</span> <span class="n">report</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">energyColumn</span><span class="p">]])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">report_values</span> <span class="o">=</span> <span class="n">report</span><span class="p">[:,</span> <span class="n">cols</span><span class="p">]</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">report_values</span><span class="p">)</span>
+            <span class="n">rowIndex</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">report_values</span><span class="p">)</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">energyColumn</span> <span class="o">&gt;</span> <span class="n">similarityColumn</span> <span class="ow">or</span> <span class="n">similarityColumn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">energyColumn</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">energyColumn</span><span class="p">,</span> <span class="n">similarityColumn</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">maxEnergy</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="n">energyColumn</span><span class="p">]</span>
+        <span class="c1"># Substract the max value so all values will be negative (avoid sign problems)</span>
+        <span class="n">values</span><span class="p">[:,</span> <span class="n">energyColumn</span><span class="p">]</span> <span class="o">-=</span> <span class="n">maxEnergy</span>
+        <span class="n">minEnergy</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="n">energyColumn</span><span class="p">]</span>
+        <span class="c1"># Normalize to the minimum value</span>
+        <span class="n">values</span><span class="p">[:,</span> <span class="n">energyColumn</span><span class="p">]</span> <span class="o">/=</span> <span class="n">minEnergy</span>
+        <span class="n">freq</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">values</span><span class="p">[:,</span> <span class="n">similarityColumn</span><span class="p">])</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">freq</span><span class="p">)))</span>
+        <span class="c1"># Get center of the bins</span>
+        <span class="n">centers</span> <span class="o">=</span> <span class="p">(</span><span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span><span class="o">/</span><span class="mf">2.0</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+            <span class="n">row</span><span class="p">[</span><span class="n">similarityColumn</span><span class="p">]</span> <span class="o">=</span> <span class="n">freq</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">similarityColumn</span><span class="p">]</span> <span class="o">-</span> <span class="n">centers</span><span class="p">))]</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">indexSelected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+        <span class="c1"># Get trajectory and snapshot number from the index selected</span>
+        <span class="n">trajNum</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="n">indexSelected</span><span class="p">:</span>
+                <span class="n">trajNum</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="n">indexSelected</span> <span class="o">&lt;</span> <span class="n">index</span><span class="p">:</span>
+                <span class="n">trajNum</span> <span class="o">=</span> <span class="n">i</span><span class="o">-</span><span class="mi">1</span>
+                <span class="k">break</span>
+        <span class="n">snapshotNum</span> <span class="o">=</span> <span class="n">indexSelected</span><span class="o">-</span><span class="n">indices</span><span class="p">[</span><span class="n">trajNum</span><span class="p">]</span>
+        <span class="c1"># trajectories are 1-indexed</span>
+        <span class="n">trajNum</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">)[</span><span class="n">snapshotNum</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="PeleSimulation.createMultipleComplexesFilenames"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.createMultipleComplexesFilenames">[docs]</a>    <span class="k">def</span> <span class="nf">createMultipleComplexesFilenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numberOfSnapshots</span><span class="p">,</span> <span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> <span class="n">equilibration</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Creates the string to substitute the complexes in the PELE control file</span>
+
+<span class="sd">            :param numberOfSnapshots: Number of complexes to write</span>
+<span class="sd">            :type numberOfSnapshots: int</span>
+<span class="sd">            :param tmpInitialStructuresTemplate: Template with the name of the initial strutctures</span>
+<span class="sd">            :type tmpInitialStructuresTemplate: str</span>
+<span class="sd">            :param iteration: Epoch number</span>
+<span class="sd">            :type iteration: int</span>
+<span class="sd">            :param equilibration: Flag to mark wether the complexes are part of an</span>
+<span class="sd">                equilibration run</span>
+<span class="sd">            :type equilibration: bool</span>
+
+<span class="sd">            :returns: str -- jsonString to be substituted in PELE control file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">jsonString</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numberOfSnapshots</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">equilibration</span><span class="p">:</span>
+                <span class="n">jsonString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">inputFileTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">tmpInitialStructuresTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">iteration</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">jsonString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">inputFileTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">tmpInitialStructuresTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">equilibration</span><span class="p">:</span>
+            <span class="n">jsonString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">inputFileTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">tmpInitialStructuresTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">iteration</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">jsonString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">inputFileTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">tmpInitialStructuresTemplate</span> <span class="o">%</span> <span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="n">numberOfSnapshots</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">jsonString</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="TestSimulation"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.TestSimulation">[docs]</a><span class="k">class</span> <span class="nc">TestSimulation</span><span class="p">(</span><span class="n">SimulationRunner</span><span class="p">):</span>
@@ -318,7 +566,7 @@
 
 
 <div class="viewcode-block" id="ExitConditionBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.ExitConditionBuilder">[docs]</a><span class="k">class</span> <span class="nc">ExitConditionBuilder</span><span class="p">:</span>
-<div class="viewcode-block" id="ExitConditionBuilder.build"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.ExitConditionBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exitConditionBlock</span><span class="p">):</span>
+<div class="viewcode-block" id="ExitConditionBuilder.build"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.ExitConditionBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exitConditionBlock</span><span class="p">,</span> <span class="n">templetizedControlFile</span><span class="p">,</span> <span class="n">nProcessors</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Build the selected exit condition object</span>
 
@@ -334,7 +582,20 @@
         <span class="k">if</span> <span class="n">exitConditionType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ExitConditionType</span><span class="o">.</span><span class="n">metric</span><span class="p">:</span>
             <span class="n">metricCol</span> <span class="o">=</span> <span class="n">exitConditionParams</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">metricCol</span><span class="p">]</span>
             <span class="n">metricValue</span> <span class="o">=</span> <span class="n">exitConditionParams</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">exitValue</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">MetricExitCondition</span><span class="p">(</span><span class="n">metricCol</span><span class="p">,</span> <span class="n">metricValue</span><span class="p">)</span>
+            <span class="n">condition</span> <span class="o">=</span> <span class="n">exitConditionParams</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">condition</span><span class="p">,</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">condition</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;In MetricExitCondition the parameter condition only accepts &gt; or &lt;, but </span><span class="si">%s</span><span class="s2"> was passed&quot;</span> <span class="o">%</span> <span class="n">condition</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">MetricExitCondition</span><span class="p">(</span><span class="n">metricCol</span><span class="p">,</span> <span class="n">metricValue</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">exitConditionType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ExitConditionType</span><span class="o">.</span><span class="n">metricMultipleTrajs</span><span class="p">:</span>
+            <span class="n">metricCol</span> <span class="o">=</span> <span class="n">exitConditionParams</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">metricCol</span><span class="p">]</span>
+            <span class="n">metricValue</span> <span class="o">=</span> <span class="n">exitConditionParams</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">exitValue</span><span class="p">]</span>
+            <span class="n">numTrajs</span> <span class="o">=</span> <span class="n">exitConditionParams</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">numTrajs</span><span class="p">]</span>
+            <span class="n">condition</span> <span class="o">=</span> <span class="n">exitConditionParams</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">condition</span><span class="p">,</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">condition</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;In MetricMultipleTrajsExitCondition the parameter condition only accepts &gt; or &lt;, but </span><span class="si">%s</span><span class="s2"> was passed&quot;</span> <span class="o">%</span> <span class="n">condition</span><span class="p">)</span>
+            <span class="n">peleControlFileDict</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getPELEControlFileDict</span><span class="p">(</span><span class="n">templetizedControlFile</span><span class="p">)</span>
+            <span class="n">reportWildCard</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getReportAndTrajectoryWildcard</span><span class="p">(</span><span class="n">peleControlFileDict</span><span class="p">)</span>
+            <span class="n">MetricMultipleTrajsExitCondition</span><span class="p">(</span><span class="n">metricCol</span><span class="p">,</span> <span class="n">metricValue</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">reportWildCard</span><span class="p">,</span> <span class="n">numTrajs</span><span class="p">,</span> <span class="n">nProcessors</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">exitConditionType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ExitConditionType</span><span class="o">.</span><span class="n">clustering</span><span class="p">:</span>
             <span class="n">ntrajs</span> <span class="o">=</span> <span class="n">exitConditionParams</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">trajectories</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">ClusteringExitCondition</span><span class="p">(</span><span class="n">ntrajs</span><span class="p">)</span>
@@ -365,15 +626,18 @@
 
 
 <div class="viewcode-block" id="MetricExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MetricExitCondition">[docs]</a><span class="k">class</span> <span class="nc">MetricExitCondition</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metricCol</span><span class="p">,</span> <span class="n">metricValue</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metricCol</span><span class="p">,</span> <span class="n">metricValue</span><span class="p">,</span> <span class="n">condition</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span> <span class="o">=</span> <span class="n">metricCol</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metricValue</span> <span class="o">=</span> <span class="n">metricValue</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lastCheckedCluster</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">simulationTypes</span><span class="o">.</span><span class="n">EXITCONDITION_TYPE</span><span class="o">.</span><span class="n">METRIC</span>
+        <span class="k">if</span> <span class="n">condition</span> <span class="o">==</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span>
 
 <div class="viewcode-block" id="MetricExitCondition.checkExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MetricExitCondition.checkExitCondition">[docs]</a>    <span class="k">def</span> <span class="nf">checkExitCondition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clustering</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Iterate over all unchecked cluster and check if the exit condtion</span>
+<span class="sd">            Iterate over all clusters and check if the exit condtion</span>
 <span class="sd">            is met</span>
 
 <span class="sd">            :param clustering: Clustering object</span>
@@ -383,13 +647,45 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">clustering</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">:</span>
             <span class="n">metric</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">getMetricFromColumn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">metric</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">metric</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">metricValue</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">metric</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metricValue</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span></div></div>
 
 
-<div class="viewcode-block" id="RunnerBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.RunnerBuilder">[docs]</a><span class="k">class</span> <span class="nc">RunnerBuilder</span><span class="p">:</span>
+<div class="viewcode-block" id="MetricMultipleTrajsExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MetricMultipleTrajsExitCondition">[docs]</a><span class="k">class</span> <span class="nc">MetricMultipleTrajsExitCondition</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metricCol</span><span class="p">,</span> <span class="n">metricValue</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">reportWildCard</span><span class="p">,</span> <span class="n">numTrajs</span><span class="p">,</span> <span class="n">nProcessors</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span> <span class="o">=</span> <span class="n">metricCol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metricValue</span> <span class="o">=</span> <span class="n">metricValue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">simulationTypes</span><span class="o">.</span><span class="n">EXITCONDITION_TYPE</span><span class="o">.</span><span class="n">METRICMULTIPLETRAJS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numTrajs</span> <span class="o">=</span> <span class="n">numTrajs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nProcessors</span> <span class="o">=</span> <span class="n">nProcessors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trajsFound</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">condition</span> <span class="o">==</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">y</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">report</span> <span class="o">=</span> <span class="n">reportWildCard</span>
 
+<div class="viewcode-block" id="MetricMultipleTrajsExitCondition.checkExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MetricMultipleTrajsExitCondition.checkExitCondition">[docs]</a>    <span class="k">def</span> <span class="nf">checkExitCondition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputFolder</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Iterate over all reports and check if the exit condtion</span>
+<span class="sd">            is met</span>
+
+<span class="sd">            :param clustering: Clustering object</span>
+<span class="sd">            :type clustering: :py:class:`.Clustering`</span>
+
+<span class="sd">            :returns: bool -- Returns True if the exit condition has been met</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nProcessors</span><span class="p">):</span>
+            <span class="n">report</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputFolder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">report</span> <span class="o">%</span> <span class="n">j</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">(</span><span class="n">report</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">metricValue</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trajsFound</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajsFound</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numTrajs</span></div></div>
+
+
+<div class="viewcode-block" id="RunnerBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.RunnerBuilder">[docs]</a><span class="k">class</span> <span class="nc">RunnerBuilder</span><span class="p">:</span>
 <div class="viewcode-block" id="RunnerBuilder.build"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.RunnerBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulationRunnerBlock</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Build the selected  SimulationRunner object</span>
@@ -413,15 +709,16 @@
             <span class="n">params</span><span class="o">.</span><span class="n">iterations</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">iterations</span><span class="p">]</span>
             <span class="n">params</span><span class="o">.</span><span class="n">peleSteps</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">peleSteps</span><span class="p">]</span>
             <span class="n">params</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">seed</span><span class="p">]</span>
-            <span class="n">parms</span><span class="o">.</span><span class="n">modeMovingBox</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">modeMovingBox</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">modeMovingBox</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">modeMovingBox</span><span class="p">)</span>
             <span class="n">params</span><span class="o">.</span><span class="n">boxCenter</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">boxCenter</span><span class="p">)</span>
             <span class="n">params</span><span class="o">.</span><span class="n">boxRadius</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">boxRadius</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">runEquilibration</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">runEquilibration</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="n">exitConditionBlock</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">exitCondition</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">exitConditionBlock</span><span class="p">:</span>
                 <span class="n">exitConditionBuilder</span> <span class="o">=</span> <span class="n">ExitConditionBuilder</span><span class="p">()</span>
-                <span class="n">params</span><span class="o">.</span><span class="n">exitCondition</span> <span class="o">=</span> <span class="n">exitConditionBuilder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">exitConditionBlock</span><span class="p">)</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">exitCondition</span> <span class="o">=</span> <span class="n">exitConditionBuilder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">exitConditionBlock</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">templetizedControlFile</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">processors</span><span class="p">)</span>
 
-            <span class="n">SimulationRunner</span> <span class="o">=</span> <span class="n">PeleSimulation</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">PeleSimulation</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">simulationType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationType</span><span class="o">.</span><span class="n">md</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">elif</span> <span class="n">simulationType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationType</span><span class="o">.</span><span class="n">test</span><span class="p">:</span>
@@ -431,10 +728,9 @@
             <span class="n">params</span><span class="o">.</span><span class="n">iterations</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">iterations</span><span class="p">]</span>
             <span class="n">params</span><span class="o">.</span><span class="n">peleSteps</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">peleSteps</span><span class="p">]</span>
             <span class="n">params</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">seed</span><span class="p">]</span>
-            <span class="n">SimulationRunner</span> <span class="o">=</span> <span class="n">TestSimulation</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">TestSimulation</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown simulation type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">simulationTypes</span><span class="o">.</span><span class="n">SIMULATION_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
-        <span class="k">return</span> <span class="n">SimulationRunner</span></div></div>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown simulation type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">simulationTypes</span><span class="o">.</span><span class="n">SIMULATION_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div></div>
 </pre></div>
 
            </div>
