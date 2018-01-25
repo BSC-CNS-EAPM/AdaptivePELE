@@ -47,7 +47,7 @@ class SimulationRunner:
         """
         return self.parameters.exitCondition is not None
 
-    def checkExitCondition(self, clustering):
+    def checkExitCondition(self, clustering, outputFolder):
         """
             Check if the exit condition has been met
 
@@ -56,9 +56,10 @@ class SimulationRunner:
 
             :returns: bool -- True if the exit condition is met
         """
-        if self.parameters.exitCondition:
+        if self.parameters.exitCondition.type == blockNames.ExitConditionType.metricMultipleTrajs:
+            return self.parameters.exitCondition.checkExitCondition(outputFolder)
+        else:
             return self.parameters.exitCondition.checkExitCondition(clustering)
-        return False
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary, inputTemplate=None):
         """
@@ -237,7 +238,6 @@ class PeleSimulation(SimulationRunner):
         else:
             return None
 
-
     def equilibrate(self, intialStructures, outputPathConstants, reportFilename, outputPath, resname):
         """
             Run short simulation to equilibrate the system. It will run one
@@ -258,13 +258,8 @@ class PeleSimulation(SimulationRunner):
             :returns: list --  List with initial structures
         """
         newInitialStructures = []
-        equilibrationPeleDict = {"PELE_STEPS": 2, "SEED": self.parameters.seed}
-        with open(self.parameters.templetizedControlFile) as fc:
-            peleControlFile = fc.read()
-
-        templateNames = {ele[1]: '"$%s"' % ele[1] for ele in string.Template.pattern.findall(peleControlFile)}
-        templateNames.pop("OUTPUT_PATH", None)
-        peleControlFileDict = json.loads(string.Template(peleControlFile).safe_substitute(templateNames))
+        equilibrationPeleDict = {"PELE_STEPS": 50, "SEED": self.parameters.seed}
+        peleControlFileDict, templateNames = utilities.getPELEControlFileDict(self.parameters.templetizedControlFile)
         peleControlFileDict = self.getEquilibrationControlFile(peleControlFileDict)
         similarityColumn = self.getMetricColumns(peleControlFileDict)
         reportWildcard, trajWildcard = utilities.getReportAndTrajectoryWildcard(peleControlFileDict)
@@ -292,7 +287,7 @@ class PeleSimulation(SimulationRunner):
             reportNames = os.path.join(equilibrationOutput, reportWildcard)
             trajNames = os.path.join(equilibrationOutput, trajWildcard)
             newStructure = self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames)
-            newStructurePath  = os.path.join(equilibrationOutput, 'equilibration_struc_%d.pdb' % (i+1))
+            newStructurePath = os.path.join(equilibrationOutput, 'equilibration_struc_%d.pdb' % (i+1))
             with open(newStructurePath, "w") as fw:
                 fw.write(newStructure)
             newInitialStructures.append(newStructurePath)
@@ -347,7 +342,7 @@ class PeleSimulation(SimulationRunner):
             rowIndex += len(report_values)
 
         values = np.array(values)
-        if energyColumn > similarityColumn or similarityColumn is  None:
+        if energyColumn > similarityColumn or similarityColumn is None:
             similarityColumn, energyColumn = range(2)
         else:
             energyColumn, similarityColumn = range(2)
@@ -365,7 +360,7 @@ class PeleSimulation(SimulationRunner):
             row[similarityColumn] = freq[np.argmin(np.abs(row[similarityColumn] - centers))]
         distance = values.sum(axis=1)
         indexSelected = np.argmax(distance)
-        # Get trajectory and snapshot number from the index selected 
+        # Get trajectory and snapshot number from the index selected
         trajNum = len(indices)-1
         for i, index in enumerate(indices):
             if index == indexSelected:
@@ -433,7 +428,7 @@ class TestSimulation(SimulationRunner):
 
 
 class ExitConditionBuilder:
-    def build(self, exitConditionBlock):
+    def build(self, exitConditionBlock, templetizedControlFile, nProcessors):
         """
             Build the selected exit condition object
 
@@ -453,6 +448,16 @@ class ExitConditionBuilder:
             if condition not in [">", "<"]:
                 raise ValueError("In MetricExitCondition the parameter condition only accepts > or <, but %s was passed" % condition)
             return MetricExitCondition(metricCol, metricValue, condition)
+        elif exitConditionType == blockNames.ExitConditionType.metricMultipleTrajs:
+            metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
+            metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
+            numTrajs = exitConditionParams[blockNames.SimulationParams.numTrajs]
+            condition = exitConditionParams.get(blockNames.SimulationParams.condition, "<")
+            if condition not in [">", "<"]:
+                raise ValueError("In MetricMultipleTrajsExitCondition the parameter condition only accepts > or <, but %s was passed" % condition)
+            peleControlFileDict = utilities.getPELEControlFileDict(templetizedControlFile)
+            reportWildCard, _ = utilities.getReportAndTrajectoryWildcard(peleControlFileDict)
+            MetricMultipleTrajsExitCondition(metricCol, metricValue, condition, reportWildCard, numTrajs, nProcessors)
         elif exitConditionType == blockNames.ExitConditionType.clustering:
             ntrajs = exitConditionParams[blockNames.SimulationParams.trajectories]
             return ClusteringExitCondition(ntrajs)
@@ -494,7 +499,7 @@ class MetricExitCondition:
 
     def checkExitCondition(self, clustering):
         """
-            Iterate over all unchecked cluster and check if the exit condtion
+            Iterate over all clusters and check if the exit condtion
             is met
 
             :param clustering: Clustering object
@@ -508,6 +513,38 @@ class MetricExitCondition:
             if metric is not None and self.condition(metric, self.metricValue):
                 return True
         return False
+
+
+class MetricMultipleTrajsExitCondition:
+    def __init__(self, metricCol, metricValue, condition, reportWildCard, numTrajs, nProcessors):
+        self.metricCol = metricCol
+        self.metricValue = metricValue
+        self.type = simulationTypes.EXITCONDITION_TYPE.METRICMULTIPLETRAJS
+        self.numTrajs = numTrajs
+        self.nProcessors = nProcessors
+        self.trajsFound = 0
+        if condition == ">":
+            self.condition = lambda x, y: x.max() > y
+        else:
+            self.condition = lambda x, y: x.min() < y
+        self.report = reportWildCard
+
+    def checkExitCondition(self, outputFolder):
+        """
+            Iterate over all reports and check if the exit condtion
+            is met
+
+            :param clustering: Clustering object
+            :type clustering: :py:class:`.Clustering`
+
+            :returns: bool -- Returns True if the exit condition has been met
+        """
+        for j in range(1, self.nProcessors):
+            report = np.loadtxt(os.path.join(outputFolder, self.report % j))
+
+            if self.condition(report[:, self.metricCol], self.metricValue):
+                self.trajsFound += 1
+        return self.trajsFound >= self.numTrajs
 
 
 class RunnerBuilder:
@@ -541,7 +578,7 @@ class RunnerBuilder:
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()
-                params.exitCondition = exitConditionBuilder.build(exitConditionBlock)
+                params.exitCondition = exitConditionBuilder.build(exitConditionBlock, params.templetizedControlFile, params.processors)
 
             return PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:

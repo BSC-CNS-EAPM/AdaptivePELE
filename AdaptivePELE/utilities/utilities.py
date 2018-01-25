@@ -222,3 +222,15 @@ def getReportAndTrajectoryWildcard(JSONdict):
     trajWildcard = '_%d'.join(os.path.splitext(trajWildcard))
     reportWildcard = '_%d'.join(os.path.splitext(reportWildcard))
     return reportWildcard, trajWildcard
+
+def getPELEControlFileDict(templetizedControlFile):
+    """
+        Parse a PELE control file into a python dictionary
+    """
+
+    with open(self.parameters.templetizedControlFile) as fc:
+        peleControlFile = fc.read()
+
+    templateNames = {ele[1]: '"$%s"' % ele[1] for ele in string.Template.pattern.findall(peleControlFile)}
+    templateNames.pop("OUTPUT_PATH", None)
+    return json.loads(string.Template(peleControlFile).safe_substitute(templateNames)), templateNames

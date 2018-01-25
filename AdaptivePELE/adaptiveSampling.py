@@ -27,6 +27,25 @@ def parseArgs():
     return arg
 
 
+def checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputFolder, simulationRunner):
+    """
+        Check the previous simulation data when restarting a simulation with a
+        multiple trajectory metric exit condition
+
+        :param firstRun: First epoch to be run in restart simulation
+        :type firstRun: int
+        :param outputFolder: Folder of the previous simulation data
+        :type outputFolder: str
+        :param simulationRunner: Simulation runner object
+        :type simulationRunner: :py:class:`.SimulationRunner`
+    """
+    if simulationRunner.hasExitCondition():
+        if simulationRunner.parameters.exitCondition.type != blockNames.ExitConditionType.metricMultipleTrajs:
+            return
+        for i in xrange(firstRun):
+            simulationRunner.parameters.exitCondition.checkExitCondition(outputFolder % i)
+
+
 def filterClustersAccordingToBox(simulationRunnerParams, clusteringObject):
     """
         Filter the clusters to select only the ones whose representative
@@ -569,6 +588,7 @@ def main(jsonParams):
             startFromScratch = True
         else:
             clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner)
+            checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner)
 
     if startFromScratch or not restart:
         firstRun = 0  # if restart false, but there were previous simulations
@@ -645,7 +665,7 @@ def main(jsonParams):
                                nativeStructure, clusteringMethod.symmetries)
 
         # check exit condition, if defined
-        if simulationRunner.hasExitCondition() and simulationRunner.checkExitCondition(clusteringMethod):
+        if simulationRunner.hasExitCondition() and simulationRunner.checkExitCondition(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i):
             print "Simulation exit condition met at iteration %d" % i
             break
 
