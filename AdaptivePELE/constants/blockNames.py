@@ -124,12 +124,14 @@ class SimulationParams:
     boxRadius = "boxRadius"
     runEquilibration = "runEquilibration"
     condition = "condition"
+    numTrajs = "numberTrajectories"
 
 
 class ExitConditionType:
     type = "type"
     metric = "metric"
     clustering = "clustering"
+    metricMultipleTrajs = "metricMultipleTrajectories"
 
 
 class ControlFileParams:

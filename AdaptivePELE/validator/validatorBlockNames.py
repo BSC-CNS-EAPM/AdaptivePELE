@@ -125,12 +125,15 @@ class SimulationParams:
     }
     exitCondition = {
         "types": {
-            "metric": "basestring"
+            "metric": "basestring",
+            "clustering": "basestring",
+            "metricMultipleTrajectories": "basestring"
         },
         "params": {
             "metricCol": "int",
             "exitValue": "numbers.Real",
-            "condition": "basestring"
+            "condition": "basestring",
+            "numTrajs": "numbers.Real"
         }
     }
 
