@@ -2,6 +2,8 @@ import os
 import sys
 import shutil
 import numpy as np
+import string
+import json
 # import pickle
 import cPickle as pickle
 from AdaptivePELE.atomset import RMSDCalculator
@@ -216,7 +218,6 @@ def getReportAndTrajectoryWildcard(JSONdict):
 
         :returns: str, str -- Report and trajectory wildcards
     """
-
     reportWildcard = os.path.split(JSONdict["commands"][0]["PELE_Output"]['reportPath'])[1]
     trajWildcard = os.path.split(JSONdict["commands"][0]["PELE_Output"]['trajectoryPath'])[1]
     trajWildcard = '_%d'.join(os.path.splitext(trajWildcard))
@@ -228,7 +229,7 @@ def getPELEControlFileDict(templetizedControlFile):
         Parse a PELE control file into a python dictionary
     """
 
-    with open(self.parameters.templetizedControlFile) as fc:
+    with open(templetizedControlFile) as fc:
         peleControlFile = fc.read()
 
     templateNames = {ele[1]: '"$%s"' % ele[1] for ele in string.Template.pattern.findall(peleControlFile)}
