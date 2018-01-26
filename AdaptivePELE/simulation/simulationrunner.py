@@ -56,7 +56,7 @@ class SimulationRunner:
 
             :returns: bool -- True if the exit condition is met
         """
-        if self.parameters.exitCondition.type == blockNames.ExitConditionType.metricMultipleTrajs:
+        if self.parameters.exitCondition.type == simulationTypes.EXITCONDITION_TYPE.METRICMULTIPLETRAJS:
             return self.parameters.exitCondition.checkExitCondition(outputFolder)
         else:
             return self.parameters.exitCondition.checkExitCondition(clustering)
@@ -427,44 +427,6 @@ class TestSimulation(SimulationRunner):
         pass
 
 
-class ExitConditionBuilder:
-    def build(self, exitConditionBlock, templetizedControlFile, nProcessors):
-        """
-            Build the selected exit condition object
-
-            :param exitConditionBlock: Block of the control file
-                corresponding to the exit condition
-            :type exitConditionBlock: dict
-
-            :returns: :py:class:`.MetricExitCondition` -- MetricExitCondition object
-                selected
-        """
-        exitConditionType = exitConditionBlock[blockNames.ExitConditionType.type]
-        exitConditionParams = exitConditionBlock[blockNames.SimulationParams.params]
-        if exitConditionType == blockNames.ExitConditionType.metric:
-            metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
-            metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
-            condition = exitConditionParams.get(blockNames.SimulationParams.condition, "<")
-            if condition not in [">", "<"]:
-                raise ValueError("In MetricExitCondition the parameter condition only accepts > or <, but %s was passed" % condition)
-            return MetricExitCondition(metricCol, metricValue, condition)
-        elif exitConditionType == blockNames.ExitConditionType.metricMultipleTrajs:
-            metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
-            metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
-            numTrajs = exitConditionParams[blockNames.SimulationParams.numTrajs]
-            condition = exitConditionParams.get(blockNames.SimulationParams.condition, "<")
-            if condition not in [">", "<"]:
-                raise ValueError("In MetricMultipleTrajsExitCondition the parameter condition only accepts > or <, but %s was passed" % condition)
-            peleControlFileDict = utilities.getPELEControlFileDict(templetizedControlFile)
-            reportWildCard, _ = utilities.getReportAndTrajectoryWildcard(peleControlFileDict)
-            MetricMultipleTrajsExitCondition(metricCol, metricValue, condition, reportWildCard, numTrajs, nProcessors)
-        elif exitConditionType == blockNames.ExitConditionType.clustering:
-            ntrajs = exitConditionParams[blockNames.SimulationParams.trajectories]
-            return ClusteringExitCondition(ntrajs)
-        else:
-            sys.exit("Unknown exit condition type! Choices are: " + str(simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY.values()))
-
-
 class ClusteringExitCondition:
     def __init__(self, ntrajs):
         self.clusterNum = 0
@@ -541,7 +503,6 @@ class MetricMultipleTrajsExitCondition:
         """
         for j in range(1, self.nProcessors):
             report = np.loadtxt(os.path.join(outputFolder, self.report % j))
-
             if self.condition(report[:, self.metricCol], self.metricValue):
                 self.trajsFound += 1
         return self.trajsFound >= self.numTrajs
@@ -593,3 +554,41 @@ class RunnerBuilder:
             return TestSimulation(params)
         else:
             sys.exit("Unknown simulation type! Choices are: " + str(simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))
+
+
+class ExitConditionBuilder:
+    def build(self, exitConditionBlock, templetizedControlFile, nProcessors):
+        """
+            Build the selected exit condition object
+
+            :param exitConditionBlock: Block of the control file
+                corresponding to the exit condition
+            :type exitConditionBlock: dict
+
+            :returns: :py:class:`.MetricExitCondition` -- MetricExitCondition object
+                selected
+        """
+        exitConditionType = exitConditionBlock[blockNames.ExitConditionType.type]
+        exitConditionParams = exitConditionBlock[blockNames.SimulationParams.params]
+        if exitConditionType == blockNames.ExitConditionType.metric:
+            metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
+            metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
+            condition = exitConditionParams.get(blockNames.SimulationParams.condition, "<")
+            if condition not in [">", "<"]:
+                raise ValueError("In MetricExitCondition the parameter condition only accepts > or <, but %s was passed" % condition)
+            return MetricExitCondition(metricCol, metricValue, condition)
+        elif exitConditionType == blockNames.ExitConditionType.metricMultipleTrajs:
+            metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
+            metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
+            numTrajs = exitConditionParams[blockNames.SimulationParams.numTrajs]
+            condition = exitConditionParams.get(blockNames.SimulationParams.condition, "<")
+            if condition not in [">", "<"]:
+                raise ValueError("In MetricMultipleTrajsExitCondition the parameter condition only accepts > or <, but %s was passed" % condition)
+            peleControlFileDict, _ = utilities.getPELEControlFileDict(templetizedControlFile)
+            reportWildCard, _ = utilities.getReportAndTrajectoryWildcard(peleControlFileDict)
+            return MetricMultipleTrajsExitCondition(metricCol, metricValue, condition, reportWildCard, numTrajs, nProcessors)
+        elif exitConditionType == blockNames.ExitConditionType.clustering:
+            ntrajs = exitConditionParams[blockNames.SimulationParams.trajectories]
+            return ClusteringExitCondition(ntrajs)
+        else:
+            sys.exit("Unknown exit condition type! Choices are: " + str(simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY.values()))

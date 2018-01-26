@@ -665,9 +665,12 @@ def main(jsonParams):
                                nativeStructure, clusteringMethod.symmetries)
 
         # check exit condition, if defined
-        if simulationRunner.hasExitCondition() and simulationRunner.checkExitCondition(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i):
-            print "Simulation exit condition met at iteration %d" % i
-            break
+        if simulationRunner.hasExitCondition():
+            if simulationRunner.checkExitCondition(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i):
+                print "Simulation exit condition met at iteration %d, stopping" % i
+                break
+            else:
+                print "Simulation exit condition not met at iteration %d, continuing..." % i
 
 if __name__ == '__main__':
     args = parseArgs()
