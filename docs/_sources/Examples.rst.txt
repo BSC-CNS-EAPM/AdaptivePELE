@@ -187,10 +187,10 @@ Additionally, the block may have an exit condition that stops the execution:
   * **metricMultipleTrajectories** : 
     this type accepts a *metricCol* which represents a column in the report file, an *exitValue* 
     which represents a value for the metric, a *condition* parameter which can
-    be either "<" or ">", default value is "<" and a *numTrajs* parameter which determines how many independent trajectories
+    be either "<" or ">", default value is "<" and a *numberTrajectories* parameter which determines how many independent trajectories
     have to meet the condition for the simulation to stop. The simulation will terminate after the metric
     written in the *metricCol* reaches a value smaller or greater than *exitValue*, depending on the condition specified for a
-    number of trajectories greater or equal than *numTrajs*. An example of the exit condition block that would terminate the 
+    number of trajectories greater or equal than *numberTrajectories*. An example of the exit condition block that would terminate the 
     program after 10 trajectories reach a value of more than 2 for the fifth column (4th starting to count from 0) of the report 
     file would look like::
 
