@@ -803,9 +803,12 @@
                                <span class="n">nativeStructure</span><span class="p">,</span> <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">symmetries</span><span class="p">)</span>
 
         <span class="c1"># check exit condition, if defined</span>
-        <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">hasExitCondition</span><span class="p">()</span> <span class="ow">and</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">checkExitCondition</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">):</span>
-            <span class="nb">print</span> <span class="s2">&quot;Simulation exit condition met at iteration </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span>
-            <span class="k">break</span></div>
+        <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">hasExitCondition</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">checkExitCondition</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">):</span>
+                <span class="nb">print</span> <span class="s2">&quot;Simulation exit condition met at iteration </span><span class="si">%d</span><span class="s2">, stopping&quot;</span> <span class="o">%</span> <span class="n">i</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span> <span class="s2">&quot;Simulation exit condition not met at iteration </span><span class="si">%d</span><span class="s2">, continuing...&quot;</span> <span class="o">%</span> <span class="n">i</span></div>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parseArgs</span><span class="p">()</span>

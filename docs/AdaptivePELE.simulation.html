@@ -329,7 +329,7 @@ equilibration run</li>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate">
-<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>intialStructures</em>, <em>outputPathConstants</em>, <em>reportFilename</em>, <em>outputPath</em>, <em>resname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>initialStructures</em>, <em>outputPathConstants</em>, <em>reportFilename</em>, <em>outputPath</em>, <em>resname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run short simulation to equilibrate the system. It will run one
 such simulation for every initial structure and select appropiate
 structures to start the simulation</p>
@@ -419,7 +419,29 @@ run</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – Pdb snapshot of the representative structure</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the pdb snapshots of the representatives structures</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibrationLastSnapshot">
+<code class="descname">selectEquilibrationLastSnapshot</code><span class="sig-paren">(</span><em>nTrajs</em>, <em>trajWildcard</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.selectEquilibrationLastSnapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibrationLastSnapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select the last snapshot of each trajectory as a  representative
+initial structure from the equilibration run</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nTrajs</strong> (<em>int</em>) – Number of trajectories</li>
+<li><strong>trajWildcard</strong> (<em>str</em>) – Templetized path to trajectory files”</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the pdb snapshots of the representatives structures</p>
 </td>
 </tr>
 </tbody>

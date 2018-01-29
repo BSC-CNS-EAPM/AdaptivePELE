@@ -306,6 +306,13 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <li><strong>boxRadius</strong> (<em>int</em>, default=20): Value of the simulation box radius</li>
 <li><strong>runEquilibration</strong> (<em>bool</em>, default=False): Whether to run a short
 equilibration or burn-in simulation for each initial structure</li>
+<li><strong>equilibrationLength</strong> (<em>int</em>, default=50): Number of steps for the
+equilibration run</li>
+<li><strong>equilibrationMode</strong> (<em>string</em>, default=”equilibrationSelect”): Choose the
+mode of the equilbration run, <em>equilibrationSelect</em> selects one of the
+structures as a representative as a function of distance and energy, while
+<em>equilibrationLastSnapshot</em> selects the last snapshot of each trajectory as
+representatives</li>
 </ul>
 <p>Additionally, the block may have an exit condition that stops the execution:</p>
 <ul>

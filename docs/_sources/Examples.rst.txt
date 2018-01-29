@@ -160,6 +160,13 @@ Optionally, you can also use the following parameters:
 * **boxRadius** (*int*, default=20): Value of the simulation box radius
 * **runEquilibration** (*bool*, default=False): Whether to run a short
   equilibration or burn-in simulation for each initial structure  
+* **equilibrationLength** (*int*, default=50): Number of steps for the
+  equilibration run
+* **equilibrationMode** (*string*, default="equilibrationSelect"): Choose the
+  mode of the equilbration run, *equilibrationSelect* selects one of the
+  structures as a representative as a function of distance and energy, while
+  *equilibrationLastSnapshot* selects the last snapshot of each trajectory as
+  representatives
 
 Additionally, the block may have an exit condition that stops the execution:
 

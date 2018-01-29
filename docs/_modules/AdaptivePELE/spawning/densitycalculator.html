@@ -279,6 +279,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">densitycalculatortypes</span><span class="o">.</span><span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">exitContinous</span>
 
 <div class="viewcode-block" id="ExitContinousDensityCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.densitycalculator.ExitContinousDensityCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contacts</span><span class="p">,</span> <span class="n">contactThreshold</span><span class="p">):</span>
+        <span class="c1"># alternative possibility</span>
+        <span class="c1"># if contacts &gt; 1.0:</span>
+        <span class="c1">#     return 1/4.0</span>
+        <span class="c1"># elif contacts &lt; 0.24:</span>
+        <span class="c1">#     return 4.0</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     return (-4*contacts+6)**3/32.0</span>
+
         <span class="k">return</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">continousDensity</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span></div></div>
 </pre></div>
 

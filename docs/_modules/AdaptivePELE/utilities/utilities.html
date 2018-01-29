@@ -140,6 +140,8 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="c1"># import pickle</span>
 <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">RMSDCalculator</span>
@@ -354,7 +356,6 @@
 
 <span class="sd">        :returns: str, str -- Report and trajectory wildcards</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">reportWildcard</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">JSONdict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PELE_Output&quot;</span><span class="p">][</span><span class="s1">&#39;reportPath&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">trajWildcard</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">JSONdict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PELE_Output&quot;</span><span class="p">][</span><span class="s1">&#39;trajectoryPath&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">trajWildcard</span> <span class="o">=</span> <span class="s1">&#39;_</span><span class="si">%d</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">trajWildcard</span><span class="p">))</span>
@@ -366,7 +367,7 @@
 <span class="sd">        Parse a PELE control file into a python dictionary</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">templetizedControlFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">fc</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">templetizedControlFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">fc</span><span class="p">:</span>
         <span class="n">peleControlFile</span> <span class="o">=</span> <span class="n">fc</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
     <span class="n">templateNames</span> <span class="o">=</span> <span class="p">{</span><span class="n">ele</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="s1">&#39;&quot;$</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">ele</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">Template</span><span class="o">.</span><span class="n">pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">peleControlFile</span><span class="p">)}</span>
