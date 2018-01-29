@@ -122,6 +122,7 @@ class SimulationParams:
         "boxRadius": "numbers.Real",
         "runEquilibration": "bool",
         "equilibrationMode": "basestring",
+        "equilibrationLength": "numbers.Real",
         "exitCondition": "dict"
     }
     exitCondition = {
