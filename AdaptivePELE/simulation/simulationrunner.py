@@ -288,7 +288,7 @@ class PeleSimulation(SimulationRunner):
             # Extract report, trajnames, metrics columns from pele control file
             reportNames = os.path.join(equilibrationOutput, reportWildcard)
             trajNames = os.path.join(equilibrationOutput, trajWildcard)
-            if len(initialStructures) == 1 and self.parameters.equilibrationMode == blockNames.SimulationParameters.equilibrationLastSnapshot:
+            if len(initialStructures) == 1 and self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationLastSnapshot:
                 newStructure = self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames)
             else:
                 newStructure = self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames)
