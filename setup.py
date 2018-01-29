@@ -37,7 +37,7 @@ if use_cython:
             Extension("AdaptivePELE.atomset.atomset", ["AdaptivePELE/atomset/atomset.pyx"], include_dirs = ["AdaptivePELE", "AdaptivePELE/atomset"]),
             Extension("AdaptivePELE.atomset.SymmetryContactMapEvaluator", ["AdaptivePELE/atomset/SymmetryContactMapEvaluator.pyx"], include_dirs = ["AdaptivePELE","AdaptivePELE/atomset"]),
             Extension("AdaptivePELE.atomset.RMSDCalculator", ["AdaptivePELE/atomset/RMSDCalculator.pyx"], include_dirs = ["AdaptivePELE", "AdaptivePELE/atomset"]),
-            Extension("AdaptivePELE.testing.utils", ["AdaptivePELE/testing/utils.pyx"], include_dirs = ["AdaptivePELE", "AdaptivePELE/testing"])
+            Extension("AdaptivePELE.freeEnergies.utils", ["AdaptivePELE/freeEnergies/utils.pyx"], include_dirs = ["AdaptivePELE", "AdaptivePELE/freeEnergies"])
                 ]
         cmdclass.update({ 'build_ext': build_ext })
 else:
@@ -45,7 +45,7 @@ else:
             Extension("AdaptivePELE.atomset.atomset", ["AdaptivePELE/atomset/atomset.c"], include_dirs = ["AdaptivePELE", "AdaptivePELE/atomset"]),
             Extension("AdaptivePELE.atomset.SymmetryContactMapEvaluator", ["AdaptivePELE/atomset/SymmetryContactMapEvaluator.c"], include_dirs = ["AdaptivePELE","AdaptivePELE/atomset"]),
             Extension("AdaptivePELE.atomset.RMSDCalculator", ["AdaptivePELE/atomset/RMSDCalculator.c"], include_dirs = ["AdaptivePELE", "AdaptivePELE/atomset"]),
-            Extension("AdaptivePELE.testing.utils", ["AdaptivePELE/testing/utils.c"], include_dirs = ["AdaptivePELE", "AdaptivePELE/testing"])
+            Extension("AdaptivePELE.freeEnergies.utils", ["AdaptivePELE/freeEnergies/utils.c"], include_dirs = ["AdaptivePELE", "AdaptivePELE/freeEnergies"])
                 ]
 
 setup(
