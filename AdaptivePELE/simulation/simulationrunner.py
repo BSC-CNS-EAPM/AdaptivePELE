@@ -27,6 +27,7 @@ class SimulationParameters:
         self.boxRadius = 20
         self.modeMovingBox = None
         self.runEquilibration = False
+        self.equilibrationLength = 50
         self.destination = None
         self.origin = None
 
@@ -258,7 +259,7 @@ class PeleSimulation(SimulationRunner):
             :returns: list --  List with initial structures
         """
         newInitialStructures = []
-        equilibrationPeleDict = {"PELE_STEPS": 50, "SEED": self.parameters.seed}
+        equilibrationPeleDict = {"PELE_STEPS": self.parameters.equilibrationLength, "SEED": self.parameters.seed}
         peleControlFileDict, templateNames = utilities.getPELEControlFileDict(self.parameters.templetizedControlFile)
         peleControlFileDict = self.getEquilibrationControlFile(peleControlFileDict)
         similarityColumn = self.getMetricColumns(peleControlFileDict)
@@ -536,6 +537,7 @@ class RunnerBuilder:
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             params.runEquilibration = paramsBlock.get(blockNames.SimulationParams.runEquilibration, False)
+            params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 50)
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()
