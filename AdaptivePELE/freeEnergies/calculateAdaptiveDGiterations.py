@@ -2,7 +2,7 @@ import os
 import shutil
 import glob
 import numpy as np
-from AdaptivePELE.testing import estimateDGAdaptive, prepareMSMFolders
+from AdaptivePELE.freeEnergies import estimateDGAdaptive, prepareMSMFolders
 
 
 def move(listFiles, dest):

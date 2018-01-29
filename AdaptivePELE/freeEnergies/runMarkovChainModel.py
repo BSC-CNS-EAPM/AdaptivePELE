@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import sparse, linalg
-from AdaptivePELE.testing import utils
+from AdaptivePELE.freeEnergies import utils
 
 
 def buildLinearChainCountMatrix():

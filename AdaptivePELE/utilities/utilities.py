@@ -7,7 +7,7 @@ import json
 # import pickle
 import cPickle as pickle
 from AdaptivePELE.atomset import RMSDCalculator
-from AdaptivePELE.testing import runMarkovChainModel as run
+from AdaptivePELE.freeEnergies import runMarkovChainModel as run
 import AdaptivePELE.atomset.atomset as atomset
 
 

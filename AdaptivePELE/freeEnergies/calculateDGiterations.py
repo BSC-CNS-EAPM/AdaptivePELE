@@ -1,6 +1,6 @@
 import os
 import shutil
-from AdaptivePELE.testing import estimateDG, prepareMSMFolders
+from AdaptivePELE.freeEnergies import estimateDG, prepareMSMFolders
 
 # list of tuples with format (lagtime, #clusters)
 iterations = [(50, 200), (50, 400), (100, 200), (100, 400), (200, 200), (200, 400)]

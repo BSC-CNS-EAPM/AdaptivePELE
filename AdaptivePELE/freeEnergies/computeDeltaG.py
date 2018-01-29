@@ -12,8 +12,8 @@ import sys
 import argparse
 import cPickle
 from pyemma.coordinates.clustering import AssignCenters
-from AdaptivePELE.testing import runMarkovChainModel as run
-from AdaptivePELE.testing import utils
+from AdaptivePELE.freeEnergies import runMarkovChainModel as run
+from AdaptivePELE.freeEnergies import utils
 import itertools
 
 
