@@ -141,4 +141,12 @@ class ExitContinousDensityCalculator(DensityCalculator):
         self.type = densitycalculatortypes.DENSITY_CALCULATOR_TYPES.exitContinous
 
     def calculate(self, contacts, contactThreshold):
+        # alternative possibility
+        # if contacts > 1.0:
+        #     return 1/4.0
+        # elif contacts < 0.24:
+        #     return 4.0
+        # else:
+        #     return (-4*contacts+6)**3/32.0
+
         return 1.0/continousDensity(contacts)

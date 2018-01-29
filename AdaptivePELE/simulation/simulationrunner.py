@@ -29,6 +29,7 @@ class SimulationParameters:
         self.runEquilibration = False
         self.destination = None
         self.origin = None
+        self.equilibrationMode = ""
 
 
 class SimulationRunner:
@@ -238,7 +239,7 @@ class PeleSimulation(SimulationRunner):
         else:
             return None
 
-    def equilibrate(self, intialStructures, outputPathConstants, reportFilename, outputPath, resname):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure and select appropiate
@@ -264,7 +265,7 @@ class PeleSimulation(SimulationRunner):
         similarityColumn = self.getMetricColumns(peleControlFileDict)
         reportWildcard, trajWildcard = utilities.getReportAndTrajectoryWildcard(peleControlFileDict)
 
-        for i, structure in enumerate(intialStructures):
+        for i, structure in enumerate(initialStructures):
             equilibrationOutput = os.path.join(outputPath, "equilibration_%d" % (i+1))
             equilibrationControlFile = outputPathConstants.tmpControlFilenameEqulibration % (i+1)
             utilities.makeFolder(equilibrationOutput)
@@ -286,12 +287,31 @@ class PeleSimulation(SimulationRunner):
             # Extract report, trajnames, metrics columns from pele control file
             reportNames = os.path.join(equilibrationOutput, reportWildcard)
             trajNames = os.path.join(equilibrationOutput, trajWildcard)
-            newStructure = self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames)
-            newStructurePath = os.path.join(equilibrationOutput, 'equilibration_struc_%d.pdb' % (i+1))
-            with open(newStructurePath, "w") as fw:
-                fw.write(newStructure)
-            newInitialStructures.append(newStructurePath)
+            if len(initialStructures) == 1 and self.parameters.equilibrationMode == blockNames.SimulationParameters.equilibrationLastSnapshot:
+                newStructure = self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames)
+            else:
+                newStructure = self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames)
+
+            for j, struct in enumerate(newStructure):
+                newStructurePath = os.path.join(equilibrationOutput, 'equilibration_struc_%d_%d.pdb' % (i+1, j+1))
+                with open(newStructurePath, "w") as fw:
+                    fw.write(struct)
+                newInitialStructures.append(newStructurePath)
         return newInitialStructures
+
+    def selectEquilibrationLastSnapshot(self, nTrajs, trajWildcard):
+        """
+            Select the last snapshot of each trajectory as a  representative
+            initial structure from the equilibration run
+
+            :param nTrajs: Number of trajectories
+            :type nTrajs: int
+            :param trajWildcard: Templetized path to trajectory files"
+            :type trajWildcard: str
+
+            :returns: list -- List with the pdb snapshots of the representatives structures
+        """
+        return [utilities.getSnapshots(trajWildcard % ij)[-1] for ij in xrange(1, nTrajs)]
 
     def selectEquilibratedStructure(self, nTrajs, similarityColumn, resname, trajWildcard, reportWildcard):
         """
@@ -310,7 +330,7 @@ class PeleSimulation(SimulationRunner):
             :param reportWildcard: Templetized path to report files"
             :type reportWildcard: str
 
-            :returns: str -- Pdb snapshot of the representative structure
+            :returns: list -- List with the pdb snapshots of the representatives structures
         """
         energyColumn = 3
         values = []
@@ -372,7 +392,8 @@ class PeleSimulation(SimulationRunner):
         snapshotNum = indexSelected-indices[trajNum]
         # trajectories are 1-indexed
         trajNum += 1
-        return utilities.getSnapshots(trajWildcard % trajNum)[snapshotNum]
+        # return as list for compatibility with selectEquilibrationLastSnapshot
+        return [utilities.getSnapshots(trajWildcard % trajNum)[snapshotNum]]
 
     def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
         """
@@ -536,6 +557,7 @@ class RunnerBuilder:
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             params.runEquilibration = paramsBlock.get(blockNames.SimulationParams.runEquilibration, False)
+            params.equilibrationMode = paramsBlock.get(blockNames.SimulationParams.equilibrationMode, blockNames.SimulationParams.equilibrationSelect)
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()
