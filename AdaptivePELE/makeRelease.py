@@ -7,10 +7,10 @@ import glob
 import shutil
 import os
 
-releaseName = "v1.3"
+releaseName = "v1.4"
 # releaseFolder = "/gpfs/projects/bsc72/adaptiveSampling/bin"
 releaseFolder = "/data2/bsc72/AdaptiveSampling/bin"
-toOmit = ["pyemma", "tests", "runAllTests.py", "os", "sys", "TODO.txt", "Data", "Documents", "DataLocal", "epsilon_values.txt", "makeRelease.py", ".git", ".gitignore"]
+toOmit = ["tests", "runAllTests.py", "os", "sys", "TODO.txt", "Data", "Documents", "DataLocal", "epsilon_values.txt", "makeRelease.py", ".git", ".gitignore"]
 
 
 files = glob.glob("*")
@@ -21,9 +21,9 @@ for filename in files:
         continue
     print "Copying", filename
     try:
-        if not os.path.exists(destFolder%filename):
-            shutil.copytree(filename, destFolder%filename)
+        if not os.path.exists(destFolder % filename):
+            shutil.copytree(filename, destFolder % filename)
     except OSError:
-        shutil.copyfile(filename, destFolder%filename)
+        shutil.copyfile(filename, destFolder % filename)
 
 print "Done with release %s!" % releaseName
