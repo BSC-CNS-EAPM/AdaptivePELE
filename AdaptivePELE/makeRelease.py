@@ -15,7 +15,7 @@ toOmit = ["pyemma", "tests", "runAllTests.py", "os", "sys", "TODO.txt", "Data", 
 
 files = glob.glob("*")
 
-destFolder = os.path.join(releaseFolder, releaseName, "%s")
+destFolder = os.path.join(releaseFolder, releaseName, "AdaptivePELE", "%s")
 for filename in files:
     if filename in toOmit or filename.startswith(".") or filename.endswith("pyc"):
         continue
