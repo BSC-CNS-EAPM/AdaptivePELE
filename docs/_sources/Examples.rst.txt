@@ -207,7 +207,7 @@ Additionally, the block may have an exit condition that stops the execution:
                 "metricCol" : 4,
                 "exitValue" : 2.0,
                 "condition" : ">",
-                "numTrajs" : 10
+                "numberTrajectoriess" : 10
             }
         }
 
