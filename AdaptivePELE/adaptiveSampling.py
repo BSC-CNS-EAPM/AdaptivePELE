@@ -109,6 +109,8 @@ def getNextIterationBox(clusteringObject, simulationRunnerParams):
     metrics = []
     for cluster in clusteringObject.clusters.clusters:
         metrics.append(cluster.metrics[3:])
+    if len(metrics) == 0:
+        raise ValueError("No cluster metrics found!!")
     metrics = np.array(metrics)
     maxMetrics = metrics.max(axis=0)
     minMetrics = metrics.min(axis=0)
