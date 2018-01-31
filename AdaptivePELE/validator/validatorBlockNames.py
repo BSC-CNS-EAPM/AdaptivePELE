@@ -39,9 +39,15 @@ class SpawningParams:
         "n": "numbers.Real"
     }
     types = {
-        "sameWeight": {},
-        "independent": {},
-        "inverselyProportional": {},
+        "sameWeight": {
+            "reportFilename": "basestring"
+        },
+        "independent": {
+            "reportFilename": "basestring"
+        },
+        "inverselyProportional": {
+            "reportFilename": "basestring"
+        },
         "epsilon": {
             "epsilon": "numbers.Real",
             "reportFilename": "basestring",

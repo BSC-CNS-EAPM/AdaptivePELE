@@ -168,7 +168,8 @@ class SpawningParams:
         spawningType = spawningBlock[blockNames.StringSpawningTypes.type]
 
         # Params general to all
-
+        # reportFilename is now mandatory for all spawning
+        self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
         # Params specific to epsilon related spawning
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon:
@@ -184,7 +185,6 @@ class SpawningParams:
                 spawningType == blockNames.StringSpawningTypes.UCB or \
                 spawningType == blockNames.StringSpawningTypes.REAP:
             self.temperature = spawningParamsBlock.get(blockNames.SpawningParams.temperature, 1000)
-            self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
 
         if spawningType == blockNames.StringSpawningTypes.variableEpsilon:
@@ -981,8 +981,8 @@ class REAPCalculator(SpawningCalculator):
         if self.weights is None:
             self.weights = np.ones(len(self.metricInd))/len(self.metricInd)
         else:
-            optimResult = optim.minimize(reward, self.weights, args=(rewProv,), 
-                                         method="SLSQP", constraints=self.cons, 
+            optimResult = optim.minimize(reward, self.weights, args=(rewProv,),
+                                         method="SLSQP", constraints=self.cons,
                                          bounds=self.bounds)
             self.weights = optimResult.x
         self.rewards = (self.weights[:, np.newaxis]*rewProv).sum(axis=0)
