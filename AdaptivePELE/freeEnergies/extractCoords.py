@@ -287,8 +287,9 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
     for folder_it in folders:
         pathFolder = os.path.join(folderWithTrajs, folder_it)
         print "Extracting coords from folder %s" % folder_it
-        if writeLigandTrajectory:
-            os.makedirs(os.path.join(pathFolder, constants.ligandTrajectoryFolder))
+        ligand_trajs_folder = os.path.join(pathFolder, constants.ligandTrajectoryFolder)
+        if writeLigandTrajectory and not os.path.exists(ligand_trajs_folder):
+            os.makedirs(ligand_trajs_folder)
         writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, protein_CA)
         if not non_Repeat:
             print "Repeating snapshots from folder %s" % folder_it
