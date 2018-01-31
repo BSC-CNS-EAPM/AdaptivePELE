@@ -24,15 +24,15 @@ toOmit = ["tests", "runAllTests.py", "os", "sys", "TODO.txt", "Data", "Documents
 files = glob.glob("*")
 
 destFolder = os.path.join(releaseFolder, releaseName, "AdaptivePELE", "%s")
+print destFolder
 for filename in files:
-    print filename
     if filename in toOmit or filename.startswith(".") or filename.endswith("pyc"):
         continue
     print "Copying", filename
     try:
         if not os.path.exists(destFolder % filename):
             shutil.copytree(filename, destFolder % filename)
-    except OSError:
+    except (IOError, OSError):
         shutil.copyfile(filename, destFolder % filename)
 
 extraFiles = ["../README.rst", "../setup.py"]
