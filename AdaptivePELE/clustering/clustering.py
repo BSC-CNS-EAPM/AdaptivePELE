@@ -278,8 +278,8 @@ class AltStructures:
 
         """
         i = 0
-        for priority, subCluster in self.altStructPQ:
-            isSimilar, distance = similarityEvaluator.isElement(PDB, subCluster, resname, resnum, resChain, contactThreshold)
+        for _, subCluster in self.altStructPQ:
+            _, distance = similarityEvaluator.isElement(PDB, subCluster, resname, resnum, resChain, contactThreshold)
             if distance < subCluster.threshold/2.0:
                 subCluster.addElement([])
                 del self.altStructPQ[i]
@@ -490,6 +490,10 @@ class Cluster:
 
 
 class ClusteringEvaluator:
+    def __init__(self):
+        self.contactMap = None
+        self.contacts = None
+
     def cleanContactMap(self):
         """
             Clean the attributes to prepare for next iteration
@@ -861,31 +865,30 @@ class Clustering:
         utilities.makeFolder(outputPath)
 
         summaryFilename = os.path.join(outputPath, "summary.txt")
-        summaryFile = open(summaryFilename, 'w')
-        summaryFile.write("#cluster size degeneracy contacts threshold density metric\n")
+        with open(summaryFilename, 'w') as summaryFile:
+            summaryFile.write("#cluster size degeneracy contacts threshold density metric\n")
 
-        for i, cluster in enumerate(self.clusters.clusters):
-            if writeAll:
-                outputFilename = "cluster_%d.pdb" % i
-                outputFilename = os.path.join(outputPath, outputFilename)
-                cluster.writePDB(outputFilename)
+            for i, cluster in enumerate(self.clusters.clusters):
+                if writeAll:
+                    outputFilename = "cluster_%d.pdb" % i
+                    outputFilename = os.path.join(outputPath, outputFilename)
+                    cluster.writePDB(outputFilename)
 
-            metric = cluster.getMetric()
-            if metric is None:
-                writeString = "%d %d %d %.2f %.4f %.1f -\n" % (i, cluster.elements,
-                                                               degeneracy[i],
-                                                               cluster.contacts,
-                                                               cluster.threshold,
-                                                               cluster.density)
-            else:
-                writeString = "%d %d %d %.2f %.4f %.1f %.3f\n" % (i, cluster.elements,
-                                                                  degeneracy[i],
-                                                                  cluster.contacts,
-                                                                  cluster.threshold,
-                                                                  cluster.density or 1.0,
-                                                                  metric)
-            summaryFile.write(writeString)
-        summaryFile.close()
+                metric = cluster.getMetric()
+                if metric is None:
+                    writeString = "%d %d %d %.2f %.4f %.1f -\n" % (i, cluster.elements,
+                                                                   degeneracy[i],
+                                                                   cluster.contacts,
+                                                                   cluster.threshold,
+                                                                   cluster.density)
+                else:
+                    writeString = "%d %d %d %.2f %.4f %.1f %.3f\n" % (i, cluster.elements,
+                                                                      degeneracy[i],
+                                                                      cluster.contacts,
+                                                                      cluster.threshold,
+                                                                      cluster.density or 1.0,
+                                                                      metric)
+                summaryFile.write(writeString)
 
         with open(outputObject, 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)

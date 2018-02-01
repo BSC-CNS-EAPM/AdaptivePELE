@@ -153,6 +153,8 @@ class SpawningParams:
         self.metricWeights = None
         self.alpha = None
         self.nclusters = None  # number of clusters to consider in epsilon
+        self.period = None
+        self.metricInd = None
 
     def buildSpawningParameters(self, spawningBlock):
         """
@@ -231,9 +233,9 @@ class SpawningCalculator:
 
             :param outputPathConstants: Output constants that depend on the path
             :type outputPathConstants: :py:class:`.OutputPathConstants`
-            :param degeneracyOfRepresentatives: Array with the degeneracy of
+            :param degeneracyOfRepresentatives: List with the degeneracy of
                 each cluster (number of processors that will start from that state)
-            :type degeneracyOfRepresentatives: np.Array
+            :type degeneracyOfRepresentatives: list
             :param clustering: Clustering object
             :type clustering: :py:class:`.Clustering`
             :param iteration: Number of epoch
@@ -409,9 +411,9 @@ class IndependentRunsCalculator(SpawningCalculator):
 
             :param outputPathConstants: Output constants that depend on the path
             :type outputPathConstants: :py:class:`.OutputPathConstants`
-            :param degeneracyOfRepresentatives: Array with the degeneracy of
+            :param degeneracyOfRepresentatives: List with the degeneracy of
                 each cluster (number of processors that will start from that state)
-            :type degeneracyOfRepresentatives: np.Array
+            :type degeneracyOfRepresentatives: list
             :param clustering: Clustering object
             :type clustering: :py:class:`.Clustering`
             :param iteration: Number of epoch
@@ -563,7 +565,7 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         self.degeneracyMetricProportional = self.divideProcessorsMetricProportional(clusters, trajToMetricProportional, spawningParams)
 
         self.degeneracyTotal = np.array(self.degeneracyInverselyProportional) + np.array(self.degeneracyMetricProportional)
-        return self.degeneracyTotal
+        return self.degeneracyTotal.tolist()
 
     def divideProcessorsMetricProportional(self, clusters, trajToDistribute, spawningParams):
         """
@@ -930,6 +932,8 @@ class REAPCalculator(SpawningCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.REAP
         self.weights = None
         self.metricInd = None
+        self.rewards = None
+        self.degeneracy = None
         # constraints so the weights have values between 0 and 1
         self.cons = ({'type': 'eq', 'fun': lambda x: np.array(x.sum()-1)})
         self.bounds = None
@@ -956,7 +960,7 @@ class REAPCalculator(SpawningCalculator):
                 self.metricInd = range(3, clusters[0].metrics.size)
             else:
                 self.metricInd = spawningParams.metricInd
-            self.bounds = [(0,1)]*len(self.metricInd)
+            self.bounds = [(0, 1)]*len(self.metricInd)
 
         # Gather population and metrics data for all clusters
         for cluster in clusters:
@@ -974,10 +978,6 @@ class REAPCalculator(SpawningCalculator):
         # energy ~ 10**2 while SASA <= 1)
         rewProv = np.abs(metrics-meanRew[:, np.newaxis])/stdRew[:, np.newaxis]
 
-        # constraints so the weights have values between 0 and 1
-        cons = ({'type': 'eq', 'fun': lambda x: np.array(x.sum()-1)})
-        bounds = [(0, 1)]*len(self.metricInd)
-
         if self.weights is None:
             self.weights = np.ones(len(self.metricInd))/len(self.metricInd)
         else:
@@ -987,7 +987,7 @@ class REAPCalculator(SpawningCalculator):
             self.weights = optimResult.x
         self.rewards = (self.weights[:, np.newaxis]*rewProv).sum(axis=0)
         self.degeneracy[argweights[:trajToDivide]] = self.divideProportionalToArray(self.rewards, trajToDivide)
-        return self.degeneracy
+        return self.degeneracy.tolist()
 
     def log(self):
         """

@@ -85,7 +85,6 @@ def mergeFilteredClustersAccordingToBox(degeneracy, clustersFiltering):
     """
     assert len(degeneracy) == sum(clustersFiltering)
     newDegeneracy = []
-    degeneracy = degeneracy.tolist()
     for filtered in clustersFiltering:
         if filtered:
             newDegeneracy.append(degeneracy.pop(0))
