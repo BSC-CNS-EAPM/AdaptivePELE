@@ -525,6 +525,9 @@ class MetricMultipleTrajsExitCondition:
         """
         for j in range(1, self.nProcessors):
             report = np.loadtxt(os.path.join(outputFolder, self.report % j))
+            if len(report.shape) < 2:
+                # If a report has only one line, add another axis
+                report = report[None]
             if self.condition(report[:, self.metricCol], self.metricValue):
                 self.trajsFound += 1
         return self.trajsFound >= self.numTrajs
