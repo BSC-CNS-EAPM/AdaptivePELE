@@ -224,6 +224,7 @@ def getReportAndTrajectoryWildcard(JSONdict):
     reportWildcard = '_%d'.join(os.path.splitext(reportWildcard))
     return reportWildcard, trajWildcard
 
+
 def getPELEControlFileDict(templetizedControlFile):
     """
         Parse a PELE control file into a python dictionary
@@ -235,3 +236,26 @@ def getPELEControlFileDict(templetizedControlFile):
     templateNames = {ele[1]: '"$%s"' % ele[1] for ele in string.Template.pattern.findall(peleControlFile)}
     templateNames.pop("OUTPUT_PATH", None)
     return json.loads(string.Template(peleControlFile).safe_substitute(templateNames)), templateNames
+
+
+def getMetricsFromReportsInEpoch(reportName, outputFolder, nTrajs):
+    """
+        Extract the metrics in report file from an epoch to a numpy array
+    """
+    metrics = []
+    for i in xrange(1, nTrajs):
+        report = np.loadtxt(os.path.join(outputFolder, "%s_%d" % (reportName, i)))
+        if len(report.shape) < 2:
+            metrics.append(report+[i, 0])
+        else:
+            traj_line = np.array([i] * report.shape[0])
+            snapshot_line = np.array(range(report.shape[0]))
+            metrics.extend(np.hstack((report, traj_line[:, np.newaxis], snapshot_line[:, np.newaxis])))
+    return np.array(metrics)
+
+
+def getSASAcolumnFromControlFile(JSONdict):
+    for i, metricBlock in enumerate(JSONdict["commands"][0]["PeleTasks"][0]['metrics']):
+        if 'sasa' in metricBlock['type'].lower():
+            return i
+    raise ValueError("No SASA metric found in control file!!! Please add it in order to use the moving box feature")

@@ -31,6 +31,10 @@ class SimulationParameters:
         self.destination = None
         self.origin = None
         self.equilibrationMode = ""
+        self.SASAforBox = None
+        self.columnSASA = None
+        self.reportName = None
+        self.trajectoryName = None
 
 
 class SimulationRunner:
@@ -145,6 +149,43 @@ class PeleSimulation(SimulationRunner):
             os.system("ln -s " + self.parameters.dataFolder + " Data")
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.documentsFolder + " Documents")
+
+    def getNextIterationBox(self, clusteringObject, outputFolder, resname):
+        """
+            Select the box for the next epoch, currently selecting the COM of
+            the cluster with max SASA
+
+            :param clusteringObject: Clustering object
+            :type clusteringObject: :py:class:`.Clustering`
+            :param outputFolder: Folder to the trajectories
+            :type outputFolder: str
+            :param resname: Name of the ligand in the pdb
+            :type resname: str
+
+            :returns str: -- string to be substitued in PELE control file
+        """
+        metrics = utilities.getMetricsFromReportsInEpoch(self.parameters.reportName, outputFolder, self.parameters.processors)
+        if self.parameters.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxBinding:
+            SASAcluster = np.argmin(metrics[:, self.parameters.columnSASA])
+            if metrics[SASAcluster, self.parameters.columnSASA] < self.parameters.SASAforBox:
+                self.parameters.SASAforBox = metrics[SASAcluster, self.parameters.columnSASA]
+            else:
+                return
+        elif self.parameters.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxUnBinding:
+            SASAcluster = np.argmax(metrics[:, self.parameters.columnSASA])
+            if metrics[SASAcluster, self.parameters.columnSASA] > self.parameters.SASAforBox:
+                self.parameters.SASAforBox = metrics[SASAcluster, self.parameters.columnSASA]
+            else:
+                return
+        else:
+            raise ValueError("%s should be either binding or unbinding, but %s is provided!!!" % (blockNames.SimulationParams.modeMovingBox, self.parameters.modeMovingBox))
+        trajNum = metrics[SASAcluster, -2]
+        snapshotNum = metrics[SASAcluster, -1]
+        snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum))[snapshotNum]
+        snapshotPDB = atomset.PDB()
+        snapshotPDB.initialise(snapshot, resname=resname)
+        self.parameters.boxCenter = str(snapshotPDB.getCOM())
+        return
 
     def selectInitialBoxCenter(self, initialStructuresAsString, resname):
         """
@@ -558,6 +599,14 @@ class RunnerBuilder:
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
             params.modeMovingBox = paramsBlock.get(blockNames.SimulationParams.modeMovingBox)
+            if params.modeMovingBox is not None:
+                if params.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxBinding:
+                    params.SASAforBox = 1.0
+                elif params.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxUnBinding:
+                    params.SASAforBox = 0.0
+                peleDict = utilities.getPELEControlFileDict(params.templetizedControlFile)
+                params.reportName, params.trajectoryName = utilities.getReportAndTrajectoryWildcard(peleDict)
+                params.columnSASA = utilities.getSASAcolumnFromControlFile(peleDict)
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             params.runEquilibration = paramsBlock.get(blockNames.SimulationParams.runEquilibration, False)

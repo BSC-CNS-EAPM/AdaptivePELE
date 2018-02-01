@@ -93,42 +93,6 @@ def mergeFilteredClustersAccordingToBox(degeneracy, clustersFiltering):
     return np.array(newDegeneracy)
 
 
-def getNextIterationBox(clusteringObject, simulationRunnerParams):
-    """
-        Select the box for the next epoch, currently selecting the COM of
-        the cluster with max SASA
-
-        :param clusteringObject: Clustering object
-        :type clusteringObject: :py:class:`.Clustering`
-        :param simulationRunnerParams: :py:class:`.SimulationParameters` Simulation parameters object
-        :type simulationRunnerParams: :py:class:`.SimulationParameters`
-
-        :returns str: -- string to be substitued in PELE control file
-    """
-    metrics = []
-    for cluster in clusteringObject.clusters.clusters:
-        metrics.append(cluster.metrics[3:])
-    if len(metrics) == 0:
-        raise ValueError("No cluster metrics found!!")
-    metrics = np.array(metrics)
-    maxMetrics = metrics.max(axis=0)
-    minMetrics = metrics.min(axis=0)
-    possibleSASACols = [i for i in xrange(metrics.shape[1]) if maxMetrics[i] < 1.05 and minMetrics[i] >= 0]
-    if len(possibleSASACols) == 0:
-        raise ValueError("No possible SASA identified in metrics, please check"
-                         " that SASA is computed in your simulation!!!!")
-    elif len(possibleSASACols) > 1:
-        print "WARNING! More than one possible SASA column is present!!"
-    columnSASA = possibleSASACols[0]
-    if simulationRunnerParams.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxBinding:
-        SASAcluster = np.argmin(metrics[:, columnSASA])
-    elif simulationRunnerParams.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxUnBinding:
-        SASAcluster = np.argmax(metrics[:, columnSASA])
-    else:
-        raise ValueError("%s should be either binding or unbinding, but %s is provided!!!" % (blockNames.SimulationParams.modeMovingBox, simulationRunnerParams.modeMovingBox))
-    return str(clusteringObject.getCluster(SASAcluster).pdb.getCOM())
-
-
 def expandInitialStructuresWildcard(initialStructuresWildcard):
     """
         Returns the initial structures after expanding the initial structures wildcard
@@ -629,7 +593,7 @@ def main(jsonParams):
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
         if simulationRunner.parameters.modeMovingBox is not None:
-            simulationRunner.parameters.boxCenter = getNextIterationBox(clusteringMethod, simulationRunner.parameters)
+            simulationRunner.getNextIterationBox(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i, resname)
             clustersList, clustersFiltered = filterClustersAccordingToBox(simulationRunner.parameters, clusteringMethod)
         else:
             clustersList = clusteringMethod.clusters.clusters
