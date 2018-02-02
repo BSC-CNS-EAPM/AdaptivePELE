@@ -117,6 +117,9 @@ class ConformationNetwork:
     def __setstate__(self, state):
         # Restore instance attributes
         self.network = state['network']
+        if NETWORK and int(nx.__version__.split(".")[0]) > 1 and 'adj' in self.network.__dict__:
+            for attr in ['node', 'adj', 'graph', 'pred', 'succ']:
+                self.network.__dict__["_"+attr] = self.network.__dict__.pop(attr)
 
     def add_node(self, node, **kwargs):
         """
@@ -171,7 +174,7 @@ class ConformationNetwork:
             sys.stderr.write("Package networkx not found! Could not write network\n")
             return
         with open(path, "w") as fw:
-            for node, data in self.network.nodes_iter(data=True):
+            for node, data in self.network.nodes(data=True):
                 if data['parent'] != 'root':
                     fw.write("%d\t%d\n" % (data['parent'], node))
 
@@ -838,7 +841,7 @@ class Clustering:
                                    " which in turn is usually caused by some problem in writing the files, e.g. quota")
 
                         # raise a new exception of the same type, with the same
-                        # traceback but with and added message
+                        # traceback but with an added message
                         raise type(e), type(e)(str(e) + message), sys.exc_info()[2]
             else:
                 for num, snapshot in enumerate(snapshots):
@@ -994,25 +997,33 @@ class Clustering:
             for i, cluster in enumerate(self.clusters.clusters):
                 f.write("%d\t%d\n" % (i, cluster.elements))
 
-    def getOptimalMetric(self, column=None):
+    def getOptimalMetric(self, column=None, simulationType="min"):
         """
             Find the cluster with the best metric
 
             :param column: Column of the metric that defines the best cluster,
                 if not specified, the cluster metric is chosen
             :type column: int
+            :param simulationType: Define optimal metric as the maximum or minimum, max or min
+            :type simulationType: str
+
             :returns: int -- Number of cluster with the optimal metric
         """
-        optimalMetric = 100
-        optimalMetricIndex = 0
+        metrics = []
         for i, cluster in enumerate(self.clusters.clusters):
             if column is None:
                 metric = cluster.getMetric()
             else:
                 metric = cluster.getMetricFromColumn(column)
-            if metric < optimalMetric:
-                optimalMetric = metric
-                optimalMetricIndex = i
+            metrics.append(metric)
+
+        if simulationType.lower() == "min":
+            optimalMetricIndex = np.argmin(metrics)
+        elif simulationType.lower() == "max":
+            optimalMetricIndex = np.argmax(metrics)
+        else:
+            raise ValueError("Unrecognized type simulation parameter!!! Possible values are max or min")
+
         return optimalMetricIndex
 
     def writePathwayTrajectory(self, pathway, filename):
@@ -1024,24 +1035,23 @@ class Clustering:
             :param filename: Path where to write the trajectory
             :type filename: str
         """
-        pathwayFile = open(filename, "w")
-        pathwayFile.write("REMARK 000 File created using PELE++\n")
-        pathwayFile.write("REMARK 000 Pathway trajectory created using the FDT\n")
-        pathwayFile.write("REMARK 000 List of cluster belonging to the pathway %s\n" % ' '.join(map(str, pathway)))
-        for i, step_cluster in enumerate(pathway):
-            cluster = self.clusters.clusters[step_cluster]
-            pathwayFile.write("MODEL %d\n" % (i+1))
-            pdbStr = cluster.pdb.pdb
-            pdbList = pdbStr.split("\n")
-            for line in pdbList:
-                line = line.strip()
-                # Avoid writing previous REMARK block
-                if line.startswith("REMARK ") or line.startswith("MODEL ") or line == "END":
-                    continue
-                elif line:
-                    pathwayFile.write(line+"\n")
-            pathwayFile.write("ENDMDL\n")
-        pathwayFile.close()
+        with open(filename, "w") as pathwayFile:
+            pathwayFile.write("REMARK 000 File created using PELE++\n")
+            pathwayFile.write("REMARK 000 Pathway trajectory created using the FDT\n")
+            pathwayFile.write("REMARK 000 List of cluster belonging to the pathway %s\n" % ' '.join(map(str, pathway)))
+            for i, step_cluster in enumerate(pathway):
+                cluster = self.clusters.clusters[step_cluster]
+                pathwayFile.write("MODEL %d\n" % (i+1))
+                pdbStr = cluster.pdb.pdb
+                pdbList = pdbStr.split("\n")
+                for line in pdbList:
+                    line = line.strip()
+                    # Avoid writing previous REMARK block
+                    if line.startswith("REMARK ") or line.startswith("MODEL ") or line == "END":
+                        continue
+                    elif line:
+                        pathwayFile.write(line+"\n")
+                pathwayFile.write("ENDMDL\n")
 
     def writePathwayOptimalCluster(self, filename):
         """
