@@ -3,6 +3,7 @@ import sys
 import argparse
 from AdaptivePELE.utilities import utilities
 import matplotlib.pyplot as plt
+plt.style.use("ggplot")
 
 
 def parseArguments():
@@ -12,12 +13,14 @@ def parseArguments():
     parser.add_argument("suffix", type=str, help="Suffix to append to file names")
     parser.add_argument("metricCol", type=int, help="Column of the metric of interest")
     parser.add_argument("-o", type=str, default=None, help="Output path where to write the files")
+    parser.add_argument("-c", "--cond", type=str, default="min", help="Condition on the metric optimality, options are max or min")
+    parser.add_argument("-b", "--bindEn", type=int, default=None, help="Column of the binding energy in the report file")
     args = parser.parse_args()
-    return args.clusteringObject, args.suffix, args.metricCol, args.o
+    return args.clusteringObject, args.suffix, args.metricCol, args.o, args.cond, args.bindEn
 
 
 if __name__ == "__main__":
-    clusteringObject, suffix, metricCol, outputPath = parseArguments()
+    clusteringObject, suffix, metricCol, outputPath, metricOptimization, bindingEnergy = parseArguments()
     if outputPath is not None:
         outputPath = os.path.join(outputPath, "")
         if not os.path.exists(outputPath):
@@ -29,7 +32,7 @@ if __name__ == "__main__":
     if cl.conformationNetwork is None:
         sys.exit("Clustering object loaded has no conformation network!!")
     conf = cl.conformationNetwork
-    optimalCluster = cl.getOptimalMetric(4)
+    optimalCluster = cl.getOptimalMetric(metricCol, simulationType=metricOptimization)
     pathway = conf.createPathwayToCluster(optimalCluster)
     if not os.path.exists(outputPath+"conformationNetwork%s.edgelist" % suffix):
         sys.stderr.write("Writing conformation network...\n")
@@ -47,11 +50,12 @@ if __name__ == "__main__":
     if not os.path.exists(outputPath+"nodesMetric%s.txt" % suffix):
         sys.stderr.write("Writing nodes metrics...\n")
         cl.writeClusterMetric(outputPath+"nodesMetric%s.txt" % suffix, metricCol)
-    plt.figure()
-    plt.plot(pathway, [cl.clusters.clusters[i].getMetricFromColumn(5) for i in pathway])
-    plt.xlabel("Cluster number")
-    plt.ylabel("Binding energy(kcal/mol)")
-    plt.savefig(outputPath+"bindingEnergy_%s.png" % suffix)
+    if bindingEnergy is not None:
+        plt.figure()
+        plt.plot(pathway, [cl.clusters.clusters[i].getMetricFromColumn(bindingEnergy) for i in pathway])
+        plt.xlabel("Cluster number")
+        plt.ylabel("Binding energy(kcal/mol)")
+        plt.savefig(outputPath+"bindingEnergy_%s.png" % suffix)
     plt.figure()
     plt.plot(pathway, [cl.clusters.clusters[i].contacts for i in pathway])
     plt.xlabel("Cluster number")
