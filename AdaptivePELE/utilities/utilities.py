@@ -244,7 +244,7 @@ def getMetricsFromReportsInEpoch(reportName, outputFolder, nTrajs):
     """
     metrics = []
     for i in xrange(1, nTrajs):
-        report = np.loadtxt(os.path.join(outputFolder, "%s_%d" % (reportName, i)))
+        report = np.loadtxt(os.path.join(outputFolder, reportName % i))
         if len(report.shape) < 2:
             metrics.append(report+[i, 0])
         else:
@@ -257,5 +257,7 @@ def getMetricsFromReportsInEpoch(reportName, outputFolder, nTrajs):
 def getSASAcolumnFromControlFile(JSONdict):
     for i, metricBlock in enumerate(JSONdict["commands"][0]["PeleTasks"][0]['metrics']):
         if 'sasa' in metricBlock['type'].lower():
-            return i
+            # Report files have 4 fixed columnts, task, steps, accepted steps
+            # and energy
+            return i+4
     raise ValueError("No SASA metric found in control file!!! Please add it in order to use the moving box feature")

@@ -179,9 +179,11 @@ class PeleSimulation(SimulationRunner):
                 return
         else:
             raise ValueError("%s should be either binding or unbinding, but %s is provided!!!" % (blockNames.SimulationParams.modeMovingBox, self.parameters.modeMovingBox))
+        # If this lines are reached then a new extreme SASA value was
+        # identified and we proceed to extract the corresponding center of mass
         trajNum = metrics[SASAcluster, -2]
         snapshotNum = metrics[SASAcluster, -1]
-        snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum))[snapshotNum]
+        snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum))[int(snapshotNum)]
         snapshotPDB = atomset.PDB()
         snapshotPDB.initialise(snapshot, resname=resname)
         self.parameters.boxCenter = str(snapshotPDB.getCOM())
@@ -604,7 +606,7 @@ class RunnerBuilder:
                     params.SASAforBox = 1.0
                 elif params.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxUnBinding:
                     params.SASAforBox = 0.0
-                peleDict = utilities.getPELEControlFileDict(params.templetizedControlFile)
+                peleDict, _ = utilities.getPELEControlFileDict(params.templetizedControlFile)
                 params.reportName, params.trajectoryName = utilities.getReportAndTrajectoryWildcard(peleDict)
                 params.columnSASA = utilities.getSASAcolumnFromControlFile(peleDict)
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
