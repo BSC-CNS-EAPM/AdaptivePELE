@@ -48,6 +48,9 @@ class SpawningParams:
         "inverselyProportional": {
             "reportFilename": "basestring"
         },
+        "null": {
+            "reportFilename": "basestring"
+        },
         "epsilon": {
             "epsilon": "numbers.Real",
             "reportFilename": "basestring",

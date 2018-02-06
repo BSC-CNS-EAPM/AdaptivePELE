@@ -602,10 +602,13 @@ def main(jsonParams):
         degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.parameters.processors-1, spawningParams, i)
         spawningCalculator.log()
 
-        if simulationRunner.parameters.modeMovingBox is not None:
-            degeneracyOfRepresentatives = mergeFilteredClustersAccordingToBox(degeneracyOfRepresentatives, clustersFiltered)
-        print "Degeneracy", degeneracyOfRepresentatives
-        assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)
+        if degeneracyOfRepresentatives is not None:
+            # When using null spawning the calculate method returns None
+            assert spawningCalculator.type == spawningTypes.SPAWNING_TYPES.null, "calculate returned None with spawning type %s" % spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]
+            if simulationRunner.parameters.modeMovingBox is not None:
+                degeneracyOfRepresentatives = mergeFilteredClustersAccordingToBox(degeneracyOfRepresentatives, clustersFiltered)
+            print "Degeneracy", degeneracyOfRepresentatives
+            assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
@@ -621,10 +624,11 @@ def main(jsonParams):
 
         # Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:
-            numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1)
-            simulationRunner.updateMappingProcessors(procMapping)
-            initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
-            peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
+            if degeneracyOfRepresentatives is not None:
+                numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1)
+                simulationRunner.updateMappingProcessors(procMapping)
+                initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
+                peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
 
         if clusteringMethod.symmetries and nativeStructure:
             fixReportsSymmetry(outputPathConstants.epochOutputPathTempletized % i, resname,

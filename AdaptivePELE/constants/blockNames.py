@@ -58,6 +58,7 @@ class StringSpawningTypes:
     variableEpsilon = "variableEpsilon"
     UCB = "UCB"
     REAP = "REAP"
+    null = "null"
 
 
 class SpawningParams:
