@@ -1,15 +1,5 @@
 Behavior changes from previous version:
-    *) Added scripts plot3DNetwork, plotSpawningClusters for better
-    visualization of simulations
-    *) Moved buildRevTransitionMatrixFunction to Cython code (speed-up of up to
-    500x)
-    *) Added exitContinuous density for exit path simulations
-    *) Added possibility to change the simulation box at each epoch
-    *) Added equilibration procedure
-    *) Added possibility to test metric greater than in metric exit condition
-    *) Added metricMultipleTrajectories exit condition
+    *) Added null spawning calculator
 
 Bug fixes:
-    *) Fixed minor bug in controlFileValidator
-    *) Fixed bug in writePrecisePathToSnapshot, where backtracking was not
-    carried out until the initial structure
+    *) Various bug fixes

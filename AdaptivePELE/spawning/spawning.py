@@ -131,6 +131,8 @@ class SpawningBuilder:
             spawningCalculator = UCBCalculator(densityCalculator)
         elif spawningTypeString == blockNames.StringSpawningTypes.REAP:
             spawningCalculator = REAPCalculator()
+        elif spawningTypeString == blockNames.StringSpawningTypes.null:
+            spawningCalculator = NullSpawningCalculator()
         else:
             sys.exit("Unknown spawning type! Choices are: " + str(spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
         return spawningCalculator
@@ -999,3 +1001,26 @@ class REAPCalculator(SpawningCalculator):
         print self.metricInd
         print "Spawning weights"
         print self.weights
+
+
+class NullSpawningCalculator(SpawningCalculator):
+    def __init__(self):
+        self.type = spawningTypes.SPAWNING_TYPES.null
+
+    def calculate(self, clusters, trajToDivide, spawningParams, currentEpoch=None):
+        """
+            Calculate the degeneracy of the clusters. In this particular class
+            no spawning is performed, so this function just returns None
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param spawningParams: Object containing the parameters of the spawning
+            :type spawningParams: :py:class:`.SpawningParams`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: None
+        """
+        return None
