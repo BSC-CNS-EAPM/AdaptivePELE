@@ -246,7 +246,7 @@ def getMetricsFromReportsInEpoch(reportName, outputFolder, nTrajs):
     for i in xrange(1, nTrajs):
         report = np.loadtxt(os.path.join(outputFolder, reportName % i))
         if len(report.shape) < 2:
-            metrics.append(report+[i, 0])
+            metrics.append(report.tolist()+[i, 0])
         else:
             traj_line = np.array([i] * report.shape[0])
             snapshot_line = np.array(range(report.shape[0]))

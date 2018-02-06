@@ -567,7 +567,8 @@ def main(jsonParams):
         if simulationRunner.parameters.runEquilibration:
             initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningParams.reportFilename, outputPath, resname)
         clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner)
-    peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps}
+    peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps, 
+                                 "BOX_RADIUS": simulationRunner.parameters.boxRadius}
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
 
