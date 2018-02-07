@@ -879,18 +879,20 @@ class Clustering:
 
                 metric = cluster.getMetric()
                 if metric is None:
-                    writeString = "%d %d %d %.2f %.4f %.1f -\n" % (i, cluster.elements,
-                                                                   degeneracy[i],
-                                                                   cluster.contacts,
-                                                                   cluster.threshold,
-                                                                   cluster.density)
+                    metric = "-"
                 else:
-                    writeString = "%d %d %d %.2f %.4f %.1f %.3f\n" % (i, cluster.elements,
-                                                                      degeneracy[i],
-                                                                      cluster.contacts,
-                                                                      cluster.threshold,
-                                                                      cluster.density or 1.0,
-                                                                      metric)
+                    metric = "%.3f" % metric
+                degeneracy_cluster = 0
+                if degeneracy is not None:
+                    # degeneracy will be None if null spawning is used
+                    degeneracy_cluster = degeneracy[i]
+
+                writeString = "%d %d %d %.2f %.4f %.1f %s\n" % (i, cluster.elements,
+                                                                degeneracy_cluster,
+                                                                cluster.contacts,
+                                                                cluster.threshold,
+                                                                cluster.density or 1.0,
+                                                                metric)
                 summaryFile.write(writeString)
 
         with open(outputObject, 'wb') as f:
