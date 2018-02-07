@@ -603,12 +603,13 @@ def main(jsonParams):
         spawningCalculator.log()
 
         if degeneracyOfRepresentatives is not None:
-            # When using null spawning the calculate method returns None
-            assert spawningCalculator.type == spawningTypes.SPAWNING_TYPES.null, "calculate returned None with spawning type %s" % spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]
             if simulationRunner.parameters.modeMovingBox is not None:
                 degeneracyOfRepresentatives = mergeFilteredClustersAccordingToBox(degeneracyOfRepresentatives, clustersFiltered)
             print "Degeneracy", degeneracyOfRepresentatives
             assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)
+        else:
+            # When using null spawning the calculate method returns None
+            assert spawningCalculator.type == spawningTypes.SPAWNING_TYPES.null, "calculate returned None with spawning type %s" % spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
