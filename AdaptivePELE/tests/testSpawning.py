@@ -146,6 +146,28 @@ class TestSpawningCalculator(unittest.TestCase):
         golden = np.array([6, 4, 4, 2])
         np.testing.assert_array_equal(degeneracy, golden)
 
+    def testEpsilonCalculatorwithMaxValues(self):
+        epsilon = spawning.EpsilonDegeneracyCalculator()
+        params = spawning.SpawningParams()
+        params.epsilon = 0.5
+        params.metricWeights = "linear"
+        params.nclusters = 100
+        params.condition = "max"
+
+        clusters = clustering.Clusters()
+        sizes = [6, 2, 3, 1]
+        energies = [-4, -2, -2, -1]
+        for size, energy in zip(sizes, energies):
+            cluster = clustering.Cluster(None, None, None, None, metricCol=0)
+            cluster.elements = size
+            cluster.metrics = [energy]
+            clusters.addCluster(cluster)
+
+        trajs = 20
+        degeneracy = epsilon.calculate(clusters.clusters, trajs, params)
+        golden = np.array([1, 5, 5, 9])
+        np.testing.assert_array_equal(degeneracy, golden)
+
     def testSameWeightDegeneracyCalculator(self):
         sameWeightDegCalculator = spawning.SameWeightDegeneracyCalculator()
         params = None
