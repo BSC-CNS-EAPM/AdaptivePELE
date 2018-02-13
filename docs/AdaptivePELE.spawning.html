@@ -348,7 +348,7 @@ case is always one</p>
 
 <dl class="class">
 <dt id="AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.spawning.spawning.</code><code class="descname">EpsilonDegeneracyCalculator</code><span class="sig-paren">(</span><em>densityCalculator=&lt;AdaptivePELE.spawning.densitycalculator.NullDensityCalculator instance&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#EpsilonDegeneracyCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">AdaptivePELE.spawning.spawning.</code><code class="descname">EpsilonDegeneracyCalculator</code><span class="sig-paren">(</span><em>densityCalculator=&lt;AdaptivePELE.spawning.densitycalculator.NullDensityCalculator instance&gt;</em>, <em>condition='min'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#EpsilonDegeneracyCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.DensitySpawningCalculator" title="AdaptivePELE.spawning.spawning.DensitySpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.DensitySpawningCalculator</span></code></a></p>
 <p>It uses epsilon * numTraj trajectories proportional to their energy and the rest inversely proportional to each cluster’s population
 We only consider the nclusters with best metric</p>
@@ -500,7 +500,7 @@ each cluster</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Output constants that depend on the path</li>
-<li><strong>degeneracyOfRepresentatives</strong> (<em>np.Array</em>) – Array with the degeneracy of
+<li><strong>degeneracyOfRepresentatives</strong> (<em>list</em>) – List with the degeneracy of
 each cluster (number of processors that will start from that state)</li>
 <li><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
 <li><strong>iteration</strong> (<em>int</em>) – Number of epoch</li>
@@ -548,6 +548,36 @@ snapshot from which the trajectories will start in the next iteration</p>
 <dt id="AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator.log">
 <code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#InverselyProportionalToPopulationCalculator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator.log" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log spawning information</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AdaptivePELE.spawning.spawning.NullSpawningCalculator">
+<em class="property">class </em><code class="descclassname">AdaptivePELE.spawning.spawning.</code><code class="descname">NullSpawningCalculator</code><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#NullSpawningCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.NullSpawningCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.SpawningCalculator</span></code></a></p>
+<dl class="method">
+<dt id="AdaptivePELE.spawning.spawning.NullSpawningCalculator.calculate">
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDivide</em>, <em>spawningParams</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#NullSpawningCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.NullSpawningCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the degeneracy of the clusters. In this particular class
+no spawning is performed, so this function just returns None</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) – Object containing the parameters of the spawning</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -825,7 +855,7 @@ each cluster</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Output constants that depend on the path</li>
-<li><strong>degeneracyOfRepresentatives</strong> (<em>np.Array</em>) – Array with the degeneracy of
+<li><strong>degeneracyOfRepresentatives</strong> (<em>list</em>) – List with the degeneracy of
 each cluster (number of processors that will start from that state)</li>
 <li><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
 <li><strong>iteration</strong> (<em>int</em>) – Number of epoch</li>
@@ -1103,6 +1133,11 @@ parameters</td>
 <dl class="attribute">
 <dt id="AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.inverselyProportional">
 <code class="descname">inverselyProportional</code><em class="property"> = 1</em><a class="headerlink" href="#AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.inverselyProportional" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.null">
+<code class="descname">null</code><em class="property"> = 9</em><a class="headerlink" href="#AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.null" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

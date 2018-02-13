@@ -384,7 +384,6 @@ There are two types of density calculators:
 
 * **exitContinuous**, which assings decreasing densities for an increasing number of contacts. Default values, if **r** > 1, density = 1/8, otherwise, density = (-4 **r** + 6)^3/64.0
 
-
 parameters
 ..........
 
@@ -397,6 +396,8 @@ parameters
 * **metricWeights** (*string*, default=linear): Selects how to distribute the weights of the cluster according to its metric, two options: linear (proportional to metric) or Boltzmann weigths (proportional to exp(-metric/T). Needs to define the temperature **T**.
 
 * **T** (*float*, default=1000): Temperature, only used for Boltzmann weights
+
+* **condition** (*string*, optional): Selects wether to take into account maximum or minimum values in epsilon related spawning, values are *min* or *max*
 
 The following parameters are mandatory for **variableEpsilon**:
 

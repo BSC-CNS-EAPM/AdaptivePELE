@@ -47,7 +47,9 @@ def getSnapshots(trajectoryFile, verbose=False):
     with open(trajectoryFile, "r") as inputFile:
         inputFileContent = inputFile.read()
 
-    snapshots = inputFileContent.split("ENDMDL")[:-1]
+    snapshots = inputFileContent.split("ENDMDL")
+    if len(snapshots) > 1:
+        snapshots = snapshots[:-1]
     if not verbose:
         return snapshots
 
