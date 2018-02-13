@@ -27,7 +27,7 @@ class SimulationParameters:
         self.boxRadius = 20
         self.modeMovingBox = None
         self.runEquilibration = False
-        self.equilibrationLength = 50
+        self.equilibrationLength = 20
         self.destination = None
         self.origin = None
         self.equilibrationMode = ""
