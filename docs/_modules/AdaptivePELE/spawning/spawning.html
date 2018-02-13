@@ -269,6 +269,8 @@
             <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">UCBCalculator</span><span class="p">(</span><span class="n">densityCalculator</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">spawningTypeString</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">REAP</span><span class="p">:</span>
             <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">REAPCalculator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">spawningTypeString</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">null</span><span class="p">:</span>
+            <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">NullSpawningCalculator</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown spawning type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
         <span class="k">return</span> <span class="n">spawningCalculator</span></div></div>
@@ -291,6 +293,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">metricWeights</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nclusters</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># number of clusters to consider in epsilon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metricInd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">minValue</span>  <span class="c1"># wether to consider min or max values in epsilon</span>
 
 <div class="viewcode-block" id="SpawningParams.buildSpawningParameters"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams.buildSpawningParameters">[docs]</a>    <span class="k">def</span> <span class="nf">buildSpawningParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spawningBlock</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -306,7 +311,8 @@
         <span class="n">spawningType</span> <span class="o">=</span> <span class="n">spawningBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
 
         <span class="c1"># Params general to all</span>
-
+        <span class="c1"># reportFilename is now mandatory for all spawning</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reportFilename</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">report_filename</span><span class="p">]</span>
         <span class="c1"># Params specific to epsilon related spawning</span>
         <span class="k">if</span> <span class="n">spawningType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">epsilon</span> <span class="ow">or</span> \
                 <span class="n">spawningType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">variableEpsilon</span><span class="p">:</span>
@@ -314,6 +320,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">nclusters</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">nclusters</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">metricWeights</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">metricWeights</span><span class="p">,</span>
                                                          <span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">linear</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">condition</span><span class="p">,</span>
+                                                     <span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">minValue</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">spawningType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">epsilon</span> <span class="ow">or</span> \
                 <span class="n">spawningType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">variableEpsilon</span> <span class="ow">or</span>\
@@ -322,7 +330,6 @@
                 <span class="n">spawningType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">UCB</span> <span class="ow">or</span> \
                 <span class="n">spawningType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">REAP</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reportFilename</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">report_filename</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reportCol</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">report_col</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">spawningType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">variableEpsilon</span><span class="p">:</span>
@@ -369,9 +376,9 @@
 
 <span class="sd">            :param outputPathConstants: Output constants that depend on the path</span>
 <span class="sd">            :type outputPathConstants: :py:class:`.OutputPathConstants`</span>
-<span class="sd">            :param degeneracyOfRepresentatives: Array with the degeneracy of</span>
+<span class="sd">            :param degeneracyOfRepresentatives: List with the degeneracy of</span>
 <span class="sd">                each cluster (number of processors that will start from that state)</span>
-<span class="sd">            :type degeneracyOfRepresentatives: np.Array</span>
+<span class="sd">            :type degeneracyOfRepresentatives: list</span>
 <span class="sd">            :param clustering: Clustering object</span>
 <span class="sd">            :type clustering: :py:class:`.Clustering`</span>
 <span class="sd">            :param iteration: Number of epoch</span>
@@ -547,9 +554,9 @@
 
 <span class="sd">            :param outputPathConstants: Output constants that depend on the path</span>
 <span class="sd">            :type outputPathConstants: :py:class:`.OutputPathConstants`</span>
-<span class="sd">            :param degeneracyOfRepresentatives: Array with the degeneracy of</span>
+<span class="sd">            :param degeneracyOfRepresentatives: List with the degeneracy of</span>
 <span class="sd">                each cluster (number of processors that will start from that state)</span>
-<span class="sd">            :type degeneracyOfRepresentatives: np.Array</span>
+<span class="sd">            :type degeneracyOfRepresentatives: list</span>
 <span class="sd">            :param clustering: Clustering object</span>
 <span class="sd">            :type clustering: :py:class:`.Clustering`</span>
 <span class="sd">            :param iteration: Number of epoch</span>
@@ -659,13 +666,14 @@
 <span class="sd">        We only consider the nclusters with best metric</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">(),</span> <span class="n">condition</span><span class="o">=</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">minValue</span><span class="p">):</span>
         <span class="n">DensitySpawningCalculator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inverselyProportionalCalculator</span> <span class="o">=</span> <span class="n">InverselyProportionalToPopulationCalculator</span><span class="p">(</span><span class="n">densityCalculator</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">epsilon</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">degeneracyInverselyProportional</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">degeneracyMetricProportional</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">degeneracyTotal</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">condition</span>
 
     <span class="c1"># TODO add possibility for different pipes</span>
 <div class="viewcode-block" id="EpsilonDegeneracyCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -701,7 +709,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">degeneracyMetricProportional</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">divideProcessorsMetricProportional</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">trajToMetricProportional</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">degeneracyTotal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degeneracyInverselyProportional</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degeneracyMetricProportional</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">degeneracyTotal</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">degeneracyTotal</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="EpsilonDegeneracyCalculator.divideProcessorsMetricProportional"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.divideProcessorsMetricProportional">[docs]</a>    <span class="k">def</span> <span class="nf">divideProcessorsMetricProportional</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -727,11 +735,17 @@
         <span class="c1"># Shift so that differences become larger.</span>
         <span class="c1"># Also, we can now merge positive &amp; negative values</span>
         <span class="c1"># Alternatives: Boltzmann weights</span>
-        <span class="n">maximumValue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
-        <span class="n">shiftedMetrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="n">maximumValue</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">spawningParams</span><span class="o">.</span><span class="n">condition</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">minValue</span><span class="p">:</span>
+            <span class="n">shiftValue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shiftValue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+        <span class="n">shiftedMetrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="n">shiftValue</span><span class="p">)</span>
         <span class="n">bestClusters</span> <span class="o">=</span> <span class="n">shiftedMetrics</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
 
-        <span class="n">shiftedMetrics</span><span class="p">[</span><span class="n">bestClusters</span><span class="p">[</span><span class="n">spawningParams</span><span class="o">.</span><span class="n">nclusters</span><span class="p">:]]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># only consider best ones</span>
+        <span class="k">if</span> <span class="n">spawningParams</span><span class="o">.</span><span class="n">condition</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">minValue</span><span class="p">:</span>
+            <span class="n">shiftedMetrics</span><span class="p">[</span><span class="n">bestClusters</span><span class="p">[</span><span class="n">spawningParams</span><span class="o">.</span><span class="n">nclusters</span><span class="p">:]]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># only consider best ones</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shiftedMetrics</span><span class="p">[</span><span class="n">bestClusters</span><span class="p">[:</span><span class="o">-</span><span class="n">spawningParams</span><span class="o">.</span><span class="n">nclusters</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># only consider best ones</span>
 
         <span class="n">metricWeights</span> <span class="o">=</span> <span class="n">spawningParams</span><span class="o">.</span><span class="n">metricWeights</span>
         <span class="k">if</span> <span class="n">metricWeights</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">linear</span><span class="p">:</span>
@@ -1068,6 +1082,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">REAP</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metricInd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rewards</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">degeneracy</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># constraints so the weights have values between 0 and 1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cons</span> <span class="o">=</span> <span class="p">({</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;eq&#39;</span><span class="p">,</span> <span class="s1">&#39;fun&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">)})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1094,7 +1110,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">metricInd</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">clusters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">metricInd</span> <span class="o">=</span> <span class="n">spawningParams</span><span class="o">.</span><span class="n">metricInd</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metricInd</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metricInd</span><span class="p">)</span>
 
         <span class="c1"># Gather population and metrics data for all clusters</span>
         <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">:</span>
@@ -1112,20 +1128,16 @@
         <span class="c1"># energy ~ 10**2 while SASA &lt;= 1)</span>
         <span class="n">rewProv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metrics</span><span class="o">-</span><span class="n">meanRew</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span><span class="o">/</span><span class="n">stdRew</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
 
-        <span class="c1"># constraints so the weights have values between 0 and 1</span>
-        <span class="n">cons</span> <span class="o">=</span> <span class="p">({</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;eq&#39;</span><span class="p">,</span> <span class="s1">&#39;fun&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">)})</span>
-        <span class="n">bounds</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metricInd</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metricInd</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metricInd</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">optimResult</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">reward</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">rewProv</span><span class="p">,),</span> 
-                                         <span class="n">method</span><span class="o">=</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cons</span><span class="p">,</span> 
+            <span class="n">optimResult</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">reward</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">rewProv</span><span class="p">,),</span>
+                                         <span class="n">method</span><span class="o">=</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cons</span><span class="p">,</span>
                                          <span class="n">bounds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">optimResult</span><span class="o">.</span><span class="n">x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rewards</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span><span class="o">*</span><span class="n">rewProv</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">degeneracy</span><span class="p">[</span><span class="n">argweights</span><span class="p">[:</span><span class="n">trajToDivide</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">divideProportionalToArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rewards</span><span class="p">,</span> <span class="n">trajToDivide</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">degeneracy</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">degeneracy</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="REAPCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.REAPCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1137,6 +1149,29 @@
         <span class="nb">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">metricInd</span>
         <span class="nb">print</span> <span class="s2">&quot;Spawning weights&quot;</span>
         <span class="nb">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span></div></div>
+
+
+<div class="viewcode-block" id="NullSpawningCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.NullSpawningCalculator">[docs]</a><span class="k">class</span> <span class="nc">NullSpawningCalculator</span><span class="p">(</span><span class="n">SpawningCalculator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">null</span>
+
+<div class="viewcode-block" id="NullSpawningCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.NullSpawningCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDivide</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the degeneracy of the clusters. In this particular class</span>
+<span class="sd">            no spawning is performed, so this function just returns None</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+<span class="sd">            :param spawningParams: Object containing the parameters of the spawning</span>
+<span class="sd">            :type spawningParams: :py:class:`.SpawningParams`</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+
+<span class="sd">            :returns: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span></div></div>
 </pre></div>
 
            </div>

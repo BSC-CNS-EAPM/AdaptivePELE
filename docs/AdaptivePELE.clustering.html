@@ -590,16 +590,21 @@ considered in contact(default 8)</li>
 
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.Clustering.getOptimalMetric">
-<code class="descname">getOptimalMetric</code><span class="sig-paren">(</span><em>column=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.getOptimalMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.getOptimalMetric" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getOptimalMetric</code><span class="sig-paren">(</span><em>column=None</em>, <em>simulationType='min'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.getOptimalMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.getOptimalMetric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the cluster with the best metric</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>column</strong> (<em>int</em>) – Column of the metric that defines the best cluster,
-if not specified, the cluster metric is chosen</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>column</strong> (<em>int</em>) – Column of the metric that defines the best cluster,
+if not specified, the cluster metric is chosen</li>
+<li><strong>simulationType</strong> (<em>str</em>) – Define optimal metric as the maximum or minimum, max or min</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – Number of cluster with the optimal metric</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Number of cluster with the optimal metric</p>
+</td>
 </tr>
 </tbody>
 </table>

@@ -387,6 +387,29 @@ file for equilibration runs</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.getNextIterationBox">
+<code class="descname">getNextIterationBox</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>outputFolder</em>, <em>resname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.getNextIterationBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getNextIterationBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select the box for the next epoch, currently selecting the COM of
+the cluster with max SASA</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
+<li><strong>outputFolder</strong> (<em>str</em>) – Folder to the trajectories</li>
+<li><strong>resname</strong> (<em>str</em>) – Name of the ligand in the pdb</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns str:</th><td class="field-body"><p class="first last">– string to be substitued in PELE control file</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation">
 <code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a short PELE simulation</p>

@@ -432,28 +432,6 @@ epoch</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="AdaptivePELE.adaptiveSampling.getNextIterationBox">
-<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">getNextIterationBox</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>simulationRunnerParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#getNextIterationBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.getNextIterationBox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Select the box for the next epoch, currently selecting the COM of
-the cluster with max SASA</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
-<li><strong>simulationRunnerParams</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a>) – <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a> Simulation parameters object</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns str:</th><td class="field-body"><p class="first last">– string to be substitued in PELE control file</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.getWorkingClusteringObjectAndReclusterIfNecessary">
 <code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">getWorkingClusteringObjectAndReclusterIfNecessary</code><span class="sig-paren">(</span><em>firstRun</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>simulationRunner</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#getWorkingClusteringObjectAndReclusterIfNecessary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.getWorkingClusteringObjectAndReclusterIfNecessary" title="Permalink to this definition">¶</a></dt>
 <dd><p>It reads the previous clustering method, and, if there are changes,

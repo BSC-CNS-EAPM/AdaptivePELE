@@ -521,6 +521,7 @@ There are two types of density calculators:</p>
 <li><strong>epsilon</strong> (<em>float</em>, mandatory in <strong>epsilon</strong> spawning): The fraction of the processors that will be assigned according to the selected metric</li>
 <li><strong>metricWeights</strong> (<em>string</em>, default=linear): Selects how to distribute the weights of the cluster according to its metric, two options: linear (proportional to metric) or Boltzmann weigths (proportional to exp(-metric/T). Needs to define the temperature <strong>T</strong>.</li>
 <li><strong>T</strong> (<em>float</em>, default=1000): Temperature, only used for Boltzmann weights</li>
+<li><strong>condition</strong> (<em>string</em>, optional): Selects wether to take into account maximum or minimum values in epsilon related spawning, values are <em>min</em> or <em>max</em></li>
 </ul>
 <p>The following parameters are mandatory for <strong>variableEpsilon</strong>:</p>
 <ul class="simple">
