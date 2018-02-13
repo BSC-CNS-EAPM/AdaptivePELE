@@ -157,6 +157,7 @@ class SpawningParams:
         self.nclusters = None  # number of clusters to consider in epsilon
         self.period = None
         self.metricInd = None
+        self.condition = blockNames.SpawningParams.minValue  # wether to consider min or max values in epsilon
 
     def buildSpawningParameters(self, spawningBlock):
         """
@@ -181,6 +182,8 @@ class SpawningParams:
             self.nclusters = spawningParamsBlock.get(blockNames.SpawningParams.nclusters, 5)
             self.metricWeights = spawningParamsBlock.get(blockNames.SpawningParams.metricWeights,
                                                          blockNames.SpawningParams.linear)
+            self.condition = spawningParamsBlock.get(blockNames.SpawningParams.condition,
+                                                     blockNames.SpawningParams.minValue)
 
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon or\
@@ -525,13 +528,14 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         We only consider the nclusters with best metric
     """
 
-    def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
+    def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator(), condition=blockNames.SpawningParams.minValue):
         DensitySpawningCalculator.__init__(self, densityCalculator)
         self.inverselyProportionalCalculator = InverselyProportionalToPopulationCalculator(densityCalculator)
         self.type = spawningTypes.SPAWNING_TYPES.epsilon
         self.degeneracyInverselyProportional = None
         self.degeneracyMetricProportional = None
         self.degeneracyTotal = None
+        self.condition = condition
 
     # TODO add possibility for different pipes
     def log(self):
@@ -593,11 +597,17 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         # Shift so that differences become larger.
         # Also, we can now merge positive & negative values
         # Alternatives: Boltzmann weights
-        maximumValue = np.max(metrics)
-        shiftedMetrics = np.subtract(metrics, maximumValue)
+        if spawningParams.condition == blockNames.SpawningParams.minValue:
+            shiftValue = np.max(metrics)
+        else:
+            shiftValue = np.min(metrics)
+        shiftedMetrics = np.subtract(metrics, shiftValue)
         bestClusters = shiftedMetrics.argsort()
 
-        shiftedMetrics[bestClusters[spawningParams.nclusters:]] = 0  # only consider best ones
+        if spawningParams.condition == blockNames.SpawningParams.minValue:
+            shiftedMetrics[bestClusters[spawningParams.nclusters:]] = 0  # only consider best ones
+        else:
+            shiftedMetrics[bestClusters[:-spawningParams.nclusters]] = 0  # only consider best ones
 
         metricWeights = spawningParams.metricWeights
         if metricWeights == blockNames.SpawningParams.linear:

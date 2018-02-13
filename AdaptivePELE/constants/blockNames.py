@@ -68,6 +68,9 @@ class SpawningParams:
     threshold = "threshold"
     report_filename = "reportFilename"
     report_col = "metricColumnInReport"
+    minValue = "min"
+    maxValue = "max"
+    condition = "condition"
     # New parameters for variable epsilon(experimental)
     varEpsilonType = "varEpsilonType"
     maxEpsilon = "maxEpsilon"

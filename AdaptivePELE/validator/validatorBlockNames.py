@@ -36,6 +36,7 @@ class SpawningParams:
         "alpha": "numbers.Real",
         "metricWeights": "basestring",
         "metricsInd": "list",
+        "condition": "basestring",
         "n": "numbers.Real"
     }
     types = {
