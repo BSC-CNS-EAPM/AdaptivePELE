@@ -27,7 +27,7 @@ class SimulationParameters:
         self.boxRadius = 20
         self.modeMovingBox = None
         self.runEquilibration = False
-        self.equilibrationLength = 50
+        self.equilibrationLength = None
         self.destination = None
         self.origin = None
         self.equilibrationMode = ""
@@ -249,10 +249,32 @@ class PeleSimulation(SimulationRunner):
         """
         # Set small rotations and translations
         peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["translationRange"] = 0.5
-        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["rotationScalingFactor"] = 0.01
+        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["rotationScalingFactor"] = 0.05
         # Remove dynamical changes in control file
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("exitConditions", None)
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("parametersChanges", None)
+        # Ensure random tags exists in metrics
+        metricsBlock = peleControlFileDict["commands"][0]["PeleTasks"][0]["metrics"]
+        nMetrics = len(metricsBlock)
+        randomIndexes = [i for i in xrange(nMetrics) if metricsBlock[i]['type'] == "random"]
+        randomIndexes.sort()
+        # Delete random numbers from metrics
+        for index in randomIndexes:
+            del metricsBlock[index]
+        nMetrics = len(metricsBlock)
+        # Add new random number to metrics
+        metricsBlock.extend([{'tag': 'rand', 'type': 'random'}])
+        # Add equilibration dynamical changes
+        changes = {
+            "doThesechanges": {
+                "Perturbation::parameters": {"rotationScalingFactor": 0.050}
+            },
+            "ifAnyIsTrue": ["rand >= .5"],
+            "otherwise": {
+                "Perturbation::parameters": {"rotationScalingFactor": 0.15}
+            }
+            }
+        peleControlFileDict["commands"][0]["PeleTasks"][0]["parametersChanges"] = [changes]
 
         return peleControlFileDict
 
@@ -283,6 +305,18 @@ class PeleSimulation(SimulationRunner):
         else:
             return None
 
+    def calculateEquilibrationLength(self):
+        """
+            Calculate the number of steps for the equilibration lenght accoding
+            to the available processors
+        """
+        # Total steps is an approximate number of total steps to produce
+        totalSteps = 1000
+        # Take at least 5 steps
+        stepsPerProc = np.max(totalSteps/float(self.parameters.processors), 5)
+        # but no more than 50
+        return np.min(stepsPerProc, 50)
+
     def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname):
         """
             Run short simulation to equilibrate the system. It will run one
@@ -303,6 +337,8 @@ class PeleSimulation(SimulationRunner):
             :returns: list --  List with initial structures
         """
         newInitialStructures = []
+        if self.parameters.equilibrationLength is None:
+            self.parameters.equilibrationLength = self.calculateEquilibrationLength()
         equilibrationPeleDict = {"PELE_STEPS": self.parameters.equilibrationLength, "SEED": self.parameters.seed}
         peleControlFileDict, templateNames = utilities.getPELEControlFileDict(self.parameters.templetizedControlFile)
         peleControlFileDict = self.getEquilibrationControlFile(peleControlFileDict)
@@ -613,7 +649,7 @@ class RunnerBuilder:
             params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             params.runEquilibration = paramsBlock.get(blockNames.SimulationParams.runEquilibration, False)
             params.equilibrationMode = paramsBlock.get(blockNames.SimulationParams.equilibrationMode, blockNames.SimulationParams.equilibrationSelect)
-            params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 50)
+            params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength)
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()
