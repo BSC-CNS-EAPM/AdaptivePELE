@@ -253,13 +253,16 @@ class PeleSimulation(SimulationRunner):
         # Remove dynamical changes in control file
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("exitConditions", None)
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("parametersChanges", None)
+        # Set box_radius to 2
+        peleControlFileDict["commands"][0]["Perturbation"]["Box"]["fixedCenter"] = "$BOX_CENTER"
+        peleControlFileDict["commands"][0]["Perturbation"]["Box"]["radius"] = 2
         # Ensure random tags exists in metrics
         metricsBlock = peleControlFileDict["commands"][0]["PeleTasks"][0]["metrics"]
         nMetrics = len(metricsBlock)
         randomIndexes = [i for i in xrange(nMetrics) if metricsBlock[i]['type'] == "random"]
         randomIndexes.sort()
         # Delete random numbers from metrics
-        for index in randomIndexes:
+        for index in randomIndexes[::-1]:
             del metricsBlock[index]
         nMetrics = len(metricsBlock)
         # Add new random number to metrics
@@ -313,9 +316,9 @@ class PeleSimulation(SimulationRunner):
         # Total steps is an approximate number of total steps to produce
         totalSteps = 1000
         # Take at least 5 steps
-        stepsPerProc = np.max(totalSteps/float(self.parameters.processors), 5)
+        stepsPerProc = max(int(totalSteps/float(self.parameters.processors)), 5)
         # but no more than 50
-        return np.min(stepsPerProc, 50)
+        return min(stepsPerProc, 50)
 
     def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname):
         """
@@ -355,6 +358,11 @@ class PeleSimulation(SimulationRunner):
             equilibrationPeleDict["COMPLEXES"] = initialStructureString
             equilibrationPeleDict["BOX_CENTER"] = self.selectInitialBoxCenter(structure, resname)
             equilibrationPeleDict["BOX_RADIUS"] = 2
+            for name in ["BOX_CENTER", "BOX_RADIUS"]:
+                # If the template PELE control file is not templetized with the
+                # box information, include it manually
+                if name not in templateNames:
+                    templateNames[name] = '"$%s"' % name
             print "Running equilibration for initial structure number %d" % (i+1)
             peleControlString = json.dumps(peleControlFileDict, indent=4)
             for key, value in templateNames.iteritems():
