@@ -27,6 +27,10 @@ def parseArgs():
     return arg
 
 
+class EmptyInitialStructuresError(Exception):
+    pass
+
+
 def checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputFolder, simulationRunner):
     """
         Check the previous simulation data when restarting a simulation with a
@@ -535,6 +539,8 @@ def main(jsonParams):
     print "================================\n\n"
 
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
+    if not initialStructures:
+        raise EmptyInitialStructuresError("No initial structures found!!!")
     checkSymmetryDict(clusteringBlock, initialStructures, resname)
 
     outputPathConstants = constants.OutputPathConstants(outputPath)
@@ -567,7 +573,7 @@ def main(jsonParams):
         if simulationRunner.parameters.runEquilibration:
             initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningParams.reportFilename, outputPath, resname)
         clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner)
-    peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps, 
+    peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps,
                                  "BOX_RADIUS": simulationRunner.parameters.boxRadius}
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
