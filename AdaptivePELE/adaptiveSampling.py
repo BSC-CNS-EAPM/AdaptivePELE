@@ -28,7 +28,7 @@ def parseArgs():
 
 
 class EmptyInitialStructuresError(Exception):
-    pass
+    __module__ = Exception.__module__
 
 
 def checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputFolder, simulationRunner):
