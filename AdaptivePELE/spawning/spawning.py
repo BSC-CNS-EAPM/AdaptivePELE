@@ -383,6 +383,7 @@ class DensitySpawningCalculator(SpawningCalculator):
 class IndependentRunsCalculator(SpawningCalculator):
 
     def __init__(self):
+        SpawningCalculator.__init__(self)
         self.calculator = SameWeightDegeneracyCalculator()
         self.type = spawningTypes.SPAWNING_TYPES.independent
 
@@ -933,14 +934,15 @@ class UCBCalculator(DensitySpawningCalculator):
         return self.divideProportionalToArray(weights_trimmed, trajToDistribute)
 
 
-class REAPCalculator(SpawningCalculator):
-    def __init__(self):
+class REAPCalculator(DensitySpawningCalculator):
+    def __init__(self, densityCalculator=densitycalculator.NullDensityCalculator()):
         """
             Spawning following the Reinforcement learning based Adaptive
             samPling (REAP) (Shamsi et al., arXiv, Oct 2017), where the reward
             given by the exploration on several reaction coordinates
             is maximized
         """
+        DensitySpawningCalculator.__init__(self, densityCalculator)
         self.type = spawningTypes.SPAWNING_TYPES.REAP
         self.weights = None
         self.metricInd = None
@@ -983,10 +985,14 @@ class REAPCalculator(SpawningCalculator):
         meanRew = np.mean(metrics, axis=1)
         stdRew = np.std(metrics, axis=1)
         # Filter top least populated clusters
+        population = np.array(population)
+        densities = self.calculateDensities(clusters)
+        if densities.any():
+            population /= densities
         argweights = np.argsort(population)
         metrics = metrics[:, argweights[:trajToDivide]]
         # Shift and scale all metrics to have mean 0 and std 1, so that the
-        # weight of each metric is not affected by its magnitued (i.e. binding
+        # weight of each metric is not affected by its magnitude (i.e. binding
         # energy ~ 10**2 while SASA <= 1)
         rewProv = np.abs(metrics-meanRew[:, np.newaxis])/stdRew[:, np.newaxis]
 
@@ -1015,6 +1021,7 @@ class REAPCalculator(SpawningCalculator):
 
 class NullSpawningCalculator(SpawningCalculator):
     def __init__(self):
+        SpawningCalculator.__init__(self)
         self.type = spawningTypes.SPAWNING_TYPES.null
 
     def calculate(self, clusters, trajToDivide, spawningParams, currentEpoch=None):
