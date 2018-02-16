@@ -6,6 +6,7 @@ import shutil
 import string
 import sys
 import numpy as np
+import ast
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
 from AdaptivePELE.atomset import atomset, RMSDCalculator
@@ -125,7 +126,7 @@ class SimulationRunner:
         """
         try:
             with open(epochDir+"/processorMapping.txt") as f:
-                self.processorsToClusterMapping = map(int, f.read().rstrip().split(':'))
+                self.processorsToClusterMapping = map(ast.literal_eval, f.read().rstrip().split(':'))
         except IOError:
             sys.stderr.write("WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
 

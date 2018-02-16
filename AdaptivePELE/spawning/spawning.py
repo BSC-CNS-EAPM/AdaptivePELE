@@ -540,7 +540,6 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         self.degeneracyTotal = None
         self.condition = condition
 
-    # TODO add possibility for different pipes
     def log(self):
         """
             Log spawning information
