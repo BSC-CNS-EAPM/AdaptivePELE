@@ -31,9 +31,9 @@ destFolder = os.path.join(releaseFolder, releaseName, "AdaptivePELE", "%s")
 for filename in files:
     if filename in toOmit or filename.startswith(".") or filename.endswith("pyc"):
         continue
-    print "Copying", filename
     try:
         if not os.path.exists(destFolder % filename):
+            print "Copying", filename
             shutil.copytree(filename, destFolder % filename, ignore=copy_ignore)
     except (IOError, OSError):
         shutil.copyfile(filename, destFolder % filename)
