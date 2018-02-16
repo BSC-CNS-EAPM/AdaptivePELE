@@ -1,5 +1,7 @@
 Behavior changes from previous version:
     *) Added null spawning calculator
+    *) Added possibility of max metric in epsilon
+    *) Improvements in REAP spawning
 
 Bug fixes:
     *) Various bug fixes

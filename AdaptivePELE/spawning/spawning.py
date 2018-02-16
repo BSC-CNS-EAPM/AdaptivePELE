@@ -428,19 +428,23 @@ class IndependentRunsCalculator(SpawningCalculator):
             :returns: int, list -- number of processors, list with the
                 snapshot from which the trajectories will start in the next iteration
         """
-        # TODO: Add processors mapping
+        procMapping = []
         trajWildcard = os.path.join(outputPathConstants.epochOutputPathTempletized, constants.trajectoryBasename)
         trajectories = glob.glob(trajWildcard % (iteration-1))
         for trajectory in trajectories:
-            lastSnapshot = utilities.getSnapshots(trajectory)[-1]
+            snapshots = utilities.getSnapshots(trajectory)
+            lastSnapshot = snapshots[-1]
+            nSnapshots = len(snapshots)
+            del snapshots
 
             num = int(trajectory.split("_")[-1][:-4]) % len(trajectories)  # to start with 0
             outputFilename = outputPathConstants.tmpInitialStructuresTemplate % (iteration, num)
+            procMapping.append((iteration, num, nSnapshots-1))
 
             with open(outputFilename, 'w') as f:
                 f.write(lastSnapshot)
 
-        return len(trajectories)
+        return len(trajectories), procMapping
 
 
 class SameWeightDegeneracyCalculator(SpawningCalculator):
@@ -449,12 +453,10 @@ class SameWeightDegeneracyCalculator(SpawningCalculator):
         SpawningCalculator.__init__(self)
         self.type = spawningTypes.SPAWNING_TYPES.sameWeight
 
-    # TODO: Don't back on pele, so that density calculator can be used
     def calculate(self, clusters, trajToDistribute, spawningParams,
                   currentEpoch=None):
         """
             Calculate the degeneracy of the clusters
-            We back on PELE to split equal trajectories
 
             :param clusters: Existing clusters
             :type clusters: :py:class:`.Clusters`
