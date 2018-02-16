@@ -439,7 +439,7 @@ class IndependentRunsCalculator(SpawningCalculator):
 
             num = int(trajectory.split("_")[-1][:-4]) % len(trajectories)  # to start with 0
             outputFilename = outputPathConstants.tmpInitialStructuresTemplate % (iteration, num)
-            procMapping.append((iteration, num, nSnapshots-1))
+            procMapping.append((iteration-1, num, nSnapshots-1))
 
             with open(outputFilename, 'w') as f:
                 f.write(lastSnapshot)
