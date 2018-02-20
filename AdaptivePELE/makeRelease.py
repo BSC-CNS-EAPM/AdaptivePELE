@@ -44,7 +44,9 @@ for filename in extraFiles:
     if not os.path.exists(destFolder % filename):
         shutil.copyfile(filename, destFolder % filename)
         print "Copying", os.path.split(filename)[1]
-print "Done with release %s!" % releaseName
 
+print "Compiling cython extensions"
 os.chdir(destFolder % "..")
 subprocess.call(['python', 'setup.py', 'build_ext', '--inplace'])
+
+print "Done with release %s!" % releaseName
