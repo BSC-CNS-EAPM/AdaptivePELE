@@ -15,6 +15,7 @@ AdaptivePELE/freeEnergies/build
 AdaptivePELE/Data
 AdaptivePELE/Documents
 AdaptivePELE/docs/_build
+setup.pyc
 .ropeproject
 build
 AdaptivePELE/*.pyc

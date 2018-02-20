@@ -6,6 +6,7 @@ import socket
 import glob
 import shutil
 import os
+import subprocess
 
 def copy_ignore(src, names):
     return filter(lambda x: x.endswith(".c") or x.endswith(".so"), names)
@@ -44,3 +45,6 @@ for filename in extraFiles:
         shutil.copyfile(filename, destFolder % filename)
         print "Copying", os.path.split(filename)[1]
 print "Done with release %s!" % releaseName
+
+os.chdir(destFolder % "..")
+subprocess.call(['python', 'setup.py', 'build_ext', '--inplace'])
