@@ -431,15 +431,15 @@ class IndependentRunsCalculator(SpawningCalculator):
         procMapping = []
         trajWildcard = os.path.join(outputPathConstants.epochOutputPathTempletized, constants.trajectoryBasename)
         trajectories = glob.glob(trajWildcard % (iteration-1))
-        for trajectory in trajectories:
+        for num, trajectory in enumerate(trajectories):
             snapshots = utilities.getSnapshots(trajectory)
             lastSnapshot = snapshots[-1]
             nSnapshots = len(snapshots)
             del snapshots
 
-            num = int(trajectory.split("_")[-1][:-4]) % len(trajectories)  # to start with 0
+            numTraj = int(os.path.splitext(trajectory.rsplit("_", 1)[-1])[0])
             outputFilename = outputPathConstants.tmpInitialStructuresTemplate % (iteration, num)
-            procMapping.append((iteration-1, num, nSnapshots-1))
+            procMapping.append((iteration-1, numTraj, nSnapshots-1))
 
             with open(outputFilename, 'w') as f:
                 f.write(lastSnapshot)
