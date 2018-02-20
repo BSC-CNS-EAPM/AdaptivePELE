@@ -133,6 +133,7 @@ class SimulationParams:
     condition = "condition"
     numTrajs = "numberTrajectories"
     equilibrationLength = "equilibrationLength"
+    srun = "useSrun"
 
 
 class ExitConditionType:

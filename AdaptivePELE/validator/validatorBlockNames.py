@@ -133,6 +133,7 @@ class SimulationParams:
         "runEquilibration": "bool",
         "equilibrationMode": "basestring",
         "equilibrationLength": "numbers.Real",
+        "useSrun": "bool",
         "exitCondition": "dict"
     }
     exitCondition = {

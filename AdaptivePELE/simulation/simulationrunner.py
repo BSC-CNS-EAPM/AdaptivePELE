@@ -36,6 +36,7 @@ class SimulationParameters:
         self.columnSASA = None
         self.reportName = None
         self.trajectoryName = None
+        self.srun = False
 
 
 class SimulationRunner:
@@ -225,7 +226,10 @@ class PeleSimulation(SimulationRunner):
         """
         self.createSymbolicLinks()
 
-        toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
+        if self.parameters.srun:
+            toRun = ["srun", self.parameters.executable, runningControlFile]
+        else:
+            toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
         toRun = " ".join(toRun)
         print toRun
         startTime = time.time()
@@ -659,6 +663,7 @@ class RunnerBuilder:
             params.runEquilibration = paramsBlock.get(blockNames.SimulationParams.runEquilibration, False)
             params.equilibrationMode = paramsBlock.get(blockNames.SimulationParams.equilibrationMode, blockNames.SimulationParams.equilibrationSelect)
             params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength)
+            params.srun = paramsBlock.get(blockNames.SimulationParams.srun, False)
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()
