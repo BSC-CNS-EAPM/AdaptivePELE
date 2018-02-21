@@ -35,6 +35,9 @@ class Clusters:
         # Restore instance attributes
         self.clusters = state['clusters']
 
+    def __len__(self):
+        return len(self.clusters)
+
     def addCluster(self, cluster):
         """
             Add a new cluster
@@ -87,8 +90,21 @@ class Clusters:
             cluster.printCluster(verbose)
             print ""
 
+    def __getitem__(self, key):
+        return self.clusters[key]
+
+    def __setitem__(self, key, value):
+        self.clusters[key] = value
+
+    def __delitem__(self, key):
+        del self.clusters[key]
+
     def __eq__(self, other):
         return self.clusters == other.clusters
+
+    def __iter__(self):
+        for cluster in self.clusters:
+            yield cluster
 
 
 class ConformationNetwork:
@@ -389,6 +405,9 @@ class Cluster:
         self.altSelection = state.get('altSelection', False)
         self.trajPosition = state.get('trajPosition')
 
+    def __len__(self):
+        return self.elements
+
     def getMetric(self):
         """
             Get the value of the prefered metric if present, otherwise return None
@@ -446,6 +465,9 @@ class Cluster:
         if self.threshold != 0:
             print "Radius threshold: ", self.threshold
         print "Number of contacts: %.2f" % self.contacts
+
+    def __str__(self):
+        return "Cluster: elements=%d, threshold=%.3f, contacts=%.3f, density=%.3f" % (self.elements, self.threshold, self.contacts, self.density or "0.000")
 
     def writePDB(self, path):
         """
@@ -768,6 +790,25 @@ class Clustering:
         self.altSelection = state.get('altSelection', False)
         self.conformationNetwork = state.get('conformationNetwork', ConformationNetwork())
         self.epoch = state.get('epoch', -1)
+
+    def __str__(self):
+        return "Clustering: nClusters: %d" % len(self.clusters)
+
+    def __len__(self):
+        return len(self.clusters)
+
+    def __iter__(self):
+        for cluster in self.clusters:
+            yield cluster
+
+    def __getitem__(self, key):
+        return self.clusters[key]
+
+    def __setitem__(self, key, value):
+        self.clusters[key] = value
+
+    def __delitem__(self, key):
+        del self.clusters[key]
 
     def setCol(self, col):
         """
