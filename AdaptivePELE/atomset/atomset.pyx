@@ -385,7 +385,8 @@ cdef class PDB:
         self.atoms[atomId] = atom
 
     def __delitem__(self, atomId):
-        del self.atoms[atomId]
+        self.atoms.pop(atomId)
+        self.atomList.remove(atomId)
 
     def __iter__(self):
         for atomId in self.atomList:
