@@ -227,7 +227,8 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">)):</span>
             <span class="c1"># change, so that whole condition is in array</span>
             <span class="k">if</span> <span class="n">contacts</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="c1"># ensure that the value is a float</span>
+                <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="c1"># the way it&#39;s built, it makes more sense to return this value, but,</span>
         <span class="c1"># should check that len(value) = len(conditions) + 1 in order to</span>
         <span class="c1"># return the &quot;else&quot; value</span>

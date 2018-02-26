@@ -584,8 +584,8 @@ no spawning is performed, so this function just returns None</p>
 
 <dl class="class">
 <dt id="AdaptivePELE.spawning.spawning.REAPCalculator">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.spawning.spawning.</code><code class="descname">REAPCalculator</code><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#REAPCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.REAPCalculator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.SpawningCalculator</span></code></a></p>
+<em class="property">class </em><code class="descclassname">AdaptivePELE.spawning.spawning.</code><code class="descname">REAPCalculator</code><span class="sig-paren">(</span><em>densityCalculator=&lt;AdaptivePELE.spawning.densitycalculator.NullDensityCalculator instance&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#REAPCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.REAPCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.DensitySpawningCalculator" title="AdaptivePELE.spawning.spawning.DensitySpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.DensitySpawningCalculator</span></code></a></p>
 <p>Spawning following the Reinforcement learning based Adaptive
 samPling (REAP) (Shamsi et al., arXiv, Oct 2017), where the reward
 given by the exploration on several reaction coordinates
@@ -628,8 +628,7 @@ is maximized</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator.calculate">
 <code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>spawningParams</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SameWeightDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the degeneracy of the clusters
-We back on PELE to split equal trajectories</p>
+<dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
