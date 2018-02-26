@@ -5,6 +5,7 @@ import pyemma.msm as msm
 import pyemma.plots as mplt
 import numpy as np
 
+
 class MSM:
     """
     def __init__(self, lagtimes, numPCCA, itsOutput=None, numberOfITS=-1,
@@ -27,6 +28,7 @@ class MSM:
         self.lagtime = 0
         self.dtrajs = dtrajs
         self.stationaryDistributionFilename = "stationaryDistribution.dat"
+        self.numPCCA = None
 
     def estimate(self, lagtime = None, lagtimes = [], numberOfITS = -1):
         self.lagtime = lagtime
@@ -34,14 +36,13 @@ class MSM:
         self.numberOfITS = numberOfITS
         print "LAGTIME", self.lagtime
         try:
-            self.lagtime = self._calculateITS() #keep calculating until convergence is reached
+            self.lagtime = self._calculateITS()  # keep calculating until convergence is reached
         except Exception as err:
             # This error should happen only when running in the MN computing queues
             # with the tkinter matplotlib backend, to avoid it set the default
             # backend to pdf
             if "connect to display" in err.message:
                 print "ITS plots not saved because of MN error"
-                pass
             else:
                 raise err
         print "Using lagtime = ", self.lagtime
@@ -67,12 +68,11 @@ class MSM:
                "the model...") % nsetsCK
         membershipsCK = self.MSM_object.metastable_memberships
         CKObject = self.ChapmanKolmogorovTest(self.MSM_object,
-                                             nsetsCK, memberships=membershipsCK,
-                                             error_estimation=self.error,
-                                             mlags=mlags)
+                                              nsetsCK, memberships=membershipsCK,
+                                              error_estimation=self.error,
+                                              mlags=mlags)
         self.plotChapmanKolmogorovTest(CKObject)
         plt.show()
-
 
     def _calculateITS(self):
         is_converged = False
@@ -80,18 +80,21 @@ class MSM:
         print ("Calculating implied time-scales, when it's done will prompt "
                "for confirmation on the validity of the lagtimes...")
         while not is_converged:
-            if self.error == False: itsErrors = None
-            elif self.error == True: itsErrors = "bayes"
-            if not self.lagtimes == [] and not self.lagtimes is None:
+            if not self.error:
+                itsErrors = None
+            elif self.error:
+                itsErrors = "bayes"
+            if self.lagtimes and self.lagtimes is not None:
                 # workaround to get new its plot at each iteration, the
                 # plot_implied_timescales function is calling plt.gca() and
                 # recovers the previous plot's axes, by creating a new figure
                 # gca gets a set of empty axes and plots are fine
                 plt.figure()
                 its_object = msm.its(self.dtrajs, lags=self.lagtimes, errors=itsErrors)
-                its_plot = mplt.plot_implied_timescales(its_object, outfile=self.itsOutput, nits=self.numberOfITS)
+                mplt.plot_implied_timescales(its_object, outfile=self.itsOutput, nits=self.numberOfITS)
                 plt.savefig("its.png")
-            if not self.lagtime is None: return self.lagtime
+            if self.lagtime is not None:
+                return self.lagtime
             while True:
                 plt.show()
                 convergence_answer = raw_input("Has the ITS plot converged?[y/n] ")
@@ -126,7 +129,7 @@ class MSM:
             for i, coords in enumerate(self.cl.clustercenters):
                 f.write(tempStr.format(i+1, i+1, coords[0], coords[1], coords[2], self.MSM_object.stationary_distribution[i]))
 
-    def plotITS(its_object, its_plot_file=None, nits=-1):
+    def plotITS(self, its_object, its_plot_file=None, nits=-1):
         its_plot = mplt.plot_implied_timescales(its_object, outfile=its_plot_file, nits=nits)
         plt.savefig("its.eps")
         return its_plot
@@ -142,18 +145,16 @@ class MSM:
         else:
             self.MSM_object = msm.estimate_markov_model(self.dtrajs, self.lagtime)
 
-
-    def ChapmanKolmogorovTest(MSM_object, nsets,memberships=None, error_estimation=False, mlags=2):
+    def ChapmanKolmogorovTest(self, MSM_object, nsets, memberships=None, error_estimation=False, mlags=2):
         """ Perform the ChapmanKolmogorov test to validate the MSM"""
-        return MSM_object.cktest(nsets,memberships=memberships,err_est=error_estimation, mlags=mlags)
+        return MSM_object.cktest(nsets, memberships=memberships, err_est=error_estimation, mlags=mlags)
 
-    def plotChapmanKolmogorovTest(CKObject, layout=None, padding_between=0.1,
+    def plotChapmanKolmogorovTest(self, CKObject, layout=None, padding_between=0.1,
                                   padding_top=0.075):
         """ Plot the results of the Chapman-Kolgomorov tests"""
-        mplt.plot_cktest(CKObject,layout=layout, padding_between=padding_between,
+        mplt.plot_cktest(CKObject, layout=layout, padding_between=padding_between,
                          padding_top=padding_top)
         plt.savefig("CK.eps")
-
 
     def loadMSM(self, MSMFile):
         with open(MSMFile) as MSMfile:
@@ -163,5 +164,5 @@ class MSM:
     def saveMSM(self, MSM_object):
         """Save the MSM object to avoid having to run again
         the more computationally expensive part"""
-        with open("MSM_object.pkl","w") as MSMfile:
+        with open("MSM_object.pkl", "w") as MSMfile:
             cPickle.dump(MSM_object, MSMfile, -1)

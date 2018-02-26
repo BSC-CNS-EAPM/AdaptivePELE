@@ -1,22 +1,20 @@
-from AdaptivePELE.pyemma_scripts import computeDeltaG as dg
-import glob
-import sys
-import numpy as np
-import os
-import shutil
-
 """
     Program that writes extracted coordinates as pdb files.
 
     Execution: python generateFiles.py outputDir rawData/traj_*
 
 """
+from AdaptivePELE.freeEnergies import computeDeltaG as dg
+import sys
+import numpy as np
+import os
+
 
 def getNum(trajFilename):
     left = trajFilename.rfind("_")
     return int(trajFilename[left+1:-4])
 
-outputFolder  = sys.argv[1]
+outputFolder = sys.argv[1]
 files = sys.argv[2:]
 
 print "files", files
@@ -26,7 +24,7 @@ for filename in files:
 
     length = content.shape[0]
 
-    dummyContent = np.ones((length,1))
+    dummyContent = np.ones((length, 1))
 
     paddedContent = np.delete(np.hstack((content, dummyContent)), 0, axis=1)
 
