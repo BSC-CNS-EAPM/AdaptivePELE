@@ -494,7 +494,7 @@ def preparePeleControlFile(epoch, outputPathConstants, simulationRunner, peleCon
     simulationRunner.makeWorkingControlFile(outputPathConstants.tmpControlFilename % epoch, peleControlFileDictionary)
 
 
-def main(jsonParams):
+def main(jsonParams, clusteringHook=None):
     """
         Main body of the adaptive sampling program.
 
@@ -598,6 +598,12 @@ def main(jsonParams):
         clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized)
         endTime = time.time()
         print "Clustering ligand: %s sec" % (endTime - startTime)
+
+        if clusteringHook is not None:
+            clusteringMethod, hasChanged = clusteringHook(clusteringMethod, outputPathConstants)
+            if hasChanged:
+                clusteringMethod.emptyClustering()
+                clusterPreviousEpochs(clusteringMethod, i+1, outputPathConstants.epochOutputPathTempletized, simulationRunner)
 
         if simulationRunner.parameters.modeMovingBox is not None:
             simulationRunner.getNextIterationBox(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i, resname)
