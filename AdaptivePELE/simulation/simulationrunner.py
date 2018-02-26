@@ -699,14 +699,16 @@ class ExitConditionBuilder:
         exitConditionType = exitConditionBlock[blockNames.ExitConditionType.type]
         exitConditionParams = exitConditionBlock[blockNames.SimulationParams.params]
         if exitConditionType == blockNames.ExitConditionType.metric:
-            metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
+            # Start counting the columns by 1
+            metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]-1
             metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
             condition = exitConditionParams.get(blockNames.SimulationParams.condition, "<")
             if condition not in [">", "<"]:
                 raise ValueError("In MetricExitCondition the parameter condition only accepts > or <, but %s was passed" % condition)
             return MetricExitCondition(metricCol, metricValue, condition)
         elif exitConditionType == blockNames.ExitConditionType.metricMultipleTrajs:
-            metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]
+            # Start counting the columns by 1
+            metricCol = exitConditionParams[blockNames.SimulationParams.metricCol]-1
             metricValue = exitConditionParams[blockNames.SimulationParams.exitValue]
             numTrajs = exitConditionParams[blockNames.SimulationParams.numTrajs]
             condition = exitConditionParams.get(blockNames.SimulationParams.condition, "<")

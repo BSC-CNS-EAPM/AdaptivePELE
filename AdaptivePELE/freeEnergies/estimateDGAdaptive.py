@@ -1,7 +1,8 @@
 import glob
 import os
-import estimateDG
+from AdaptivePELE.freeEnergies import estimateDG
 import numpy as np
+
 
 def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1):
     allFolders = np.array(glob.glob("MSM_*"))
@@ -9,7 +10,7 @@ def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1):
     args = np.argsort(epochs)
     sortedFolders = allFolders[args]
     origDir = os.getcwd()
-    resultsFile=os.path.join(origDir, "results.txt")
+    resultsFile = os.path.join(origDir, "results.txt")
 
     with open(resultsFile, "a") as f:
         f.write("#Epoch DG StdDG Db StdDb\n")
@@ -37,18 +38,18 @@ def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1):
         print "FINAL RESULTS EPOCH %d: dG: %f +- %f, asymmetric fluxes: %f +- %f" % (epoch, dG, stdDg, db, stdDb)
         resultsEpoch.append([dG, stdDg, db, stdDb])
         with open(resultsFile, "a") as f:
-            f.write("%d %.3f %.3f %.3f %.3f\n"%(epoch, dG, stdDg, db, stdDb))
+            f.write("%d %.3f %.3f %.3f %.3f\n" % (epoch, dG, stdDg, db, stdDb))
         os.chdir("..")
 
     print "Results"
     print "epoch, DG, stdDg, DB, stdDb"
     print "====="
-    for i,results in enumerate(resultsEpoch):
+    for i, results in enumerate(resultsEpoch):
         print i, results
 
 if __name__ == "__main__":
-    trajsPerEpoch = 50
-    lagtime = 50
-    nclusters = 100
-    clusteringStride = 10
-    main(trajsPerEpoch, lagtime, nclusters, clusteringStride=clusteringStride)
+    trajs_Epoch = 50
+    lag_time = 50
+    n_clusters = 100
+    clustering_Stride = 10
+    main(trajs_Epoch, lag_time, n_clusters, clusteringStride=clustering_Stride)

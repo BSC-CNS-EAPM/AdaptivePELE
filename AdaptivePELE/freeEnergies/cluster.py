@@ -5,6 +5,7 @@ import pyemma.coordinates as coor
 from pyemma.coordinates.clustering import AssignCenters
 import scipy
 
+
 class Cluster:
     def __init__(self, numClusters, trajectoryFolder, trajectoryBasename, stride=1, alwaysCluster=True):
         """
@@ -13,7 +14,7 @@ class Cluster:
 
         self.discretizedFolder = "discretized"
         self.clusterCentersFile = os.path.join(self.discretizedFolder, "clusterCenters.dat")
-        self.clusterCenters= np.array([])
+        self.clusterCenters = np.array([])
         self.dTrajTemplateName = os.path.join(self.discretizedFolder, "%s.disctraj")
         self.clusteringFile = "clustering_object.pkl"
         self.stride = stride
@@ -24,7 +25,6 @@ class Cluster:
         self.trajectoryFolder = trajectoryFolder
         self.trajectoryBasename = trajectoryBasename
         self.x = []
-
 
     def cluster(self, trajectories):
         """ Cluster the trajectories into numClusters clusters using kmeans
@@ -45,7 +45,7 @@ class Cluster:
         # cluster & assign
         if self.alwaysCluster or not os.path.exists(self.clusterCentersFile):
             print "Clustering data..."
-            cl = self.cluster(self.x) #cl: pyemma's clusteringObject
+            cl = self.cluster(self.x)  # cl: pyemma's clusteringObject
             makeFolder(self.discretizedFolder)
             self.clusterCenters = cl.clustercenters
             self._writeClusterCenters(self.clusterCenters, self.clusterCentersFile)
@@ -66,14 +66,14 @@ class Cluster:
 
         dtrajs = np.array(self.dtrajs).copy()
         try:
-            dtrajs = np.concatenate(dtrajs[:,:-tau])
+            dtrajs = np.concatenate(dtrajs[:, :-tau])
         except:
             dtrajs = np.concatenate(dtrajs)
 
         dummy = np.zeros(dtrajs.size)
         data = np.ones(dtrajs.size)
-        #using sparse is fast and sucint
-        counts = np.ravel(scipy.sparse.coo_matrix((data, (dtrajs, dummy)), shape=(self.numClusters,1)).toarray())
+        # using sparse is fast and sucint
+        counts = np.ravel(scipy.sparse.coo_matrix((data, (dtrajs, dummy)), shape=(self.numClusters, 1)).toarray())
 
         clustersToDelete = np.argwhere(counts < clusterCountsThreshold)
         if clustersToDelete.shape[0] > 0:
@@ -89,13 +89,11 @@ class Cluster:
     def _writeDtrajs(self, filenames, dtrajs, filenameTemplate="%s.disctraj"):
         for filename, dtraj in zip(filenames, dtrajs):
             fname = os.path.split(filename)[-1][:-4]
-            dtrajfname = filenameTemplate%(fname)
+            dtrajfname = filenameTemplate % (fname)
             np.savetxt(dtrajfname, dtraj, fmt="%d")
 
 
-"""
-#Standalone functions
-"""
+# Standalone functions
 
 def loadTrajFiles(trajectoryFolder, trajectory_basename):
     trajectoryBasename = os.path.join(trajectoryFolder, trajectory_basename)
@@ -103,12 +101,13 @@ def loadTrajFiles(trajectoryFolder, trajectory_basename):
     # load traj
     files = glob.glob(trajectoryBasename)
     x = len(files)*[0]
-    for i, file in enumerate(files):
-        currentX = np.loadtxt(file, ndmin=2)[:,1:]
+    for i, f in enumerate(files):
+        currentX = np.loadtxt(f, ndmin=2)[:, 1:]
         x[i] = currentX
     if not x:
         raise ValueError("Didn't find any trajectory files in the specified path!!!")
     return x, files
+
 
 def makeFolder(outputDir):
     if not os.path.exists(outputDir):

@@ -1,7 +1,8 @@
 import argparse
-import cluster
-import estimate
 import json
+from AdaptivePELE.freeEnergies import cluster
+from AdaptivePELE.freeEnergies import estimate
+
 
 def parseArgs():
     parser = argparse.ArgumentParser(description="Build a MSM using PyEMMA "
@@ -9,6 +10,7 @@ def parseArgs():
     parser.add_argument('controlFile', type=str)
     args = parser.parse_args()
     return args
+
 
 def readParams(control_file):
     try:
@@ -33,10 +35,11 @@ def readParams(control_file):
 
     return trajectoryFolder, trajectoryBasename, numClusters, stride, lagtimes, numPCCA, itsOutput, numberOfITS, errors, mlags, lagtime, clusterCountsThreshold
 
+
 def main(control_file):
 
     # parameters
-    trajectoryFolder, trajectoryBasename, numClusters, stride, lagtimes, numPCCA, itsOutput, numberOfITS, errors, mlags, lagtime, clusterCountsThreshold = readParams(control_file)
+    trajectoryFolder, trajectoryBasename, numClusters, stride, lagtimes, _, _, numberOfITS, _, _, lagtime, clusterCountsThreshold = readParams(control_file)
 
     # program
     clusteringObject = cluster.Cluster(numClusters, trajectoryFolder, trajectoryBasename, alwaysCluster=False, stride=stride)
@@ -46,7 +49,6 @@ def main(control_file):
     calculateMSM.estimate(lagtime=lagtime, lagtimes=lagtimes, numberOfITS=numberOfITS)
 
 
-
 if __name__ == "__main__":
-    args = parseArgs()
-    main(args.controlFile)
+    arguments = parseArgs()
+    main(arguments.controlFile)

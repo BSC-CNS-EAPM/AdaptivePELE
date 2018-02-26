@@ -14,17 +14,13 @@ for tau, k in iterations:
     os.chdir(destFolder+"/MSM_0")
     print "***************"
     print "Estimating dG value in folder" + os.getcwd()
-    parameters = estimateDG.Parameters(ntrajs=None,
-                            length=None,
-                            lagtime=tau,
-                            nclusters=k,
-                            nruns=10,
-                            skipFirstSteps = 0,
-                            useAllTrajInFirstRun=True,
-                            computeDetailedBalance=True,
-                            trajWildcard="traj_*",
-                            folderWithTraj="rawData",
-                            lagtimes=[1,10,25,50,100,250,500,1000],
-                            clusterCountsThreshold=0)
+    parameters = estimateDG.Parameters(ntrajs=None, length=None, lagtime=tau,
+                                       nclusters=k, nruns=10, skipFirstSteps=0,
+                                       useAllTrajInFirstRun=True,
+                                       computeDetailedBalance=True,
+                                       trajWildcard="traj_*",
+                                       folderWithTraj="rawData",
+                                       lagtimes=[1, 10, 25, 50, 100, 250, 500, 1000],
+                                       clusterCountsThreshold=0)
     estimateDG.estimateDG(parameters, cleanupClusterCentersAtStart=True)
     os.chdir(runFolder)
