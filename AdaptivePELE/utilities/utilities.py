@@ -7,7 +7,7 @@ import json
 # import pickle
 import cPickle as pickle
 from AdaptivePELE.atomset import RMSDCalculator
-from AdaptivePELE.freeEnergies import runMarkovChainModel as run
+from AdaptivePELE.freeEnergies import utils
 import AdaptivePELE.atomset.atomset as atomset
 
 
@@ -158,9 +158,18 @@ def ensure_connectivity_msm(msm):
     else:
         counts = msm.count_matrix_full
         counts += 1/float(counts.shape[0])
-        trans = run.buildRevTransitionMatrix(counts)
-        _, eic = run.getSortedEigen(trans)
+        trans = utils.buildRevTransitionMatrix(counts)
+        _, eic = getSortedEigen(trans)
         return run.getStationaryDistr(eic[:, 0])
+
+
+def getSortedEigen(T):
+    eigenvals, eigenvectors = linalg.eig(T, left=True, right=False)
+    sortedIndices = np.argsort(eigenvals)[::-1]
+
+    # reigenvals, reigenvectors = linalg.eig(T.T)
+    # rsortedIndices = np.argsort(reigenvals)[::-1]
+    return eigenvals[sortedIndices], eigenvectors[:, sortedIndices]
 
 
 def get_epoch_folders(path):
