@@ -21,6 +21,8 @@ class Constants:
         self.ligandTrajectoryBasename = os.path.join(self.ligandTrajectoryFolder, "traj_ligand_%s.pdb")
         self.gatherTrajsFolder = "allTrajs"
         self.gatherTrajsFilename = os.path.join(self.gatherTrajsFolder, "traj_%s_%s.dat")
+        self.gatherNonRepeatedFolder = os.path.join(self.gatherTrajsFolder, "extractedCoordinates")
+        self.gatherNonRepeatedTrajsFilename = os.path.join(self.gatherNonRepeatedFolder, "traj_%s_%s.dat")
 
 
 def parseArguments():
@@ -250,6 +252,16 @@ def repeatExtractedSnapshotsInFolder(folder_name, constants, numtotalSteps):
 def makeGatheredTrajsFolder(constants):
     if not os.path.exists(constants.gatherTrajsFolder):
         os.makedirs(constants.gatherTrajsFolder)
+    if not os.path.exists(constants.gatherNonRepeatedFolder):
+        os.makedirs(constants.gatherNonRepeatedFolder)
+
+
+def copyTrajectories(traj_names, destFolderTempletized, folderName):
+    for inputTrajectory in traj_names:
+        trajectoryNumber = extractFilenumber(os.path.split(inputTrajectory)[1])
+        if folderName != ".":  # if not sequential
+            setNumber = folderName
+        shutil.copyfile(inputTrajectory, destFolderTempletized % (setNumber, trajectoryNumber))
 
 
 def gatherTrajs(constants, folder_name, setNumber, non_Repeat):
@@ -258,11 +270,9 @@ def gatherTrajs(constants, folder_name, setNumber, non_Repeat):
     else:
         trajectoriesFilenames = os.path.join(constants.outputTrajectoryFolder % folder_name, constants.baseExtractedTrajectoryName + "*")
     trajectories = glob.glob(trajectoriesFilenames)
-    for inputTrajectory in trajectories:
-        trajectoryNumber = extractFilenumber(os.path.split(inputTrajectory)[1])
-        if folder_name != ".":  # if not sequential
-            setNumber = folder_name
-        shutil.copyfile(inputTrajectory, constants.gatherTrajsFilename % (setNumber, trajectoryNumber))
+    copyTrajectories(trajectories, constants.gatherTrajsFilename, folder_name)
+    nonRepeatedTrajs = glob.glob(os.path.join(constants.extractedTrajectoryFolder % folder_name, constants.baseExtractedTrajectoryName + "*"))
+    copyTrajectories(nonRepeatedTrajs, constants.gatherNonRepeatedTrajsFilename, folder_name)
 
 
 def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False):

@@ -7,10 +7,11 @@ import matplotlib.pyplot as plt
 from AdaptivePELE.freeEnergies import checkDetailedBalance
 from AdaptivePELE.freeEnergies import ownBuildMSM
 from AdaptivePELE.freeEnergies import computeDeltaG
+from AdaptivePELE.freeEnergies import cluster
 
 
 class Parameters:
-    def __init__(self, ntrajs, length, lagtime, nclusters, nruns, useAllTrajInFirstRun, computeDetailedBalance, trajWildcard, folderWithTraj, lagtimes=[], skipFirstSteps=0, clusterCountsThreshold=0, clusteringStride=1):
+    def __init__(self, ntrajs, length, lagtime, nclusters, nruns, useAllTrajInFirstRun, computeDetailedBalance, trajWildcard, folderWithTraj, lagtimes=None, skipFirstSteps=0, clusterCountsThreshold=0, clusteringStride=1):
         # If ntrajs/length = None, all trajs/lengths will be used
         self.trajWildcard = trajWildcard
         self.folderWithTraj = folderWithTraj
@@ -21,7 +22,10 @@ class Parameters:
         self.nruns = nruns
         self.useAllTrajInFirstRun = useAllTrajInFirstRun
         self.computeDetailedBalance = computeDetailedBalance
-        self.lagtimes = lagtimes
+        if lagtimes is None:
+            self.lagtimes = []
+        else:
+            self.lagtimes = lagtimes
         self.skipFirstSteps = skipFirstSteps
         self.clusterCountsThreshold = clusterCountsThreshold
         self.clusteringStride = clusteringStride
@@ -54,7 +58,7 @@ def __prepareWorkingControlFile(lagtime, clusters, trajectoryFolder, trajectoryB
     workingFolder = os.path.split(trajectoryFolder)[0]  # note that we assume a workingFolder/origTrajs structure (typically origTrajs=rawData)
     try:
         string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"stride\":%d, \"lagtime\":%d, \"itsOutput\":\"its.png\", \"lagtimes\":%s, \"clusterCountsThreshold\":%d}" % (workingFolder, trajectoryBasename, clusters, clusteringStride, lagtime, lagtimes, clusterCountsThreshold)
-    except:
+    except TypeError:
         string = "{\"trajectoryFolder\":\"%s\", \"trajectoryBasename\":\"%s\", \"numClusters\":%d, \"stride\":%d, \"itsOutput\":\"its.png\", \"lagtimes\":%s, \"clusterCountsThreshold\":%d}" % (workingFolder, trajectoryBasename, clusters, clusteringStride, lagtimes, clusterCountsThreshold)
     with open(workingControlFile, 'w') as f:
         f.write(string)
@@ -164,7 +168,7 @@ def __copyMSMDataFromRun(i):
             shutil.copyfile("db_frobenius.eps", "db_frobenius_%d.eps" % i)
             shutil.copyfile("db_abs_diff.eps", "db_abs_diff_%d.eps" % i)
             shutil.copyfile("db_flux.eps", "db_flux_%d.eps" % i)
-        except:
+        except IOError:
             pass
 
 
@@ -180,6 +184,31 @@ def __getMeanAndStdFromList(l, accessFunction=lambda x: x):
     return np.mean(values), np.std(values)
 
 
+def getRepresentativePDBs(filesWildcard, run):
+    files = glob.glob(filesWildcard)
+    trajs = [np.loadtxt(f)[:, 1:] for f in files]
+    cl = cluster.Cluster(0, "", "")
+    cl.clusterCenters = np.loadtxt(cl.clusterCentersFile)
+    dtrajs = cl.assignNewTrajectories(trajs)
+    numClusters = cl.clusterCenters.shape[0]
+    centersInfo = {x: {"structure": None, "minDist": 1e6} for x in xrange(numClusters)}
+    for i, traj in enumerate(trajs):
+        traj_name = files[i]
+        _, epochNum, trajNum = os.path.splitext(traj_name)[0].split("_", 2)
+        for nSnap, snapshot in enumerate(traj):
+            clusterInd = dtrajs[i][nSnap]
+            dist = np.linalg.norm(cl.clusterCenters[clusterInd]-snapshot)
+            if dist < centersInfo[clusterInd]['minDist']:
+                centersInfo[clusterInd]["minDist"] = dist
+                centersInfo[clusterInd]["structure"] = (epochNum, trajNum, str(nSnap))
+
+    if not os.path.exists("representative_structures"):
+        os.makedirs("representative_structures")
+    with open("representative_structures/representative_structures_%d.dat" % run, "w") as fw:
+        for clNum in xrange(numClusters):
+            fw.write("%d\t" % clNum+"\t".join(centersInfo[clNum]["structure"])+"\n")
+
+
 def estimateDG(parameters, cleanupClusterCentersAtStart=False):
     """
         Estimates the absolute binding free energy using the parameters in the Parameters object.
@@ -191,6 +220,7 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 
     workingControlFile = "control_MSM.conf"
     origFilesWildcard = os.path.join(parameters.folderWithTraj, parameters.trajWildcard)
+    origFilesNonRepeatedWildcard = os.path.join(parameters.folderWithTraj, "extractedCoordinates", parameters.trajWildcard)
 
     __prepareWorkingControlFile(parameters.lagtime, parameters.nclusters, parameters.folderWithTraj, parameters.trajWildcard, workingControlFile, parameters.lagtimes, parameters.clusterCountsThreshold, parameters.clusteringStride)
 
@@ -206,8 +236,9 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
         __constructMSM(workingControlFile)
 
         deltaG = __computeDG(parameters.trajWildcard)
-
         deltaGs.append(deltaG)
+
+        getRepresentativePDBs(origFilesNonRepeatedWildcard, i)
 
         if parameters.computeDetailedBalance:
             avgAsymmetricFlux = checkDetailedBalance.main(folder="discretized", countsThreshold=0, lagtime=parameters.lagtime, printFigs=False)
@@ -217,7 +248,7 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
 
         __cleanupFiles(parameters.trajWildcard, True)
 
-        # Close all open matplotlib windows, apparently the its plot open a lot
+        # Close all open matplotlib windows, apparently the its plot opens a lot
         # of windows that are not closed, which consumes a lot of memory (not
         # sure how much exactly)
         plt.close("all")
