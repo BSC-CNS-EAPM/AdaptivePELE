@@ -1,3 +1,4 @@
+import sys
 import os
 import shutil
 import glob
@@ -10,21 +11,33 @@ def move(listFiles, dest):
         shutil.move(element, dest)
 
 # list of tuples with format (lagtime(k), #clusters(tau))
-iterations = [(50, 100), (50, 200), (50, 400), (100, 200), (100, 400)]
-trajsPerEpoch = 50
+iterations = [(25, 100), (50, 100), (100, 100), (200, 100), (400, 100),
+              (25, 200), (50, 200), (100, 200), (200, 200), (400, 200),
+              (25, 400), (50, 400), (100, 400), (200, 400), (400, 400)]
+trajsPerEpoch = 239
+nruns = 10
 runFolder = os.getcwd()
 print "Running from " + runFolder
 for tau, k in iterations:
-    destFolder = "%d/%dcl" % (tau, k)
+    destFolder = "%dlag/%dcl" % (tau, k)
     prepareMSMFolders.main()
-    os.makedirs(destFolder)
+    if not os.path.exists(destFolder):
+        os.makedirs(destFolder)
+    print "***************"
+    print "Estimating dG value in folder" + os.getcwd()
+    try:
+        estimateDGAdaptive.main(trajsPerEpoch, tau, k, nruns=nruns)
+    except Exception as err:
+        if "distribution contains entries smaller" in err.message:
+            print "Caught exception in step with lag %d and k %d, moving to next iteration" % (tau, k)
+            with open("error.txt", "w") as fe:
+                fe.write("Caught exception in step with lag %d and k %d, moving to next iteration\n" % (tau, k))
+        else:
+            raise type(err), type(err)(str(err)), sys.exc_info()[2]
+
     foldersToMove = np.array(glob.glob("MSM_*"))
     epochs = [int(folder[4:]) for folder in foldersToMove]
     args = np.argsort(epochs)
     sortedFolders = foldersToMove[args]
     move(sortedFolders, destFolder)
-    os.chdir(destFolder)
-    print "***************"
-    print "Estimating dG value in folder" + os.getcwd()
-    estimateDGAdaptive.main(trajsPerEpoch, tau, k)
-    os.chdir(runFolder)
+    shutil.move("results.txt", destFolder)
