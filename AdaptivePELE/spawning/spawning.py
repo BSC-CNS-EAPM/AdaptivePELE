@@ -979,7 +979,7 @@ class REAPCalculator(DensitySpawningCalculator):
 
         # Gather population and metrics data for all clusters
         for cluster in clusters:
-            population.append(cluster.elements)
+            population.append(float(cluster.elements))
             metrics.append([cluster.metrics[i] for i in self.metricInd])
         self.degeneracy = np.zeros_like(population)
         metrics = np.array(metrics).T
