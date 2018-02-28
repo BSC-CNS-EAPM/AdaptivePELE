@@ -830,6 +830,14 @@ class Clustering:
         """
         return self.clusters.getCluster(clusterNum)
 
+    def emptyClustering(self):
+        """
+            Delete previous results of clustering object
+        """
+        self.clusters = Clusters()
+        self.conformationNetwork = ConformationNetwork()
+        self.epoch = -1
+
     def clusterIterator(self):
         """
             Iterator over the clusters
@@ -1053,7 +1061,7 @@ class Clustering:
             :returns: int -- Number of cluster with the optimal metric
         """
         metrics = []
-        for i, cluster in enumerate(self.clusters.clusters):
+        for _, cluster in enumerate(self.clusters.clusters):
             if column is None:
                 metric = cluster.getMetric()
             else:

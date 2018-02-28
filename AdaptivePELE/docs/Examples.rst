@@ -14,6 +14,7 @@ Also, if AdaptivePELE was not installed in a typical library directory, a common
 
     export PYTHONPATH=<location_of_AdaptivePELE>
 
+
 Overview
 --------
 
@@ -580,6 +581,16 @@ To plot the evolution of the number of clusters along the simulation::
 
 It shows the evolution of the total number of clusters, and the number of clusters divided in different densities and cluster thresholds.
 It also prints a histogram with the ratio of counts *r* (see above). When ``-filename`` is provided, it saves the plots as png files.
+
+
+Dynamical hooks
+---------------
+
+Starting from version 4.2, the option of dynamically changing the cluster sizes
+is implemented using a hook. This hook is a function that is passed to the
+adaptive main function which accepts two arguments: *clustering* and *outputPath*
+and returns two arguments: *clustering* and *hasChanged*. *clustering* refers to  the clustering object, while *hasChanged* is a boolean that marks whether any change has been done to the clustering object in the hook function. If so, the data is reclustered before starting the new iteration.
+
 
 .. [APELE] Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, https://www.nature.com/articles/s41598-017-08445-5
 
