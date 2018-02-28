@@ -4,6 +4,7 @@ import shutil
 import numpy as np
 import string
 import json
+from scipy import linalg
 # import pickle
 import cPickle as pickle
 from AdaptivePELE.atomset import RMSDCalculator
@@ -160,7 +161,12 @@ def ensure_connectivity_msm(msm):
         counts += 1/float(counts.shape[0])
         trans = utils.buildRevTransitionMatrix(counts)
         _, eic = getSortedEigen(trans)
-        return run.getStationaryDistr(eic[:, 0])
+        return getStationaryDistr(eic[:, 0])
+
+
+def getStationaryDistr(lowestEigenvector):
+    absStationary = np.abs(lowestEigenvector)
+    return absStationary / absStationary.sum()
 
 
 def getSortedEigen(T):
