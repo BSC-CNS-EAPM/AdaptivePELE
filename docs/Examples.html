@@ -122,6 +122,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#analysis">Analysis</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamical-hooks">Dynamical hooks</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
@@ -689,13 +690,20 @@ If we change a clustering parameter in a restart run, AdaptivePELE will recluste
 </div>
 <p>It shows the evolution of the total number of clusters, and the number of clusters divided in different densities and cluster thresholds.
 It also prints a histogram with the ratio of counts <em>r</em> (see above). When <code class="docutils literal"><span class="pre">-filename</span></code> is provided, it saves the plots as png files.</p>
+</div>
+</div>
+<div class="section" id="dynamical-hooks">
+<h2>Dynamical hooks<a class="headerlink" href="#dynamical-hooks" title="Permalink to this headline">¶</a></h2>
+<p>Starting from version 4.2, the option of dynamically changing the cluster sizes
+is implemented using a hook. This hook is a function that is passed to the
+adaptive main function which accepts two arguments: <em>clustering</em> and <em>outputPath</em>
+and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clustering</em> refers to  the clustering object, while <em>hasChanged</em> is a boolean that marks whether any change has been done to the clustering object in the hook function. If so, the data is reclustered before starting the new iteration.</p>
 <table class="docutils citation" frame="void" id="apele" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label">[APELE]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id5">2</a>)</em> Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></td></tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 

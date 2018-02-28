@@ -192,7 +192,8 @@ class SpawningParams:
                 spawningType == blockNames.StringSpawningTypes.UCB or \
                 spawningType == blockNames.StringSpawningTypes.REAP:
             self.temperature = spawningParamsBlock.get(blockNames.SpawningParams.temperature, 1000)
-            self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]
+            # Start counting the columns by 1
+            self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]-1
 
         if spawningType == blockNames.StringSpawningTypes.variableEpsilon:
             self.varEpsilonType = spawningParamsBlock[blockNames.SpawningParams.varEpsilonType]

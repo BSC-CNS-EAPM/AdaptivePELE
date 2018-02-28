@@ -374,6 +374,24 @@ cdef class PDB:
         """
         return self.atoms[atomId]
 
+    def __len__(self):
+        return len(self.atomList)
+
+
+    def __getitem__(self, atomId):
+        return self.atoms[atomId]
+
+    def __setitem__(self, atomId, atom):
+        self.atoms[atomId] = atom
+
+    def __delitem__(self, atomId):
+        self.atoms.pop(atomId)
+        self.atomList.remove(atomId)
+
+    def __iter__(self):
+        for atomId in self.atomList:
+            yield self.atoms[atomId]
+
     def extractCOM(self):
         """
             Calculate the PDB's center of mass

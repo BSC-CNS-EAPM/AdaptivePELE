@@ -173,6 +173,9 @@
         <span class="c1"># Restore instance attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;clusters&#39;</span><span class="p">]</span>
 
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
+
 <div class="viewcode-block" id="Clusters.addCluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters.addCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cluster</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Add a new cluster</span>
@@ -225,8 +228,21 @@
             <span class="n">cluster</span><span class="o">.</span><span class="n">printCluster</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
             <span class="nb">print</span> <span class="s2">&quot;&quot;</span></div>
 
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">clusters</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">clusters</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">cluster</span></div>
 
 
 <div class="viewcode-block" id="ConformationNetwork"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ConformationNetwork">[docs]</a><span class="k">class</span> <span class="nc">ConformationNetwork</span><span class="p">:</span>
@@ -527,6 +543,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">altSelection</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;altSelection&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trajPosition</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;trajPosition&#39;</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span>
+
 <div class="viewcode-block" id="Cluster.getMetric"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Cluster.getMetric">[docs]</a>    <span class="k">def</span> <span class="nf">getMetric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Get the value of the prefered metric if present, otherwise return None</span>
@@ -584,6 +603,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span> <span class="s2">&quot;Radius threshold: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span>
         <span class="nb">print</span> <span class="s2">&quot;Number of contacts: </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Cluster: elements=</span><span class="si">%d</span><span class="s2">, threshold=</span><span class="si">%.3f</span><span class="s2">, contacts=</span><span class="si">%.3f</span><span class="s2">, density=</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span> <span class="ow">or</span> <span class="s2">&quot;0.000&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Cluster.writePDB"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Cluster.writePDB">[docs]</a>    <span class="k">def</span> <span class="nf">writePDB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -907,6 +929,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">conformationNetwork</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;conformationNetwork&#39;</span><span class="p">,</span> <span class="n">ConformationNetwork</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;epoch&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Clustering: nClusters: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">cluster</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
 <div class="viewcode-block" id="Clustering.setCol"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.setCol">[docs]</a>    <span class="k">def</span> <span class="nf">setCol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Set the column of the prefered column to col</span>
@@ -926,6 +967,14 @@
 <span class="sd">            :returns: :py:class:`.Cluster` -- Cluster at clusterNum</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">getCluster</span><span class="p">(</span><span class="n">clusterNum</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Clustering.emptyClustering"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.emptyClustering">[docs]</a>    <span class="k">def</span> <span class="nf">emptyClustering</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Delete previous results of clustering object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="n">Clusters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conformationNetwork</span> <span class="o">=</span> <span class="n">ConformationNetwork</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span></div>
 
 <div class="viewcode-block" id="Clustering.clusterIterator"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.clusterIterator">[docs]</a>    <span class="k">def</span> <span class="nf">clusterIterator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -975,12 +1024,12 @@
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">origCluster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">trajNum</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">origCluster</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">metrics</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot; This is usually caused by a mismatch between report files and trajectory files&quot;</span>
+                        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot; in trajectory </span><span class="si">%d</span><span class="s2">. This is usually caused by a mismatch between report files and trajectory files&quot;</span>
                                    <span class="s2">&quot; which in turn is usually caused by some problem in writing the files, e.g. quota&quot;</span><span class="p">)</span>
 
                         <span class="c1"># raise a new exception of the same type, with the same</span>
                         <span class="c1"># traceback but with an added message</span>
-                        <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="n">message</span><span class="p">),</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+                        <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="n">message</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">),</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">):</span>
                     <span class="n">origCluster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">trajNum</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">origCluster</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
@@ -1150,7 +1199,7 @@
 <span class="sd">            :returns: int -- Number of cluster with the optimal metric</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">column</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">metric</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">getMetric</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>

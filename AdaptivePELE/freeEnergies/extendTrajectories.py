@@ -1,11 +1,11 @@
 import numpy as np
 import glob
 import os
-import shutil
-import collections
 import re
 import sys
 import argparse
+import ast
+
 
 def parseArguments():
     desc = "Program that extends trajectories.\n\
@@ -30,22 +30,25 @@ def tryToOpenMapping(mapFilename):
             mapping = f.read().split(":")
             opened = True
     except:
-            mapping = None
-            opened = False
+        mapping = None
+        opened = False
 
     return mapping, opened
+
 
 def sameCoords(coords1, coords2):
     threshold = 1e-4
     diff = np.abs(coords1 - coords2)
-    return (diff < threshold).all() 
+    return (diff < threshold).all()
+
 
 def checkFirstMatchingSnapshot(traj, snapshot, coords):
     for i in range(snapshot, traj.shape[0]):
-        if sameCoords(coords[1:], traj[i,1:]): #coords[0] is the snapshot num, which is not important and is discarded in MSM
+        if sameCoords(coords[1:], traj[i, 1:]):  # coords[0] is the snapshot num, which is not important and is discarded in MSM
             firstMatchingSnapshot = i
             return firstMatchingSnapshot
     raise IndexError
+
 
 def findSnapshotAndOpenTraj(trajName, lastSnapshot, coords, firstSnapshot=0):
     if lastSnapshot is None or coords is None:
@@ -53,7 +56,7 @@ def findSnapshotAndOpenTraj(trajName, lastSnapshot, coords, firstSnapshot=0):
     else:
         traj = np.loadtxt(trajName)
         try:
-            snapshot = checkFirstMatchingSnapshot(traj,lastSnapshot, coords)
+            snapshot = checkFirstMatchingSnapshot(traj, lastSnapshot, coords)
             return traj[firstSnapshot:snapshot]
         except IndexError:
             sys.exit("Did not find matching traj in trajName: %s; coords:%s, from snapshot:%d" % (trajName, coords, lastSnapshot))
@@ -62,56 +65,58 @@ def findSnapshotAndOpenTraj(trajName, lastSnapshot, coords, firstSnapshot=0):
 def reconstructFullTrajectory(mapping, thisTrajMap, trajNameTempletized, coords):
     """
         thisTrajMap contains the exact point at which a cluster was discovered
-        Note that the number of snapshot corresponds to the accepted steps and 
-        not absolute steps. There are different ways to overcome the limitation. 
-        The fastest is looking at the report file. A slower way is looking at 
-        the exact coordinates. It is slower, but the main advantage is that we 
+        Note that the number of snapshot corresponds to the accepted steps and
+        not absolute steps. There are different ways to overcome the limitation.
+        The fastest is looking at the report file. A slower way is looking at
+        the exact coordinates. It is slower, but the main advantage is that we
         do not need any extra file.
     """
     (epoch, num, snapshot) = thisTrajMap
 
     try:
-        thisTraj = findSnapshotAndOpenTraj(trajNameTempletized%(epoch, num), snapshot, coords)
-    except: #this is due to an error in adaptiveSampling. Once the bug is found, please remove the except block
+        thisTraj = findSnapshotAndOpenTraj(trajNameTempletized % (epoch, num), snapshot, coords)
+    except:  # this is due to an error in adaptiveSampling. Once the bug is found, please remove the except block
         epoch += 1
-        thisTraj = findSnapshotAndOpenTraj(trajNameTempletized%(epoch, num), snapshot, coords)
-
+        thisTraj = findSnapshotAndOpenTraj(trajNameTempletized % (epoch, num), snapshot, coords)
 
     if epoch == 0:
         return thisTraj
     else:
-        prevTrajMap = eval(mapping[epoch][num-1])
-        return np.vstack ((reconstructFullTrajectory(mapping, prevTrajMap, trajNameTempletized, thisTraj[0]), thisTraj))
+        prevTrajMap = ast.literal_eval(mapping[epoch][num-1])
+        return np.vstack((reconstructFullTrajectory(mapping, prevTrajMap, trajNameTempletized, thisTraj[0]), thisTraj))
+
 
 def addUncountedSnapshots(mapping, thisTrajMap, trajNameTempletized, coords, lagtime):
     """
-        This function adds all possible previous uncounted snapshots 
+        This function adds all possible previous uncounted snapshots
         (i.e. those in the last lagtime snapshots) to the current traj
 
         thisTrajMap contains the exact point at which a cluster was discovered
-        Note that the number of snapshot corresponds to the accepted steps and 
-        not absolute steps. There are different ways to overcome the limitation. 
-        The fastest is looking at the report file. A slower way is looking at 
-        the exact coordinates. It is slower, but the main advantage is that we 
+        Note that the number of snapshot corresponds to the accepted steps and
+        not absolute steps. There are different ways to overcome the limitation.
+        The fastest is looking at the report file. A slower way is looking at
+        the exact coordinates. It is slower, but the main advantage is that we
         do not need any extra file.
     """
 
     (epoch, num, snapshot) = thisTrajMap
-    thisTraj = findSnapshotAndOpenTraj(trajNameTempletized%(epoch, num), snapshot, None)
+    thisTraj = findSnapshotAndOpenTraj(trajNameTempletized % (epoch, num), snapshot, None)
 
-    if epoch == 0: return thisTraj
+    if epoch == 0:
+        return thisTraj
 
-    prevTrajMap = eval(mapping[epoch][num-1])
+    prevTrajMap = ast.literal_eval(mapping[epoch][num-1])
     (epoch, num, snapshot) = prevTrajMap
     try:
-        #only consider the last "lagtime" snapshots
-        #if the initial point was found before the last lagtime snapshots, then: prevTraj = []
-        prevTraj = findSnapshotAndOpenTraj(trajNameTempletized%(epoch, num), snapshot, thisTraj[0], firstSnapshot=-lagtime)
+        # only consider the last "lagtime" snapshots
+        # if the initial point was found before the last lagtime snapshots, then: prevTraj = []
+        prevTraj = findSnapshotAndOpenTraj(trajNameTempletized % (epoch, num), snapshot, thisTraj[0], firstSnapshot=-lagtime)
     except:
         epoch += 1
-        prevTraj = findSnapshotAndOpenTraj(trajNameTempletized%(epoch, num), snapshot, thisTraj[0], firstSnapshot=-lagtime)
+        prevTraj = findSnapshotAndOpenTraj(trajNameTempletized % (epoch, num), snapshot, thisTraj[0], firstSnapshot=-lagtime)
 
-    return np.vstack ((prevTraj, thisTraj))
+    return np.vstack((prevTraj, thisTraj))
+
 
 def main():
     choice, lagtime, outputDir, inputDir = parseArguments()
@@ -121,23 +126,23 @@ def main():
     if not os.path.exists(outputDir):
         os.makedirs(outputDir)
 
-    trajWildcard = "traj_%d_*.dat" #%d for the epoch
-    trajName = "traj_%d_%d.dat" #%d for the epoch and number
+    trajWildcard = "traj_%d_*.dat"  # %d for the epoch
+    trajName = "traj_%d_%d.dat"  # %d for the epoch and number
 
     trajNameTempletized = os.path.join(inputDir, trajName)
 
     allFolders = os.listdir(".")
     epochFolders = [int(re.sub("MSM_", "", epoch)) for epoch in allFolders if epoch.startswith("MSM")]
-     
+
     numberOfEpochs = max(epochFolders)
     mappings = []
     for epoch in range(0, numberOfEpochs):
-        epochMapping, opened = tryToOpenMapping(mapFilename%epoch)
+        epochMapping, _ = tryToOpenMapping(mapFilename % epoch)
         mappings.append(epochMapping)
 
     newSizes = []
     for epoch in range(0, numberOfEpochs):
-        allFiles = glob.glob(os.path.join(inputDir, trajWildcard%epoch))
+        allFiles = glob.glob(os.path.join(inputDir, trajWildcard % epoch))
         for source in allFiles:
             print source
             num = int(source.split("_")[-1][:-4])
@@ -149,7 +154,7 @@ def main():
             newSizes.append(fullTraj.shape[0])
 
             fname = os.path.split(source)[-1]
-            dst = os.path.join(outputDir, fname) 
+            dst = os.path.join(outputDir, fname)
             np.savetxt(dst, fullTraj)
 
     newSizes = np.array(newSizes)

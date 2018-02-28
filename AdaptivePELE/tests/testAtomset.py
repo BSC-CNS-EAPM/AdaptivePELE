@@ -334,8 +334,7 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         symmetryEvaluator = sym.SymmetryContactMapEvaluator([])
 
         # function to test
-        contact_map, contacts = symmetryEvaluator.createContactMap(pdb_1,
-                                                                   "AIN", 16)
+        _, contacts = symmetryEvaluator.createContactMap(pdb_1, "AIN", 16)
         golden_contacts = pdb_1.countContacts("AIN", 8)
         self.assertEqual(golden_contacts, contacts)
 
@@ -352,7 +351,7 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         contactMap1, contacts1 = symmetryEvaluator.buildContactMap(pdb_1, 'AEN', 16)
         cluster = clustering.Cluster(pdb_1, contactMap=contactMap1)
         contactMap1Sym, contactsSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
-        contactMapNoSym, contactsNoSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
+        contactMapNoSym, _ = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
 
         goldenJaccard = 0.0
         Jaccard = symmetryEvaluator.evaluateJaccard(contactMap1Sym, cluster.contactMap)
@@ -375,7 +374,7 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         contactMap1, contacts1 = symmetryEvaluator.buildContactMap(pdb_1, 'AEN', 16)
         cluster = clustering.Cluster(pdb_1, contactMap=contactMap1)
         contactMap1Sym, contactsSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
-        contactMapNoSym, contactsNoSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
+        contactMapNoSym, _ = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
 
         goldenCorrelation = 0.0
         correlationSym = symmetryEvaluator.evaluateCorrelation(contactMap1Sym, cluster.contactMap)
@@ -398,7 +397,7 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         contactMap1, contacts1 = symmetryEvaluator.buildContactMap(pdb_1, 'AEN', 16)
         cluster = clustering.Cluster(pdb_1, contactMap=contactMap1)
         contactMap1Sym, contactsSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
-        contactMapNoSym, contactsNoSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
+        contactMapNoSym, _ = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
 
         goldenDifference = 0.0
         DifferenceSym = symmetryEvaluator.evaluateDifferenceDistance(contactMap1Sym, cluster.contactMap)
@@ -407,3 +406,16 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         self.assertEqual(contacts1, contactsSym)
         self.assertAlmostEqual(goldenDifference, DifferenceSym)
         self.assertNotAlmostEqual(DifferenceSym, DifferenceNosym)
+
+    def test_PDB_interface(self):
+        pdb = atomset.PDB()
+        pdb.initialise("tests/data/symmetries/cluster_1.pdb", resname='AEN')
+        self.assertEqual(len(pdb), 9)
+        atomList = [atom for atom in pdb]
+        atoms = [pdb.getAtom(a) for a in pdb.atomList]
+        self.assertEqual(atomList, atoms)
+        atomId = pdb.atomList[0]
+        atom = pdb[atomId]
+        self.assertEqual(atom, pdb.getAtom(atomId))
+        pdb[atomId] = None
+        self.assertEqual(None, pdb.getAtom(atomId))
