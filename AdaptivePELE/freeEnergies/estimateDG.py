@@ -205,6 +205,7 @@ def getRepresentativePDBs(filesWildcard, run):
     if not os.path.exists("representative_structures"):
         os.makedirs("representative_structures")
     with open("representative_structures/representative_structures_%d.dat" % run, "w") as fw:
+        fw.write("Cluster\tEpoch\tTrajectory\tSnapshot\n")
         for clNum in xrange(numClusters):
             fw.write("%d\t" % clNum+"\t".join(centersInfo[clNum]["structure"])+"\n")
 
