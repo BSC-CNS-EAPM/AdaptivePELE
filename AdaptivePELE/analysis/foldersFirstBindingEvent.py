@@ -71,4 +71,6 @@ def main(folders, column, threshold, stepsPerEpoch, sequential, unbinding):
 
 if __name__ == "__main__":
     folders, column, threshold, stepsPerEpoch, seq, unbind = parseArguments()
+    # We count columns starting by 1
+    column -= 1
     main(folders, column, threshold, stepsPerEpoch, seq, unbind)
