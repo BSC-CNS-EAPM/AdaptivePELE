@@ -1,4 +1,4 @@
-import math 
+import math
 import os
 import numpy
 import argparse
@@ -6,11 +6,11 @@ import argparse
 def parseArguments():
     desc = "Program that analyses a column of data, printing different statistical values and a histogram if desired."
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("col", type=int, default=0, help="Column with the values (Integer values in [0, N-1]).") 
-    parser.add_argument("files", nargs='+', help="Files with the data to analyse.") 
+    parser.add_argument("col", type=int, default=1, help="Column with the values (Integer values in [1, N]).")
+    parser.add_argument("files", nargs='+', help="Files with the data to analyse.")
     parser.add_argument("-o", metavar="OUTLIERRANGE", type=float, default=1, help="Factor that widens the range for a value not to be considered as an outlier.")
-    parser.add_argument("-p", nargs='?', type=int, const=10, metavar='bins', help="Plots histogram. Can take as argument the number of bins.") 
-    parser.add_argument("-e", action="store_true", default=False, help="If plotting, draw the error bars.") 
+    parser.add_argument("-p", nargs='?', type=int, const=10, metavar='bins', help="Plots histogram. Can take as argument the number of bins.")
+    parser.add_argument("-e", action="store_true", default=False, help="If plotting, draw the error bars.")
     args = parser.parse_args()
 
     return args.col, args.files, args.p, args.o, args.e
@@ -29,7 +29,7 @@ def analyseData(data):
 
     variance = 0
     for number in data:
-        variance += math.pow(number - average,2)   
+        variance += math.pow(number - average,2)
 
     variance = variance/(numberOfElements-1)
 
@@ -85,6 +85,8 @@ def readDataFromFiles(files, column):
 
 def main():
     column, files, bins, outlierRange, plotErrorBars = parseArguments()
+    # We count columns starting with 1
+    column -= 1
 
     data = readDataFromFiles(files, column)
 
@@ -104,11 +106,11 @@ def main():
     if bins:
         import histogram
         plotErrorBars = plotErrorBars not in ['False', 'false', 0]
-        histogram.plot_histogram(data, bins, plotErrorBars, 1, "Before removing outliers") 
-        histogram.plot_histogram(filteredData, bins, plotErrorBars, 2, "After removing outliers (%.2f * IQR)"%(outlierRange*1.5)) 
+        histogram.plot_histogram(data, bins, plotErrorBars, 1, "Before removing outliers")
+        histogram.plot_histogram(filteredData, bins, plotErrorBars, 2, "After removing outliers (%.2f * IQR)"%(outlierRange*1.5))
         #To keep plots "alive"
         raw_input()
 
 
 if __name__ == '__main__':
-    main() 
+    main()
