@@ -301,7 +301,7 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <ul class="simple">
 <li><strong>data</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE</li>
 <li><strong>documents</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE</li>
-<li><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder, it is already</li>
+<li><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder</li>
 <li><strong>modeMovingBox</strong> (<em>string</em>, default=None, possible values={<em>unbinding</em>, <em>binding</em>}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation</li>
 <li><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</li>
 <li><strong>boxRadius</strong> (<em>int</em>, default=20): Value of the simulation box radius</li>
@@ -313,7 +313,11 @@ equilibration run</li>
 mode of the equilbration run, <em>equilibrationSelect</em> selects one of the
 structures as a representative as a function of distance and energy, while
 <em>equilibrationLastSnapshot</em> selects the last snapshot of each trajectory as
-representatives</li>
+representatives and <em>equilibrationCluster</em> clusters the output of the 25%
+best energy structures in the equilibration by the center of mass.</li>
+<li><strong>numberEquilibrationStructures</strong> (<em>int</em>, default=10): Number of clusters to
+obtain from the <em>equilibrationCluster</em> structure selection (see
+<strong>equilibrationMode</strong> for more details)</li>
 </ul>
 <p>Additionally, the block may have an exit condition that stops the execution:</p>
 <ul>
@@ -697,7 +701,15 @@ It also prints a histogram with the ratio of counts <em>r</em> (see above). When
 <p>Starting from version 4.2, the option of dynamically changing the cluster sizes
 is implemented using a hook. This hook is a function that is passed to the
 adaptive main function which accepts two arguments: <em>clustering</em> and <em>outputPath</em>
-and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clustering</em> refers to  the clustering object, while <em>hasChanged</em> is a boolean that marks whether any change has been done to the clustering object in the hook function. If so, the data is reclustered before starting the new iteration.</p>
+and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clustering</em> refers to  the clustering object, while <em>hasChanged</em> is a boolean that marks whether any change has been done to the clustering object in the hook function. If so, the data is reclustered before starting the new iteration. One example of such function would look like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">hook_function</span><span class="p">(</span><span class="n">clustering</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">):</span>
+    <span class="n">hasChanged</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">clustering</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">clustering</span><span class="o">.</span><span class="n">thresholdCalculator</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+        <span class="n">hasChanged</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">clustering</span><span class="p">,</span> <span class="n">hasChanged</span>
+</pre></div>
+</div>
 <table class="docutils citation" frame="void" id="apele" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">

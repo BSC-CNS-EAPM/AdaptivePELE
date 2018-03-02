@@ -142,10 +142,11 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">linalg</span>
 <span class="c1"># import pickle</span>
 <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">RMSDCalculator</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">runMarkovChainModel</span> <span class="k">as</span> <span class="n">run</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">utils</span>
 <span class="kn">import</span> <span class="nn">AdaptivePELE.atomset.atomset</span> <span class="k">as</span> <span class="nn">atomset</span>
 
 
@@ -296,9 +297,23 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">counts</span> <span class="o">=</span> <span class="n">msm</span><span class="o">.</span><span class="n">count_matrix_full</span>
         <span class="n">counts</span> <span class="o">+=</span> <span class="mi">1</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">trans</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">buildRevTransitionMatrix</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">eic</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">getSortedEigen</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">run</span><span class="o">.</span><span class="n">getStationaryDistr</span><span class="p">(</span><span class="n">eic</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span></div>
+        <span class="n">trans</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">buildRevTransitionMatrix</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">eic</span> <span class="o">=</span> <span class="n">getSortedEigen</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">getStationaryDistr</span><span class="p">(</span><span class="n">eic</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="getStationaryDistr"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getStationaryDistr">[docs]</a><span class="k">def</span> <span class="nf">getStationaryDistr</span><span class="p">(</span><span class="n">lowestEigenvector</span><span class="p">):</span>
+    <span class="n">absStationary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lowestEigenvector</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">absStationary</span> <span class="o">/</span> <span class="n">absStationary</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="getSortedEigen"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getSortedEigen">[docs]</a><span class="k">def</span> <span class="nf">getSortedEigen</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+    <span class="n">eigenvals</span><span class="p">,</span> <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">sortedIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">eigenvals</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># reigenvals, reigenvectors = linalg.eig(T.T)</span>
+    <span class="c1"># rsortedIndices = np.argsort(reigenvals)[::-1]</span>
+    <span class="k">return</span> <span class="n">eigenvals</span><span class="p">[</span><span class="n">sortedIndices</span><span class="p">],</span> <span class="n">eigenvectors</span><span class="p">[:,</span> <span class="n">sortedIndices</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="get_epoch_folders"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.get_epoch_folders">[docs]</a><span class="k">def</span> <span class="nf">get_epoch_folders</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
