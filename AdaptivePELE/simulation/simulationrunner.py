@@ -7,10 +7,12 @@ import string
 import sys
 import numpy as np
 import ast
+import glob
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
 from AdaptivePELE.atomset import atomset, RMSDCalculator
 from AdaptivePELE.utilities import utilities
+from sklearn.cluster import KMeans
 
 
 class SimulationParameters:
@@ -37,6 +39,7 @@ class SimulationParameters:
         self.reportName = None
         self.trajectoryName = None
         self.srun = False
+        self.numberEquilibrationStructures = 10
 
 
 class SimulationRunner:
@@ -382,8 +385,10 @@ class PeleSimulation(SimulationRunner):
             trajNames = os.path.join(equilibrationOutput, trajWildcard)
             if len(initialStructures) == 1 and self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationLastSnapshot:
                 newStructure = self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames)
-            else:
+            elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationSelect:
                 newStructure = self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames)
+            elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationCluster:
+                newStructure = self.clusterEquilibrationStructures(resname, trajNames, reportNames)
 
             for j, struct in enumerate(newStructure):
                 newStructurePath = os.path.join(equilibrationOutput, 'equilibration_struc_%d_%d.pdb' % (i+1, j+1))
@@ -391,6 +396,48 @@ class PeleSimulation(SimulationRunner):
                     fw.write(struct)
                 newInitialStructures.append(newStructurePath)
         return newInitialStructures
+
+    def clusterEquilibrationStructures(self, resname, trajWildcard, reportWildcard):
+        """
+            Cluster the equilibration run
+
+            :param resname: Name of the ligand in the pdb
+            :type resname: str
+            :param trajWildcard: Templetized path to trajectory files"
+            :type trajWildcard: str
+            :param reportWildcard: Templetized path to report files"
+            :type reportWildcard: str
+
+            :returns: list -- List with the pdb snapshots of the representatives structures
+        """
+        energyColumn = 3
+        # detect number of trajectories available
+        nTrajs = len(glob.glob(trajWildcard.rsplit("_", 1)[0]+"*"))
+        data = []
+        for i in xrange(1, nTrajs):
+            report = np.loadtxt(reportWildcard % i)
+            snapshots = utilities.getSnapshots(trajWildcard % i)
+            for nSnap, (line, snapshot) in enumerate(zip(report, snapshots)):
+                conformation = atomset.PDB()
+                conformation.initialise(snapshot, resname=resname)
+                com = conformation.getCOM()
+                data.append([line[energyColumn], i, nSnap]+com)
+        data = np.array(data)
+        data = data[data[:, 0].argsort()]
+        nPoints = max(self.parameters.numberEquilibrationStructures, data.shape[0]/4)
+        data = data[:nPoints]
+        kmeans = KMeans(n_clusters=self.parameters.numberEquilibrationStructures).fit(data[:, 3:])
+        clustersInfo = {x: {"structure": None, "minDist": 1e6} for x in xrange(self.parameters.numberEquilibrationStructures)}
+        for conf, cluster in zip(data, kmeans.labels_):
+            dist = np.linalg.norm(kmeans.cluster_centers_-conf[3:])
+            if dist < clustersInfo[cluster]["minDist"]:
+                clustersInfo[cluster]["minDist"] = dist
+                clustersInfo[cluster]["structure"] = tuple(conf[1:3].astype(int))
+        initialStructures = []
+        for cl in xrange(self.parameters.numberEquilibrationStructures):
+            traj, snap = clustersInfo[cl]["structure"]
+            initialStructures.append(utilities.getSnapshots(trajWildcard % traj)[snap])
+        return initialStructures
 
     def selectEquilibrationLastSnapshot(self, nTrajs, trajWildcard):
         """
@@ -663,6 +710,7 @@ class RunnerBuilder:
             params.runEquilibration = paramsBlock.get(blockNames.SimulationParams.runEquilibration, False)
             params.equilibrationMode = paramsBlock.get(blockNames.SimulationParams.equilibrationMode, blockNames.SimulationParams.equilibrationSelect)
             params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength)
+            params.numberEquilibrationStructures = paramsBlock.get(blockNames.SimulationParams.numberEquilibrationStructures, 10)
             params.srun = paramsBlock.get(blockNames.SimulationParams.srun, False)
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
