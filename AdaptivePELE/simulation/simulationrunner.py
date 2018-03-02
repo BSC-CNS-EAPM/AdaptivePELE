@@ -427,6 +427,7 @@ class PeleSimulation(SimulationRunner):
         nPoints = max(self.parameters.numberEquilibrationStructures, data.shape[0]/4)
         data = data[:nPoints]
         kmeans = KMeans(n_clusters=self.parameters.numberEquilibrationStructures).fit(data[:, 3:])
+        print "Clustered equilibration output into %d clusters!" % self.parameters.numberEquilibrationStructures
         clustersInfo = {x: {"structure": None, "minDist": 1e6} for x in xrange(self.parameters.numberEquilibrationStructures)}
         for conf, cluster in zip(data, kmeans.labels_):
             dist = np.linalg.norm(kmeans.cluster_centers_-conf[3:])
