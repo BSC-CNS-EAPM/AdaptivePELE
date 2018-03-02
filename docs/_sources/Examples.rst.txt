@@ -155,7 +155,7 @@ Optionally, you can also use the following parameters:
 
 * **data** (*string*, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE
 * **documents** (*string*, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE
-* **executable** (*string*, default=MareNostrum or Life cluster path): Path to the Pele executable folder, it is already
+* **executable** (*string*, default=MareNostrum or Life cluster path): Path to the Pele executable folder
 * **modeMovingBox** (*string*, default=None, possible values={*unbinding*, *binding*}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation
 * **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center
 * **boxRadius** (*int*, default=20): Value of the simulation box radius
@@ -167,7 +167,11 @@ Optionally, you can also use the following parameters:
   mode of the equilbration run, *equilibrationSelect* selects one of the
   structures as a representative as a function of distance and energy, while
   *equilibrationLastSnapshot* selects the last snapshot of each trajectory as
-  representatives
+  representatives and *equilibrationCluster* clusters the output of the 25%
+  best energy structures in the equilibration by the center of mass.
+* **numberEquilibrationStructures** (*int*, default=10): Number of clusters to
+  obtain from the *equilibrationCluster* structure selection (see
+  **equilibrationMode** for more details)
 
 Additionally, the block may have an exit condition that stops the execution:
 
@@ -589,7 +593,14 @@ Dynamical hooks
 Starting from version 4.2, the option of dynamically changing the cluster sizes
 is implemented using a hook. This hook is a function that is passed to the
 adaptive main function which accepts two arguments: *clustering* and *outputPath*
-and returns two arguments: *clustering* and *hasChanged*. *clustering* refers to  the clustering object, while *hasChanged* is a boolean that marks whether any change has been done to the clustering object in the hook function. If so, the data is reclustered before starting the new iteration.
+and returns two arguments: *clustering* and *hasChanged*. *clustering* refers to  the clustering object, while *hasChanged* is a boolean that marks whether any change has been done to the clustering object in the hook function. If so, the data is reclustered before starting the new iteration. One example of such function would look like::
+
+    def hook_function(clustering, outputPath):
+        hasChanged = False
+        if len(clustering) < 2:
+            clustering.thresholdCalculator.values = [1.5, 3]
+            hasChanged = True
+        return clustering, hasChanged
 
 
 .. [APELE] Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, https://www.nature.com/articles/s41598-017-08445-5
