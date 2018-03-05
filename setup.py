@@ -50,7 +50,7 @@ else:
 
 setup(
     name="AdaptivePELE",
-    version="1.4",
+    version="1.4.2",
     description='Enhanced sampling of molecular simulations',
     long_description=long_description,
     url="https://github.com/cescgina/AdaptivePELE",
