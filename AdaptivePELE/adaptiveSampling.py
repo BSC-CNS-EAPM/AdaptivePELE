@@ -600,11 +600,8 @@ def main(jsonParams, clusteringHook=None):
         print "Clustering ligand: %s sec" % (endTime - startTime)
 
         if clusteringHook is not None:
-            clusteringMethod, hasChanged = clusteringHook(clusteringMethod, outputPathConstants)
-            if hasChanged:
-                clusteringMethod.emptyClustering()
-                clusterPreviousEpochs(clusteringMethod, i+1, outputPathConstants.epochOutputPathTempletized, simulationRunner)
-
+            clusteringHook(clusteringMethod, outputPathConstants, simulationRunner, i+1)
+    
         if simulationRunner.parameters.modeMovingBox is not None:
             simulationRunner.getNextIterationBox(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i, resname)
             clustersList, clustersFiltered = filterClustersAccordingToBox(simulationRunner.parameters, clusteringMethod)
