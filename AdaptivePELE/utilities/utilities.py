@@ -12,6 +12,9 @@ from AdaptivePELE.freeEnergies import utils
 import AdaptivePELE.atomset.atomset as atomset
 
 
+class UnsatisfiedDependencyException(Exception):
+    __module__ = Exception.__module__
+
 def cleanup(tmpFolder):
     """
         Remove folder if exists

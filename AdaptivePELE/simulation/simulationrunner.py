@@ -12,8 +12,11 @@ from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
 from AdaptivePELE.atomset import atomset, RMSDCalculator
 from AdaptivePELE.utilities import utilities
-from sklearn.cluster import KMeans
-
+SKLEARN = True
+try:
+    from sklearn.cluster import KMeans
+except ImportError:
+    SKLEARN = False
 
 class SimulationParameters:
     def __init__(self):
@@ -410,6 +413,8 @@ class PeleSimulation(SimulationRunner):
 
             :returns: list -- List with the pdb snapshots of the representatives structures
         """
+        if not SKLEARN:
+            raise utilities.UnsatisfiedDependencyException("No installation of scikit-learn found. Please, install scikit-learn or select a different equilibrationMode.")
         energyColumn = 3
         # detect number of trajectories available
         nTrajs = len(glob.glob(trajWildcard.rsplit("_", 1)[0]+"*"))
