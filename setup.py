@@ -1,6 +1,3 @@
-# Run the following line to compile atomset package
-# python setup.py build_ext --inplace
-
 import numpy
 from setuptools import setup, find_packages
 # To use a consistent encoding
@@ -15,6 +12,10 @@ except ImportError:
 else:
     use_cython = True
 from distutils.command.sdist import sdist as _sdist
+
+# Run the following line to compile atomset package
+# python setup.py build_ext --inplace
+
 
 class sdist(_sdist):
     def run(self):
@@ -33,20 +34,20 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 if use_cython:
-        ext_modules += [
-            Extension("AdaptivePELE.atomset.atomset", ["AdaptivePELE/atomset/atomset.pyx"], include_dirs = ["AdaptivePELE", "AdaptivePELE/atomset"]),
-            Extension("AdaptivePELE.atomset.SymmetryContactMapEvaluator", ["AdaptivePELE/atomset/SymmetryContactMapEvaluator.pyx"], include_dirs = ["AdaptivePELE","AdaptivePELE/atomset"]),
-            Extension("AdaptivePELE.atomset.RMSDCalculator", ["AdaptivePELE/atomset/RMSDCalculator.pyx"], include_dirs = ["AdaptivePELE", "AdaptivePELE/atomset"]),
-            Extension("AdaptivePELE.freeEnergies.utils", ["AdaptivePELE/freeEnergies/utils.pyx"], include_dirs = ["AdaptivePELE", "AdaptivePELE/freeEnergies"])
-                ]
-        cmdclass.update({ 'build_ext': build_ext })
+    ext_modules += [
+        Extension("AdaptivePELE.atomset.atomset", ["AdaptivePELE/atomset/atomset.pyx"], include_dirs=["AdaptivePELE", "AdaptivePELE/atomset"]),
+        Extension("AdaptivePELE.atomset.SymmetryContactMapEvaluator", ["AdaptivePELE/atomset/SymmetryContactMapEvaluator.pyx"], include_dirs=["AdaptivePELE", "AdaptivePELE/atomset"]),
+        Extension("AdaptivePELE.atomset.RMSDCalculator", ["AdaptivePELE/atomset/RMSDCalculator.pyx"], include_dirs=["AdaptivePELE", "AdaptivePELE/atomset"]),
+        Extension("AdaptivePELE.freeEnergies.utils", ["AdaptivePELE/freeEnergies/utils.pyx"], include_dirs=["AdaptivePELE", "AdaptivePELE/freeEnergies"])
+    ]
+    cmdclass.update({'build_ext': build_ext})
 else:
-        ext_modules += [
-            Extension("AdaptivePELE.atomset.atomset", ["AdaptivePELE/atomset/atomset.c"], include_dirs = ["AdaptivePELE", "AdaptivePELE/atomset"]),
-            Extension("AdaptivePELE.atomset.SymmetryContactMapEvaluator", ["AdaptivePELE/atomset/SymmetryContactMapEvaluator.c"], include_dirs = ["AdaptivePELE","AdaptivePELE/atomset"]),
-            Extension("AdaptivePELE.atomset.RMSDCalculator", ["AdaptivePELE/atomset/RMSDCalculator.c"], include_dirs = ["AdaptivePELE", "AdaptivePELE/atomset"]),
-            Extension("AdaptivePELE.freeEnergies.utils", ["AdaptivePELE/freeEnergies/utils.c"], include_dirs = ["AdaptivePELE", "AdaptivePELE/freeEnergies"])
-                ]
+    ext_modules += [
+        Extension("AdaptivePELE.atomset.atomset", ["AdaptivePELE/atomset/atomset.c"], include_dirs=["AdaptivePELE", "AdaptivePELE/atomset"]),
+        Extension("AdaptivePELE.atomset.SymmetryContactMapEvaluator", ["AdaptivePELE/atomset/SymmetryContactMapEvaluator.c"], include_dirs=["AdaptivePELE", "AdaptivePELE/atomset"]),
+        Extension("AdaptivePELE.atomset.RMSDCalculator", ["AdaptivePELE/atomset/RMSDCalculator.c"], include_dirs=["AdaptivePELE", "AdaptivePELE/atomset"]),
+        Extension("AdaptivePELE.freeEnergies.utils", ["AdaptivePELE/freeEnergies/utils.c"], include_dirs=["AdaptivePELE", "AdaptivePELE/freeEnergies"])
+    ]
 
 setup(
     name="AdaptivePELE",
@@ -58,9 +59,9 @@ setup(
     author_email='danilecina@gmail.com, cescgina@gmail.com',
     license='',
     packages=find_packages(exclude=['docs', 'tests']),
-    package_data={ "AdaptivePELE/atomset": ['*.pxd'] },
+    package_data={"AdaptivePELE/atomset": ['*.pxd']},
     install_requires=['numpy'],
-    cmdclass = cmdclass,
-    ext_modules = cythonize(ext_modules),  # accepts a glob pattern
+    cmdclass=cmdclass,
+    ext_modules=cythonize(ext_modules),  # accepts a glob pattern
     include_dirs=[numpy.get_include()]
 )

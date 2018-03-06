@@ -2,7 +2,7 @@ from AdaptivePELE.constants import blockNames
 
 
 class SPAWNING_TYPES:
-    sameWeight, inverselyProportional, epsilon, simulatedAnnealing, FAST, variableEpsilon, UCB, independent, REAP, null = range(10)
+    sameWeight, inverselyProportional, epsilon, simulatedAnnealing, FAST, variableEpsilon, UCB, independent, REAP, null = list(range(10))
 
 SPAWNING_TYPE_TO_STRING_DICTIONARY = {
     SPAWNING_TYPES.independent: blockNames.StringSpawningTypes.independent,
@@ -19,7 +19,7 @@ SPAWNING_TYPE_TO_STRING_DICTIONARY = {
 
 
 class EPSILON_VARIATION_TYPES:
-    linearVariation, contactsVariation = range(2)
+    linearVariation, contactsVariation = list(range(2))
 
 EPSILON_VARIATION_TYPE_TO_STRING_DICTIONARY = {
     EPSILON_VARIATION_TYPES.linearVariation: blockNames.VariableEpsilonTypes.linearVariation,

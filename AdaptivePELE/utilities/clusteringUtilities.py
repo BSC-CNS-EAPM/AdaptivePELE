@@ -1,6 +1,7 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import pickle
-import utilities
+from AdaptivePELE.utilities import utilities
 
 
 def writeStructures(clusteringObject, listStructures, checker=lambda x: True, outputPath="cluster.pdb"):
@@ -25,15 +26,12 @@ def writeStructures(clusteringObject, listStructures, checker=lambda x: True, ou
         utilities.makeFolder(path[0])
         pathToWrite = os.path.join(path[0], path[1])
 
-    if listStructures is None or len(listStructures) == 0: #If no listStructures, write all
+    if listStructures is None or len(listStructures) == 0:  # If no listStructures, write all
         listStructures = range(len(clObject.clusters.clusters))
 
-    output = ""
     for element in listStructures:
         cluster = clObject.clusters.clusters[element]
         if checker is None or checker(cluster):
-            print "Writing", pathToWrite%element
+            print("Writing", pathToWrite % element)
             cluster.pdb.pdb += "\nENDMDL\n"
-            output += cluster.pdb.pdb
             cluster.writePDB(pathToWrite % element)
-

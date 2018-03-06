@@ -1,6 +1,6 @@
 import numpy as np
 import re
-import StringIO
+from io import StringIO
 cimport cython
 cimport numpy as np
 
@@ -297,7 +297,7 @@ cdef class PDB:
             resnumStr = ""
         else:
             resnumStr = str(resnum)
-        PDBContent = StringIO.StringIO(readPDB(PDBstr))  # Using StringIO
+        PDBContent = StringIO(readPDB(PDBstr))  # Using StringIO
         # creates a buffer that can handle a pdb file or a string containing
         # the PDB
         self.pdb = PDBContent.read()  # in case one wants to write it

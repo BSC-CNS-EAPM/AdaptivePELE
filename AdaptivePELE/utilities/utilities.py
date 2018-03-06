@@ -1,3 +1,5 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+from six import reraise as raise_
 import os
 import sys
 import shutil
@@ -5,8 +7,10 @@ import numpy as np
 import string
 import json
 from scipy import linalg
-# import pickle
-import cPickle as pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 from AdaptivePELE.atomset import RMSDCalculator
 from AdaptivePELE.freeEnergies import utils
 import AdaptivePELE.atomset.atomset as atomset
@@ -14,6 +18,7 @@ import AdaptivePELE.atomset.atomset as atomset
 
 class UnsatisfiedDependencyException(Exception):
     __module__ = Exception.__module__
+
 
 def cleanup(tmpFolder):
     """
@@ -107,7 +112,7 @@ def assertSymmetriesDict(symmetries, PDB):
         for key in group:
             assert key in PDB.atoms, "Symmetry atom %s not found in initial structure" % key
     if symmetries:
-        print "Symmetry dictionary correctly defined!"
+        print("Symmetry dictionary correctly defined!")
 
 
 def getRMSD(traj, nativePDB, resname, symmetries):
@@ -153,7 +158,7 @@ def readClusteringObject(clusteringObjectPath):
         try:
             return pickle.load(f)
         except EOFError:
-            raise EOFError, EOFError("Empty clustering object!"), sys.exc_info()[2]
+            raise_(EOFError, "Empty clustering object!", sys.exc_info()[2])
 
 
 def ensure_connectivity_msm(msm):

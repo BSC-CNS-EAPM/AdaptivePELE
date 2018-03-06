@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import sys
 import numpy as np
@@ -256,12 +257,12 @@ class SpawningCalculator:
         for i, cluster in enumerate(clustering.clusters.clusters):
             for _ in range(int(degeneracyOfRepresentatives[i])):
                 outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
-                print 'Writing to ', outputFilename, 'cluster', i
+                print('Writing to ', outputFilename, 'cluster', i)
                 procMapping.append(cluster.writeSpawningStructure(outputFilename))
 
                 counts += 1
 
-        print "counts & cluster centers", counts, np.where(np.array(degeneracyOfRepresentatives) > 0)[0].size
+        print("counts & cluster centers", counts, np.where(np.array(degeneracyOfRepresentatives) > 0)[0].size)
         return counts, procMapping
 
     def divideTrajAccordingToWeights(self, weights, trajToDistribute):
@@ -546,11 +547,11 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
             Log spawning information
         """
         if self.degeneracyTotal is not None:
-            print "[SpawningLog] Total: %s" % str(self.degeneracyTotal)
+            print("[SpawningLog] Total: %s" % str(self.degeneracyTotal))
         if self.degeneracyInverselyProportional is not None:
-            print "[SpawningLog] Inversely prop: %s" % str(self.degeneracyInverselyProportional)
+            print("[SpawningLog] Inversely prop: %s" % str(self.degeneracyInverselyProportional))
         if self.degeneracyMetricProportional is not None:
-            print "[SpawningLog] Metric prop:    %s" % str(self.degeneracyMetricProportional)
+            print("[SpawningLog] Metric prop:    %s" % str(self.degeneracyMetricProportional))
 
     def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
         """
@@ -1014,11 +1015,11 @@ class REAPCalculator(DensitySpawningCalculator):
             Log spawning information
         """
         if self.degeneracy is not None:
-            print "[SpawningLog] Total: %s" % str(self.degeneracy)
-        print "Metric indices"
-        print self.metricInd
-        print "Spawning weights"
-        print self.weights
+            print("[SpawningLog] Total: %s" % str(self.degeneracy))
+        print("Metric indices")
+        print(self.metricInd)
+        print("Spawning weights")
+        print(self.weights)
 
 
 class NullSpawningCalculator(SpawningCalculator):
