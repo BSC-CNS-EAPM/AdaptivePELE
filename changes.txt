@@ -1,10 +1,4 @@
 Behavior changes from previous version:
-    *) Added null spawning calculator
-    *) Added possibility of max metric in epsilon
-    *) Improvements in REAP spawning
-    *) Metric columns in control file now start by 1
-    *) Changed symbolic links in rawData in freeEnergies calculation to
-    relative paths
+    *) Now adaptive is compatible with python 2 and 3
 
 Bug fixes:
-    *) Various bug fixes

@@ -1,5 +1,6 @@
-from simulation import simulationrunner
-import adaptiveSampling
+from __future__ import absolute_import, division, print_function, unicode_literals
+from AdaptivePELE.simulation import simulationrunner
+import AdaptivePELE.adaptiveSampling as adaptiveSampling
 import argparse
 import os
 
@@ -24,8 +25,8 @@ def automateSimulation(args):
     if epochs:
         rangeOfEpochs = epochs
     else:
-        rangeOfEpochs = range(1, numSimulations+1)
-    print "rangeOfEpochs", rangeOfEpochs
+        rangeOfEpochs = list(range(1, numSimulations+1))
+    print("rangeOfEpochs", rangeOfEpochs)
 
     for i in rangeOfEpochs:
         controlFileDictionary = {"SEED": "%d%d%d", "OUTPUTPATH": "%s_%d"}
@@ -34,9 +35,9 @@ def automateSimulation(args):
         outputPath_i = controlFileDictionary["OUTPUTPATH"] % (simulationName, i)
         controlFileDictionary["OUTPUTPATH"] = outputPath_i
         controlFileName = "tmp_%s_controlfile_%s_%d.conf" % (os.path.splitext(controlFile)[0], simulationName, i)
-        controlFileName = controlFileName.replace("/","_")
+        controlFileName = controlFileName.replace("/", "_")
         simulationRunner.makeWorkingControlFile(controlFileName, controlFileDictionary)
-        print "Starting simulation %d" % i
+        print("Starting simulation %d" % i)
         adaptiveSampling.main(controlFileName)
 
 

@@ -270,8 +270,7 @@ class PeleSimulation(SimulationRunner):
         # Ensure random tags exists in metrics
         metricsBlock = peleControlFileDict["commands"][0]["PeleTasks"][0]["metrics"]
         nMetrics = len(metricsBlock)
-        randomIndexes = [i for i in xrange(nMetrics) if metricsBlock[i]['type'] == "random"]
-        randomIndexes.sort()
+        randomIndexes = sorted([i for i in xrange(nMetrics) if metricsBlock[i]['type'] == "random"])
         # Delete random numbers from metrics
         for index in randomIndexes[::-1]:
             del metricsBlock[index]

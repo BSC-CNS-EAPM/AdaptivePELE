@@ -155,7 +155,7 @@ def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeL
 
 def parseResname(atom_Ids, lig_resname):
     if atom_Ids is not None and len(atom_Ids) > 0:
-        differentResnames = set([atomId.split(":")[-1] for atomId in atom_Ids])
+        differentResnames = {atomId.split(":")[-1] for atomId in atom_Ids}
         if len(differentResnames) > 1:
             sys.exit("Error! Different resnames provided in atomIds!")
         elif len(differentResnames) == 1:

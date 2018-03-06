@@ -41,8 +41,7 @@ def findEpochFirstBindingEvent(thresholdValue, columnInReport, reportWildcard="*
 
 def getAllSortedEpochs():
     allFolders = os.listdir(".")
-    epochFolders = [int(epoch) for epoch in allFolders if epoch.isdigit()]
-    epochFolders.sort()
+    epochFolders = sorted([int(epoch) for epoch in allFolders if epoch.isdigit()])
     return epochFolders
 
 def findFirstBindingEvent(stepsPerEpoch, columnInReport, thresholdValue, unBinding=False):

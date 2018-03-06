@@ -28,8 +28,7 @@ def getAllDifferentEpochs(origTrajFiles):
     for f in trajFiles:
         epoch = extractEpoch(f)
         epochs.add(int(epoch))
-    epochs = list(epochs)
-    epochs.sort()
+    epochs = sorted(epochs)
     return epochs
 
 

@@ -56,12 +56,13 @@ if __name__ == "__main__":
         avgPDB, totPDBs = mapReference(ref, trajs)
     RMSF = {atom: 0.0 for atom in avgPDB}
     residueMapping = {}
+    # TODO: Handle multiple chains and insertion residues in PDB
     for PDBobj in totPDBs:
         for atomID, atom in PDBobj.atoms.iteritems():
             RMSF[atomID] += np.sum((atom.getAtomCoords()-avgPDB[atomID])**2)
     for atomID, atom in PDBobj.atoms.iteritems():
         if atom.resnum not in residueMapping:
-            residueMapping[atom.resnum] = set([atomID])
+            residueMapping[atom.resnum] = {atomID}
         else:
             residueMapping[atom.resnum].add(atomID)
     RMSFresidue = {}
