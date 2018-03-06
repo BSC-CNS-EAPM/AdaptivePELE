@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import unittest
 import pickle
 import shutil
@@ -101,8 +102,8 @@ class TestadaptiveSampling(unittest.TestCase):
                    [1.0, 0.0, 0.0, -7498.06, 18.5232, 0.229384],
                    [1.0, 0.0, 0.0, -7498.01, 18.6059, 0.253929],
                    [1.0, 0.0, 0.0, -7498.05, 22.4539, 0.238184],
-                   [1.0, 4.0, 4.0, -7498.05, 22.7766, 0.242335]
-                  ]
+                   [1.0, 4.0, 4.0, -7498.05, 22.7766, 0.242335]]
+
         goldenClusters = []
         for i in range(5):
             pdb = atomset.PDB()
@@ -132,7 +133,7 @@ class TestadaptiveSampling(unittest.TestCase):
             goldenClusters.append(cluster)
         name = socket.gethostname()
         if "bsccv" not in name and "login" not in name:
-            print "Some integration can't be run due to not having PELE  installed"
+            print("Some integration can't be run due to not having PELE  installed")
             return True
         self.integrationTest(controlFile, goldenPath, outputPath, goldenClusters)
 
@@ -145,7 +146,7 @@ class TestadaptiveSampling(unittest.TestCase):
             os.makedirs(os.path.join(outputPath, "1", "clustering"))
         name = socket.gethostname()
         if "bsccv" not in name and "login" not in name:
-            print "Some integration can't be run due to not having PELE  installed"
+            print("Some integration can't be run due to not having PELE  installed")
             return True
         # Function to test --> integration test
         shutil.copy("tests/data/3ptb_data/object_test_bk.pkl", os.path.join(outputPath, "1", "clustering", "object.pkl"))

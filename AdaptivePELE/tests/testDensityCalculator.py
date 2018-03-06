@@ -1,6 +1,8 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from AdaptivePELE.spawning import densitycalculator
 from AdaptivePELE.spawning import densitycalculatortypes
 import unittest
+
 
 class densityCalculatorTest(unittest.TestCase):
     def testDensityCalculatorUndefinedBlock(self):
@@ -12,8 +14,8 @@ class densityCalculatorTest(unittest.TestCase):
     def testDensityCalculatorNullCalculator(self):
         spawningBlock = {
             type: "irrelevant",
-            "density" : {
-                "type" : "null"
+            "density": {
+                "type": "null"
             }
         }
         densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
@@ -23,13 +25,12 @@ class densityCalculatorTest(unittest.TestCase):
     def testDensityCalculatorHeavisideNoParams(self):
         spawningBlock = {
             type: "irrelevant",
-            "density" : {
-                "type" : "heaviside"
+            "density": {
+                "type": "heaviside"
             }
         }
         densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
         densityCalculator = densityCalculatorBuilder.build(spawningBlock)
-
 
         goldenValues = [1.]
         goldenConditions = []
@@ -41,17 +42,16 @@ class densityCalculatorTest(unittest.TestCase):
     def testDensityCalculatorHeavisideParams(self):
         spawningBlock = {
             type: "irrelevant",
-            "density" : {
-                "type" : "heaviside",
-                "params" : {
-                    "conditions" : [1,2],
-                    "values" : [1,2]
+            "density": {
+                "type": "heaviside",
+                "params": {
+                    "conditions": [1, 2],
+                    "values": [1, 2]
                 }
             }
         }
         densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
         densityCalculator = densityCalculatorBuilder.build(spawningBlock)
-
 
         goldenValues = [1., 2.]
         goldenConditions = [1., 2.]
@@ -63,13 +63,12 @@ class densityCalculatorTest(unittest.TestCase):
     def testDensityCalculatorContinuousParams(self):
         spawningBlock = {
             type: "irrelevant",
-            "density" : {
-                "type" : "continuous"
+            "density": {
+                "type": "continuous"
             }
         }
         densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
         densityCalculator = densityCalculatorBuilder.build(spawningBlock)
-
 
         self.assertAlmostEqual(densityCalculator.calculate(0.5, 8), 1)
         self.assertAlmostEqual(densityCalculator.calculate(1.5, 8), 8)
@@ -84,17 +83,15 @@ class densityCalculatorTest(unittest.TestCase):
         # self.assertAlmostEqual(densityCalculator.calculate(0.05, 4), 1)
         # self.assertAlmostEqual(densityCalculator.calculate(0.2, 4), 8)
 
-
     def testDensityCalculatorInverseContinuousParams(self):
         spawningBlock = {
             type: "irrelevant",
-            "density" : {
-                "type" : "exitContinuous"
+            "density": {
+                "type": "exitContinuous"
             }
         }
         densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
         densityCalculator = densityCalculatorBuilder.build(spawningBlock)
-
 
         self.assertAlmostEqual(densityCalculator.calculate(0.5, 8), 1)
         self.assertAlmostEqual(densityCalculator.calculate(1.5, 8), 0.125)
