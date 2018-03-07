@@ -395,7 +395,7 @@ class PeleSimulation(SimulationRunner):
                     templateNames[name] = '"$%s"' % name
             print("Running equilibration for initial structure number %d" % (i+1))
             peleControlString = json.dumps(peleControlFileDict, indent=4)
-            for key, value in templateNames.iteritems():
+            for key, value in templateNames.items():
                 # Remove double quote around template keys, so that PELE
                 # understands the options
                 peleControlString = peleControlString.replace(value, "$%s" % key)

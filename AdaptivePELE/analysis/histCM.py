@@ -71,6 +71,6 @@ if __name__ == "__main__":
     plt.figure()
     plt.ylabel("Contact frequency")
     plt.xlabel("Residue number")
-    plt.bar(residueCounts.keys(), residueCounts.values())
+    plt.bar(list(residueCounts.keys()), residueCounts.values())
     plt.savefig("hist_CM.png")
     plt.show()

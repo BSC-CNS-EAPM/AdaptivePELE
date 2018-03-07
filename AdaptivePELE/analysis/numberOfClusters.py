@@ -206,7 +206,7 @@ def plotClustersPerValue(clustersPerValue):
             value
         :type clustersPerValue: dict
     """
-    values = clustersPerValue.keys()
+    values = list(clustersPerValue.keys())
     sortedValues = np.sort(values)
     for value in sortedValues:
         plt.plot(clustersPerValue[value], label=str(value))
