@@ -274,7 +274,8 @@ def loadParams(jsonParams):
         :type jsonParams: json str
     """
     jsonFile = open(jsonParams, 'r').read()
-    parsedJSON = json.loads(jsonFile, object_hook=__unicodeToStr)
+    # parsedJSON = json.loads(jsonFile, object_hook=__unicodeToStr)
+    parsedJSON = json.loads(jsonFile)
 
     return parsedJSON[blockNames.ControlFileParams.generalParams], parsedJSON[blockNames.ControlFileParams.spawningBlockname],\
         parsedJSON[blockNames.ControlFileParams.simulationBlockname], parsedJSON[blockNames.ControlFileParams.clusteringBlockname]
