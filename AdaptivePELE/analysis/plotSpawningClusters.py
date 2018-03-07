@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import socket
 import matplotlib
 import numpy as np
@@ -30,7 +31,7 @@ def printHelp():
 
 def main():
     filename = printHelp()
-    print "FILENAME", filename
+    print("FILENAME", filename)
     templateSummary = "%d/clustering/summary.txt"
     allFolders = os.listdir(".")
     numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit() and

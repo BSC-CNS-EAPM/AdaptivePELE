@@ -71,9 +71,9 @@ if __name__ == "__main__":
         RMSFresidue[residue] /= len(atoms)
         RMSFresidue[residue] = np.sqrt(RMSFresidue[residue])
 
-    print "Residue\tRMSF"
+    print("Residue\tRMSF")
     for res in sorted(RMSFresidue, key=lambda x: RMSFresidue[x], reverse=True)[:nResidues]:
-        print "%s\t%.4f" % (res, RMSFresidue[res])
+        print("%s\t%.4f" % (res, RMSFresidue[res]))
 
     plt.plot(RMSFresidue.keys(), RMSFresidue.values(), 'x')
     plt.xlabel("Residue number")

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import argparse
 import glob
@@ -124,7 +125,7 @@ def generateForLoopString(gnuplotString, reportName, column1, column2, stepsPerR
         plottingString += gnuplotString % dictionary + "\n"
         # plottingString += "pause 0.25\n"
 
-    print plottingString
+    print(plottingString)
 
 
 def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint):
@@ -164,4 +165,4 @@ if __name__ == "__main__":
         kind_Print = "PRINT_RMSD_STEPS"
 
     printLine = generatePrintString(steps_Run, Xcol, Ycol, filename, kind_Print)
-    print printLine
+    print(printLine)

@@ -1,6 +1,8 @@
-from utilities import utilities
+from __future__ import absolute_import, division, print_function, unicode_literals
+from AdaptivePELE.utilities import utilities
 import argparse
 import os
+
 
 def parseArguments():
     desc = "Program that writes a trajectory into separate pdbs."
@@ -10,6 +12,7 @@ def parseArguments():
     args = parser.parse_args()
     return args.files, args.o
 
+
 files, outputDir = parseArguments()
 utilities.makeFolder(outputDir)
 
@@ -17,9 +20,8 @@ for f in files:
     name = os.path.split(f)[-1]
     templateName = os.path.join(outputDir, name[:-4] + "_%d.pdb")
     snapshots = utilities.getSnapshots(f)
-    print len(snapshots)
+    print(len(snapshots))
     for i, snapshot in enumerate(snapshots):
-        print templateName%i
-        of = open(templateName%i, 'w')
-        of.write(snapshot)
-        of.close()
+        print(templateName % i)
+        with open(templateName % i, 'w') as of:
+            of.write(snapshot)

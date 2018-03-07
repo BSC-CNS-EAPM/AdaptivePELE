@@ -400,7 +400,7 @@ for i in range(nEpochs):
     # #     fw5.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
     # # path = getUnvisitedPath(ClAcc, 10)
     # path = getShortestPath(ClAcc, 10)
-    # print path
+    # print(path)
     # for node in path:
     #     cluster = ClAcc.getCluster(node)
     #     fw6.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
