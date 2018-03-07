@@ -448,7 +448,7 @@ class PeleSimulation(SimulationRunner):
                 data.append([line[energyColumn], i, nSnap]+com)
         data = np.array(data)
         data = data[data[:, 0].argsort()]
-        nPoints = max(self.parameters.numberEquilibrationStructures, data.shape[0]/4)
+        nPoints = max(self.parameters.numberEquilibrationStructures, data.shape[0]//4)
         data = data[:nPoints]
         kmeans = KMeans(n_clusters=self.parameters.numberEquilibrationStructures).fit(data[:, 3:])
         print("Clustered equilibration output into %d clusters!" % self.parameters.numberEquilibrationStructures)

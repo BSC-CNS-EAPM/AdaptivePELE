@@ -26,7 +26,7 @@ def analyseData(data):
     data.sort()
     minVal = data[0]
     maxVal = data[-1]
-    median = data[numberOfElements/2]
+    median = data[numberOfElements//2]
 
     variance = 0
     for number in data:
@@ -56,8 +56,8 @@ def returnListWithoutOutliers(data, outlierRange):
     data.sort()
 
     dataPointsBefore = len(data)
-    Q1 = data[dataPointsBefore/4]
-    Q3 = data[3*dataPointsBefore/4]
+    Q1 = data[dataPointsBefore//4]
+    Q3 = data[3*dataPointsBefore//4]
     IQR = Q3 - Q1
 
     lowerFence = Q1 - 1.5 * IQR * outlierRange

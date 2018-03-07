@@ -998,7 +998,7 @@ class Clustering:
                                                                  self.resname, self.resnum,
                                                                  self.resChain, self.contactThresholdDistance)
             if isSimilar:
-                if dist > cluster.threshold/2:
+                if dist > cluster.threshold/2.0:
                     cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.resnum, self.resChain, self.contactThresholdDistance, self.clusteringEvaluator, trajPosition=(self.epoch, trajNum, snapshotNum))
                 cluster.addElement(metrics)
                 if origCluster is None:
@@ -1013,7 +1013,7 @@ class Clustering:
                                                  self.resChain, self.contactThresholdDistance)
         contacts = self.clusteringEvaluator.contacts
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
-        contactsPerAtom = float(contacts)/numberOfLigandAtoms
+        contactsPerAtom = contacts/numberOfLigandAtoms
 
         threshold = self.thresholdCalculator.calculate(contactsPerAtom)
         cluster = Cluster(pdb, thresholdRadius=threshold,
@@ -1358,7 +1358,7 @@ class SequentialLastSnapshotClustering(Clustering):
                        chain=self.resChain)
         contacts = pdb.countContacts(self.resname, self.contactThresholdDistance, self.resnum, self.resChain)
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
-        contactsPerAtom = float(contacts)/numberOfLigandAtoms
+        contactsPerAtom = contacts/numberOfLigandAtoms
 
         cluster = Cluster(pdb, thresholdRadius=0,
                           contacts=contactsPerAtom, metrics=metrics,
