@@ -158,7 +158,8 @@ def readClusteringObject(clusteringObjectPath):
         try:
             return pickle.load(f)
         except EOFError:
-            raise_(EOFError, "Empty clustering object!", sys.exc_info()[2])
+            t, v, tb = sys.exc_info()
+            raise_(t, v, tb)
 
 
 def ensure_connectivity_msm(msm):
