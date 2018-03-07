@@ -30,9 +30,9 @@ def validate(control_file):
         if block.startswith('__'):
             continue
         block_obj = getattr(validatorBlockNames,
-                            ast.literal_ast.literal_eval("validatorBlockNames.ControlFileParams.%s" %
+                            eval("validatorBlockNames.ControlFileParams.%s" %
                                                          block))
-        controlfile_obj = ast.literal_ast.literal_eval("blockNames.ControlFileParams.%s" % block)
+        controlfile_obj = eval("blockNames.ControlFileParams.%s" % block)
 
         if block == "generalParams":
             try:
@@ -84,16 +84,16 @@ def validateBlock(blockName, controlFileBlock):
         warnings.warn("Missing mandatory parameter type in block")
 
     # Check if type selected is valid
-    if not isinstance(blockType, basestring):
+    if not isinstance(blockType, str):
         warnings.warn("Type for %s should be %s and instead is %s" %
-                      (blockType, 'basestring', type(blockType).__name__))
+                      (blockType, 'str', type(blockType).__name__))
         isCorrect = False
 
     # check for mandatory parameters
     try:
-        for mandatory, value in blockName.types[blockType].iteritems():
+        for mandatory, value in blockName.types[blockType].items():
             try:
-                if not isinstance(controlFileBlock['params'][mandatory], ast.literal_eval(value)):
+                if not isinstance(controlFileBlock['params'][mandatory], eval(value)):
                     warnings.warn("Type for %s should be %s and instead is %s" %
                                   (mandatory, value, type(controlFileBlock['params'][mandatory]).__name__))
                     isCorrect = False
@@ -107,9 +107,9 @@ def validateBlock(blockName, controlFileBlock):
         isCorrect = False
     # check rest of parameters specified
     try:
-        for param, value in controlFileBlock["params"].iteritems():
+        for param, value in controlFileBlock["params"].items():
             try:
-                if not isinstance(value, ast.literal_eval(blockName.params[param])):
+                if not isinstance(value, eval(blockName.params[param])):
                     warnings.warn("Type for %s should be %s and instead is %s" %
                                   (param, blockName.params[param],
                                    type(value).__name__))
@@ -129,8 +129,8 @@ def validateBlock(blockName, controlFileBlock):
             if block not in controlFileBlock:
                 continue
             try:
-                types_dict = ast.literal_eval("blockName.%s" % block)["types"]
-                params_dict = ast.literal_eval("blockName.%s" % block)["params"]
+                types_dict = eval("blockName.%s" % block)["types"]
+                params_dict = eval("blockName.%s" % block)["params"]
             except KeyError as err:
                 warnings.warn("Type %s in %s not found." %
                               (err.message, block))
@@ -145,16 +145,16 @@ def validateBlock(blockName, controlFileBlock):
                 warnings.warn("Type %s in %s not found." %
                               (blockType, blockName.__name__))
                 isCorrect = False
-            if not isinstance(blockType, basestring):
+            if not isinstance(blockType, str):
                 warnings.warn("Type for %s should be %s and instead is %s" %
-                              (blockType, 'basestring', type(blockType).__name__))
+                              (blockType, 'str', type(blockType).__name__))
                 isCorrect = False
             # check rest of parameters specified
             # Do a get on the "params" block and return an empty list if not found
             paramsControlFile = controlFileBlock[block].get("params", {})
-            for param, value in paramsControlFile.iteritems():
+            for param, value in paramsControlFile.items():
                 try:
-                    if not isinstance(value, ast.literal_ast.literal_eval(params_dict[param])):
+                    if not isinstance(value, eval(params_dict[param])):
                         warnings.warn("Type for %s should be %s and instead is %s" %
                                       (param, params_dict[param], type(value).__name__))
                         isCorrect = False
@@ -183,7 +183,7 @@ def validateGeneralBlock(blockName, controlFileBlock):
     isCorrect = True
     for key, value in blockName.mandatory.items():
         try:
-            if not isinstance(controlFileBlock[key], ast.literal_ast.literal_eval(value)):
+            if not isinstance(controlFileBlock[key], eval(value)):
                 warnings.warn("Type for %s should be %s and instead is %s" %
                               (key, value, type(controlFileBlock[key]).__name__))
                 isCorrect = False
@@ -192,9 +192,9 @@ def validateGeneralBlock(blockName, controlFileBlock):
                           key)
             isCorrect = False
 
-    for key, value in controlFileBlock.iteritems():
+    for key, value in controlFileBlock.items():
         try:
-            if not isinstance(value, ast.literal_eval(blockName.params[key])):
+            if not isinstance(value, eval(blockName.params[key])):
                 warnings.warn("Type for %s should be %s and instead is %s" %
                               (key, value, type(blockName.params[key]).__name__))
                 isCorrect = False
