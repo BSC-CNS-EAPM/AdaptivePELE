@@ -146,6 +146,23 @@ class SimulationRunner:
         """
         self.processorsToClusterMapping = [0 for _ in range(1, self.parameters.processors)]
 
+    def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
+        """
+            Creates the string to substitute the complexes in the PELE control file
+
+            :param numberOfSnapshots: Number of complexes to write
+            :type numberOfSnapshots: int
+            :param tmpInitialStructuresTemplate: Template with the name of the initial strutctures
+            :type tmpInitialStructuresTemplate: str
+            :param iteration: Epoch number
+            :type iteration: int
+            :param equilibration: Flag to mark wether the complexes are part of an
+                equilibration run
+            :type equilibration: bool
+
+            :returns: str -- jsonString to be substituted in PELE control file
+        """
+        pass
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
@@ -242,7 +259,7 @@ class PeleSimulation(SimulationRunner):
         toRun = " ".join(toRun)
         print(toRun)
         startTime = time.time()
-        proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True)
+        proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
         print(out)
         if err:
