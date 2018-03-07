@@ -1,11 +1,12 @@
 # coding: utf-8
+from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import argparse
 import glob
-from AdaptivePELE.atomset import atomset
 import re
 import numpy as np
 import shutil
+from AdaptivePELE.atomset import atomset
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -176,12 +177,12 @@ def buildFullTrajectory(steps, trajectory, numtotalSteps, inputTrajectory):
     counter = 0
     if len(trajectory) > 0:
         sthWrongInTraj = False
-        print inputTrajectory
+        print(inputTrajectory)
         for i in range(len(trajectory) - 1):
             try:
                 repeated = steps[i+1] - steps[i]
             except IndexError:
-                print "sth wrong in trajectory %s. This is likely to disagreement between report and trajectory files. Please, fix it manually" % inputTrajectory
+                print("sth wrong in trajectory %s. This is likely to disagreement between report and trajectory files. Please, fix it manually" % inputTrajectory)
                 sthWrongInTraj = True
                 break
 
@@ -219,7 +220,7 @@ def repeatExtractedSnapshotsInTrajectory(inputTrajectory, constants, numtotalSte
     try:
         reportFile = glob.glob(os.path.join(origDataFolder, constants.reportName + trajectoryNumber))[0]
     except IndexError:
-        print "folder", origDataFolder
+        print("folder", origDataFolder)
         sys.exit("Couldn't find file that matches: %s" % os.path.join(origDataFolder, constants.reportName + trajectoryNumber))
 
     with open(inputTrajectory) as f:
@@ -296,15 +297,15 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
     for folder_it in folders:
         pathFolder = os.path.join(folderWithTrajs, folder_it)
-        print "Extracting coords from folder %s" % folder_it
+        print("Extracting coords from folder %s" % folder_it)
         ligand_trajs_folder = os.path.join(pathFolder, constants.ligandTrajectoryFolder)
         if writeLigandTrajectory and not os.path.exists(ligand_trajs_folder):
             os.makedirs(ligand_trajs_folder)
         writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, protein_CA)
         if not non_Repeat:
-            print "Repeating snapshots from folder %s" % folder_it
+            print("Repeating snapshots from folder %s" % folder_it)
             repeatExtractedSnapshotsInFolder(pathFolder, constants, numtotalSteps)
-        print "Gathering trajs in %s" % constants.gatherTrajsFolder
+        print("Gathering trajs in %s" % constants.gatherTrajsFolder)
         gatherTrajs(constants, folder_it, setNumber, non_Repeat)
 
 

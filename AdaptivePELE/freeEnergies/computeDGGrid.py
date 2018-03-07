@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import numpy as np
 import shutil
@@ -15,12 +16,12 @@ def lengthVsNtrajs(nruns, lagtime, clusters, lengths, ntrajs, outputFilename, ca
     for i, length in enumerate(lengths):
         for j, ntraj in enumerate(ntrajs):
             if (length, ntraj) in cache:
-                print "Loading cached computation for length:%d and ntrajs:%d" % (length, ntraj)
+                print("Loading cached computation for length:%d and ntrajs:%d" % (length, ntraj))
                 results[i][j], stdDev[i][j], db[i][j], stdDb[i][j] = cache[(length, ntraj)]
                 with open(outputFilename, 'a') as f:
                     f.write("%d %d %f %f %f %f\n" % (length, ntraj, results[i][j], stdDev[i][j], db[i][j], stdDb[i][j]))
                 continue
-            print "Computing for length:%d and ntrajs:%d" % (length, ntraj)
+            print("Computing for length:%d and ntrajs:%d" % (length, ntraj))
             parameters = estimateDG.Parameters(ntrajs=ntraj, length=length, lagtime=lagtime, nclusters=clusters, nruns=nruns,
                                                useAllTrajInFirstRun=False, computeDetailedBalance=True, trajWildcard="traj_*",
                                                folderWithTraj="rawData", skipFirstSteps=skipFirstSnaphots)

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import sparse, linalg
@@ -97,7 +98,8 @@ def buildRevTransitionMatrix(C):
 
     T = np.zeros(C.shape)
     for _ in range(iterations):
-        # if it != 0 and it % 10 == 0: print it
+        # if it != 0 and it % 10 == 0:
+        #    print(it)
         for i in range(n):
             X[i, i] = C[i, i] * (x[i] - X[i, i]) / (c[i] - C[i, i])
         x = X.sum(axis=1)
@@ -133,7 +135,7 @@ def runSetOfSimulations(numberOfSimulations, P, steps):
     trajs = []
     for sim in range(numberOfSimulations):
         if sim % 50 == 0:
-            print "Simulation", sim
+            print("Simulation", sim)
 
         startingPosition = sim % P.shape[0]
         traj = runSimulation(P, steps, startingPosition)
@@ -145,7 +147,7 @@ def runSetOfSimulations(numberOfSimulations, P, steps):
 #
 #     #for traj in trajectories:
 #     for i, traj in enumerate(trajectories):
-#         print i
+#         print(i)
 #         for i in range(len(traj) - tau):
 #             fromState = traj[i]
 #             toState = traj[i + tau]
@@ -175,8 +177,8 @@ def estimateCountMatrix(trajectories, n, tau):
 def printMatrix(matrix):
     for array in matrix:
         for element in array:
-            print "%e" % element,
-        print ""
+            print("%e" % element)
+        print("")
 
 
 def estimateTransitionMatrix(trajectories, n, tau, symm=True):
@@ -259,11 +261,11 @@ def main():
     # stationary distribution
     goldenStationary = getStationaryDistr(eigenvectors[:, sortedIndices[0]])
 
-    print "real C"
-    print printMatrix(C)
-    print "real T"
-    print printMatrix(T)
-    print "====="
+    print("real C")
+    print(printMatrix(C))
+    print("real T")
+    print(printMatrix(T))
+    print("=====")
 
     # trajs = runSetOfSimulations(numberOfSimulations, T, steps)
     # np.save("trajs_S_50_60000.npy", trajs)
@@ -291,7 +293,7 @@ def main():
             goldenT = getGoldenTForGivenTau(T, tau)
 
             rEntropy = getRelativeEntropy(goldenStationary, goldenT, estimatedT)
-            print j, rEntropy
+            print(j, rEntropy)
             entropies[i] = rEntropy
 
     fig = plt.figure(3)

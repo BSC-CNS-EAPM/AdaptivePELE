@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import glob
 import os
 import argparse
@@ -182,7 +183,7 @@ def main(folder, countsThreshold, lagtime, printFigs=False):
     detailedBalanceComponentsAbsoluteDifference = np.absolute(detailedBalanceComponents - detailedBalanceComponents.T) / 2.  # factor 2 to avoid the metric to go from 0 to 2, but from 0 to 1
     detailedBalanceComponentsAverage = np.multiply(detailedBalanceComponents + detailedBalanceComponents.T, 0.5)
     frobeniusAvg = linalg.norm(detailedBalanceComponentsAbsoluteDifference) / linalg.norm(detailedBalanceComponentsAverage)
-    print "|semidiff| / |average|", frobeniusAvg
+    print("|semidiff| / |average|", frobeniusAvg)
 
     np.seterr(divide='ignore', invalid='ignore')
     detailedbalanceComponentsRelativeDifference = np.divide(detailedBalanceComponentsAbsoluteDifference, detailedBalanceComponentsAverage)

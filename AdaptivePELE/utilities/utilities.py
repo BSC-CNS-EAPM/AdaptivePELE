@@ -268,7 +268,7 @@ def getMetricsFromReportsInEpoch(reportName, outputFolder, nTrajs):
         Extract the metrics in report file from an epoch to a numpy array
     """
     metrics = []
-    for i in xrange(1, nTrajs):
+    for i in range(1, nTrajs):
         report = np.loadtxt(os.path.join(outputFolder, reportName % i))
         if len(report.shape) < 2:
             metrics.append(report.tolist()+[i, 0])

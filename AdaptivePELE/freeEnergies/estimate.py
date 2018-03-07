@@ -1,5 +1,9 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import os
-import cPickle
+try:
+    import cPickle
+except ImportError:
+    import pickle as cPickle
 import matplotlib.pyplot as plt
 import pyemma.msm as msm
 import pyemma.plots as mplt
@@ -11,7 +15,7 @@ class MSM:
     def __init__(self, lagtimes, numPCCA, itsOutput=None, numberOfITS=-1,
                  itsErrors=None, error_estimationCK=None, mlags=2, lagtime=None, dtrajs=[]):
     """
-    def __init__(self, error=False, dtrajs=[]):
+    def __init__(self, error=False, dtrajs=None):
         """
             If MSM_object.pkl exists, and we call estimate, does it override whatever was before?
         """
@@ -26,15 +30,19 @@ class MSM:
         self.numberOfITS = -1
         self.error = error
         self.lagtime = 0
+        if dtrajs is None:
+            dtrajs = []
         self.dtrajs = dtrajs
         self.stationaryDistributionFilename = "stationaryDistribution.dat"
         self.numPCCA = None
 
-    def estimate(self, lagtime = None, lagtimes = [], numberOfITS = -1):
+    def estimate(self, lagtime=None, lagtimes=None, numberOfITS=-1):
         self.lagtime = lagtime
+        if lagtimes is None:
+            lagtimes = []
         self.lagtimes = lagtimes
         self.numberOfITS = numberOfITS
-        print "LAGTIME", self.lagtime
+        print("LAGTIME", self.lagtime)
         try:
             self.lagtime = self._calculateITS()  # keep calculating until convergence is reached
         except Exception as err:
@@ -42,10 +50,10 @@ class MSM:
             # with the tkinter matplotlib backend, to avoid it set the default
             # backend to pdf
             if "connect to display" in err.message:
-                print "ITS plots not saved because of MN error"
+                print("ITS plots not saved because of MN error")
             else:
                 raise err
-        print "Using lagtime = ", self.lagtime
+        print("Using lagtime = ", self.lagtime)
         self.buildMSM()
         np.savetxt(self.stationaryDistributionFilename, self.MSM_object.pi)
         self.saveMSM(self.MSM_object)
@@ -63,9 +71,9 @@ class MSM:
     def _performCKTest(self, mlags):
         # Chapman-Kolgomorov validation
         nsetsCK = len(self.MSM_object.metastable_sets)
-        print ("Performing Chapman-Kolmogorov validation with the %d sets from"
+        print(("Performing Chapman-Kolmogorov validation with the %d sets from"
                " the PCCA, when it's done will prompt for the validity of "
-               "the model...") % nsetsCK
+               "the model...") % nsetsCK)
         membershipsCK = self.MSM_object.metastable_memberships
         CKObject = self.ChapmanKolmogorovTest(self.MSM_object,
                                               nsetsCK, memberships=membershipsCK,
@@ -77,8 +85,8 @@ class MSM:
     def _calculateITS(self):
         is_converged = False
         # its
-        print ("Calculating implied time-scales, when it's done will prompt "
-               "for confirmation on the validity of the lagtimes...")
+        print(("Calculating implied time-scales, when it's done will prompt "
+               "for confirmation on the validity of the lagtimes..."))
         while not is_converged:
             if not self.error:
                 itsErrors = None
@@ -108,7 +116,7 @@ class MSM:
                 elif convergence_answer.lower() == "n" or convergence_answer.lower() == "no":
                     break
                 else:
-                    print "Answer not valid. Please answer yes or no"
+                    print("Answer not valid. Please answer yes or no")
             if not is_converged:
                 new_lagtimes = raw_input("Do you want to define new lagtimes or add to the previous?[add(a)/new(n)] ")
                 new_lagtimes.rstrip()

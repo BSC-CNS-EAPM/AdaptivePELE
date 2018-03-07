@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import glob
 import os
 from AdaptivePELE.freeEnergies import estimateDG
@@ -20,7 +21,7 @@ def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1, nruns=10):
     initialEpoch = 0
     for i, folder in enumerate(sortedFolders[initialEpoch:]):
         epoch = i + initialEpoch
-        print epoch, folder
+        print(epoch, folder)
         os.chdir(folder)
         parameters = estimateDG.Parameters(ntrajs=trajsPerEpoch*(epoch+1),
                                            length=None,
@@ -35,17 +36,17 @@ def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1, nruns=10):
                                            clusterCountsThreshold=0,
                                            clusteringStride=clusteringStride)
         dG, stdDg, db, stdDb = estimateDG.estimateDG(parameters, cleanupClusterCentersAtStart=True)
-        print "FINAL RESULTS EPOCH %d: dG: %f +- %f, asymmetric fluxes: %f +- %f" % (epoch, dG, stdDg, db, stdDb)
+        print("FINAL RESULTS EPOCH %d: dG: %f +- %f, asymmetric fluxes: %f +- %f" % (epoch, dG, stdDg, db, stdDb))
         resultsEpoch.append([dG, stdDg, db, stdDb])
         with open(resultsFile, "a") as f:
             f.write("%d %.3f %.3f %.3f %.3f\n" % (epoch, dG, stdDg, db, stdDb))
         os.chdir("..")
 
-    print "Results"
-    print "epoch, DG, stdDg, DB, stdDb"
-    print "====="
+    print("Results")
+    print("epoch, DG, stdDg, DB, stdDb")
+    print("=====")
     for i, results in enumerate(resultsEpoch):
-        print i, results
+        print(i, results)
 
 if __name__ == "__main__":
     trajs_Epoch = 50
