@@ -221,18 +221,21 @@ class AltStructures:
     def __init__(self):
         self.altStructPQ = []
         self.limitSize = 10
+        self.index = -1
 
     def __getstate__(self):
         # Defining pickling interface to avoid problems when working with old
         # simulations if the properties of the clustering-related classes have
         # changed
-        state = {"altStructPQ": self.altStructPQ, "limitSize": self.limitSize}
+        state = {"altStructPQ": self.altStructPQ, "limitSize": self.limitSize, "index": self.index}
         return state
 
     def __setstate__(self, state):
         # Restore instance attributes
         self.limitSize = state['limitSize']
         self.altStructPQ = state['altStructPQ']
+        self.altStructPQ = [(el[0], i, el[-1]) for i, el in enumerate(state['altStructPQ'])]
+        self.index = state.get('index', len(self.altStructPQ)-1)
 
     def altSpawnSelection(self, centerPair):
         """
@@ -298,20 +301,30 @@ class AltStructures:
 
         """
         i = 0
-        for _, subCluster in self.altStructPQ:
+        for _, _, subCluster in self.altStructPQ:
             _, distance = similarityEvaluator.isElement(PDB, subCluster, resname, resnum, resChain, contactThreshold)
             if distance < subCluster.threshold/2.0:
                 subCluster.addElement([])
                 del self.altStructPQ[i]
-                heapq.heappush(self.altStructPQ, (subCluster.elements, subCluster))
+                heapq.heappush(self.altStructPQ, (subCluster.elements, self.updateIndex(), subCluster))
                 if len(self.altStructPQ) > 2*self.limitSize:
                     self.cleanPQ()
                 return
             i += 1
         newCluster = Cluster(PDB, thresholdRadius=threshold, contactThreshold=contactThreshold, contactMap=similarityEvaluator.contactMap, trajPosition=trajPosition)
-        heapq.heappush(self.altStructPQ, (1, newCluster))
+        heapq.heappush(self.altStructPQ, (1, self.updateIndex(), newCluster))
         if len(self.altStructPQ) > 2*self.limitSize:
             self.cleanPQ()
+
+    def updateIndex(self):
+        """
+            Update the index which represents chronological order of entries in
+            the priority queue
+
+            :returns: int -- Index of the following element
+        """
+        self.index += 1
+        return self.index
 
     def sizePQ(self):
         """
