@@ -1,4 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import math
 import sys
 import numpy as np
@@ -974,7 +975,7 @@ class REAPCalculator(DensitySpawningCalculator):
         metrics = []
         if self.metricInd is None:
             if spawningParams.metricInd == -1:
-                self.metricInd = range(3, clusters[0].metrics.size)
+                self.metricInd = list(range(3, clusters[0].metrics.size))
             else:
                 self.metricInd = spawningParams.metricInd
             self.bounds = [(0, 1)]*len(self.metricInd)

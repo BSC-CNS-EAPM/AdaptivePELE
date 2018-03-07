@@ -1,4 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import os
 import numpy as np
 import shutil
@@ -66,11 +67,11 @@ def main():
     ilengths = 200
     flengths = 4000
     dlengths = 200
-    lengths = range(ilengths, flengths, dlengths)
+    lengths = list(range(ilengths, flengths, dlengths))
     itrajs = 32-1
     ftrajs = 1008
     dtrajs = 32
-    ntrajs = range(itrajs, ftrajs, dtrajs)
+    ntrajs = list(range(itrajs, ftrajs, dtrajs))
     nruns = 10
     skipFirstSnaphots = 0
     outputFilename = "results.txt"

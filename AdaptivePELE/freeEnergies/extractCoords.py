@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import os
 import argparse
 import glob
@@ -197,9 +198,9 @@ def buildFullTrajectory(steps, trajectory, numtotalSteps, inputTrajectory):
             return completeTrajectory
 
         if numtotalSteps == 0:
-            iterations = range(1)
+            iterations = list(range(1))
         else:
-            iterations = range(numtotalSteps + 1 - counter)
+            iterations = list(range(numtotalSteps + 1 - counter))
 
         for i in iterations:
             snapshot = trajectory[-1].split()

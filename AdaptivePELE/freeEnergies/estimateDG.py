@@ -1,4 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import os
 import numpy as np
 import shutil
@@ -192,7 +193,7 @@ def getRepresentativePDBs(filesWildcard, run):
     cl.clusterCenters = np.loadtxt(cl.clusterCentersFile)
     dtrajs = cl.assignNewTrajectories(trajs)
     numClusters = cl.clusterCenters.shape[0]
-    centersInfo = {x: {"structure": None, "minDist": 1e6} for x in xrange(numClusters)}
+    centersInfo = {x: {"structure": None, "minDist": 1e6} for x in range(numClusters)}
     for i, traj in enumerate(trajs):
         traj_name = files[i]
         _, epochNum, trajNum = os.path.splitext(traj_name)[0].split("_", 2)
@@ -207,7 +208,7 @@ def getRepresentativePDBs(filesWildcard, run):
         os.makedirs("representative_structures")
     with open("representative_structures/representative_structures_%d.dat" % run, "w") as fw:
         fw.write("Cluster\tEpoch\tTrajectory\tSnapshot\n")
-        for clNum in xrange(numClusters):
+        for clNum in range(numClusters):
             fw.write("%d\t" % clNum+"\t".join(centersInfo[clNum]["structure"])+"\n")
 
 

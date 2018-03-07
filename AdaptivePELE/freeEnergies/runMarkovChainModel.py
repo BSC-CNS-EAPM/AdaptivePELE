@@ -1,4 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import sparse, linalg
@@ -276,9 +277,9 @@ def main():
     # taus = np.array([1, 10, 25,  50,  75,  100,  250,  500,  750,  1000,  2000,  2500])
     plotEigenvalEvolutionInTau(trajs, taus, n)
 
-    simLengths = range(50, 2000, 50)
-    simLengths = range(10, 50, 5)
-    trajNumbers = range(0, 600, 5)
+    simLengths = list(range(50, 2000, 50))
+    simLengths = list(range(10, 50, 5))
+    trajNumbers = list(range(0, 600, 5))
     trajNumbers = [600]
 
     entropies = np.zeros(len(simLengths))

@@ -7,6 +7,7 @@
         4) For the moment, it needs of a reweightingT, in order to do a histogram reweighting, but does not seem to work that well
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import numpy as np
 import glob
 import sys
@@ -239,7 +240,7 @@ def calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d):
             if indices.size > 0:
                 init = indices[0]
                 end = indices[-1]
-                centers_x.extend([[x_val, y_val, bins[2][zi]] for zi in xrange(init, end+1)])
+                centers_x.extend([[x_val, y_val, bins[2][zi]] for zi in range(init, end+1)])
         if len(centers_x):
             centers_trajs.append(np.array(centers_x))
 

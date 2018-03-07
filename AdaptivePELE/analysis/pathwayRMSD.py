@@ -1,4 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import networkx as nx
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.atomset import RMSDCalculator
@@ -6,7 +7,7 @@ from AdaptivePELE.atomset import RMSDCalculator
 
 def weight(pathway, confs):
     w = 0
-    for j in xrange(1, len(path)):
+    for j in range(1, len(path)):
         w += confs[pathway[j-1]][path[j]]['metric']
     return w
 

@@ -528,9 +528,9 @@ class PeleSimulation(SimulationRunner):
 
         values = np.array(values)
         if energyColumn > similarityColumn or similarityColumn is None:
-            similarityColumn, energyColumn = range(2)
+            similarityColumn, energyColumn = list(range(2))
         else:
-            energyColumn, similarityColumn = range(2)
+            energyColumn, similarityColumn = list(range(2))
         maxEnergy = values.max(axis=0)[energyColumn]
         # Substract the max value so all values will be negative (avoid sign problems)
         values[:, energyColumn] -= maxEnergy

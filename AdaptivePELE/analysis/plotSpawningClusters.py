@@ -1,4 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import socket
 import matplotlib
 import numpy as np
@@ -41,7 +42,7 @@ def main():
     clustersThres = list(set(clustering[:, 4]))
     clustersThres.sort(reverse=True)
     spawningPerThres = np.zeros((numberOfEpochs, len(clustersThres)))
-    for i in xrange(numberOfEpochs):
+    for i in range(numberOfEpochs):
         clustering = np.loadtxt(templateSummary % i)
         for j, threshold in enumerate(clustersThres):
             spawningPerThres[i, j] = clustering[clustering[:, 4] == threshold, 2].sum()
