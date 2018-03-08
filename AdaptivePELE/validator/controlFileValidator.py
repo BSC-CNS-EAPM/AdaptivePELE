@@ -99,11 +99,11 @@ def validateBlock(blockName, controlFileBlock):
                     isCorrect = False
             except KeyError as err:
                 warnings.warn("%s missing: Mandatory parameter %s in %s not found." %
-                              (err.message, mandatory, blockName.__name__))
+                              (str(err), mandatory, blockName.__name__))
                 isCorrect = False
     except KeyError as err:
         warnings.warn("Missing %s: Type %s in %s not found." %
-                      (err.message, blockType, blockName.__name__))
+                      (str(err), blockType, blockName.__name__))
         isCorrect = False
     # check rest of parameters specified
     try:
@@ -119,7 +119,7 @@ def validateBlock(blockName, controlFileBlock):
                               (param, blockName.__name__))
                 isCorrect = False
     except KeyError as err:
-        warnings.warn("Missing %s in %s" % (err.message, blockName.__name__))
+        warnings.warn("Missing %s in %s" % (str(err), blockName.__name__))
         isCorrect = False
 
     for block in dir(blockName):
@@ -133,7 +133,7 @@ def validateBlock(blockName, controlFileBlock):
                 params_dict = eval("blockName.%s" % block)["params"]
             except KeyError as err:
                 warnings.warn("Type %s in %s not found." %
-                              (err.message, block))
+                              (str(err), block))
                 isCorrect = False
             try:
                 blockType = controlFileBlock[block]["type"]
