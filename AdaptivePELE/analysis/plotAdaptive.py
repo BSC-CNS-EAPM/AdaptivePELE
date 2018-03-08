@@ -63,7 +63,7 @@ def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRu
     if printWithLines:
         dictionary['withLines'] = "w l"
 
-    if isinstance(column1, types.IntType):
+    if isinstance(column1, int):
         if totalNumberOfSteps:
             dictionary['col1'] = "($" + str(column1) + "+ (%d*j))" % stepsPerRun  # adds steps per runs, so that it mathes the total number of steps
         else:
