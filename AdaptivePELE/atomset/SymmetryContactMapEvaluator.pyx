@@ -205,7 +205,7 @@ cdef class SymmetryContactMapEvaluator:
     def evaluateDifferenceDistance(self, contactMap, clusterContactMap):
         permContactMap = self.buildOptimalPermutationContactMap(contactMap,
                                                                 clusterContactMap)
-        differenceContactMaps = np.abs(permContactMap-clusterContactMap).sum()
+        differenceContactMaps = np.abs(permContactMap^clusterContactMap).sum()
         averageContacts = (0.5*(permContactMap.sum()+clusterContactMap.sum()))
         if not averageContacts:
             # The only way the denominator can be 0 is if both contactMaps are
