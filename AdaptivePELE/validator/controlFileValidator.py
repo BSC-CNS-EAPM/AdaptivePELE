@@ -6,6 +6,11 @@ import warnings
 import numbers
 import sys
 import ast
+try:
+    # Check if the basestring type if available, this will fail in python3
+    basestring
+except NameError:
+    basestring = str
 
 
 def validate(control_file):
@@ -84,7 +89,7 @@ def validateBlock(blockName, controlFileBlock):
         warnings.warn("Missing mandatory parameter type in block")
 
     # Check if type selected is valid
-    if not isinstance(blockType, str):
+    if not isinstance(blockType, basestring):
         warnings.warn("Type for %s should be %s and instead is %s" %
                       (blockType, 'str', type(blockType).__name__))
         isCorrect = False
@@ -145,7 +150,7 @@ def validateBlock(blockName, controlFileBlock):
                 warnings.warn("Type %s in %s not found." %
                               (blockType, blockName.__name__))
                 isCorrect = False
-            if not isinstance(blockType, str):
+            if not isinstance(blockType, basestring):
                 warnings.warn("Type for %s should be %s and instead is %s" %
                               (blockType, 'str', type(blockType).__name__))
                 isCorrect = False

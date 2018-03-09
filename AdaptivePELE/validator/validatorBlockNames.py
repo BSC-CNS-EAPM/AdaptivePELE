@@ -1,3 +1,10 @@
+try:
+    # Check if the basestring type if available, this will fail in python3
+    basestring
+except NameError:
+    basestring = basestring
+
+
 class ControlFileParams:
     generalParams = "GeneralParams"
     spawningBlockname = "SpawningParams"
@@ -8,16 +15,16 @@ class ControlFileParams:
 class GeneralParams:
     mandatory = {
         "restart": "bool",
-        "outputPath": "str",
+        "outputPath": "basestring",
         "initialStructures": "list"
     }
     params = {
         "restart": "bool",
-        "outputPath": "str",
+        "outputPath": "basestring",
         "initialStructures": "list",
         "debug": "bool",
         "writeAllClusteringStructures": "bool",
-        "nativeStructure": "str"
+        "nativeStructure": "basestring"
     }
 
 
@@ -25,75 +32,75 @@ class SpawningParams:
     params = {
         "epsilon": "numbers.Real",
         "T": "numbers.Real",
-        "reportFilename": "str",
+        "reportFilename": "basestring",
         "metricColumnInReport": "numbers.Real",
-        "varEpsilonType": "str",
+        "varEpsilonType": "basestring",
         "maxEpsilon": "numbers.Real",
         "minEpsilon": "numbers.Real",
         "variationWindow": "numbers.Real",
         "maxEpsilonWindow": "numbers.Real",
         "period": "numbers.Real",
         "alpha": "numbers.Real",
-        "metricWeights": "str",
+        "metricWeights": "basestring",
         "metricsInd": "list",
-        "condition": "str",
+        "condition": "basestring",
         "n": "numbers.Real"
     }
     types = {
         "sameWeight": {
-            "reportFilename": "str"
+            "reportFilename": "basestring"
         },
         "independent": {
-            "reportFilename": "str"
+            "reportFilename": "basestring"
         },
         "inverselyProportional": {
-            "reportFilename": "str"
+            "reportFilename": "basestring"
         },
         "null": {
-            "reportFilename": "str"
+            "reportFilename": "basestring"
         },
         "epsilon": {
             "epsilon": "numbers.Real",
-            "reportFilename": "str",
+            "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
         },
         "FAST": {
             "epsilon": "numbers.Real",
-            "reportFilename": "str",
+            "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
         },
         "variableEpsilon": {
             "epsilon": "numbers.Real",
-            "reportFilename": "str",
+            "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real",
-            "varEpsilonType": "str",
+            "varEpsilonType": "basestring",
             "maxEpsilon": "numbers.Real"
         },
         "UCB": {
-            "reportFilename": "str",
+            "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real"
         },
         "REAP": {
-            "reportFilename": "str",
+            "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real"
         }
     }
     density = {
         "types": {
-            "heaviside": "str",
-            "null": "str",
-            "constant": "str",
-            "exitContinuous": "str",
-            "continuous": "str"
+            "heaviside": "basestring",
+            "null": "basestring",
+            "constant": "basestring",
+            "exitContinuous": "basestring",
+            "continuous": "basestring"
         },
         "params": {
-            "heaviside": "str",
-            "null": "str",
-            "constant": "str",
+            "heaviside": "basestring",
+            "null": "basestring",
+            "constant": "basestring",
             "values": "list",
             "conditions": "list",
-            "exitContinuous": "str",
-            "continuous": "str"
+            "exitContinuous": "basestring",
+            "continuous": "basestring"
         }
     }
 
@@ -102,14 +109,14 @@ class SimulationParams:
     types = {
         "pele": {
             "processors": "numbers.Real",
-            "controlFile": "str",
+            "controlFile": "basestring",
             "seed": "numbers.Real",
             "peleSteps": "numbers.Real",
             "iterations": "numbers.Real"
             },
         "test": {
-            "destination": "str",
-            "origin": "str",
+            "destination": "basestring",
+            "origin": "basestring",
             "processors": "numbers.Real",
             "seed": "numbers.Real",
             "peleSteps": "numbers.Real",
@@ -117,21 +124,21 @@ class SimulationParams:
             },
         "md": {}}
     params = {
-        "executable": "str",
-        "data": "str",
-        "documents": "str",
-        "destination": "str",
-        "origin": "str",
+        "executable": "basestring",
+        "data": "basestring",
+        "documents": "basestring",
+        "destination": "basestring",
+        "origin": "basestring",
         "processors": "numbers.Real",
-        "controlFile": "str",
+        "controlFile": "basestring",
         "seed": "numbers.Real",
         "peleSteps": "numbers.Real",
         "iterations": "numbers.Real",
-        "modeMovingBox": "str",
+        "modeMovingBox": "basestring",
         "boxCenter": "list",
         "boxRadius": "numbers.Real",
         "runEquilibration": "bool",
-        "equilibrationMode": "str",
+        "equilibrationMode": "basestring",
         "equilibrationLength": "numbers.Real",
         "numberEquilibrationStructures": "numbers.Real",
         "useSrun": "bool",
@@ -139,14 +146,14 @@ class SimulationParams:
     }
     exitCondition = {
         "types": {
-            "metric": "str",
-            "clustering": "str",
-            "metricMultipleTrajectories": "str"
+            "metric": "basestring",
+            "clustering": "basestring",
+            "metricMultipleTrajectories": "basestring"
         },
         "params": {
             "metricCol": "int",
             "exitValue": "numbers.Real",
-            "condition": "str",
+            "condition": "basestring",
             "numTrajs": "numbers.Real"
         }
     }
@@ -157,34 +164,34 @@ class clusteringTypes:
         "rmsd": {
         },
         "contactMap": {
-            "similarityEvaluator": "str"
+            "similarityEvaluator": "basestring"
         },
         "lastSnapshot": {
         }
     }
     params = {
-        "rmsd": "str",
-        "contactMap": "str",
+        "rmsd": "basestring",
+        "contactMap": "basestring",
         "contactThresholdDistance": "numbers.Real",
-        "lastSnapshot": "str",
-        "ligandResname": "str",
+        "lastSnapshot": "basestring",
+        "ligandResname": "basestring",
         "ligandResnum": "numbers.Real",
-        "ligandChain": "str",
-        "similarityEvaluator": "str",
+        "ligandChain": "basestring",
+        "similarityEvaluator": "basestring",
         "symmetries": "list",
         "alternativeStructure": "bool",
         "nclusters": "numbers.Real"
     }
     thresholdCalculator = {
         "types": {
-            "heaviside": "str",
-            "constant": "str"
+            "heaviside": "basestring",
+            "constant": "basestring"
         },
         "params": {
             "conditions": "list",
             "values": "list",
             "value": "numbers.Real",
-            "heaviside": "str",
-            "constant": "str"
+            "heaviside": "basestring",
+            "constant": "basestring"
         }
     }
