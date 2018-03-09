@@ -27,8 +27,6 @@ class TestadaptiveSampling(unittest.TestCase):
     def checkStartingConformations(self, goldenPath, outputPath):
         goldenPathInitial = os.path.join(goldenPath, "%d/initial_%d.pdb")
         outputPathInitial = os.path.join(outputPath, "initial_%d_%d.pdb")
-
-        j = 0
         for j in range(3):
             for ij in range(1, 5):
                 goldenInitial = atomset.PDB()
@@ -72,7 +70,7 @@ class TestadaptiveSampling(unittest.TestCase):
         shutil.rmtree(outputPath)
         shutil.rmtree(tmpFolder)
 
-    def testIntegration1(self):
+    def _testIntegration1(self):
         """
             Simulations are not run, trajectories and reports are copied
         """
@@ -81,10 +79,18 @@ class TestadaptiveSampling(unittest.TestCase):
         outputPath = "tests/data/3ptb_data/Test1"
         elements = [28, 17, 5, 18, 1, 3]
         goldenClusters = []
+        metrics = [
+                [ 1.00000e+00, 0.00000e+00, 0.00000e+00, -7.49807e+03, 2.01909e+01, 2.16436e-01],
+                [ 1.00000e+00, 0.00000e+00, 0.00000e+00, -7.49806e+03, 1.85232e+01, 2.29384e-01],
+                [ 1.00000e+00, 0.00000e+00, 0.00000e+00, -7.49801e+03, 1.82444e+01, 2.53929e-01],
+                [ 1.00000e+00, 0.00000e+00, 0.00000e+00, -7.49800e+03, 2.24539e+01, 2.66941e-01],
+                [ 1.00000e+00, 5.00000e+00, 5.00000e+00, -7.49797e+03, 2.23322e+01, 3.08604e-01],
+                [ 1.00000e+00, 3.00000e+00, 3.00000e+00, -7.49829e+03, 1.48606e+01, 7.32479e-03]
+                ]
         for i in range(6):
             pdb = atomset.PDB()
             pdb.initialise(goldenPath+"/2/clustering/cluster_%d.pdb" % i, resname="AEN")
-            cluster = clustering.Cluster(pdb, thresholdRadius=4)
+            cluster = clustering.Cluster(pdb, thresholdRadius=4, metrics=metrics[i])
             cluster.elements = elements[i]
             cluster.contacts = 0
             goldenClusters.append(cluster)
@@ -122,12 +128,19 @@ class TestadaptiveSampling(unittest.TestCase):
         controlFile = "tests/data/3ptb_data/integrationTest3.conf"
         goldenPath = "tests/data/3ptb_data/originTest3"
         outputPath = "tests/data/3ptb_data/Test3"
-        elements = [27, 22, 21, 2]
+        elements = [22, 14, 16, 19, 1]
         goldenClusters = []
-        for i in range(4):
+        metrics = [
+                [1.00000e+00, 0.00000e+00, 0.00000e+00, -5.28675e+02, 6.41969e-03],
+                [1.00000e+00, 0.00000e+00, 0.00000e+00, -5.28657e+02, 1.88599e-02],
+                [1.00000e+00, 0.00000e+00, 0.00000e+00, -5.28675e+02, 6.41969e-03],
+                [1.00000e+00, 0.00000e+00, 0.00000e+00, -5.28665e+02, 1.24213e-02],
+                [1.00000e+00, 5.00000e+00, 5.00000e+00, -5.28660e+02, 1.75149e-02]
+                ]
+        for i in range(5):
             pdb = atomset.PDB()
             pdb.initialise(goldenPath+"/2/clustering/cluster_%d.pdb" % i, resname="AEN")
-            cluster = clustering.Cluster(pdb, 4)
+            cluster = clustering.Cluster(pdb, 4, metrics=metrics[i])
             cluster.elements = elements[i]
             cluster.contacts = 0
             goldenClusters.append(cluster)

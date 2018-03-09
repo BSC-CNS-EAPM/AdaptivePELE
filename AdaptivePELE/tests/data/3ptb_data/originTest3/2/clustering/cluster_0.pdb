@@ -1,5 +1,5 @@
 REMARK 000 File created using PELE++
-REMARK source            : <type 'file'>
+REMARK source            : tests/data/3ptb_data/Test3/0/trajectory_1.pdb
 REMARK original model nr : 1
 REMARK First snapshot is 1, not 0 (as opposed to report)
 MODEL     1
@@ -75,3 +75,5 @@ HETATM 3237  H6  AEN L   1      -4.110  35.611  28.689  1.00  0.00           H
 HETATM 3238  H7  AEN L   1      -5.244  35.654  27.358  1.00  0.00           H  
 HETATM 3239  H8  AEN L   1      -1.901  35.738  28.309  1.00  0.00           H  
 HETATM 3240  H9  AEN L   1      -1.285  35.887  26.677  1.00  0.00           H  
+
+ENDMDL
