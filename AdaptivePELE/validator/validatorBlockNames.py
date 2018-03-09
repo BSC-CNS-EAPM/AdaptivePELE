@@ -2,7 +2,7 @@ try:
     # Check if the basestring type if available, this will fail in python3
     basestring
 except NameError:
-    basestring = basestring
+    basestring = str
 
 
 class ControlFileParams:
