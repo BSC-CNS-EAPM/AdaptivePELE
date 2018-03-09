@@ -484,7 +484,7 @@ class Cluster:
         print("Number of contacts: %.2f" % self.contacts)
 
     def __str__(self):
-        return "Cluster: elements=%d, threshold=%.3f, contacts=%.3f, density=%.3f" % (self.elements, self.threshold, self.contacts, self.density or "0.000")
+        return "Cluster: elements=%d, threshold=%.3f, contacts=%.3f, density=%.3f" % (self.elements, self.threshold, self.contacts, self.density or 0.000)
 
     def writePDB(self, path):
         """
@@ -964,7 +964,7 @@ class Clustering:
                 summaryFile.write(writeString)
 
         with open(outputObject, 'wb') as f:
-            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(self, f, 2)
 
     def addSnapshotToCluster(self, trajNum, snapshot, origCluster, snapshotNum, metrics=None, col=None):
         """

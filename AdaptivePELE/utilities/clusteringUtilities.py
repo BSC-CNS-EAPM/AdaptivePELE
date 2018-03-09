@@ -1,6 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import os
-import pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 from AdaptivePELE.utilities import utilities
 
 
@@ -16,8 +19,7 @@ def writeStructures(clusteringObject, listStructures, checker=lambda x: True, ou
         :param outputPath: Output cluster pdb filename
         :type outputPath: str
     """
-    with open(clusteringObject, "rb") as f:
-        clObject = pickle.load(f)
+    clObject = utilities.readClusteringObject(clusteringObject)
     nameStructure = os.path.splitext(outputPath)
     outputName = nameStructure[0]+'_%d'+nameStructure[1]
     path = os.path.split(outputName)
