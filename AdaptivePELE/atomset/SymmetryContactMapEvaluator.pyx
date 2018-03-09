@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import atomset
 import numpy as np
 cimport cython
@@ -33,7 +34,7 @@ cdef class SymmetryContactMapEvaluator:
         self.ligandList = state.get('ligandList', [])
         self.proteinList = state.get('proteinList', [])
 
-    def createContactMap(self, atomset.PDB PDB, str ligandResname, int contactThresholdDistance, int ligandResnum=0, str ligandResChain=""):
+    def createContactMap(self, atomset.PDB PDB, basestring ligandResname, int contactThresholdDistance, int ligandResnum=0, basestring ligandResChain=""):
         """
             Create the contact map of the protein and ligand. The contact map is
             a boolean matrix that has as many rows as the number of ligand heavy
@@ -42,11 +43,11 @@ cdef class SymmetryContactMapEvaluator:
             contactThresholdDistance Amstrongs away
 
             :param ligandResname: Residue name of the ligand in the PDB
-            :type ligandResname: str
+            :type ligandResname: basestring
             :param ligandResnum: Integer containing the residue number of the ligand in the pdb
             :type ligandResnum: int
             :param ligandResChain: String containing the chain name of the ligand in the pdb
-            :type ligandResChain: str
+            :type ligandResChain: basestring
             :param contactThresholdDistance: Maximum distance at which two atoms are considered in contanct (in Angstroms)
             :type contactThresholdDistance: int
             :returns: numpy.Array -- The contact map of the ligand and the protein
@@ -57,7 +58,7 @@ cdef class SymmetryContactMapEvaluator:
         else:
             return self.buildContactMapWithRowMap(PDB, ligandResname, contactThresholdDistance, ligandResnum, ligandResChain)
 
-    def buildContactMapWithRowMap(self, atomset.PDB PDBobj, str ligandResname, int contactThresholdDistance, int ligandResnum=0, str ligandResChain=""):
+    def buildContactMapWithRowMap(self, atomset.PDB PDBobj, basestring ligandResname, int contactThresholdDistance, int ligandResnum=0, basestring ligandResChain=""):
         """
             Create a map that relates symmetric atoms in the ligand to row
             indices in the contactMap matrix and the contact map of the protein
@@ -70,11 +71,11 @@ cdef class SymmetryContactMapEvaluator:
             :param PDBobj: PDB object that contains the conformation's info
             :type PDBobj: PDB
             :param ligandResname: Residue name of the ligand in the PDB
-            :type ligandResname: str
+            :type ligandResname: basestring
             :param ligandResnum: Integer containing the residue number of the ligand in the pdb
             :type ligandResnum: int
             :param ligandResChain: String containing the chain name of the ligand in the pdb
-            :type ligandResChain: str
+            :type ligandResChain: basestring
             :param contactThresholdDistance: Maximum distance at which two atoms are considered in contanct (in Angstroms)
             :type contactThresholdDistance: int
             :returns: numpy.Array -- The contact map of the ligand and the protein
@@ -84,7 +85,7 @@ cdef class SymmetryContactMapEvaluator:
         contactThresholdDistance2 = contactThresholdDistance**2
         cdef atomset.PDB ligandPDB, alphaCarbonsPDB
         cdef np.ndarray[char, ndim=2] contactMap
-        cdef str ligandAtomID, proteinAtomID
+        cdef basestring ligandAtomID, proteinAtomID
         cdef atomset.Atom proteinAtom, ligandAtom
         cdef set contacts
         cdef double dist2
@@ -120,7 +121,7 @@ cdef class SymmetryContactMapEvaluator:
                     contacts.update([proteinAtomID])
         return contactMap.view(np.bool), len(contacts)
 
-    def buildContactMap(self, atomset.PDB PDBobj, str ligandResname, int contactThresholdDistance, int ligandResnum=0, str ligandResChain=""):
+    def buildContactMap(self, atomset.PDB PDBobj, basestring ligandResname, int contactThresholdDistance, int ligandResnum=0, basestring ligandResChain=""):
         """
             Create the contact map of the protein and ligand. The contact map is
             a boolean matrix that has as many rows as the number of ligand heavy
@@ -131,11 +132,11 @@ cdef class SymmetryContactMapEvaluator:
             :param PDBobj: PDB object that contains the conformation's info
             :type PDBobj: PDB
             :param ligandResname: Residue name of the ligand in the PDB
-            :type ligandResname: str
+            :type ligandResname: basestring
             :param ligandResnum: Integer containing the residue number of the ligand in the pdb
             :type ligandResnum: int
             :param ligandResChain: String containing the chain name of the ligand in the pdb
-            :type ligandResChain: str
+            :type ligandResChain: basestring
             :param contactThresholdDistance: Maximum distance at which two atoms are considered in contanct (in Angstroms)
             :type contactThresholdDistance: int
             :returns: numpy.Array -- The contact map of the ligand and the protein
@@ -145,7 +146,7 @@ cdef class SymmetryContactMapEvaluator:
         contactThresholdDistance2 = contactThresholdDistance**2
         cdef atomset.PDB ligandPDB, alphaCarbonsPDB
         cdef np.ndarray[char, ndim=2] contactMap
-        cdef str ligandAtomID, proteinAtomID
+        cdef basestring ligandAtomID, proteinAtomID
         cdef atomset.Atom proteinAtom, ligandAtom
         cdef set contacts
         cdef double dist2

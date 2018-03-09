@@ -70,7 +70,7 @@ class TestadaptiveSampling(unittest.TestCase):
         shutil.rmtree(outputPath)
         shutil.rmtree(tmpFolder)
 
-    def _testIntegration1(self):
+    def testIntegration1(self):
         """
             Simulations are not run, trajectories and reports are copied
         """

@@ -1,4 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+from io import open
 from AdaptivePELE.atomset import RMSDCalculator
 from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
 from AdaptivePELE.clustering import clustering
@@ -38,9 +39,8 @@ ATOM      5  CB  CYS A   1       8.108  20.445  11.030  1.00 16.53           C  
 
     def testPDB_from_str(self):
         # preparation
-        pdbfile = open("tests/data/pdb_test.pdb", "r")
-        pdbstring = pdbfile.read()
-        pdbfile.close()
+        with open("tests/data/pdb_test.pdb", "rt") as pdbfile:
+            pdbstring = pdbfile.read()
         pdb = atomset.PDB()
 
         # function to test

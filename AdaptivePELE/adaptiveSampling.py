@@ -131,7 +131,7 @@ def checkSymmetryDict(clusteringBlock, initialStructures, resname):
     symmetries = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.symmetries, {})
     for structure in initialStructures:
         PDB = atomset.PDB()
-        PDB.initialise(str(structure), resname=resname)
+        PDB.initialise(structure, resname=resname)
         utilities.assertSymmetriesDict(symmetries, PDB)
 
 
