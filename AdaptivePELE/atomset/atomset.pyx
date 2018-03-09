@@ -75,7 +75,7 @@ cdef class Atom:
                     "HG": 200.59,
                     "PB": 207.2,
                     "U": 238.03}
-    def __init__(self, str atomContent):
+    def __init__(self, str atomContent=""):
         """ Create an atom from a pdb line
 
             :param atomContent: Line of the pdb from which the atom will be created
@@ -262,8 +262,8 @@ cdef class PDB:
         # Restore instance attributes
         self.atoms = state['atoms']
         self.atomList = state['atomList']
-        self.com = state['com']
-        self.centroid = state['centroid']
+        self.com = state.get('com')
+        self.centroid = state.get('centroid')
         self.totalMass = state['totalMass']
         self.pdb = state['pdb']
 
