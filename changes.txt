@@ -1,10 +1,6 @@
 Behavior changes from previous version:
-    *) Added null spawning calculator
-    *) Added possibility of max metric in epsilon
-    *) Improvements in REAP spawning
-    *) Metric columns in control file now start by 1
-    *) Changed symbolic links in rawData in freeEnergies calculation to
-    relative paths
+    *) Make code compatible with python2 and python3
 
 Bug fixes:
-    *) Various bug fixes
+    *) Fix bug in alternative structure when a cluster had no other structure
+    than the representative

@@ -252,7 +252,8 @@ class AltStructures:
         weights /= weights.sum()
         # This function only works on numpy >= 1.7, on life we have 1.6
         # ind = np.random.choice(range(len(self.altStructPQ)), p=weights)
-        r = stats.rv_discrete(values=(range(self.sizePQ()), weights))
+        # Add one to account for the cluster representative
+        r = stats.rv_discrete(values=(range(self.sizePQ()+1), weights))
         ind = r.rvs(size=10)[0]
         # The first value of the distribution is always the cluster center
         if ind == 0:
@@ -261,6 +262,8 @@ class AltStructures:
         else:
             # pick an alternative structure from the priority queue
             print "alternative structure"
+            # The first element corresponds to the cluster center
+            ind -= 1
             return self.altStructPQ[ind][1].pdb, self.altStructPQ[ind][1].trajPosition
 
     def cleanPQ(self):
