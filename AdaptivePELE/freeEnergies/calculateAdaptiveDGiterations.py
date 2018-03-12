@@ -30,7 +30,7 @@ for tau, k in iterations:
     try:
         estimateDGAdaptive.main(trajsPerEpoch, tau, k, nruns=nruns)
     except Exception as err:
-        if "distribution contains entries smaller" in err.message:
+        if "distribution contains entries smaller" in str(err):
             print("Caught exception in step with lag %d and k %d, moving to next iteration" % (tau, k))
             with open("error.txt", "w") as fe:
                 fe.write("Caught exception in step with lag %d and k %d, moving to next iteration\n" % (tau, k))
