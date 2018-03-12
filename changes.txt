@@ -1,5 +1,6 @@
 Behavior changes from previous version:
     *) Make code compatible with python2 and python3
+    *) Add posibility of using a third column as color in plotAdaptive
 
 Bug fixes:
     *) Fix bug in alternative structure when a cluster had no other structure
