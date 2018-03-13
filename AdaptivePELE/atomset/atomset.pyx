@@ -228,7 +228,7 @@ cdef class PDB:
         # Where atomId := serial:atomName:resName
         self.totalMass = 0
         # ensure every string is unicode
-        self.pdb = ""
+        self.pdb = u""
         self.com = None
         self.centroid = None
 
@@ -472,7 +472,7 @@ cdef class PDB:
         """
         cdef object fileHandle
         with open(path, 'w', encoding="utf-8") as fileHandle:
-            fileHandle.write(self.pdb.decode("utf-8"))
+            fileHandle.write(self.pdb)
 
     def countContacts(self, basestring ligandResname, int contactThresholdDistance, int ligandResnum=0, basestring ligandChain=""):
         """
