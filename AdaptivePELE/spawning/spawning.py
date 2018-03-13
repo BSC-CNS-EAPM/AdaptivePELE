@@ -904,8 +904,8 @@ class UCBCalculator(DensitySpawningCalculator):
         l = self.prevMetrics.size
         n = weights.size
         try:
-            self.prevMetrics = np.pad(self.prevMetrics, (0, n-l), 'constant', constant_values=(0.0))
-            self.epoch = np.pad(self.epoch, (0, n-l), 'constant', constant_values=(1.0))
+            self.prevMetrics = np.pad(self.prevMetrics, (0, n-l), str('constant'), constant_values=(0.0))
+            self.epoch = np.pad(self.epoch, (0, n-l), str('constant'), constant_values=(1.0))
         except AttributeError:
             # Numpy version in life is too old to use pad function
             prevMetrics = np.zeros_like(weights)
