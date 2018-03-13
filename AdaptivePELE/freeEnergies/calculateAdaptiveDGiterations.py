@@ -35,7 +35,8 @@ for tau, k in iterations:
             with open("error.txt", "w") as fe:
                 fe.write("Caught exception in step with lag %d and k %d, moving to next iteration\n" % (tau, k))
         else:
-            raise_(type(err), str(err), sys.exc_info()[2])
+            t, v, tb = sys.exc_info()
+            raise_(t, v, tb)
 
     foldersToMove = np.array(glob.glob("MSM_*"))
     epochs = [int(folder[4:]) for folder in foldersToMove]
