@@ -421,6 +421,8 @@ class PeleSimulation(SimulationRunner):
         data = []
         for i in xrange(1, nTrajs):
             report = np.loadtxt(reportWildcard % i)
+            if len(report.shape) < 2:
+                report = report[np.newaxis, :]
             snapshots = utilities.getSnapshots(trajWildcard % i)
             for nSnap, (line, snapshot) in enumerate(zip(report, snapshots)):
                 conformation = atomset.PDB()
