@@ -3,7 +3,6 @@
 """
 from AdaptivePELE.utilities import clusteringUtilities
 import argparse
-import math
 
 
 def parseArgs():
@@ -26,10 +25,10 @@ def parseArgs():
     return args
 
 if __name__ == "__main__":
-    args = parseArgs()
-    if not args.threshold is None:
-        condition = lambda x: abs(x.threshold-args.threshold) < 0.01
+    arguments = parseArgs()
+    if arguments.threshold is not None:
+        condition = lambda x: abs(x.threshold-arguments.threshold) < 0.01
     else:
         condition = None
-    clusteringUtilities.writeStructures(args.clObject, args.structures, condition,
-                                        args.outputPath)
+    clusteringUtilities.writeStructures(arguments.clObject, arguments.structures, condition,
+                                        arguments.outputPath)

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
@@ -123,7 +124,7 @@ def plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
         if contactsPlotFilename:
             plotContcont.savefig(contactsPlotFilename)
 
-    print "Number of elements", totalElements
+    print("Number of elements", totalElements)
 
 
 def parseArguments():
@@ -140,17 +141,17 @@ def parseArguments():
     return args.clusteringObject, args.resname, args.metrics, args.population, args.contacts, args.i
 
 if __name__ == "__main__":
-    pklObjectFilename, resname, metricsFlag, populationFlag, contactsFlag, inputFile = parseArguments()
+    pklObject_filename, lig_resname, metricsFlag, population_flag, contacts_flag, input_file = parseArguments()
 
-    metricPlotFilename = ""  # "results/contactClusters.png"
-    populationPlotFilename = ""  # "results/contactClusterspop.png"
-    contactsPlotFilename = ""  # "results/contactClustersContacts.png"
-    titlemetric = "Metrics Contacts"
-    titlepopulation = "Population Contacts"
-    titlecontacts = "Number of contacts Contacts"
+    metricPlot_filename = ""  # "results/contactClusters.png"
+    populationPlot_filename = ""  # "results/contactClusterspop.png"
+    contactsPlot_filename = ""  # "results/contactClustersContacts.png"
+    title_metric = "Metrics Contacts"
+    title_population = "Population Contacts"
+    title_contacts = "Number of contacts Contacts"
 
-    plotClusteringData(pklObjectFilename, resname, titlemetric, titlepopulation,
-                       titlecontacts, metricPlotFilename,
-                       populationPlotFilename, contactsPlotFilename, metricsFlag,
-                       populationFlag, contactsFlag, inputFile)
+    plotClusteringData(pklObject_filename, lig_resname, title_metric, title_population,
+                       title_contacts, metricPlot_filename,
+                       populationPlot_filename, contactsPlot_filename, metricsFlag,
+                       population_flag, contacts_flag, input_file)
     plt.show()

@@ -1,3 +1,5 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import time
 import sys
 import os
@@ -5,7 +7,7 @@ import numpy as np
 import networkx as nx
 from AdaptivePELE.clustering import clustering, thresholdcalculator
 from AdaptivePELE.spawning import spawning, densitycalculator
-from AdaptivePELE.analysis import plot3DNetwork as net3D
+# from AdaptivePELE.analysis import plot3DNetwork as net3D
 
 
 def getUnvisitedPath(clustering, numClusters=5):
@@ -19,7 +21,7 @@ def getUnvisitedPath(clustering, numClusters=5):
         visited.add(node)
         minVisit = 1e6
         minNeigh = None
-        for foo, target, data in conf.out_edges_iter(node, data=True):
+        for _, target, data in conf.out_edges_iter(node, data=True):
             if data['transition'] < minVisit and target not in visited:
                 minVisit = data['transition']
                 minNeigh = target
@@ -31,6 +33,7 @@ def getUnvisitedPath(clustering, numClusters=5):
     else:
         return path[-1:-numClusters-1:-1]
 
+
 def getShortestPath(clustering, numClusters=5):
     conf = clustering.conformationNetwork
     contacts = [cluster.contacts for cluster in clustering.clusterIterator()]
@@ -41,10 +44,11 @@ def getShortestPath(clustering, numClusters=5):
     else:
         return shortPath[-1:-numClusters-1:-1]
 
+
 def getMetastableClusters(clustering, numClusters=5):
     conf = clustering.conformationNetwork.network
     betweenness = nx.betweenness_centrality(conf, weight='transition')
-    b2 = np.array([betweenness[i] for i in xrange(len(betweenness))])
+    b2 = np.array([betweenness[i] for i in range(len(betweenness))])
     thresholds = [cluster.threshold for cluster in clustering.clusters.clusters]
     metInd = np.zeros_like(thresholds, dtype=np.float)
     for node in conf.nbunch_iter():
@@ -55,10 +59,10 @@ def getMetastableClusters(clustering, numClusters=5):
         totalOut = 0
         selfTrans = 0
         totalKin = 0
-        for source, foo, data in conf.in_edges_iter(node, data=True):
+        for source, _, data in conf.in_edges_iter(node, data=True):
             if source != node:
                 totalIn += data['transition']*thresholds[source]**3
-        for n, edge, data in conf.out_edges_iter(node, data=True):
+        for _, edge, data in conf.out_edges_iter(node, data=True):
             if edge == node:
                 selfTrans = data['transition']
             totalOut += data['transition']*thresholds[edge]**3
@@ -70,11 +74,13 @@ def getMetastableClusters(clustering, numClusters=5):
     finalMetInd = metInd*b2
     return np.argsort(finalMetInd)[-1:-numClusters-1:-1]
 
+
 def getMetastableClusters2(clustering, numClusters=5):
     conf = clustering.conformationNetwork.network
     betweenness = nx.betweenness_centrality(conf, weight='transition')
-    b2 = np.array([betweenness[i] for i in xrange(len(betweenness))])
+    b2 = np.array([betweenness[i] for i in range(len(betweenness))])
     return np.argsort(b2)[-1:-numClusters-1:-1]
+
 
 def getMetastableClusters5(clustering, numClusters=5):
     conf = clustering.conformationNetwork.network
@@ -83,12 +89,13 @@ def getMetastableClusters5(clustering, numClusters=5):
     volume = np.zeros(len(thresholds))
     for node in conf.nbunch_iter():
         vol = 0.0
-        for foo, target in conf.edges_iter(node):
-            assert foo == node
+        for source, target in conf.edges_iter(node):
+            assert source == node
             cluster = clustering.getCluster(target)
             vol += (cluster.threshold/minThres)**3
         volume[node] = vol
     return np.argsort(volume)[:numClusters+1]
+
 
 def getMetastableClusters4(clustering, numClusters=5):
     conf = clustering.conformationNetwork.network
@@ -103,12 +110,12 @@ def getMetastableClusters4(clustering, numClusters=5):
             inNeigh = 0.0
             countOut = 0
             countIn = 0
-            for foo, target in conf.out_edges_iter(node):
+            for _, target in conf.out_edges_iter(node):
                 cluster = clustering.getCluster(target)
                 countOut += 1
                 outNeigh += (cluster.elements/cluster.threshold**3-outNeigh)/float(countOut)
 
-            for source, foo in conf.in_edges_iter(node):
+            for source, _ in conf.in_edges_iter(node):
                 cluster = clustering.getCluster(source)
                 countIn += 1
                 inNeigh += (cluster.elements/cluster.threshold**3-inNeigh)/float(countIn)
@@ -133,10 +140,10 @@ def getMetastableClusters3(clustering, numClusters=5):
         totalOut = 0
         selfTrans = 0
         totalKin = 0
-        for source, foo, data in conf.in_edges_iter(node, data=True):
+        for source, _, data in conf.in_edges_iter(node, data=True):
             if source != node:
                 totalIn += data['transition']*thresholds[source]**3
-        for n, edge, data in conf.out_edges_iter(node, data=True):
+        for _, edge, data in conf.out_edges_iter(node, data=True):
             if edge == node:
                 selfTrans = data['transition']
             totalOut += data['transition']*thresholds[edge]**3
@@ -150,13 +157,13 @@ def getMetastableClusters3(clustering, numClusters=5):
 
 thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
 thresholdCalculator = thresholdCalculatorBuilder.build({
-        "thresholdCalculator": {
-            "type": "heaviside",
-            "params": {
-                "values": [2, 3, 4, 5],
-                "conditions": [1, 0.75, 0.5]
-            }
+    "thresholdCalculator": {
+        "type": "heaviside",
+        "params": {
+            "values": [2, 3, 4, 5],
+            "conditions": [1, 0.75, 0.5]
         }
+    }
 })
 # thresholdCalculator = thresholdCalculatorBuilder.build({})
 # Distance index
@@ -183,10 +190,10 @@ similarityEvaluator = clustering.CMSimilarityEvaluator("Jaccard")
 # })
 thresholdCalculatorAcc = thresholdCalculatorBuilder.build({
     "thresholdCalculator": {
-        "type" : "heaviside",
-        "params" : {
-            "values" : [0.2, 0.3, 0.5, 0.8],
-            "conditions" : [1.0, 0.75, 0.5]
+        "type": "heaviside",
+        "params": {
+            "values": [0.2, 0.3, 0.5, 0.8],
+            "conditions": [1.0, 0.75, 0.5]
         }
     }
 })
@@ -269,7 +276,7 @@ ClAcc = clustering.ContactMapAccumulativeClustering(thresholdCalculatorAcc,
 spawningObject = spawning.REAPCalculator()
 # ClAcc.clusterInitialStructures(["/home/jgilaber/PR/PR_prog_initial_adaptive.pdb"])
 # ClCont.clusterInitialStructures(["/home/jgilaber/4DAJ/4DAJ_initial_adaptive.pdb"])
-# processorMapping = [0 for i in xrange(ntrajs-1)]
+# processorMapping = [0 for i in range(ntrajs-1)]
 if not os.path.exists("mappings"):
     os.makedirs("mappings")
 if not os.path.exists("results"):
@@ -288,12 +295,12 @@ for i in range(nEpochs):
     # paths_report = ["trajs/%d/run_report*"%i]
     # path = ["/home/bsc72/bsc72021/simulations/PR/testCM_4_32/simulation/PRprog_CM_variabExtra_UCB_5/%d/traj*" % i]
     # paths_report = ["/home/bsc72/bsc72021/simulations/PR/testCM_4_32/simulation/PRprog_CM_variabExtra_UCB_5//%d/report*" % i]
-    # path = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/traj*"%i]
-    # paths_report = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/report*"%i]
-    # path = ["/home/jgilaber/PR/PR_simulation_network/%d/traj*"%i]
-    # paths_report = ["/home/jgilaber/PR/PR_simulation_network/%d/report*"%i]
-    path = ["/home/jgilaber/urokinases_free_energy/1sqa_adaptive_expl_sameR/%d/traj*"%i]
-    paths_report = ["/home/jgilaber/urokinases_free_energy/1sqa_adaptive_expl_sameR/%d/report*"%i]
+    # path = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/traj*" % i]
+    # paths_report = ["/gpfs/scratch/bsc72/bsc72021/AdaptiveCM/simulation/PRprog_4_64CMExtraSubset_prova_SASA3/%d/report*" % i]
+    # path = ["/home/jgilaber/PR/PR_simulation_network/%d/traj*" % i]
+    # paths_report = ["/home/jgilaber/PR/PR_simulation_network/%d/report*" % i]
+    path = ["/home/jgilaber/urokinases_free_energy/1sqa_adaptive_expl_sameR/%d/traj*" % i]
+    paths_report = ["/home/jgilaber/urokinases_free_energy/1sqa_adaptive_expl_sameR/%d/report*" % i]
     trajs = clustering.getAllTrajectories(paths_report)
     total_snapshots = 0
     for traj in trajs:
@@ -305,8 +312,8 @@ for i in range(nEpochs):
     # ClCont.cluster(path, processorMapping)
     ClCont.cluster(path)
     endTimeCont = time.time()
-    sys.stderr.write("Total time of clustering contacts, epoch %d: %.6f\n"%(i,endTimeCont-startTimeCont))
-    sys.stderr.write("Number of clusters contacts epoch %d: %d\n"%(i,len(ClCont.clusters.clusters)))
+    sys.stderr.write("Total time of clustering contacts, epoch %d: %.6f\n" % (i, endTimeCont-startTimeCont))
+    sys.stderr.write("Number of clusters contacts epoch %d: %d\n" % (i, len(ClCont.clusters.clusters)))
     # invTrajs = (ntrajs - 1)/2
     # centTrajs = ntrajs - 1- invTrajs
     invTrajs = ntrajs-1
@@ -314,13 +321,13 @@ for i in range(nEpochs):
     spawningObject.log()
     nProc = 0
     clusterList = []
-    for icl in xrange(len(ClCont.clusters.clusters)):
+    for icl in range(len(ClCont.clusters.clusters)):
         for j in range(int(degeneraciesCont[icl])):
             clusterList.append(ClCont.clusters.clusters[icl].trajPosition)
             nProc += 1
     assert nProc == ntrajs-1
     processorMapping = clusterList[1:]+[clusterList[0]]
-    with open("%d/processorMapping.txt"%(i+1), "w") as f:
+    with open("%d/processorMapping.txt" % (i+1), "w") as f:
         f.write(':'.join(map(str, processorMapping)))
     # fNet = open("networkEpochs/network3d_%d.pdb" % nModel, "w")
     # metrics = [cl.getMetricFromColumn(4) for cl in ClCont.clusterIterator()]
@@ -331,11 +338,11 @@ for i in range(nEpochs):
     # fNet.write("ENDMDL\n")
     # fNet.close()
     # nModel += 1
-    ClCont.writeOutput("clsummary",degeneraciesCont,"ClCont.pkl", False)
+    ClCont.writeOutput("clsummary", degeneraciesCont, "ClCont.pkl", False)
     os.rename("clsummary/summary.txt", "results/summary_ClCont.txt")
     # sortedNodes = getMetastableClusters2(ClCont, centTrajs)
     # sortedNodes = set(sortedNodes).union(set([num for num, cl in enumerate(degeneraciesCont) if cl]))
-    # print sortedNodes
+    # print(sortedNodes)
     # for node in sortedNodes:
     #     cluster = ClCont.getCluster(node)
     #     fw3.write("%d\t%.3f\n" % (i*4, cluster.getMetricFromColumn(4)))
@@ -351,7 +358,7 @@ for i in range(nEpochs):
     # #     os.makedirs(summaryFolder)
     # nProc = 0
     # clusterList = processorMapping[:]
-    # for icl in xrange(len(ClAcc.clusters.clusters)):
+    # for icl in range(len(ClAcc.clusters.clusters)):
     #     for j in range(int(degeneraciesAcc[icl])):
     #         clusterList[nProc] = icl
     #         nProc += 1
@@ -371,11 +378,11 @@ for i in range(nEpochs):
     # # sortedNodes4 = set(sortedNodes4)
     # # sortedNodes5 = getMetastableClusters5(ClAcc, 10)
     # # sortedNodes5 = set(sortedNodes5)
-    # # print sortedNodes
-    # # print sortedNodes2
-    # # print sortedNodes3
-    # # print sortedNodes4
-    # # print sortedNodes5
+    # # print(sortedNodes)
+    # # print(sortedNodes2)
+    # # print(sortedNodes3)
+    # # print(sortedNodes4)
+    # # print(sortedNodes5)
     # # for node in sortedNodes:
     # #     cluster = ClAcc.getCluster(node)
     # #     fw.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
@@ -393,8 +400,8 @@ for i in range(nEpochs):
     # #     fw5.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
     # # path = getUnvisitedPath(ClAcc, 10)
     # path = getShortestPath(ClAcc, 10)
-    # print path
+    # print(path)
     # for node in path:
     #     cluster = ClAcc.getCluster(node)
     #     fw6.write("%d\t%.3f\n" % ((i+1)*4, cluster.originalMetrics[4]))
-fNet.close()
+# fNet.close()

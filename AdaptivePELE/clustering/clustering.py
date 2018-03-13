@@ -1,9 +1,11 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import sys
 import glob
 import numpy as np
 import os
 import pickle
-# import cPickle as pickle
+from six import reraise as raise_
 from AdaptivePELE.constants import blockNames
 import AdaptivePELE.atomset.atomset as atomset
 from AdaptivePELE.utilities import utilities
@@ -84,11 +86,11 @@ class Clusters:
             :type verbose: bool
         """
         for i, cluster in enumerate(self.clusters):
-            print "--------------"
-            print "CLUSTER #%d" % i
-            print "--------------"
+            print("--------------")
+            print("CLUSTER #%d" % i)
+            print("--------------")
             cluster.printCluster(verbose)
-            print ""
+            print("")
 
     def __getitem__(self, key):
         return self.clusters[key]
@@ -220,18 +222,21 @@ class AltStructures:
     def __init__(self):
         self.altStructPQ = []
         self.limitSize = 10
+        self.index = -1
 
     def __getstate__(self):
         # Defining pickling interface to avoid problems when working with old
         # simulations if the properties of the clustering-related classes have
         # changed
-        state = {"altStructPQ": self.altStructPQ, "limitSize": self.limitSize}
+        state = {"altStructPQ": self.altStructPQ, "limitSize": self.limitSize, "index": self.index}
         return state
 
     def __setstate__(self, state):
         # Restore instance attributes
         self.limitSize = state['limitSize']
         self.altStructPQ = state['altStructPQ']
+        self.altStructPQ = [(el[0], i, el[-1]) for i, el in enumerate(state['altStructPQ'])]
+        self.index = state.get('index', len(self.altStructPQ)-1)
 
     def altSpawnSelection(self, centerPair):
         """
@@ -257,13 +262,13 @@ class AltStructures:
         ind = r.rvs(size=10)[0]
         # The first value of the distribution is always the cluster center
         if ind == 0:
-            print "cluster center"
+            print("cluster center")
             return centerPair[1], None
         else:
             # pick an alternative structure from the priority queue
-            print "alternative structure"
             # The first element corresponds to the cluster center
             ind -= 1
+            print("alternative structure")
             return self.altStructPQ[ind][1].pdb, self.altStructPQ[ind][1].trajPosition
 
     def cleanPQ(self):
@@ -300,20 +305,30 @@ class AltStructures:
 
         """
         i = 0
-        for _, subCluster in self.altStructPQ:
+        for _, _, subCluster in self.altStructPQ:
             _, distance = similarityEvaluator.isElement(PDB, subCluster, resname, resnum, resChain, contactThreshold)
             if distance < subCluster.threshold/2.0:
                 subCluster.addElement([])
                 del self.altStructPQ[i]
-                heapq.heappush(self.altStructPQ, (subCluster.elements, subCluster))
+                heapq.heappush(self.altStructPQ, (subCluster.elements, self.updateIndex(), subCluster))
                 if len(self.altStructPQ) > 2*self.limitSize:
                     self.cleanPQ()
                 return
             i += 1
         newCluster = Cluster(PDB, thresholdRadius=threshold, contactThreshold=contactThreshold, contactMap=similarityEvaluator.contactMap, trajPosition=trajPosition)
-        heapq.heappush(self.altStructPQ, (1, newCluster))
+        heapq.heappush(self.altStructPQ, (1, self.updateIndex(), newCluster))
         if len(self.altStructPQ) > 2*self.limitSize:
             self.cleanPQ()
+
+    def updateIndex(self):
+        """
+            Update the index which represents chronological order of entries in
+            the priority queue
+
+            :returns: int -- Index of the following element
+        """
+        self.index += 1
+        return self.index
 
     def sizePQ(self):
         """
@@ -331,7 +346,7 @@ class Cluster:
         a contactMap(sometimes) and a metric
     """
     def __init__(self, pdb, thresholdRadius=None, contactMap=None,
-                 contacts=None, metrics=[], metricCol=None, density=None,
+                 contacts=None, metrics=None, metricCol=None, density=None,
                  contactThreshold=8, altSelection=False, trajPosition=None):
         """
             :param pdb: Pdb of the representative structure
@@ -364,6 +379,8 @@ class Cluster:
         self.density = density
         self.contacts = contacts
         self.contactMap = contactMap
+        if metrics is None:
+            metrics = []
         self.metrics = metrics
         self.originalMetrics = metrics
         self.metricCol = metricCol
@@ -462,15 +479,15 @@ class Cluster:
             :type verbose: bool
         """
         if verbose:
-            print self.pdb.printAtoms()
-        print "Elements: ", self.elements
-        print "Metrics: ", self.metrics
+            print(self.pdb.printAtoms())
+        print("Elements: ", self.elements)
+        print("Metrics: ", self.metrics)
         if self.threshold != 0:
-            print "Radius threshold: ", self.threshold
-        print "Number of contacts: %.2f" % self.contacts
+            print("Radius threshold: ", self.threshold)
+        print("Number of contacts: %.2f" % self.contacts)
 
     def __str__(self):
-        return "Cluster: elements=%d, threshold=%.3f, contacts=%.3f, density=%.3f" % (self.elements, self.threshold, self.contacts, self.density or "0.000")
+        return "Cluster: elements=%d, threshold=%.3f, contacts=%.3f, density=%.3f" % (self.elements, self.threshold, self.contacts, self.density or 0.000)
 
     def writePDB(self, path):
         """
@@ -499,7 +516,7 @@ class Cluster:
                 identifying the structure added
         """
         if not self.altSelection or self.altStructure.sizePQ() == 0:
-            print "cluster center"
+            print("cluster center")
             self.pdb.writePDB(str(path))
             return self.trajPosition
         else:
@@ -531,7 +548,7 @@ class ClusteringEvaluator:
 
 
 class ContactsClusteringEvaluator(ClusteringEvaluator):
-    def __init__(self, RMSDCalculator):
+    def __init__(self, RMSDCalculator_object):
         """
             Helper object to carry out the RMSD clustering
 
@@ -539,7 +556,8 @@ class ContactsClusteringEvaluator(ClusteringEvaluator):
                 conformations
             :type RMSDCalculator: :py:class:`.RMSDCalculator`
         """
-        self.RMSDCalculator = RMSDCalculator
+        ClusteringEvaluator.__init__(self)
+        self.RMSDCalculator = RMSDCalculator_object
         self.contacts = None
         # Only here for compatibility purpose
         self.contactMap = None
@@ -623,6 +641,7 @@ class CMClusteringEvaluator(ClusteringEvaluator):
                 contacts maps
             :type symmetryEvaluator: :py:class:`.SymmetryContactMapEvaluator`
         """
+        ClusteringEvaluator.__init__(self)
         self.similarityEvaluator = similarityEvaluator
         self.symmetryEvaluator = symmetryEvaluator
         self.contacts = None
@@ -894,7 +913,7 @@ class Clustering:
 
                         # raise a new exception of the same type, with the same
                         # traceback but with an added message
-                        raise type(e), type(e)(str(e) + message % trajNum), sys.exc_info()[2]
+                        raise_(IndexError, (str(e) + message % trajNum), sys.exc_info()[2])
             else:
                 for num, snapshot in enumerate(snapshots):
                     origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num)
@@ -948,9 +967,9 @@ class Clustering:
                 summaryFile.write(writeString)
 
         with open(outputObject, 'wb') as f:
-            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(self, f, 2)
 
-    def addSnapshotToCluster(self, trajNum, snapshot, origCluster, snapshotNum, metrics=[], col=None):
+    def addSnapshotToCluster(self, trajNum, snapshot, origCluster, snapshotNum, metrics=None, col=None):
         """
             Cluster a snapshot using the leader algorithm
 
@@ -968,6 +987,8 @@ class Clustering:
             :type col: int
             :returns: int -- Cluster to which the snapshot belongs
         """
+        if metrics is None:
+            metrics = []
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname, resnum=self.resnum, chain=self.resChain)
         self.clusteringEvaluator.cleanContactMap()
@@ -980,7 +1001,7 @@ class Clustering:
                                                                  self.resname, self.resnum,
                                                                  self.resChain, self.contactThresholdDistance)
             if isSimilar:
-                if dist > cluster.threshold/2:
+                if dist > cluster.threshold/2.0:
                     cluster.altStructure.addStructure(pdb, cluster.threshold, self.resname, self.resnum, self.resChain, self.contactThresholdDistance, self.clusteringEvaluator, trajPosition=(self.epoch, trajNum, snapshotNum))
                 cluster.addElement(metrics)
                 if origCluster is None:
@@ -995,7 +1016,7 @@ class Clustering:
                                                  self.resChain, self.contactThresholdDistance)
         contacts = self.clusteringEvaluator.contacts
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
-        contactsPerAtom = float(contacts)/numberOfLigandAtoms
+        contactsPerAtom = contacts/numberOfLigandAtoms
 
         threshold = self.thresholdCalculator.calculate(contactsPerAtom)
         cluster = Cluster(pdb, thresholdRadius=threshold,
@@ -1123,7 +1144,7 @@ class Clustering:
 class ContactsClustering(Clustering):
     def __init__(self, thresholdCalculator, resname="", resnum=0, resChain="",
                  reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8, symmetries=[], altSelection=False):
+                 contactThresholdDistance=8, symmetries=None, altSelection=False):
         """
             Cluster together all snapshots that are closer to the cluster center
             than certain threshold. This threshold is assigned according to the
@@ -1159,6 +1180,8 @@ class ContactsClustering(Clustering):
                             altSelection=altSelection)
         self.type = clusteringTypes.CLUSTERING_TYPES.rmsd
         self.thresholdCalculator = thresholdCalculator
+        if symmetries is None:
+            symmetries = []
         self.symmetries = symmetries
         self.clusteringEvaluator = ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
 
@@ -1203,7 +1226,7 @@ class ContactMapAccumulativeClustering(Clustering):
     def __init__(self, thresholdCalculator, similarityEvaluator, resname="",
                  resnum=0, resChain="",
                  reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8, symmetries=[], altSelection=False):
+                 contactThresholdDistance=8, symmetries=None, altSelection=False):
         """ Cluster together all snapshots that have similar enough contactMaps.
             This similarity can be calculated with different methods (see similariyEvaluator documentation)
 
@@ -1233,6 +1256,8 @@ class ContactMapAccumulativeClustering(Clustering):
             :param altSelection: Flag that controls wether to use the alternative structures (default 8)
             :type altSelection: bool
         """
+        if symmetries is None:
+            symmetries = []
         Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain,
                             reportBaseFilename=reportBaseFilename,
                             columnOfReportFile=columnOfReportFile,
@@ -1315,7 +1340,7 @@ class SequentialLastSnapshotClustering(Clustering):
             else:
                 self.addSnapshotToCluster(snapshots[-1])
 
-    def addSnapshotToCluster(self, snapshot, metrics=[], col=None):
+    def addSnapshotToCluster(self, snapshot, metrics=None, col=None):
         """
             Cluster a snapshot using the leader algorithm
 
@@ -1329,12 +1354,14 @@ class SequentialLastSnapshotClustering(Clustering):
             :type col: int
             :returns: int -- Cluster to which the snapshot belongs
         """
+        if metrics is None:
+            metrics = []
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname, resnum=self.resnum,
                        chain=self.resChain)
         contacts = pdb.countContacts(self.resname, self.contactThresholdDistance, self.resnum, self.resChain)
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
-        contactsPerAtom = float(contacts)/numberOfLigandAtoms
+        contactsPerAtom = contacts/numberOfLigandAtoms
 
         cluster = Cluster(pdb, thresholdRadius=0,
                           contacts=contactsPerAtom, metrics=metrics,

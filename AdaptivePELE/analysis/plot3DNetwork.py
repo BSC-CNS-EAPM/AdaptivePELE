@@ -1,10 +1,9 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
-import os
 import argparse
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+# import matplotlib.pyplot as plt
+# from mpl_toolkits.mplot3d import Axes3D
 from AdaptivePELE.utilities import utilities
-
 
 
 def parseArgs():
@@ -26,12 +25,12 @@ def writePDB(X, Y, Z, metric, f):
         number3 = str(i).ljust(3)
         yn = Y[i]
         zn = Z[i]
-        x = ("%.3f"%xn).rjust(8)
-        y = ("%.3f"%yn).rjust(8)
-        z = ("%.3f"%zn).rjust(8)
-        g = ("%.3f"%metric[i]).rjust(8)
+        x = ("%.3f" % xn).rjust(8)
+        y = ("%.3f" % yn).rjust(8)
+        z = ("%.3f" % zn).rjust(8)
+        g = ("%.3f" % metric[i]).rjust(8)
 
-        content += templateLine%(number, number3, x, y, z, g)
+        content += templateLine % (number, number3, x, y, z, g)
     f.write(content)
     return f
 
@@ -40,19 +39,19 @@ def writeConnectionsPDB(network, f):
     template = "CONECT%s%s%s%s%s%s%s%s%s%s              \n"
     for node in network.nbunch_iter():
         contents = [node]
-        for source, target in network.out_edges(node):
+        for _, target in network.out_edges(node):
             contents.append(target)
             if len(contents) == 10:
-                f.write(template % tuple(map(lambda x: str(x).rjust(5), contents)))
+                f.write(template % tuple([str(x).rjust(5) for x in contents]))
                 contents = [node]
         if contents:
             contents += [""]*(10-len(contents))
-            f.write(template % tuple(map(lambda x: str(x).rjust(5), contents)))
+            f.write(template % tuple([str(x).rjust(5) for x in contents]))
     return f
 
 
 def readClustering(clusteringPath, metricCol):
-    print "Reading clustering object..."
+    print("Reading clustering object...")
     clustering = utilities.readClusteringObject(clusteringPath)
     network = clustering.conformationNetwork.network
     metrics = [cl.metrics[metricCol] for cl in clustering.clusterIterator()]
@@ -60,7 +59,7 @@ def readClustering(clusteringPath, metricCol):
 
 
 def getCoords(clustering):
-    print "Extracting nodes coordinates..."
+    print("Extracting nodes coordinates...")
     coords = [cl.pdb.getCOM() for cl in clustering.clusterIterator()]
     # Attempt to delete clustering object from memory, since it is not
     # needed and is very heavy
@@ -72,23 +71,22 @@ def getCoords(clustering):
     return Xn, Yn, Zn
 
 if __name__ == "__main__":
-    clusteringPath, metricCol, filename = parseArgs()
+    clustering_path, metric_col, filename = parseArgs()
 
-    clustering, network, metrics = readClustering(clusteringPath, metricCol)
-    Xn, Yn, Zn = getCoords(clustering)
+    cluster, Network, Metric = readClustering(clustering_path, metric_col)
+    Xm, Ym, Zm = getCoords(cluster)
 
     # Write info in pdb file
-    f = open(filename, "w")
-    f = writePDB(Xn, Yn, Zn, metrics, f)
-    f = writeConnectionsPDB(network, f)
-    f.close()
+    with open(filename, "w") as fw:
+        fw = writePDB(Xm, Ym, Zm, Metric, fw)
+        fw = writeConnectionsPDB(Network, fw)
 
 # Plot using matplotlib
 
 # Xe = []
 # Ye = []
 # Ze = []
-# for e in network.edges_iter():
+# for e in Network.edges_iter():
 #     Xe += [[coords[e[0], 0], coords[e[1], 0]]]
 #     Ye += [[coords[e[0], 1], coords[e[1], 1]]]
 #     Ze += [[coords[e[0], 2], coords[e[1], 2]]]
@@ -97,6 +95,6 @@ if __name__ == "__main__":
 # # ax.plot(Xe, Ye, Xe)
 # for i, xl in enumerate(Xe):
 #     ax.plot(xl, Ye[i], Ze[i], 'k', alpha=0.1, linewidth=0.5)
-# ax.scatter(Xn, Yn, Zn, c=metrics)
+# ax.scatter(Xn, Yn, Zn, c=metric)
 # # plt.colorbar()
 # plt.show()

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import argparse
 from AdaptivePELE.atomset import atomset, SymmetryContactMapEvaluator
 from AdaptivePELE.utilities import utilities
@@ -29,21 +30,21 @@ def generateConformations(resname, clAcc, trajectory):
             yield cluster.pdb
 
 if __name__ == "__main__":
-    trajectory, clustering, nRes, resname, contactThreshold = parseArguments()
+    traj_name, clustering, nRes, lig_resname, contactThreshold = parseArguments()
 
     if clustering is None:
-        clAcc = None
+        clusterAcc = None
     else:
-        clAcc = utilities.readClusteringObject(clustering)
+        clusetrAcc = utilities.readClusteringObject(clustering)
 
     totalAcc = []
     symEval = SymmetryContactMapEvaluator.SymmetryContactMapEvaluator()
     refPDB = None
 
-    for pdb in generateConformations(resname, clAcc, trajectory):
+    for pdb in generateConformations(lig_resname, clusetrAcc, traj_name):
         if refPDB is None:
             refPDB = pdb
-        contactMap, foo = symEval.createContactMap(pdb, resname, contactThreshold)
+        contactMap, foo = symEval.createContactMap(pdb, lig_resname, contactThreshold)
         if len(totalAcc):
             totalAcc += contactMap.sum(axis=0, dtype=bool).astype(int)
         else:
@@ -63,13 +64,13 @@ if __name__ == "__main__":
     for res in residueCounts:
         residueCounts[res] /= float(totCounts)
 
-    print "Residue\tResidue frequency"
+    print("Residue\tResidue frequency")
     for res in sorted(residueCounts, key=lambda x: residueCounts[x], reverse=True)[:nRes]:
-        print "%s\t%.4f" % (res, residueCounts[res])
+        print("%s\t%.4f" % (res, residueCounts[res]))
 
     plt.figure()
     plt.ylabel("Contact frequency")
     plt.xlabel("Residue number")
-    plt.bar(residueCounts.keys(), residueCounts.values())
+    plt.bar(list(residueCounts.keys()), residueCounts.values())
     plt.savefig("hist_CM.png")
     plt.show()

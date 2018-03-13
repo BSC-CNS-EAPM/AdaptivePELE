@@ -1,6 +1,7 @@
+from __future__ import unicode_literals
 import numpy as np
 import re
-import StringIO
+from io import StringIO, open
 cimport cython
 cimport numpy as np
 
@@ -75,11 +76,11 @@ cdef class Atom:
                     "HG": 200.59,
                     "PB": 207.2,
                     "U": 238.03}
-    def __init__(self, str atomContent):
+    def __init__(self, basestring atomContent=""):
         """ Create an atom from a pdb line
 
             :param atomContent: Line of the pdb from which the atom will be created
-            :type atomContent: str
+            :type atomContent: basestring
         """
         # atomContent = atomContent.split()
         if len(atomContent) > 6 and (atomContent[:4] == 'ATOM' or atomContent[:6] == 'HETATM'):
@@ -224,9 +225,10 @@ cdef class PDB:
         """
         self.atoms = {}
         # {atomId: atom, ...}
-        # Where atomId := serail:atomName:resName
+        # Where atomId := serial:atomName:resName
         self.totalMass = 0
-        self.pdb = ""
+        # ensure every string is unicode
+        self.pdb = u""
         self.com = None
         self.centroid = None
 
@@ -262,28 +264,28 @@ cdef class PDB:
         # Restore instance attributes
         self.atoms = state['atoms']
         self.atomList = state['atomList']
-        self.com = state['com']
-        self.centroid = state['centroid']
+        self.com = state.get('com')
+        self.centroid = state.get('centroid')
         self.totalMass = state['totalMass']
         self.pdb = state['pdb']
 
-    def initialise(self, str PDBstr, bint heavyAtoms=True, str resname="", str atomname="", str type="ALL", str chain="", int resnum = 0):
+    def initialise(self, basestring PDBstr, bint heavyAtoms=True, basestring resname="", basestring atomname="", basestring type="ALL", basestring chain="", int resnum = 0):
         """
             Load the information from a PDB file or a string with the PDB
             contents
 
             :param PDBstr: may be a path to the PDB file or a string with the contents of the PDB
-            :type PDBstr: str
+            :type PDBstr: basestring
             :param heavyAtoms: wether to consider only heavy atoms (True if onl y heavy atoms have to be considered)
             :type heavyAtoms: bool
             :param resname: Residue name to select from the pdb (will only select the residues with that name)
-            :type resname: str
+            :type resname: basestring
             :param atomname: Residue name to select from the pdb (will only select the atoms with that name)
-            :type atomname: str
+            :type atomname: basestring
             :param type: type of atoms to select: may be ALL, PROTEIN or HETERO
-            :type type: str
+            :type type: basestring
             :param chain: Chain name to select from the pdb (will only select the atoms with that name)
-            :type chain: str
+            :type chain: basestring
             :param resnum: Residue number to select from the pdb (will only select the atoms with that name)
             :type atomname: int
             :raises: ValueError if the pdb contained no atoms
@@ -291,13 +293,13 @@ cdef class PDB:
         cdef object PDBContent
         cdef list stringWithPDBContent
         cdef int atomLineNum
-        cdef str atomName, resName, atomLine, resnumStr
+        cdef basestring atomName, resName, atomLine, resnumStr
         cdef Atom atom
         if resnum == 0:
             resnumStr = ""
         else:
             resnumStr = str(resnum)
-        PDBContent = StringIO.StringIO(readPDB(PDBstr))  # Using StringIO
+        PDBContent = StringIO(readPDB(PDBstr))  # Using StringIO
         # creates a buffer that can handle a pdb file or a string containing
         # the PDB
         self.pdb = PDBContent.read()  # in case one wants to write it
@@ -368,7 +370,7 @@ cdef class PDB:
             Get an Atom in the PDB by its id
 
             :param atomId: Id of the Atom (in the format "atomserial:atomName:resname")
-            :type atomId: str
+            :type atomId: basestring
             :returns: int -- Number of atoms in the PDB
             :raises: KeyError if the id is not in the PDB
         """
@@ -460,26 +462,25 @@ cdef class PDB:
         else:
             return self.centroid
 
-    def writePDB(self, str path):
+    def writePDB(self, basestring path):
         """
             Write the pdb contents of the file from wich the PDB object was
             created
 
             :param path: Path of the file where to write the pdb
-            :type path: str
+            :type path: basestring
         """
         cdef object fileHandle
-        fileHandle = open(path, 'w')
-        fileHandle.write(self.pdb)
-        fileHandle.close()
+        with open(path, 'w', encoding="utf-8") as fileHandle:
+            fileHandle.write(self.pdb)
 
-    def countContacts(self, str ligandResname, int contactThresholdDistance, int ligandResnum=0, str ligandChain=""):
+    def countContacts(self, basestring ligandResname, int contactThresholdDistance, int ligandResnum=0, basestring ligandChain=""):
         """
             Count the number of alpha carbons that are in contact with the
             protein (i.e. less than contactThresholdDistance Amstrogms away)
 
             :param ligandResname: Residue name of the ligand in the PDB
-            :type ligandResname: str
+            :type ligandResname: basestring
             :param contactThresholdDistance: Maximum distance at which two atoms are considered in contanct (in Angstroms)
             :type contactThresholdDistance: int
             :returns: int -- The number of alpha carbons in contact with the ligand
@@ -498,7 +499,7 @@ cdef class PDB:
         # count contacts
         cdef set contacts = set([])
         cdef int rowind, colind
-        cdef str proteinAtomId
+        cdef basestring proteinAtomId
         cdef Atom ligandAtom, proteinAtom
         for rowind in range(len(ligandPDB.atomList)):
         # can be optimised with cell list
@@ -572,10 +573,10 @@ def readPDB(pdbfile):
         Helper function, parses a string with PDB content or the path of a pdb file into a string
 
         :param pdbfile: A string with PDB content or the path of a pdb file
-        :type pdbfile: str
-        :returns: str -- A string with PDB content
+        :type pdbfile: basestring
+        :returns: basestring -- A string with PDB content
     """
     try:
-        return open(pdbfile, "r").read()
+        return open(pdbfile, "rt").read()
     except IOError:
         return pdbfile

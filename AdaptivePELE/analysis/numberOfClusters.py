@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import socket
 import matplotlib
 import numpy as np
@@ -164,7 +165,7 @@ def buildClustersPerValue(clustersPerEpoch, numberOfEpochs):
 
     for epochSummary in clustersPerEpoch:
         foundValues = set()
-        for value, numClusters in epochSummary.iteritems():
+        for value, numClusters in epochSummary.items():
             clustersPerValue[value].append(numClusters)
             foundValues.update([value])
 
@@ -205,7 +206,7 @@ def plotClustersPerValue(clustersPerValue):
             value
         :type clustersPerValue: dict
     """
-    values = clustersPerValue.keys()
+    values = list(clustersPerValue.keys())
     sortedValues = np.sort(values)
     for value in sortedValues:
         plt.plot(clustersPerValue[value], label=str(value))
@@ -238,7 +239,7 @@ def main():
     """
     filename = printHelp()
 
-    print "FILENAME", filename
+    print("FILENAME", filename)
 
     # Params
     clusteringFileDensityColumn = 5

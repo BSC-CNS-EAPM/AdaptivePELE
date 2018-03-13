@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import argparse
 import sys
 from AdaptivePELE.atomset import atomset, SymmetryContactMapEvaluator
@@ -67,7 +68,7 @@ if __name__ == "__main__":
 
     numAtoms = min(nRes, network.order())
     deg = network.degree()
-    print "Residue\tDegree"
+    print("Residue\tDegree")
     for node in sorted(network.nodes(), key=lambda x: deg[x], reverse=True)[:nRes]:
-        print "%d\t%d" % (node, deg[node])
+        print("%d\t%d" % (node, deg[node]))
     nx.write_weighted_edgelist(network, "newtorkCM.edgelist")

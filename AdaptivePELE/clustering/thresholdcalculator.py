@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import sys
 import numpy as np
 from AdaptivePELE.constants import blockNames
@@ -31,7 +32,7 @@ class ThresholdCalculatorBuilder():
                 value = paramsBlock[blockNames.ThresholdCalculatorParams.value]
                 return ThresholdCalculatorConstant(value)
             except KeyError:
-                print "Using default parameters for constant threshold calculator"
+                print("Using default parameters for constant threshold calculator")
                 return ThresholdCalculatorConstant()
         elif typeParam == blockNames.ThresholdCalculator.heaviside:
             try:
@@ -40,7 +41,7 @@ class ThresholdCalculatorBuilder():
                 conditions = paramsBlock[blockNames.ThresholdCalculatorParams.conditions]
                 return ThresholdCalculatorHeaviside(conditions, values)
             except KeyError:
-                print "Using default parameters for Heaviside threshold calculator"
+                print("Using default parameters for Heaviside threshold calculator")
                 return ThresholdCalculatorHeaviside()
         else:
             sys.exit("Unknown threshold calculator type! Choices are: " + str(thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPE_TO_STRING_DICTIONARY.values()))
@@ -64,6 +65,7 @@ class ThresholdCalculator():
 
 class ThresholdCalculatorConstant(ThresholdCalculator):
     def __init__(self, value=2):
+        ThresholdCalculator.__init__(self)
         self.type = thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.constant
         self.value = value
 
@@ -92,8 +94,13 @@ class ThresholdCalculatorConstant(ThresholdCalculator):
 
 
 class ThresholdCalculatorHeaviside(ThresholdCalculator):
-    def __init__(self, conditions=[1.0, 0.75, 0.5], values=[2, 3, 4, 5.0]):
+    def __init__(self, conditions=None, values=None):
+        ThresholdCalculator.__init__(self)
         self.type = thresholdcalculatortypes.THRESHOLD_CALCULATOR_TYPES.heaviside
+        if conditions is None:
+            conditions = [1.0, 0.75, 0.5]
+        if values is None:
+            values = [2, 3, 4, 5.0]
 
         if len(values) != len(conditions) and len(values) != len(conditions) + 1:
             raise ValueError('The number of values must be equal or one more, than the number of conditions')

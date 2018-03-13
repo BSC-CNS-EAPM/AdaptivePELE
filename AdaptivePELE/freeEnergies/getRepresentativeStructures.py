@@ -45,7 +45,7 @@ def main(representatives_files, path_structures, output, clusters, trajNames):
     if not os.path.exists(destFolder):
         os.makedirs(destFolder)
     structureFolder = os.path.join(path_structures, "%d", trajNames+"_%d.pdb")
-    for trajFile, extraInfo in extract_info.iteritems():
+    for trajFile, extraInfo in extract_info.items():
         pdbFile = structureFolder % trajFile
         try:
             snapshots = utilities.getSnapshots(pdbFile)

@@ -2,7 +2,7 @@ from AdaptivePELE.constants import blockNames
 
 
 class CLUSTERING_TYPES:
-    rmsd, contactMap, lastSnapshot = range(3)
+    rmsd, contactMap, lastSnapshot = list(range(3))
 
 CLUSTERING_TYPE_TO_STRING_DICTIONARY = {
     CLUSTERING_TYPES.rmsd: blockNames.ClusteringTypes.rmsd,
@@ -12,7 +12,7 @@ CLUSTERING_TYPE_TO_STRING_DICTIONARY = {
 
 
 class SIMILARITY_TYPES:
-    differenceDistance, Jaccard, correlation = range(3)
+    differenceDistance, Jaccard, correlation = list(range(3))
 
 SIMILARITY_TYPES_TO_STRING_DICTIONARY = {
     SIMILARITY_TYPES.differenceDistance: blockNames.ClusteringTypes.differenceDistance,
@@ -20,6 +20,6 @@ SIMILARITY_TYPES_TO_STRING_DICTIONARY = {
     SIMILARITY_TYPES.correlation: blockNames.ClusteringTypes.correlation
 }
 
-SIMILARITY_TYPES_NAMES = set([blockNames.ClusteringTypes.differenceDistance,
+SIMILARITY_TYPES_NAMES = {blockNames.ClusteringTypes.differenceDistance,
                               blockNames.ClusteringTypes.Jaccard,
-                              blockNames.ClusteringTypes.correlation])
+                              blockNames.ClusteringTypes.correlation}

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import glob
 import os
@@ -144,7 +145,7 @@ def main():
     for epoch in range(0, numberOfEpochs):
         allFiles = glob.glob(os.path.join(inputDir, trajWildcard % epoch))
         for source in allFiles:
-            print source
+            print(source)
             num = int(source.split("_")[-1][:-4])
             if choice == "full":
                 fullTraj = reconstructFullTrajectory(mappings, (epoch, num, None), trajNameTempletized, None)
@@ -159,12 +160,12 @@ def main():
 
     newSizes = np.array(newSizes)
     avgNewSize = np.average(newSizes)
-    print ""
-    print "Avg new size: %.2f +/- %.2f" % (avgNewSize, np.std(newSizes))
+    print("")
+    print("Avg new size: %.2f +/- %.2f" % (avgNewSize, np.std(newSizes)))
     try:
         origSize = np.loadtxt(allFiles[0]).shape[0]
-        print "Assuming orig trajectories of %d steps" % origSize
-        print "New trajectories are {0:.2f}% larger".format((avgNewSize/origSize - 1)*100)
+        print("Assuming orig trajectories of %d steps" % origSize)
+        print("New trajectories are {0:.2f}% larger".format((avgNewSize/origSize - 1)*100))
     except:
         pass
 

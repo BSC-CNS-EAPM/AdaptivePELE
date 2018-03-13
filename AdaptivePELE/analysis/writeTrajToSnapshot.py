@@ -33,7 +33,7 @@ if __name__ == "__main__":
     filename = glob.glob(epoch+"/*traj*_%d.pdb" % trajectory)
     snapshots = utilities.getSnapshots(filename[0])
     snapshots = snapshots[:snapshot+1]
-    procMapping  = open(os.path.join(epoch, "processorMapping.txt")).read().rstrip().split(',')
+    procMapping = open(os.path.join(epoch, "processorMapping.txt")).read().rstrip().split(',')
     leaf = procMapping[trajectory-1]
     pathway = conf.createPathwayToCluster(int(leaf))
     cl.writePathwayTrajectory(pathway, outputPath+"pathway.pdb")

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import numpy as np
 import glob
@@ -39,29 +40,29 @@ class Cluster:
         return dTrajs
 
     def clusterTrajectories(self):
-        print "Loading trajectories..."
+        print("Loading trajectories...")
         self.x, self.trajFilenames = loadTrajFiles(self.trajectoryFolder, self.trajectoryBasename)
 
         # cluster & assign
         if self.alwaysCluster or not os.path.exists(self.clusterCentersFile):
-            print "Clustering data..."
+            print("Clustering data...")
             cl = self.cluster(self.x)  # cl: pyemma's clusteringObject
             makeFolder(self.discretizedFolder)
             self.clusterCenters = cl.clustercenters
             self._writeClusterCenters(self.clusterCenters, self.clusterCentersFile)
-            print "Assigning data..."
+            print("Assigning data...")
             self.dtrajs = cl.dtrajs[:]
         else:
-            print "Assigning data (clustering exists)..."
+            print("Assigning data (clustering exists)...")
             self.clusterCenters = np.loadtxt(self.clusterCentersFile)
             self.dtrajs = self.assignNewTrajectories(self.x)
 
-        print "Writing clustering data..."
+        print("Writing clustering data...")
         self._writeDtrajs(self.trajFilenames, self.dtrajs, self.dTrajTemplateName)
 
     def eliminateLowPopulatedClusters(self, clusterCountsThreshold, tau=None):
         if self.dtrajs == []:
-            print "Call clusterTrajectories() first!"
+            print("Call clusterTrajectories() first!")
             return
 
         dtrajs = np.array(self.dtrajs).copy()
@@ -77,10 +78,10 @@ class Cluster:
 
         clustersToDelete = np.argwhere(counts < clusterCountsThreshold)
         if clustersToDelete.shape[0] > 0:
-            print "Removing %d clusters due to a small number of counts (less than %d)" % (clustersToDelete.shape[0], clusterCountsThreshold)
+            print("Removing %d clusters due to a small number of counts (less than %d)" % (clustersToDelete.shape[0], clusterCountsThreshold))
             self.clusterCenters = np.delete(self.clusterCenters, clustersToDelete, axis=0)
             self._writeClusterCenters(self.clusterCenters, self.clusterCentersFile)
-            print "Reassigning trajectories"
+            print("Reassigning trajectories")
             self.dtrajs = self.assignNewTrajectories(self.x)
 
     def _writeClusterCenters(self, clusterCenters, outputFilename):

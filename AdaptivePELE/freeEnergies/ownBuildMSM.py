@@ -1,5 +1,6 @@
 import argparse
 import json
+import sys
 from AdaptivePELE.freeEnergies import cluster
 from AdaptivePELE.freeEnergies import estimate
 
@@ -17,7 +18,6 @@ def readParams(control_file):
         with open(control_file, "r") as f:
             params = json.load(f)
     except:
-        import sys
         sys.exit("Sth wrong with the control file: %s" % control_file)
 
     trajectoryFolder = params["trajectoryFolder"]

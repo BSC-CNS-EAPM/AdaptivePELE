@@ -26,7 +26,7 @@ def extractAvgPDB(trajs):
             PDB = atomset.PDB()
             PDB.initialise(snapshot, type="PROTEIN")
             snapshotsTot.append(PDB)
-            for atomID, atom in PDB.atoms.iteritems():
+            for atomID, atom in PDB.atoms.items():
                 if atomID in avgStruct:
                     avgStruct[atomID] += (atom.getAtomCoords()-avgStruct[atomID])/nSnapshots
                 else:
@@ -56,25 +56,26 @@ if __name__ == "__main__":
         avgPDB, totPDBs = mapReference(ref, trajs)
     RMSF = {atom: 0.0 for atom in avgPDB}
     residueMapping = {}
+    # TODO: Handle multiple chains and insertion residues in PDB
     for PDBobj in totPDBs:
-        for atomID, atom in PDBobj.atoms.iteritems():
+        for atomID, atom in PDBobj.atoms.items():
             RMSF[atomID] += np.sum((atom.getAtomCoords()-avgPDB[atomID])**2)
-    for atomID, atom in PDBobj.atoms.iteritems():
+    for atomID, atom in PDBobj.atoms.items():
         if atom.resnum not in residueMapping:
-            residueMapping[atom.resnum] = set([atomID])
+            residueMapping[atom.resnum] = {atomID}
         else:
             residueMapping[atom.resnum].add(atomID)
     RMSFresidue = {}
-    for residue, atoms in residueMapping.iteritems():
+    for residue, atoms in residueMapping.items():
         RMSFresidue[residue] = sum([RMSF[atom] for atom in atoms])
         RMSFresidue[residue] /= len(atoms)
         RMSFresidue[residue] = np.sqrt(RMSFresidue[residue])
 
-    print "Residue\tRMSF"
+    print("Residue\tRMSF")
     for res in sorted(RMSFresidue, key=lambda x: RMSFresidue[x], reverse=True)[:nResidues]:
-        print "%s\t%.4f" % (res, RMSFresidue[res])
+        print("%s\t%.4f" % (res, RMSFresidue[res]))
 
-    plt.plot(RMSFresidue.keys(), RMSFresidue.values(), 'x')
+    plt.plot(list(RMSFresidue.keys()), RMSFresidue.values(), 'x')
     plt.xlabel("Residue number")
     plt.ylabel("RMSF")
     plt.savefig("RMSF-residue.png")

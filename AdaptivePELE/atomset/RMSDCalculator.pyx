@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import numpy as np
 cimport cython
 cimport numpy as np
@@ -41,7 +42,7 @@ cdef class RMSDCalculator:
             :returns: float -- The squared RMSD between two PDB
         """
         cdef double rmsd, d2, d2sm
-        cdef str atom1Id, atom2Id, atomId
+        cdef basestring atom1Id, atom2Id, atomId
         cdef atomset.Atom atom11, atom12, atom21, atom22, atom1, atom2
         cdef dict group
         cdef int n

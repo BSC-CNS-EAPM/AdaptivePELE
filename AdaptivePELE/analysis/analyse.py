@@ -1,7 +1,9 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import os
 import numpy
 import argparse
+
 
 def parseArguments():
     desc = "Program that analyses a column of data, printing different statistical values and a histogram if desired."
@@ -22,29 +24,29 @@ def analyseData(data):
     average /= numberOfElements
 
     data.sort()
-    min = data[0]
-    max = data[-1]
-    median = data[numberOfElements/2]
-
+    minVal = data[0]
+    maxVal = data[-1]
+    median = data[numberOfElements//2]
 
     variance = 0
     for number in data:
-        variance += math.pow(number - average,2)
+        variance += math.pow(number - average, 2)
 
     variance = variance/(numberOfElements-1)
 
     standardDeviation = math.sqrt(variance)
 
-    print "------------------------------"
-    print "RESULTS"
-    print "------------------------------"
-    print "# of elements: ", numberOfElements
-    print "Average value: ", average
-    print "Std deviation: ", standardDeviation
-    print "Maximum vaule: ", max
-    print "Minumum value: ", min
-    print "Median  value: ", median
-    print "------------------------------\n"
+    print("------------------------------")
+    print("RESULTS")
+    print("------------------------------")
+    print("# of elements: ", numberOfElements)
+    print("Average value: ", average)
+    print("Std deviation: ", standardDeviation)
+    print("Maximum vaule: ", maxVal)
+    print("Minumum value: ", minVal)
+    print("Median  value: ", median)
+    print("------------------------------")
+
 
 def returnListWithoutOutliers(data, outlierRange):
     """
@@ -54,8 +56,8 @@ def returnListWithoutOutliers(data, outlierRange):
     data.sort()
 
     dataPointsBefore = len(data)
-    Q1 = data[dataPointsBefore/4]
-    Q3 = data[3*dataPointsBefore/4]
+    Q1 = data[dataPointsBefore//4]
+    Q3 = data[3*dataPointsBefore//4]
     IQR = Q3 - Q1
 
     lowerFence = Q1 - 1.5 * IQR * outlierRange
@@ -64,24 +66,27 @@ def returnListWithoutOutliers(data, outlierRange):
     filteredData = [i for i in data if i >= lowerFence and i <= upperFence]
 
     dataPointsAfter = len(filteredData)
-    print 'Removed ' + str(dataPointsBefore - dataPointsAfter) + ' outliers\n'
+    print('Removed ' + str(dataPointsBefore - dataPointsAfter) + ' outliers')
 
     return filteredData
 
+
 def printFilenamesAbsolutePath(files):
-    print "files:"
-    for file in files:
-        print os.path.abspath(file)
+    print("files:")
+    for f in files:
+        print(os.path.abspath(f))
+
 
 def readDataFromFiles(files, column):
     data = []
-    for file in files:
-        tmpdata = numpy.loadtxt(file, unpack=True, usecols=[column])
+    for f in files:
+        tmpdata = numpy.loadtxt(f, unpack=True, usecols=[column])
         try:
             data.extend(tmpdata)
         except:
             data.append(tmpdata)
     return data
+
 
 def main():
     column, files, bins, outlierRange, plotErrorBars = parseArguments()
@@ -91,15 +96,15 @@ def main():
     data = readDataFromFiles(files, column)
 
     printFilenamesAbsolutePath(files)
-    print "---------------------------"
-    print "Before removing outliers:"
+    print("---------------------------")
+    print("Before removing outliers:")
 
     analyseData(data)
 
     filteredData = returnListWithoutOutliers(data, outlierRange)
 
-    print "---------------------------"
-    print "After removing outliers:"
+    print("---------------------------")
+    print("After removing outliers:")
 
     analyseData(filteredData)
 
@@ -107,8 +112,8 @@ def main():
         import histogram
         plotErrorBars = plotErrorBars not in ['False', 'false', 0]
         histogram.plot_histogram(data, bins, plotErrorBars, 1, "Before removing outliers")
-        histogram.plot_histogram(filteredData, bins, plotErrorBars, 2, "After removing outliers (%.2f * IQR)"%(outlierRange*1.5))
-        #To keep plots "alive"
+        histogram.plot_histogram(filteredData, bins, plotErrorBars, 2, "After removing outliers (%.2f * IQR)" % (outlierRange*1.5))
+        # To keep plots "alive"
         raw_input()
 
 

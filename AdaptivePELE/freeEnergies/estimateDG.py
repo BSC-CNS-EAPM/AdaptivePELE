@@ -1,3 +1,5 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import os
 import numpy as np
 import shutil
@@ -125,9 +127,9 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
                 np.savetxt(dst, trimmedTraj, fmt="%.4f", delimiter="\t")
         except:
             sys.exit("There is a problem with %s" % trajFile)
-    print "Boostraping trajectories", ntrajs, len(trajFiles), len(set(trajFiles))
+    print("Boostraping trajectories", ntrajs, len(trajFiles), len(set(trajFiles)))
     # trajFiles.sort()
-    # print trajFiles
+    # print(trajFiles)
     return writenFiles
 
 
@@ -142,11 +144,11 @@ def __cleanupFiles(trajWildcard, cleanupClusterCenters=True):
 
 def __setVariablesForFirstIteration(useAllTrajInFirstRun, i, ntrajs):
     if useAllTrajInFirstRun and i == 0:
-        print "Not using bootstrap in iteration %d" % i
+        print("Not using bootstrap in iteration %d" % i)
         bootstrap = False
         nWorkingTrajs = None  # Not necessary, just to make it explicit that all of them are used
     else:
-        print "Using bootstrap in iteration %d" % i
+        print("Using bootstrap in iteration %d" % i)
         bootstrap = True
         nWorkingTrajs = ntrajs
 
@@ -173,10 +175,10 @@ def __copyMSMDataFromRun(i):
 
 
 def __printList(l, label):
-    print label
-    print "====="
+    print(label)
+    print("=====")
     for el in l:
-        print el
+        print(el)
 
 
 def __getMeanAndStdFromList(l, accessFunction=lambda x: x):
@@ -191,7 +193,7 @@ def getRepresentativePDBs(filesWildcard, run):
     cl.clusterCenters = np.loadtxt(cl.clusterCentersFile)
     dtrajs = cl.assignNewTrajectories(trajs)
     numClusters = cl.clusterCenters.shape[0]
-    centersInfo = {x: {"structure": None, "minDist": 1e6} for x in xrange(numClusters)}
+    centersInfo = {x: {"structure": None, "minDist": 1e6} for x in range(numClusters)}
     for i, traj in enumerate(trajs):
         traj_name = files[i]
         _, epochNum, trajNum = os.path.splitext(traj_name)[0].split("_", 2)
@@ -206,7 +208,7 @@ def getRepresentativePDBs(filesWildcard, run):
         os.makedirs("representative_structures")
     with open("representative_structures/representative_structures_%d.dat" % run, "w") as fw:
         fw.write("Cluster\tEpoch\tTrajectory\tSnapshot\n")
-        for clNum in xrange(numClusters):
+        for clNum in range(numClusters):
             fw.write("%d\t" % clNum+"\t".join(centersInfo[clNum]["structure"])+"\n")
 
 
@@ -255,13 +257,13 @@ def estimateDG(parameters, cleanupClusterCentersAtStart=False):
         plt.close("all")
     # PLOT RESULTS
     # FIX TO WORK WITH NONES
-    # print "clusters: %d, ntrajs: %d, trajLength: %d, lagtime: %d"%(parameters.nclusters, parameters.ntrajs, parameters.length, parameters.lagtime)
+    # print("clusters: %d, ntrajs: %d, trajLength: %d, lagtime: # % d"%(parameters.nclusters, parameters.ntrajs, parameters.length, # parameters.lagtime))
     __printList(deltaGs, "dG")
     meanDG, stdDG = __getMeanAndStdFromList(deltaGs, lambda element: element.split()[1])
-    print "dG = %f +- %f" % (meanDG, stdDG)
+    print("dG = %f +- %f" % (meanDG, stdDG))
     __printList(detailedBalance, "Asymmetric fluxes (see D.Lecina PhD thesis for more info)")
     meanDB, stdDB = __getMeanAndStdFromList(detailedBalance)  # DB from detailed balance
-    print "Asymmetric flux = %f +- %f" % (meanDB, stdDB)
+    print("Asymmetric flux = %f +- %f" % (meanDB, stdDB))
     with open("results_summary.txt", "w") as fw:
         fw.write("Lagtime %d\n" % parameters.lagtime)
         fw.write("Number of clusters %d\n" % parameters.nclusters)

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import glob
 import os
 import shutil
@@ -28,8 +29,7 @@ def getAllDifferentEpochs(origTrajFiles):
     for f in trajFiles:
         epoch = extractEpoch(f)
         epochs.add(int(epoch))
-    epochs = list(epochs)
-    epochs.sort()
+    epochs = sorted(epochs)
     return epochs
 
 
@@ -82,7 +82,7 @@ def makeSymbolicLinks(epochs, rawDataFolder, trajFileEpoch, trajNonRepeatedEpoch
 def copyMSMcontrolFile(epochs, msmFolder, templetizedControlFileMSM):
     scriptsFolder = os.path.dirname(os.path.realpath(__file__))
     scriptsFile = os.path.join(scriptsFolder, templetizedControlFileMSM)
-    print scriptsFile
+    print(scriptsFile)
     for epoch in epochs:
         dst = os.path.join(msmFolder % epoch, templetizedControlFileMSM)
         shutil.copyfile(scriptsFile, dst)

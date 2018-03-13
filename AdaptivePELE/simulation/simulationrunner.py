@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import time
 import os
 import json
@@ -8,6 +9,7 @@ import sys
 import numpy as np
 import ast
 import glob
+from builtins import range
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
 from AdaptivePELE.atomset import atomset, RMSDCalculator
@@ -17,6 +19,7 @@ try:
     from sklearn.cluster import KMeans
 except ImportError:
     SKLEARN = False
+
 
 class SimulationParameters:
     def __init__(self):
@@ -141,8 +144,25 @@ class SimulationRunner:
         """
             Set the processorsToClusterMapping to zero
         """
-        self.processorsToClusterMapping = [0 for _ in xrange(1, self.parameters.processors)]
+        self.processorsToClusterMapping = [0 for _ in range(1, self.parameters.processors)]
 
+    def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
+        """
+            Creates the string to substitute the complexes in the PELE control file
+
+            :param numberOfSnapshots: Number of complexes to write
+            :type numberOfSnapshots: int
+            :param tmpInitialStructuresTemplate: Template with the name of the initial strutctures
+            :type tmpInitialStructuresTemplate: str
+            :param iteration: Epoch number
+            :type iteration: int
+            :param equilibration: Flag to mark wether the complexes are part of an
+                equilibration run
+            :type equilibration: bool
+
+            :returns: str -- jsonString to be substituted in PELE control file
+        """
+        pass
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
@@ -237,16 +257,16 @@ class PeleSimulation(SimulationRunner):
         else:
             toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
         toRun = " ".join(toRun)
-        print toRun
+        print(toRun)
         startTime = time.time()
-        proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True)
+        proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
-        print out
+        print(out)
         if err:
-            print err
+            print(err)
 
         endTime = time.time()
-        print "PELE took %.2f sec" % (endTime - startTime)
+        print("PELE took %.2f sec" % (endTime - startTime))
 
     def getEquilibrationControlFile(self, peleControlFileDict):
         """
@@ -270,8 +290,7 @@ class PeleSimulation(SimulationRunner):
         # Ensure random tags exists in metrics
         metricsBlock = peleControlFileDict["commands"][0]["PeleTasks"][0]["metrics"]
         nMetrics = len(metricsBlock)
-        randomIndexes = [i for i in xrange(nMetrics) if metricsBlock[i]['type'] == "random"]
-        randomIndexes.sort()
+        randomIndexes = sorted([i for i in range(nMetrics) if metricsBlock[i]['type'] == "random"])
         # Delete random numbers from metrics
         for index in randomIndexes[::-1]:
             del metricsBlock[index]
@@ -374,9 +393,9 @@ class PeleSimulation(SimulationRunner):
                 # box information, include it manually
                 if name not in templateNames:
                     templateNames[name] = '"$%s"' % name
-            print "Running equilibration for initial structure number %d" % (i+1)
+            print("Running equilibration for initial structure number %d" % (i+1))
             peleControlString = json.dumps(peleControlFileDict, indent=4)
-            for key, value in templateNames.iteritems():
+            for key, value in templateNames.items():
                 # Remove double quote around template keys, so that PELE
                 # understands the options
                 peleControlString = peleControlString.replace(value, "$%s" % key)
@@ -419,7 +438,7 @@ class PeleSimulation(SimulationRunner):
         # detect number of trajectories available
         nTrajs = len(glob.glob(trajWildcard.rsplit("_", 1)[0]+"*"))
         data = []
-        for i in xrange(1, nTrajs):
+        for i in range(1, nTrajs):
             report = np.loadtxt(reportWildcard % i)
             if len(report.shape) < 2:
                 report = report[np.newaxis, :]
@@ -431,18 +450,18 @@ class PeleSimulation(SimulationRunner):
                 data.append([line[energyColumn], i, nSnap]+com)
         data = np.array(data)
         data = data[data[:, 0].argsort()]
-        nPoints = max(self.parameters.numberEquilibrationStructures, data.shape[0]/4)
+        nPoints = max(self.parameters.numberEquilibrationStructures, data.shape[0]//4)
         data = data[:nPoints]
         kmeans = KMeans(n_clusters=self.parameters.numberEquilibrationStructures).fit(data[:, 3:])
-        print "Clustered equilibration output into %d clusters!" % self.parameters.numberEquilibrationStructures
-        clustersInfo = {x: {"structure": None, "minDist": 1e6} for x in xrange(self.parameters.numberEquilibrationStructures)}
+        print("Clustered equilibration output into %d clusters!" % self.parameters.numberEquilibrationStructures)
+        clustersInfo = {x: {"structure": None, "minDist": 1e6} for x in range(self.parameters.numberEquilibrationStructures)}
         for conf, cluster in zip(data, kmeans.labels_):
             dist = np.linalg.norm(kmeans.cluster_centers_-conf[3:])
             if dist < clustersInfo[cluster]["minDist"]:
                 clustersInfo[cluster]["minDist"] = dist
                 clustersInfo[cluster]["structure"] = tuple(conf[1:3].astype(int))
         initialStructures = []
-        for cl in xrange(self.parameters.numberEquilibrationStructures):
+        for cl in range(self.parameters.numberEquilibrationStructures):
             traj, snap = clustersInfo[cl]["structure"]
             initialStructures.append(utilities.getSnapshots(trajWildcard % traj)[snap])
         return initialStructures
@@ -459,7 +478,7 @@ class PeleSimulation(SimulationRunner):
 
             :returns: list -- List with the pdb snapshots of the representatives structures
         """
-        return [utilities.getSnapshots(trajWildcard % ij)[-1] for ij in xrange(1, nTrajs)]
+        return [utilities.getSnapshots(trajWildcard % ij)[-1] for ij in range(1, nTrajs)]
 
     def selectEquilibratedStructure(self, nTrajs, similarityColumn, resname, trajWildcard, reportWildcard):
         """
@@ -490,7 +509,7 @@ class PeleSimulation(SimulationRunner):
         else:
             cols = sorted([energyColumn, similarityColumn])
 
-        for i in xrange(1, nTrajs):
+        for i in range(1, nTrajs):
             indices.append(rowIndex)
             report = np.loadtxt(reportWildcard % i)
             if similarityColumn is None:
@@ -511,9 +530,9 @@ class PeleSimulation(SimulationRunner):
 
         values = np.array(values)
         if energyColumn > similarityColumn or similarityColumn is None:
-            similarityColumn, energyColumn = range(2)
+            similarityColumn, energyColumn = list(range(2))
         else:
-            energyColumn, similarityColumn = range(2)
+            energyColumn, similarityColumn = list(range(2))
         maxEnergy = values.max(axis=0)[energyColumn]
         # Substract the max value so all values will be negative (avoid sign problems)
         values[:, energyColumn] -= maxEnergy
