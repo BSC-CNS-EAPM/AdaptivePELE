@@ -172,5 +172,5 @@ class MSM:
     def saveMSM(self, MSM_object):
         """Save the MSM object to avoid having to run again
         the more computationally expensive part"""
-        with open("MSM_object.pkl", "w") as MSMfile:
+        with open("MSM_object.pkl", "wb") as MSMfile:
             cPickle.dump(MSM_object, MSMfile, -1)

@@ -91,7 +91,7 @@ def reweightProbabilities(T, Torig, origProb):
 
 
 def loadMSM(MSMFile):
-    with open(MSMFile) as MSMfile:
+    with open(MSMFile, "rb") as MSMfile:
         MSM_object = cPickle.load(MSMfile)
     return MSM_object
 
