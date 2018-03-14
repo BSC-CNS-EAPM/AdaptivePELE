@@ -22,9 +22,10 @@ runFolder = os.getcwd()
 print("Running from " + runFolder)
 for tau, k in iterations:
     destFolder = "%dlag/%dcl" % (tau, k)
-    prepareMSMFolders.main()
     if not os.path.exists(destFolder):
         os.makedirs(destFolder)
+    os.chdir(destFolder)
+    prepareMSMFolders.main(trajsPath=runFolder)
     print("***************")
     print("Estimating dG value in folder" + os.getcwd())
     try:
@@ -37,10 +38,4 @@ for tau, k in iterations:
         else:
             t, v, tb = sys.exc_info()
             raise_(t, v, tb)
-
-    foldersToMove = np.array(glob.glob("MSM_*"))
-    epochs = [int(folder[4:]) for folder in foldersToMove]
-    args = np.argsort(epochs)
-    sortedFolders = foldersToMove[args]
-    move(sortedFolders, destFolder)
-    shutil.move("results.txt", destFolder)
+    os.chdir(runFolder)

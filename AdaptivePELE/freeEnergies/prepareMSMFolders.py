@@ -5,8 +5,10 @@ import shutil
 
 
 class Constants():
-    def __init__(self):
+    def __init__(self, trajs_path=None):
         self.trajFolder = "allTrajs"
+        if trajs_path is not None:
+            self.trajFolder = os.path.join(trajs_path, self.trajFolder)
         self.origTrajFiles = os.path.join(self.trajFolder, "traj_*")
         self.trajFileEpoch = os.path.join(self.trajFolder, "traj_%d_*")
         self.nonRepeatedTrajEpoch = os.path.join(self.trajFolder, "extractedCoordinates", "traj_%d_*")
@@ -17,10 +19,8 @@ class Constants():
 
 
 def extractEpoch(f):
-    first = f.find("_")
-    second = f.rfind("_")
-    epoch = f[first+1:second]
-    return epoch
+    # Split the filename blablb_0_1.dat into [balblb, 0, 1.dat]
+    return f.rsplit("_", 2)[1]
 
 
 def getAllDifferentEpochs(origTrajFiles):
@@ -88,8 +88,8 @@ def copyMSMcontrolFile(epochs, msmFolder, templetizedControlFileMSM):
         shutil.copyfile(scriptsFile, dst)
 
 
-def main():
-    constants = Constants()
+def main(trajsPath=None):
+    constants = Constants(trajsPath)
 
     epochs = getAllDifferentEpochs(constants.origTrajFiles)
 

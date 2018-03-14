@@ -13,9 +13,10 @@ runFolder = os.getcwd()
 print("Running from " + runFolder)
 for tau, k in iterations:
     destFolder = "%d/%dcl" % (tau, k)
-    prepareMSMFolders.main()
     if not os.path.exists(destFolder):
         os.makedirs(destFolder)
+    os.chdir(destFolder)
+    prepareMSMFolders.main(trajsPath=runFolder)
     print("***************")
     print("Estimating dG value in folder" + os.getcwd())
     parameters = estimateDG.Parameters(ntrajs=None, length=None, lagtime=tau,
@@ -36,4 +37,4 @@ for tau, k in iterations:
         else:
             t, v, tb = sys.exc_info()
             raise_(t, v, tb)
-    shutil.move("MSM_0", destFolder)
+    os.chdir(runFolder)
