@@ -15,6 +15,10 @@ for tau, k in iterations:
     destFolder = "%d/%dcl" % (tau, k)
     if not os.path.exists(destFolder):
         os.makedirs(destFolder)
+    elif os.path.exists(os.path.join(destFolder, "MSM_0", "results_summary.txt")):
+        print("Skipping run with lagtime %d, clusters %d" % (tau, k))
+        os.chdir(runFolder)
+        continue
     os.chdir(destFolder)
     prepareMSMFolders.main(trajsPath=runFolder)
     print("***************")
