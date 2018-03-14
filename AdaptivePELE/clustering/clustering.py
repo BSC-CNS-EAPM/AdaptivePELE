@@ -269,7 +269,7 @@ class AltStructures:
             # The first element corresponds to the cluster center
             ind -= 1
             print("alternative structure")
-            return self.altStructPQ[ind][1].pdb, self.altStructPQ[ind][1].trajPosition
+            return self.altStructPQ[ind][2].pdb, self.altStructPQ[ind][2].trajPosition
 
     def cleanPQ(self):
         """
