@@ -124,7 +124,7 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
         try:
             trimmedTraj = traj[skipFirstSteps:length+1, :]
             if len(trimmedTraj) > 0:
-                np.savetxt(dst, trimmedTraj, fmt="%.4f", delimiter="\t")
+                np.savetxt(dst, trimmedTraj, fmt=b"%.4f", delimiter="\t")
         except:
             sys.exit("There is a problem with %s" % trajFile)
     print("Boostraping trajectories", ntrajs, len(trajFiles), len(set(trajFiles)))

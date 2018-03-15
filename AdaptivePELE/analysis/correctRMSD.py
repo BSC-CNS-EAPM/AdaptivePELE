@@ -117,7 +117,7 @@ def main(controlFile):
                 fixedReport = extendReportWithRmsd(reportFile, rmsds)
 
             # print(fixedReport)
-            np.savetxt(outputFilename % trajNum, fixedReport, fmt='%.4f')
+            np.savetxt(outputFilename % trajNum, fixedReport, fmt=b'%.4f')
 
         os.chdir("..")
 

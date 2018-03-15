@@ -85,13 +85,13 @@ class Cluster:
             self.dtrajs = self.assignNewTrajectories(self.x)
 
     def _writeClusterCenters(self, clusterCenters, outputFilename):
-        np.savetxt(outputFilename, clusterCenters, fmt="%.5f")
+        np.savetxt(outputFilename, clusterCenters, fmt=b"%.5f")
 
     def _writeDtrajs(self, filenames, dtrajs, filenameTemplate="%s.disctraj"):
         for filename, dtraj in zip(filenames, dtrajs):
             fname = os.path.split(filename)[-1][:-4]
             dtrajfname = filenameTemplate % (fname)
-            np.savetxt(dtrajfname, dtraj, fmt="%d")
+            np.savetxt(dtrajfname, dtraj, fmt=b"%d")
 
 
 # Standalone functions
