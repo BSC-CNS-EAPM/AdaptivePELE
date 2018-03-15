@@ -8,6 +8,13 @@ import numpy as np
 from AdaptivePELE.freeEnergies import estimateDGAdaptive, prepareMSMFolders
 
 
+def isfinished(folders):
+    for folder in folders:
+        if not os.path.exists(os.path.join(folder, "results_summary.txt")):
+                return False
+    return True
+
+
 def move(listFiles, dest):
     for element in listFiles:
         shutil.move(element, dest)
@@ -24,11 +31,15 @@ for tau, k in iterations:
     destFolder = "%dlag/%dcl" % (tau, k)
     if not os.path.exists(destFolder):
         os.makedirs(destFolder)
-    elif os.path.exists(os.path.join(destFolder, "MSM_0", "results_summary.txt")):
+    os.chdir(destFolder)
+    folders_MSM = glob.glob("MSM_*")
+    if isfinished(folders_MSM):
         print("Skipping run with lagtime %d, clusters %d" % (tau, k))
         os.chdir(runFolder)
         continue
-    os.chdir(destFolder)
+    else:
+        for folder in folders_MSM:
+            shutil.rmtree(folder)
     prepareMSMFolders.main(trajsPath=runFolder)
     print("***************")
     print("Estimating dG value in folder" + os.getcwd())
