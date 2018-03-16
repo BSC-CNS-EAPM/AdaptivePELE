@@ -38,6 +38,14 @@ if __name__ == "__main__":
             os.makedirs(outputPath)
     else:
         outputPath = ""
+    if os.path.exists(outputPath+out_filename):
+        # If the specified name exists, append a number to distinguish the files
+        name, ext = os.path.splitext(out_filename)
+        out_filename = "".join([name, "_%d", ext])
+        i = 1
+        while os.path.exists(outputPath+out_filename % i):
+            i += 1
+        out_filename %= i
     pathway = []
     # Strip out trailing backslash if present
     pathPrefix, epoch = os.path.split(epoch.rstrip("/"))
