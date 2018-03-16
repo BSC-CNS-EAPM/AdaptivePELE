@@ -24,11 +24,13 @@ def parseArguments():
     parser.add_argument("-be", action="store_true", help="Points")
     parser.add_argument("-rmsd", action="store_true", help="Lines")
     parser.add_argument("-zcol", type=int, default=None, help="Column to define color according to metric")
+    parser.add_argument("-t", "--traj_range", type=str, default=None, help="Range of trajs to select, e.g to select trajs from 1 to 10, 1:10")
+
     args = parser.parse_args()
-    return args.steps, args.xcol, args.ycol, args.filename, args.be, args.rmsd, args.zcol
+    return args.steps, args.xcol, args.ycol, args.filename, args.be, args.rmsd, args.zcol, args.traj_range
 
 
-def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRun, printWithLines, totalNumberOfSteps=False, replotFirst=False, paletteModifier=None):
+def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRun, printWithLines, totalNumberOfSteps=False, replotFirst=False, paletteModifier=None, trajs_range=None):
     """
         Generate a string to be passed to gnuplot
 
@@ -58,9 +60,15 @@ def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRu
 
     dictionary = {'reportName': reportName, 'col2': column2, 'numberOfEpochs': numberOfEpochs, 'withLines': ''}
 
-    # runs of epoch 0, assumed constant
-    numberOfRunsPerEpoch = len(glob.glob(os.path.join(str(0), reportName+"*")))
-    dictionary['runsPerEpoch'] = numberOfRunsPerEpoch
+    if trajs_range is not None:
+        start, end = map(int, traj_range.split(":"))
+        dictionary['startTraj'] = start
+        dictionary['runsPerEpoch'] = end
+    else:
+        dictionary['startTraj'] = 1
+        # runs of epoch 0, assumed constant
+        numberOfRunsPerEpoch = len(glob.glob(os.path.join(str(0), reportName+"*")))
+        dictionary['runsPerEpoch'] = numberOfRunsPerEpoch
 
     if printWithLines:
         dictionary['withLines'] = "w l"
@@ -74,7 +82,7 @@ def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRu
     return gnuplotString % dictionary + "\n"
 
 
-def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier):
+def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier, trajs_range):
     """
         Generate a template string to use with gnuplot
 
@@ -88,6 +96,10 @@ def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint, palett
         :type reportName: str
         :param kindOfPrint:  Kind of lines to plot (solid or points)
         :type kindOfPrint: bool
+        :param paletteModifier: Third column to specify color
+        :type paletteModifier: int
+        :trajs_range: Range of trajectories to plot
+        :type trajs_range: str
 
         :returns: str -- String to plot using gnuplot
     """
@@ -104,17 +116,17 @@ def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint, palett
         stringPalette = ""
         colorMetric = ":%d" % paletteModifier
 
-    gnuplotString = "".join(["plot for [i=1:%(runsPerEpoch)d] for [j=0:%(numberOfEpochs)d-1] \'\'.j.\'/%(reportName)s\'.i u %(col1)s:%(col2)d", colorMetric, " lt 6 lc palette ", stringPalette, "notitle %(withLines)s"])
-    return generateNestedString(gnuplotString, reportName, xcol, ycol, stepsPerRun, printWithLines, totalNumberOfSteps, False, paletteModifier)
+    gnuplotString = "".join(["plot for [i=%(startTraj)d:%(runsPerEpoch)d] for [j=0:%(numberOfEpochs)d-1] \'\'.j.\'/%(reportName)s\'.i u %(col1)s:%(col2)d", colorMetric, " lt 6 lc palette ", stringPalette, "notitle %(withLines)s"])
+    return generateNestedString(gnuplotString, reportName, xcol, ycol, stepsPerRun, printWithLines, totalNumberOfSteps, False, paletteModifier, trajs_range)
 
 
 if __name__ == "__main__":
-    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier = parseArguments()
+    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range = parseArguments()
     # VARIABLES TO SET WHEN PRINTING
     if be:
         kind_Print = "PRINT_BE_RMSD"
     elif rmsd:
         kind_Print = "PRINT_RMSD_STEPS"
 
-    printLine = generatePrintString(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier)
+    printLine = generatePrintString(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier, traj_range)
     print(printLine)
