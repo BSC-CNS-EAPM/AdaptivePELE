@@ -2,6 +2,7 @@
     Recreate the trajectory fragments to the led to the discovery of a snapshot,
     specified by the tuple (epoch, trajectory, snapshot) and write as a pdb file
 """
+from __future__ import print_function
 import os
 import sys
 import argparse
@@ -20,16 +21,17 @@ def parseArguments():
     """
     desc = "Write the information related to the conformation network to file\n"
     parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("epoch", type=str, help="Path to the epoch to search the snapshot")
     parser.add_argument("trajectory", type=int, help="Trajectory number")
     parser.add_argument("snapshot", type=int, help="Snapshot to select (in accepted steps)")
-    parser.add_argument("epoch", type=str, help="Path to the epoch to search the snapshot")
     parser.add_argument("-o", type=str, default=None, help="Output path where to write the files")
+    parser.add_argument("--name", type=str, default="pathway.pdb", help="Name of the pdb to write the files")
     args = parser.parse_args()
-    return args.trajectory, args.snapshot, args.epoch, args.o
+    return args.trajectory, args.snapshot, args.epoch, args.o, args.name
 
 
 if __name__ == "__main__":
-    trajectory, snapshot, epoch, outputPath = parseArguments()
+    trajectory, snapshot, epoch, outputPath, out_filename = parseArguments()
     if outputPath is not None:
         outputPath = os.path.join(outputPath, "")
         if not os.path.exists(outputPath):
@@ -53,5 +55,5 @@ if __name__ == "__main__":
         epoch, trajectory, snapshot = map(int, procMapping[trajectory-1][1:-1].split(','))
         epoch = str(epoch)
     sys.stderr.write("Writing pathway...\n")
-    with open(outputPath+"pathway.pdb", "a") as f:
+    with open(outputPath+out_filename, "a") as f:
         f.write("ENDMDL\n".join(itertools.chain.from_iterable(pathway)))

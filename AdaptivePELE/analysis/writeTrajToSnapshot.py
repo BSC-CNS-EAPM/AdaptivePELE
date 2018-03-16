@@ -9,9 +9,9 @@ def parseArguments():
     desc = "Write the information related to the conformation network to file\n"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("clusteringObject", type=str, help="Path to the clustering object")
+    parser.add_argument("epoch", type=str, help="Path to the epoch to search the snapshot")
     parser.add_argument("trajectory", type=int, help="Trajectory number")
     parser.add_argument("snapshot", type=int, help="Snapshot to select (in accepted steps)")
-    parser.add_argument("epoch", type=str, help="Path to the epoch to search the snapshot")
     parser.add_argument("-o", type=str, default=None, help="Output path where to write the files")
     args = parser.parse_args()
     return args.clusteringObject, args.trajectory, args.snapshot, args.epoch, args.o
