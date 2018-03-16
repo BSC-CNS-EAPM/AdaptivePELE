@@ -20,7 +20,7 @@ def parseArgs():
 def main(representatives_files, path_structures, output, clusters, trajNames):
     # Load the representative structures file
     try:
-        clusters_info = np.loadtxt(representatives_files)
+        clusters_info = np.loadtxt(representatives_files, skiprows=1)
     except IOError:
         raise IOError("Couldn't find a representative file in %s, please check that the path is correct" % representatives_files)
     # Organize to minimise pdb loading
@@ -43,6 +43,13 @@ def main(representatives_files, path_structures, output, clusters, trajNames):
         destFolder = os.path.join(destFolder, "representative_structures_pdbs")
 
     if not os.path.exists(destFolder):
+        os.makedirs(destFolder)
+    else:
+        destFolder += "_%d"
+        it = 1
+        while os.path.exists(destFolder % it):
+            it += 1
+        destFolder %= it
         os.makedirs(destFolder)
     structureFolder = os.path.join(path_structures, "%d", trajNames+"_%d.pdb")
     for trajFile, extraInfo in extract_info.items():
