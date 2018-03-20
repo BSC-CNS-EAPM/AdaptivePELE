@@ -12,7 +12,11 @@ elif 'login' in machine:
     matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 if machine != "bsccv03":
+try:
+    # This might fail for older versions of matplotlib (e.g in life cluster)
     plt.style.use("ggplot")
+except:
+    pass
 
 
 def printHelp():

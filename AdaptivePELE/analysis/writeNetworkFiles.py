@@ -3,7 +3,11 @@ import sys
 import argparse
 from AdaptivePELE.utilities import utilities
 import matplotlib.pyplot as plt
-plt.style.use("ggplot")
+try:
+    # This might fail for older versions of matplotlib (e.g in life cluster)
+    plt.style.use("ggplot")
+except:
+    pass
 
 
 def parseArguments():
