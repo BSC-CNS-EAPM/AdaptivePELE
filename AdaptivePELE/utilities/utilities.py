@@ -207,7 +207,7 @@ def gen_atom_name(index):
 
 
 def write_PDB_clusters(pmf_xyzg, title="clusters.pdb", use_beta=False, elements=None):
-    templateLine = "HETATM%s %s CLT L 502    %s%s%s  0.75%s            %s  \n"
+    templateLine = "HETATM%s %s CLT L 502    %s%s%s  0.75%s          %s  \n"
     if elements is None:
         elements = ["H" for i in range(len(pmf_xyzg))]
 
@@ -221,11 +221,12 @@ def write_PDB_clusters(pmf_xyzg, title="clusters.pdb", use_beta=False, elements=
         x = ("%.3f" % line[0]).rjust(8)
         y = ("%.3f" % line[1]).rjust(8)
         z = ("%.3f" % line[2]).rjust(8)
+        element = elements[i].rjust(2)
         if use_beta:
             g = ("%.2f" % line[-1]).rjust(6)
         else:
             g = ("%.2f" % 0).rjust(6)
-        content += templateLine % (number, number3, x, y, z, g, elements[i])
+        content += templateLine % (number, number3, x, y, z, g, element)
 
     with open(title, 'w') as f:
         f.write(content)
