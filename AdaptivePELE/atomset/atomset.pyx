@@ -82,6 +82,13 @@ cdef class Atom:
             :param atomContent: Line of the pdb from which the atom will be created
             :type atomContent: basestring
         """
+        # Force string attributes to be unicode strings
+        self.atomSerial = u""
+        self.name = u""
+        self.resname = u""
+        self.resChain = u""
+        self.resnum = u""
+        self.type = u""
         # atomContent = atomContent.split()
         if len(atomContent) > 6 and (atomContent[:4] == 'ATOM' or atomContent[:6] == 'HETATM'):
             self.atomSerial = atomContent[6:11].strip()
