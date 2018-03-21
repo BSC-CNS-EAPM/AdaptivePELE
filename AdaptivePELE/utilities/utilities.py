@@ -206,8 +206,10 @@ def gen_atom_name(index):
     return chr(65+ind1)+chr(65+ind2//260)+chr(65+ind3//10)+str(ind3 % 10)
 
 
-def write_PDB_clusters(pmf_xyzg, title="clusters.pdb", use_beta=False):
-    templateLine = "HETATM%s %s CLT L 502    %s%s%s  0.75%s            H  \n"
+def write_PDB_clusters(pmf_xyzg, title="clusters.pdb", use_beta=False, elements=None):
+    templateLine = "HETATM%s %s CLT L 502    %s%s%s  0.75%s            %s  \n"
+    if elements is None:
+        elements = ["H" for i in range(len(pmf_xyzg))]
 
     content = ""
     names = []
@@ -223,7 +225,7 @@ def write_PDB_clusters(pmf_xyzg, title="clusters.pdb", use_beta=False):
             g = ("%.2f" % line[-1]).rjust(6)
         else:
             g = ("%.2f" % 0).rjust(6)
-        content += templateLine % (number, number3, x, y, z, g)
+        content += templateLine % (number, number3, x, y, z, g, elements[i])
 
     with open(title, 'w') as f:
         f.write(content)
@@ -234,6 +236,36 @@ def distanceCOM(coords1, coords2):
     coords1 = np.array(coords1)
     coords2 = np.array(coords2)
     return np.linalg.norm(coords1-coords2)
+
+
+def sign(x, tol=1e-7):
+    """
+        Return the sign of a number
+
+        :param x: Array of number to evaluate the sign
+        :type x: numpy.array
+        :param tol: Tolerance to define the zero
+        :type tol: float
+
+        :returns: int -- Sign of the number
+    """
+    x[abs(x) < tol] = 0
+    return np.sign(x)
+
+
+def getAtomNames(values):
+    """
+        Assign to each value an atomname, O for negatives, H for 0 and N for
+        positives. This function is created for assign atomnames for custom pdbs
+
+        :param values: Collection of numbers to assing an atom name for
+        :type values: iterable
+
+        :returns: list -- List of atom names
+    """
+    names = ["O", "H", "N"]
+    values += 1
+    return [names[int(value)] for value in values]
 
 
 def getReportAndTrajectoryWildcard(JSONdict):
