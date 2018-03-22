@@ -11,11 +11,10 @@ if machine == "bsccv03":
 elif 'login' in machine:
     matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
-if machine != "bsccv03":
 try:
     # This might fail for older versions of matplotlib (e.g in life cluster)
     plt.style.use("ggplot")
-except:
+except NameError:
     pass
 
 
@@ -34,8 +33,7 @@ def printHelp():
     return args.filename
 
 
-def main():
-    filename = printHelp()
+def main(filename):
     print("FILENAME", filename)
     templateSummary = "%d/clustering/summary.txt"
     allFolders = os.listdir(".")
@@ -61,4 +59,5 @@ def main():
     plt.show()
 
 if __name__ == "__main__":
-    main()
+    filename = printHelp()
+    main(filename)

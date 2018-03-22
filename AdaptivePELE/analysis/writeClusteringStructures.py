@@ -24,11 +24,15 @@ def parseArgs():
     args = parser.parse_args()
     return args
 
+
+def main(clObject, structures, condition, outputPath):
+    clusteringUtilities.writeStructures(clObject, structures, condition, outputPath)
+
+
 if __name__ == "__main__":
     arguments = parseArgs()
     if arguments.threshold is not None:
         condition = lambda x: abs(x.threshold-arguments.threshold) < 0.01
     else:
         condition = None
-    clusteringUtilities.writeStructures(arguments.clObject, arguments.structures, condition,
-                                        arguments.outputPath)
+    main(arguments.clObject, arguments.structures, condition, arguments.outputPath)
