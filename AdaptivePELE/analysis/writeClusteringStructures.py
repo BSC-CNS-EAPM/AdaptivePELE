@@ -17,7 +17,7 @@ def parseArgs():
     parser.add_argument('outputPath', type=str,
                         help="Path where to write the structures, including "
                         "name of the files, i.e output/path/cluster.pdb")
-    parser.add_argument("structures", nargs='*', type=list, default=None,
+    parser.add_argument("structures", nargs='*', type=int, default=None,
                         help="Structures to write")
     parser.add_argument("--threshold", type=float, default=None,
                         help="Only print those structures with mathcing threshold")
