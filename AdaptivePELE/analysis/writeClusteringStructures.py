@@ -20,7 +20,7 @@ def parseArgs():
     parser.add_argument("structures", nargs='*', type=int, default=None,
                         help="Structures to write")
     parser.add_argument("--threshold", type=float, default=None,
-                        help="Only print those structures with mathcing threshold")
+                        help="Only print those structures with matching threshold")
     args = parser.parse_args()
     return args
 

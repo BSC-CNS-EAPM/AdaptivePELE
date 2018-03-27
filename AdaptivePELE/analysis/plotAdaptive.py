@@ -21,8 +21,8 @@ def parseArguments():
     parser.add_argument("xcol", type=int, default=2, help="xcol")
     parser.add_argument("ycol", type=int, default=4, help="ycol")
     parser.add_argument("filename", type=str, default="report_", help="Report filename")
-    parser.add_argument("-be", action="store_true", help="Points")
-    parser.add_argument("-rmsd", action="store_true", help="Lines")
+    parser.add_argument("-points", action="store_true", help="Plot using points")
+    parser.add_argument("-lines", action="store_true", help="Plot using lines")
     parser.add_argument("-zcol", type=int, default=None, help="Column to define color according to metric")
     parser.add_argument("-t", "--traj_range", type=str, default=None, help="Range of trajs to select, e.g to select trajs from 1 to 10, 1:10")
 
