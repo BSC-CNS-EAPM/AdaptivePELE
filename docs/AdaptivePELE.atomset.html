@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.4.2
               </div>
             
           
@@ -169,7 +169,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomContent</strong> (<em>str</em>) – Line of the pdb from which the atom will be created</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomContent</strong> (<em>basestring</em>) – Line of the pdb from which the atom will be created</td>
 </tr>
 </tbody>
 </table>
@@ -321,7 +321,7 @@
 the initialise method to load the file</p>
 <dl class="attribute">
 <dt id="AdaptivePELE.atomset.atomset.PDB.CMAtoms">
-<code class="descname">CMAtoms</code><em class="property"> = {'ILE': 'empty', 'GLN': 'empty', 'GLY': 'empty', 'GLU': 'OE1', 'CYS': 'empty', 'ASP': 'OD1', 'SER': 'empty', 'LYS': 'NZ', 'PRO': 'empty', 'HID': 'CE1', 'HIE': 'CE1', 'ASN': 'empty', 'HIP': 'CE1', 'VAL': 'empty', 'THR': 'empty', 'HIS': 'CE1', 'TRP': 'CH2', 'PHE': 'CZ', 'ALA': 'empty', 'MET': 'empty', 'LEU': 'empty', 'ARG': 'NE', 'TYR': 'OH'}</em><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.CMAtoms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">CMAtoms</code><em class="property"> = {u'ILE': u'empty', u'GLN': u'empty', u'GLY': u'empty', u'GLU': u'OE1', u'CYS': u'empty', u'ASP': u'OD1', u'SER': u'empty', u'LYS': u'NZ', u'PRO': u'empty', u'HID': u'CE1', u'HIE': u'CE1', u'ASN': u'empty', u'HIP': u'CE1', u'VAL': u'empty', u'THR': u'empty', u'HIS': u'CE1', u'TRP': u'CH2', u'PHE': u'CZ', u'ALA': u'empty', u'MET': u'empty', u'LEU': u'empty', u'ARG': u'NE', u'TYR': u'OH'}</em><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.CMAtoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -360,7 +360,7 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ligandResname</strong> (<em>str</em>) – Residue name of the ligand in the PDB</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
 <li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>
@@ -408,7 +408,7 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomId</strong> (<em>str</em>) – Id of the Atom (in the format “atomserial:atomName:resname”)</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomId</strong> (<em>basestring</em>) – Id of the Atom (in the format “atomserial:atomName:resname”)</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – Number of atoms in the PDB</td>
 </tr>
@@ -470,12 +470,12 @@ contents</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>PDBstr</strong> (<em>str</em>) – may be a path to the PDB file or a string with the contents of the PDB</li>
+<li><strong>PDBstr</strong> (<em>basestring</em>) – may be a path to the PDB file or a string with the contents of the PDB</li>
 <li><strong>heavyAtoms</strong> (<em>bool</em>) – wether to consider only heavy atoms (True if onl y heavy atoms have to be considered)</li>
-<li><strong>resname</strong> (<em>str</em>) – Residue name to select from the pdb (will only select the residues with that name)</li>
+<li><strong>resname</strong> (<em>basestring</em>) – Residue name to select from the pdb (will only select the residues with that name)</li>
 <li><strong>atomname</strong> (<em>int</em>) – Residue name to select from the pdb (will only select the atoms with that name)</li>
-<li><strong>type</strong> (<em>str</em>) – type of atoms to select: may be ALL, PROTEIN or HETERO</li>
-<li><strong>chain</strong> (<em>str</em>) – Chain name to select from the pdb (will only select the atoms with that name)</li>
+<li><strong>type</strong> (<em>basestring</em>) – type of atoms to select: may be ALL, PROTEIN or HETERO</li>
+<li><strong>chain</strong> (<em>basestring</em>) – Chain name to select from the pdb (will only select the atoms with that name)</li>
 <li><strong>resnum</strong> – Residue number to select from the pdb (will only select the atoms with that name)</li>
 </ul>
 </td>
@@ -512,7 +512,7 @@ created</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – Path of the file where to write the pdb</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>basestring</em>) – Path of the file where to write the pdb</td>
 </tr>
 </tbody>
 </table>
@@ -591,9 +591,9 @@ created</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pdbfile</strong> (<em>str</em>) – A string with PDB content or the path of a pdb file</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pdbfile</strong> (<em>basestring</em>) – A string with PDB content or the path of a pdb file</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str – A string with PDB content</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">basestring – A string with PDB content</td>
 </tr>
 </tbody>
 </table>
@@ -696,9 +696,9 @@ contactThresholdDistance Amstrongs away</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>PDBobj</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – PDB object that contains the conformation’s info</li>
-<li><strong>ligandResname</strong> (<em>str</em>) – Residue name of the ligand in the PDB</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
 <li><strong>ligandResnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>ligandResChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>ligandResChain</strong> (<em>basestring</em>) – String containing the chain name of the ligand in the pdb</li>
 <li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>
@@ -729,9 +729,9 @@ away</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>PDBobj</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – PDB object that contains the conformation’s info</li>
-<li><strong>ligandResname</strong> (<em>str</em>) – Residue name of the ligand in the PDB</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
 <li><strong>ligandResnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>ligandResChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>ligandResChain</strong> (<em>basestring</em>) – String containing the chain name of the ligand in the pdb</li>
 <li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>
@@ -771,9 +771,9 @@ contactThresholdDistance Amstrongs away</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ligandResname</strong> (<em>str</em>) – Residue name of the ligand in the PDB</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
 <li><strong>ligandResnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>ligandResChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>ligandResChain</strong> (<em>basestring</em>) – String containing the chain name of the ligand in the pdb</li>
 <li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>

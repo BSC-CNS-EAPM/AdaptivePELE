@@ -13,6 +13,7 @@ Contents:
 
    Examples
    AdaptivePELE
+   Changelog
 
 
 Indices and tables

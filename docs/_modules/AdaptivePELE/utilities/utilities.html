@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.4.2
               </div>
             
           
@@ -87,6 +87,7 @@
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -136,18 +137,27 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.utilities.utilities</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">reraise</span> <span class="k">as</span> <span class="n">raise_</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">linalg</span>
-<span class="c1"># import pickle</span>
-<span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">RMSDCalculator</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">utils</span>
 <span class="kn">import</span> <span class="nn">AdaptivePELE.atomset.atomset</span> <span class="k">as</span> <span class="nn">atomset</span>
+
+
+<span class="k">class</span> <span class="nc">UnsatisfiedDependencyException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="n">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="n">__module__</span>
 
 
 <div class="viewcode-block" id="cleanup"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.cleanup">[docs]</a><span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="n">tmpFolder</span><span class="p">):</span>
@@ -242,7 +252,7 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">PDB</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="s2">&quot;Symmetry atom </span><span class="si">%s</span><span class="s2"> not found in initial structure&quot;</span> <span class="o">%</span> <span class="n">key</span>
     <span class="k">if</span> <span class="n">symmetries</span><span class="p">:</span>
-        <span class="nb">print</span> <span class="s2">&quot;Symmetry dictionary correctly defined!&quot;</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Symmetry dictionary correctly defined!&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="getRMSD"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getRMSD">[docs]</a><span class="k">def</span> <span class="nf">getRMSD</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">nativePDB</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">):</span>
@@ -288,7 +298,8 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">EOFError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">EOFError</span><span class="p">,</span> <span class="ne">EOFError</span><span class="p">(</span><span class="s2">&quot;Empty clustering object!&quot;</span><span class="p">),</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span></div>
+            <span class="n">t</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">tb</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+            <span class="n">raise_</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">tb</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ensure_connectivity_msm"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.ensure_connectivity_msm">[docs]</a><span class="k">def</span> <span class="nf">ensure_connectivity_msm</span><span class="p">(</span><span class="n">msm</span><span class="p">):</span>
@@ -296,7 +307,7 @@
         <span class="k">return</span> <span class="n">msm</span><span class="o">.</span><span class="n">stationary_distribution</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">counts</span> <span class="o">=</span> <span class="n">msm</span><span class="o">.</span><span class="n">count_matrix_full</span>
-        <span class="n">counts</span> <span class="o">+=</span> <span class="mi">1</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">counts</span> <span class="o">+=</span> <span class="mi">1</span><span class="o">/</span><span class="n">counts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">trans</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">buildRevTransitionMatrix</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">eic</span> <span class="o">=</span> <span class="n">getSortedEigen</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">getStationaryDistr</span><span class="p">(</span><span class="n">eic</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span></div>
@@ -328,14 +339,16 @@
     <span class="c1"># The maximum number of unique ids generated by this method is 175760 =</span>
     <span class="c1"># 26*26*26*10, however, remember that generally the maximum number of unique</span>
     <span class="c1"># atoms that can be used with vmd is around 32000</span>
-    <span class="n">ind1</span> <span class="o">=</span> <span class="n">index</span><span class="o">/</span><span class="mi">6760</span>
+    <span class="n">ind1</span> <span class="o">=</span> <span class="n">index</span><span class="o">//</span><span class="mi">6760</span>
     <span class="n">ind2</span> <span class="o">=</span> <span class="p">(</span><span class="n">index</span> <span class="o">%</span> <span class="mi">6760</span><span class="p">)</span>
     <span class="n">ind3</span> <span class="o">=</span> <span class="n">ind2</span> <span class="o">%</span> <span class="mi">260</span>
-    <span class="k">return</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind1</span><span class="p">)</span><span class="o">+</span><span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind2</span><span class="o">/</span><span class="mi">260</span><span class="p">)</span><span class="o">+</span><span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind3</span><span class="o">/</span><span class="mi">10</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ind3</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind1</span><span class="p">)</span><span class="o">+</span><span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind2</span><span class="o">//</span><span class="mi">260</span><span class="p">)</span><span class="o">+</span><span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind3</span><span class="o">//</span><span class="mi">10</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ind3</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="write_PDB_clusters"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.write_PDB_clusters">[docs]</a><span class="k">def</span> <span class="nf">write_PDB_clusters</span><span class="p">(</span><span class="n">pmf_xyzg</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;clusters.pdb&quot;</span><span class="p">,</span> <span class="n">use_beta</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">templateLine</span> <span class="o">=</span> <span class="s2">&quot;HETATM</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> CLT L 502    </span><span class="si">%s%s%s</span><span class="s2">  0.75</span><span class="si">%s</span><span class="s2">            H  </span><span class="se">\n</span><span class="s2">&quot;</span>
+<div class="viewcode-block" id="write_PDB_clusters"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.write_PDB_clusters">[docs]</a><span class="k">def</span> <span class="nf">write_PDB_clusters</span><span class="p">(</span><span class="n">pmf_xyzg</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;clusters.pdb&quot;</span><span class="p">,</span> <span class="n">use_beta</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">templateLine</span> <span class="o">=</span> <span class="s2">&quot;HETATM</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> CLT L 502    </span><span class="si">%s%s%s</span><span class="s2">  0.75</span><span class="si">%s</span><span class="s2">          </span><span class="si">%s</span><span class="s2">  </span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="n">elements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">elements</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;H&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pmf_xyzg</span><span class="p">))]</span>
 
     <span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
@@ -347,11 +360,12 @@
         <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">use_beta</span><span class="p">:</span>
             <span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
-        <span class="n">content</span> <span class="o">+=</span> <span class="n">templateLine</span> <span class="o">%</span> <span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">number3</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">+=</span> <span class="n">templateLine</span> <span class="o">%</span> <span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">number3</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
@@ -362,6 +376,36 @@
     <span class="n">coords1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords1</span><span class="p">)</span>
     <span class="n">coords2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords2</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">coords1</span><span class="o">-</span><span class="n">coords2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sign"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.sign">[docs]</a><span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the sign of a number</span>
+
+<span class="sd">        :param x: Array of number to evaluate the sign</span>
+<span class="sd">        :type x: numpy.array</span>
+<span class="sd">        :param tol: Tolerance to define the zero</span>
+<span class="sd">        :type tol: float</span>
+
+<span class="sd">        :returns: int -- Sign of the number</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getAtomNames"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getAtomNames">[docs]</a><span class="k">def</span> <span class="nf">getAtomNames</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assign to each value an atomname, O for negatives, H for 0 and N for</span>
+<span class="sd">        positives. This function is created for assign atomnames for custom pdbs</span>
+
+<span class="sd">        :param values: Collection of numbers to assing an atom name for</span>
+<span class="sd">        :type values: iterable</span>
+
+<span class="sd">        :returns: list -- List of atom names</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">]</span>
+    <span class="n">values</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">names</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="getReportAndTrajectoryWildcard"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getReportAndTrajectoryWildcard">[docs]</a><span class="k">def</span> <span class="nf">getReportAndTrajectoryWildcard</span><span class="p">(</span><span class="n">JSONdict</span><span class="p">):</span>
@@ -398,7 +442,7 @@
 <span class="sd">        Extract the metrics in report file from an epoch to a numpy array</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">metrics</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
         <span class="n">report</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputFolder</span><span class="p">,</span> <span class="n">reportName</span> <span class="o">%</span> <span class="n">i</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">+</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>

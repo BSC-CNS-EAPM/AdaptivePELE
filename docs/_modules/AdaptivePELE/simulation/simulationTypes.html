@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.4.2
               </div>
             
           
@@ -87,6 +87,7 @@
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -140,7 +141,7 @@
 
 
 <div class="viewcode-block" id="SIMULATION_TYPE"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationTypes.SIMULATION_TYPE">[docs]</a><span class="k">class</span> <span class="nc">SIMULATION_TYPE</span><span class="p">:</span>
-    <span class="n">PELE</span><span class="p">,</span> <span class="n">MD</span><span class="p">,</span> <span class="n">TEST</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
+    <span class="n">PELE</span><span class="p">,</span> <span class="n">MD</span><span class="p">,</span> <span class="n">TEST</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span></div>
 
 <span class="n">SIMULATION_TYPE_TO_STRING_DICTIONARY</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">SIMULATION_TYPE</span><span class="o">.</span><span class="n">PELE</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationType</span><span class="o">.</span><span class="n">pele</span><span class="p">,</span>
@@ -150,7 +151,7 @@
 
 
 <div class="viewcode-block" id="EXITCONDITION_TYPE"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationTypes.EXITCONDITION_TYPE">[docs]</a><span class="k">class</span> <span class="nc">EXITCONDITION_TYPE</span><span class="p">:</span>
-    <span class="n">METRIC</span><span class="p">,</span> <span class="n">METRICMULTIPLETRAJS</span><span class="p">,</span> <span class="n">CLUSTERING</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
+    <span class="n">METRIC</span><span class="p">,</span> <span class="n">METRICMULTIPLETRAJS</span><span class="p">,</span> <span class="n">CLUSTERING</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span></div>
 
 <span class="n">EXITCONDITION_TYPE_TO_STRING_DICTIONARY</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">EXITCONDITION_TYPE</span><span class="o">.</span><span class="n">METRIC</span><span class="p">:</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ExitConditionType</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span>

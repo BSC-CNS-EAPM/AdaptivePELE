@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.4.2
               </div>
             
           
@@ -87,6 +87,7 @@
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -141,7 +142,6 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">clusteringUtilities</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">math</span>
 
 
 <div class="viewcode-block" id="parseArgs"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.writeClusteringStructures.parseArgs">[docs]</a><span class="k">def</span> <span class="nf">parseArgs</span><span class="p">():</span>
@@ -152,25 +152,29 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Write the requested cluster &quot;</span>
                                      <span class="s2">&quot;structures from a clustering object&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;clObject&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;clObject&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the clustering object&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;outputPath&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path where to write the structures, including &quot;</span>
                         <span class="s2">&quot;name of the files, i.e output/path/cluster.pdb&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;structures&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;structures&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Structures to write&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--threshold&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Only print those structures with mathcing threshold&quot;</span><span class="p">)</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Only print those structures with matching threshold&quot;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">args</span></div>
 
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.writeClusteringStructures.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">clObject</span><span class="p">,</span> <span class="n">structures</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">):</span>
+    <span class="n">clusteringUtilities</span><span class="o">.</span><span class="n">writeStructures</span><span class="p">(</span><span class="n">clObject</span><span class="p">,</span> <span class="n">structures</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">)</span></div>
+
+
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">args</span> <span class="o">=</span> <span class="n">parseArgs</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">condition</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">threshold</span><span class="o">-</span><span class="n">args</span><span class="o">.</span><span class="n">threshold</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="n">parseArgs</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">condition</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">threshold</span><span class="o">-</span><span class="n">arguments</span><span class="o">.</span><span class="n">threshold</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">condition</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">clusteringUtilities</span><span class="o">.</span><span class="n">writeStructures</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">clObject</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">structures</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span>
-                                        <span class="n">args</span><span class="o">.</span><span class="n">outputPath</span><span class="p">)</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">clObject</span><span class="p">,</span> <span class="n">arguments</span><span class="o">.</span><span class="n">structures</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">arguments</span><span class="o">.</span><span class="n">outputPath</span><span class="p">)</span>
 </pre></div>
 
            </div>

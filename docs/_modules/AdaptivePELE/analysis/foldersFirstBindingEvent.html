@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.4.2
               </div>
             
           
@@ -87,6 +87,7 @@
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -136,10 +137,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.analysis.foldersFirstBindingEvent</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">argparse</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">findfirstbindingevent</span>
-<span class="kn">import</span> <span class="nn">analyse</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.analysis</span> <span class="k">import</span> <span class="n">findfirstbindingevent</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.analysis</span> <span class="k">import</span> <span class="n">analyse</span>
+
 
 <div class="viewcode-block" id="parseArguments"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.foldersFirstBindingEvent.parseArguments">[docs]</a><span class="k">def</span> <span class="nf">parseArguments</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -157,10 +160,10 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;stepsPerEpoch&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;StepsPerEpoch&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-seq&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use a sequential run, instead of adaptive&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-u&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Look for unbinding event, instead of binding&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;folders&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>  <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Folders with adaptive sampling runs&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;folders&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Folders with adaptive sampling runs&quot;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
-    <span class="k">return</span>  <span class="n">args</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">column</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">stepsPerEpoch</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">seq</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">u</span></div>
+    <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">column</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">stepsPerEpoch</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">seq</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">u</span></div>
 
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.foldersFirstBindingEvent.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">folders</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">stepsPerEpoch</span><span class="p">,</span> <span class="n">sequential</span><span class="p">,</span> <span class="n">unbinding</span><span class="p">):</span>
@@ -192,26 +195,26 @@
             <span class="n">stepsFirstBindingEvent</span> <span class="o">=</span> <span class="n">findfirstbindingevent</span><span class="o">.</span><span class="n">findFirstBindingEvent</span><span class="p">(</span><span class="n">stepsPerEpoch</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">unBinding</span><span class="o">=</span><span class="n">unbinding</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">stepsFirstBindingEvent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="s2">&quot;Didn&#39;t see any first </span><span class="si">%s</span><span class="s2"> event in folder:&quot;</span> <span class="o">%</span> <span class="n">print_label</span><span class="p">,</span> <span class="n">folder</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Didn&#39;t see any first </span><span class="si">%s</span><span class="s2"> event in folder:&quot;</span> <span class="o">%</span> <span class="n">print_label</span><span class="p">,</span> <span class="n">folder</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">firstBE</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stepsFirstBindingEvent</span><span class="p">)</span>
 
         <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">firstBE</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="nb">print</span> <span class="n">firstBE</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">firstBE</span><span class="p">)</span>
         <span class="n">analyse</span><span class="o">.</span><span class="n">analyseData</span><span class="p">(</span><span class="n">firstBE</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">firstBE</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="nb">print</span> <span class="n">firstBE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">firstBE</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span> <span class="s2">&quot;No </span><span class="si">%s</span><span class="s2"> event found&quot;</span> <span class="o">%</span> <span class="n">print_label</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No </span><span class="si">%s</span><span class="s2"> event found&quot;</span> <span class="o">%</span> <span class="n">print_label</span><span class="p">)</span></div>
 
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">folders</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">stepsPerEpoch</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">unbind</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
+    <span class="n">folders_name</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">steps_epoch</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">unbind</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
     <span class="c1"># We count columns starting by 1</span>
-    <span class="n">column</span> <span class="o">-=</span> <span class="mi">1</span>
-    <span class="n">main</span><span class="p">(</span><span class="n">folders</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">stepsPerEpoch</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">unbind</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">folders_name</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">steps_epoch</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">unbind</span><span class="p">)</span>
 </pre></div>
 
            </div>

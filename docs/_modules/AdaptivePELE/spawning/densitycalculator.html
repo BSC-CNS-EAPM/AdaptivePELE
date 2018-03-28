@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.4.2
               </div>
             
           
@@ -87,6 +87,7 @@
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -136,7 +137,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.spawning.densitycalculator</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.spawning</span> <span class="k">import</span> <span class="n">densitycalculatortypes</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -162,7 +164,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">densityBlock</span> <span class="o">=</span> <span class="n">spawningBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">density</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="s2">&quot;Using null density calculator (no preference for any cluster)&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using null density calculator (no preference for any cluster)&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">NullDensityCalculator</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -171,7 +173,7 @@
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Density calculator must have a type&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">density_type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">null</span> <span class="ow">or</span> <span class="n">density_type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">constant</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="s2">&quot;Using constant density&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using constant density&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">NullDensityCalculator</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">density_type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">heaviside</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -180,13 +182,13 @@
                 <span class="n">conditions</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculatorParams</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
                 <span class="k">return</span> <span class="n">DensityCalculatorHeaviside</span><span class="p">(</span><span class="n">conditions</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="nb">print</span> <span class="s2">&quot;Using default parameters for Heaviside density calculator&quot;</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using default parameters for Heaviside density calculator&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">DensityCalculatorHeaviside</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">density_type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">continuous</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="s2">&quot;Using continuous density calculator&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using continuous density calculator&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ContinuousDensityCalculator</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">density_type</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">DensityCalculator</span><span class="o">.</span><span class="n">exitContinuous</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="s2">&quot;Using inverse continuous density calculator&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using inverse continuous density calculator&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ExitContinousDensityCalculator</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown density calculator type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">densitycalculatortypes</span><span class="o">.</span><span class="n">DENSITY_CALCULATOR_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div></div>
@@ -203,9 +205,13 @@
 
 <div class="viewcode-block" id="DensityCalculatorHeaviside"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.densitycalculator.DensityCalculatorHeaviside">[docs]</a><span class="k">class</span> <span class="nc">DensityCalculatorHeaviside</span><span class="p">(</span><span class="n">DensityCalculator</span><span class="p">):</span>
     <span class="c1"># Mostly duplicated code with threshold calculator</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conditions</span><span class="o">=</span><span class="p">[],</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">1.</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conditions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">DensityCalculator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">densitycalculatortypes</span><span class="o">.</span><span class="n">DENSITY_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">heaviside</span>
+        <span class="k">if</span> <span class="n">conditions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">conditions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditions</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditions</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The number of values must be equal or one more, than the number of conditions&#39;</span><span class="p">)</span>

@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.4.2
               </div>
             
           
@@ -440,7 +440,7 @@ the cluster with max SASA</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=u''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a short PELE simulation</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -572,6 +572,30 @@ selected</td>
 </dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.createMultipleComplexesFilenames">
+<code class="descname">createMultipleComplexesFilenames</code><span class="sig-paren">(</span><em>numberOfSnapshots</em>, <em>tmpInitialStructuresTemplate</em>, <em>iteration</em>, <em>equilibration=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.createMultipleComplexesFilenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.createMultipleComplexesFilenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the string to substitute the complexes in the PELE control file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>numberOfSnapshots</strong> (<em>int</em>) – Number of complexes to write</li>
+<li><strong>tmpInitialStructuresTemplate</strong> (<em>str</em>) – Template with the name of the initial strutctures</li>
+<li><strong>iteration</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>equilibration</strong> (<em>bool</em>) – Flag to mark wether the complexes are part of an
+equilibration run</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – jsonString to be substituted in PELE control file</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.hasExitCondition">
 <code class="descname">hasExitCondition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.hasExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.hasExitCondition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if an exit condition has been set</p>
@@ -622,7 +646,7 @@ processorsToClusterMapping</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=u''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -676,7 +700,7 @@ processorsToClusterMapping</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#TestSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=u''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#TestSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copy file to test the rest of the AdaptivePELE procedure</p>
 </dd></dl>
 
