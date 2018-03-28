@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [1.5] - 2018-MM-DD (Unreleased)
 
-### Behavior changes from previous version:
+### Behaviour changes from previous version:
     - Make code compatible with python2 and python3
     - Add posibility of using a third column as color in plotAdaptive
     - Change rmsd and be otions of plotAdaptive to lines and points
@@ -21,20 +21,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [1.4.2] - 2018-03-02
 
-### Behavior changes from previous version:
+### Behaviour changes from previous version:
     - Added null spawning calculator
     - Added possibility of max metric in epsilon
     - Improvements in REAP spawning
     - Metric columns in control file now start by 1
     - Changed symbolic links in rawData in freeEnergies calculation to
-relative paths
+    relative paths
 
 ### Bug fixes:
     - Various bug fixes
 
 ## [1.4] - 2018-01-30
 
-### Behavior changes from previous version:
+### Behaviour changes from previous version:
     - Added scripts plot3DNetwork, plotSpawningClusters for better
     visualization of simulations
     - Moved buildRevTransitionMatrixFunction to Cython code (speed-up of up to
@@ -48,11 +48,11 @@ relative paths
 ### Bug fixes:
     - Fixed minor bug in controlFileValidator
     - Fixed bug in writePrecisePathToSnapshot, where backtracking was not
-carried out until the initial structure
+    carried out until the initial structure
 
 ## [1.3] - 2017-06-01
 
-### Behavior changes from previous version:
+### Behaviour changes from previous version:
     - Added script to reconstruct precise path to a given snapshot
     (writePrecisePathToSnapshot.py)
     - Added possibility of chain and resnum selection in PDB
@@ -68,7 +68,7 @@ carried out until the initial structure
 
 ## [1.2] - 2017-05-09
 
-### Behavior changes from previous version:
+### Behaviour changes from previous version:
     - Alternative structures are stored in a priority queue with the priority
     set to the population of the subclusters spawn inversely proportinal way
     according to this population
@@ -92,7 +92,7 @@ carried out until the initial structure
 
 ## [1.1] - 2017-02-17
 
-### Behavior changes from previous version:
+### Behaviour changes from previous version:
     - Follow proper packaging conventions for Python packaging
     - Atomset package implemented in Cython (faster)
     - Jaccard index is calcualed using only the cells of the matrix that are 1
@@ -102,7 +102,8 @@ carried out until the initial structure
 
 ## [1.0] - 2017-01-19
 
-### Behavior changes from previous version:
+### Behaviour changes from previous version:
+
     - Changed quadratic function for continuous
     - Changed symmetry dictionary for list of dictionaries, with symmetry groups
     - Added support for symmetry with contactMap
@@ -115,5 +116,6 @@ carried out until the initial structure
     - Added several scripts for analysis
 
 ### Bug fixes:
+
     - Fixed bug of incorrect atom consideration in symmetries
     - Fixed bug of NaN correlation similarity evaluator in contactMap
