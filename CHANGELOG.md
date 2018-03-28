@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     bactrackAdaptiveTrajectory, added name parameter to select the name of the
     output file and automatic detection of said name, so that if a file exists
     with the same name, a number is added at the end to differentiate them
+    - Add __version__ attribrute to package
 
 ### Bug fixes:
     - Fix bug in alternative structure when a cluster had no other structure

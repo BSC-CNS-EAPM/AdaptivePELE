@@ -19,6 +19,7 @@ Behaviour changes from previous version:
       bactrackAdaptiveTrajectory, added name parameter to select the name of the
       output file and automatic detection of said name, so that if a file exists
       with the same name, a number is added at the end to differentiate them
+    - Add __version__ attribrute to package
 
 Bug fixes:
 ..........
