@@ -12,8 +12,8 @@ Contents:
    :maxdepth: 4
 
    Examples
-   AdaptivePELE
    Changelog
+   AdaptivePELE
 
 
 Indices and tables
