@@ -35,7 +35,9 @@ class Cluster:
         return coor.cluster_kmeans(data=trajectories, k=self.numClusters, max_iter=500, stride=self.stride)
 
     def assignNewTrajectories(self, trajs):
-        assign = AssignCenters(self.clusterCentersFile)
+        # wrap the clusterCentersFile argument in a str call to pass pyemma
+        # assign check if isinstance of str
+        assign = AssignCenters(str(self.clusterCentersFile))
         dTrajs = assign.assign(trajs)
         return dTrajs
 
