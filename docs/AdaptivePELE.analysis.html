@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.4.2
               </div>
             
           
@@ -450,7 +450,7 @@ epoch</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.numberOfClusters.main">
-<code class="descclassname">AdaptivePELE.analysis.numberOfClusters.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfClusters.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfClusters.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.numberOfClusters.</code><code class="descname">main</code><span class="sig-paren">(</span><em>filename</em>, <em>outputPath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/numberOfClusters.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.numberOfClusters.main" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Plot a summary of the clustering for a simulation:</dt>
 <dd><ol class="first last arabic simple">
@@ -514,36 +514,8 @@ clustering summary file</li>
 <div class="section" id="module-AdaptivePELE.analysis.plotAdaptive">
 <span id="plotadaptive-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">plotAdaptive</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.plotAdaptive" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="AdaptivePELE.analysis.plotAdaptive.generateForLoopString">
-<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generateForLoopString</code><span class="sig-paren">(</span><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generateForLoopString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generateForLoopString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a string to be passed to gnuplot</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>gnuplotString</strong> (<em>str</em>) – Template string for gnuplot</li>
-<li><strong>reportName</strong> (<em>str</em>) – Name of the files containing the simulation data</li>
-<li><strong>column1</strong> (<em>int</em>) – Column to plot in the X axis</li>
-<li><strong>column2</strong> (<em>int</em>) – Column to plot in the Y axis</li>
-<li><strong>stepsPerRun</strong> (<em>int</em>) – Number of steps per epoch,</li>
-<li><strong>printWithLines</strong> (<em>bool</em>) – Wether the plot should use solid lines</li>
-<li><strong>TotalNumberOfSteps</strong> (<em>bool</em>) – Not only considering steps in current epoch,
-but steps with all previous epochs</li>
-<li><strong>replotFirst</strong> (<em>bool</em>) – </li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – String to plot using gnuplot</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="AdaptivePELE.analysis.plotAdaptive.generateNestedString">
-<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generateNestedString</code><span class="sig-paren">(</span><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generateNestedString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generateNestedString" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generateNestedString</code><span class="sig-paren">(</span><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em>, <em>paletteModifier=None</em>, <em>trajs_range=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generateNestedString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generateNestedString" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a string to be passed to gnuplot</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -558,6 +530,7 @@ but steps with all previous epochs</li>
 <li><strong>TotalNumberOfSteps</strong> (<em>bool</em>) – Not only considering steps in current epoch,
 but steps with all previous epochs</li>
 <li><strong>replotFirst</strong> (<em>bool</em>) – Deprecated parameter</li>
+<li><strong>paletteModifier</strong> (<em>int</em>) – Wheter to use the epoch as color or a column</li>
 </ul>
 </td>
 </tr>
@@ -570,7 +543,7 @@ but steps with all previous epochs</li>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.plotAdaptive.generatePrintString">
-<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generatePrintString</code><span class="sig-paren">(</span><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generatePrintString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generatePrintString" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generatePrintString</code><span class="sig-paren">(</span><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em>, <em>paletteModifier</em>, <em>trajs_range</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generatePrintString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generatePrintString" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a template string to use with gnuplot</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -582,10 +555,14 @@ but steps with all previous epochs</li>
 <li><strong>ycol</strong> (<em>int</em>) – Column to plot in the Y axis</li>
 <li><strong>reportName</strong> (<em>str</em>) – Name of the files containing the simulation data</li>
 <li><strong>kindOfPrint</strong> (<em>bool</em>) – Kind of lines to plot (solid or points)</li>
+<li><strong>paletteModifier</strong> (<em>int</em>) – Third column to specify color</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – String to plot using gnuplot</p>
+<tr class="field-even field"><th class="field-name">Trajs_range:</th><td class="field-body"><p class="first">Range of trajectories to plot</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – String to plot using gnuplot</p>
 </td>
 </tr>
 </tbody>
@@ -614,6 +591,11 @@ as points, wether to plot the data as lines</td>
 <span id="writeclusteringstructures-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">writeClusteringStructures</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.writeClusteringStructures" title="Permalink to this headline">¶</a></h2>
 <p>Write specified cluster representative structures to pdb</p>
 <dl class="function">
+<dt id="AdaptivePELE.analysis.writeClusteringStructures.main">
+<code class="descclassname">AdaptivePELE.analysis.writeClusteringStructures.</code><code class="descname">main</code><span class="sig-paren">(</span><em>clObject</em>, <em>structures</em>, <em>condition</em>, <em>outputPath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/writeClusteringStructures.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.writeClusteringStructures.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.analysis.writeClusteringStructures.parseArgs">
 <code class="descclassname">AdaptivePELE.analysis.writeClusteringStructures.</code><code class="descname">parseArgs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/writeClusteringStructures.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.writeClusteringStructures.parseArgs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse command line arguments</p>
@@ -634,7 +616,7 @@ as points, wether to plot the data as lines</td>
 specified by the tuple (epoch, trajectory, snapshot) and write as a pdb file</p>
 <dl class="function">
 <dt id="AdaptivePELE.analysis.writePrecisePathToSnapshot.parseArguments">
-<code class="descclassname">AdaptivePELE.analysis.writePrecisePathToSnapshot.</code><code class="descname">parseArguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/writePrecisePathToSnapshot.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.writePrecisePathToSnapshot.parseArguments" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.writePrecisePathToSnapshot.</code><code class="descname">parseArguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.analysis.writePrecisePathToSnapshot.parseArguments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse the command-line options</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.4.2
               </div>
             
           
@@ -87,6 +87,7 @@
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -136,12 +137,14 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.clustering.clustering</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
-<span class="c1"># import cPickle as pickle</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">reraise</span> <span class="k">as</span> <span class="n">raise_</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
 <span class="kn">import</span> <span class="nn">AdaptivePELE.atomset.atomset</span> <span class="k">as</span> <span class="nn">atomset</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span>
@@ -222,11 +225,11 @@
 <span class="sd">            :type verbose: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
-            <span class="nb">print</span> <span class="s2">&quot;--------------&quot;</span>
-            <span class="nb">print</span> <span class="s2">&quot;CLUSTER #</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span>
-            <span class="nb">print</span> <span class="s2">&quot;--------------&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CLUSTER #</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------&quot;</span><span class="p">)</span>
             <span class="n">cluster</span><span class="o">.</span><span class="n">printCluster</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
-            <span class="nb">print</span> <span class="s2">&quot;&quot;</span></div>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -358,18 +361,21 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">limitSize</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Defining pickling interface to avoid problems when working with old</span>
         <span class="c1"># simulations if the properties of the clustering-related classes have</span>
         <span class="c1"># changed</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;altStructPQ&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">,</span> <span class="s2">&quot;limitSize&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">limitSize</span><span class="p">}</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;altStructPQ&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">,</span> <span class="s2">&quot;limitSize&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">limitSize</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">state</span>
 
     <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="c1"># Restore instance attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">limitSize</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;limitSize&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;altStructPQ&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span> <span class="o">=</span> <span class="p">[(</span><span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">,</span> <span class="n">el</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">el</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;altStructPQ&#39;</span><span class="p">])]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AltStructures.altSpawnSelection"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.AltStructures.altSpawnSelection">[docs]</a>    <span class="k">def</span> <span class="nf">altSpawnSelection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centerPair</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -390,16 +396,19 @@
         <span class="n">weights</span> <span class="o">/=</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="c1"># This function only works on numpy &gt;= 1.7, on life we have 1.6</span>
         <span class="c1"># ind = np.random.choice(range(len(self.altStructPQ)), p=weights)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">rv_discrete</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizePQ</span><span class="p">()),</span> <span class="n">weights</span><span class="p">))</span>
+        <span class="c1"># Add one to account for the cluster representative</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">rv_discrete</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizePQ</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">weights</span><span class="p">))</span>
         <span class="n">ind</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># The first value of the distribution is always the cluster center</span>
         <span class="k">if</span> <span class="n">ind</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="s2">&quot;cluster center&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;cluster center&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">centerPair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># pick an alternative structure from the priority queue</span>
-            <span class="nb">print</span> <span class="s2">&quot;alternative structure&quot;</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">trajPosition</span></div>
+            <span class="c1"># The first element corresponds to the cluster center</span>
+            <span class="n">ind</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;alternative structure&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">trajPosition</span></div>
 
 <div class="viewcode-block" id="AltStructures.cleanPQ"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.AltStructures.cleanPQ">[docs]</a>    <span class="k">def</span> <span class="nf">cleanPQ</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -435,20 +444,30 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">subCluster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">subCluster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">distance</span> <span class="o">=</span> <span class="n">similarityEvaluator</span><span class="o">.</span><span class="n">isElement</span><span class="p">(</span><span class="n">PDB</span><span class="p">,</span> <span class="n">subCluster</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">resChain</span><span class="p">,</span> <span class="n">contactThreshold</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">subCluster</span><span class="o">.</span><span class="n">threshold</span><span class="o">/</span><span class="mf">2.0</span><span class="p">:</span>
                 <span class="n">subCluster</span><span class="o">.</span><span class="n">addElement</span><span class="p">([])</span>
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">,</span> <span class="p">(</span><span class="n">subCluster</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="n">subCluster</span><span class="p">))</span>
+                <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">,</span> <span class="p">(</span><span class="n">subCluster</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateIndex</span><span class="p">(),</span> <span class="n">subCluster</span><span class="p">))</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">limitSize</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">cleanPQ</span><span class="p">()</span>
                 <span class="k">return</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">newCluster</span> <span class="o">=</span> <span class="n">Cluster</span><span class="p">(</span><span class="n">PDB</span><span class="p">,</span> <span class="n">thresholdRadius</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span> <span class="n">contactThreshold</span><span class="o">=</span><span class="n">contactThreshold</span><span class="p">,</span> <span class="n">contactMap</span><span class="o">=</span><span class="n">similarityEvaluator</span><span class="o">.</span><span class="n">contactMap</span><span class="p">,</span> <span class="n">trajPosition</span><span class="o">=</span><span class="n">trajPosition</span><span class="p">)</span>
-        <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">newCluster</span><span class="p">))</span>
+        <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateIndex</span><span class="p">(),</span> <span class="n">newCluster</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">limitSize</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cleanPQ</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AltStructures.updateIndex"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.AltStructures.updateIndex">[docs]</a>    <span class="k">def</span> <span class="nf">updateIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Update the index which represents chronological order of entries in</span>
+<span class="sd">            the priority queue</span>
+
+<span class="sd">            :returns: int -- Index of the following element</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span></div>
 
 <div class="viewcode-block" id="AltStructures.sizePQ"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.AltStructures.sizePQ">[docs]</a>    <span class="k">def</span> <span class="nf">sizePQ</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -466,7 +485,7 @@
 <span class="sd">        a contactMap(sometimes) and a metric</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb</span><span class="p">,</span> <span class="n">thresholdRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contactMap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">contacts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[],</span> <span class="n">metricCol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">contacts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metricCol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">contactThreshold</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">trajPosition</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            :param pdb: Pdb of the representative structure</span>
@@ -499,6 +518,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">density</span> <span class="o">=</span> <span class="n">density</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span> <span class="o">=</span> <span class="n">contacts</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contactMap</span> <span class="o">=</span> <span class="n">contactMap</span>
+        <span class="k">if</span> <span class="n">metrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">originalMetrics</span> <span class="o">=</span> <span class="n">metrics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span> <span class="o">=</span> <span class="n">metricCol</span>
@@ -597,15 +618,15 @@
 <span class="sd">            :type verbose: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">printAtoms</span><span class="p">()</span>
-        <span class="nb">print</span> <span class="s2">&quot;Elements: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span>
-        <span class="nb">print</span> <span class="s2">&quot;Metrics: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">printAtoms</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Elements: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Metrics: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="s2">&quot;Radius threshold: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span>
-        <span class="nb">print</span> <span class="s2">&quot;Number of contacts: </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span></div>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Radius threshold: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of contacts: </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Cluster: elements=</span><span class="si">%d</span><span class="s2">, threshold=</span><span class="si">%.3f</span><span class="s2">, contacts=</span><span class="si">%.3f</span><span class="s2">, density=</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span> <span class="ow">or</span> <span class="s2">&quot;0.000&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;Cluster: elements=</span><span class="si">%d</span><span class="s2">, threshold=</span><span class="si">%.3f</span><span class="s2">, contacts=</span><span class="si">%.3f</span><span class="s2">, density=</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span> <span class="ow">or</span> <span class="mf">0.000</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Cluster.writePDB"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Cluster.writePDB">[docs]</a>    <span class="k">def</span> <span class="nf">writePDB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -634,7 +655,7 @@
 <span class="sd">                identifying the structure added</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">altSelection</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructure</span><span class="o">.</span><span class="n">sizePQ</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="s2">&quot;cluster center&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;cluster center&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajPosition</span>
         <span class="k">else</span><span class="p">:</span>
@@ -666,7 +687,7 @@
 
 
 <div class="viewcode-block" id="ContactsClusteringEvaluator"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator">[docs]</a><span class="k">class</span> <span class="nc">ContactsClusteringEvaluator</span><span class="p">(</span><span class="n">ClusteringEvaluator</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">RMSDCalculator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">RMSDCalculator_object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Helper object to carry out the RMSD clustering</span>
 
@@ -674,7 +695,8 @@
 <span class="sd">                conformations</span>
 <span class="sd">            :type RMSDCalculator: :py:class:`.RMSDCalculator`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">RMSDCalculator</span> <span class="o">=</span> <span class="n">RMSDCalculator</span>
+        <span class="n">ClusteringEvaluator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">RMSDCalculator</span> <span class="o">=</span> <span class="n">RMSDCalculator_object</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Only here for compatibility purpose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contactMap</span> <span class="o">=</span> <span class="kc">None</span>
@@ -758,6 +780,7 @@
 <span class="sd">                contacts maps</span>
 <span class="sd">            :type symmetryEvaluator: :py:class:`.SymmetryContactMapEvaluator`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ClusteringEvaluator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">similarityEvaluator</span> <span class="o">=</span> <span class="n">similarityEvaluator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">symmetryEvaluator</span> <span class="o">=</span> <span class="n">symmetryEvaluator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1029,7 +1052,7 @@
 
                         <span class="c1"># raise a new exception of the same type, with the same</span>
                         <span class="c1"># traceback but with an added message</span>
-                        <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="n">message</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">),</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+                        <span class="n">raise_</span><span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="n">message</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">),</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">):</span>
                     <span class="n">origCluster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">trajNum</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">origCluster</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
@@ -1083,9 +1106,9 @@
                 <span class="n">summaryFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeString</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputObject</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span></div>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Clustering.addSnapshotToCluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.addSnapshotToCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addSnapshotToCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">origCluster</span><span class="p">,</span> <span class="n">snapshotNum</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[],</span> <span class="n">col</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Clustering.addSnapshotToCluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.addSnapshotToCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addSnapshotToCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">origCluster</span><span class="p">,</span> <span class="n">snapshotNum</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Cluster a snapshot using the leader algorithm</span>
 
@@ -1103,6 +1126,8 @@
 <span class="sd">            :type col: int</span>
 <span class="sd">            :returns: int -- Cluster to which the snapshot belongs</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">metrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">pdb</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
         <span class="n">pdb</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resChain</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clusteringEvaluator</span><span class="o">.</span><span class="n">cleanContactMap</span><span class="p">()</span>
@@ -1115,7 +1140,7 @@
                                                                  <span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span>
                                                                  <span class="bp">self</span><span class="o">.</span><span class="n">resChain</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">isSimilar</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">dist</span> <span class="o">&gt;</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dist</span> <span class="o">&gt;</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span><span class="o">/</span><span class="mf">2.0</span><span class="p">:</span>
                     <span class="n">cluster</span><span class="o">.</span><span class="n">altStructure</span><span class="o">.</span><span class="n">addStructure</span><span class="p">(</span><span class="n">pdb</span><span class="p">,</span> <span class="n">cluster</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resChain</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusteringEvaluator</span><span class="p">,</span> <span class="n">trajPosition</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">,</span> <span class="n">snapshotNum</span><span class="p">))</span>
                 <span class="n">cluster</span><span class="o">.</span><span class="n">addElement</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">origCluster</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1130,7 +1155,7 @@
                                                  <span class="bp">self</span><span class="o">.</span><span class="n">resChain</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">)</span>
         <span class="n">contacts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusteringEvaluator</span><span class="o">.</span><span class="n">contacts</span>
         <span class="n">numberOfLigandAtoms</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">getNumberOfAtoms</span><span class="p">()</span>
-        <span class="n">contactsPerAtom</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span><span class="o">/</span><span class="n">numberOfLigandAtoms</span>
+        <span class="n">contactsPerAtom</span> <span class="o">=</span> <span class="n">contacts</span><span class="o">/</span><span class="n">numberOfLigandAtoms</span>
 
         <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholdCalculator</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">contactsPerAtom</span><span class="p">)</span>
         <span class="n">cluster</span> <span class="o">=</span> <span class="n">Cluster</span><span class="p">(</span><span class="n">pdb</span><span class="p">,</span> <span class="n">thresholdRadius</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
@@ -1258,7 +1283,7 @@
 <div class="viewcode-block" id="ContactsClustering"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ContactsClustering">[docs]</a><span class="k">class</span> <span class="nc">ContactsClustering</span><span class="p">(</span><span class="n">Clustering</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thresholdCalculator</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                  <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="p">[],</span> <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                 <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Cluster together all snapshots that are closer to the cluster center</span>
 <span class="sd">            than certain threshold. This threshold is assigned according to the</span>
@@ -1294,6 +1319,8 @@
                             <span class="n">altSelection</span><span class="o">=</span><span class="n">altSelection</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">rmsd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">thresholdCalculator</span> <span class="o">=</span> <span class="n">thresholdCalculator</span>
+        <span class="k">if</span> <span class="n">symmetries</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">symmetries</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">symmetries</span> <span class="o">=</span> <span class="n">symmetries</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clusteringEvaluator</span> <span class="o">=</span> <span class="n">ContactsClusteringEvaluator</span><span class="p">(</span><span class="n">RMSDCalculator</span><span class="o">.</span><span class="n">RMSDCalculator</span><span class="p">(</span><span class="n">symmetries</span><span class="p">))</span>
 
@@ -1338,7 +1365,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thresholdCalculator</span><span class="p">,</span> <span class="n">similarityEvaluator</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                  <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                  <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="p">[],</span> <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                 <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Cluster together all snapshots that have similar enough contactMaps.</span>
 <span class="sd">            This similarity can be calculated with different methods (see similariyEvaluator documentation)</span>
 
@@ -1368,6 +1395,8 @@
 <span class="sd">            :param altSelection: Flag that controls wether to use the alternative structures (default 8)</span>
 <span class="sd">            :type altSelection: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">symmetries</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">symmetries</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">Clustering</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="n">resnum</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="n">resChain</span><span class="p">,</span>
                             <span class="n">reportBaseFilename</span><span class="o">=</span><span class="n">reportBaseFilename</span><span class="p">,</span>
                             <span class="n">columnOfReportFile</span><span class="o">=</span><span class="n">columnOfReportFile</span><span class="p">,</span>
@@ -1450,7 +1479,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="SequentialLastSnapshotClustering.addSnapshotToCluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.addSnapshotToCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addSnapshotToCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[],</span> <span class="n">col</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SequentialLastSnapshotClustering.addSnapshotToCluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.addSnapshotToCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addSnapshotToCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Cluster a snapshot using the leader algorithm</span>
 
@@ -1464,12 +1493,14 @@
 <span class="sd">            :type col: int</span>
 <span class="sd">            :returns: int -- Cluster to which the snapshot belongs</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">metrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">pdb</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
         <span class="n">pdb</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span>
                        <span class="n">chain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resChain</span><span class="p">)</span>
         <span class="n">contacts</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">countContacts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resChain</span><span class="p">)</span>
         <span class="n">numberOfLigandAtoms</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">getNumberOfAtoms</span><span class="p">()</span>
-        <span class="n">contactsPerAtom</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span><span class="o">/</span><span class="n">numberOfLigandAtoms</span>
+        <span class="n">contactsPerAtom</span> <span class="o">=</span> <span class="n">contacts</span><span class="o">/</span><span class="n">numberOfLigandAtoms</span>
 
         <span class="n">cluster</span> <span class="o">=</span> <span class="n">Cluster</span><span class="p">(</span><span class="n">pdb</span><span class="p">,</span> <span class="n">thresholdRadius</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                           <span class="n">contacts</span><span class="o">=</span><span class="n">contactsPerAtom</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span>

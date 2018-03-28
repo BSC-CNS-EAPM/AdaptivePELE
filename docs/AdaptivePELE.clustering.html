@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.4.2
               </div>
             
           
@@ -233,6 +233,21 @@ elements than the limit in order to ensure efficiency</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.AltStructures.updateIndex">
+<code class="descname">updateIndex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#AltStructures.updateIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.AltStructures.updateIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the index which represents chronological order of entries in
+the priority queue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int – Index of the following element</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -362,7 +377,7 @@ False otherwise</p>
 
 <dl class="class">
 <dt id="AdaptivePELE.clustering.clustering.Cluster">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">Cluster</code><span class="sig-paren">(</span><em>pdb</em>, <em>thresholdRadius=None</em>, <em>contactMap=None</em>, <em>contacts=None</em>, <em>metrics=[]</em>, <em>metricCol=None</em>, <em>density=None</em>, <em>contactThreshold=8</em>, <em>altSelection=False</em>, <em>trajPosition=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Cluster" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">Cluster</code><span class="sig-paren">(</span><em>pdb</em>, <em>thresholdRadius=None</em>, <em>contactMap=None</em>, <em>contacts=None</em>, <em>metrics=None</em>, <em>metricCol=None</em>, <em>density=None</em>, <em>contactThreshold=8</em>, <em>altSelection=False</em>, <em>trajPosition=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>A cluster contains a representative structure(pdb), the number of
 elements, its density, threshold, number of contacts,
 a contactMap(sometimes) and a metric</p>
@@ -495,7 +510,7 @@ identifying the structure added</td>
 
 <dl class="class">
 <dt id="AdaptivePELE.clustering.clustering.Clustering">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">Clustering</code><span class="sig-paren">(</span><em>resname=''</em>, <em>resnum=0</em>, <em>resChain=''</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>altSelection=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">Clustering</code><span class="sig-paren">(</span><em>resname=u''</em>, <em>resnum=0</em>, <em>resChain=u''</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>altSelection=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for clustering methods, it defines a cluster method that
 contacts and accumulative inherit and use</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -517,7 +532,7 @@ considered in contact(default 8)</li>
 </table>
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.Clustering.addSnapshotToCluster">
-<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>trajNum</em>, <em>snapshot</em>, <em>origCluster</em>, <em>snapshotNum</em>, <em>metrics=[]</em>, <em>col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>trajNum</em>, <em>snapshot</em>, <em>origCluster</em>, <em>snapshotNum</em>, <em>metrics=None</em>, <em>col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster a snapshot using the leader algorithm</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -596,7 +611,7 @@ considered in contact(default 8)</li>
 
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.Clustering.getOptimalMetric">
-<code class="descname">getOptimalMetric</code><span class="sig-paren">(</span><em>column=None</em>, <em>simulationType='min'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.getOptimalMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.getOptimalMetric" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getOptimalMetric</code><span class="sig-paren">(</span><em>column=None</em>, <em>simulationType=u'min'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.getOptimalMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.getOptimalMetric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the cluster with the best metric</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -940,7 +955,7 @@ visualize it</p>
 
 <dl class="class">
 <dt id="AdaptivePELE.clustering.clustering.ContactMapAccumulativeClustering">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">ContactMapAccumulativeClustering</code><span class="sig-paren">(</span><em>thresholdCalculator</em>, <em>similarityEvaluator</em>, <em>resname=''</em>, <em>resnum=0</em>, <em>resChain=''</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>symmetries=[]</em>, <em>altSelection=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ContactMapAccumulativeClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ContactMapAccumulativeClustering" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">ContactMapAccumulativeClustering</code><span class="sig-paren">(</span><em>thresholdCalculator</em>, <em>similarityEvaluator</em>, <em>resname=u''</em>, <em>resnum=0</em>, <em>resChain=u''</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>symmetries=None</em>, <em>altSelection=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ContactMapAccumulativeClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ContactMapAccumulativeClustering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.clustering.clustering.Clustering</span></code></a></p>
 <p>Cluster together all snapshots that have similar enough contactMaps.
 This similarity can be calculated with different methods (see similariyEvaluator documentation)</p>
@@ -973,7 +988,7 @@ considered in contact(default 8)</li>
 
 <dl class="class">
 <dt id="AdaptivePELE.clustering.clustering.ContactsClustering">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">ContactsClustering</code><span class="sig-paren">(</span><em>thresholdCalculator</em>, <em>resname=''</em>, <em>resnum=0</em>, <em>resChain=''</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>symmetries=[]</em>, <em>altSelection=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ContactsClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ContactsClustering" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">ContactsClustering</code><span class="sig-paren">(</span><em>thresholdCalculator</em>, <em>resname=u''</em>, <em>resnum=0</em>, <em>resChain=u''</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>symmetries=None</em>, <em>altSelection=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ContactsClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ContactsClustering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.clustering.clustering.Clustering</span></code></a></p>
 <p>Cluster together all snapshots that are closer to the cluster center
 than certain threshold. This threshold is assigned according to the
@@ -1005,7 +1020,7 @@ considered in contact(default 8)</li>
 
 <dl class="class">
 <dt id="AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">ContactsClusteringEvaluator</code><span class="sig-paren">(</span><em>RMSDCalculator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ContactsClusteringEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">ContactsClusteringEvaluator</code><span class="sig-paren">(</span><em>RMSDCalculator_object</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ContactsClusteringEvaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.clustering.clustering.ClusteringEvaluator" title="AdaptivePELE.clustering.clustering.ClusteringEvaluator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.clustering.clustering.ClusteringEvaluator</span></code></a></p>
 <p>Helper object to carry out the RMSD clustering</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1083,7 +1098,7 @@ conformations</td>
 
 <dl class="class">
 <dt id="AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">SequentialLastSnapshotClustering</code><span class="sig-paren">(</span><em>resname=''</em>, <em>resnum=0</em>, <em>resChain=''</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>altSelection=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#SequentialLastSnapshotClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">SequentialLastSnapshotClustering</code><span class="sig-paren">(</span><em>resname=u''</em>, <em>resnum=0</em>, <em>resChain=u''</em>, <em>reportBaseFilename=None</em>, <em>columnOfReportFile=None</em>, <em>contactThresholdDistance=8</em>, <em>altSelection=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#SequentialLastSnapshotClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.clustering.clustering.Clustering</span></code></a></p>
 <p>Assigned  the last snapshot of the trajectory to a cluster.
 Only useful for PELE sequential runs</p>
@@ -1108,7 +1123,7 @@ considered in contact(default 8)</li>
 </table>
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.addSnapshotToCluster">
-<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>snapshot</em>, <em>metrics=[]</em>, <em>col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#SequentialLastSnapshotClustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>snapshot</em>, <em>metrics=None</em>, <em>col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#SequentialLastSnapshotClustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster a snapshot using the leader algorithm</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1299,7 +1314,7 @@ distance-ordered clustering(in early development)</p>
 
 <dl class="class">
 <dt id="AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculatorHeaviside">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.thresholdcalculator.</code><code class="descname">ThresholdCalculatorHeaviside</code><span class="sig-paren">(</span><em>conditions=[1.0, 0.75, 0.5], values=[2, 3, 4, 5.0]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/thresholdcalculator.html#ThresholdCalculatorHeaviside"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculatorHeaviside" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.thresholdcalculator.</code><code class="descname">ThresholdCalculatorHeaviside</code><span class="sig-paren">(</span><em>conditions=None</em>, <em>values=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/thresholdcalculator.html#ThresholdCalculatorHeaviside"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculatorHeaviside" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator" title="AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculatorHeaviside.calculate">

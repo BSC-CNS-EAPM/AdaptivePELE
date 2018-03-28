@@ -11,11 +11,10 @@ if machine == "bsccv03":
 elif 'login' in machine:
     matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
-if machine != "bsccv03":
 try:
     # This might fail for older versions of matplotlib (e.g in life cluster)
     plt.style.use("ggplot")
-except:
+except NameError:
     pass
 
 
@@ -30,12 +29,12 @@ def printHelp():
            "It must be run in the root folder. "
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("-filename", type=str, default="", help="Output filename")
+    parser.add_argument("-o", "--output", type=str, default="", help="Output folder")
     args = parser.parse_args()
-    return args.filename
+    return args.filename, args.output
 
 
-def main():
-    filename = printHelp()
+def main(filename, output_folder):
     print("FILENAME", filename)
     templateSummary = "%d/clustering/summary.txt"
     allFolders = os.listdir(".")
@@ -56,9 +55,12 @@ def main():
     plt.title("Processors spawned per epoch and cluster size")
     plt.xlabel("Epoch")
     plt.ylabel("Number of spawned processors")
+    if output_folder and not os.path.exists(output_folder):
+        os.makedirs(output_folder)
     if filename != "":
-        plt.savefig("%s_spawning.png" % filename)
+        plt.savefig(os.path.join(output_folder, "%s_spawning.png" % filename))
     plt.show()
 
 if __name__ == "__main__":
-    main()
+    filename, out_folder = printHelp()
+    main(filename, out_folder)

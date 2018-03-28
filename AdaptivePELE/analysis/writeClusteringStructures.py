@@ -17,12 +17,17 @@ def parseArgs():
     parser.add_argument('outputPath', type=str,
                         help="Path where to write the structures, including "
                         "name of the files, i.e output/path/cluster.pdb")
-    parser.add_argument("structures", nargs='*', type=list, default=None,
+    parser.add_argument("structures", nargs='*', type=int, default=None,
                         help="Structures to write")
     parser.add_argument("--threshold", type=float, default=None,
-                        help="Only print those structures with mathcing threshold")
+                        help="Only print those structures with matching threshold")
     args = parser.parse_args()
     return args
+
+
+def main(clObject, structures, condition, outputPath):
+    clusteringUtilities.writeStructures(clObject, structures, condition, outputPath)
+
 
 if __name__ == "__main__":
     arguments = parseArgs()
@@ -30,5 +35,4 @@ if __name__ == "__main__":
         condition = lambda x: abs(x.threshold-arguments.threshold) < 0.01
     else:
         condition = None
-    clusteringUtilities.writeStructures(arguments.clObject, arguments.structures, condition,
-                                        arguments.outputPath)
+    main(arguments.clObject, arguments.structures, condition, arguments.outputPath)

@@ -48,7 +48,7 @@ copyright = u'2017, Daniel Lecina, Joan Francesc Gilabert'
 # built documents.
 #
 # The short X.Y version.
-version = 'v1.4'
+version = 'v1.4.2'
 # The full version, including alpha/beta/rc tags.
 release = ''
 

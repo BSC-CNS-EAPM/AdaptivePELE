@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.4.2
               </div>
             
           
@@ -87,6 +87,7 @@
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -136,7 +137,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.simulation.simulationrunner</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">time</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
@@ -146,11 +148,16 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">blockNames</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="k">import</span> <span class="n">simulationTypes</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">atomset</span><span class="p">,</span> <span class="n">RMSDCalculator</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">KMeans</span>
+<span class="n">SKLEARN</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">KMeans</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">SKLEARN</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <div class="viewcode-block" id="SimulationParameters"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters">[docs]</a><span class="k">class</span> <span class="nc">SimulationParameters</span><span class="p">:</span>
@@ -276,8 +283,25 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Set the processorsToClusterMapping to zero</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">processorsToClusterMapping</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">)]</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processorsToClusterMapping</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">)]</span></div>
 
+<div class="viewcode-block" id="SimulationRunner.createMultipleComplexesFilenames"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.createMultipleComplexesFilenames">[docs]</a>    <span class="k">def</span> <span class="nf">createMultipleComplexesFilenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numberOfSnapshots</span><span class="p">,</span> <span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> <span class="n">equilibration</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Creates the string to substitute the complexes in the PELE control file</span>
+
+<span class="sd">            :param numberOfSnapshots: Number of complexes to write</span>
+<span class="sd">            :type numberOfSnapshots: int</span>
+<span class="sd">            :param tmpInitialStructuresTemplate: Template with the name of the initial strutctures</span>
+<span class="sd">            :type tmpInitialStructuresTemplate: str</span>
+<span class="sd">            :param iteration: Epoch number</span>
+<span class="sd">            :type iteration: int</span>
+<span class="sd">            :param equilibration: Flag to mark wether the complexes are part of an</span>
+<span class="sd">                equilibration run</span>
+<span class="sd">            :type equilibration: bool</span>
+
+<span class="sd">            :returns: str -- jsonString to be substituted in PELE control file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
 
 <div class="viewcode-block" id="PeleSimulation"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation">[docs]</a><span class="k">class</span> <span class="nc">PeleSimulation</span><span class="p">(</span><span class="n">SimulationRunner</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
@@ -372,16 +396,16 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">toRun</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mpirun -np &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="n">runningControlFile</span><span class="p">]</span>
         <span class="n">toRun</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">toRun</span><span class="p">)</span>
-        <span class="nb">print</span> <span class="n">toRun</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">toRun</span><span class="p">)</span>
         <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">toRun</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">toRun</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-        <span class="nb">print</span> <span class="n">out</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="n">err</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 
         <span class="n">endTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="nb">print</span> <span class="s2">&quot;PELE took </span><span class="si">%.2f</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">)</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PELE took </span><span class="si">%.2f</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="PeleSimulation.getEquilibrationControlFile"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getEquilibrationControlFile">[docs]</a>    <span class="k">def</span> <span class="nf">getEquilibrationControlFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">peleControlFileDict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -405,8 +429,7 @@
         <span class="c1"># Ensure random tags exists in metrics</span>
         <span class="n">metricsBlock</span> <span class="o">=</span> <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PeleTasks&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;metrics&quot;</span><span class="p">]</span>
         <span class="n">nMetrics</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">metricsBlock</span><span class="p">)</span>
-        <span class="n">randomIndexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">nMetrics</span><span class="p">)</span> <span class="k">if</span> <span class="n">metricsBlock</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">]</span>
-        <span class="n">randomIndexes</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">randomIndexes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nMetrics</span><span class="p">)</span> <span class="k">if</span> <span class="n">metricsBlock</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">])</span>
         <span class="c1"># Delete random numbers from metrics</span>
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">randomIndexes</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">del</span> <span class="n">metricsBlock</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -509,9 +532,9 @@
                 <span class="c1"># box information, include it manually</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">templateNames</span><span class="p">:</span>
                     <span class="n">templateNames</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;$</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">name</span>
-            <span class="nb">print</span> <span class="s2">&quot;Running equilibration for initial structure number </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running equilibration for initial structure number </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
             <span class="n">peleControlString</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">peleControlFileDict</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">templateNames</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">templateNames</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="c1"># Remove double quote around template keys, so that PELE</span>
                 <span class="c1"># understands the options</span>
                 <span class="n">peleControlString</span> <span class="o">=</span> <span class="n">peleControlString</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;$</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
@@ -548,12 +571,16 @@
 
 <span class="sd">            :returns: list -- List with the pdb snapshots of the representatives structures</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">SKLEARN</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">utilities</span><span class="o">.</span><span class="n">UnsatisfiedDependencyException</span><span class="p">(</span><span class="s2">&quot;No installation of scikit-learn found. Please, install scikit-learn or select a different equilibrationMode.&quot;</span><span class="p">)</span>
         <span class="n">energyColumn</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="c1"># detect number of trajectories available</span>
         <span class="n">nTrajs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">trajWildcard</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;*&quot;</span><span class="p">))</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
             <span class="n">report</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">reportWildcard</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">report</span> <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">nSnap</span><span class="p">,</span> <span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">snapshots</span><span class="p">)):</span>
                 <span class="n">conformation</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
@@ -562,17 +589,18 @@
                 <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">line</span><span class="p">[</span><span class="n">energyColumn</span><span class="p">],</span> <span class="n">i</span><span class="p">,</span> <span class="n">nSnap</span><span class="p">]</span><span class="o">+</span><span class="n">com</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
-        <span class="n">nPoints</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">nPoints</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">4</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">nPoints</span><span class="p">]</span>
         <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:])</span>
-        <span class="n">clustersInfo</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;structure&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;minDist&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="n">e6</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">)}</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Clustered equilibration output into </span><span class="si">%d</span><span class="s2"> clusters!&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">)</span>
+        <span class="n">clustersInfo</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;structure&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;minDist&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="n">e6</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">)}</span>
         <span class="k">for</span> <span class="n">conf</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">labels_</span><span class="p">):</span>
             <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">kmeans</span><span class="o">.</span><span class="n">cluster_centers_</span><span class="o">-</span><span class="n">conf</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span>
             <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">clustersInfo</span><span class="p">[</span><span class="n">cluster</span><span class="p">][</span><span class="s2">&quot;minDist&quot;</span><span class="p">]:</span>
                 <span class="n">clustersInfo</span><span class="p">[</span><span class="n">cluster</span><span class="p">][</span><span class="s2">&quot;minDist&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span>
                 <span class="n">clustersInfo</span><span class="p">[</span><span class="n">cluster</span><span class="p">][</span><span class="s2">&quot;structure&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
         <span class="n">initialStructures</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">):</span>
             <span class="n">traj</span><span class="p">,</span> <span class="n">snap</span> <span class="o">=</span> <span class="n">clustersInfo</span><span class="p">[</span><span class="n">cl</span><span class="p">][</span><span class="s2">&quot;structure&quot;</span><span class="p">]</span>
             <span class="n">initialStructures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">traj</span><span class="p">)[</span><span class="n">snap</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">initialStructures</span></div>
@@ -589,7 +617,7 @@
 
 <span class="sd">            :returns: list -- List with the pdb snapshots of the representatives structures</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">ij</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ij</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">)]</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">ij</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ij</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="PeleSimulation.selectEquilibratedStructure"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibratedStructure">[docs]</a>    <span class="k">def</span> <span class="nf">selectEquilibratedStructure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">,</span> <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">trajWildcard</span><span class="p">,</span> <span class="n">reportWildcard</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -620,7 +648,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">energyColumn</span><span class="p">,</span> <span class="n">similarityColumn</span><span class="p">])</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
             <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rowIndex</span><span class="p">)</span>
             <span class="n">report</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">reportWildcard</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">similarityColumn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -641,9 +669,9 @@
 
         <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">energyColumn</span> <span class="o">&gt;</span> <span class="n">similarityColumn</span> <span class="ow">or</span> <span class="n">similarityColumn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">energyColumn</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">energyColumn</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">energyColumn</span><span class="p">,</span> <span class="n">similarityColumn</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">energyColumn</span><span class="p">,</span> <span class="n">similarityColumn</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
         <span class="n">maxEnergy</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="n">energyColumn</span><span class="p">]</span>
         <span class="c1"># Substract the max value so all values will be negative (avoid sign problems)</span>
         <span class="n">values</span><span class="p">[:,</span> <span class="n">energyColumn</span><span class="p">]</span> <span class="o">-=</span> <span class="n">maxEnergy</span>
