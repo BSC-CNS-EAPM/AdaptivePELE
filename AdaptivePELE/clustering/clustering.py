@@ -234,7 +234,6 @@ class AltStructures:
     def __setstate__(self, state):
         # Restore instance attributes
         self.limitSize = state['limitSize']
-        self.altStructPQ = state['altStructPQ']
         self.altStructPQ = [(el[0], i, el[-1]) for i, el in enumerate(state['altStructPQ'])]
         self.index = state.get('index', len(self.altStructPQ)-1)
 
