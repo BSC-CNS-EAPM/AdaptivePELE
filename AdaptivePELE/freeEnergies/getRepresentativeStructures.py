@@ -17,7 +17,9 @@ def parseArgs():
     return args
 
 
-def main(representatives_files, path_structures, output, clusters, trajNames):
+def main(representatives_files, path_structures, output="", clusters=None, trajNames="trajectory"):
+    if clusters is None:
+        clusters = ['a']
     # Load the representative structures file
     try:
         clusters_info = np.loadtxt(representatives_files, skiprows=1)
