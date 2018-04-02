@@ -27,7 +27,7 @@ def parseArguments():
     parser.add_argument("-t", "--traj_range", type=str, default=None, help="Range of trajs to select, e.g to select trajs from 1 to 10, 1:10")
 
     args = parser.parse_args()
-    return args.steps, args.xcol, args.ycol, args.filename, args.be, args.rmsd, args.zcol, args.traj_range
+    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range
 
 
 def generateNestedString(gnuplotString, reportName, column1, column2, stepsPerRun, printWithLines, totalNumberOfSteps=False, replotFirst=False, paletteModifier=None, trajs_range=None):
