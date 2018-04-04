@@ -164,6 +164,7 @@ class SimulationRunner:
         """
         pass
 
+
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
         SimulationRunner.__init__(self, parameters)
@@ -456,12 +457,15 @@ class PeleSimulation(SimulationRunner):
         print("Clustered equilibration output into %d clusters!" % self.parameters.numberEquilibrationStructures)
         clustersInfo = {x: {"structure": None, "minDist": 1e6} for x in range(self.parameters.numberEquilibrationStructures)}
         for conf, cluster in zip(data, kmeans.labels_):
-            dist = np.linalg.norm(kmeans.cluster_centers_-conf[3:])
+            dist = np.linalg.norm(kmeans.cluster_centers_[cluster]-conf[3:])
             if dist < clustersInfo[cluster]["minDist"]:
                 clustersInfo[cluster]["minDist"] = dist
                 clustersInfo[cluster]["structure"] = tuple(conf[1:3].astype(int))
         initialStructures = []
         for cl in range(self.parameters.numberEquilibrationStructures):
+            if clustersInfo[cl]["structure"] is None:
+                # If a cluster has no structure assigned, skip it
+                continue
             traj, snap = clustersInfo[cl]["structure"]
             initialStructures.append(utilities.getSnapshots(trajWildcard % traj)[snap])
         return initialStructures
