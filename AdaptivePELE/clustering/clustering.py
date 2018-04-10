@@ -884,7 +884,7 @@ class Clustering:
             and self.resChain == other.resChain\
             and self.col == other.col
 
-    def cluster(self, paths):
+    def cluster(self, paths, ignoreFirstRow=False):
         """
             Cluster the snaptshots contained in the paths folder
 
@@ -898,12 +898,15 @@ class Clustering:
             # origCluster = processorsToClusterMapping[trajNum-1]
             origCluster = None
             snapshots = utilities.getSnapshots(trajectory, True)
+
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
                 metrics = np.loadtxt(reportFilename, ndmin=2)
 
                 for num, snapshot in enumerate(snapshots):
+                    if ignoreFirstRow and num == 0:
+                        continue
                     try:
                         origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col)
                     except IndexError as e:
@@ -915,6 +918,8 @@ class Clustering:
                         raise_(IndexError, (str(e) + message % trajNum), sys.exc_info()[2])
             else:
                 for num, snapshot in enumerate(snapshots):
+                    if ignoreFirstRow and num == 0:
+                        continue
                     origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num)
         for cluster in self.clusters.clusters:
             cluster.altStructure.cleanPQ()
