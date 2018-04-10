@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Make code compatible with python2 and python3
     - Add posibility of using a third column as color in plotAdaptive
     - Add __version__ attribute to package
+    - Add possibility of skipping first structure of each trajectory in
+      clustering when calling cluster function
 
 ### Behaviour changes from previous version:
 
