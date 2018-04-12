@@ -65,3 +65,12 @@ def buildRevTransitionMatrix(double[:,:] C):
         for j in range(sx):
             T[i,j] = X[i,j]/x[i]
     return np.array(T)
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def isAlphaCarbon(basestring string, bint writeCA):
+    cdef basestring CA = u"CA"
+    cdef basestring C = u"C"
+
+    return writeCA and string[12:16].strip() == CA and string[76:80].strip() == C
