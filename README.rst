@@ -6,9 +6,9 @@ AdaptivePELE aims at enhancing sampling of molecular simulations.
 ----
 
 AdaptivePELE uses cython in order to speedup internal processes
-Please, compile AdaptivePELE with:
+Please, compile AdaptivePELE with::
 
-python setup.py build_ext --inplace
+    python setup.py build_ext --inplace
 
 ----
 
@@ -21,6 +21,6 @@ run, first run a propagation algorithm (simulation), then cluster the
 trajectories obtained (clustering) and finally select the best point to start
 the next iteration (spawning).
 
-An example of usage:
+An example of usage::
 
-python -m AdaptivePELE.adaptiveSampling controlFile.conf
+    python -m AdaptivePELE.adaptiveSampling controlFile.conf

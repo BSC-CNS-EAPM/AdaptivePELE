@@ -15,6 +15,8 @@ New features:
     - Make code compatible with python2 and python3
     - Add posibility of using a third column as color in plotAdaptive
     - Add __version__ attribute to package
+    - Add possibility of skipping first structure of each trajectory in
+      clustering when calling cluster function
 
 Behaviour changes from previous version:
 ........................................
@@ -24,6 +26,8 @@ Behaviour changes from previous version:
       bactrackAdaptiveTrajectory, added name parameter to select the name of the
       output file and automatic detection of said name, so that if a file exists
       with the same name, a number is added at the end to differentiate them
+    - Optimize and parallelize extractCoords script from the freeEnergies
+      subpackage
 
 Bug fixes:
 ..........
