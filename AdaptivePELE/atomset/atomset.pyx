@@ -303,7 +303,7 @@ cdef class PDB:
     def isfromPDBFile(self):
         return isinstance(self.pdb, basestring)
 
-    cdef _initialisePDB(self, basestring PDBstr, bint heavyAtoms=True, basestring resname="", basestring atomname="", basestring type="ALL", basestring chain="", int resnum = 0):
+    def _initialisePDB(self, basestring PDBstr, bint heavyAtoms=True, basestring resname="", basestring atomname="", basestring type="ALL", basestring chain="", int resnum = 0):
         """
             Load the information from a PDB file or a string with the PDB
             contents
@@ -373,7 +373,7 @@ cdef class PDB:
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
-    cdef _initialiseXTC(self, object frame, bint heavyAtoms=True, basestring resname="", basestring atomname="", basestring type="ALL", basestring chain="", int resnum = 0):
+    def _initialiseXTC(self, object frame, bint heavyAtoms=True, basestring resname="", basestring atomname="", basestring type="ALL", basestring chain="", int resnum = 0):
         """
             Load the information from a loaded XTC file into a  mdtraj Trajectory
 
@@ -458,9 +458,9 @@ cdef class PDB:
             Wrapper function
         """
         if isinstance(coordinates, basestring):
-            _initialisePDB(coordinates, heavyAtoms, resname, atomname, type, chain, resnum)
+            self._initialisePDB(coordinates, heavyAtoms, resname, atomname, type, chain, resnum)
         else:
-            _initialiseXTC(coordinates, heavyAtoms, resname, atomname, type, chain, resnum)
+            self._initialiseXTC(coordinates, heavyAtoms, resname, atomname, type, chain, resnum)
 
     def computeTotalMass(self):
         """
