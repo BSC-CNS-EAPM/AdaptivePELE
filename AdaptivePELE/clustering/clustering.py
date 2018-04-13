@@ -488,14 +488,18 @@ class Cluster:
     def __str__(self):
         return "Cluster: elements=%d, threshold=%.3f, contacts=%.3f, density=%.3f" % (self.elements, self.threshold, self.contacts, self.density or 0.000)
 
-    def writePDB(self, path):
+    def writePDB(self, path, topology=None):
         """
             Write the pdb of the representative structure to file
 
             :param path: Filename of the file to write
             :type path: str
+            :param topology: Topology like structure to write PDB from xtc files
+            :type topology: list
         """
-        self.pdb.writePDB(str(path))
+        if topology is None:
+            topology = []
+        self.pdb.writePDB(str(path), topology=topology)
 
     def getContacts(self):
         """
@@ -505,22 +509,27 @@ class Cluster:
         """
         return self.contacts
 
-    def writeSpawningStructure(self, path):
+    def writeSpawningStructure(self, path, topology=None):
         """
             Write the pdb of the chosen structure to spawn
 
             :param path: Filename of the file to write
             :type path: str
+            :param topology: Topology like structure to write PDB from xtc files
+            :type topology: list
+
             :returns int, int, int: Tuple of (epoch, trajectory, snapshot) that permit
                 identifying the structure added
         """
+        if topology is None:
+            topology = []
         if not self.altSelection or self.altStructure.sizePQ() == 0:
             print("cluster center")
-            self.pdb.writePDB(str(path))
+            self.pdb.writePDB(str(path), topology=topology)
             return self.trajPosition
         else:
             spawnStruct, trajPosition = self.altStructure.altSpawnSelection((self.elements, self.pdb))
-            spawnStruct.writePDB(str(path))
+            spawnStruct.writePDB(str(path), topology=topology)
             if trajPosition is None:
                 trajPosition = self.trajPosition
             return trajPosition
@@ -782,6 +791,7 @@ class Clustering:
         self.altSelection = altSelection
         self.conformationNetwork = ConformationNetwork()
         self.epoch = -1
+        self.topology = []
 
     def __getstate__(self):
         # Defining pickling interface to avoid problems when working with old
@@ -950,7 +960,7 @@ class Clustering:
                 if writeAll:
                     outputFilename = "cluster_%d.pdb" % i
                     outputFilename = os.path.join(outputPath, outputFilename)
-                    cluster.writePDB(outputFilename)
+                    cluster.writePDB(outputFilename, topology=self.topology)
 
                 metric = cluster.getMetric()
                 if metric is None:

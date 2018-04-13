@@ -8,6 +8,7 @@ import numpy as np
 import string
 import json
 from scipy import linalg
+import mdtraj as md
 try:
     import cPickle as pickle
 except ImportError:
@@ -54,17 +55,23 @@ def getSnapshots(trajectoryFile, verbose=False):
 
         :returns: str -- Snapshots with information
     """
-    with open(trajectoryFile, "r") as inputFile:
-        inputFileContent = inputFile.read()
+    ext = os.path.splitext(trajectoryFile)[1]
+    if ext == "pdb":
+        with open(trajectoryFile, "r") as inputFile:
+            inputFileContent = inputFile.read()
 
-    snapshots = inputFileContent.split("ENDMDL")
-    if len(snapshots) > 1:
-        snapshots = snapshots[:-1]
-    if not verbose:
-        return snapshots
+        snapshots = inputFileContent.split("ENDMDL")
+        if len(snapshots) > 1:
+            snapshots = snapshots[:-1]
+        if not verbose:
+            return snapshots
 
-    remarkInfo = "REMARK 000 File created using PELE++\nREMARK source            : %s\nREMARK original model nr : %d\nREMARK First snapshot is 1, not 0 (as opposed to report)\n"
-    snapshotsWithInfo = [remarkInfo % (trajectoryFile, i+1)+snapshot for i, snapshot in enumerate(snapshots)]
+        remarkInfo = "REMARK 000 File created using PELE++\nREMARK source            : %s\nREMARK original model nr : %d\nREMARK First snapshot is 1, not 0 (as opposed to report)\n"
+        snapshotsWithInfo = [remarkInfo % (trajectoryFile, i+1)+snapshot for i, snapshot in enumerate(snapshots)]
+    elif ext == "xtc":
+        snapshotsWithInfo = md.load(trajectoryFile)
+    else:
+        raise ValueError("Unrecongnized file extension for %s" % trajectoryFile)
     return snapshotsWithInfo
 
 

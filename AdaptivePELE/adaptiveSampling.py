@@ -115,6 +115,25 @@ def expandInitialStructuresWildcard(initialStructuresWildcard):
     return totalInitialStructures
 
 
+def getTopologyFile(structure):
+    """
+        Extract the topology information to write structures from xtc format
+
+        :param structure: Pdb file with the topology information
+        :type structure: str
+
+        :return: list of str -- The lines of the topology file
+    """
+    top = []
+    with open(structure) as f:
+        for line in f:
+            if not (line.startswith("ATOM") or line.startwith("HETATM")):
+                continue
+            else:
+                top.append("".join([line[:31], "%s%s%s", line[55:]]))
+    return top
+
+
 def checkSymmetryDict(clusteringBlock, initialStructures, resname):
     """
         Check if the symmetries dictionary is valid for the ligand
@@ -152,7 +171,7 @@ def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries):
         :raise IndexError: If original report file not found in output folder
     """
     outputFilename = "fixedReport_%d"  # move to constants?
-    trajName = "*traj*.pdb"  # move to constants?
+    trajName = "*traj*"  # move to constants?
     reportName = "*report_%d"  # move to constants?
     trajs = glob.glob(os.path.join(outputPath, trajName))
     nativePDB = atomset.PDB()
@@ -546,6 +565,7 @@ def main(jsonParams, clusteringHook=None):
         raise EmptyInitialStructuresError("No initial structures found!!!")
     checkSymmetryDict(clusteringBlock, initialStructures, resname)
 
+    topology = getTopologyFile(initialStructures[0])
     outputPathConstants = constants.OutputPathConstants(outputPath)
 
     if not debug:
@@ -580,6 +600,8 @@ def main(jsonParams, clusteringHook=None):
                                  "BOX_RADIUS": simulationRunner.parameters.boxRadius}
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
+
+    clusteringMethod.topology = topology
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print("Iteration", i)

@@ -1,9 +1,15 @@
 from __future__ import unicode_literals
 import numpy as np
 import re
+import mdtraj as md
 from io import StringIO, open
 cimport cython
 cimport numpy as np
+# try:
+#     # Check if the basestring type if available, this will fail in python3
+#     basestring
+# except NameError:
+#     basestring = str
 
 
 cdef class Atom:
@@ -135,6 +141,23 @@ cdef class Atom:
         self.z = state['z']
         self.protein = state['protein']
 
+    def set_properties(self, bint isProtein, int atomSerial, basestring atomName, basestring resName, basestring resNum, float x, float y, float z, basestring element, int resChain):
+        self.atomSerial = atomSerial
+        self.name = atomName
+        self.resname = resName
+        self.resChain = u"%d" % resChain
+        self.resnum = resNum
+        self.x = x
+        self.y = y
+        self.z = z
+
+        self.type = element
+        self.mass = self._ATOM_WEIGHTS[self.type]
+
+        self.protein = isProtein
+
+        self.id = self.atomSerial + ":" + self.name + ":" + self.resname
+
     def isHeavyAtom(self):
        """
             Check if Atom is a heavy atom
@@ -224,6 +247,7 @@ cdef class PDB:
                "ASN": "empty", "GLN": "empty", "LYS": "NZ", "HIS": "CE1",
                "HIE": "CE1", "HID": "CE1", "HIP": "CE1", "ARG": "NE",
                "ASP": "OD1", "GLU": "OE1", "GLY": "empty"}
+    ATOM_LINE_TEMPLATE = u"%s%s %s %s %s%s%s   %.3f%.3f%.3f%.2f%.2f          %s   "
 
     def __init__(self):
         """
@@ -276,7 +300,10 @@ cdef class PDB:
         self.totalMass = state['totalMass']
         self.pdb = state['pdb']
 
-    def initialise(self, basestring PDBstr, bint heavyAtoms=True, basestring resname="", basestring atomname="", basestring type="ALL", basestring chain="", int resnum = 0):
+    def isfromPDBFile(self):
+        return isinstance(self.pdb, basestring)
+
+    cdef _initialisePDB(self, basestring PDBstr, bint heavyAtoms=True, basestring resname="", basestring atomname="", basestring type="ALL", basestring chain="", int resnum = 0):
         """
             Load the information from a PDB file or a string with the PDB
             contents
@@ -345,6 +372,95 @@ cdef class PDB:
                 pass
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
+
+    cdef _initialiseXTC(self, object frame, bint heavyAtoms=True, basestring resname="", basestring atomname="", basestring type="ALL", basestring chain="", int resnum = 0):
+        """
+            Load the information from a loaded XTC file into a  mdtraj Trajectory
+
+            :param PDBstr: may be a path to the PDB file or a string with the contents of the PDB
+            :type PDBstr: basestring
+            :param heavyAtoms: wether to consider only heavy atoms (True if onl y heavy atoms have to be considered)
+            :type heavyAtoms: bool
+            :param resname: Residue name to select from the pdb (will only select the residues with that name)
+            :type resname: basestring
+            :param atomname: Residue name to select from the pdb (will only select the atoms with that name)
+            :type atomname: basestring
+            :param type: type of atoms to select: may be ALL, PROTEIN or HETERO
+            :type type: basestring
+            :param chain: Chain name to select from the pdb (will only select the atoms with that name)
+            :type chain: basestring
+            :param resnum: Residue number to select from the pdb (will only select the atoms with that name)
+            :type atomname: int
+            :raises: ValueError if the pdb contained no atoms
+        """
+        cdef list stringWithPDBContent
+        cdef int atomLineNum, atomIndex, atomSerial, resChain
+        cdef basestring atomName, resName, atomLine, resnumStr, selection_string, element
+        cdef Atom atom
+        cdef np.ndarray[int, ndim=1] selection_indexes
+        cdef bint isProtein
+        cdef object chain_obj, atomProv
+        cdef float x, y, z
+        selection_string = self.createSelectionString()
+        if resnum == 0:
+            resnumStr = ""
+        else:
+            resnumStr = str(resnum)
+        self.pdb = frame  # in case one wants to write it
+
+        for chain_obj in self.pdb.topology.chains():
+            resChain = chain_obj.index
+            selection_indexes = self.pdb.topology.select(selection_string)
+            for atomIndex in selection_indexes:
+                atomProv = self.pdb.topology.atom(atomIndex)
+                isProtein = atomProv.is_backbone or atomProv.is_sidechain
+                atomSerial = atomProv.serial
+                atomName = atomProv.name
+                resName = atomProv.residue[:3]
+                resNum = atomProv.residue[3:]
+                x = self.pdb.xyz[0, atomProv.index, 0]
+                y = self.pdb.xyz[0, atomProv.index, 1]
+                z = self.pdb.xyz[0, atomProv.index, 2]
+                element = atomProv.element[3]
+                atom = Atom()
+                atom.set_properties(isProtein, atomSerial, atomName, resName, resNum, x, y, z, element)
+                self.atoms.update({atom.id: atom})
+                self.atomList.append(atom.id)
+            if self.atoms == {}:
+                raise ValueError('The input pdb file/string was empty, no atoms loaded!')
+
+    def createSelectionString(self, bint heavyAtoms=True, basestring resname="", basestring atomname="", basestring type="ALL", basestring chain="", int resnum = 0):
+        cdef list selection = []
+        if type == "CM":
+            for res in self.CMAtoms:
+                if self.CMAtoms != "empty":
+                    selection.append(u"(resname %s and name %s)" % (res, self.CMAtoms[res]))
+            return u"protein and (%s)" % "or".join(selection)
+        if atomname:
+            selection.append("name %s" % atomname)
+        if heavyAtoms:
+            selection.append("not element H")
+        if resname:
+            selection.append("resname %s" % atomname)
+        if resnum != 0:
+            selection.append("residue %d" % resnum)
+        if type == "HETERO":
+            selection.append("not protein")
+        elif type == "PROTEIN":
+            selection.append("protein")
+        if selection:
+            return "and".join(selection)
+        else:
+            return "all"
+
+    def initialise(self, object coordinates, bint heavyAtoms=True, basestring resname="", basestring atomname="", basestring type="ALL", basestring chain="", int resnum = 0):
+        """
+            Wrapper function
+        """
+        if isinstance(coordinates, basestring):
+            _initialisePDB(coordinates, heavyAtoms, resname, atomname, type, chain, resnum)
+        else:
+            _initialiseXTC(coordinates, heavyAtoms, resname, atomname, type, chain, resnum)
 
     def computeTotalMass(self):
         """
@@ -469,7 +585,7 @@ cdef class PDB:
         else:
             return self.centroid
 
-    def writePDB(self, basestring path):
+    def writePDB(self, basestring path, list topology=[]):
         """
             Write the pdb contents of the file from wich the PDB object was
             created
@@ -477,9 +593,24 @@ cdef class PDB:
             :param path: Path of the file where to write the pdb
             :type path: basestring
         """
-        cdef object fileHandle
-        with open(path, 'w', encoding="utf-8") as fileHandle:
-            fileHandle.write(self.pdb)
+        cdef object fileHandle, atom
+        cdef basestring prevLine = None
+        if self.isfromPDBFile():
+            with open(path, 'w', encoding="utf-8") as fileHandle:
+                fileHandle.write(self.pdb)
+        else:
+            with open(path, 'w', encoding="utf-8") as fileHandle:
+                # This might be problematic?, for the moment write 1
+                fileHandle.write("MODEL 1\n")
+                for line, atom in zip(topology, self.pdb.topology.atoms()):
+                    if prevLine is not None and (prevLine[22] != line[22] or (prevLine[23:27] != line[23:27] and "HOH" == line[18:21] or "HOH" == prevLine[18:21])):
+                        fileHandle.write("TER\n")
+                        x, y, z = tuple(self.pdb.xyz[0, atom.index]*10)
+                        x = "%.3f".rjust(6) % x
+                        y = "%.3f".rjust(6) % y
+                        z = "%.3f".rjust(6) % z
+                        fileHandle.write(line % (x, y, z))
+                fileHandle.write("ENDMDL\n")
 
     def countContacts(self, basestring ligandResname, int contactThresholdDistance, int ligandResnum=0, basestring ligandChain=""):
         """
