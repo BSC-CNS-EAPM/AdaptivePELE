@@ -127,10 +127,10 @@ def getTopologyFile(structure):
     top = []
     with open(structure) as f:
         for line in f:
-            if not (line.startswith("ATOM") or line.startwith("HETATM")):
+            if not (line.startswith("ATOM") or line.startswith("HETATM")):
                 continue
             else:
-                top.append("".join([line[:31], "%s%s%s", line[55:]]))
+                top.append("".join([line[:30], "%s%s%s", line[55:]]))
     return top
 
 

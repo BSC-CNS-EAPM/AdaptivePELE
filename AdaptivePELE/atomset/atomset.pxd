@@ -7,4 +7,4 @@ cdef class PDB:
     cdef public dict atoms
     cdef public list atomList, com, centroid
     cdef public double totalMass
-    cdef public basestring pdb
+    cdef public object pdb

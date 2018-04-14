@@ -142,7 +142,7 @@ cdef class Atom:
         self.protein = state['protein']
 
     def set_properties(self, bint isProtein, int atomSerial, basestring atomName, basestring resName, basestring resNum, float x, float y, float z, basestring element, int resChain):
-        self.atomSerial = atomSerial
+        self.atomSerial = u"%d" % atomSerial
         self.name = atomName
         self.resname = resName
         self.resChain = u"%d" % resChain
@@ -259,7 +259,7 @@ cdef class PDB:
         # Where atomId := serial:atomName:resName
         self.totalMass = 0
         # ensure every string is unicode
-        self.pdb = u""
+        self.pdb = None
         self.com = None
         self.centroid = None
 
@@ -397,7 +397,7 @@ cdef class PDB:
         cdef int atomLineNum, atomIndex, atomSerial, resChain
         cdef basestring atomName, resName, atomLine, resnumStr, selection_string, element
         cdef Atom atom
-        cdef np.ndarray[int, ndim=1] selection_indexes
+        # cdef np.ndarray[int, ndim=1] selection_indexes
         cdef bint isProtein
         cdef object chain_obj, atomProv
         cdef float x, y, z
@@ -408,7 +408,7 @@ cdef class PDB:
             resnumStr = str(resnum)
         self.pdb = frame  # in case one wants to write it
 
-        for chain_obj in self.pdb.topology.chains():
+        for chain_obj in self.pdb.topology.chains:
             resChain = chain_obj.index
             selection_indexes = self.pdb.topology.select(selection_string)
             for atomIndex in selection_indexes:
@@ -416,14 +416,14 @@ cdef class PDB:
                 isProtein = atomProv.is_backbone or atomProv.is_sidechain
                 atomSerial = atomProv.serial
                 atomName = atomProv.name
-                resName = atomProv.residue[:3]
-                resNum = atomProv.residue[3:]
+                resName = atomProv.residue.name
+                resNum = str(atomProv.residue.resSeq)
                 x = self.pdb.xyz[0, atomProv.index, 0]
                 y = self.pdb.xyz[0, atomProv.index, 1]
                 z = self.pdb.xyz[0, atomProv.index, 2]
-                element = atomProv.element[3]
+                element = atomProv.element.symbol.upper()
                 atom = Atom()
-                atom.set_properties(isProtein, atomSerial, atomName, resName, resNum, x, y, z, element)
+                atom.set_properties(isProtein, atomSerial, atomName, resName, resNum, x, y, z, element, resChain)
                 self.atoms.update({atom.id: atom})
                 self.atomList.append(atom.id)
             if self.atoms == {}:
@@ -602,14 +602,15 @@ cdef class PDB:
             with open(path, 'w', encoding="utf-8") as fileHandle:
                 # This might be problematic?, for the moment write 1
                 fileHandle.write("MODEL 1\n")
-                for line, atom in zip(topology, self.pdb.topology.atoms()):
-                    if prevLine is not None and (prevLine[22] != line[22] or (prevLine[23:27] != line[23:27] and "HOH" == line[18:21] or "HOH" == prevLine[18:21])):
+                for line, atom in zip(topology, self.pdb.topology.atoms):
+                    if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and ("HOH" == line[17:20] or "HOH" == prevLine[17:20]))):
                         fileHandle.write("TER\n")
-                        x, y, z = tuple(self.pdb.xyz[0, atom.index]*10)
-                        x = "%.3f".rjust(6) % x
-                        y = "%.3f".rjust(6) % y
-                        z = "%.3f".rjust(6) % z
-                        fileHandle.write(line % (x, y, z))
+                    x, y, z = tuple(self.pdb.xyz[0, atom.index]*10)
+                    x = u"%.3f".rjust(6) % x
+                    y = u"%.3f".rjust(6) % y
+                    z = u"%.3f".rjust(6) % z
+                    fileHandle.write(line % (x, y, z))
+                    prevLine = line
                 fileHandle.write("ENDMDL\n")
 
     def countContacts(self, basestring ligandResname, int contactThresholdDistance, int ligandResnum=0, basestring ligandChain=""):
