@@ -606,12 +606,13 @@ cdef class PDB:
                     if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and ("HOH" == line[17:20] or "HOH" == prevLine[17:20]))):
                         fileHandle.write("TER\n")
                     x, y, z = tuple(self.pdb.xyz[0, atom.index]*10)
-                    x = u"%.3f".rjust(6) % x
-                    y = u"%.3f".rjust(6) % y
-                    z = u"%.3f".rjust(6) % z
+                    x = (u"%.3f" % x).rjust(8)
+                    y = (u"%.3f" % y).rjust(8)
+                    z = (u"%.3f" % z).rjust(8)
                     fileHandle.write(line % (x, y, z))
                     prevLine = line
                 fileHandle.write("ENDMDL\n")
+                fileHandle.write("END\n")
 
     def countContacts(self, basestring ligandResname, int contactThresholdDistance, int ligandResnum=0, basestring ligandChain=""):
         """

@@ -130,7 +130,7 @@ def getTopologyFile(structure):
             if not (line.startswith("ATOM") or line.startswith("HETATM")):
                 continue
             else:
-                top.append("".join([line[:30], "%s%s%s", line[55:]]))
+                top.append("".join([line[:30], "%s%s%s", line[54:]]))
     return top
 
 
