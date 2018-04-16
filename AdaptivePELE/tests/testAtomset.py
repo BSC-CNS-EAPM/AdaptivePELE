@@ -15,7 +15,6 @@ class atomsetTest(unittest.TestCase):
     """ For the moment the tests include loading from file and string, resname
     and atomname selection. It uses a toy pdb of only 5 lines located in
     tests/data
-   TODO: heavyAtoms and type selection
     """
     def testPDB_from_file(self):
         # preparation
@@ -438,3 +437,176 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         output_pdb.initialise(output, resname="AIN")
         os.remove(output)
         self.assertEqual(golden_pdb.atoms, output_pdb.atoms)
+
+    def testPDB_sel_resname_XTC(self):
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, resname="AIN")
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, resname="AIN")
+        self.assertEqual(xtc, golden_pdb)
+
+    def testPDB_sel_atomname_XTC(self):
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, resname="CA")
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, resname="CA")
+        self.assertEqual(xtc, golden_pdb)
+
+    def testPDB_sel_type_protein_XTC(self):
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, type="PROTEIN")
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, type="PROTEIN")
+        self.assertEqual(xtc, golden_pdb)
+
+    def testPDB_sel_type_hetero_XTC(self):
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, type="HETERO")
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, type="HETERO")
+        self.assertEqual(xtc, golden_pdb)
+
+    def testPDB_sel_type_heavyAtoms_XTC(self):
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, heavyAtoms=False)
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, heavyAtoms=False)
+        self.assertEqual(xtc, golden_pdb)
+
+    def testPDB_sel_resnum_XTC(self):
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, resnum=2)
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, resnum=2)
+        self.assertEqual(xtc, golden_pdb)
+
+    def testPDB_COM_XTC(self):
+        # preparation
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, resname="AIN")
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, resname="AIN")
+
+        # assertion
+
+        np.testing.assert_array_almost_equal(xtc.getCOM(), golden_pdb.getCOM())
+        self.assertAlmostEqual(xtc.totalMass, golden_pdb.totalMass)
+
+    def testPDB_RMSD_XTC(self):
+        # preparation
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, resname="AIN")
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, resname="AIN")
+
+        # assertion
+        RMSDCalc = RMSDCalculator.RMSDCalculator()
+
+        # function to test
+        RMSD = RMSDCalc.computeRMSD(golden_pdb, xtc)
+        golden_RMSD = 0.0000
+        self.assertAlmostEqual(RMSD, golden_RMSD, 5)
+
+    def testPDB_RMSD_symmetries_XTC(self):
+        # preparation
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, resname="AIN")
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, resname="AIN")
+        symDict = [{"1733:O1:AIN": "1735:O2:AIN"}]
+        RMSDCalc = RMSDCalculator.RMSDCalculator(symDict)
+        # function to test
+        RMSD = RMSDCalc.computeRMSD(xtc, golden_pdb)
+        reverseRMSD = RMSDCalc.computeRMSD(golden_pdb, xtc)
+        golden_RMSD = 0.00000
+        self.assertAlmostEqual(RMSD, reverseRMSD, 5)
+        self.assertAlmostEqual(RMSD, golden_RMSD, 5)
+
+    def testPDB_contacts_XTC(self):
+        # preparation
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, resname="AIN")
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, resname="AIN")
+
+        # function to test
+        contacts = golden_pdb.countContacts("AIN", 8)
+        contacts_xtc = xtc.countContacts("AIN", 8)
+        self.assertEqual(contacts, contacts_xtc)
+
+    def testPDB_contactmap_XTC(self):
+        # preparation
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, resname="AIN")
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, resname="AIN")
+        symmetryEvaluator = sym.SymmetryContactMapEvaluator([])
+
+        # function to test
+        contact_map, contacts = symmetryEvaluator.createContactMap(golden_pdb,
+                                                                   "AIN", 8)
+        contact_map_xtc, contacts_xtc = symmetryEvaluator.createContactMap(xtc,
+                                                                   "AIN", 8)
+        np.testing.assert_array_equal(contact_map, contact_map_xtc)
+        self.assertEqual(contacts_xtc, contacts)
+
+    def test_symmetryContactMapJaccard_XTC(self):
+        xtc_obj = mdtraj.load("tests/data/symmetries/cluster_1.xtc", top="tests/data/symmetries/cluster_1.pdb")
+        pdb_1 = atomset.PDB()
+        pdb_1.initialise(xtc_obj, resname='AEN')
+        xtc_obj = mdtraj.load("tests/data/symmetries/cluster_1_sym.xtc", top="tests/data/symmetries/cluster_1_sym.pdb")
+        pdb_1_sym = atomset.PDB()
+        pdb_1_sym.initialise(xtc_obj, resname='AEN')
+        symmetries3PTB = [{"3230:N1:AEN": "3231:N2:AEN"}]
+        symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries3PTB)
+        symmetryEvaluatorEmpty = sym.SymmetryContactMapEvaluator()
+
+        contactMap1, contacts1 = symmetryEvaluator.buildContactMap(pdb_1, 'AEN', 16)
+        cluster = clustering.Cluster(pdb_1, contactMap=contactMap1)
+        contactMap1Sym, contactsSym = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
+        contactMapNoSym, _ = symmetryEvaluator.createContactMap(pdb_1_sym, 'AEN', 16)
+
+        goldenJaccard = 0.0
+        Jaccard = symmetryEvaluator.evaluateJaccard(contactMap1Sym, cluster.contactMap)
+        JaccardNosym = symmetryEvaluatorEmpty.evaluateJaccard(contactMapNoSym, cluster.contactMap)
+
+        self.assertEqual(contacts1, contactsSym)
+
+    def test_PDB_interface_XTC(self):
+        golden = "tests/data/ain_native_fixed.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, resname="AIN")
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, resname="AIN")
+        self.assertEqual(len(golden_pdb), len(xtc))
+        atomList = [atom for atom in golden_pdb]
+        atomList_xtc = [atom for atom in xtc]
+        self.assertEqual(atomList, atomList_xtc)
+        atomId = xtc.atomList[0]
+        atom = xtc[atomId]
+        self.assertEqual(atom, xtc.getAtom(atomId))
+        xtc[atomId] = None
+        self.assertEqual(None, xtc.getAtom(atomId))
