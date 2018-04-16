@@ -436,5 +436,5 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         golden_pdb.initialise(golden, resname="AIN")
         output_pdb = atomset.PDB()
         output_pdb.initialise(output, resname="AIN")
-        # os.remove(output)
-        self.assertEqual(golden_pdb, output_pdb)
+        os.remove(output)
+        self.assertEqual(golden_pdb.atoms, output_pdb.atoms)
