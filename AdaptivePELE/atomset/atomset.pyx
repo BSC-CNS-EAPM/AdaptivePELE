@@ -273,13 +273,19 @@ cdef class PDB:
         """
         cdef list pdb1, pdb2
         if op == 2:
-            pdb1 = [element.strip() for element in self.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
-            pdb2 = [element.strip() for element in other.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
-            return pdb1 == pdb2
+            if self.isfromPDBFile() and other.isfromPDBFile():
+                pdb1 = [element.strip() for element in self.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
+                pdb2 = [element.strip() for element in other.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
+                return pdb1 == pdb2
+            else:
+                return self.atoms == other.atoms
         elif op == 3:
-            pdb1 = [element.strip() for element in self.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
-            pdb2 = [element.strip() for element in other.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
-            return pdb1 != pdb2
+            if self.isfromPDBFile() and other.isfromPDBFile():
+                pdb1 = [element.strip() for element in self.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
+                pdb2 = [element.strip() for element in other.pdb.split('\n') if element.startswith("ATOM") or element.startswith("HETATM")]
+                return pdb1 != pdb2
+            else:
+                return self.atoms != other.atoms
         else:
             print "No boolean operator available for PDB apart from equality"
 
