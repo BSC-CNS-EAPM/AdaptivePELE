@@ -1,11 +1,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from io import open
+import os
+import unittest
+import mdtraj
+import numpy as np
+import AdaptivePELE.atomset.atomset as atomset
 from AdaptivePELE.atomset import RMSDCalculator
 from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
 from AdaptivePELE.clustering import clustering
-import AdaptivePELE.atomset.atomset as atomset
-import unittest
-import numpy as np
+from AdaptivePELE import adaptiveSampling
 
 
 class atomsetTest(unittest.TestCase):
@@ -420,3 +423,18 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         self.assertEqual(atom, pdb.getAtom(atomId))
         pdb[atomId] = None
         self.assertEqual(None, pdb.getAtom(atomId))
+
+    def test_write_XTC_to_pdb(self):
+        golden = "tests/data/ain_native_fixed.pdb"
+        output = "xtc_to_pdb.pdb"
+        xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
+        xtc = atomset.PDB()
+        xtc.initialise(xtc_obj, resname="AIN")
+        top = adaptiveSampling.getTopologyFile(golden)
+        xtc.writePDB(output, topology=top)
+        golden_pdb = atomset.PDB()
+        golden_pdb.initialise(golden, resname="AIN")
+        output_pdb = atomset.PDB()
+        output_pdb.initialise(output, resname="AIN")
+        # os.remove(output)
+        self.assertEqual(golden_pdb, output_pdb)
