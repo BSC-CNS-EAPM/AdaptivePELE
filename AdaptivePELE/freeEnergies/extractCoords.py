@@ -68,7 +68,8 @@ def getCpuCount():
     elif "bsc.mn" in machine:
         # MNIV
         cores = os.getenv("SLURM_NPROC", None)
-    return cores or mp.cpu_count()
+    # Take 1 less than the count of processors, to not clog the machine
+    return cores or max(1, mp.cpu_count()-1)
 
 
 def loadAllResnameAtomsInPdb(filename, lig_resname, writeCA):
