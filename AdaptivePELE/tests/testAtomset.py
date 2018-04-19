@@ -428,7 +428,6 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         output = "xtc_to_pdb.pdb"
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        print("resname=AIN")
         xtc.initialise(xtc_obj, resname="AIN")
         top = adaptiveSampling.getTopologyFile(golden)
         xtc.writePDB(output, topology=top)
@@ -455,10 +454,6 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         xtc.initialise(xtc_obj, atomname="CA")
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, atomname="CA")
-        for at, at2 in zip(xtc.atomList, golden_pdb.atomList):
-            if at!= at2:
-                print(at, at2)
-        print(xtc.atoms==golden_pdb.atoms)
         self.assertEqual(xtc, golden_pdb)
 
     def testPDB_sel_type_protein_XTC(self):
@@ -482,7 +477,6 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
     def testPDB_sel_type_heavyAtoms_XTC(self):
         golden = "tests/data/ain_native_fixed.pdb"
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
-        print("HEAVY ATOMS FALSE")
         xtc = atomset.PDB()
         xtc.initialise(xtc_obj, heavyAtoms=False)
         golden_pdb = atomset.PDB()
@@ -572,7 +566,8 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         # function to test
         contact_map, contacts = symmetryEvaluator.createContactMap(golden_pdb,
                                                                    "AIN", 8)
-        contact_map_xtc, contacts_xtc = symmetryEvaluator.createContactMap(xtc, "AIN", 8)
+        symmetryEvaluator_xtc = sym.SymmetryContactMapEvaluator([])
+        contact_map_xtc, contacts_xtc = symmetryEvaluator_xtc.createContactMap(xtc, "AIN", 8)
         np.testing.assert_array_equal(contact_map, contact_map_xtc)
         self.assertEqual(contacts_xtc, contacts)
 
@@ -595,8 +590,9 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         goldenJaccard = 0.0
         Jaccard = symmetryEvaluator.evaluateJaccard(contactMap1Sym, cluster.contactMap)
         JaccardNosym = symmetryEvaluatorEmpty.evaluateJaccard(contactMapNoSym, cluster.contactMap)
-
         self.assertEqual(contacts1, contactsSym)
+        self.assertAlmostEqual(goldenJaccard, Jaccard)
+        self.assertNotAlmostEqual(Jaccard, JaccardNosym)
 
     def test_PDB_interface_XTC(self):
         golden = "tests/data/ain_native_fixed.pdb"
