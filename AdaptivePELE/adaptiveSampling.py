@@ -115,25 +115,6 @@ def expandInitialStructuresWildcard(initialStructuresWildcard):
     return totalInitialStructures
 
 
-def getTopologyFile(structure):
-    """
-        Extract the topology information to write structures from xtc format
-
-        :param structure: Pdb file with the topology information
-        :type structure: str
-
-        :return: list of str -- The lines of the topology file
-    """
-    top = []
-    with open(structure) as f:
-        for line in f:
-            if not (line.startswith("ATOM") or line.startswith("HETATM")):
-                continue
-            else:
-                top.append("".join([line[:30], "%s%s%s", line[54:]]))
-    return top
-
-
 def checkSymmetryDict(clusteringBlock, initialStructures, resname):
     """
         Check if the symmetries dictionary is valid for the ligand
@@ -565,7 +546,7 @@ def main(jsonParams, clusteringHook=None):
         raise EmptyInitialStructuresError("No initial structures found!!!")
     checkSymmetryDict(clusteringBlock, initialStructures, resname)
 
-    topology = getTopologyFile(initialStructures[0])
+    topology = utilities.getTopologyFile(initialStructures[0])
     outputPathConstants = constants.OutputPathConstants(outputPath)
 
     if not debug:

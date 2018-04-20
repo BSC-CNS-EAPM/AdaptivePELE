@@ -56,7 +56,7 @@ def getSnapshots(trajectoryFile, verbose=False):
         :returns: str -- Snapshots with information
     """
     ext = os.path.splitext(trajectoryFile)[1]
-    if ext == "pdb":
+    if ext == ".pdb":
         with open(trajectoryFile, "r") as inputFile:
             inputFileContent = inputFile.read()
 
@@ -68,7 +68,7 @@ def getSnapshots(trajectoryFile, verbose=False):
 
         remarkInfo = "REMARK 000 File created using PELE++\nREMARK source            : %s\nREMARK original model nr : %d\nREMARK First snapshot is 1, not 0 (as opposed to report)\n"
         snapshotsWithInfo = [remarkInfo % (trajectoryFile, i+1)+snapshot for i, snapshot in enumerate(snapshots)]
-    elif ext == "xtc":
+    elif ext == ".xtc":
         snapshotsWithInfo = md.load(trajectoryFile)
     else:
         raise ValueError("Unrecongnized file extension for %s" % trajectoryFile)
@@ -328,3 +328,29 @@ def getSASAcolumnFromControlFile(JSONdict):
             # and energy
             return i+4
     raise ValueError("No SASA metric found in control file!!! Please add it in order to use the moving box feature")
+
+
+def write_xtc_to_pdb(filename, output_file):
+    xtc_object = md.load(filename)
+    pdb = atomset.PDB()
+    pdb.initialise(xtc_object)
+    pdb.writePDB(output_file)
+
+
+def getTopologyFile(structure):
+    """
+        Extract the topology information to write structures from xtc format
+
+        :param structure: Pdb file with the topology information
+        :type structure: str
+
+        :return: list of str -- The lines of the topology file
+    """
+    top = []
+    with open(structure) as f:
+        for line in f:
+            if not (line.startswith("ATOM") or line.startswith("HETATM")):
+                continue
+            else:
+                top.append("".join([line[:30], "%s%s%s", line[54:]]))
+    return top
