@@ -7,10 +7,10 @@ import os
 import pickle
 from six import reraise as raise_
 from AdaptivePELE.constants import blockNames
-import AdaptivePELE.atomset.atomset as atomset
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
 from AdaptivePELE.atomset import RMSDCalculator
+from AdaptivePELE.atomset import atomset
 from AdaptivePELE.clustering import clusteringTypes
 from AdaptivePELE.clustering import thresholdcalculator
 from scipy import stats
@@ -1115,7 +1115,7 @@ class Clustering:
 
         return optimalMetricIndex
 
-    def writePathwayTrajectory(self, pathway, filename):
+    def writePathwayTrajectory(self, pathway, filename, topology=None):
         """
             Write a list of cluster forming a pathway into a trajectory pdb file
 
@@ -1123,7 +1123,11 @@ class Clustering:
             :type pathway: list
             :param filename: Path where to write the trajectory
             :type filename: str
+            :param topology: Lines of topology file
+            :type topology: list
         """
+        if topology is None:
+            topology = []
         with open(filename, "w") as pathwayFile:
             pathwayFile.write("REMARK 000 File created using PELE++\n")
             pathwayFile.write("REMARK 000 Pathway trajectory created using the FDT\n")
@@ -1131,7 +1135,7 @@ class Clustering:
             for i, step_cluster in enumerate(pathway):
                 cluster = self.clusters.clusters[step_cluster]
                 pathwayFile.write("MODEL %d\n" % (i+1))
-                pdbStr = cluster.pdb.pdb
+                pdbStr = cluster.pdb.get_pdb_string(topology)
                 pdbList = pdbStr.split("\n")
                 for line in pdbList:
                     line = line.strip()

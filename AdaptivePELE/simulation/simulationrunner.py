@@ -240,6 +240,9 @@ class PeleSimulation(SimulationRunner):
             # as a path to a file
             initialStruct = initialStructuresAsString
 
+        # Note: this lines were not changed when adding support for xtc
+        # trajectories because it was assumed that initial structures would
+        # still be pdbs
         PDBinitial = atomset.PDB()
         PDBinitial.initialise(initialStruct, resname=resname)
         return repr(PDBinitial.getCOM())
