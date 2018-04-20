@@ -8,6 +8,7 @@ import re
 import socket
 import shutil
 import sys
+import mdtraj as md
 import numpy as np
 import multiprocess as mp
 from AdaptivePELE.atomset import atomset
@@ -140,20 +141,45 @@ def writeToFile(COMs, outputFilename):
             f.write(str(line[-1]) + '\n')
 
 
-def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA):
-    allCoordinates = loadAllResnameAtomsInPdb(filename, lig_resname, writeCA)
-    if writeLigandTrajectory:
-        outputFilename = os.path.join(pathFolder, constants.ligandTrajectoryBasename % extractFilenumber(filename))
-        with open(outputFilename, 'w') as f:
-            f.write("\nENDMDL\n".join(allCoordinates))
+def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA):
+    trajectory = md.load(file_name)
     if writeCA:
-        coords = getLigandAlphaCarbonsCoords(allCoordinates[:-1], lig_resname)
+        selection = "(protein and name CA) or (resname %s)" % ligand
+    elif atom_Ids and atom_Ids is not None:
+        selection = " or ".join(["index %d" % (int(atomID.split(":")[0])+1) for atomID in atom_Ids])
     else:
-        # because of the way it's split, the last element is empty
-        if atom_Ids is None or len(atom_Ids) == 0:
-            coords = getPDBCOM(allCoordinates[:-1], lig_resname)
+        selection = "resname %s" % ligand
+    selected_indices = trajectory.topology.select(selection)
+    coordinates = []
+    for iframe, frame in enumerate(trajectory):
+        if not writeCA and (atom_Ids is None or len(atom_Ids) == 0):
+            # getCOM case
+            coordinates.append(md.compute_center_of_mass(frame.atom_slice(selected_indices)))
         else:
-            coords = getAtomCoord(allCoordinates[:-1], lig_resname, atom_Ids)
+            coordinates.append(frame.xyz[iframe, selected_indices].tolist())
+    return coordinates
+
+
+def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA):
+    ext = os.path.splitext(filename)
+    if ext == ".pdb":
+        allCoordinates = loadAllResnameAtomsInPdb(filename, lig_resname, writeCA)
+        if writeLigandTrajectory:
+            outputFilename = os.path.join(pathFolder, constants.ligandTrajectoryBasename % extractFilenumber(filename))
+            with open(outputFilename, 'w') as f:
+                f.write("\nENDMDL\n".join(allCoordinates))
+        if writeCA:
+            coords = getLigandAlphaCarbonsCoords(allCoordinates[:-1], lig_resname)
+        else:
+            # because of the way it's split, the last element is empty
+            if atom_Ids is None or len(atom_Ids) == 0:
+                coords = getPDBCOM(allCoordinates[:-1], lig_resname)
+            else:
+                coords = getAtomCoord(allCoordinates[:-1], lig_resname, atom_Ids)
+    elif ext == ".xtc":
+        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA)
+    else:
+        raise ValueError("Unrecongnized file extension for %s" % filename)
 
     outputFilename = getOutputFilename(constants.extractedTrajectoryFolder, filename,
                                        constants.baseExtractedTrajectoryName)
@@ -164,7 +190,7 @@ def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeL
     if not os.path.exists(constants.extractedTrajectoryFolder % pathFolder):
         os.makedirs(constants.extractedTrajectoryFolder % pathFolder)
 
-    originalPDBfiles = glob.glob(pathFolder+'/*traj*.pdb')
+    originalPDBfiles = glob.glob(pathFolder+'/*traj*')
     workers = []
     for filename in originalPDBfiles:
         if pool is None:
