@@ -752,7 +752,26 @@ cdef class PDB:
         else:
             return self.centroid
 
-    def writePDB(self, basestring path, list topology=[]):
+
+    def iteratePDBLines(self, list topology=[]):
+        cdef basestring prevLine = None
+        for line, atom in zip(topology, self.pdb.topology.atoms):
+            if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and (u"HOH" == line[17:20] or u"HOH" == prevLine[17:20]))):
+                yield u"TER\n"
+            x, y, z = tuple(self.pdb.xyz[0, atom.index])
+            x = (u"%.3f" % x).rjust(8)
+            y = (u"%.3f" % y).rjust(8)
+            z = (u"%.3f" % z).rjust(8)
+            prevLine = line
+            yield line % (x, y, z)
+
+    def get_pdb_string(self, list topology=[]):
+        if self.isfromPDBFile():
+            return self.pdb
+        else:
+            return "".join(list(self.iteratePDBLines(topology)))
+
+    def writePDB(self, basestring path, list topology=[], int model_num=1):
         """
             Write the pdb contents of the file from wich the PDB object was
             created
@@ -761,27 +780,18 @@ cdef class PDB:
             :type path: basestring
         """
         cdef object fileHandle, atom
-        cdef basestring prevLine = None
         if self.isfromPDBFile():
             with open(path, 'w', encoding="utf-8") as fileHandle:
                 fileHandle.write(self.pdb)
         else:
             with open(path, 'w', encoding="utf-8") as fileHandle:
-                # This might be problematic?, for the moment write 1
-                fileHandle.write("MODEL 1\n")
-                for line, atom in zip(topology, self.pdb.topology.atoms):
-                    if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and ("HOH" == line[17:20] or "HOH" == prevLine[17:20]))):
-                        fileHandle.write("TER\n")
-                    x, y, z = tuple(self.pdb.xyz[0, atom.index])
-                    x = (u"%.3f" % x).rjust(8)
-                    y = (u"%.3f" % y).rjust(8)
-                    z = (u"%.3f" % z).rjust(8)
-                    fileHandle.write(line % (x, y, z))
-                    prevLine = line
-                fileHandle.write("ENDMDL\n")
-                fileHandle.write("END\n")
+                fileHandle.write(u"MODEL %d\n" % model_num)
+                for line in self.iteratePDBLines(topology):
+                    fileHandle.write(line)
+                fileHandle.write(u"ENDMDL\n")
+                fileHandle.write(u"END\n")
 
-    def countContacts(self, basestring ligandResname, int contactThresholdDistance, int ligandResnum=0, basestring ligandChain=""):
+    def countContacts(self, basestring ligandResname, int contactThresholdDistance, int ligandResnum=0, basestring ligandChain=u""):
         """
             Count the number of alpha carbons that are in contact with the
             protein (i.e. less than contactThresholdDistance Amstrogms away)
