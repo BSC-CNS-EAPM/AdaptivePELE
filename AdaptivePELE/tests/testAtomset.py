@@ -8,7 +8,7 @@ import AdaptivePELE.atomset.atomset as atomset
 from AdaptivePELE.atomset import RMSDCalculator
 from AdaptivePELE.atomset import SymmetryContactMapEvaluator as sym
 from AdaptivePELE.clustering import clustering
-from AdaptivePELE import adaptiveSampling
+from AdaptivePELE.utilities import utilities
 
 
 class atomsetTest(unittest.TestCase):
@@ -429,7 +429,7 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
         xtc.initialise(xtc_obj, resname="AIN")
-        top = adaptiveSampling.getTopologyFile(golden)
+        top = utilities.getTopologyFile(golden)
         xtc.writePDB(output, topology=top)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, resname="AIN")
