@@ -357,3 +357,9 @@ def getTopologyFile(structure):
             else:
                 top.append("".join([line[:30], "%s%s%s", line[54:]]))
     return top
+
+
+def write_mdtraj_object_PDB(conformation, output, topology):
+    PDB = atomset.PDB()
+    PDB.initialise(conformation)
+    PDB.writePDB(output, topology)

@@ -12,7 +12,6 @@ from AdaptivePELE.constants import constants
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.spawning import spawningTypes
 from AdaptivePELE.spawning import densitycalculator
-from AdaptivePELE.atomset import atomset
 from abc import abstractmethod
 
 
@@ -456,9 +455,7 @@ class IndependentRunsCalculator(SpawningCalculator):
                 with open(outputFilename, 'w') as f:
                     f.write(lastSnapshot)
             else:
-                PDB = atomset.PDB()
-                PDB.initialise(lastSnapshot)
-                PDB.writePDB(outputFilename, topology)
+                utilities.write_mdtraj_PDB(lastSnapshot, outputFilename, topology)
 
         return len(trajectories), procMapping
 

@@ -3,7 +3,6 @@ import glob
 import os
 import numpy as np
 from AdaptivePELE.utilities import utilities
-from AdaptivePELE.atomset import atomset
 
 
 def parseArgs():
@@ -74,9 +73,7 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
                     fw.write(snapshots[int(pair[1])])
                     fw.write("\n")
             else:
-                PDB = atomset.PDB()
-                PDB.initialise(snapshots[int(pair[1])])
-                PDB.writePDB(os.path.join(destFolder, "cluster_%d.pdb" % pair[0]), topology=topology_contents)
+                utilities.write_mdtraj_object_PDB(snapshots[int(pair[1])], os.path.join(destFolder, "cluster_%d.pdb" % pair[0]), topology=topology_contents)
 
 
 if __name__ == "__main__":
