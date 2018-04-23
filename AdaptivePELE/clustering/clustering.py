@@ -791,7 +791,6 @@ class Clustering:
         self.altSelection = altSelection
         self.conformationNetwork = ConformationNetwork()
         self.epoch = -1
-        self.topology = []
 
     def __getstate__(self):
         # Defining pickling interface to avoid problems when working with old
@@ -894,12 +893,14 @@ class Clustering:
             and self.resChain == other.resChain\
             and self.col == other.col
 
-    def cluster(self, paths, ignoreFirstRow=False):
+    def cluster(self, paths, ignoreFirstRow=False, topology=None):
         """
             Cluster the snaptshots contained in the paths folder
 
             :param paths: List of folders with the snapshots
             :type paths: list
+            :param topology: Topology file for non-pdb trajectories
+            :type topology: str
         """
         self.epoch += 1
         trajectories = getAllTrajectories(paths)
@@ -907,7 +908,7 @@ class Clustering:
             trajNum = utilities.getTrajNum(trajectory)
             # origCluster = processorsToClusterMapping[trajNum-1]
             origCluster = None
-            snapshots = utilities.getSnapshots(trajectory, True)
+            snapshots = utilities.getSnapshots(trajectory, True, topology=topology)
 
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
@@ -934,7 +935,7 @@ class Clustering:
         for cluster in self.clusters.clusters:
             cluster.altStructure.cleanPQ()
 
-    def writeOutput(self, outputPath, degeneracy, outputObject, writeAll):
+    def writeOutput(self, outputPath, degeneracy, outputObject, writeAll, topology=None):
         """
             Writes all the clustering information in outputPath
 
@@ -948,6 +949,8 @@ class Clustering:
             :param writeAll: Wether to write pdb files for all cluster in addition
                 of the summary
             :type writeAll: bool
+            :param topology: Topology for non-pdb trajectories
+            :type topology: list
         """
         utilities.cleanup(outputPath)
         utilities.makeFolder(outputPath)
@@ -960,7 +963,7 @@ class Clustering:
                 if writeAll:
                     outputFilename = "cluster_%d.pdb" % i
                     outputFilename = os.path.join(outputPath, outputFilename)
-                    cluster.writePDB(outputFilename, topology=self.topology)
+                    cluster.writePDB(outputFilename, topology=topology)
 
                 metric = cluster.getMetric()
                 if metric is None:
@@ -1330,12 +1333,14 @@ class SequentialLastSnapshotClustering(Clustering):
         Assigned  the last snapshot of the trajectory to a cluster.
         Only useful for PELE sequential runs
     """
-    def cluster(self, paths):
+    def cluster(self, paths, topology=None):
         """
             Cluster the snaptshots contained in the paths folder
 
             :param paths: List of folders with the snapshots
             :type paths: list
+            :param topology: Topology file for non-pdb trajectories
+            :type topology: str
         """
         # Clean clusters at every step, so we only have the last snapshot of
         # each trajectory as clusters
@@ -1344,7 +1349,7 @@ class SequentialLastSnapshotClustering(Clustering):
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
 
-            snapshots = utilities.getSnapshots(trajectory, True)
+            snapshots = utilities.getSnapshots(trajectory, True, topology=topology)
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)

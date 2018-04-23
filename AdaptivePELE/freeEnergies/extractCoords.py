@@ -51,10 +51,11 @@ def parseArguments():
     parser.add_argument("-t", "--totalSteps", type=int, default=0, help="Total number of steps in traj. Equivalent to epoch length in adaptive runs")
     parser.add_argument("-nR", "--noRepeat", action="store_true", help="Flag to avoid repeating the rejected steps")
     parser.add_argument("-n", "--numProcessors", type=int, default=None, help="Number of cpus to use")
+    parser.add_argument("--top", type=str, default=None, help="Topology file for non-pdb trajectories")
     # parser.add_argument("-f", nargs='+', help="Files to get coordinates")
     args = parser.parse_args()
 
-    return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors
+    return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors, args.top
 
 
 def getCpuCount():
@@ -141,8 +142,8 @@ def writeToFile(COMs, outputFilename):
             f.write(str(line[-1]) + '\n')
 
 
-def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA):
-    trajectory = md.load(file_name)
+def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology):
+    trajectory = md.load(file_name, topology=topology)
     if writeCA:
         selection = "(protein and name CA) or (resname %s)" % ligand
     elif atom_Ids and atom_Ids is not None:
@@ -160,7 +161,7 @@ def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA):
     return coordinates
 
 
-def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA):
+def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, topology=None):
     ext = os.path.splitext(filename)
     if ext == ".pdb":
         allCoordinates = loadAllResnameAtomsInPdb(filename, lig_resname, writeCA)
@@ -177,7 +178,7 @@ def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolde
             else:
                 coords = getAtomCoord(allCoordinates[:-1], lig_resname, atom_Ids)
     elif ext == ".xtc":
-        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA)
+        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA, topology)
     else:
         raise ValueError("Unrecongnized file extension for %s" % filename)
 
@@ -186,7 +187,7 @@ def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolde
     writeToFile(coords, outputFilename % pathFolder)
 
 
-def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, writeCA, pool=None):
+def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, writeCA, pool=None, topology=None):
     if not os.path.exists(constants.extractedTrajectoryFolder % pathFolder):
         os.makedirs(constants.extractedTrajectoryFolder % pathFolder)
 
@@ -195,10 +196,10 @@ def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeL
     for filename in originalPDBfiles:
         if pool is None:
             # serial version
-            writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA)
+            writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, topology=topology)
         else:
             # multiprocessor version
-            workers.append(pool.apply_async(writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA)))
+            workers.append(pool.apply_async(writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, topology)))
     for w in workers:
         w.get()
 
@@ -332,7 +333,7 @@ def gatherTrajs(constants, folder_name, setNumber, non_Repeat):
     copyTrajectories(nonRepeatedTrajs, constants.gatherNonRepeatedTrajsFilename, folder_name)
 
 
-def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None):
+def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, topology=None):
 
     constants = Constants()
 
@@ -364,7 +365,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
         ligand_trajs_folder = os.path.join(pathFolder, constants.ligandTrajectoryFolder)
         if writeLigandTrajectory and not os.path.exists(ligand_trajs_folder):
             os.makedirs(ligand_trajs_folder)
-        writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, protein_CA, pool=pool)
+        writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, protein_CA, pool=pool, topology=topology)
         if not non_Repeat:
             print("Repeating snapshots from folder %s" % folder_it)
             repeatExtractedSnapshotsInFolder(pathFolder, constants, numtotalSteps, pool=pool)
@@ -373,5 +374,5 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
 
 if __name__ == "__main__":
-    folder, atomIds, resname, proteinCA, enforceSequential, writeLigandTraj, totalSteps, setNum, nonRepeat, n_processors = parseArguments()
-    main(folder, atomIds, resname, totalSteps, enforceSequential, writeLigandTraj, setNum, proteinCA, nonRepeat, n_processors)
+    folder, atomIds, resname, proteinCA, enforceSequential, writeLigandTraj, totalSteps, setNum, nonRepeat, n_processors, top = parseArguments()
+    main(folder, atomIds, resname, totalSteps, enforceSequential, writeLigandTraj, setNum, proteinCA, nonRepeat, n_processors, topology=top)

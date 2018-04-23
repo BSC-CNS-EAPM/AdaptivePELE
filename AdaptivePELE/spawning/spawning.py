@@ -12,6 +12,7 @@ from AdaptivePELE.constants import constants
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.spawning import spawningTypes
 from AdaptivePELE.spawning import densitycalculator
+from AdaptivePELE.atomset import atomset
 from abc import abstractmethod
 
 
@@ -235,7 +236,7 @@ class SpawningCalculator:
         """
         pass
 
-    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration):
+    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration, topology_file=None, topology=None):
         """
             Write initial structures for the next iteration
 
@@ -248,6 +249,10 @@ class SpawningCalculator:
             :type clustering: :py:class:`.Clustering`
             :param iteration: Number of epoch
             :type iteration: int
+            :param topology_file: Topology file for non-pdb trajectories
+            :type topology_file: str
+            :param topology: Topology like structure to write PDB from xtc files
+            :type topology: list
 
             :returns: int, list -- number of processors, list with the
                 snapshot from which the trajectories will start in the next iteration
@@ -259,7 +264,7 @@ class SpawningCalculator:
             for _ in range(int(degeneracyOfRepresentatives[i])):
                 outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
                 print('Writing to ', outputFilename, 'cluster', i)
-                procMapping.append(cluster.writeSpawningStructure(outputFilename))
+                procMapping.append(cluster.writeSpawningStructure(outputFilename, topology=topology))
 
                 counts += 1
 
@@ -414,7 +419,7 @@ class IndependentRunsCalculator(SpawningCalculator):
         """
         pass
 
-    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration):
+    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration, topology_file=None, topology=None):
         """
             Write last trajectory structure as initial one for the next iteration
 
@@ -427,6 +432,10 @@ class IndependentRunsCalculator(SpawningCalculator):
             :type clustering: :py:class:`.Clustering`
             :param iteration: Number of epoch
             :type iteration: int
+            :param topology_file: Topology file for non-pdb trajectories
+            :type topology_file: str
+            :param topology: Topology for non-pdb trajectories
+            :type topology: list
 
             :returns: int, list -- number of processors, list with the
                 snapshot from which the trajectories will start in the next iteration
@@ -435,7 +444,7 @@ class IndependentRunsCalculator(SpawningCalculator):
         trajWildcard = os.path.join(outputPathConstants.epochOutputPathTempletized, constants.trajectoryBasename)
         trajectories = glob.glob(trajWildcard % (iteration-1))
         for num, trajectory in enumerate(trajectories):
-            snapshots = utilities.getSnapshots(trajectory)
+            snapshots = utilities.getSnapshots(trajectory, topology=topology_file)
             lastSnapshot = snapshots[-1]
             nSnapshots = len(snapshots)
             del snapshots
@@ -443,9 +452,13 @@ class IndependentRunsCalculator(SpawningCalculator):
             numTraj = int(os.path.splitext(trajectory.rsplit("_", 1)[-1])[0])
             outputFilename = outputPathConstants.tmpInitialStructuresTemplate % (iteration, num)
             procMapping.append((iteration-1, numTraj, nSnapshots-1))
-
-            with open(outputFilename, 'w') as f:
-                f.write(lastSnapshot)
+            if isinstance(lastSnapshot, basestring):
+                with open(outputFilename, 'w') as f:
+                    f.write(lastSnapshot)
+            else:
+                PDB = atomset.PDB()
+                PDB.initialise(lastSnapshot)
+                PDB.writePDB(outputFilename, topology)
 
         return len(trajectories), procMapping
 

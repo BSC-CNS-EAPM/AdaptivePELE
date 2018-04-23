@@ -1,3 +1,4 @@
+from __future__ import print_function, unicode_literals
 import argparse
 import numpy as np
 from AdaptivePELE.atomset import atomset
@@ -11,16 +12,17 @@ def parseArguments():
     parser.add_argument("trajectory", type=str, nargs='+', help="Path to the trajectory or pdbs to analyse")
     parser.add_argument("-ref", default=None, help="Reference structure, if not specified use average of the trajectories")
     parser.add_argument("-nRes", type=int, default=10, help="Number of top RMSF residues to display")
+    parser.add_argument("-top", type=str, default=None, help="Topology file for non-pdb trajectories")
     args = parser.parse_args()
-    return args.trajectory, args.ref, args.nRes
+    return args.trajectory, args.ref, args.nRes, args.top
 
 
-def extractAvgPDB(trajs):
+def extractAvgPDB(trajs, topology):
     nSnapshots = 0
     avgStruct = {}
     snapshotsTot = []
     for traj in trajs:
-        snapshots = utilities.getSnapshots(traj)
+        snapshots = utilities.getSnapshots(traj, topology=topology)
         for snapshot in snapshots:
             nSnapshots += 1
             PDB = atomset.PDB()
@@ -34,13 +36,13 @@ def extractAvgPDB(trajs):
     return avgStruct, snapshotsTot
 
 
-def mapReference(ref, trajs):
+def mapReference(ref, trajs, topology):
     refPDB = atomset.PDB()
     refPDB.initialise(ref, type="PROTEIN")
     avgStruct = {atomID: refPDB.atoms[atomID].getAtomCoords() for atomID in refPDB.atoms}
     snapshotsTot = []
     for traj in trajs:
-        snapshots = utilities.getSnapshots(traj)
+        snapshots = utilities.getSnapshots(traj, topology=topology)
         for snapshot in snapshots:
             PDB = atomset.PDB()
             PDB.initialise(snapshot, type="PROTEIN")
@@ -49,11 +51,11 @@ def mapReference(ref, trajs):
     return avgStruct, snapshotsTot
 
 if __name__ == "__main__":
-    trajs, ref, nResidues = parseArguments()
+    trajs, ref, nResidues, top = parseArguments()
     if ref is None:
-        avgPDB, totPDBs = extractAvgPDB(trajs)
+        avgPDB, totPDBs = extractAvgPDB(trajs, top)
     else:
-        avgPDB, totPDBs = mapReference(ref, trajs)
+        avgPDB, totPDBs = mapReference(ref, trajs, top)
     RMSF = {atom: 0.0 for atom in avgPDB}
     residueMapping = {}
     # TODO: Handle multiple chains and insertion residues in PDB

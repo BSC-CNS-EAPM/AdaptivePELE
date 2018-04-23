@@ -179,7 +179,7 @@ class PeleSimulation(SimulationRunner):
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.documentsFolder + " Documents")
 
-    def getNextIterationBox(self, clusteringObject, outputFolder, resname):
+    def getNextIterationBox(self, clusteringObject, outputFolder, resname, topology):
         """
             Select the box for the next epoch, currently selecting the COM of
             the cluster with max SASA
@@ -212,7 +212,7 @@ class PeleSimulation(SimulationRunner):
         # identified and we proceed to extract the corresponding center of mass
         trajNum = metrics[SASAcluster, -2]
         snapshotNum = metrics[SASAcluster, -1]
-        snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum))[int(snapshotNum)]
+        snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum), topology=topology)[int(snapshotNum)]
         snapshotPDB = atomset.PDB()
         snapshotPDB.initialise(snapshot, resname=resname)
         self.parameters.boxCenter = str(snapshotPDB.getCOM())
@@ -354,7 +354,7 @@ class PeleSimulation(SimulationRunner):
         # but no more than 50
         return min(stepsPerProc, 50)
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology=None):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure and select appropiate
@@ -370,6 +370,8 @@ class PeleSimulation(SimulationRunner):
             :type outputPath: str
             :param resname: Residue name of the ligand in the system pdb
             :type resname: str
+            :param topology: Topology file for non-pdb trajectories
+            :type topology: str
 
             :returns: list --  List with initial structures
         """
@@ -410,11 +412,11 @@ class PeleSimulation(SimulationRunner):
             reportNames = os.path.join(equilibrationOutput, reportWildcard)
             trajNames = os.path.join(equilibrationOutput, trajWildcard)
             if len(initialStructures) == 1 and self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationLastSnapshot:
-                newStructure = self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames)
+                newStructure = self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames, topology=topology)
             elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationSelect:
-                newStructure = self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames)
+                newStructure = self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames, topology=topology)
             elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationCluster:
-                newStructure = self.clusterEquilibrationStructures(resname, trajNames, reportNames)
+                newStructure = self.clusterEquilibrationStructures(resname, trajNames, reportNames, topology=topology)
 
             for j, struct in enumerate(newStructure):
                 newStructurePath = os.path.join(equilibrationOutput, 'equilibration_struc_%d_%d.pdb' % (i+1, j+1))
@@ -423,7 +425,7 @@ class PeleSimulation(SimulationRunner):
                 newInitialStructures.append(newStructurePath)
         return newInitialStructures
 
-    def clusterEquilibrationStructures(self, resname, trajWildcard, reportWildcard):
+    def clusterEquilibrationStructures(self, resname, trajWildcard, reportWildcard, topology=None):
         """
             Cluster the equilibration run
 
@@ -433,6 +435,8 @@ class PeleSimulation(SimulationRunner):
             :type trajWildcard: str
             :param reportWildcard: Templetized path to report files"
             :type reportWildcard: str
+            :param topology: Topology file for non-pdb trajectories
+            :type topology: str
 
             :returns: list -- List with the pdb snapshots of the representatives structures
         """
@@ -446,7 +450,7 @@ class PeleSimulation(SimulationRunner):
             report = np.loadtxt(reportWildcard % i)
             if len(report.shape) < 2:
                 report = report[np.newaxis, :]
-            snapshots = utilities.getSnapshots(trajWildcard % i)
+            snapshots = utilities.getSnapshots(trajWildcard % i, topology=topology)
             for nSnap, (line, snapshot) in enumerate(zip(report, snapshots)):
                 conformation = atomset.PDB()
                 conformation.initialise(snapshot, resname=resname)
@@ -470,10 +474,10 @@ class PeleSimulation(SimulationRunner):
                 # If a cluster has no structure assigned, skip it
                 continue
             traj, snap = clustersInfo[cl]["structure"]
-            initialStructures.append(utilities.getSnapshots(trajWildcard % traj)[snap])
+            initialStructures.append(utilities.getSnapshots(trajWildcard % traj, topology=topology)[snap])
         return initialStructures
 
-    def selectEquilibrationLastSnapshot(self, nTrajs, trajWildcard):
+    def selectEquilibrationLastSnapshot(self, nTrajs, trajWildcard, topology=None):
         """
             Select the last snapshot of each trajectory as a  representative
             initial structure from the equilibration run
@@ -482,12 +486,14 @@ class PeleSimulation(SimulationRunner):
             :type nTrajs: int
             :param trajWildcard: Templetized path to trajectory files"
             :type trajWildcard: str
+            :param topology: Topology file for non-pdb trajectories
+            :type topology: str
 
             :returns: list -- List with the pdb snapshots of the representatives structures
         """
-        return [utilities.getSnapshots(trajWildcard % ij)[-1] for ij in range(1, nTrajs)]
+        return [utilities.getSnapshots(trajWildcard % ij, topology=topology)[-1] for ij in range(1, nTrajs)]
 
-    def selectEquilibratedStructure(self, nTrajs, similarityColumn, resname, trajWildcard, reportWildcard):
+    def selectEquilibratedStructure(self, nTrajs, similarityColumn, resname, trajWildcard, reportWildcard, topology=None):
         """
             Select a representative initial structure from the equilibration
             run
@@ -520,7 +526,7 @@ class PeleSimulation(SimulationRunner):
             indices.append(rowIndex)
             report = np.loadtxt(reportWildcard % i)
             if similarityColumn is None:
-                snapshots = utilities.getSnapshots(trajWildcard % i)
+                snapshots = utilities.getSnapshots(trajWildcard % i, topology=topology)
                 report_values = []
                 if i == 1:
                     initial.initialise(snapshots.pop(0), resname=resname)
@@ -567,7 +573,7 @@ class PeleSimulation(SimulationRunner):
         # trajectories are 1-indexed
         trajNum += 1
         # return as list for compatibility with selectEquilibrationLastSnapshot
-        return [utilities.getSnapshots(trajWildcard % trajNum)[snapshotNum]]
+        return [utilities.getSnapshots(trajWildcard % trajNum, topology=topology)[snapshotNum]]
 
     def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
         """

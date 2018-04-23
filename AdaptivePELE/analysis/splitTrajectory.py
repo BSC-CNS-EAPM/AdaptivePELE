@@ -1,7 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from AdaptivePELE.utilities import utilities
+from AdaptivePELE.atomset import atomset
 import argparse
 import os
+try:
+    basestring
+except NameError:
+    basestring = str
 
 
 def parseArguments():
@@ -9,19 +14,30 @@ def parseArguments():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("files", nargs='+', help="Trajectory files to split")
     parser.add_argument("-o", type=str, default=".", help="Output dir")
+    parser.add_argument("--top", type=str, default=None, help="Topology file for non-pdb trajectories")
     args = parser.parse_args()
-    return args.files, args.o
+    return args.files, args.o, args.top
 
 
-files, outputDir = parseArguments()
-utilities.makeFolder(outputDir)
+def main(outputDir, files, topology):
+    utilities.makeFolder(outputDir)
+    if topology is not None:
+        topology_contents = utilities.getTopologyFile(topology)
+    else:
+        topology_contents = None
 
-for f in files:
-    name = os.path.split(f)[-1]
-    templateName = os.path.join(outputDir, name[:-4] + "_%d.pdb")
-    snapshots = utilities.getSnapshots(f)
-    print(len(snapshots))
-    for i, snapshot in enumerate(snapshots):
-        print(templateName % i)
-        with open(templateName % i, 'w') as of:
-            of.write(snapshot)
+    for f in files:
+        name = os.path.split(f)[-1]
+        templateName = os.path.join(outputDir, name[:-4] + "_%d.pdb")
+        snapshots = utilities.getSnapshots(f, topology=topology)
+        for i, snapshot in enumerate(snapshots):
+            if not isinstance(snapshot, basestring):
+                PDB = atomset.PDB()
+                PDB.initialise(snapshot)
+                snapshot = PDB.get_pdb_string(topology_contents)
+            with open(templateName % i, 'w') as of:
+                of.write(snapshot)
+
+if __name__ == "__main__":
+    traj_files, output_dir, top = parseArguments()
+    main(output_dir, traj_files, top)

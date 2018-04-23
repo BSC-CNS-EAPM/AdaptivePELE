@@ -53,6 +53,7 @@ class OutputPathConstants():
         self.epochOutputPathTempletized = os.path.join(outputPath, "%d")
         self.clusteringOutputDir = os.path.join(self.epochOutputPathTempletized, "clustering")
         self.clusteringOutputObject = os.path.join(self.clusteringOutputDir, "object.pkl")
+        self.topologyFile = os.path.join(outputPath, "topology.pdb")
 
     def buildTmpFolderConstants(self, tmpFolder):
         self.tmpInitialStructuresTemplate = tmpFolder+"/initial_%d_%d.pdb"

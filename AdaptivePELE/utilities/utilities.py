@@ -13,9 +13,8 @@ try:
     import cPickle as pickle
 except ImportError:
     import pickle
-from AdaptivePELE.atomset import RMSDCalculator
+from AdaptivePELE.atomset import RMSDCalculator, atomset
 from AdaptivePELE.freeEnergies import utils
-import AdaptivePELE.atomset.atomset as atomset
 
 
 class UnsatisfiedDependencyException(Exception):
@@ -44,7 +43,7 @@ def makeFolder(outputDir):
         os.makedirs(outputDir)
 
 
-def getSnapshots(trajectoryFile, verbose=False):
+def getSnapshots(trajectoryFile, verbose=False, topology=None):
     """
         Gets the snapshots
 
@@ -69,7 +68,9 @@ def getSnapshots(trajectoryFile, verbose=False):
         remarkInfo = "REMARK 000 File created using PELE++\nREMARK source            : %s\nREMARK original model nr : %d\nREMARK First snapshot is 1, not 0 (as opposed to report)\n"
         snapshotsWithInfo = [remarkInfo % (trajectoryFile, i+1)+snapshot for i, snapshot in enumerate(snapshots)]
     elif ext == ".xtc":
-        snapshotsWithInfo = md.load(trajectoryFile)
+        if topology is None:
+            raise ValueError("Topology needed for loading xtc files")
+        snapshotsWithInfo = md.load(trajectoryFile, topology=topology)
     else:
         raise ValueError("Unrecongnized file extension for %s" % trajectoryFile)
     return snapshotsWithInfo
@@ -123,7 +124,7 @@ def assertSymmetriesDict(symmetries, PDB):
         print("Symmetry dictionary correctly defined!")
 
 
-def getRMSD(traj, nativePDB, resname, symmetries):
+def getRMSD(traj, nativePDB, resname, symmetries, topology=None):
     """
         Computes the RMSD of a trajectory, given a native and symmetries
 
@@ -135,11 +136,13 @@ def getRMSD(traj, nativePDB, resname, symmetries):
         :type resname: str
         :param symmetries: Symmetries dictionary list with independent symmetry groups
         :type symmetries: list of dict
+        :param topology: Topology file for non-pdb trajectories
+        :type topology: str
 
         :return: np.array -- Array with the rmsd values of the trajectory
     """
 
-    snapshots = getSnapshots(traj)
+    snapshots = getSnapshots(traj, topology=topology)
     rmsds = np.zeros(len(snapshots))
     RMSDCalc = RMSDCalculator.RMSDCalculator(symmetries)
     for i, snapshot in enumerate(snapshots):

@@ -13,14 +13,15 @@ def parseArguments():
     parser.add_argument("-trajectory", type=str, nargs='+', help="Path to the trajectory or pdbs to analyse")
     parser.add_argument("-clustering", help="Path to the clustering object to analyse")
     parser.add_argument("-nRes", type=int, default=10, help="Number of top residues to display")
+    parser.add_argument("--top", type=str, default=None, help="Topology file needed for non-pdb trajectories")
     args = parser.parse_args()
-    return args.trajectory, args.clustering, args.nRes, args.resname, args.contactThreshold
+    return args.trajectory, args.clustering, args.nRes, args.resname, args.contactThreshold, args.top
 
 
-def generateConformations(resname, clAcc, trajectory):
+def generateConformations(resname, clAcc, trajectory, topology):
     if clAcc is None:
         for traj in trajectory:
-            snapshots = utilities.getSnapshots(traj)
+            snapshots = utilities.getSnapshots(traj, topology=topology)
             for snapshot in snapshots:
                 PDBobj = atomset.PDB()
                 PDBobj.initialise(snapshot, resname)
@@ -30,7 +31,7 @@ def generateConformations(resname, clAcc, trajectory):
             yield cluster.pdb
 
 if __name__ == "__main__":
-    traj_name, clustering, nRes, lig_resname, contactThreshold = parseArguments()
+    traj_name, clustering, nRes, lig_resname, contactThreshold, top = parseArguments()
 
     if clustering is None:
         clusterAcc = None
@@ -41,7 +42,7 @@ if __name__ == "__main__":
     symEval = SymmetryContactMapEvaluator.SymmetryContactMapEvaluator()
     refPDB = None
 
-    for pdb in generateConformations(lig_resname, clusetrAcc, traj_name):
+    for pdb in generateConformations(lig_resname, clusetrAcc, traj_name, top):
         if refPDB is None:
             refPDB = pdb
         contactMap, foo = symEval.createContactMap(pdb, lig_resname, contactThreshold)
