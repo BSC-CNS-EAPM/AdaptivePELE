@@ -758,7 +758,7 @@ cdef class PDB:
         for line, atom in zip(topology, self.pdb.topology.atoms):
             if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and (u"HOH" == line[17:20] or u"HOH" == prevLine[17:20]))):
                 yield u"TER\n"
-            x, y, z = tuple(self.pdb.xyz[0, atom.index])
+            x, y, z = tuple(10*self.pdb.xyz[0, atom.index])
             x = (u"%.3f" % x).rjust(8)
             y = (u"%.3f" % y).rjust(8)
             z = (u"%.3f" % z).rjust(8)
