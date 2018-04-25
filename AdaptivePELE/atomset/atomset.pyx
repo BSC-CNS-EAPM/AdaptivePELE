@@ -608,7 +608,7 @@ cdef class PDB:
         if heavyAtoms:
             selection.append(u"not element H")
         if resname != u"":
-            selection.append(u"resname %s" % resname)
+            selection.append(u"resname '%s'" % resname)
         if resnum != 0:
             selection.append(u"residue %d" % resnum)
         if type == u"HETERO":

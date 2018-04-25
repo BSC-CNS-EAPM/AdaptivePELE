@@ -143,26 +143,29 @@ def writeToFile(COMs, outputFilename):
 
 
 def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology):
-    trajectory = md.load(file_name, topology=topology)
+    trajectory = md.load(file_name, top=topology)
     if writeCA:
-        selection = "(protein and name CA) or (resname %s)" % ligand
+        selection = "(protein and name CA) or (resname '%s' and not element H)" % ligand
     elif atom_Ids and atom_Ids is not None:
-        selection = " or ".join(["index %d" % (int(atomID.split(":")[0])+1) for atomID in atom_Ids])
+        selection_list = []
+        for atomID in atom_Ids:
+            _, name, residue = atomID.split(":")
+            selection_list.append("(name %s and resname '%s')" % (name, residue))
+        selection = " or ".join(selection_list)
     else:
-        selection = "resname %s" % ligand
+        selection = "resname '%s' and not element H" % ligand
     selected_indices = trajectory.topology.select(selection)
-    coordinates = []
-    for iframe, frame in enumerate(trajectory):
-        if not writeCA and (atom_Ids is None or len(atom_Ids) == 0):
-            # getCOM case
-            coordinates.append(md.compute_center_of_mass(frame.atom_slice(selected_indices)))
-        else:
-            coordinates.append(frame.xyz[iframe, selected_indices].tolist())
+    if not writeCA and (atom_Ids is None or len(atom_Ids) == 0):
+        # getCOM case
+        # convert nm to A
+        coordinates = 10*md.compute_center_of_mass(trajectory.atom_slice(selected_indices))
+    else:
+        coordinates = 10*trajectory.xyz[:, selected_indices, :].reshape((trajectory.n_frames, -1))
     return coordinates
 
 
 def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, topology=None):
-    ext = os.path.splitext(filename)
+    ext = os.path.splitext(filename)[1]
     if ext == ".pdb":
         allCoordinates = loadAllResnameAtomsInPdb(filename, lig_resname, writeCA)
         if writeLigandTrajectory:

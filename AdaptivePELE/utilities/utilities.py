@@ -70,7 +70,7 @@ def getSnapshots(trajectoryFile, verbose=False, topology=None):
     elif ext == ".xtc":
         if topology is None:
             raise ValueError("Topology needed for loading xtc files")
-        snapshotsWithInfo = md.load(trajectoryFile, topology=topology)
+        snapshotsWithInfo = md.load(trajectoryFile, top=topology)
     else:
         raise ValueError("Unrecongnized file extension for %s" % trajectoryFile)
     return snapshotsWithInfo
