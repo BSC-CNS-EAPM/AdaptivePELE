@@ -34,7 +34,7 @@ def main(outputDir, files, topology):
             if not isinstance(snapshot, basestring):
                 PDB = atomset.PDB()
                 PDB.initialise(snapshot)
-                snapshot = PDB.get_pdb_string(topology_contents)
+                snapshot = "".join(["MODEL %d\n" % (i+1), PDB.get_pdb_string(topology_contents)])
             with open(templateName % i, 'w') as of:
                 of.write(snapshot)
 
