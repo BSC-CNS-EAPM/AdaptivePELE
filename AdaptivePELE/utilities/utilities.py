@@ -363,3 +363,9 @@ def write_mdtraj_object_PDB(conformation, output, topology):
     PDB = atomset.PDB()
     PDB.initialise(conformation)
     PDB.writePDB(output, topology)
+
+
+def get_mdtraj_object_PDBstring(conformation, topology):
+    PDB = atomset.PDB()
+    PDB.initialise(conformation)
+    return PDB.get_pdb_string(topology)
