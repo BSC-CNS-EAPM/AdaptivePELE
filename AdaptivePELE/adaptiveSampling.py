@@ -34,7 +34,6 @@ class EmptyInitialStructuresError(Exception):
 
 
 def writeTopologyFile(topology, destination):
-    print(topology, destination)
     shutil.copy(topology, destination)
     return destination
 
@@ -571,10 +570,9 @@ def main(jsonParams, clusteringHook=None):
 
     utilities.makeFolder(outputPath)
     utilities.makeFolder(outputPathConstants.tmpFolder)
-    saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
     topology_file = writeTopologyFile(initialStructures[0], outputPathConstants.topologyFile)
     topology = utilities.getTopologyFile(initialStructures[0])
-
+    saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
     startFromScratch = False
     if restart:
         firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject)
@@ -592,6 +590,8 @@ def main(jsonParams, clusteringHook=None):
         if not debug:
             shutil.rmtree(outputPath)
         utilities.makeFolder(outputPath)
+        topology_file = writeTopologyFile(initialStructures[0], outputPathConstants.topologyFile)
+        topology = utilities.getTopologyFile(initialStructures[0])
 
         if simulationRunner.parameters.runEquilibration:
             initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningParams.reportFilename, outputPath, resname, topology_file)
