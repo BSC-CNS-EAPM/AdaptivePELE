@@ -78,8 +78,8 @@ _AMINO_ACID_CODES =  {'ACE': None, 'NME':  None, '00C': 'C', '01W':  'X', '02K':
 'HCS': 'X', 'HFA':  'X', 'HGL': 'X', 'HHI': 'H', 'HIA':  'H', 'HIC': 'H', 'HIP':
 'H', 'HIQ':  'H', 'HIE': 'H', 'HIS': 'H',  'HL2': 'L', 'HLU':  'L',  'HMR': 'R',
 'HPC': 'F', 'HPE': 'F', 'HPH':  'F', 'HPQ': 'F', 'HQA': 'A', 'HRG':  'R', 'HRP':
-'W', 'HS8':
-'H', 'HS9':  'H', 'HSE': 'S',  'HSL': 'S', 'HSO':  'H', 'HTI': 'C',  'HTN': 'N',
+    'W', 'HS8': 'H', 'CYT': 'C',
+'HS9':  'H', 'HSE': 'S',  'HSL': 'S', 'HSO':  'H', 'HTI': 'C',  'HTN': 'N',
 'HTR': 'W', 'HV5':  'A', 'HVA': 'V', 'HY3': 'P', 'HYP':  'P', 'HZP': 'P', 'I2M':
 'I', 'I58':  'K', 'IAM': 'A',  'IAR': 'R', 'IAS':  'D', 'IEL': 'K',  'IGL': 'G',
 'IIL': 'I', 'ILE':  'I', 'ILG': 'E', 'ILX': 'I', 'IML':  'I', 'IOY': 'F', 'IPG':
@@ -469,7 +469,7 @@ cdef class PDB:
     def isfromPDBFile(self):
         return isinstance(self.pdb, basestring)
 
-    def _initialisePDB(self, basestring PDBstr, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0):
+    def _initialisePDB(self, basestring PDBstr, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=""):
         """
             Load the information from a PDB file or a string with the PDB
             contents
@@ -525,6 +525,8 @@ cdef class PDB:
                     continue
                 if resnumStr != u"" and not atomLine[22:26].strip() == resnumStr:
                     continue
+                if element != u"" and not atomLine[76:78].strip() == element:
+                    continue
 
             atom = Atom(atomLine)
             # Here atom will be not null, empty or not.
@@ -539,7 +541,7 @@ cdef class PDB:
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
-    def _initialiseXTC(self, object frame, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0):
+    def _initialiseXTC(self, object frame, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u""):
         """
             Load the information from a loaded XTC file into a  mdtraj Trajectory
 
@@ -561,14 +563,14 @@ cdef class PDB:
         """
         cdef list stringWithPDBContent
         cdef int atomLineNum, atomIndex, atomSerial, resChain
-        cdef basestring atomName, resName, atomLine, resnumStr, selection_string, element
+        cdef basestring atomName, resName, atomLine, resnumStr, selection_string, element_atom
         cdef Atom atom
         # cdef np.ndarray[int, ndim=1] selection_indexes
         cdef set selection_indexes
         cdef bint isProtein
         cdef object chain_obj, atomProv
         cdef float x, y, z
-        selection_string = self.createSelectionString(heavyAtoms, resname, atomname, type, chain, resnum)
+        selection_string = self.createSelectionString(heavyAtoms, resname, atomname, type, chain, resnum, element)
         if resnum == 0:
             resnumStr = u""
         else:
@@ -588,21 +590,21 @@ cdef class PDB:
                 x = self.pdb.xyz[0, atomProv.index, 0] * 10
                 y = self.pdb.xyz[0, atomProv.index, 1] * 10
                 z = self.pdb.xyz[0, atomProv.index, 2] * 10
-                element = atomProv.element.symbol.upper()
+                element_atom = atomProv.element.symbol.upper()
                 atom = Atom()
-                atom.set_properties(isProtein, atomSerial, atomName, resName, resNum, x, y, z, element, resChain)
+                atom.set_properties(isProtein, atomSerial, atomName, resName, resNum, x, y, z, element_atom, resChain)
                 self.atoms.update({atom.id: atom})
                 self.atomList.append(atom.id)
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
-    def createSelectionString(self, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0):
+    def createSelectionString(self, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=""):
         cdef list selection = []
         if type == u"CM":
             for res in self.CMAtoms:
                 if self.CMAtoms[res] != u"empty":
                     selection.append(u"(resname %s and name %s)" % (res, self.CMAtoms[res]))
-            return u"protein and (name CA or %s)" % u" or ".join(selection)
+            return u"((name CA and element C) or %s)" % u" or ".join(selection)
         if atomname != u"":
             selection.append(u"name %s" % atomname)
         if heavyAtoms:
@@ -615,19 +617,21 @@ cdef class PDB:
             selection.append(u"not protein")
         elif type == u"PROTEIN":
             selection.append(u"protein")
+        if element != u"":
+            selection.append(u"element %s" % element)
         if selection != []:
             return u" and ".join(selection)
         else:
             return u"all"
 
-    def initialise(self, object coordinates, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0):
+    def initialise(self, object coordinates, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u""):
         """
             Wrapper function
         """
         if isinstance(coordinates, basestring):
-            self._initialisePDB(coordinates, heavyAtoms, resname, atomname, type, chain, resnum)
+            self._initialisePDB(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element)
         else:
-            self._initialiseXTC(coordinates, heavyAtoms, resname, atomname, type, chain, resnum)
+            self._initialiseXTC(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element)
 
     def computeTotalMass(self):
         """
@@ -683,6 +687,13 @@ cdef class PDB:
     def __iter__(self):
         for atomId in self.atomList:
             yield self.atoms[atomId]
+
+    def updateCoords(self, newCoords):
+        for atom, coords in zip(self.atomList, newCoords):
+            atomObj = self.atoms[atom]
+            atomObj.x = coords[0]
+            atomObj.y = coords[1]
+            atomObj.z = coords[2]
 
     def extractCOM(self):
         """
@@ -811,7 +822,7 @@ cdef class PDB:
         ligandPDB.initialise(self.pdb, resname=ligandResname, resnum=ligandResnum, chain=ligandChain, heavyAtoms=True)
 
         alphaCarbonsPDB = PDB()
-        alphaCarbonsPDB.initialise(self.pdb, type=self._typeProtein,
+        alphaCarbonsPDB.initialise(self.pdb, element=u"C",
                                    atomname=u"CA")
         # count contacts
         cdef set contacts = set([])
@@ -825,7 +836,7 @@ cdef class PDB:
                 proteinAtomId = alphaCarbonsPDB.atomList[colind]
                 proteinAtom = alphaCarbonsPDB.atoms[proteinAtomId]
                 dist2 = ligandAtom.squaredDistance(proteinAtom)
-                if dist2 < contactThresholdDistance2:
+                if (dist2 - contactThresholdDistance2) < 0.1:
                     contacts.update([proteinAtomId])
 
         return len(contacts)
