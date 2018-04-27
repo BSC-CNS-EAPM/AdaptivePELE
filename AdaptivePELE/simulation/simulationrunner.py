@@ -19,6 +19,10 @@ try:
     from sklearn.cluster import KMeans
 except ImportError:
     SKLEARN = False
+try:
+    basestring
+except NameError:
+    basestring = str
 
 
 class SimulationParameters:
@@ -460,7 +464,8 @@ class PeleSimulation(SimulationRunner):
         data = data[data[:, 0].argsort()]
         nPoints = max(self.parameters.numberEquilibrationStructures, data.shape[0]//4)
         data = data[:nPoints]
-        kmeans = KMeans(n_clusters=self.parameters.numberEquilibrationStructures).fit(data[:, 3:])
+        n_clusters = min(self.parameters.numberEquilibrationStructures, data.shape[0])
+        kmeans = KMeans(n_clusters=n_clusters).fit(data[:, 3:])
         print("Clustered equilibration output into %d clusters!" % self.parameters.numberEquilibrationStructures)
         clustersInfo = {x: {"structure": None, "minDist": 1e6} for x in range(self.parameters.numberEquilibrationStructures)}
         for conf, cluster in zip(data, kmeans.labels_):
@@ -469,12 +474,19 @@ class PeleSimulation(SimulationRunner):
                 clustersInfo[cluster]["minDist"] = dist
                 clustersInfo[cluster]["structure"] = tuple(conf[1:3].astype(int))
         initialStructures = []
+        if topology is not None:
+            topology_content = utilities.getTopologyFile(topology)
+        else:
+            topology_content = None
         for cl in range(self.parameters.numberEquilibrationStructures):
             if clustersInfo[cl]["structure"] is None:
                 # If a cluster has no structure assigned, skip it
                 continue
             traj, snap = clustersInfo[cl]["structure"]
-            initialStructures.append(utilities.getSnapshots(trajWildcard % traj, topology=topology)[snap])
+            conf = utilities.getSnapshots(trajWildcard % traj, topology=topology)[snap]
+            if not isinstance(conf, basestring):
+                conf = utilities.get_mdtraj_object_PDBstring(conf, topology_content)
+            initialStructures.append(conf)
         return initialStructures
 
     def selectEquilibrationLastSnapshot(self, nTrajs, trajWildcard, topology=None):
@@ -491,7 +503,18 @@ class PeleSimulation(SimulationRunner):
 
             :returns: list -- List with the pdb snapshots of the representatives structures
         """
-        return [utilities.getSnapshots(trajWildcard % ij, topology=topology)[-1] for ij in range(1, nTrajs)]
+        initialStructures = []
+        if topology is not None:
+            topology_content = utilities.getTopologyFile(topology)
+        else:
+            topology_content = None
+        for ij in range(1, nTrajs):
+            conf = utilities.getSnapshots(trajWildcard % ij, topology=topology)[-1]
+            if not isinstance(conf, basestring):
+                conf = utilities.get_mdtraj_object_PDBstring(conf, topology_content)
+            initialStructures.append(conf)
+
+        return initialStructures
 
     def selectEquilibratedStructure(self, nTrajs, similarityColumn, resname, trajWildcard, reportWildcard, topology=None):
         """
@@ -573,7 +596,14 @@ class PeleSimulation(SimulationRunner):
         # trajectories are 1-indexed
         trajNum += 1
         # return as list for compatibility with selectEquilibrationLastSnapshot
-        return [utilities.getSnapshots(trajWildcard % trajNum, topology=topology)[snapshotNum]]
+        conf = utilities.getSnapshots(trajWildcard % trajNum, topology=topology)[snapshotNum]
+        if topology is not None:
+            topology_content = utilities.getTopologyFile(topology)
+        else:
+            topology_content = None
+        if not isinstance(conf, basestring):
+            conf = utilities.get_mdtraj_object_PDBstring(conf, topology_content)
+        return [conf]
 
     def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
         """
