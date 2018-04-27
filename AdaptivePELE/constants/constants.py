@@ -22,6 +22,12 @@ elif "bsc.mn" in machine:
     DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev12455/Data"
     DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev12455/Documents"
 
+elif machine == "bscls309":
+    PELE_EXECUTABLE = "/home/jgilaber/PELE/PELE-1.5/PELE-1.5_mpi"
+    DATA_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Data"
+    DOCUMENTS_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Documents"
+
+
 inputFileTemplate = "{ \"files\" : [ { \"path\" : \"%s\" } ] }"
 trajectoryBasename = "*traj*"
 
