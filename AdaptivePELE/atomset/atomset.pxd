@@ -8,3 +8,4 @@ cdef class PDB:
     cdef public list atomList, com, centroid
     cdef public double totalMass
     cdef public object pdb
+    cdef public bint ispdb

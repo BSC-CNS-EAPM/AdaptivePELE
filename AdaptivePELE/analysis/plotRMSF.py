@@ -17,7 +17,7 @@ def parseArguments():
     return args.trajectory, args.ref, args.nRes, args.top
 
 
-def extractAvgPDB(trajs, topology):
+def extractAvgPDB(trajs, topology, topology_content):
     nSnapshots = 0
     avgStruct = {}
     snapshotsTot = []
@@ -26,7 +26,7 @@ def extractAvgPDB(trajs, topology):
         for snapshot in snapshots:
             nSnapshots += 1
             PDB = atomset.PDB()
-            PDB.initialise(snapshot, type="PROTEIN")
+            PDB.initialise(snapshot, type="PROTEIN", topology=topology_content)
             snapshotsTot.append(PDB)
             for atomID, atom in PDB.atoms.items():
                 if atomID in avgStruct:
@@ -36,26 +36,30 @@ def extractAvgPDB(trajs, topology):
     return avgStruct, snapshotsTot
 
 
-def mapReference(ref, trajs, topology):
+def mapReference(ref, trajs, topology, topology_content):
     refPDB = atomset.PDB()
-    refPDB.initialise(ref, type="PROTEIN")
+    refPDB.initialise(ref, type="PROTEIN", topology=topology_content)
     avgStruct = {atomID: refPDB.atoms[atomID].getAtomCoords() for atomID in refPDB.atoms}
     snapshotsTot = []
     for traj in trajs:
         snapshots = utilities.getSnapshots(traj, topology=topology)
         for snapshot in snapshots:
             PDB = atomset.PDB()
-            PDB.initialise(snapshot, type="PROTEIN")
+            PDB.initialise(snapshot, type="PROTEIN", topology=topology_content)
             snapshotsTot.append(PDB)
 
     return avgStruct, snapshotsTot
 
 if __name__ == "__main__":
     trajs, ref, nResidues, top = parseArguments()
-    if ref is None:
-        avgPDB, totPDBs = extractAvgPDB(trajs, top)
+    if top is None:
+        top_content = None
     else:
-        avgPDB, totPDBs = mapReference(ref, trajs, top)
+        top_content = utilities.getTopologyFile(top)
+    if ref is None:
+        avgPDB, totPDBs = extractAvgPDB(trajs, top, top_content)
+    else:
+        avgPDB, totPDBs = mapReference(ref, trajs, top, top_content)
     RMSF = {atom: 0.0 for atom in avgPDB}
     residueMapping = {}
     # TODO: Handle multiple chains and insertion residues in PDB

@@ -67,8 +67,8 @@ def main(trajectory, snapshot, epoch, outputPath, out_filename, topology):
             for i in range(snapshot+1):
                 snapshot = snapshots.slice(i, copy=False)
                 PDB = atomset.PDB()
-                PDB.initialise(snapshot)
-                new_snapshots.append(PDB.get_pdb_string(topology_contents))
+                PDB.initialise(snapshot, topology=topology_contents)
+                new_snapshots.append(PDB.get_pdb_string())
             snapshots = new_snapshots
         else:
             snapshots = snapshots[:snapshot+1]

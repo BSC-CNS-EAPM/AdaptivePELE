@@ -143,11 +143,12 @@ def getRMSD(traj, nativePDB, resname, symmetries, topology=None):
     """
 
     snapshots = getSnapshots(traj, topology=topology)
+    topology_contents = getTopologyFile(topology)
     rmsds = np.zeros(len(snapshots))
     RMSDCalc = RMSDCalculator.RMSDCalculator(symmetries)
     for i, snapshot in enumerate(snapshots):
         snapshotPDB = atomset.PDB()
-        snapshotPDB.initialise(snapshot, resname=resname)
+        snapshotPDB.initialise(snapshot, resname=resname, topology=topology_contents)
 
         rmsds[i] = RMSDCalc.computeRMSD(nativePDB, snapshotPDB)
 
@@ -333,13 +334,6 @@ def getSASAcolumnFromControlFile(JSONdict):
     raise ValueError("No SASA metric found in control file!!! Please add it in order to use the moving box feature")
 
 
-def write_xtc_to_pdb(filename, output_file):
-    xtc_object = md.load(filename)
-    pdb = atomset.PDB()
-    pdb.initialise(xtc_object)
-    pdb.writePDB(output_file)
-
-
 def getTopologyFile(structure):
     """
         Extract the topology information to write structures from xtc format
@@ -360,12 +354,52 @@ def getTopologyFile(structure):
 
 
 def write_mdtraj_object_PDB(conformation, output, topology):
+    """
+        Write a snapshot from a xtc trajectory to pdb
+
+        :param conformation: Mdtraj trajectory object to write
+        :type structure: str or Trajectory
+        :param output: Output where to write the object
+        :type output: str
+        :param topology: Topoloy-like object
+        :type topology: list
+    """
     PDB = atomset.PDB()
-    PDB.initialise(conformation)
-    PDB.writePDB(output, topology)
+    PDB.initialise(conformation, topology=topology)
+    PDB.writePDB(output)
 
 
 def get_mdtraj_object_PDBstring(conformation, topology):
+    """
+        Get the pdb string of a snapshot from a xtc trajectory to pdb
+
+        :param conformation: Mdtraj trajectory object to write
+        :type structure: str or Trajectory
+        :param topology: Topoloy-like object
+        :type topology: list
+
+        :returns: str -- The pdb representation of a snapshot from a xtc
+    """
     PDB = atomset.PDB()
-    PDB.initialise(conformation)
-    return PDB.get_pdb_string(topology)
+    PDB.initialise(conformation, topology=topology)
+    return PDB.get_pdb_string()
+
+
+def write_xtc_to_pdb(filename, output_file, topology):
+    """
+        Get the pdb string of a snapshot from a xtc trajectory to pdb
+
+        :param filename: Path to the xtc trajectory
+        :type filename: str
+        :param output_file: Output where to write the object
+        :type output_file: str
+        :param topology: Topology file object
+        :type topology: str
+
+        :returns: str -- The pdb representation of a snapshot from a xtc
+    """
+    topology_contents = getTopologyFile(topology)
+    xtc_object = md.load(filename, top=topology)
+    pdb = atomset.PDB()
+    pdb.initialise(xtc_object, topology=topology_contents)
+    pdb.writePDB(output_file)

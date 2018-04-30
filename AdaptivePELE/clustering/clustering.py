@@ -488,18 +488,16 @@ class Cluster:
     def __str__(self):
         return "Cluster: elements=%d, threshold=%.3f, contacts=%.3f, density=%.3f" % (self.elements, self.threshold, self.contacts, self.density or 0.000)
 
-    def writePDB(self, path, topology=None):
+    def writePDB(self, path):
         """
             Write the pdb of the representative structure to file
 
             :param path: Filename of the file to write
             :type path: str
-            :param topology: Topology like structure to write PDB from xtc files
-            :type topology: list
         """
         if topology is None:
             topology = []
-        self.pdb.writePDB(str(path), topology=topology)
+        self.pdb.writePDB(str(path))
 
     def getContacts(self):
         """
@@ -509,27 +507,23 @@ class Cluster:
         """
         return self.contacts
 
-    def writeSpawningStructure(self, path, topology=None):
+    def writeSpawningStructure(self, path):
         """
             Write the pdb of the chosen structure to spawn
 
             :param path: Filename of the file to write
             :type path: str
-            :param topology: Topology like structure to write PDB from xtc files
-            :type topology: list
 
             :returns int, int, int: Tuple of (epoch, trajectory, snapshot) that permit
                 identifying the structure added
         """
-        if topology is None:
-            topology = []
         if not self.altSelection or self.altStructure.sizePQ() == 0:
             print("cluster center")
-            self.pdb.writePDB(str(path), topology=topology)
+            self.pdb.writePDB(str(path))
             return self.trajPosition
         else:
             spawnStruct, trajPosition = self.altStructure.altSpawnSelection((self.elements, self.pdb))
-            spawnStruct.writePDB(str(path), topology=topology)
+            spawnStruct.writePDB(str(path))
             if trajPosition is None:
                 trajPosition = self.trajPosition
             return trajPosition
@@ -903,6 +897,10 @@ class Clustering:
             :type topology: str
         """
         self.epoch += 1
+        if topology is None:
+            topology_contents = None
+        else:
+            topology_contents = utilities.getTopologyFile(topology)
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
@@ -919,7 +917,7 @@ class Clustering:
                     if ignoreFirstRow and num == 0:
                         continue
                     try:
-                        origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col)
+                        origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col, topology=topology_contents)
                     except IndexError as e:
                         message = (" in trajectory %d. This is usually caused by a mismatch between report files and trajectory files"
                                    " which in turn is usually caused by some problem in writing the files, e.g. quota")
@@ -931,11 +929,11 @@ class Clustering:
                 for num, snapshot in enumerate(snapshots):
                     if ignoreFirstRow and num == 0:
                         continue
-                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num)
+                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, topology=topology_contents)
         for cluster in self.clusters.clusters:
             cluster.altStructure.cleanPQ()
 
-    def writeOutput(self, outputPath, degeneracy, outputObject, writeAll, topology=None):
+    def writeOutput(self, outputPath, degeneracy, outputObject, writeAll):
         """
             Writes all the clustering information in outputPath
 
@@ -949,8 +947,6 @@ class Clustering:
             :param writeAll: Wether to write pdb files for all cluster in addition
                 of the summary
             :type writeAll: bool
-            :param topology: Topology for non-pdb trajectories
-            :type topology: list
         """
         utilities.cleanup(outputPath)
         utilities.makeFolder(outputPath)
@@ -963,7 +959,7 @@ class Clustering:
                 if writeAll:
                     outputFilename = "cluster_%d.pdb" % i
                     outputFilename = os.path.join(outputPath, outputFilename)
-                    cluster.writePDB(outputFilename, topology=topology)
+                    cluster.writePDB(outputFilename)
 
                 metric = cluster.getMetric()
                 if metric is None:
@@ -986,7 +982,7 @@ class Clustering:
         with open(outputObject, 'wb') as f:
             pickle.dump(self, f, 2)
 
-    def addSnapshotToCluster(self, trajNum, snapshot, origCluster, snapshotNum, metrics=None, col=None):
+    def addSnapshotToCluster(self, trajNum, snapshot, origCluster, snapshotNum, metrics=None, col=None, topology=None):
         """
             Cluster a snapshot using the leader algorithm
 
@@ -1003,11 +999,13 @@ class Clustering:
             :param col: Column of the desired metrics
             :type col: int
             :returns: int -- Cluster to which the snapshot belongs
+            :param topology: Topology for non-pdb trajectories
+            :type topology: list
         """
         if metrics is None:
             metrics = []
         pdb = atomset.PDB()
-        pdb.initialise(snapshot, resname=self.resname, resnum=self.resnum, chain=self.resChain)
+        pdb.initialise(snapshot, resname=self.resname, resnum=self.resnum, chain=self.resChain, topology=topology)
         self.clusteringEvaluator.cleanContactMap()
         for clusterNum, cluster in enumerate(self.clusters.clusters):
             scd = atomset.computeSquaredCentroidDifference(cluster.pdb, pdb)
@@ -1138,7 +1136,7 @@ class Clustering:
             for i, step_cluster in enumerate(pathway):
                 cluster = self.clusters.clusters[step_cluster]
                 pathwayFile.write("MODEL %d\n" % (i+1))
-                pdbStr = cluster.pdb.get_pdb_string(topology)
+                pdbStr = cluster.pdb.get_pdb_string()
                 pdbList = pdbStr.split("\n")
                 for line in pdbList:
                     line = line.strip()
@@ -1344,6 +1342,10 @@ class SequentialLastSnapshotClustering(Clustering):
         """
         # Clean clusters at every step, so we only have the last snapshot of
         # each trajectory as clusters
+        if topology is None:
+            topology_contents = None
+        else:
+            topology_contents = utilities.getTopologyFile(topology)
         self.clusters = Clusters()
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
@@ -1359,11 +1361,11 @@ class SequentialLastSnapshotClustering(Clustering):
                 # check the exit condition
                 metrics = metrics.min(axis=0)
 
-                self.addSnapshotToCluster(snapshots[-1], metrics, self.col)
+                self.addSnapshotToCluster(snapshots[-1], metrics, self.col, topology=topology_contents)
             else:
-                self.addSnapshotToCluster(snapshots[-1])
+                self.addSnapshotToCluster(snapshots[-1], topology=topology_contents)
 
-    def addSnapshotToCluster(self, snapshot, metrics=None, col=None):
+    def addSnapshotToCluster(self, snapshot, metrics=None, col=None, topology=None):
         """
             Cluster a snapshot using the leader algorithm
 
@@ -1376,12 +1378,14 @@ class SequentialLastSnapshotClustering(Clustering):
             :param col: Column of the desired metrics
             :type col: int
             :returns: int -- Cluster to which the snapshot belongs
+            :param topology: Topology for non-pdb trajectories
+            :type topology: list
         """
         if metrics is None:
             metrics = []
         pdb = atomset.PDB()
         pdb.initialise(snapshot, resname=self.resname, resnum=self.resnum,
-                       chain=self.resChain)
+                       chain=self.resChain, topology=topology)
         contacts = pdb.countContacts(self.resname, self.contactThresholdDistance, self.resnum, self.resChain)
         numberOfLigandAtoms = pdb.getNumberOfAtoms()
         contactsPerAtom = contacts/numberOfLigandAtoms

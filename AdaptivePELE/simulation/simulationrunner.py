@@ -183,7 +183,7 @@ class PeleSimulation(SimulationRunner):
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.documentsFolder + " Documents")
 
-    def getNextIterationBox(self, clusteringObject, outputFolder, resname, topology):
+    def getNextIterationBox(self, clusteringObject, outputFolder, resname, topology=None):
         """
             Select the box for the next epoch, currently selecting the COM of
             the cluster with max SASA
@@ -194,6 +194,8 @@ class PeleSimulation(SimulationRunner):
             :type outputFolder: str
             :param resname: Name of the ligand in the pdb
             :type resname: str
+            :param topology: Topology file
+            :type topology: str
 
             :returns str: -- string to be substitued in PELE control file
         """
@@ -214,11 +216,15 @@ class PeleSimulation(SimulationRunner):
             raise ValueError("%s should be either binding or unbinding, but %s is provided!!!" % (blockNames.SimulationParams.modeMovingBox, self.parameters.modeMovingBox))
         # If this lines are reached then a new extreme SASA value was
         # identified and we proceed to extract the corresponding center of mass
+        if topology is not None:
+            topology_content = utilities.getTopologyFile(topology)
+        else:
+            topology_content = None
         trajNum = metrics[SASAcluster, -2]
         snapshotNum = metrics[SASAcluster, -1]
         snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum), topology=topology)[int(snapshotNum)]
         snapshotPDB = atomset.PDB()
-        snapshotPDB.initialise(snapshot, resname=resname)
+        snapshotPDB.initialise(snapshot, resname=resname, topology=topology_content)
         self.parameters.boxCenter = str(snapshotPDB.getCOM())
         return
 
@@ -446,6 +452,10 @@ class PeleSimulation(SimulationRunner):
         """
         if not SKLEARN:
             raise utilities.UnsatisfiedDependencyException("No installation of scikit-learn found. Please, install scikit-learn or select a different equilibrationMode.")
+        if topology is None:
+            topology_content = None
+        else:
+            topology_content = utilities.getTopologyFile(topology)
         energyColumn = 3
         # detect number of trajectories available
         nTrajs = len(glob.glob(trajWildcard.rsplit("_", 1)[0]+"*"))+1
@@ -457,7 +467,7 @@ class PeleSimulation(SimulationRunner):
             snapshots = utilities.getSnapshots(trajWildcard % i, topology=topology)
             for nSnap, (line, snapshot) in enumerate(zip(report, snapshots)):
                 conformation = atomset.PDB()
-                conformation.initialise(snapshot, resname=resname)
+                conformation.initialise(snapshot, resname=resname, topology=topology_content)
                 com = conformation.getCOM()
                 data.append([line[energyColumn], i, nSnap]+com)
         data = np.array(data)
@@ -474,10 +484,6 @@ class PeleSimulation(SimulationRunner):
                 clustersInfo[cluster]["minDist"] = dist
                 clustersInfo[cluster]["structure"] = tuple(conf[1:3].astype(int))
         initialStructures = []
-        if topology is not None:
-            topology_content = utilities.getTopologyFile(topology)
-        else:
-            topology_content = None
         for cl in range(self.parameters.numberEquilibrationStructures):
             if clustersInfo[cl]["structure"] is None:
                 # If a cluster has no structure assigned, skip it
@@ -545,6 +551,11 @@ class PeleSimulation(SimulationRunner):
         else:
             cols = sorted([energyColumn, similarityColumn])
 
+        if topology is not None:
+            topology_content = utilities.getTopologyFile(topology)
+        else:
+            topology_content = None
+
         for i in range(1, nTrajs):
             indices.append(rowIndex)
             report = np.loadtxt(reportWildcard % i)
@@ -552,12 +563,12 @@ class PeleSimulation(SimulationRunner):
                 snapshots = utilities.getSnapshots(trajWildcard % i, topology=topology)
                 report_values = []
                 if i == 1:
-                    initial.initialise(snapshots.pop(0), resname=resname)
+                    initial.initialise(snapshots.pop(0), resname=resname, topology=topology_content)
                     report_values.append([0, report[0, energyColumn]])
                     report = report[1:, :]
                 for j, snap in enumerate(snapshots):
                     pdbConformation = atomset.PDB()
-                    pdbConformation.initialise(snap, resname=resname)
+                    pdbConformation.initialise(snap, resname=resname, topology=topology_content)
                     report_values.append([RMSDCalc.computeRMSD(initial, pdbConformation), report[j, energyColumn]])
             else:
                 report_values = report[:, cols]
@@ -597,10 +608,6 @@ class PeleSimulation(SimulationRunner):
         trajNum += 1
         # return as list for compatibility with selectEquilibrationLastSnapshot
         conf = utilities.getSnapshots(trajWildcard % trajNum, topology=topology)[snapshotNum]
-        if topology is not None:
-            topology_content = utilities.getTopologyFile(topology)
-        else:
-            topology_content = None
         if not isinstance(conf, basestring):
             conf = utilities.get_mdtraj_object_PDBstring(conf, topology_content)
         return [conf]

@@ -263,7 +263,7 @@ class SpawningCalculator:
             for _ in range(int(degeneracyOfRepresentatives[i])):
                 outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
                 print('Writing to ', outputFilename, 'cluster', i)
-                procMapping.append(cluster.writeSpawningStructure(outputFilename, topology=topology))
+                procMapping.append(cluster.writeSpawningStructure(outputFilename))
 
                 counts += 1
 

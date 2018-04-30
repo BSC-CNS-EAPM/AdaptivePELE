@@ -45,8 +45,8 @@ if __name__ == "__main__":
         new_snapshots = []
         for snapshot in snapshots:
             PDB = atomset.PDB()
-            PDB.initialise(snapshot)
-            new_snapshots.append(PDB.get_pdb_string(topology_contents))
+            PDB.initialise(snapshot, topology=topology_contents)
+            new_snapshots.append(PDB.get_pdb_string())
         snapshots = new_snapshots
 
     procMapping = open(os.path.join(epoch, "processorMapping.txt")).read().rstrip().split(',')

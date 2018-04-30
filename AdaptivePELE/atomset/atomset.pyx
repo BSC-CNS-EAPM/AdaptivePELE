@@ -416,6 +416,7 @@ cdef class PDB:
         self.pdb = None
         self.com = None
         self.centroid = None
+        self.ispdb = False
 
         # Necessary for contactMaps
         self.atomList = []
@@ -427,7 +428,7 @@ cdef class PDB:
         """
         cdef list pdb1, pdb2
         if op == 2:
-            if self.isfromPDBFile() and other.isfromPDBFile():
+            if self.ispdb and other.ispdb:
                 pdb1 = [element.strip() for element in self.pdb.split(u'\n') if element.startswith(u"ATOM") or element.startswith(u"HETATM")]
                 pdb2 = [element.strip() for element in other.pdb.split(u'\n') if element.startswith(u"ATOM") or element.startswith(u"HETATM")]
                 return pdb1 == pdb2
@@ -437,7 +438,7 @@ cdef class PDB:
                         return False
                 return True
         elif op == 3:
-            if self.isfromPDBFile() and other.isfromPDBFile():
+            if self.ispdb and other.ispdb:
                 pdb1 = [element.strip() for element in self.pdb.split('\n') if element.startswith(u"ATOM") or element.startswith(u"HETATM")]
                 pdb2 = [element.strip() for element in other.pdb.split('\n') if element.startswith(u"ATOM") or element.startswith(u"HETATM")]
                 return pdb1 != pdb2
@@ -453,7 +454,8 @@ cdef class PDB:
         # Copy the object's state from
         state = {u"atoms": self.atoms, u"atomList": self.atomList,
                  u"com": self.com, u"centroid": self.centroid,
-                 u"totalMass": self.totalMass, u"pdb": self.pdb}
+                 u"totalMass": self.totalMass, u"pdb": self.pdb,
+                 u"ispdb": self.ispdb}
         return state
 
 
@@ -465,9 +467,10 @@ cdef class PDB:
         self.centroid = state.get(u'centroid')
         self.totalMass = state[u'totalMass']
         self.pdb = state[u'pdb']
+        self.ispdb = state.get(u'ispdb', True)
 
     def isfromPDBFile(self):
-        return isinstance(self.pdb, basestring)
+        return self.ispdb
 
     def _initialisePDB(self, basestring PDBstr, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=""):
         """
@@ -541,7 +544,7 @@ cdef class PDB:
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
-    def _initialiseXTC(self, object frame, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u""):
+    def _initialiseXTC(self, object frame, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None):
         """
             Load the information from a loaded XTC file into a  mdtraj Trajectory
 
@@ -575,9 +578,9 @@ cdef class PDB:
             resnumStr = u""
         else:
             resnumStr = str(resnum)
-        self.pdb = frame  # in case one wants to write it
-        selection_indexes = set(self.pdb.topology.select(selection_string))
-        for chain_obj in self.pdb.topology.chains:
+        self.pdb = self.join_PDB_lines(topology, frame)  # in case one wants to write it
+        selection_indexes = set(frame.topology.select(selection_string))
+        for chain_obj in frame.topology.chains:
             resChain = chain_obj.index
             for atomProv in chain_obj.atoms:
                 if atomProv.index not in selection_indexes:
@@ -587,9 +590,9 @@ cdef class PDB:
                 atomName = atomProv.name
                 resName = atomProv.residue.name
                 resNum = "%d" % atomProv.residue.resSeq
-                x = self.pdb.xyz[0, atomProv.index, 0] * 10
-                y = self.pdb.xyz[0, atomProv.index, 1] * 10
-                z = self.pdb.xyz[0, atomProv.index, 2] * 10
+                x = frame.xyz[0, atomProv.index, 0] * 10
+                y = frame.xyz[0, atomProv.index, 1] * 10
+                z = frame.xyz[0, atomProv.index, 2] * 10
                 element_atom = atomProv.element.symbol.upper()
                 atom = Atom()
                 atom.set_properties(isProtein, atomSerial, atomName, resName, resNum, x, y, z, element_atom, resChain)
@@ -624,14 +627,16 @@ cdef class PDB:
         else:
             return u"all"
 
-    def initialise(self, object coordinates, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u""):
+    def initialise(self, object coordinates, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None):
         """
             Wrapper function
         """
         if isinstance(coordinates, basestring):
+            self.ispdb = True
             self._initialisePDB(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element)
         else:
-            self._initialiseXTC(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element)
+            self.ispdb = False
+            self._initialiseXTC(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element, topology=topology)
 
     def computeTotalMass(self):
         """
@@ -764,25 +769,27 @@ cdef class PDB:
             return self.centroid
 
 
-    def iteratePDBLines(self, list topology=[]):
+    def join_PDB_lines(self, list topology=[], object frame=None):
         cdef basestring prevLine = None
-        for line, atom in zip(topology, self.pdb.topology.atoms):
+        cdef list pdb = []
+        for line, atom in zip(topology, frame.topology.atoms):
             if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and (u"HOH" == line[17:20] or u"HOH" == prevLine[17:20]))):
-                yield u"TER\n"
-            x, y, z = tuple(10*self.pdb.xyz[0, atom.index])
+                pdb.append(u"TER\n")
+            x, y, z = tuple(10*frame.xyz[0, atom.index])
             x = (u"%.3f" % x).rjust(8)
             y = (u"%.3f" % y).rjust(8)
             z = (u"%.3f" % z).rjust(8)
             prevLine = line
-            yield line % (x, y, z)
+            pdb.append(line % (x, y, z))
+        return "".join(pdb)
 
-    def get_pdb_string(self, list topology=[]):
-        if self.isfromPDBFile():
+    def get_pdb_string(self, int model_num=1):
+        if self.ispdb:
             return self.pdb
         else:
-            return "".join(list(self.iteratePDBLines(topology)))
+            return "".join([u"MODEL %d\n" % model_num, self.pdb, u"ENDMDL\n", u"END\n"])
 
-    def writePDB(self, basestring path, list topology=[], int model_num=1):
+    def writePDB(self, basestring path, int model_num=1):
         """
             Write the pdb contents of the file from wich the PDB object was
             created
@@ -791,14 +798,13 @@ cdef class PDB:
             :type path: basestring
         """
         cdef object fileHandle, atom
-        if self.isfromPDBFile():
+        if self.ispdb:
             with open(path, 'w', encoding="utf-8") as fileHandle:
                 fileHandle.write(self.pdb)
         else:
             with open(path, 'w', encoding="utf-8") as fileHandle:
                 fileHandle.write(u"MODEL %d\n" % model_num)
-                for line in self.iteratePDBLines(topology):
-                    fileHandle.write(line)
+                fileHandle.write(self.pdb)
                 fileHandle.write(u"ENDMDL\n")
                 fileHandle.write(u"END\n")
 

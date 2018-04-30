@@ -426,11 +426,12 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
     def test_write_XTC_to_pdb(self):
         golden = "tests/data/ain_native_fixed.pdb"
         output = "xtc_to_pdb.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, resname="AIN")
+        xtc.initialise(xtc_obj, resname="AIN", topology=topology)
         top = utilities.getTopologyFile(golden)
-        xtc.writePDB(output, topology=top)
+        xtc.writePDB(output)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, resname="AIN")
         output_pdb = atomset.PDB()
@@ -440,54 +441,60 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
 
     def testPDB_sel_resname_XTC(self):
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, resname="AIN")
+        xtc.initialise(xtc_obj, resname="AIN", topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, resname="AIN")
         self.assertEqual(xtc, golden_pdb)
 
     def testPDB_sel_atomname_XTC(self):
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, atomname="CA")
+        xtc.initialise(xtc_obj, atomname="CA", topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, atomname="CA")
         self.assertEqual(xtc, golden_pdb)
 
     def testPDB_sel_type_protein_XTC(self):
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, type="PROTEIN")
+        xtc.initialise(xtc_obj, type="PROTEIN", topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, type="PROTEIN")
         self.assertEqual(xtc, golden_pdb)
 
     def testPDB_sel_type_hetero_XTC(self):
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, type="HETERO")
+        xtc.initialise(xtc_obj, type="HETERO", topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, type="HETERO")
         self.assertEqual(xtc, golden_pdb)
 
     def testPDB_sel_type_heavyAtoms_XTC(self):
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, heavyAtoms=False)
+        xtc.initialise(xtc_obj, heavyAtoms=False, topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, heavyAtoms=False)
         self.assertEqual(xtc, golden_pdb)
 
     def testPDB_sel_resnum_XTC(self):
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, resnum=2)
+        xtc.initialise(xtc_obj, resnum=2, topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, resnum=2)
         self.assertEqual(xtc, golden_pdb)
@@ -495,9 +502,10 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
     def testPDB_COM_XTC(self):
         # preparation
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, resname="AIN")
+        xtc.initialise(xtc_obj, resname="AIN", topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, resname="AIN")
 
@@ -508,9 +516,10 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
     def testPDB_RMSD_XTC(self):
         # preparation
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, resname="AIN")
+        xtc.initialise(xtc_obj, resname="AIN", topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, resname="AIN")
 
@@ -525,9 +534,10 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
     def testPDB_RMSD_symmetries_XTC(self):
         # preparation
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, resname="AIN")
+        xtc.initialise(xtc_obj, resname="AIN", topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, resname="AIN")
         symDict = [{"1733:O1:AIN": "1735:O2:AIN"}]
@@ -542,9 +552,10 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
     def testPDB_contacts_XTC(self):
         # preparation
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, resname="AIN")
+        xtc.initialise(xtc_obj, resname="AIN", topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, resname="AIN")
 
@@ -556,9 +567,10 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
     def testPDB_contactmap_XTC(self):
         # preparation
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, resname="AIN")
+        xtc.initialise(xtc_obj, resname="AIN", topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, resname="AIN")
         symmetryEvaluator = sym.SymmetryContactMapEvaluator([])
@@ -573,11 +585,13 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
 
     def test_symmetryContactMapJaccard_XTC(self):
         xtc_obj = mdtraj.load("tests/data/symmetries/cluster_1.xtc", top="tests/data/symmetries/cluster_1.pdb")
+        topology = utilities.getTopologyFile("tests/data/symmetries/cluster_1.pdb")
         pdb_1 = atomset.PDB()
-        pdb_1.initialise(xtc_obj, resname='AEN')
+        pdb_1.initialise(xtc_obj, resname='AEN', topology=topology)
+        topology = utilities.getTopologyFile("tests/data/symmetries/cluster_1_sym.pdb")
         xtc_obj = mdtraj.load("tests/data/symmetries/cluster_1_sym.xtc", top="tests/data/symmetries/cluster_1_sym.pdb")
         pdb_1_sym = atomset.PDB()
-        pdb_1_sym.initialise(xtc_obj, resname='AEN')
+        pdb_1_sym.initialise(xtc_obj, resname='AEN', topology=topology)
         symmetries3PTB = [{"3230:N1:AEN": "3231:N2:AEN"}]
         symmetryEvaluator = sym.SymmetryContactMapEvaluator(symmetries3PTB)
         symmetryEvaluatorEmpty = sym.SymmetryContactMapEvaluator()
@@ -596,9 +610,10 @@ ATOM      5  CB  CYS A   2       8.108  20.445  11.030  1.00 16.53           C  
 
     def test_PDB_interface_XTC(self):
         golden = "tests/data/ain_native_fixed.pdb"
+        topology = utilities.getTopologyFile(golden)
         xtc_obj = mdtraj.load("tests/data/ain_native_fixed.xtc", top=golden)
         xtc = atomset.PDB()
-        xtc.initialise(xtc_obj, resname="AIN")
+        xtc.initialise(xtc_obj, resname="AIN", topology=topology)
         golden_pdb = atomset.PDB()
         golden_pdb.initialise(golden, resname="AIN")
         self.assertEqual(len(golden_pdb), len(xtc))

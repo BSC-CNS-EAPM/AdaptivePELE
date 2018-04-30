@@ -26,7 +26,7 @@ def extractCOMMatrix(clusters, resname, topology=None):
         metrics[index] = cluster.metrics[cluster.metricCol]
         contacts[index] = cluster.contacts
         ligandPDB = atomset.PDB()
-        ligandPDB.initialise(cluster.pdb.get_pdb_string(topology), resname=resname)
+        ligandPDB.initialise(cluster.pdb.get_pdb_string(), resname=resname, topology=topology)
         cluster_matrix[index, :] = ligandPDB.extractCOM()
         population[index] = cluster.elements
         total_elements += cluster.elements

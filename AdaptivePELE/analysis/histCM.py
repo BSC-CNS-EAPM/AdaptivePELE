@@ -19,12 +19,16 @@ def parseArguments():
 
 
 def generateConformations(resname, clAcc, trajectory, topology):
+    if topology is None:
+        topology_contents = None
+    else:
+        topology_contents = utilities.getTopologyFile(topology)
     if clAcc is None:
         for traj in trajectory:
             snapshots = utilities.getSnapshots(traj, topology=topology)
             for snapshot in snapshots:
                 PDBobj = atomset.PDB()
-                PDBobj.initialise(snapshot, resname)
+                PDBobj.initialise(snapshot, resname=resname, topology=topology_contents)
                 yield PDBobj
     else:
         for cluster in clAcc.clusters.clusters:

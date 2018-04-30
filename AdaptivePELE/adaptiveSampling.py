@@ -645,7 +645,7 @@ def main(jsonParams, clusteringHook=None):
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
-                                     outputPathConstants.clusteringOutputObject % i, writeAll, topology=topology)
+                                     outputPathConstants.clusteringOutputObject % i, writeAll)
 
         if i > 0:
             # Remove old clustering object, since we already have a newer one
