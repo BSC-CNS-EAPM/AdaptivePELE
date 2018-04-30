@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Add __version__ attribute to package
     - Add possibility of skipping first structure of each trajectory in
       clustering when calling cluster function
+    - Add compatibility with non-pdb trajectories
 
 ### Behaviour changes from previous version:
 

@@ -569,15 +569,15 @@ In order to analyse simulation results, a bunch of scripts are provided in ``Ada
 
 Example to print column 5 evolution with gnuplot::
 
-    python -m AdaptivePELE.analysis.plotAdaptive 4 2 5 report_ -rmsd | gnuplot -persist
+    python -m AdaptivePELE.analysis.plotAdaptive 4 2 5 report_ -lines | gnuplot -persist
 
-It prints the evolution of column 5 (e.g. RMSD) in report_* files with lines (-rmsd) in epochs of 4 steps.
+It prints the evolution of column 5 (e.g. RMSD) in report_* files with lines in epochs of 4 steps.
 
 Example to print BE against RMSD with gnuplot::
 
-    python -m AdaptivePELE.analysis.plotAdaptive 4 5 6 report_ -be | gnuplot -persist
+    python -m AdaptivePELE.analysis.plotAdaptive 4 5 6 report_ -points | gnuplot -persist
 
-It prints the column 6 against column 5 with points (-be). Epoch length is ignored in this case
+It prints the column 6 against column 5 with points. Epoch length is ignored in this case
 
 To plot the evolution of the number of clusters along the simulation::
 
@@ -603,5 +603,34 @@ and returns two arguments: *clustering* and *hasChanged*. *clustering* refers to
         return clustering, hasChanged
 
 
-.. [APELE] Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, https://www.nature.com/articles/s41598-017-08445-5
 
+Non-PDB trajectories
+--------------------
+
+Starting from version 1.5, AdaptivePELE supports working with non-PDB
+trajectories by relying on the mdtraj library [MDTRAJ]_, with only minor changes in
+the exposed interface of the atomset module. However, some caution is needed
+when using mdtraj to convert between formats:
+
+* Mdtraj does not keep the chain names, for example, if we have a pdb with 2
+  chains, *A* for the protein and *L* for the ligand, mdtraj will rewrite the
+  PDB chains as *A* and *B*
+
+* Mdtraj does not keep protonation states, for example, if we have histidines
+  with different states (*HIS*, *HID* and *HIP*) all will be written as *HIS*
+
+To overcome these issues, the splitTrajectories script in the analysis
+subpackage can be used:::
+
+    python -m AdaptivePELE.analysis.splitTrajectory 0/trajectory_10.xtc -o output_pdb --top topology.pdb --structs 2
+
+
+The top parameter stands for topology and is necessary for dealing with xtc
+trajectories. Typically is a pdb file with the description of the system. The
+call shown above will extract the second, fifth and tenth snapshots of the file
+0/trajectory_10.xtc into the folder output_pdb, as separate files for a system that can be
+described with the file topology.pdb
+
+
+.. [APELE] Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, https://www.nature.com/articles/s41598-017-08445-5
+.. [MDTRAJ] Robert T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, http://mdtraj.org

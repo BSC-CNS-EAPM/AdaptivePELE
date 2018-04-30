@@ -51,8 +51,10 @@ def getSnapshots(trajectoryFile, verbose=False, topology=None):
         :type trajectoryFile: str
         :param verbose: Add verbose to snapshots
         :type verbose: bool
+        :param topology: Topology file object
+        :type topology: str
 
-        :returns: str -- Snapshots with information
+        :returns: iterable -- Snapshots with information
     """
     ext = os.path.splitext(trajectoryFile)[1]
     if ext == ".pdb":
@@ -200,6 +202,16 @@ def getSortedEigen(T):
 
 
 def get_epoch_folders(path):
+    """
+        List the folders belonging to an adaptive simulation and containing
+        trajectories and reports
+
+        :param path: Path where to check for the folders
+        :type path: str
+
+        :returns: list -- List of folders belonging to the simulation, sorted
+
+    """
     allFolders = os.listdir(path)
     folders = [epoch for epoch in allFolders if epoch.isdigit()]
     folders.sort(key=int)

@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5
               </div>
             
           
@@ -533,7 +533,7 @@ considered in contact(default 8)</li>
 </table>
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.Clustering.addSnapshotToCluster">
-<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>trajNum</em>, <em>snapshot</em>, <em>origCluster</em>, <em>snapshotNum</em>, <em>metrics=None</em>, <em>col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>trajNum</em>, <em>snapshot</em>, <em>origCluster</em>, <em>snapshotNum</em>, <em>metrics=None</em>, <em>col=None</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster a snapshot using the leader algorithm</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -546,6 +546,7 @@ considered in contact(default 8)</li>
 <li><strong>snapshotNum</strong> (<em>int</em>) – Number of snapshot in its trajectory</li>
 <li><strong>metrics</strong> (<em>numpy.Array</em>) – Array with the metrics of the snapshot</li>
 <li><strong>col</strong> (<em>int</em>) – Column of the desired metrics</li>
+<li><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
@@ -558,13 +559,17 @@ considered in contact(default 8)</li>
 
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.Clustering.cluster">
-<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em>, <em>ignoreFirstRow=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.cluster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em>, <em>ignoreFirstRow=False</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the snaptshots contained in the paths folder</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>list</em>) – List of folders with the snapshots</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paths</strong> (<em>list</em>) – List of folders with the snapshots</li>
+<li><strong>topology</strong> (<em>str</em>) – Topology file for non-pdb trajectories</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -719,7 +724,7 @@ trajectory and  write it to a PDB file</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.Clustering.writePathwayTrajectory">
-<code class="descname">writePathwayTrajectory</code><span class="sig-paren">(</span><em>pathway</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.writePathwayTrajectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.writePathwayTrajectory" title="Permalink to this definition">¶</a></dt>
+<code class="descname">writePathwayTrajectory</code><span class="sig-paren">(</span><em>pathway</em>, <em>filename</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.writePathwayTrajectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.writePathwayTrajectory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a list of cluster forming a pathway into a trajectory pdb file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -728,6 +733,7 @@ trajectory and  write it to a PDB file</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>pathway</strong> (<em>list</em>) – List of clusters that form the pathway</li>
 <li><strong>filename</strong> (<em>str</em>) – Path where to write the trajectory</li>
+<li><strong>topology</strong> (<em>list</em>) – Lines of topology file</li>
 </ul>
 </td>
 </tr>
@@ -1124,7 +1130,7 @@ considered in contact(default 8)</li>
 </table>
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.addSnapshotToCluster">
-<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>snapshot</em>, <em>metrics=None</em>, <em>col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#SequentialLastSnapshotClustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">addSnapshotToCluster</code><span class="sig-paren">(</span><em>snapshot</em>, <em>metrics=None</em>, <em>col=None</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#SequentialLastSnapshotClustering.addSnapshotToCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.addSnapshotToCluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster a snapshot using the leader algorithm</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1135,6 +1141,7 @@ considered in contact(default 8)</li>
 <li><strong>snapshot</strong> (<em>str</em>) – Snapshot to add</li>
 <li><strong>metrics</strong> (<em>numpy.Array</em>) – Array with the metrics of the snapshot</li>
 <li><strong>col</strong> (<em>int</em>) – Column of the desired metrics</li>
+<li><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
@@ -1147,13 +1154,17 @@ considered in contact(default 8)</li>
 
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.cluster">
-<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#SequentialLastSnapshotClustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.cluster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#SequentialLastSnapshotClustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the snaptshots contained in the paths folder</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>list</em>) – List of folders with the snapshots</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paths</strong> (<em>list</em>) – List of folders with the snapshots</li>
+<li><strong>topology</strong> (<em>str</em>) – Topology file for non-pdb trajectories</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>

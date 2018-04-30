@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5
               </div>
             
           
@@ -147,13 +147,13 @@
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">linalg</span>
+<span class="kn">import</span> <span class="nn">mdtraj</span> <span class="k">as</span> <span class="nn">md</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">RMSDCalculator</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">RMSDCalculator</span><span class="p">,</span> <span class="n">atomset</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">utils</span>
-<span class="kn">import</span> <span class="nn">AdaptivePELE.atomset.atomset</span> <span class="k">as</span> <span class="nn">atomset</span>
 
 
 <span class="k">class</span> <span class="nc">UnsatisfiedDependencyException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -182,7 +182,7 @@
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outputDir</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="getSnapshots"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getSnapshots">[docs]</a><span class="k">def</span> <span class="nf">getSnapshots</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="getSnapshots"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getSnapshots">[docs]</a><span class="k">def</span> <span class="nf">getSnapshots</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the snapshots</span>
 
@@ -190,20 +190,30 @@
 <span class="sd">        :type trajectoryFile: str</span>
 <span class="sd">        :param verbose: Add verbose to snapshots</span>
 <span class="sd">        :type verbose: bool</span>
+<span class="sd">        :param topology: Topology file object</span>
+<span class="sd">        :type topology: str</span>
 
-<span class="sd">        :returns: str -- Snapshots with information</span>
+<span class="sd">        :returns: iterable -- Snapshots with information</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inputFile</span><span class="p">:</span>
-        <span class="n">inputFileContent</span> <span class="o">=</span> <span class="n">inputFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.pdb&quot;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inputFile</span><span class="p">:</span>
+            <span class="n">inputFileContent</span> <span class="o">=</span> <span class="n">inputFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-    <span class="n">snapshots</span> <span class="o">=</span> <span class="n">inputFileContent</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;ENDMDL&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">snapshots</span> <span class="o">=</span> <span class="n">snapshots</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">snapshots</span>
+        <span class="n">snapshots</span> <span class="o">=</span> <span class="n">inputFileContent</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;ENDMDL&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">snapshots</span> <span class="o">=</span> <span class="n">snapshots</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">snapshots</span>
 
-    <span class="n">remarkInfo</span> <span class="o">=</span> <span class="s2">&quot;REMARK 000 File created using PELE++</span><span class="se">\n</span><span class="s2">REMARK source            : </span><span class="si">%s</span><span class="se">\n</span><span class="s2">REMARK original model nr : </span><span class="si">%d</span><span class="se">\n</span><span class="s2">REMARK First snapshot is 1, not 0 (as opposed to report)</span><span class="se">\n</span><span class="s2">&quot;</span>
-    <span class="n">snapshotsWithInfo</span> <span class="o">=</span> <span class="p">[</span><span class="n">remarkInfo</span> <span class="o">%</span> <span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">snapshot</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)]</span>
+        <span class="n">remarkInfo</span> <span class="o">=</span> <span class="s2">&quot;REMARK 000 File created using PELE++</span><span class="se">\n</span><span class="s2">REMARK source            : </span><span class="si">%s</span><span class="se">\n</span><span class="s2">REMARK original model nr : </span><span class="si">%d</span><span class="se">\n</span><span class="s2">REMARK First snapshot is 1, not 0 (as opposed to report)</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">snapshotsWithInfo</span> <span class="o">=</span> <span class="p">[</span><span class="n">remarkInfo</span> <span class="o">%</span> <span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">snapshot</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.xtc&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Topology needed for loading xtc files&quot;</span><span class="p">)</span>
+        <span class="n">snapshotsWithInfo</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecongnized file extension for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">trajectoryFile</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">snapshotsWithInfo</span></div>
 
 
@@ -255,7 +265,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Symmetry dictionary correctly defined!&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="getRMSD"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getRMSD">[docs]</a><span class="k">def</span> <span class="nf">getRMSD</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">nativePDB</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">):</span>
+<div class="viewcode-block" id="getRMSD"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getRMSD">[docs]</a><span class="k">def</span> <span class="nf">getRMSD</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">nativePDB</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the RMSD of a trajectory, given a native and symmetries</span>
 
@@ -267,16 +277,19 @@
 <span class="sd">        :type resname: str</span>
 <span class="sd">        :param symmetries: Symmetries dictionary list with independent symmetry groups</span>
 <span class="sd">        :type symmetries: list of dict</span>
+<span class="sd">        :param topology: Topology file for non-pdb trajectories</span>
+<span class="sd">        :type topology: str</span>
 
 <span class="sd">        :return: np.array -- Array with the rmsd values of the trajectory</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">snapshots</span> <span class="o">=</span> <span class="n">getSnapshots</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+    <span class="n">snapshots</span> <span class="o">=</span> <span class="n">getSnapshots</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+    <span class="n">topology_contents</span> <span class="o">=</span> <span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
     <span class="n">rmsds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">snapshots</span><span class="p">))</span>
     <span class="n">RMSDCalc</span> <span class="o">=</span> <span class="n">RMSDCalculator</span><span class="o">.</span><span class="n">RMSDCalculator</span><span class="p">(</span><span class="n">symmetries</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">):</span>
         <span class="n">snapshotPDB</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
-        <span class="n">snapshotPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
+        <span class="n">snapshotPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_contents</span><span class="p">)</span>
 
         <span class="n">rmsds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">RMSDCalc</span><span class="o">.</span><span class="n">computeRMSD</span><span class="p">(</span><span class="n">nativePDB</span><span class="p">,</span> <span class="n">snapshotPDB</span><span class="p">)</span>
 
@@ -328,6 +341,16 @@
 
 
 <div class="viewcode-block" id="get_epoch_folders"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.get_epoch_folders">[docs]</a><span class="k">def</span> <span class="nf">get_epoch_folders</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List the folders belonging to an adaptive simulation and containing</span>
+<span class="sd">        trajectories and reports</span>
+
+<span class="sd">        :param path: Path where to check for the folders</span>
+<span class="sd">        :type path: str</span>
+
+<span class="sd">        :returns: list -- List of folders belonging to the simulation, sorted</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">allFolders</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="n">folders</span> <span class="o">=</span> <span class="p">[</span><span class="n">epoch</span> <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">allFolders</span> <span class="k">if</span> <span class="n">epoch</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
     <span class="n">folders</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
@@ -460,6 +483,77 @@
             <span class="c1"># and energy</span>
             <span class="k">return</span> <span class="n">i</span><span class="o">+</span><span class="mi">4</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No SASA metric found in control file!!! Please add it in order to use the moving box feature&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getTopologyFile"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getTopologyFile">[docs]</a><span class="k">def</span> <span class="nf">getTopologyFile</span><span class="p">(</span><span class="n">structure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract the topology information to write structures from xtc format</span>
+
+<span class="sd">        :param structure: Pdb file with the topology information</span>
+<span class="sd">        :type structure: str</span>
+
+<span class="sd">        :return: list of str -- The lines of the topology file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ATOM&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;HETATM&quot;</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">top</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">line</span><span class="p">[:</span><span class="mi">30</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s%s%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="mi">54</span><span class="p">:]]))</span>
+    <span class="k">return</span> <span class="n">top</span></div>
+
+
+<div class="viewcode-block" id="write_mdtraj_object_PDB"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.write_mdtraj_object_PDB">[docs]</a><span class="k">def</span> <span class="nf">write_mdtraj_object_PDB</span><span class="p">(</span><span class="n">conformation</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">topology</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write a snapshot from a xtc trajectory to pdb</span>
+
+<span class="sd">        :param conformation: Mdtraj trajectory object to write</span>
+<span class="sd">        :type structure: str or Trajectory</span>
+<span class="sd">        :param output: Output where to write the object</span>
+<span class="sd">        :type output: str</span>
+<span class="sd">        :param topology: Topoloy-like object</span>
+<span class="sd">        :type topology: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">PDB</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
+    <span class="n">PDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">conformation</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+    <span class="n">PDB</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_mdtraj_object_PDBstring"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.get_mdtraj_object_PDBstring">[docs]</a><span class="k">def</span> <span class="nf">get_mdtraj_object_PDBstring</span><span class="p">(</span><span class="n">conformation</span><span class="p">,</span> <span class="n">topology</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the pdb string of a snapshot from a xtc trajectory to pdb</span>
+
+<span class="sd">        :param conformation: Mdtraj trajectory object to write</span>
+<span class="sd">        :type structure: str or Trajectory</span>
+<span class="sd">        :param topology: Topoloy-like object</span>
+<span class="sd">        :type topology: list</span>
+
+<span class="sd">        :returns: str -- The pdb representation of a snapshot from a xtc</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">PDB</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
+    <span class="n">PDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">conformation</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">PDB</span><span class="o">.</span><span class="n">get_pdb_string</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="write_xtc_to_pdb"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.write_xtc_to_pdb">[docs]</a><span class="k">def</span> <span class="nf">write_xtc_to_pdb</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">topology</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the pdb string of a snapshot from a xtc trajectory to pdb</span>
+
+<span class="sd">        :param filename: Path to the xtc trajectory</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param output_file: Output where to write the object</span>
+<span class="sd">        :type output_file: str</span>
+<span class="sd">        :param topology: Topology file object</span>
+<span class="sd">        :type topology: str</span>
+
+<span class="sd">        :returns: str -- The pdb representation of a snapshot from a xtc</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">topology_contents</span> <span class="o">=</span> <span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
+    <span class="n">xtc_object</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+    <span class="n">pdb</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
+    <span class="n">pdb</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">xtc_object</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_contents</span><span class="p">)</span>
+    <span class="n">pdb</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
