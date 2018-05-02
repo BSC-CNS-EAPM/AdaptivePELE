@@ -554,6 +554,33 @@
     <span class="n">pdb</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
     <span class="n">pdb</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">xtc_object</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_contents</span><span class="p">)</span>
     <span class="n">pdb</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="convert_trajectory_to_pdb"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.convert_trajectory_to_pdb">[docs]</a><span class="k">def</span> <span class="nf">convert_trajectory_to_pdb</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write a trajectory from a non-pdb trajectory to pdb format</span>
+
+<span class="sd">        :param trajectory: Trajectory to convert</span>
+<span class="sd">        :type trajectory: str</span>
+<span class="sd">        :param topology: Topology file</span>
+<span class="sd">        :type topology: str</span>
+<span class="sd">        :param output: Filename of the ouput file</span>
+<span class="sd">        :type output: str</span>
+<span class="sd">        :param output_folder: Folder where to store the output trajectory</span>
+<span class="sd">        :type output_folder: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+    <span class="n">topology_contents</span> <span class="o">=</span> <span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
+    <span class="n">traj</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">n_frames</span><span class="p">):</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">PDB</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
+            <span class="n">PDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_contents</span><span class="p">)</span>
+            <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;MODEL </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">PDB</span><span class="o">.</span><span class="n">pdb</span><span class="p">)</span>
+            <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ENDMDL</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;END</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

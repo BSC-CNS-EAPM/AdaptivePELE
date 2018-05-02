@@ -725,6 +725,9 @@ chains, <em>A</em> for the protein and <em>L</em> for the ligand, mdtraj will re
 PDB chains as <em>A</em> and <em>B</em></li>
 <li>Mdtraj does not keep protonation states, for example, if we have histidines
 with different states (<em>HIS</em>, <em>HID</em> and <em>HIP</em>) all will be written as <em>HIS</em></li>
+<li>Mdtraj stores atomic coordinates in nanometers which leads to lose of
+precision when converting to Amstrong, however this only affects the second
+or third decimal, so most structures should be fine</li>
 </ul>
 <p>To overcome these issues, the splitTrajectories script in the analysis
 subpackage can be used::</p>
@@ -735,6 +738,14 @@ subpackage can be used::</p>
 trajectories. Typically is a pdb file with the description of the system. The
 call shown above will extract the second, fifth and tenth snapshots of the file
 0/trajectory_10.xtc into the folder output_pdb, as separate files for a system that can be
+described with the file topology.pdb</p>
+<p>If a whole trajectory has to be converted one can also use the
+convertTrajectory script, also in the analysis subpackage:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">convertTrajectory</span> <span class="mi">0</span><span class="o">/</span><span class="n">trajectory_3</span><span class="o">.</span><span class="n">xtc</span> <span class="o">--</span><span class="n">top</span> <span class="n">topology</span><span class="o">.</span><span class="n">pdb</span> <span class="o">-</span><span class="n">o</span> <span class="n">trajectory_0_3</span><span class="o">.</span><span class="n">pdb</span> <span class="o">--</span><span class="nb">dir</span> <span class="n">outupt_pdb</span>
+</pre></div>
+</div>
+<p>As before, the top parameter stands for topology. The
+call shown above will convert the file 0/trajectory_3.xtc into the file output_pdb/trajectory_0_3.pdb, for a system that can be
 described with the file topology.pdb</p>
 <table class="docutils citation" frame="void" id="apele" rules="none">
 <colgroup><col class="label" /><col /></colgroup>

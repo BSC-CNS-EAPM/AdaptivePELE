@@ -619,6 +619,10 @@ when using mdtraj to convert between formats:
 * Mdtraj does not keep protonation states, for example, if we have histidines
   with different states (*HIS*, *HID* and *HIP*) all will be written as *HIS*
 
+* Mdtraj stores atomic coordinates in nanometers which leads to lose of
+  precision when converting to Amstrong, however this only affects the second
+  or third decimal, so most structures should be fine
+
 To overcome these issues, the splitTrajectories script in the analysis
 subpackage can be used:::
 
@@ -629,6 +633,15 @@ The top parameter stands for topology and is necessary for dealing with xtc
 trajectories. Typically is a pdb file with the description of the system. The
 call shown above will extract the second, fifth and tenth snapshots of the file
 0/trajectory_10.xtc into the folder output_pdb, as separate files for a system that can be
+described with the file topology.pdb
+
+If a whole trajectory has to be converted one can also use the
+convertTrajectory script, also in the analysis subpackage::
+
+    python -m AdaptivePELE.analysis.convertTrajectory 0/trajectory_3.xtc --top topology.pdb -o trajectory_0_3.pdb --dir outupt_pdb
+
+As before, the top parameter stands for topology. The
+call shown above will convert the file 0/trajectory_3.xtc into the file output_pdb/trajectory_0_3.pdb, for a system that can be
 described with the file topology.pdb
 
 
