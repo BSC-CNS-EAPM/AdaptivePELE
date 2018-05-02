@@ -415,3 +415,30 @@ def write_xtc_to_pdb(filename, output_file, topology):
     pdb = atomset.PDB()
     pdb.initialise(xtc_object, topology=topology_contents)
     pdb.writePDB(output_file)
+
+
+def convert_trajectory_to_pdb(trajectory, topology, output, output_folder):
+    """
+        Write a trajectory from a non-pdb trajectory to pdb format
+
+        :param trajectory: Trajectory to convert
+        :type trajectory: str
+        :param topology: Topology file
+        :type topology: str
+        :param output: Filename of the ouput file
+        :type output: str
+        :param output_folder: Folder where to store the output trajectory
+        :type output_folder: str
+    """
+    output = os.path.join(output_folder, output)
+    topology_contents = getTopologyFile(topology)
+    traj = md.load(trajectory, top=topology)
+    with open(output, "w") as fw:
+        for i in range(traj.n_frames):
+            conf = traj.slice(i, copy=False)
+            PDB = atomset.PDB()
+            PDB.initialise(conf, topology=topology_contents)
+            fw.write("MODEL %d\n" % (i+1))
+            fw.write(PDB.pdb)
+            fw.write("ENDMDL\n")
+        fw.write("END\n")
