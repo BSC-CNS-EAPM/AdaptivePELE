@@ -57,7 +57,7 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
         os.makedirs(destFolder)
     structureFolder = os.path.join(path_structures, "%d", trajNames+"_%d*")
     for trajFile, extraInfo in extract_info.items():
-        pdbFile = glob.glob(structureFolder % trajFile)
+        pdbFile = glob.glob(structureFolder % trajFile)[0]
         try:
             snapshots = utilities.getSnapshots(pdbFile, topology=topology)
         except IOError:
