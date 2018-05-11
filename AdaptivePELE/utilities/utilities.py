@@ -8,13 +8,13 @@ import numpy as np
 import string
 import json
 from scipy import linalg
+import mdtraj as md
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
-from AdaptivePELE.atomset import RMSDCalculator
+from AdaptivePELE.atomset import RMSDCalculator, atomset
 from AdaptivePELE.freeEnergies import utils
-import AdaptivePELE.atomset.atomset as atomset
 
 
 class UnsatisfiedDependencyException(Exception):
@@ -43,7 +43,7 @@ def makeFolder(outputDir):
         os.makedirs(outputDir)
 
 
-def getSnapshots(trajectoryFile, verbose=False):
+def getSnapshots(trajectoryFile, verbose=False, topology=None):
     """
         Gets the snapshots
 
@@ -51,20 +51,30 @@ def getSnapshots(trajectoryFile, verbose=False):
         :type trajectoryFile: str
         :param verbose: Add verbose to snapshots
         :type verbose: bool
+        :param topology: Topology file object
+        :type topology: str
 
-        :returns: str -- Snapshots with information
+        :returns: iterable -- Snapshots with information
     """
-    with open(trajectoryFile, "r") as inputFile:
-        inputFileContent = inputFile.read()
+    ext = os.path.splitext(trajectoryFile)[1]
+    if ext == ".pdb":
+        with open(trajectoryFile, "r") as inputFile:
+            inputFileContent = inputFile.read()
 
-    snapshots = inputFileContent.split("ENDMDL")
-    if len(snapshots) > 1:
-        snapshots = snapshots[:-1]
-    if not verbose:
-        return snapshots
+        snapshots = inputFileContent.split("ENDMDL")
+        if len(snapshots) > 1:
+            snapshots = snapshots[:-1]
+        if not verbose:
+            return snapshots
 
-    remarkInfo = "REMARK 000 File created using PELE++\nREMARK source            : %s\nREMARK original model nr : %d\nREMARK First snapshot is 1, not 0 (as opposed to report)\n"
-    snapshotsWithInfo = [remarkInfo % (trajectoryFile, i+1)+snapshot for i, snapshot in enumerate(snapshots)]
+        remarkInfo = "REMARK 000 File created using PELE++\nREMARK source            : %s\nREMARK original model nr : %d\nREMARK First snapshot is 1, not 0 (as opposed to report)\n"
+        snapshotsWithInfo = [remarkInfo % (trajectoryFile, i+1)+snapshot for i, snapshot in enumerate(snapshots)]
+    elif ext == ".xtc":
+        if topology is None:
+            raise ValueError("Topology needed for loading xtc files")
+        snapshotsWithInfo = md.load(trajectoryFile, top=topology)
+    else:
+        raise ValueError("Unrecongnized file extension for %s" % trajectoryFile)
     return snapshotsWithInfo
 
 
@@ -116,7 +126,7 @@ def assertSymmetriesDict(symmetries, PDB):
         print("Symmetry dictionary correctly defined!")
 
 
-def getRMSD(traj, nativePDB, resname, symmetries):
+def getRMSD(traj, nativePDB, resname, symmetries, topology=None):
     """
         Computes the RMSD of a trajectory, given a native and symmetries
 
@@ -128,16 +138,19 @@ def getRMSD(traj, nativePDB, resname, symmetries):
         :type resname: str
         :param symmetries: Symmetries dictionary list with independent symmetry groups
         :type symmetries: list of dict
+        :param topology: Topology file for non-pdb trajectories
+        :type topology: str
 
         :return: np.array -- Array with the rmsd values of the trajectory
     """
 
-    snapshots = getSnapshots(traj)
+    snapshots = getSnapshots(traj, topology=topology)
+    topology_contents = getTopologyFile(topology)
     rmsds = np.zeros(len(snapshots))
     RMSDCalc = RMSDCalculator.RMSDCalculator(symmetries)
     for i, snapshot in enumerate(snapshots):
         snapshotPDB = atomset.PDB()
-        snapshotPDB.initialise(snapshot, resname=resname)
+        snapshotPDB.initialise(snapshot, resname=resname, topology=topology_contents)
 
         rmsds[i] = RMSDCalc.computeRMSD(nativePDB, snapshotPDB)
 
@@ -189,6 +202,16 @@ def getSortedEigen(T):
 
 
 def get_epoch_folders(path):
+    """
+        List the folders belonging to an adaptive simulation and containing
+        trajectories and reports
+
+        :param path: Path where to check for the folders
+        :type path: str
+
+        :returns: list -- List of folders belonging to the simulation, sorted
+
+    """
     allFolders = os.listdir(path)
     folders = [epoch for epoch in allFolders if epoch.isdigit()]
     folders.sort(key=int)
@@ -321,3 +344,101 @@ def getSASAcolumnFromControlFile(JSONdict):
             # and energy
             return i+4
     raise ValueError("No SASA metric found in control file!!! Please add it in order to use the moving box feature")
+
+
+def getTopologyFile(structure):
+    """
+        Extract the topology information to write structures from xtc format
+
+        :param structure: Pdb file with the topology information
+        :type structure: str
+
+        :return: list of str -- The lines of the topology file
+    """
+    top = []
+    with open(structure) as f:
+        for line in f:
+            if not (line.startswith("ATOM") or line.startswith("HETATM")):
+                continue
+            else:
+                top.append("".join([line[:30], "%s%s%s", line[54:]]))
+    return top
+
+
+def write_mdtraj_object_PDB(conformation, output, topology):
+    """
+        Write a snapshot from a xtc trajectory to pdb
+
+        :param conformation: Mdtraj trajectory object to write
+        :type structure: str or Trajectory
+        :param output: Output where to write the object
+        :type output: str
+        :param topology: Topoloy-like object
+        :type topology: list
+    """
+    PDB = atomset.PDB()
+    PDB.initialise(conformation, topology=topology)
+    PDB.writePDB(output)
+
+
+def get_mdtraj_object_PDBstring(conformation, topology):
+    """
+        Get the pdb string of a snapshot from a xtc trajectory to pdb
+
+        :param conformation: Mdtraj trajectory object to write
+        :type structure: str or Trajectory
+        :param topology: Topoloy-like object
+        :type topology: list
+
+        :returns: str -- The pdb representation of a snapshot from a xtc
+    """
+    PDB = atomset.PDB()
+    PDB.initialise(conformation, topology=topology)
+    return PDB.get_pdb_string()
+
+
+def write_xtc_to_pdb(filename, output_file, topology):
+    """
+        Get the pdb string of a snapshot from a xtc trajectory to pdb
+
+        :param filename: Path to the xtc trajectory
+        :type filename: str
+        :param output_file: Output where to write the object
+        :type output_file: str
+        :param topology: Topology file object
+        :type topology: str
+
+        :returns: str -- The pdb representation of a snapshot from a xtc
+    """
+    topology_contents = getTopologyFile(topology)
+    xtc_object = md.load(filename, top=topology)
+    pdb = atomset.PDB()
+    pdb.initialise(xtc_object, topology=topology_contents)
+    pdb.writePDB(output_file)
+
+
+def convert_trajectory_to_pdb(trajectory, topology, output, output_folder):
+    """
+        Write a trajectory from a non-pdb trajectory to pdb format
+
+        :param trajectory: Trajectory to convert
+        :type trajectory: str
+        :param topology: Topology file
+        :type topology: str
+        :param output: Filename of the ouput file
+        :type output: str
+        :param output_folder: Folder where to store the output trajectory
+        :type output_folder: str
+    """
+    output = os.path.join(output_folder, output)
+    topology_contents = getTopologyFile(topology)
+    traj = md.load(trajectory, top=topology)
+    with open(output, "w") as fw:
+        for i in range(traj.n_frames):
+            conf = traj.slice(i, copy=False)
+            PDB = atomset.PDB()
+            PDB.initialise(conf, topology=topology_contents)
+            fw.write("MODEL %d\n" % (i+1))
+            fw.write(PDB.pdb)
+            fw.write("ENDMDL\n")
+        fw.write("END\n")

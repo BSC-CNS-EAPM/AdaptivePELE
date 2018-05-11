@@ -10,19 +10,22 @@ from AdaptivePELE.tests import testDensityCalculator as tDensity
 
 
 def parse_args():
-    desc = ("Run testing suite. Possible options are:\na Run all tests\n"
-            "at Runs atomset tests\ns Run spawning tests\nth Run threshold "
-            "calculator tests\nd Run density tests\nc Run clustering tests"
-            "Ad Run adaptive integration tests")
-    parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("--run", default=['a'], nargs="*", help="Tests to run")
+    desc = ("Run testing suite. Possible options are:\na  -- Run all tests\n"
+            "at -- Run atomset tests\ns  -- Run spawning tests\nth -- Run threshold "
+            "calculator tests\nd  -- Run density tests\nc  -- Run clustering tests\n"
+            "Ad -- Run adaptive integration tests")
+    parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument("--run", default=None, nargs="*", help="Tests to run")
     parser.add_argument("--exclude", default=[], nargs="*", help="Tests to exclude")
     args = parser.parse_args()
 
     return args.run, args.exclude
 
+
 def main(run, exclude):
     testSuite = unittest.TestSuite()
+    if run is None:
+        run = ["at", "s", "th", "d", "c", "Ad"]
     to_run = set(run)-set(exclude)
 
     if "at" in to_run or "a" in to_run:

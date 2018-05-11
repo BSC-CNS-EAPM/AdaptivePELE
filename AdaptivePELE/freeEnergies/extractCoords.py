@@ -8,6 +8,7 @@ import re
 import socket
 import shutil
 import sys
+import mdtraj as md
 import numpy as np
 import multiprocess as mp
 from AdaptivePELE.atomset import atomset
@@ -50,10 +51,11 @@ def parseArguments():
     parser.add_argument("-t", "--totalSteps", type=int, default=0, help="Total number of steps in traj. Equivalent to epoch length in adaptive runs")
     parser.add_argument("-nR", "--noRepeat", action="store_true", help="Flag to avoid repeating the rejected steps")
     parser.add_argument("-n", "--numProcessors", type=int, default=None, help="Number of cpus to use")
+    parser.add_argument("--top", type=str, default=None, help="Topology file for non-pdb trajectories")
     # parser.add_argument("-f", nargs='+', help="Files to get coordinates")
     args = parser.parse_args()
 
-    return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors
+    return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors, args.top
 
 
 def getCpuCount():
@@ -145,38 +147,67 @@ def writeToFile(COMs, outputFilename):
             f.write(str(line[-1]) + '\n')
 
 
-def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA):
-    allCoordinates = loadAllResnameAtomsInPdb(filename, lig_resname, writeCA)
-    if writeLigandTrajectory:
-        outputFilename = os.path.join(pathFolder, constants.ligandTrajectoryBasename % extractFilenumber(filename))
-        with open(outputFilename, 'w') as f:
-            f.write("\nENDMDL\n".join(allCoordinates))
+def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology):
+    trajectory = md.load(file_name, top=topology)
     if writeCA:
-        coords = getLigandAlphaCarbonsCoords(allCoordinates[:-1], lig_resname)
+        selection = "(protein and name CA) or (resname '%s' and not element H)" % ligand
+    elif atom_Ids and atom_Ids is not None:
+        selection_list = []
+        for atomID in atom_Ids:
+            _, name, residue = atomID.split(":")
+            selection_list.append("(name %s and resname '%s')" % (name, residue))
+        selection = " or ".join(selection_list)
     else:
-        if atom_Ids is None or len(atom_Ids) == 0:
-            coords = getPDBCOM(allCoordinates, lig_resname)
+        selection = "resname '%s' and not element H" % ligand
+    selected_indices = trajectory.topology.select(selection)
+    if not writeCA and (atom_Ids is None or len(atom_Ids) == 0):
+        # getCOM case
+        # convert nm to A
+        coordinates = 10*md.compute_center_of_mass(trajectory.atom_slice(selected_indices))
+    else:
+        coordinates = 10*trajectory.xyz[:, selected_indices, :].reshape((trajectory.n_frames, -1))
+    return coordinates
+
+
+def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, topology=None):
+    ext = os.path.splitext(filename)[1]
+    if ext == ".pdb":
+        allCoordinates = loadAllResnameAtomsInPdb(filename, lig_resname, writeCA)
+        if writeLigandTrajectory:
+            outputFilename = os.path.join(pathFolder, constants.ligandTrajectoryBasename % extractFilenumber(filename))
+            with open(outputFilename, 'w') as f:
+                f.write("\nENDMDL\n".join(allCoordinates))
+        if writeCA:
+            coords = getLigandAlphaCarbonsCoords(allCoordinates[:-1], lig_resname)
         else:
-            coords = getAtomCoord(allCoordinates, lig_resname, atom_Ids)
+            # because of the way it's split, the last element is empty
+            if atom_Ids is None or len(atom_Ids) == 0:
+                coords = getPDBCOM(allCoordinates[:-1], lig_resname)
+            else:
+                coords = getAtomCoord(allCoordinates[:-1], lig_resname, atom_Ids)
+    elif ext == ".xtc":
+        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA, topology)
+    else:
+        raise ValueError("Unrecongnized file extension for %s" % filename)
 
     outputFilename = getOutputFilename(constants.extractedTrajectoryFolder, filename,
                                        constants.baseExtractedTrajectoryName)
     writeToFile(coords, outputFilename % pathFolder)
 
 
-def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, writeCA, pool=None):
+def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, writeCA, pool=None, topology=None):
     if not os.path.exists(constants.extractedTrajectoryFolder % pathFolder):
         os.makedirs(constants.extractedTrajectoryFolder % pathFolder)
 
-    originalPDBfiles = glob.glob(pathFolder+'/*traj*.pdb')
+    originalPDBfiles = glob.glob(pathFolder+'/*traj*')
     workers = []
     for filename in originalPDBfiles:
         if pool is None:
             # serial version
-            writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA)
+            writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, topology=topology)
         else:
             # multiprocessor version
-            workers.append(pool.apply_async(writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA)))
+            workers.append(pool.apply_async(writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, topology)))
     for w in workers:
         w.get()
 
@@ -310,7 +341,7 @@ def gatherTrajs(constants, folder_name, setNumber, non_Repeat):
     copyTrajectories(nonRepeatedTrajs, constants.gatherNonRepeatedTrajsFilename, folder_name)
 
 
-def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None):
+def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, topology=None):
 
     constants = Constants()
 
@@ -342,7 +373,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
         ligand_trajs_folder = os.path.join(pathFolder, constants.ligandTrajectoryFolder)
         if writeLigandTrajectory and not os.path.exists(ligand_trajs_folder):
             os.makedirs(ligand_trajs_folder)
-        writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, protein_CA, pool=pool)
+        writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, protein_CA, pool=pool, topology=topology)
         if not non_Repeat:
             print("Repeating snapshots from folder %s" % folder_it)
             repeatExtractedSnapshotsInFolder(pathFolder, constants, numtotalSteps, pool=None)
@@ -351,5 +382,5 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
 
 if __name__ == "__main__":
-    folder, atomIds, resname, proteinCA, enforceSequential, writeLigandTraj, totalSteps, setNum, nonRepeat, n_processors = parseArguments()
-    main(folder, atomIds, resname, totalSteps, enforceSequential, writeLigandTraj, setNum, proteinCA, nonRepeat, n_processors)
+    folder, atomIds, resname, proteinCA, enforceSequential, writeLigandTraj, totalSteps, setNum, nonRepeat, n_processors, top = parseArguments()
+    main(folder, atomIds, resname, totalSteps, enforceSequential, writeLigandTraj, setNum, proteinCA, nonRepeat, n_processors, topology=top)

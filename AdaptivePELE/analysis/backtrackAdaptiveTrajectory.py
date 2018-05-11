@@ -9,6 +9,11 @@ import argparse
 import glob
 import itertools
 from AdaptivePELE.utilities import utilities
+from AdaptivePELE.atomset import atomset
+try:
+    basestring
+except NameError:
+    basestring = str
 
 
 def parseArguments():
@@ -26,17 +31,22 @@ def parseArguments():
     parser.add_argument("snapshot", type=int, help="Snapshot to select (in accepted steps)")
     parser.add_argument("-o", type=str, default=None, help="Output path where to write the files")
     parser.add_argument("--name", type=str, default="pathway.pdb", help="Name of the pdb to write the files")
+    parser.add_argument("--top", type=str, default=None, help="Name of the pdb topology for loading non-pdb trajectories")
     args = parser.parse_args()
-    return args.trajectory, args.snapshot, args.epoch, args.o, args.name
+    return args.trajectory, args.snapshot, args.epoch, args.o, args.name, args.top
 
 
-def main(trajectory, snapshot, epoch, outputPath, out_filename):
+def main(trajectory, snapshot, epoch, outputPath, out_filename, topology):
     if outputPath is not None:
         outputPath = os.path.join(outputPath, "")
         if not os.path.exists(outputPath):
             os.makedirs(outputPath)
     else:
         outputPath = ""
+    if topology is not None:
+        topology_contents = utilities.getTopologyFile(topology)
+    else:
+        topology_contents = None
     if os.path.exists(outputPath+out_filename):
         # If the specified name exists, append a number to distinguish the files
         name, ext = os.path.splitext(out_filename)
@@ -50,9 +60,18 @@ def main(trajectory, snapshot, epoch, outputPath, out_filename):
     pathPrefix, epoch = os.path.split(epoch.rstrip("/"))
     sys.stderr.write("Creating pathway...\n")
     while True:
-        filename = glob.glob(os.path.join(pathPrefix, epoch, "*traj*_%d.pdb" % trajectory))
-        snapshots = utilities.getSnapshots(filename[0])
-        snapshots = snapshots[:snapshot+1]
+        filename = glob.glob(os.path.join(pathPrefix, epoch, "*traj*_%d.*" % trajectory))
+        snapshots = utilities.getSnapshots(filename[0], topology=topology)
+        if not isinstance(snapshots[0], basestring):
+            new_snapshots = []
+            for i in range(snapshot+1):
+                snapshot = snapshots.slice(i, copy=False)
+                PDB = atomset.PDB()
+                PDB.initialise(snapshot, topology=topology_contents)
+                new_snapshots.append(PDB.get_pdb_string())
+            snapshots = new_snapshots
+        else:
+            snapshots = snapshots[:snapshot+1]
         pathway.insert(0, snapshots)
         if epoch == '0':
             # Once we get to epoch 0, we just need to append the trajectory
@@ -67,5 +86,5 @@ def main(trajectory, snapshot, epoch, outputPath, out_filename):
 
 
 if __name__ == "__main__":
-    trajectory, snapshot, epoch, outputPath, out_filename = parseArguments()
-    main(trajectory, snapshot, epoch, outputPath, out_filename)
+    traj, num_snapshot, num_epoch, output_path, output_filename, top = parseArguments()
+    main(traj, num_snapshot, num_epoch, output_path, output_filename, top)

@@ -1,6 +1,7 @@
 import argparse
-import numpy as np
+import glob
 import os
+import numpy as np
 from AdaptivePELE.utilities import utilities
 
 
@@ -13,11 +14,12 @@ def parseArgs():
     parser.add_argument('-o', type=str, default="", help="Path where to store the structures")
     parser.add_argument('-c', '--clusters', default=['a'], nargs="*", help="Clusters to extract, if not specified it will extract all")
     parser.add_argument("-t", "-trajectoryName", type=str, default="trajectory", help="Name of the trajectory files, e.g for trajectory_1.pdb the name is trajectory")
+    parser.add_argument("--top", type=str, default=None, help="Topology file for non-pdb trajectories")
     args = parser.parse_args()
     return args
 
 
-def main(representatives_files, path_structures, output="", clusters=None, trajNames="trajectory"):
+def main(representatives_files, path_structures, output="", clusters=None, trajNames="trajectory", topology=None):
     if clusters is None:
         clusters = ['a']
     # Load the representative structures file
@@ -53,19 +55,27 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
             it += 1
         destFolder %= it
         os.makedirs(destFolder)
-    structureFolder = os.path.join(path_structures, "%d", trajNames+"_%d.pdb")
+    structureFolder = os.path.join(path_structures, "%d", trajNames+"_%d*")
     for trajFile, extraInfo in extract_info.items():
-        pdbFile = structureFolder % trajFile
+        pdbFile = glob.glob(structureFolder % trajFile)[0]
         try:
-            snapshots = utilities.getSnapshots(pdbFile)
+            snapshots = utilities.getSnapshots(pdbFile, topology=topology)
         except IOError:
             raise IOError("Unable to open %s, please check that the path to structures provided is correct" % pdbFile)
+        if not isinstance(snapshots[0], basestring):
+            topology_contents = utilities.getTopologyFile(topology)
+        else:
+            topology_contents = None
+
         for pair in extraInfo:
-            with open(os.path.join(destFolder, "cluster_%d.pdb" % pair[0]), "w") as fw:
-                fw.write(snapshots[int(pair[1])])
-                fw.write("\n")
+            if topology_contents is None:
+                with open(os.path.join(destFolder, "cluster_%d.pdb" % pair[0]), "w") as fw:
+                    fw.write(snapshots[int(pair[1])])
+                    fw.write("\n")
+            else:
+                utilities.write_mdtraj_object_PDB(snapshots[int(pair[1])], os.path.join(destFolder, "cluster_%d.pdb" % pair[0]), topology=topology_contents)
 
 
 if __name__ == "__main__":
     arg = parseArgs()
-    main(arg.representatives, arg.structures_path, arg.o, arg.clusters, arg.t)
+    main(arg.representatives, arg.structures_path, arg.o, arg.clusters, arg.t, arg.top)
