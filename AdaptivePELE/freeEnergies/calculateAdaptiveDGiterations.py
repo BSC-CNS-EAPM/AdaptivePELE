@@ -4,14 +4,15 @@ import sys
 import os
 import shutil
 import glob
-import numpy as np
 from AdaptivePELE.freeEnergies import estimateDGAdaptive, prepareMSMFolders
 
 
 def isfinished(folders):
-    for folder in folders:
-        if not os.path.exists(os.path.join(folder, "results_summary.txt")):
-                return False
+    if not folders:
+        return False
+    for folder_it in folders:
+        if not os.path.exists(os.path.join(folder_it, "results_summary.txt")):
+            return False
     return True
 
 

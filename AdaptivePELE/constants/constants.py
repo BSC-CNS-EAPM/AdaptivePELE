@@ -24,7 +24,7 @@ elif "bsc.mn" in machine:
     DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/bin/rev090518/Documents"
 
 elif machine == "bscls309":
-    PELE_EXECUTABLE = "/home/jgilaber/PELE/PELE-1.5/PELE-1.5_mpi"
+    PELE_EXECUTABLE = "/home/jgilaber/PELE/PELE-1.5/bin/PELE-1.5_mpi"
     DATA_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Data"
     DOCUMENTS_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Documents"
 
