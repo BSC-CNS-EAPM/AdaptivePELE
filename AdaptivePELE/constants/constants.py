@@ -16,11 +16,12 @@ elif "mn.bsc" in machine:
     DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/data/rev12360/Data"
     DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/Documents/rev12360"
     PYTHON = "python"
+    
 
 elif "bsc.mn" in machine:
-    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/mniv/rev12455/bin/PELE-1.5_mpi"
-    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev12455/Data"
-    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev12455/Documents"
+    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/bin/rev090518/PELE-1.5_mpi"
+    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/bin/rev090518/Data"
+    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/bin/rev090518/Documents"
 
 elif machine == "bscls309":
     PELE_EXECUTABLE = "/home/jgilaber/PELE/PELE-1.5/PELE-1.5_mpi"
