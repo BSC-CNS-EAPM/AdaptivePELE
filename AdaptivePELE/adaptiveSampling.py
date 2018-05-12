@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import sys
 import shutil
 import os
@@ -8,6 +9,7 @@ import argparse
 import atexit
 import ast
 import numpy as np
+from builtins import range
 from AdaptivePELE.constants import blockNames, constants
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.utilities import utilities
@@ -31,6 +33,11 @@ class EmptyInitialStructuresError(Exception):
     __module__ = Exception.__module__
 
 
+def writeTopologyFile(topology, destination):
+    shutil.copy(topology, destination)
+    return destination
+
+
 def checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputFolder, simulationRunner):
     """
         Check the previous simulation data when restarting a simulation with a
@@ -46,7 +53,7 @@ def checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputFolder, simul
     if simulationRunner.hasExitCondition():
         if simulationRunner.parameters.exitCondition.type != blockNames.ExitConditionType.metricMultipleTrajs:
             return
-        for i in xrange(firstRun):
+        for i in range(firstRun):
             simulationRunner.parameters.exitCondition.checkExitCondition(outputFolder % i)
 
 
@@ -129,11 +136,11 @@ def checkSymmetryDict(clusteringBlock, initialStructures, resname):
     symmetries = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.symmetries, {})
     for structure in initialStructures:
         PDB = atomset.PDB()
-        PDB.initialise(str(structure), resname=resname)
+        PDB.initialise(structure, resname=resname)
         utilities.assertSymmetriesDict(symmetries, PDB)
 
 
-def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries):
+def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries, topology_file):
     """
         Adds a new column in the report file with the RMSD that takes into account symmetries.
         New reports are stored in the fixedReport_i where i is the number of the report
@@ -146,18 +153,20 @@ def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries):
         :type nativeStructure: str
         :param symmetries: Dictionary containg the symmetries of the ligand
         :type symmetries: dict
+        :param topology_file: Topology file for non-pdb trajectories
+        :type topology_file: str
 
         :raise IndexError: If original report file not found in output folder
     """
     outputFilename = "fixedReport_%d"  # move to constants?
-    trajName = "*traj*.pdb"  # move to constants?
+    trajName = "*traj*"  # move to constants?
     reportName = "*report_%d"  # move to constants?
     trajs = glob.glob(os.path.join(outputPath, trajName))
     nativePDB = atomset.PDB()
     nativePDB.initialise(str(nativeStructure), resname=resname)
     for traj in trajs:
         trajNum = utilities.getTrajNum(traj)
-        rmsd = list(utilities.getRMSD(traj, nativePDB, resname, symmetries))
+        rmsd = list(utilities.getRMSD(traj, nativePDB, resname, symmetries, topology=topology_file))
         try:
             reportFilename = glob.glob(os.path.join(outputPath, reportName) % trajNum)[0]
         except IndexError:
@@ -252,7 +261,7 @@ def checkIntegrityClusteringObject(objectPath):
 def __unicodeToStr(data):
     # convert dict
     if isinstance(data, dict):
-        return {__unicodeToStr(key): __unicodeToStr(value) for key, value in data.iteritems()}
+        return {__unicodeToStr(key): __unicodeToStr(value) for key, value in data.items()}
     # convert list
     if isinstance(data, list):
         return [__unicodeToStr(val) for val in data]
@@ -272,7 +281,8 @@ def loadParams(jsonParams):
         :type jsonParams: json str
     """
     jsonFile = open(jsonParams, 'r').read()
-    parsedJSON = json.loads(jsonFile, object_hook=__unicodeToStr)
+    # parsedJSON = json.loads(jsonFile, object_hook=__unicodeToStr)
+    parsedJSON = json.loads(jsonFile)
 
     return parsedJSON[blockNames.ControlFileParams.generalParams], parsedJSON[blockNames.ControlFileParams.spawningBlockname],\
         parsedJSON[blockNames.ControlFileParams.simulationBlockname], parsedJSON[blockNames.ControlFileParams.clusteringBlockname]
@@ -322,7 +332,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return oldClusteringMethod.similarityEvaluator.typeEvaluator != newClusteringMethod.similarityEvaluator.typeEvaluator
 
 
-def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
+def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topology):
     """
         Cluster the trajecotories of a given epoch
 
@@ -332,16 +342,18 @@ def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized):
         :type epoch: int
         :param epochOutputPathTempletized: Path where to find the trajectories
         :type epochOutputPathTempletized: str
+        :param topology: Topology file for non-pdb trajectories
+        :type topology: str
 """
 
     snapshotsJSONSelectionString = generateTrajectorySelectionString(epoch, epochOutputPathTempletized)
     paths = ast.literal_eval(snapshotsJSONSelectionString)
     if len(glob.glob(paths[-1])) == 0:
         sys.exit("No trajectories to cluster! Matching path:%s" % paths[-1])
-    clusteringMethod.cluster(paths)
+    clusteringMethod.cluster(paths, topology=topology)
 
 
-def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner):
+def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner, topology):
     """
         Cluster all previous epochs using the clusteringMethod object
 
@@ -353,13 +365,15 @@ def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletiz
         :type epochOutputPathTempletized: str
         :param simulationRunner: Simulation runner object
         :type simulationRunner: :py:class:`.SimulationRunner`
+        :param topology: Topology file for non-pdb trajectories
+        :type topology: str
 """
     for i in range(finalEpoch):
         simulationRunner.readMappingFromDisk(epochOutputPathTempletized % i)
-        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized)
+        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized, topology)
 
 
-def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner):
+def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topology_file):
     """
         It reads the previous clustering method, and, if there are changes,
         it reclusters the previous trajectories. Returns the clustering object to use
@@ -372,6 +386,8 @@ def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConsta
         :type clusteringBlock: json
         :param spawningParams: Spawning params, to know what reportFile and column to read
         :type spawningParams: :py:class:`.SpawningParams`
+        :param topology_file: Topology file for non-pdb trajectories
+        :type topology_file: str
 
         :returns: :py:class:`.Clustering` -- The clustering method to use in the
             adaptive sampling simulation
@@ -387,11 +403,11 @@ def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConsta
                                                          spawningParams.reportCol)
 
     if needToRecluster(oldClusteringMethod, clusteringMethod):
-        print "Reclustering!"
+        print("Reclustering!")
         startTime = time.time()
-        clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner)
+        clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner, topology_file)
         endTime = time.time()
-        print "Reclustering took %s sec" % (endTime - startTime)
+        print("Reclustering took %s sec" % (endTime - startTime))
     else:
         clusteringMethod = oldClusteringMethod
         clusteringMethod.setCol(spawningParams.reportCol)
@@ -400,7 +416,7 @@ def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConsta
 
 
 def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock,
-                                                         spawningParams, spawningCalculator, simulationRunner):
+                                                         spawningParams, spawningCalculator, simulationRunner, topology_file, topology):
     """
         It reads the previous clustering method, and if there are changes (clustering method or related to thresholds),
         reclusters the previous trajectories. Returns the clustering object to use,
@@ -418,16 +434,20 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
         :type spawningCalculator: :py:class:`.SpawningCalculator`
         :param simulationRunner: :py:class:`.SimulationRunner` Simulation runner object
         :type simulationRunner: :py:class:`.SimulationRunner`
+        :param topology_file: Topology file for non-pdb trajectories
+        :type topology_file: str
+        :param topology: Topology structure for non-pdb trajectories
+        :type topology: list
 
         :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames
     """
 
-    clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner)
+    clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topology_file)
 
     degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.parameters.processors-1, spawningParams, firstRun)
     spawningCalculator.log()
-    print "Degeneracy", degeneracyOfRepresentatives
-    seedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun)
+    print("Degeneracy", degeneracyOfRepresentatives)
+    seedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun, topology_file=topology_file, topology=topology)
     initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(seedingPoints, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
     simulationRunner.updateMappingProcessors(procMapping)
 
@@ -519,24 +539,24 @@ def main(jsonParams, clusteringHook=None):
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
     resname = str(clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.ligandResname])
 
-    print "================================"
-    print "            PARAMS              "
-    print "================================"
-    print "Restarting simulations", restart
-    print "Debug:", debug
+    print("================================")
+    print("            PARAMS              ")
+    print("================================")
+    print("Restarting simulations", restart)
+    print("Debug:", debug)
 
-    print "Iterations: %d, Mpi processors: %d, Pele steps: %d" % (simulationRunner.parameters.iterations, simulationRunner.parameters.processors, simulationRunner.parameters.peleSteps)
+    print("Iterations: %d, Mpi processors: %d, Pele steps: %d" % (simulationRunner.parameters.iterations, simulationRunner.parameters.processors, simulationRunner.parameters.peleSteps))
 
-    print "SpawningType:", spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]
+    print("SpawningType:", spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type])
 
-    print "SimulationType:", simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY[simulationRunner.type]
+    print("SimulationType:", simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY[simulationRunner.type])
     if simulationRunner.hasExitCondition():
-        print "Exit condition:", simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY[simulationRunner.parameters.exitCondition.type]
-    print "Clustering method:", clusteringBlock[blockNames.ClusteringTypes.type]
+        print("Exit condition:", simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY[simulationRunner.parameters.exitCondition.type])
+    print("Clustering method:", clusteringBlock[blockNames.ClusteringTypes.type])
 
-    print "Output path: ", outputPath
-    print "Initial Structures: ", initialStructuresWildcard
-    print "================================\n\n"
+    print("Output path: ", outputPath)
+    print("Initial Structures: ", initialStructuresWildcard)
+    print("================================\n\n")
 
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
     if not initialStructures:
@@ -550,15 +570,16 @@ def main(jsonParams, clusteringHook=None):
 
     utilities.makeFolder(outputPath)
     utilities.makeFolder(outputPathConstants.tmpFolder)
+    topology_file = writeTopologyFile(initialStructures[0], outputPathConstants.topologyFile)
+    topology = utilities.getTopologyFile(initialStructures[0])
     saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
-
     startFromScratch = False
     if restart:
         firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject)
         if firstRun == 0:
             startFromScratch = True
         else:
-            clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner)
+            clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner, topology_file, topology)
             checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner)
 
     if startFromScratch or not restart:
@@ -569,9 +590,11 @@ def main(jsonParams, clusteringHook=None):
         if not debug:
             shutil.rmtree(outputPath)
         utilities.makeFolder(outputPath)
+        topology_file = writeTopologyFile(initialStructures[0], outputPathConstants.topologyFile)
+        topology = utilities.getTopologyFile(initialStructures[0])
 
         if simulationRunner.parameters.runEquilibration:
-            initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningParams.reportFilename, outputPath, resname)
+            initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningParams.reportFilename, outputPath, resname, topology_file)
         clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner)
     peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps,
                                  "BOX_RADIUS": simulationRunner.parameters.boxRadius}
@@ -579,34 +602,31 @@ def main(jsonParams, clusteringHook=None):
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
-        print "Iteration", i
+        print("Iteration", i)
 
-        print "Preparing control file..."
+        print("Preparing control file...")
         preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControlFileDictionary)
 
-        print "Production run..."
+        print("Production run...")
         if not debug:
             startTime = time.time()
             simulationRunner.runSimulation(outputPathConstants.tmpControlFilename % i)
             endTime = time.time()
-            print "PELE %s sec" % (endTime - startTime)
+            print("PELE %s sec" % (endTime - startTime))
 
         simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
 
-        print "Clustering..."
+        print("Clustering...")
         startTime = time.time()
-        clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized)
+        clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topology_file)
         endTime = time.time()
-        print "Clustering ligand: %s sec" % (endTime - startTime)
+        print("Clustering ligand: %s sec" % (endTime - startTime))
 
         if clusteringHook is not None:
-            clusteringMethod, hasChanged = clusteringHook(clusteringMethod, outputPathConstants)
-            if hasChanged:
-                clusteringMethod.emptyClustering()
-                clusterPreviousEpochs(clusteringMethod, i+1, outputPathConstants.epochOutputPathTempletized, simulationRunner)
+            clusteringHook(clusteringMethod, outputPathConstants, simulationRunner, i+1)
 
         if simulationRunner.parameters.modeMovingBox is not None:
-            simulationRunner.getNextIterationBox(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i, resname)
+            simulationRunner.getNextIterationBox(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i, resname, topology_file)
             clustersList, clustersFiltered = filterClustersAccordingToBox(simulationRunner.parameters, clusteringMethod)
         else:
             clustersList = clusteringMethod.clusters.clusters
@@ -617,7 +637,7 @@ def main(jsonParams, clusteringHook=None):
         if degeneracyOfRepresentatives is not None:
             if simulationRunner.parameters.modeMovingBox is not None:
                 degeneracyOfRepresentatives = mergeFilteredClustersAccordingToBox(degeneracyOfRepresentatives, clustersFiltered)
-            print "Degeneracy", degeneracyOfRepresentatives
+            print("Degeneracy", degeneracyOfRepresentatives)
             assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)
         else:
             # When using null spawning the calculate method returns None
@@ -638,22 +658,22 @@ def main(jsonParams, clusteringHook=None):
         # Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:
             if degeneracyOfRepresentatives is not None:
-                numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1)
+                numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1, topology_file=topology_file, topology=topology)
                 simulationRunner.updateMappingProcessors(procMapping)
                 initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
                 peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
 
         if clusteringMethod.symmetries and nativeStructure:
             fixReportsSymmetry(outputPathConstants.epochOutputPathTempletized % i, resname,
-                               nativeStructure, clusteringMethod.symmetries)
+                               nativeStructure, clusteringMethod.symmetries, topology_file)
 
         # check exit condition, if defined
         if simulationRunner.hasExitCondition():
             if simulationRunner.checkExitCondition(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i):
-                print "Simulation exit condition met at iteration %d, stopping" % i
+                print("Simulation exit condition met at iteration %d, stopping" % i)
                 break
             else:
-                print "Simulation exit condition not met at iteration %d, continuing..." % i
+                print("Simulation exit condition not met at iteration %d, continuing..." % i)
 
 if __name__ == '__main__':
     args = parseArgs()

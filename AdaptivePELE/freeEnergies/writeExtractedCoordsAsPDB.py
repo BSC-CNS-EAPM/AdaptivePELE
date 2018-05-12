@@ -4,6 +4,7 @@
     Execution: python generateFiles.py outputDir rawData/traj_*
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 from AdaptivePELE.freeEnergies import computeDeltaG as dg
 import sys
 import numpy as np
@@ -17,7 +18,7 @@ def getNum(trajFilename):
 outputFolder = sys.argv[1]
 files = sys.argv[2:]
 
-print "files", files
+print("files", files)
 
 for filename in files:
     content = np.loadtxt(filename)

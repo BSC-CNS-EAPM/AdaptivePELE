@@ -34,7 +34,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="AdaptivePELE  documentation" href="index.html"/>
-        <link rel="next" title="AdaptivePELE – Package Description" href="AdaptivePELE.html"/>
+        <link rel="next" title="Changelog" href="Changelog.html"/>
         <link rel="prev" title="Welcome to AdaptivePELE’s documentation!" href="index.html"/> 
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.5
               </div>
             
           
@@ -123,8 +123,10 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#dynamical-hooks">Dynamical hooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#non-pdb-trajectories">Non-PDB trajectories</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
 </ul>
 
@@ -679,15 +681,15 @@ If we change a clustering parameter in a restart run, AdaptivePELE will recluste
 <h3>Analysis<a class="headerlink" href="#analysis" title="Permalink to this headline">¶</a></h3>
 <p>In order to analyse simulation results, a bunch of scripts are provided in <code class="docutils literal"><span class="pre">AdaptivePELE/analysis</span></code>. Get help to run them with: <code class="docutils literal"><span class="pre">python</span> <span class="pre">&lt;script&gt;</span> <span class="pre">-h</span></code></p>
 <p>Example to print column 5 evolution with gnuplot:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">2</span> <span class="mi">5</span> <span class="n">report_</span> <span class="o">-</span><span class="n">rmsd</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">2</span> <span class="mi">5</span> <span class="n">report_</span> <span class="o">-</span><span class="n">lines</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
 </pre></div>
 </div>
-<p>It prints the evolution of column 5 (e.g. RMSD) in report_* files with lines (-rmsd) in epochs of 4 steps.</p>
+<p>It prints the evolution of column 5 (e.g. RMSD) in report_* files with lines in epochs of 4 steps.</p>
 <p>Example to print BE against RMSD with gnuplot:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span> <span class="n">report_</span> <span class="o">-</span><span class="n">be</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span> <span class="n">report_</span> <span class="o">-</span><span class="n">points</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
 </pre></div>
 </div>
-<p>It prints the column 6 against column 5 with points (-be). Epoch length is ignored in this case</p>
+<p>It prints the column 6 against column 5 with points. Epoch length is ignored in this case</p>
 <p>To plot the evolution of the number of clusters along the simulation:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">numberOfClusters</span> <span class="o">-</span><span class="n">filename</span> <span class="s2">&quot;plot&quot;</span>
 </pre></div>
@@ -710,10 +712,51 @@ and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clus
     <span class="k">return</span> <span class="n">clustering</span><span class="p">,</span> <span class="n">hasChanged</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="non-pdb-trajectories">
+<h2>Non-PDB trajectories<a class="headerlink" href="#non-pdb-trajectories" title="Permalink to this headline">¶</a></h2>
+<p>Starting from version 1.5, AdaptivePELE supports working with non-PDB
+trajectories by relying on the mdtraj library <a class="reference internal" href="#mdtraj" id="id6">[MDTRAJ]</a>, with only minor changes in
+the exposed interface of the atomset module. However, some caution is needed
+when using mdtraj to convert between formats:</p>
+<ul class="simple">
+<li>Mdtraj does not keep the chain names, for example, if we have a pdb with 2
+chains, <em>A</em> for the protein and <em>L</em> for the ligand, mdtraj will rewrite the
+PDB chains as <em>A</em> and <em>B</em></li>
+<li>Mdtraj does not keep protonation states, for example, if we have histidines
+with different states (<em>HIS</em>, <em>HID</em> and <em>HIP</em>) all will be written as <em>HIS</em></li>
+<li>Mdtraj stores atomic coordinates in nanometers which leads to lose of
+precision when converting to Amstrong, however this only affects the second
+or third decimal, so most structures should be fine</li>
+</ul>
+<p>To overcome these issues, the splitTrajectories script in the analysis
+subpackage can be used::</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">splitTrajectory</span> <span class="mi">0</span><span class="o">/</span><span class="n">trajectory_10</span><span class="o">.</span><span class="n">xtc</span> <span class="o">-</span><span class="n">o</span> <span class="n">output_pdb</span> <span class="o">--</span><span class="n">top</span> <span class="n">topology</span><span class="o">.</span><span class="n">pdb</span> <span class="o">--</span><span class="n">structs</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p>The top parameter stands for topology and is necessary for dealing with xtc
+trajectories. Typically is a pdb file with the description of the system. The
+call shown above will extract the second, fifth and tenth snapshots of the file
+0/trajectory_10.xtc into the folder output_pdb, as separate files for a system that can be
+described with the file topology.pdb</p>
+<p>If a whole trajectory has to be converted one can also use the
+convertTrajectory script, also in the analysis subpackage:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">convertTrajectory</span> <span class="mi">0</span><span class="o">/</span><span class="n">trajectory_3</span><span class="o">.</span><span class="n">xtc</span> <span class="o">--</span><span class="n">top</span> <span class="n">topology</span><span class="o">.</span><span class="n">pdb</span> <span class="o">-</span><span class="n">o</span> <span class="n">trajectory_0_3</span><span class="o">.</span><span class="n">pdb</span> <span class="o">--</span><span class="nb">dir</span> <span class="n">outupt_pdb</span>
+</pre></div>
+</div>
+<p>As before, the top parameter stands for topology. The
+call shown above will convert the file 0/trajectory_3.xtc into the file output_pdb/trajectory_0_3.pdb, for a system that can be
+described with the file topology.pdb</p>
 <table class="docutils citation" frame="void" id="apele" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label">[APELE]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id5">2</a>)</em> Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="mdtraj" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id6">[MDTRAJ]</a></td><td>Robert&nbsp;T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, <a class="reference external" href="http://mdtraj.org">http://mdtraj.org</a></td></tr>
 </tbody>
 </table>
 </div>
@@ -726,7 +769,7 @@ and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clus
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="AdaptivePELE.html" class="btn btn-neutral float-right" title="AdaptivePELE – Package Description" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="Changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral" title="Welcome to AdaptivePELE’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>

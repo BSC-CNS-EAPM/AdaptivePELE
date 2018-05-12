@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import numpy as np
 import glob
@@ -34,34 +35,36 @@ class Cluster:
         return coor.cluster_kmeans(data=trajectories, k=self.numClusters, max_iter=500, stride=self.stride)
 
     def assignNewTrajectories(self, trajs):
-        assign = AssignCenters(self.clusterCentersFile)
+        # wrap the clusterCentersFile argument in a str call to pass pyemma
+        # assign check if isinstance of str
+        assign = AssignCenters(str(self.clusterCentersFile))
         dTrajs = assign.assign(trajs)
         return dTrajs
 
     def clusterTrajectories(self):
-        print "Loading trajectories..."
+        print("Loading trajectories...")
         self.x, self.trajFilenames = loadTrajFiles(self.trajectoryFolder, self.trajectoryBasename)
 
         # cluster & assign
         if self.alwaysCluster or not os.path.exists(self.clusterCentersFile):
-            print "Clustering data..."
+            print("Clustering data...")
             cl = self.cluster(self.x)  # cl: pyemma's clusteringObject
             makeFolder(self.discretizedFolder)
             self.clusterCenters = cl.clustercenters
             self._writeClusterCenters(self.clusterCenters, self.clusterCentersFile)
-            print "Assigning data..."
+            print("Assigning data...")
             self.dtrajs = cl.dtrajs[:]
         else:
-            print "Assigning data (clustering exists)..."
+            print("Assigning data (clustering exists)...")
             self.clusterCenters = np.loadtxt(self.clusterCentersFile)
             self.dtrajs = self.assignNewTrajectories(self.x)
 
-        print "Writing clustering data..."
+        print("Writing clustering data...")
         self._writeDtrajs(self.trajFilenames, self.dtrajs, self.dTrajTemplateName)
 
     def eliminateLowPopulatedClusters(self, clusterCountsThreshold, tau=None):
         if self.dtrajs == []:
-            print "Call clusterTrajectories() first!"
+            print("Call clusterTrajectories() first!")
             return
 
         dtrajs = np.array(self.dtrajs).copy()
@@ -77,20 +80,20 @@ class Cluster:
 
         clustersToDelete = np.argwhere(counts < clusterCountsThreshold)
         if clustersToDelete.shape[0] > 0:
-            print "Removing %d clusters due to a small number of counts (less than %d)" % (clustersToDelete.shape[0], clusterCountsThreshold)
+            print("Removing %d clusters due to a small number of counts (less than %d)" % (clustersToDelete.shape[0], clusterCountsThreshold))
             self.clusterCenters = np.delete(self.clusterCenters, clustersToDelete, axis=0)
             self._writeClusterCenters(self.clusterCenters, self.clusterCentersFile)
-            print "Reassigning trajectories"
+            print("Reassigning trajectories")
             self.dtrajs = self.assignNewTrajectories(self.x)
 
     def _writeClusterCenters(self, clusterCenters, outputFilename):
-        np.savetxt(outputFilename, clusterCenters, fmt="%.5f")
+        np.savetxt(outputFilename, clusterCenters, fmt=b"%.5f")
 
     def _writeDtrajs(self, filenames, dtrajs, filenameTemplate="%s.disctraj"):
         for filename, dtraj in zip(filenames, dtrajs):
             fname = os.path.split(filename)[-1][:-4]
             dtrajfname = filenameTemplate % (fname)
-            np.savetxt(dtrajfname, dtraj, fmt="%d")
+            np.savetxt(dtrajfname, dtraj, fmt=b"%d")
 
 
 # Standalone functions

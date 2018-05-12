@@ -3,7 +3,6 @@
 """
 from AdaptivePELE.utilities import clusteringUtilities
 import argparse
-import math
 
 
 def parseArgs():
@@ -14,22 +13,28 @@ def parseArgs():
     """
     parser = argparse.ArgumentParser(description="Write the requested cluster "
                                      "structures from a clustering object")
-    parser.add_argument('clObject', type=str)
+    parser.add_argument('clObject', type=str, help="Path to the clustering object")
     parser.add_argument('outputPath', type=str,
                         help="Path where to write the structures, including "
                         "name of the files, i.e output/path/cluster.pdb")
-    parser.add_argument("structures", nargs='*', type=list, default=None,
+    parser.add_argument("structures", nargs='*', type=int, default=None,
                         help="Structures to write")
     parser.add_argument("--threshold", type=float, default=None,
-                        help="Only print those structures with mathcing threshold")
+                        help="Only print those structures with matching threshold")
+    parser.add_argument('--top', type=str,
+                        help="Path to the topology file for non-pdb trajectories")
     args = parser.parse_args()
     return args
 
+
+def main(clObject, structures, cond, outputPath, topology):
+    clusteringUtilities.writeStructures(clObject, structures, cond, outputPath, topology=topology)
+
+
 if __name__ == "__main__":
-    args = parseArgs()
-    if not args.threshold is None:
-        condition = lambda x: abs(x.threshold-args.threshold) < 0.01
+    arguments = parseArgs()
+    if arguments.threshold is not None:
+        condition = lambda x: abs(x.threshold-arguments.threshold) < 0.01
     else:
         condition = None
-    clusteringUtilities.writeStructures(args.clObject, args.structures, condition,
-                                        args.outputPath)
+    main(arguments.clObject, arguments.structures, condition, arguments.outputPath, arguments.top)

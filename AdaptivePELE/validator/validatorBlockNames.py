@@ -1,3 +1,10 @@
+try:
+    # Check if the basestring type if available, this will fail in python3
+    basestring
+except NameError:
+    basestring = str
+
+
 class ControlFileParams:
     generalParams = "GeneralParams"
     spawningBlockname = "SpawningParams"

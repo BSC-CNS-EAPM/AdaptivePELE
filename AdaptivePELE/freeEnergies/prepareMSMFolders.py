@@ -1,11 +1,14 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import glob
 import os
 import shutil
 
 
 class Constants():
-    def __init__(self):
+    def __init__(self, trajs_path=None):
         self.trajFolder = "allTrajs"
+        if trajs_path is not None:
+            self.trajFolder = os.path.join(trajs_path, self.trajFolder)
         self.origTrajFiles = os.path.join(self.trajFolder, "traj_*")
         self.trajFileEpoch = os.path.join(self.trajFolder, "traj_%d_*")
         self.nonRepeatedTrajEpoch = os.path.join(self.trajFolder, "extractedCoordinates", "traj_%d_*")
@@ -16,10 +19,8 @@ class Constants():
 
 
 def extractEpoch(f):
-    first = f.find("_")
-    second = f.rfind("_")
-    epoch = f[first+1:second]
-    return epoch
+    # Split the filename blablb_0_1.dat into [balblb, 0, 1.dat]
+    return f.rsplit("_", 2)[1]
 
 
 def getAllDifferentEpochs(origTrajFiles):
@@ -28,8 +29,7 @@ def getAllDifferentEpochs(origTrajFiles):
     for f in trajFiles:
         epoch = extractEpoch(f)
         epochs.add(int(epoch))
-    epochs = list(epochs)
-    epochs.sort()
+    epochs = sorted(epochs)
     return epochs
 
 
@@ -82,14 +82,14 @@ def makeSymbolicLinks(epochs, rawDataFolder, trajFileEpoch, trajNonRepeatedEpoch
 def copyMSMcontrolFile(epochs, msmFolder, templetizedControlFileMSM):
     scriptsFolder = os.path.dirname(os.path.realpath(__file__))
     scriptsFile = os.path.join(scriptsFolder, templetizedControlFileMSM)
-    print scriptsFile
+    print(scriptsFile)
     for epoch in epochs:
         dst = os.path.join(msmFolder % epoch, templetizedControlFileMSM)
         shutil.copyfile(scriptsFile, dst)
 
 
-def main():
-    constants = Constants()
+def main(trajsPath=None):
+    constants = Constants(trajsPath)
 
     epochs = getAllDifferentEpochs(constants.origTrajFiles)
 

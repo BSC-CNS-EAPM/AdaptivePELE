@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.5
               </div>
             
           
@@ -88,6 +88,7 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
@@ -223,7 +224,7 @@
 
 <dl class="class">
 <dt id="AdaptivePELE.spawning.densitycalculator.DensityCalculatorHeaviside">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.spawning.densitycalculator.</code><code class="descname">DensityCalculatorHeaviside</code><span class="sig-paren">(</span><em>conditions=[], values=[1.0]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/densitycalculator.html#DensityCalculatorHeaviside"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.densitycalculator.DensityCalculatorHeaviside" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">AdaptivePELE.spawning.densitycalculator.</code><code class="descname">DensityCalculatorHeaviside</code><span class="sig-paren">(</span><em>conditions=None</em>, <em>values=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/densitycalculator.html#DensityCalculatorHeaviside"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.densitycalculator.DensityCalculatorHeaviside" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.densitycalculator.DensityCalculator" title="AdaptivePELE.spawning.densitycalculator.DensityCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.densitycalculator.DensityCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.densitycalculator.DensityCalculatorHeaviside.calculate">
@@ -492,7 +493,7 @@ each cluster</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures">
-<code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#IndependentRunsCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
+<code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em>, <em>topology_file=None</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#IndependentRunsCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write last trajectory structure as initial one for the next iteration</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -504,6 +505,8 @@ each cluster</p>
 each cluster (number of processors that will start from that state)</li>
 <li><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
 <li><strong>iteration</strong> (<em>int</em>) – Number of epoch</li>
+<li><strong>topology_file</strong> (<em>str</em>) – Topology file for non-pdb trajectories</li>
+<li><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
@@ -846,7 +849,7 @@ each cluster</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures">
-<code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
+<code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em>, <em>topology_file=None</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write initial structures for the next iteration</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -858,6 +861,8 @@ each cluster</p>
 each cluster (number of processors that will start from that state)</li>
 <li><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
 <li><strong>iteration</strong> (<em>int</em>) – Number of epoch</li>
+<li><strong>topology_file</strong> (<em>str</em>) – Topology file for non-pdb trajectories</li>
+<li><strong>topology</strong> (<em>list</em>) – Topology like structure to write PDB from xtc files</li>
 </ul>
 </td>
 </tr>

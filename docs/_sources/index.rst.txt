@@ -3,15 +3,26 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+========================================
 Welcome to AdaptivePELE's documentation!
-============================================
+========================================
 
-Contents:
+AdaptivePELE is a Python module to perform enhancing sampling of molecular
+simulation built around the Protein Energy Landscape Exploration method (`PELE <https:www.pele.bsc.es>`_) developed in the Electronic and Atomic Protein Modelling grop (`EAPM <https://www.bsc.es/discover-bsc/organisation/scientific-structure/electronic-and-atomic-protein-modeling-eapm>`_) at the Barcelona Supercomputing Center (`BSC <https://www.bsc.es>`_). AdaptivePELE's 
+code is publicly available in `GitHub <https://github.com/AdaptivePELE/AdaptivePELE>`_ under the MIT license.
+
+.. image:: adaptiveDiagram.png
+    :align: center
+    :alt: image trouble
+
+Contents
+========
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    Examples
+   Changelog
    AdaptivePELE
 
 

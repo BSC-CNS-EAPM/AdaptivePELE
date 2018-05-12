@@ -1,11 +1,14 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import networkx as nx
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.atomset import RMSDCalculator
 
-def weight(path, conf):
+
+def weight(pathway, confs):
     w = 0
-    for i in xrange(1, len(path)):
-        w += conf[path[i-1]][path[i]]['metric']
+    for j in range(1, len(path)):
+        w += confs[pathway[j-1]][path[j]]['metric']
     return w
 
 metricCol = 4
@@ -27,4 +30,4 @@ for i, path in enumerate(paths, start=1):
         break
     elif i < 3:
         cl.writePathwayTrajectory(path, "pathway_%d.pdb" % (i-1))
-    print "Path ", i, "length ", weight(path, conf)
+    print("Path ", i, "length ", weight(path, conf))

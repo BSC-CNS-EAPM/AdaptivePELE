@@ -1,15 +1,17 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from AdaptivePELE.clustering import thresholdcalculator
 import unittest
 import numpy as np
+
 
 class thresholdCalculatorTest(unittest.TestCase):
     def testConstantDefaultParams(self):
         thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
 
         clusteringBlock = {
-            "type" : "irrelevant",
-            "thresholdCalculator" : {
-                "type" : "constant"
+            "type": "irrelevant",
+            "thresholdCalculator": {
+                "type": "constant"
             }
         }
 
@@ -23,11 +25,11 @@ class thresholdCalculatorTest(unittest.TestCase):
         thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
 
         clusteringBlock = {
-            "type" : "irrelevant",
-            "thresholdCalculator" : {
-                "type" : "constant",
-                "params" : {
-                    "value" : 3
+            "type": "irrelevant",
+            "thresholdCalculator": {
+                "type": "constant",
+                "params": {
+                    "value": 3
                 }
             }
         }
@@ -42,7 +44,7 @@ class thresholdCalculatorTest(unittest.TestCase):
         thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()
 
         clusteringBlock = {
-            "type" : "irrelevant"
+            "type": "irrelevant"
         }
 
         thresholdCalculator = thresholdCalculatorBuilder.build(clusteringBlock)
@@ -71,7 +73,7 @@ class thresholdCalculatorTest(unittest.TestCase):
         goldenValues = [2., 3, 4., 5.]
         goldenConditions = [1.0, 0.75, 0.5]
         np.testing.assert_almost_equal(np.array(values), np.array(goldenValues), 10)
-        np.testing.assert_almost_equal(np.array(conditions),np.array(goldenConditions), 10)
+        np.testing.assert_almost_equal(np.array(conditions), np.array(goldenConditions), 10)
 
     def testHeavisideParams(self):
         thresholdCalculatorBuilder = thresholdcalculator.ThresholdCalculatorBuilder()

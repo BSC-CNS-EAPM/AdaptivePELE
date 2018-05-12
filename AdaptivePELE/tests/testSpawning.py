@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import unittest
 import numpy as np
 import AdaptivePELE.spawning.spawning as spawning
@@ -73,7 +74,7 @@ class TestSpawningCalculator(unittest.TestCase):
         clusteringBlock = {
             "density": {
                 "type": "heaviside",
-                "params" : {
+                "params": {
                     "values": [6, 2, 3, 1],
                     "conditions": [3, 2, 1]
                 }
@@ -131,8 +132,8 @@ class TestSpawningCalculator(unittest.TestCase):
         clusteringBlock = {
             "density": {
                 "type": "heaviside",
-                "params" : {
-                    "values": [6, 2, 3 , 1],
+                "params": {
+                    "values": [6, 2, 3, 1],
                     "conditions": [3, 2, 1]
                 }
             }
@@ -255,7 +256,7 @@ class TestSpawningCalculator(unittest.TestCase):
         self.assertAlmostEqual(params.epsilon, params.minEpsilon)
         for i in range(1, params.variationWindow):
             degeneracy7 = variable_epsilon.calculate(clusters.clusters, trajs, params, i)
-        #TODO: check degeneracy after next steps
+        # TODO: check degeneracy after next steps
         # self.assertAlmostEqual(params.epsilon, params.minEpsilon+rateVariation)
         # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 2)
         # self.assertAlmostEqual(params.epsilon, params.maxEpsilon)
@@ -267,7 +268,6 @@ class TestSpawningCalculator(unittest.TestCase):
         # self.assertAlmostEqual(params.epsilon, params.minEpsilon)
         # degeneracy9 = variable_epsilon.calculate(clusters.clusters, trajs, params, 9)
         # self.assertAlmostEqual(params.epsilon, params.minEpsilon)
-
 
     def testUCBCalculator(self):
         UCB = spawning.UCBCalculator()
@@ -287,6 +287,7 @@ class TestSpawningCalculator(unittest.TestCase):
         degeneracy = UCB.calculate(clusters.clusters, trajs, params)
         golden = np.array([3, 5, 3, 9])
         np.testing.assert_array_equal(degeneracy, golden)
+
 
 def main():
     return unittest.main(exit=False)

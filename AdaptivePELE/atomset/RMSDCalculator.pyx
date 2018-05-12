@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import numpy as np
 cimport cython
 cimport numpy as np
@@ -14,13 +15,13 @@ cdef class RMSDCalculator:
         self.symmetries = symmetries
 
     def __getstate__(self):
-        state = {'nonSymmetricalAtomsSet': self.nonSymmetricalAtomsSet,
-                 'symmetries': self.symmetries}
+        state = {u'nonSymmetricalAtomsSet': self.nonSymmetricalAtomsSet,
+                 u'symmetries': self.symmetries}
         return state
 
     def __setstate__(self, state):
-        self.nonSymmetricalAtomsSet = state['nonSymmetricalAtomsSet']
-        self.symmetries = state['symmetries']
+        self.nonSymmetricalAtomsSet = state[u'nonSymmetricalAtomsSet']
+        self.symmetries = state[u'symmetries']
 
     def computeNonSymmAtoms(self, atomset.PDB PDB):
         cdef set allAtomsSet
@@ -41,7 +42,7 @@ cdef class RMSDCalculator:
             :returns: float -- The squared RMSD between two PDB
         """
         cdef double rmsd, d2, d2sm
-        cdef str atom1Id, atom2Id, atomId
+        cdef basestring atom1Id, atom2Id, atomId
         cdef atomset.Atom atom11, atom12, atom21, atom22, atom1, atom2
         cdef dict group
         cdef int n

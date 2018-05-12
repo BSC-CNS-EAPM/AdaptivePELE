@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.5
               </div>
             
           
@@ -86,6 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
 </ul>
 
@@ -136,8 +137,9 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.automateRoundsAdaptive</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">simulation</span> <span class="k">import</span> <span class="n">simulationrunner</span>
-<span class="kn">import</span> <span class="nn">adaptiveSampling</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="k">import</span> <span class="n">simulationrunner</span>
+<span class="kn">import</span> <span class="nn">AdaptivePELE.adaptiveSampling</span> <span class="k">as</span> <span class="nn">adaptiveSampling</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
@@ -162,8 +164,8 @@
     <span class="k">if</span> <span class="n">epochs</span><span class="p">:</span>
         <span class="n">rangeOfEpochs</span> <span class="o">=</span> <span class="n">epochs</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">rangeOfEpochs</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">numSimulations</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="s2">&quot;rangeOfEpochs&quot;</span><span class="p">,</span> <span class="n">rangeOfEpochs</span>
+        <span class="n">rangeOfEpochs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">numSimulations</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;rangeOfEpochs&quot;</span><span class="p">,</span> <span class="n">rangeOfEpochs</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rangeOfEpochs</span><span class="p">:</span>
         <span class="n">controlFileDictionary</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;SEED&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%d%d%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;OUTPUTPATH&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">}</span>
@@ -172,9 +174,9 @@
         <span class="n">outputPath_i</span> <span class="o">=</span> <span class="n">controlFileDictionary</span><span class="p">[</span><span class="s2">&quot;OUTPUTPATH&quot;</span><span class="p">]</span> <span class="o">%</span> <span class="p">(</span><span class="n">simulationName</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
         <span class="n">controlFileDictionary</span><span class="p">[</span><span class="s2">&quot;OUTPUTPATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">outputPath_i</span>
         <span class="n">controlFileName</span> <span class="o">=</span> <span class="s2">&quot;tmp_</span><span class="si">%s</span><span class="s2">_controlfile_</span><span class="si">%s</span><span class="s2">_</span><span class="si">%d</span><span class="s2">.conf&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">controlFile</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">simulationName</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-        <span class="n">controlFileName</span> <span class="o">=</span> <span class="n">controlFileName</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+        <span class="n">controlFileName</span> <span class="o">=</span> <span class="n">controlFileName</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
         <span class="n">simulationRunner</span><span class="o">.</span><span class="n">makeWorkingControlFile</span><span class="p">(</span><span class="n">controlFileName</span><span class="p">,</span> <span class="n">controlFileDictionary</span><span class="p">)</span>
-        <span class="nb">print</span> <span class="s2">&quot;Starting simulation </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting simulation </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
         <span class="n">adaptiveSampling</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">controlFileName</span><span class="p">)</span></div>
 
 

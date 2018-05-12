@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.5
               </div>
             
           
@@ -86,6 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
 </ul>
 
@@ -136,10 +137,10 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.analysis.plotAdaptive</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">types</span>
 
 
 <div class="viewcode-block" id="parseArguments"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.parseArguments">[docs]</a><span class="k">def</span> <span class="nf">parseArguments</span><span class="p">():</span>
@@ -159,13 +160,17 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;xcol&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;xcol&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;ycol&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;ycol&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;filename&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;report_&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Report filename&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-be&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Points&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-rmsd&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Lines&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-points&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Plot using points&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-lines&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Plot using lines&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-zcol&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Column to define color according to metric&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-traj_col&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Color differently each trajectory&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--traj_range&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Range of trajs to select, e.g to select trajs from 1 to 10, 1:10&quot;</span><span class="p">)</span>
+
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">steps</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">xcol</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">ycol</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">be</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">rmsd</span></div>
+    <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">steps</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">xcol</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">ycol</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">lines</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">zcol</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">traj_range</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">traj_col</span></div>
 
 
-<div class="viewcode-block" id="generateNestedString"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.generateNestedString">[docs]</a><span class="k">def</span> <span class="nf">generateNestedString</span><span class="p">(</span><span class="n">gnuplotString</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">column1</span><span class="p">,</span> <span class="n">column2</span><span class="p">,</span> <span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">printWithLines</span><span class="p">,</span> <span class="n">totalNumberOfSteps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">replotFirst</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="generateNestedString"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.generateNestedString">[docs]</a><span class="k">def</span> <span class="nf">generateNestedString</span><span class="p">(</span><span class="n">gnuplotString</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">column1</span><span class="p">,</span> <span class="n">column2</span><span class="p">,</span> <span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">printWithLines</span><span class="p">,</span> <span class="n">totalNumberOfSteps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">replotFirst</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">paletteModifier</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trajs_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a string to be passed to gnuplot</span>
 
@@ -184,6 +189,8 @@
 <span class="sd">        :type TotalNumberOfSteps: bool</span>
 <span class="sd">        :param replotFirst: Deprecated parameter</span>
 <span class="sd">        :type replotFirst: bool</span>
+<span class="sd">        :param paletteModifier: Wheter to use the epoch as color or a column</span>
+<span class="sd">        :type paletteModifier: int</span>
 
 <span class="sd">        :returns: str -- String to plot using gnuplot</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -193,14 +200,20 @@
 
     <span class="n">dictionary</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reportName&#39;</span><span class="p">:</span> <span class="n">reportName</span><span class="p">,</span> <span class="s1">&#39;col2&#39;</span><span class="p">:</span> <span class="n">column2</span><span class="p">,</span> <span class="s1">&#39;numberOfEpochs&#39;</span><span class="p">:</span> <span class="n">numberOfEpochs</span><span class="p">,</span> <span class="s1">&#39;withLines&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
 
-    <span class="c1"># runs of epoch 0, assumed constant</span>
-    <span class="n">numberOfRunsPerEpoch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">reportName</span><span class="o">+</span><span class="s2">&quot;*&quot;</span><span class="p">)))</span>
-    <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;runsPerEpoch&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numberOfRunsPerEpoch</span>
+    <span class="k">if</span> <span class="n">trajs_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">traj_range</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">))</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;startTraj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;runsPerEpoch&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">end</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;startTraj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># runs of epoch 0, assumed constant</span>
+        <span class="n">numberOfRunsPerEpoch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">reportName</span><span class="o">+</span><span class="s2">&quot;*&quot;</span><span class="p">)))</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;runsPerEpoch&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numberOfRunsPerEpoch</span>
 
     <span class="k">if</span> <span class="n">printWithLines</span><span class="p">:</span>
         <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;withLines&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;w l&quot;</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column1</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">IntType</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column1</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">totalNumberOfSteps</span><span class="p">:</span>
             <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;($&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">column1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;+ (</span><span class="si">%d</span><span class="s2">*j))&quot;</span> <span class="o">%</span> <span class="n">stepsPerRun</span>  <span class="c1"># adds steps per runs, so that it mathes the total number of steps</span>
         <span class="k">else</span><span class="p">:</span>
@@ -209,63 +222,7 @@
     <span class="k">return</span> <span class="n">gnuplotString</span> <span class="o">%</span> <span class="n">dictionary</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span></div>
 
 
-<div class="viewcode-block" id="generateForLoopString"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.generateForLoopString">[docs]</a><span class="k">def</span> <span class="nf">generateForLoopString</span><span class="p">(</span><span class="n">gnuplotString</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">column1</span><span class="p">,</span> <span class="n">column2</span><span class="p">,</span> <span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">printWithLines</span><span class="p">,</span> <span class="n">totalNumberOfSteps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">replotFirst</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a string to be passed to gnuplot</span>
-
-<span class="sd">        :param gnuplotString: Template string for gnuplot</span>
-<span class="sd">        :type gnuplotString: str</span>
-<span class="sd">        :param reportName: Name of the files containing the simulation data</span>
-<span class="sd">        :type reportName: str</span>
-<span class="sd">        :param column1: Column to plot in the X axis</span>
-<span class="sd">        :type column1: int</span>
-<span class="sd">        :param column2: Column to plot in the Y axis</span>
-<span class="sd">        :type column2: int</span>
-<span class="sd">        :param stepsPerRun: Number of steps per epoch,</span>
-<span class="sd">        :type stepsPerRun: int</span>
-<span class="sd">        :param printWithLines:  Wether the plot should use solid lines</span>
-<span class="sd">        :type printWithLines: bool</span>
-<span class="sd">        :param TotalNumberOfSteps: Not only considering steps in current epoch,</span>
-<span class="sd">            but steps with all previous epochs</span>
-<span class="sd">        :type TotalNumberOfSteps: bool</span>
-<span class="sd">        :param replotFirst:</span>
-<span class="sd">        :type replotFirst: bool</span>
-
-<span class="sd">        :returns: str -- String to plot using gnuplot</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">allFolders</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
-    <span class="n">epochFolders</span> <span class="o">=</span> <span class="p">[</span><span class="n">epoch</span> <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">allFolders</span> <span class="k">if</span> <span class="n">epoch</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
-    <span class="n">numberOfEpochs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">epochFolders</span><span class="p">))</span>
-
-    <span class="n">dictionary</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reportName&#39;</span><span class="p">:</span> <span class="n">reportName</span><span class="p">,</span> <span class="s1">&#39;col2&#39;</span><span class="p">:</span> <span class="n">column2</span><span class="p">,</span> <span class="s1">&#39;numberOfEpochs&#39;</span><span class="p">:</span> <span class="n">numberOfEpochs</span><span class="p">,</span> <span class="s1">&#39;withLines&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
-    <span class="n">plottingString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numberOfEpochs</span><span class="p">):</span>
-        <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;epoch&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
-
-        <span class="n">numberOfRunsPerEpoch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">reportName</span><span class="o">+</span><span class="s2">&quot;*&quot;</span><span class="p">)))</span>
-        <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;runsPerEpoch&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numberOfRunsPerEpoch</span>
-
-        <span class="k">if</span> <span class="n">printWithLines</span><span class="p">:</span>
-            <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;withLines&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;w l&quot;</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column1</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">IntType</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">totalNumberOfSteps</span><span class="p">:</span>
-                <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;($&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">column1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;+&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">stepsPerRun</span><span class="o">*</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>  <span class="c1"># adds steps per runs, so that it mathes the total number of steps</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">column1</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column1</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">LambdaType</span><span class="p">):</span>
-            <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">column1</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-
-        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">replotFirst</span><span class="p">:</span>
-            <span class="n">plottingString</span> <span class="o">+=</span> <span class="s2">&quot;re&quot;</span>
-
-        <span class="n">plottingString</span> <span class="o">+=</span> <span class="n">gnuplotString</span> <span class="o">%</span> <span class="n">dictionary</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="c1"># plottingString += &quot;pause 0.25\n&quot;</span>
-
-    <span class="nb">print</span> <span class="n">plottingString</span></div>
-
-
-<div class="viewcode-block" id="generatePrintString"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.generatePrintString">[docs]</a><span class="k">def</span> <span class="nf">generatePrintString</span><span class="p">(</span><span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">kindOfPrint</span><span class="p">):</span>
+<div class="viewcode-block" id="generatePrintString"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.generatePrintString">[docs]</a><span class="k">def</span> <span class="nf">generatePrintString</span><span class="p">(</span><span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">kindOfPrint</span><span class="p">,</span> <span class="n">paletteModifier</span><span class="p">,</span> <span class="n">trajs_range</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a template string to use with gnuplot</span>
 
@@ -279,6 +236,10 @@
 <span class="sd">        :type reportName: str</span>
 <span class="sd">        :param kindOfPrint:  Kind of lines to plot (solid or points)</span>
 <span class="sd">        :type kindOfPrint: bool</span>
+<span class="sd">        :param paletteModifier: Third column to specify color</span>
+<span class="sd">        :type paletteModifier: int</span>
+<span class="sd">        :trajs_range: Range of trajectories to plot</span>
+<span class="sd">        :type trajs_range: str</span>
 
 <span class="sd">        :returns: str -- String to plot using gnuplot</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -288,21 +249,32 @@
     <span class="k">elif</span> <span class="n">kindOfPrint</span> <span class="o">==</span> <span class="s2">&quot;PRINT_BE_RMSD&quot;</span><span class="p">:</span>
         <span class="n">printWithLines</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">totalNumberOfSteps</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">paletteModifier</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">stringPalette</span> <span class="o">=</span> <span class="s2">&quot;lt 6 lc palette frac j/</span><span class="si">%(numberOfEpochs)d</span><span class="s2">. &quot;</span>
+        <span class="n">colorMetric</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">paletteModifier</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">stringPalette</span> <span class="o">=</span> <span class="s2">&quot;lt 6 lc palette &quot;</span>
+        <span class="n">colorMetric</span> <span class="o">=</span> <span class="s2">&quot;:</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">paletteModifier</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">stringPalette</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">colorMetric</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="n">gnuplotString</span> <span class="o">=</span> <span class="s2">&quot;plot for [i=1:</span><span class="si">%(runsPerEpoch)d</span><span class="s2">] for [j=0:</span><span class="si">%(numberOfEpochs)d</span><span class="s2">-1] </span><span class="se">\&#39;\&#39;</span><span class="s2">.j.</span><span class="se">\&#39;</span><span class="s2">/</span><span class="si">%(reportName)s</span><span class="se">\&#39;</span><span class="s2">.i u </span><span class="si">%(col1)s</span><span class="s2">:</span><span class="si">%(col2)d</span><span class="s2"> lt 6 lc palette frac j/</span><span class="si">%(numberOfEpochs)d</span><span class="s2">. notitle </span><span class="si">%(withLines)s</span><span class="s2">&quot;</span>
-    <span class="k">return</span> <span class="n">generateNestedString</span><span class="p">(</span><span class="n">gnuplotString</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="p">,</span> <span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">printWithLines</span><span class="p">,</span> <span class="n">totalNumberOfSteps</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">gnuplotString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;plot for [i=</span><span class="si">%(startTraj)d</span><span class="s2">:</span><span class="si">%(runsPerEpoch)d</span><span class="s2">] for [j=0:</span><span class="si">%(numberOfEpochs)d</span><span class="s2">-1] </span><span class="se">\&#39;\&#39;</span><span class="s2">.j.</span><span class="se">\&#39;</span><span class="s2">/</span><span class="si">%(reportName)s</span><span class="se">\&#39;</span><span class="s2">.i u </span><span class="si">%(col1)s</span><span class="s2">:</span><span class="si">%(col2)d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">colorMetric</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">stringPalette</span><span class="p">,</span> <span class="s2">&quot;notitle </span><span class="si">%(withLines)s</span><span class="s2">&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">generateNestedString</span><span class="p">(</span><span class="n">gnuplotString</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="p">,</span> <span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">printWithLines</span><span class="p">,</span> <span class="n">totalNumberOfSteps</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">paletteModifier</span><span class="p">,</span> <span class="n">trajs_range</span><span class="p">)</span></div>
 
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">steps_Run</span><span class="p">,</span> <span class="n">Xcol</span><span class="p">,</span> <span class="n">Ycol</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">be</span><span class="p">,</span> <span class="n">rmsd</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
+    <span class="n">steps_Run</span><span class="p">,</span> <span class="n">Xcol</span><span class="p">,</span> <span class="n">Ycol</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">be</span><span class="p">,</span> <span class="n">rmsd</span><span class="p">,</span> <span class="n">colModifier</span><span class="p">,</span> <span class="n">traj_range</span><span class="p">,</span> <span class="n">color_traj</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
     <span class="c1"># VARIABLES TO SET WHEN PRINTING</span>
     <span class="k">if</span> <span class="n">be</span><span class="p">:</span>
         <span class="n">kind_Print</span> <span class="o">=</span> <span class="s2">&quot;PRINT_BE_RMSD&quot;</span>
     <span class="k">elif</span> <span class="n">rmsd</span><span class="p">:</span>
         <span class="n">kind_Print</span> <span class="o">=</span> <span class="s2">&quot;PRINT_RMSD_STEPS&quot;</span>
+    <span class="k">if</span> <span class="n">color_traj</span><span class="p">:</span>
+        <span class="n">colModifier</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="n">printLine</span> <span class="o">=</span> <span class="n">generatePrintString</span><span class="p">(</span><span class="n">steps_Run</span><span class="p">,</span> <span class="n">Xcol</span><span class="p">,</span> <span class="n">Ycol</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">kind_Print</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="n">printLine</span>
+    <span class="n">printLine</span> <span class="o">=</span> <span class="n">generatePrintString</span><span class="p">(</span><span class="n">steps_Run</span><span class="p">,</span> <span class="n">Xcol</span><span class="p">,</span> <span class="n">Ycol</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">kind_Print</span><span class="p">,</span> <span class="n">colModifier</span><span class="p">,</span> <span class="n">traj_range</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">printLine</span><span class="p">)</span>
 </pre></div>
 
            </div>

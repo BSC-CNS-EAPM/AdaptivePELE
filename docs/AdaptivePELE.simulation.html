@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.5
               </div>
             
           
@@ -88,6 +88,7 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
@@ -306,7 +307,7 @@ to the available processors</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.clusterEquilibrationStructures">
-<code class="descname">clusterEquilibrationStructures</code><span class="sig-paren">(</span><em>resname</em>, <em>trajWildcard</em>, <em>reportWildcard</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.clusterEquilibrationStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.clusterEquilibrationStructures" title="Permalink to this definition">¶</a></dt>
+<code class="descname">clusterEquilibrationStructures</code><span class="sig-paren">(</span><em>resname</em>, <em>trajWildcard</em>, <em>reportWildcard</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.clusterEquilibrationStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.clusterEquilibrationStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the equilibration run</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -316,6 +317,7 @@ to the available processors</p>
 <li><strong>resname</strong> (<em>str</em>) – Name of the ligand in the pdb</li>
 <li><strong>trajWildcard</strong> (<em>str</em>) – Templetized path to trajectory files”</li>
 <li><strong>reportWildcard</strong> (<em>str</em>) – Templetized path to report files”</li>
+<li><strong>topology</strong> (<em>str</em>) – Topology file for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
@@ -358,7 +360,7 @@ equilibration run</li>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate">
-<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>initialStructures</em>, <em>outputPathConstants</em>, <em>reportFilename</em>, <em>outputPath</em>, <em>resname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>initialStructures</em>, <em>outputPathConstants</em>, <em>reportFilename</em>, <em>outputPath</em>, <em>resname</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run short simulation to equilibrate the system. It will run one
 such simulation for every initial structure and select appropiate
 structures to start the simulation</p>
@@ -372,6 +374,7 @@ structures to start the simulation</p>
 <li><strong>reportBaseFilename</strong> (<em>str</em>) – Name of the file that contains the metrics of the snapshots to cluster</li>
 <li><strong>outputPath</strong> (<em>str</em>) – Path where trajectories are found</li>
 <li><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the system pdb</li>
+<li><strong>topology</strong> (<em>str</em>) – Topology file for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
@@ -417,7 +420,7 @@ file for equilibration runs</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.getNextIterationBox">
-<code class="descname">getNextIterationBox</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>outputFolder</em>, <em>resname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.getNextIterationBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getNextIterationBox" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getNextIterationBox</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>outputFolder</em>, <em>resname</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.getNextIterationBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getNextIterationBox" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select the box for the next epoch, currently selecting the COM of
 the cluster with max SASA</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -428,6 +431,7 @@ the cluster with max SASA</p>
 <li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
 <li><strong>outputFolder</strong> (<em>str</em>) – Folder to the trajectories</li>
 <li><strong>resname</strong> (<em>str</em>) – Name of the ligand in the pdb</li>
+<li><strong>topology</strong> (<em>str</em>) – Topology file</li>
 </ul>
 </td>
 </tr>
@@ -440,7 +444,7 @@ the cluster with max SASA</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=u''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a short PELE simulation</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -454,7 +458,7 @@ the cluster with max SASA</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibratedStructure">
-<code class="descname">selectEquilibratedStructure</code><span class="sig-paren">(</span><em>nTrajs</em>, <em>similarityColumn</em>, <em>resname</em>, <em>trajWildcard</em>, <em>reportWildcard</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.selectEquilibratedStructure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibratedStructure" title="Permalink to this definition">¶</a></dt>
+<code class="descname">selectEquilibratedStructure</code><span class="sig-paren">(</span><em>nTrajs</em>, <em>similarityColumn</em>, <em>resname</em>, <em>trajWildcard</em>, <em>reportWildcard</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.selectEquilibratedStructure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibratedStructure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select a representative initial structure from the equilibration
 run</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -480,7 +484,7 @@ run</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibrationLastSnapshot">
-<code class="descname">selectEquilibrationLastSnapshot</code><span class="sig-paren">(</span><em>nTrajs</em>, <em>trajWildcard</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.selectEquilibrationLastSnapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibrationLastSnapshot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">selectEquilibrationLastSnapshot</code><span class="sig-paren">(</span><em>nTrajs</em>, <em>trajWildcard</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.selectEquilibrationLastSnapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibrationLastSnapshot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select the last snapshot of each trajectory as a  representative
 initial structure from the equilibration run</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -490,6 +494,7 @@ initial structure from the equilibration run</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>nTrajs</strong> (<em>int</em>) – Number of trajectories</li>
 <li><strong>trajWildcard</strong> (<em>str</em>) – Templetized path to trajectory files”</li>
+<li><strong>topology</strong> (<em>str</em>) – Topology file for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
@@ -572,6 +577,30 @@ selected</td>
 </dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.createMultipleComplexesFilenames">
+<code class="descname">createMultipleComplexesFilenames</code><span class="sig-paren">(</span><em>numberOfSnapshots</em>, <em>tmpInitialStructuresTemplate</em>, <em>iteration</em>, <em>equilibration=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.createMultipleComplexesFilenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.createMultipleComplexesFilenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the string to substitute the complexes in the PELE control file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>numberOfSnapshots</strong> (<em>int</em>) – Number of complexes to write</li>
+<li><strong>tmpInitialStructuresTemplate</strong> (<em>str</em>) – Template with the name of the initial strutctures</li>
+<li><strong>iteration</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>equilibration</strong> (<em>bool</em>) – Flag to mark wether the complexes are part of an
+equilibration run</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – jsonString to be substituted in PELE control file</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.hasExitCondition">
 <code class="descname">hasExitCondition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.hasExitCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.hasExitCondition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if an exit condition has been set</p>
@@ -622,7 +651,7 @@ processorsToClusterMapping</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=u''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -676,7 +705,7 @@ processorsToClusterMapping</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#TestSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>runningControlFile=u''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#TestSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copy file to test the rest of the AdaptivePELE procedure</p>
 </dd></dl>
 

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import unittest
 import argparse
 from AdaptivePELE.tests import testSpawning as tSpawning
@@ -9,38 +10,41 @@ from AdaptivePELE.tests import testDensityCalculator as tDensity
 
 
 def parse_args():
-    desc = ("Run testing suite. Possible options are:\na Run all tests\n"
-            "at Runs atomset tests\ns Run spawning tests\nth Run threshold "
-            "calculator tests\nd Run density tests\nc Run clustering tests"
-            "Ad Run adaptive integration tests")
-    parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("--run", default=['a'], nargs="*", help="Tests to run")
+    desc = ("Run testing suite. Possible options are:\na  -- Run all tests\n"
+            "at -- Run atomset tests\ns  -- Run spawning tests\nth -- Run threshold "
+            "calculator tests\nd  -- Run density tests\nc  -- Run clustering tests\n"
+            "Ad -- Run adaptive integration tests")
+    parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument("--run", default=None, nargs="*", help="Tests to run")
     parser.add_argument("--exclude", default=[], nargs="*", help="Tests to exclude")
     args = parser.parse_args()
 
     return args.run, args.exclude
 
+
 def main(run, exclude):
     testSuite = unittest.TestSuite()
+    if run is None:
+        run = ["at", "s", "th", "d", "c", "Ad"]
     to_run = set(run)-set(exclude)
 
     if "at" in to_run or "a" in to_run:
-        print "Will run atomset tests"
+        print("Will run atomset tests")
         testSuite.addTest(unittest.makeSuite(tAtomset.atomsetTest))
     if "s" in to_run or "a" in to_run:
-        print "Will run spawning tests"
+        print("Will run spawning tests")
         testSuite.addTest(unittest.makeSuite(tSpawning.TestSpawningCalculator))
     if "th" in to_run or "a" in to_run:
-        print "Will run threshold tests"
+        print("Will run threshold tests")
         testSuite.addTest(unittest.makeSuite(tThreshold.thresholdCalculatorTest))
     if "d" in to_run or "a" in to_run:
-        print "Will run denstity tests"
+        print("Will run denstity tests")
         testSuite.addTest(unittest.makeSuite(tDensity.densityCalculatorTest))
     if "c" in to_run or "a" in to_run:
-        print "Will run clustering tests"
+        print("Will run clustering tests")
         testSuite.addTest(unittest.makeSuite(tClustering.clusteringTest))
     if "Ad" in to_run or "a" in to_run:
-        print "Will run integration tests"
+        print("Will run integration tests")
         testSuite.addTest(unittest.makeSuite(tAdaptive.TestadaptiveSampling))
 
     runner = unittest.TextTestRunner()

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import socket
 import matplotlib
 import numpy as np
@@ -10,8 +11,11 @@ if machine == "bsccv03":
 elif 'login' in machine:
     matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
-if machine != "bsccv03":
+try:
+    # This might fail for older versions of matplotlib (e.g in life cluster)
     plt.style.use("ggplot")
+except NameError:
+    pass
 
 
 def printHelp():
@@ -23,9 +27,10 @@ def printHelp():
     desc = "Program that prints the number of clusters throughout an adaptive sampling simulation. "\
            "It must be run in the root folder. "
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("-filename", type=str, default="", help="Output filename")
+    parser.add_argument("-f", "--filename", type=str, default="", help="Output filename")
+    parser.add_argument("-o", "--output", type=str, default="", help="Output folder")
     args = parser.parse_args()
-    return args.filename
+    return args.filename, args.output
 
 
 def getClusteringSummaryContent(summaryFile):
@@ -164,7 +169,7 @@ def buildClustersPerValue(clustersPerEpoch, numberOfEpochs):
 
     for epochSummary in clustersPerEpoch:
         foundValues = set()
-        for value, numClusters in epochSummary.iteritems():
+        for value, numClusters in epochSummary.items():
             clustersPerValue[value].append(numClusters)
             foundValues.update([value])
 
@@ -205,7 +210,7 @@ def plotClustersPerValue(clustersPerValue):
             value
         :type clustersPerValue: dict
     """
-    values = clustersPerValue.keys()
+    values = list(clustersPerValue.keys())
     sortedValues = np.sort(values)
     for value in sortedValues:
         plt.plot(clustersPerValue[value], label=str(value))
@@ -229,16 +234,19 @@ def plotContactsHistogram(folder, templetizedClusteringSummaryFile):
     plt.hist(allContacts)
 
 
-def main():
+def main(filename, outputPath):
     """
         Plot a summary of the clustering for a simulation:
             1) Number of clusters for each threshold value at each epoch
             2) Number of clusters for each density value at each epoch
             3) Histogram of the number of contacts
     """
-    filename = printHelp()
 
-    print "FILENAME", filename
+    if filename:
+        print("FILENAME", filename)
+    outputPath = os.path.join(outputPath, "")
+    if outputPath and not os.path.exists(outputPath):
+        os.makedirs(outputPath)
 
     # Params
     clusteringFileDensityColumn = 5
@@ -258,7 +266,7 @@ def main():
     plt.figure(1)
     plt.plot(totalNumberOfClustersPerEpoch, label="All clusters")
     if filename != "":
-        plt.savefig("%s_total.png" % filename)
+        plt.savefig("%s%s_total.png" % (outputPath, filename))
 
     plotClustersPerValue(clustersPerDensityValue)
     plt.title("Number of cluser per density value")
@@ -266,7 +274,7 @@ def main():
     plt.ylabel("Number of clusters")
     plt.legend(loc=2)
     if filename != "":
-        plt.savefig("%s_density.png" % filename)
+        plt.savefig("%s%s_density.png" % (outputPath, filename))
 
     plt.figure(2)
     plt.plot(totalNumberOfClustersPerEpoch, label="All clusters")
@@ -276,15 +284,16 @@ def main():
     plt.ylabel("Number of clusters")
     plt.legend(loc=2)
     if filename != "":
-        plt.savefig("%s_threshold.png" % filename)
+        plt.savefig("%s%s_threshold.png" % (outputPath, filename))
 
     plt.figure(3)
     plotContactsHistogram(folder, templetizedClusteringSummaryFile)
     plt.title("Contact ratio distribution")
     plt.xlabel("Contact ratio")
     if filename != "":
-        plt.savefig("%s_hist.png" % filename)
+        plt.savefig("%s%s_hist.png" % (outputPath, filename))
     plt.show()
 
 if __name__ == "__main__":
-    main()
+    file_name, outputFolder = printHelp()
+    main(file_name, outputFolder)

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from AdaptivePELE.constants import blockNames
 from abc import abstractmethod
 from AdaptivePELE.spawning import densitycalculatortypes
@@ -24,7 +25,7 @@ class DensityCalculatorBuilder():
         try:
             densityBlock = spawningBlock[blockNames.SpawningParams.density]
         except KeyError:
-            print "Using null density calculator (no preference for any cluster)"
+            print("Using null density calculator (no preference for any cluster)")
             return NullDensityCalculator()
 
         try:
@@ -33,7 +34,7 @@ class DensityCalculatorBuilder():
             sys.exit("Density calculator must have a type")
 
         if density_type == blockNames.DensityCalculator.null or density_type == blockNames.DensityCalculator.constant:
-            print "Using constant density"
+            print("Using constant density")
             return NullDensityCalculator()
         elif density_type == blockNames.DensityCalculator.heaviside:
             try:
@@ -42,13 +43,13 @@ class DensityCalculatorBuilder():
                 conditions = paramsBlock[blockNames.DensityCalculatorParams.conditions]
                 return DensityCalculatorHeaviside(conditions, values)
             except KeyError:
-                print "Using default parameters for Heaviside density calculator"
+                print("Using default parameters for Heaviside density calculator")
                 return DensityCalculatorHeaviside()
         elif density_type == blockNames.DensityCalculator.continuous:
-            print "Using continuous density calculator"
+            print("Using continuous density calculator")
             return ContinuousDensityCalculator()
         elif density_type == blockNames.DensityCalculator.exitContinuous:
-            print "Using inverse continuous density calculator"
+            print("Using inverse continuous density calculator")
             return ExitContinousDensityCalculator()
         else:
             sys.exit("Unknown density calculator type! Choices are: " + str(densitycalculatortypes.DENSITY_CALCULATOR_TYPE_TO_STRING_DICTIONARY.values()))
@@ -65,9 +66,13 @@ class DensityCalculator():
 
 class DensityCalculatorHeaviside(DensityCalculator):
     # Mostly duplicated code with threshold calculator
-    def __init__(self, conditions=[], values=[1.]):
+    def __init__(self, conditions=None, values=None):
         DensityCalculator.__init__(self)
         self.type = densitycalculatortypes.DENSITY_CALCULATOR_TYPES.heaviside
+        if conditions is None:
+            conditions = []
+        if values is None:
+            values = [1.]
 
         if len(values) != len(conditions) and len(values) != len(conditions) + 1:
             raise ValueError('The number of values must be equal or one more, than the number of conditions')

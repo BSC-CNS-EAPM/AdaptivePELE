@@ -1,3 +1,5 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import math
 import sys
 import numpy as np
@@ -233,7 +235,7 @@ class SpawningCalculator:
         """
         pass
 
-    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration):
+    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration, topology_file=None, topology=None):
         """
             Write initial structures for the next iteration
 
@@ -246,6 +248,10 @@ class SpawningCalculator:
             :type clustering: :py:class:`.Clustering`
             :param iteration: Number of epoch
             :type iteration: int
+            :param topology_file: Topology file for non-pdb trajectories
+            :type topology_file: str
+            :param topology: Topology like structure to write PDB from xtc files
+            :type topology: list
 
             :returns: int, list -- number of processors, list with the
                 snapshot from which the trajectories will start in the next iteration
@@ -256,12 +262,12 @@ class SpawningCalculator:
         for i, cluster in enumerate(clustering.clusters.clusters):
             for _ in range(int(degeneracyOfRepresentatives[i])):
                 outputFilename = tmpInitialStructuresTemplate % (iteration, counts)
-                print 'Writing to ', outputFilename, 'cluster', i
+                print('Writing to ', outputFilename, 'cluster', i)
                 procMapping.append(cluster.writeSpawningStructure(outputFilename))
 
                 counts += 1
 
-        print "counts & cluster centers", counts, np.where(np.array(degeneracyOfRepresentatives) > 0)[0].size
+        print("counts & cluster centers", counts, np.where(np.array(degeneracyOfRepresentatives) > 0)[0].size)
         return counts, procMapping
 
     def divideTrajAccordingToWeights(self, weights, trajToDistribute):
@@ -412,7 +418,7 @@ class IndependentRunsCalculator(SpawningCalculator):
         """
         pass
 
-    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration):
+    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration, topology_file=None, topology=None):
         """
             Write last trajectory structure as initial one for the next iteration
 
@@ -425,6 +431,10 @@ class IndependentRunsCalculator(SpawningCalculator):
             :type clustering: :py:class:`.Clustering`
             :param iteration: Number of epoch
             :type iteration: int
+            :param topology_file: Topology file for non-pdb trajectories
+            :type topology_file: str
+            :param topology: Topology for non-pdb trajectories
+            :type topology: list
 
             :returns: int, list -- number of processors, list with the
                 snapshot from which the trajectories will start in the next iteration
@@ -432,18 +442,20 @@ class IndependentRunsCalculator(SpawningCalculator):
         procMapping = []
         trajWildcard = os.path.join(outputPathConstants.epochOutputPathTempletized, constants.trajectoryBasename)
         trajectories = glob.glob(trajWildcard % (iteration-1))
-        for trajectory in trajectories:
-            snapshots = utilities.getSnapshots(trajectory)
+        for num, trajectory in enumerate(trajectories):
+            snapshots = utilities.getSnapshots(trajectory, topology=topology_file)
             lastSnapshot = snapshots[-1]
             nSnapshots = len(snapshots)
             del snapshots
 
-            num = int(trajectory.split("_")[-1][:-4]) % len(trajectories)  # to start with 0
+            numTraj = int(os.path.splitext(trajectory.rsplit("_", 1)[-1])[0])
             outputFilename = outputPathConstants.tmpInitialStructuresTemplate % (iteration, num)
-            procMapping.append((iteration-1, num, nSnapshots-1))
-
-            with open(outputFilename, 'w') as f:
-                f.write(lastSnapshot)
+            procMapping.append((iteration-1, numTraj, nSnapshots-1))
+            if isinstance(lastSnapshot, basestring):
+                with open(outputFilename, 'w') as f:
+                    f.write(lastSnapshot)
+            else:
+                utilities.write_mdtraj_PDB(lastSnapshot, outputFilename, topology)
 
         return len(trajectories), procMapping
 
@@ -546,11 +558,11 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
             Log spawning information
         """
         if self.degeneracyTotal is not None:
-            print "[SpawningLog] Total: %s" % str(self.degeneracyTotal)
+            print("[SpawningLog] Total: %s" % str(self.degeneracyTotal))
         if self.degeneracyInverselyProportional is not None:
-            print "[SpawningLog] Inversely prop: %s" % str(self.degeneracyInverselyProportional)
+            print("[SpawningLog] Inversely prop: %s" % str(self.degeneracyInverselyProportional))
         if self.degeneracyMetricProportional is not None:
-            print "[SpawningLog] Metric prop:    %s" % str(self.degeneracyMetricProportional)
+            print("[SpawningLog] Metric prop:    %s" % str(self.degeneracyMetricProportional))
 
     def calculate(self, clusters, trajToDistribute, spawningParams, currentEpoch=None):
         """
@@ -902,8 +914,8 @@ class UCBCalculator(DensitySpawningCalculator):
         l = self.prevMetrics.size
         n = weights.size
         try:
-            self.prevMetrics = np.pad(self.prevMetrics, (0, n-l), 'constant', constant_values=(0.0))
-            self.epoch = np.pad(self.epoch, (0, n-l), 'constant', constant_values=(1.0))
+            self.prevMetrics = np.pad(self.prevMetrics, (0, n-l), str('constant'), constant_values=(0.0))
+            self.epoch = np.pad(self.epoch, (0, n-l), str('constant'), constant_values=(1.0))
         except AttributeError:
             # Numpy version in life is too old to use pad function
             prevMetrics = np.zeros_like(weights)
@@ -973,7 +985,7 @@ class REAPCalculator(DensitySpawningCalculator):
         metrics = []
         if self.metricInd is None:
             if spawningParams.metricInd == -1:
-                self.metricInd = range(3, clusters[0].metrics.size)
+                self.metricInd = list(range(3, clusters[0].metrics.size))
             else:
                 self.metricInd = spawningParams.metricInd
             self.bounds = [(0, 1)]*len(self.metricInd)
@@ -1014,11 +1026,11 @@ class REAPCalculator(DensitySpawningCalculator):
             Log spawning information
         """
         if self.degeneracy is not None:
-            print "[SpawningLog] Total: %s" % str(self.degeneracy)
-        print "Metric indices"
-        print self.metricInd
-        print "Spawning weights"
-        print self.weights
+            print("[SpawningLog] Total: %s" % str(self.degeneracy))
+        print("Metric indices")
+        print(self.metricInd)
+        print("Spawning weights")
+        print(self.weights)
 
 
 class NullSpawningCalculator(SpawningCalculator):

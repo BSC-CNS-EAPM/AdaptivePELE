@@ -1,10 +1,10 @@
 REMARK 000 File created using PELE++
-REMARK source            : <type 'file'>
-REMARK original model nr : 6
+REMARK source            : tests/data/3ptb_data/Test3/0/trajectory_1.pdb
+REMARK original model nr : 3
 REMARK First snapshot is 1, not 0 (as opposed to report)
     
 
-MODEL     6
+MODEL     3
 ATOM      1  N   ILE A  16      -8.096   9.599  20.309  1.00  8.95           N1+
 ATOM      2  CA  ILE A  16      -8.084   8.707  19.112  1.00  8.95           C  
 ATOM      3  C   ILE A  16      -9.354   8.966  18.287  1.00  8.95           C  
@@ -59,21 +59,23 @@ ATOM     51  HA3 GLY A  19     -10.060   4.120  17.391  1.00  0.00           H
 TER
 HETATM 3222 CA    CA A 480     -10.300   4.358  36.895  1.00 10.61          Ca2+
 TER
-HETATM 3223  C1  AEN L   1      -0.689  36.083  27.889  1.00 19.86           C  
-HETATM 3224  C2  AEN L   1      -1.210  36.583  26.725  1.00 19.86           C  
-HETATM 3225  C3  AEN L   1      -2.596  36.573  26.519  1.00 19.86           C  
-HETATM 3226  C4  AEN L   1      -3.455  36.061  27.506  1.00 19.86           C  
-HETATM 3227  C5  AEN L   1      -2.908  35.564  28.692  1.00 19.86           C  
-HETATM 3228  C6  AEN L   1      -1.527  35.582  28.869  1.00 19.86           C  
-HETATM 3229  C7  AEN L   1       0.687  36.083  28.086  1.00 19.86           C  
-HETATM 3230  N1  AEN L   1       1.517  36.521  27.156  1.00 19.86           N1+
-HETATM 3231  N2  AEN L   1       1.182  35.805  29.281  1.00 19.86           N  
-HETATM 3232  H1  AEN L   1      -0.553  36.982  25.966  1.00  0.00           H  
-HETATM 3233  H2  AEN L   1      -3.009  36.962  25.601  1.00  0.00           H  
-HETATM 3234  H3  AEN L   1      -4.521  36.054  27.343  1.00  0.00           H  
-HETATM 3235  H4  AEN L   1      -3.556  35.170  29.461  1.00  0.00           H  
-HETATM 3236  H5  AEN L   1      -1.111  35.197  29.790  1.00  0.00           H  
-HETATM 3237  H6  AEN L   1       2.182  35.804  29.427  1.00  0.00           H  
-HETATM 3238  H7  AEN L   1       0.560  35.593  30.048  1.00  0.00           H  
-HETATM 3239  H8  AEN L   1       2.514  36.510  27.322  1.00  0.00           H  
-HETATM 3240  H9  AEN L   1       1.155  36.863  26.276  1.00  0.00           H  
+HETATM 3223  C1  AEN L   1      -3.418  32.384  23.152  1.00 19.86           C  
+HETATM 3224  C2  AEN L   1      -3.614  32.253  21.803  1.00 19.86           C  
+HETATM 3225  C3  AEN L   1      -4.905  32.044  21.302  1.00 19.86           C  
+HETATM 3226  C4  AEN L   1      -6.002  31.977  22.177  1.00 19.86           C  
+HETATM 3227  C5  AEN L   1      -5.787  32.123  23.550  1.00 19.86           C  
+HETATM 3228  C6  AEN L   1      -4.492  32.326  24.021  1.00 19.86           C  
+HETATM 3229  C7  AEN L   1      -2.134  32.581  23.648  1.00 19.86           C  
+HETATM 3230  N1  AEN L   1      -1.083  32.606  22.849  1.00 19.86           N1+
+HETATM 3231  N2  AEN L   1      -1.962  32.920  24.915  1.00 19.86           N  
+HETATM 3232  H1  AEN L   1      -2.773  32.309  21.127  1.00  0.00           H  
+HETATM 3233  H2  AEN L   1      -5.061  31.935  20.239  1.00  0.00           H  
+HETATM 3234  H3  AEN L   1      -6.995  31.814  21.786  1.00  0.00           H  
+HETATM 3235  H4  AEN L   1      -6.621  32.076  24.233  1.00  0.00           H  
+HETATM 3236  H5  AEN L   1      -4.334  32.440  25.085  1.00  0.00           H  
+HETATM 3237  H6  AEN L   1      -1.030  33.064  25.279  1.00  0.00           H  
+HETATM 3238  H7  AEN L   1      -2.762  33.037  25.520  1.00  0.00           H  
+HETATM 3239  H8  AEN L   1      -0.159  32.749  23.234  1.00  0.00           H  
+HETATM 3240  H9  AEN L   1      -1.201  32.477  21.854  1.00  0.00           H  
+
+ENDMDL

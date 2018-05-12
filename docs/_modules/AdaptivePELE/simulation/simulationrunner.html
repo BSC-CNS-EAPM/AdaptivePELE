@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.5
               </div>
             
           
@@ -86,6 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
 </ul>
 
@@ -136,7 +137,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.simulation.simulationrunner</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">time</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
@@ -146,11 +148,20 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">blockNames</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="k">import</span> <span class="n">simulationTypes</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">atomset</span><span class="p">,</span> <span class="n">RMSDCalculator</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">KMeans</span>
+<span class="n">SKLEARN</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">KMeans</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">SKLEARN</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">basestring</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">basestring</span> <span class="o">=</span> <span class="nb">str</span>
 
 
 <div class="viewcode-block" id="SimulationParameters"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters">[docs]</a><span class="k">class</span> <span class="nc">SimulationParameters</span><span class="p">:</span>
@@ -276,7 +287,25 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Set the processorsToClusterMapping to zero</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">processorsToClusterMapping</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">)]</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processorsToClusterMapping</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="SimulationRunner.createMultipleComplexesFilenames"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.createMultipleComplexesFilenames">[docs]</a>    <span class="k">def</span> <span class="nf">createMultipleComplexesFilenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numberOfSnapshots</span><span class="p">,</span> <span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> <span class="n">equilibration</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Creates the string to substitute the complexes in the PELE control file</span>
+
+<span class="sd">            :param numberOfSnapshots: Number of complexes to write</span>
+<span class="sd">            :type numberOfSnapshots: int</span>
+<span class="sd">            :param tmpInitialStructuresTemplate: Template with the name of the initial strutctures</span>
+<span class="sd">            :type tmpInitialStructuresTemplate: str</span>
+<span class="sd">            :param iteration: Epoch number</span>
+<span class="sd">            :type iteration: int</span>
+<span class="sd">            :param equilibration: Flag to mark wether the complexes are part of an</span>
+<span class="sd">                equilibration run</span>
+<span class="sd">            :type equilibration: bool</span>
+
+<span class="sd">            :returns: str -- jsonString to be substituted in PELE control file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
 
 
 <div class="viewcode-block" id="PeleSimulation"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation">[docs]</a><span class="k">class</span> <span class="nc">PeleSimulation</span><span class="p">(</span><span class="n">SimulationRunner</span><span class="p">):</span>
@@ -293,7 +322,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="s2">&quot;Documents&quot;</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ln -s &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">documentsFolder</span> <span class="o">+</span> <span class="s2">&quot; Documents&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PeleSimulation.getNextIterationBox"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getNextIterationBox">[docs]</a>    <span class="k">def</span> <span class="nf">getNextIterationBox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusteringObject</span><span class="p">,</span> <span class="n">outputFolder</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+<div class="viewcode-block" id="PeleSimulation.getNextIterationBox"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getNextIterationBox">[docs]</a>    <span class="k">def</span> <span class="nf">getNextIterationBox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusteringObject</span><span class="p">,</span> <span class="n">outputFolder</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Select the box for the next epoch, currently selecting the COM of</span>
 <span class="sd">            the cluster with max SASA</span>
@@ -304,6 +333,8 @@
 <span class="sd">            :type outputFolder: str</span>
 <span class="sd">            :param resname: Name of the ligand in the pdb</span>
 <span class="sd">            :type resname: str</span>
+<span class="sd">            :param topology: Topology file</span>
+<span class="sd">            :type topology: str</span>
 
 <span class="sd">            :returns str: -- string to be substitued in PELE control file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -324,11 +355,15 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> should be either binding or unbinding, but </span><span class="si">%s</span><span class="s2"> is provided!!!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">modeMovingBox</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">modeMovingBox</span><span class="p">))</span>
         <span class="c1"># If this lines are reached then a new extreme SASA value was</span>
         <span class="c1"># identified and we proceed to extract the corresponding center of mass</span>
+        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">topology_content</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">topology_content</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">trajNum</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="n">SASAcluster</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">snapshotNum</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="n">SASAcluster</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">snapshot</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputFolder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">trajectoryName</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">))[</span><span class="nb">int</span><span class="p">(</span><span class="n">snapshotNum</span><span class="p">)]</span>
+        <span class="n">snapshot</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputFolder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">trajectoryName</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">),</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)[</span><span class="nb">int</span><span class="p">(</span><span class="n">snapshotNum</span><span class="p">)]</span>
         <span class="n">snapshotPDB</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
-        <span class="n">snapshotPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
+        <span class="n">snapshotPDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_content</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">boxCenter</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">snapshotPDB</span><span class="o">.</span><span class="n">getCOM</span><span class="p">())</span>
         <span class="k">return</span></div>
 
@@ -354,6 +389,9 @@
             <span class="c1"># as a path to a file</span>
             <span class="n">initialStruct</span> <span class="o">=</span> <span class="n">initialStructuresAsString</span>
 
+        <span class="c1"># Note: this lines were not changed when adding support for xtc</span>
+        <span class="c1"># trajectories because it was assumed that initial structures would</span>
+        <span class="c1"># still be pdbs</span>
         <span class="n">PDBinitial</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
         <span class="n">PDBinitial</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">initialStruct</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="n">PDBinitial</span><span class="o">.</span><span class="n">getCOM</span><span class="p">())</span></div>
@@ -372,16 +410,16 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">toRun</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mpirun -np &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="n">runningControlFile</span><span class="p">]</span>
         <span class="n">toRun</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">toRun</span><span class="p">)</span>
-        <span class="nb">print</span> <span class="n">toRun</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">toRun</span><span class="p">)</span>
         <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">toRun</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">toRun</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-        <span class="nb">print</span> <span class="n">out</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="n">err</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 
         <span class="n">endTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="nb">print</span> <span class="s2">&quot;PELE took </span><span class="si">%.2f</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">)</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PELE took </span><span class="si">%.2f</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="PeleSimulation.getEquilibrationControlFile"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getEquilibrationControlFile">[docs]</a>    <span class="k">def</span> <span class="nf">getEquilibrationControlFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">peleControlFileDict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -405,8 +443,7 @@
         <span class="c1"># Ensure random tags exists in metrics</span>
         <span class="n">metricsBlock</span> <span class="o">=</span> <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PeleTasks&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;metrics&quot;</span><span class="p">]</span>
         <span class="n">nMetrics</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">metricsBlock</span><span class="p">)</span>
-        <span class="n">randomIndexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">nMetrics</span><span class="p">)</span> <span class="k">if</span> <span class="n">metricsBlock</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">]</span>
-        <span class="n">randomIndexes</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">randomIndexes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nMetrics</span><span class="p">)</span> <span class="k">if</span> <span class="n">metricsBlock</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">])</span>
         <span class="c1"># Delete random numbers from metrics</span>
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">randomIndexes</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">del</span> <span class="n">metricsBlock</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -466,7 +503,7 @@
         <span class="c1"># but no more than 50</span>
         <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">stepsPerProc</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PeleSimulation.equilibrate"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate">[docs]</a>    <span class="k">def</span> <span class="nf">equilibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">reportFilename</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+<div class="viewcode-block" id="PeleSimulation.equilibrate"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate">[docs]</a>    <span class="k">def</span> <span class="nf">equilibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">reportFilename</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Run short simulation to equilibrate the system. It will run one</span>
 <span class="sd">            such simulation for every initial structure and select appropiate</span>
@@ -482,6 +519,8 @@
 <span class="sd">            :type outputPath: str</span>
 <span class="sd">            :param resname: Residue name of the ligand in the system pdb</span>
 <span class="sd">            :type resname: str</span>
+<span class="sd">            :param topology: Topology file for non-pdb trajectories</span>
+<span class="sd">            :type topology: str</span>
 
 <span class="sd">            :returns: list --  List with initial structures</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -509,9 +548,9 @@
                 <span class="c1"># box information, include it manually</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">templateNames</span><span class="p">:</span>
                     <span class="n">templateNames</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;$</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">name</span>
-            <span class="nb">print</span> <span class="s2">&quot;Running equilibration for initial structure number </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running equilibration for initial structure number </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
             <span class="n">peleControlString</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">peleControlFileDict</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">templateNames</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">templateNames</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="c1"># Remove double quote around template keys, so that PELE</span>
                 <span class="c1"># understands the options</span>
                 <span class="n">peleControlString</span> <span class="o">=</span> <span class="n">peleControlString</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;$</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
@@ -522,11 +561,11 @@
             <span class="n">reportNames</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">equilibrationOutput</span><span class="p">,</span> <span class="n">reportWildcard</span><span class="p">)</span>
             <span class="n">trajNames</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">equilibrationOutput</span><span class="p">,</span> <span class="n">trajWildcard</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">equilibrationMode</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">equilibrationLastSnapshot</span><span class="p">:</span>
-                <span class="n">newStructure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectEquilibrationLastSnapshot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">,</span> <span class="n">trajNames</span><span class="p">)</span>
+                <span class="n">newStructure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectEquilibrationLastSnapshot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">,</span> <span class="n">trajNames</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">equilibrationMode</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">equilibrationSelect</span><span class="p">:</span>
-                <span class="n">newStructure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectEquilibratedStructure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">,</span> <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">trajNames</span><span class="p">,</span> <span class="n">reportNames</span><span class="p">)</span>
+                <span class="n">newStructure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectEquilibratedStructure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">,</span> <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">trajNames</span><span class="p">,</span> <span class="n">reportNames</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">equilibrationMode</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">equilibrationCluster</span><span class="p">:</span>
-                <span class="n">newStructure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterEquilibrationStructures</span><span class="p">(</span><span class="n">resname</span><span class="p">,</span> <span class="n">trajNames</span><span class="p">,</span> <span class="n">reportNames</span><span class="p">)</span>
+                <span class="n">newStructure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterEquilibrationStructures</span><span class="p">(</span><span class="n">resname</span><span class="p">,</span> <span class="n">trajNames</span><span class="p">,</span> <span class="n">reportNames</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">struct</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">newStructure</span><span class="p">):</span>
                 <span class="n">newStructurePath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">equilibrationOutput</span><span class="p">,</span> <span class="s1">&#39;equilibration_struc_</span><span class="si">%d</span><span class="s1">_</span><span class="si">%d</span><span class="s1">.pdb&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
@@ -535,7 +574,7 @@
                 <span class="n">newInitialStructures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newStructurePath</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">newInitialStructures</span></div>
 
-<div class="viewcode-block" id="PeleSimulation.clusterEquilibrationStructures"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.clusterEquilibrationStructures">[docs]</a>    <span class="k">def</span> <span class="nf">clusterEquilibrationStructures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">trajWildcard</span><span class="p">,</span> <span class="n">reportWildcard</span><span class="p">):</span>
+<div class="viewcode-block" id="PeleSimulation.clusterEquilibrationStructures"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.clusterEquilibrationStructures">[docs]</a>    <span class="k">def</span> <span class="nf">clusterEquilibrationStructures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">trajWildcard</span><span class="p">,</span> <span class="n">reportWildcard</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Cluster the equilibration run</span>
 
@@ -545,39 +584,57 @@
 <span class="sd">            :type trajWildcard: str</span>
 <span class="sd">            :param reportWildcard: Templetized path to report files&quot;</span>
 <span class="sd">            :type reportWildcard: str</span>
+<span class="sd">            :param topology: Topology file for non-pdb trajectories</span>
+<span class="sd">            :type topology: str</span>
 
 <span class="sd">            :returns: list -- List with the pdb snapshots of the representatives structures</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">SKLEARN</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">utilities</span><span class="o">.</span><span class="n">UnsatisfiedDependencyException</span><span class="p">(</span><span class="s2">&quot;No installation of scikit-learn found. Please, install scikit-learn or select a different equilibrationMode.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">topology_content</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">topology_content</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
         <span class="n">energyColumn</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="c1"># detect number of trajectories available</span>
-        <span class="n">nTrajs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">trajWildcard</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;*&quot;</span><span class="p">))</span>
+        <span class="n">nTrajs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">trajWildcard</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;*&quot;</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
             <span class="n">report</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">reportWildcard</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
-            <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">report</span> <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">nSnap</span><span class="p">,</span> <span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">snapshots</span><span class="p">)):</span>
                 <span class="n">conformation</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
-                <span class="n">conformation</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
+                <span class="n">conformation</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_content</span><span class="p">)</span>
                 <span class="n">com</span> <span class="o">=</span> <span class="n">conformation</span><span class="o">.</span><span class="n">getCOM</span><span class="p">()</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">line</span><span class="p">[</span><span class="n">energyColumn</span><span class="p">],</span> <span class="n">i</span><span class="p">,</span> <span class="n">nSnap</span><span class="p">]</span><span class="o">+</span><span class="n">com</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
-        <span class="n">nPoints</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">nPoints</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">4</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">nPoints</span><span class="p">]</span>
-        <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:])</span>
-        <span class="n">clustersInfo</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;structure&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;minDist&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="n">e6</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">)}</span>
+        <span class="n">n_clusters</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Clustered equilibration output into </span><span class="si">%d</span><span class="s2"> clusters!&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">)</span>
+        <span class="n">clustersInfo</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;structure&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;minDist&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="n">e6</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">)}</span>
         <span class="k">for</span> <span class="n">conf</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">labels_</span><span class="p">):</span>
-            <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">kmeans</span><span class="o">.</span><span class="n">cluster_centers_</span><span class="o">-</span><span class="n">conf</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">kmeans</span><span class="o">.</span><span class="n">cluster_centers_</span><span class="p">[</span><span class="n">cluster</span><span class="p">]</span><span class="o">-</span><span class="n">conf</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span>
             <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">clustersInfo</span><span class="p">[</span><span class="n">cluster</span><span class="p">][</span><span class="s2">&quot;minDist&quot;</span><span class="p">]:</span>
                 <span class="n">clustersInfo</span><span class="p">[</span><span class="n">cluster</span><span class="p">][</span><span class="s2">&quot;minDist&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span>
                 <span class="n">clustersInfo</span><span class="p">[</span><span class="n">cluster</span><span class="p">][</span><span class="s2">&quot;structure&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
         <span class="n">initialStructures</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">clustersInfo</span><span class="p">[</span><span class="n">cl</span><span class="p">][</span><span class="s2">&quot;structure&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># If a cluster has no structure assigned, skip it</span>
+                <span class="k">continue</span>
             <span class="n">traj</span><span class="p">,</span> <span class="n">snap</span> <span class="o">=</span> <span class="n">clustersInfo</span><span class="p">[</span><span class="n">cl</span><span class="p">][</span><span class="s2">&quot;structure&quot;</span><span class="p">]</span>
-            <span class="n">initialStructures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">traj</span><span class="p">)[</span><span class="n">snap</span><span class="p">])</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">traj</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)[</span><span class="n">snap</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+                <span class="n">conf</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_mdtraj_object_PDBstring</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">topology_content</span><span class="p">)</span>
+            <span class="n">initialStructures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">initialStructures</span></div>
 
-<div class="viewcode-block" id="PeleSimulation.selectEquilibrationLastSnapshot"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibrationLastSnapshot">[docs]</a>    <span class="k">def</span> <span class="nf">selectEquilibrationLastSnapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">,</span> <span class="n">trajWildcard</span><span class="p">):</span>
+<div class="viewcode-block" id="PeleSimulation.selectEquilibrationLastSnapshot"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibrationLastSnapshot">[docs]</a>    <span class="k">def</span> <span class="nf">selectEquilibrationLastSnapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">,</span> <span class="n">trajWildcard</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Select the last snapshot of each trajectory as a  representative</span>
 <span class="sd">            initial structure from the equilibration run</span>
@@ -586,12 +643,25 @@
 <span class="sd">            :type nTrajs: int</span>
 <span class="sd">            :param trajWildcard: Templetized path to trajectory files&quot;</span>
 <span class="sd">            :type trajWildcard: str</span>
+<span class="sd">            :param topology: Topology file for non-pdb trajectories</span>
+<span class="sd">            :type topology: str</span>
 
 <span class="sd">            :returns: list -- List with the pdb snapshots of the representatives structures</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">ij</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ij</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">)]</span></div>
+        <span class="n">initialStructures</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">topology_content</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">topology_content</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">ij</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">ij</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+                <span class="n">conf</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_mdtraj_object_PDBstring</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">topology_content</span><span class="p">)</span>
+            <span class="n">initialStructures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PeleSimulation.selectEquilibratedStructure"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibratedStructure">[docs]</a>    <span class="k">def</span> <span class="nf">selectEquilibratedStructure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">,</span> <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">trajWildcard</span><span class="p">,</span> <span class="n">reportWildcard</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">initialStructures</span></div>
+
+<div class="viewcode-block" id="PeleSimulation.selectEquilibratedStructure"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.selectEquilibratedStructure">[docs]</a>    <span class="k">def</span> <span class="nf">selectEquilibratedStructure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">,</span> <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">trajWildcard</span><span class="p">,</span> <span class="n">reportWildcard</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Select a representative initial structure from the equilibration</span>
 <span class="sd">            run</span>
@@ -620,19 +690,24 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">energyColumn</span><span class="p">,</span> <span class="n">similarityColumn</span><span class="p">])</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">topology_content</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">topology_content</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nTrajs</span><span class="p">):</span>
             <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rowIndex</span><span class="p">)</span>
             <span class="n">report</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">reportWildcard</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">similarityColumn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
                 <span class="n">report_values</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">initial</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshots</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
+                    <span class="n">initial</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshots</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_content</span><span class="p">)</span>
                     <span class="n">report_values</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">report</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">energyColumn</span><span class="p">]])</span>
                     <span class="n">report</span> <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span>
                 <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">snap</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">):</span>
                     <span class="n">pdbConformation</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
-                    <span class="n">pdbConformation</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snap</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
+                    <span class="n">pdbConformation</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snap</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_content</span><span class="p">)</span>
                     <span class="n">report_values</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">RMSDCalc</span><span class="o">.</span><span class="n">computeRMSD</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">pdbConformation</span><span class="p">),</span> <span class="n">report</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">energyColumn</span><span class="p">]])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">report_values</span> <span class="o">=</span> <span class="n">report</span><span class="p">[:,</span> <span class="n">cols</span><span class="p">]</span>
@@ -641,9 +716,9 @@
 
         <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">energyColumn</span> <span class="o">&gt;</span> <span class="n">similarityColumn</span> <span class="ow">or</span> <span class="n">similarityColumn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">energyColumn</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">similarityColumn</span><span class="p">,</span> <span class="n">energyColumn</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">energyColumn</span><span class="p">,</span> <span class="n">similarityColumn</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">energyColumn</span><span class="p">,</span> <span class="n">similarityColumn</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
         <span class="n">maxEnergy</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="n">energyColumn</span><span class="p">]</span>
         <span class="c1"># Substract the max value so all values will be negative (avoid sign problems)</span>
         <span class="n">values</span><span class="p">[:,</span> <span class="n">energyColumn</span><span class="p">]</span> <span class="o">-=</span> <span class="n">maxEnergy</span>
@@ -671,7 +746,10 @@
         <span class="c1"># trajectories are 1-indexed</span>
         <span class="n">trajNum</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="c1"># return as list for compatibility with selectEquilibrationLastSnapshot</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">)[</span><span class="n">snapshotNum</span><span class="p">]]</span></div>
+        <span class="n">conf</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajWildcard</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)[</span><span class="n">snapshotNum</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_mdtraj_object_PDBstring</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">topology_content</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">conf</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="PeleSimulation.createMultipleComplexesFilenames"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.createMultipleComplexesFilenames">[docs]</a>    <span class="k">def</span> <span class="nf">createMultipleComplexesFilenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numberOfSnapshots</span><span class="p">,</span> <span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> <span class="n">equilibration</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

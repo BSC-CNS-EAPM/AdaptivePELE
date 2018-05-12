@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.5
               </div>
             
           
@@ -88,6 +88,7 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
@@ -169,13 +170,18 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomContent</strong> (<em>str</em>) – Line of the pdb from which the atom will be created</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomContent</strong> (<em>basestring</em>) – Line of the pdb from which the atom will be created</td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="AdaptivePELE.atomset.atomset.Atom.atomSerial">
 <code class="descname">atomSerial</code><a class="headerlink" href="#AdaptivePELE.atomset.atomset.Atom.atomSerial" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.atomset.atomset.Atom.equivalentResname">
+<code class="descname">equivalentResname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.Atom.equivalentResname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -276,6 +282,11 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.atomset.atomset.Atom.set_properties">
+<code class="descname">set_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.Atom.set_properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.atomset.atomset.Atom.squaredDistance">
 <code class="descname">squaredDistance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.Atom.squaredDistance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the squared distance between two atoms</p>
@@ -320,8 +331,13 @@
 <p>Object that will contain the information of a PDB file. Has to call
 the initialise method to load the file</p>
 <dl class="attribute">
+<dt id="AdaptivePELE.atomset.atomset.PDB.ATOM_LINE_TEMPLATE">
+<code class="descname">ATOM_LINE_TEMPLATE</code><em class="property"> = u'%s%s %s %s %s%s%s   %.3f%.3f%.3f%.2f%.2f          %s   '</em><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.ATOM_LINE_TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="AdaptivePELE.atomset.atomset.PDB.CMAtoms">
-<code class="descname">CMAtoms</code><em class="property"> = {'ILE': 'empty', 'GLN': 'empty', 'GLY': 'empty', 'GLU': 'OE1', 'CYS': 'empty', 'ASP': 'OD1', 'SER': 'empty', 'LYS': 'NZ', 'PRO': 'empty', 'HID': 'CE1', 'HIE': 'CE1', 'ASN': 'empty', 'HIP': 'CE1', 'VAL': 'empty', 'THR': 'empty', 'HIS': 'CE1', 'TRP': 'CH2', 'PHE': 'CZ', 'ALA': 'empty', 'MET': 'empty', 'LEU': 'empty', 'ARG': 'NE', 'TYR': 'OH'}</em><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.CMAtoms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">CMAtoms</code><em class="property"> = {u'ILE': u'empty', u'GLN': u'empty', u'GLY': u'empty', u'GLU': u'OE1', u'CYS': u'empty', u'ASP': u'OD1', u'SER': u'empty', u'LYS': u'NZ', u'PRO': u'empty', u'HID': u'CE1', u'HIE': u'CE1', u'ASN': u'empty', u'HIP': u'CE1', u'VAL': u'empty', u'THR': u'empty', u'HIS': u'CE1', u'TRP': u'CH2', u'PHE': u'CZ', u'ALA': u'empty', u'MET': u'empty', u'LEU': u'empty', u'ARG': u'NE', u'TYR': u'OH'}</em><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.CMAtoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -360,7 +376,7 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ligandResname</strong> (<em>str</em>) – Residue name of the ligand in the PDB</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
 <li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>
@@ -371,6 +387,11 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.atomset.atomset.PDB.createSelectionString">
+<code class="descname">createSelectionString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.createSelectionString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.atomset.atomset.PDB.extractCOM">
@@ -408,7 +429,7 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomId</strong> (<em>str</em>) – Id of the Atom (in the format “atomserial:atomName:resname”)</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomId</strong> (<em>basestring</em>) – Id of the Atom (in the format “atomserial:atomName:resname”)</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – Number of atoms in the PDB</td>
 </tr>
@@ -461,31 +482,30 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.atomset.atomset.PDB.get_pdb_string">
+<code class="descname">get_pdb_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.get_pdb_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.atomset.atomset.PDB.initialise">
 <code class="descname">initialise</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.initialise" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load the information from a PDB file or a string with the PDB
-contents</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>PDBstr</strong> (<em>str</em>) – may be a path to the PDB file or a string with the contents of the PDB</li>
-<li><strong>heavyAtoms</strong> (<em>bool</em>) – wether to consider only heavy atoms (True if onl y heavy atoms have to be considered)</li>
-<li><strong>resname</strong> (<em>str</em>) – Residue name to select from the pdb (will only select the residues with that name)</li>
-<li><strong>atomname</strong> (<em>int</em>) – Residue name to select from the pdb (will only select the atoms with that name)</li>
-<li><strong>type</strong> (<em>str</em>) – type of atoms to select: may be ALL, PROTEIN or HETERO</li>
-<li><strong>chain</strong> (<em>str</em>) – Chain name to select from the pdb (will only select the atoms with that name)</li>
-<li><strong>resnum</strong> – Residue number to select from the pdb (will only select the atoms with that name)</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError if the pdb contained no atoms</p>
-</td>
-</tr>
-</tbody>
-</table>
+<dd><p>Wrapper function</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.atomset.atomset.PDB.isfromPDBFile">
+<code class="descname">isfromPDBFile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.isfromPDBFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="AdaptivePELE.atomset.atomset.PDB.ispdb">
+<code class="descname">ispdb</code><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.ispdb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.atomset.atomset.PDB.join_PDB_lines">
+<code class="descname">join_PDB_lines</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.join_PDB_lines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="AdaptivePELE.atomset.atomset.PDB.pdb">
@@ -504,6 +524,11 @@ contents</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.atomset.atomset.PDB.updateCoords">
+<code class="descname">updateCoords</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.updateCoords" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.atomset.atomset.PDB.writePDB">
 <code class="descname">writePDB</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.writePDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the pdb contents of the file from wich the PDB object was
@@ -512,7 +537,7 @@ created</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – Path of the file where to write the pdb</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>basestring</em>) – Path of the file where to write the pdb</td>
 </tr>
 </tbody>
 </table>
@@ -591,9 +616,9 @@ created</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pdbfile</strong> (<em>str</em>) – A string with PDB content or the path of a pdb file</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pdbfile</strong> (<em>basestring</em>) – A string with PDB content or the path of a pdb file</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str – A string with PDB content</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">basestring – A string with PDB content</td>
 </tr>
 </tbody>
 </table>
@@ -696,9 +721,9 @@ contactThresholdDistance Amstrongs away</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>PDBobj</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – PDB object that contains the conformation’s info</li>
-<li><strong>ligandResname</strong> (<em>str</em>) – Residue name of the ligand in the PDB</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
 <li><strong>ligandResnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>ligandResChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>ligandResChain</strong> (<em>basestring</em>) – String containing the chain name of the ligand in the pdb</li>
 <li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>
@@ -729,9 +754,9 @@ away</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>PDBobj</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – PDB object that contains the conformation’s info</li>
-<li><strong>ligandResname</strong> (<em>str</em>) – Residue name of the ligand in the PDB</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
 <li><strong>ligandResnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>ligandResChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>ligandResChain</strong> (<em>basestring</em>) – String containing the chain name of the ligand in the pdb</li>
 <li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>
@@ -771,9 +796,9 @@ contactThresholdDistance Amstrongs away</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ligandResname</strong> (<em>str</em>) – Residue name of the ligand in the PDB</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
 <li><strong>ligandResnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>ligandResChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</li>
+<li><strong>ligandResChain</strong> (<em>basestring</em>) – String containing the chain name of the ligand in the pdb</li>
 <li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>

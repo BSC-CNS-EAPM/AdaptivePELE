@@ -2,7 +2,7 @@ from AdaptivePELE.constants import blockNames
 
 
 class DENSITY_CALCULATOR_TYPES:
-    null, heaviside, continuous, exitContinous = range(4)
+    null, heaviside, continuous, exitContinous = list(range(4))
 
 DENSITY_CALCULATOR_TYPE_TO_STRING_DICTIONARY = {
     DENSITY_CALCULATOR_TYPES.heaviside: blockNames.DensityCalculator.heaviside,

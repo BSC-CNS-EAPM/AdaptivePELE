@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.4
+                v1.5
               </div>
             
           
@@ -86,6 +86,7 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
 </ul>
 
@@ -175,8 +176,6 @@
 </li>
       <li><a href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.makePNGs">AdaptivePELE.analysis.makePNGs (module)</a>
 </li>
-      <li><a href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.numberOfClusters">AdaptivePELE.analysis.numberOfClusters (module)</a>
-</li>
       <li><a href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.plotAdaptive">AdaptivePELE.analysis.plotAdaptive (module)</a>
 </li>
       <li><a href="AdaptivePELE.analysis.html#module-AdaptivePELE.analysis.writeClusteringStructures">AdaptivePELE.analysis.writeClusteringStructures (module)</a>
@@ -205,10 +204,10 @@
 </li>
       <li><a href="AdaptivePELE.spawning.html#module-AdaptivePELE.spawning.densitycalculator">AdaptivePELE.spawning.densitycalculator (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="AdaptivePELE.spawning.html#module-AdaptivePELE.spawning.densitycalculatortypes">AdaptivePELE.spawning.densitycalculatortypes (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="AdaptivePELE.spawning.html#module-AdaptivePELE.spawning.spawning">AdaptivePELE.spawning.spawning (module)</a>
 </li>
       <li><a href="AdaptivePELE.spawning.html#module-AdaptivePELE.spawning.spawningTypes">AdaptivePELE.spawning.spawningTypes (module)</a>
@@ -243,6 +242,8 @@
 </li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.Atom">Atom (class in AdaptivePELE.atomset.atomset)</a>
 </li>
+      <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.ATOM_LINE_TEMPLATE">ATOM_LINE_TEMPLATE (AdaptivePELE.atomset.atomset.PDB attribute)</a>
+</li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.atomList">atomList (AdaptivePELE.atomset.atomset.PDB attribute)</a>
 </li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.atoms">atoms (AdaptivePELE.atomset.atomset.PDB attribute)</a>
@@ -275,8 +276,6 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.numberOfClusters.buildClustersPerValue">buildClustersPerValue() (in module AdaptivePELE.analysis.numberOfClusters)</a>
-</li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildContactMap">buildContactMap() (AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator method)</a>
 </li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.buildContactMapWithRowMap">buildContactMapWithRowMap() (AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator method)</a>
@@ -461,6 +460,8 @@
 </li>
       <li><a href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.densitycalculator.ContinuousDensityCalculator">ContinuousDensityCalculator (class in AdaptivePELE.spawning.densitycalculator)</a>
 </li>
+      <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.convert_trajectory_to_pdb">convert_trajectory_to_pdb() (in module AdaptivePELE.utilities.utilities)</a>
+</li>
       <li><a href="AdaptivePELE.html#AdaptivePELE.adaptiveSampling.copyInitialStructures">copyInitialStructures() (in module AdaptivePELE.adaptiveSampling)</a>
 </li>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clusteringTypes.SIMILARITY_TYPES.correlation">correlation (AdaptivePELE.clustering.clusteringTypes.SIMILARITY_TYPES attribute)</a>
@@ -470,8 +471,14 @@
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.createContactMap">createContactMap() (AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator method)</a>
 </li>
       <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.createMultipleComplexesFilenames">createMultipleComplexesFilenames() (AdaptivePELE.simulation.simulationrunner.PeleSimulation method)</a>
+
+      <ul>
+        <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.createMultipleComplexesFilenames">(AdaptivePELE.simulation.simulationrunner.SimulationRunner method)</a>
 </li>
+      </ul></li>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ConformationNetwork.createPathwayToCluster">createPathwayToCluster() (AdaptivePELE.clustering.clustering.ConformationNetwork method)</a>
+</li>
+      <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.createSelectionString">createSelectionString() (AdaptivePELE.atomset.atomset.PDB method)</a>
 </li>
       <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.createSymbolicLinks">createSymbolicLinks() (AdaptivePELE.simulation.simulationrunner.PeleSimulation method)</a>
 </li>
@@ -523,6 +530,8 @@
 </li>
       <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate">equilibrate() (AdaptivePELE.simulation.simulationrunner.PeleSimulation method)</a>
 </li>
+      <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.Atom.equivalentResname">equivalentResname() (AdaptivePELE.atomset.atomset.Atom method)</a>
+</li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateCorrelation">evaluateCorrelation() (AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator method)</a>
 </li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator.evaluateDifferenceDistance">evaluateDifferenceDistance() (AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator method)</a>
@@ -557,13 +566,9 @@
 </li>
       <li><a href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator">FASTDegeneracyCalculator (class in AdaptivePELE.spawning.spawning)</a>
 </li>
-      <li><a href="AdaptivePELE.html#AdaptivePELE.adaptiveSampling.filterClustersAccordingToBox">filterClustersAccordingToBox() (in module AdaptivePELE.adaptiveSampling)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.numberOfClusters.findDifferentClustersForAllEpochs">findDifferentClustersForAllEpochs() (in module AdaptivePELE.analysis.numberOfClusters)</a>
-</li>
-      <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.numberOfClusters.findDifferentClustersInEpoch">findDifferentClustersInEpoch() (in module AdaptivePELE.analysis.numberOfClusters)</a>
+      <li><a href="AdaptivePELE.html#AdaptivePELE.adaptiveSampling.filterClustersAccordingToBox">filterClustersAccordingToBox() (in module AdaptivePELE.adaptiveSampling)</a>
 </li>
       <li><a href="AdaptivePELE.html#AdaptivePELE.adaptiveSampling.findFirstRun">findFirstRun() (in module AdaptivePELE.adaptiveSampling)</a>
 </li>
@@ -577,8 +582,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.gen_atom_name">gen_atom_name() (in module AdaptivePELE.utilities.utilities)</a>
 </li>
-      <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.generateForLoopString">generateForLoopString() (in module AdaptivePELE.analysis.plotAdaptive)</a>
-</li>
       <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.generateNestedString">generateNestedString() (in module AdaptivePELE.analysis.plotAdaptive)</a>
 </li>
       <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.generatePrintString">generatePrintString() (in module AdaptivePELE.analysis.plotAdaptive)</a>
@@ -587,13 +590,17 @@
 </li>
       <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.get_epoch_folders">get_epoch_folders() (in module AdaptivePELE.utilities.utilities)</a>
 </li>
-      <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.numberOfClusters.getAllDifferentValues">getAllDifferentValues() (in module AdaptivePELE.analysis.numberOfClusters)</a>
+      <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.get_mdtraj_object_PDBstring">get_mdtraj_object_PDBstring() (in module AdaptivePELE.utilities.utilities)</a>
+</li>
+      <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.get_pdb_string">get_pdb_string() (AdaptivePELE.atomset.atomset.PDB method)</a>
 </li>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.getAllTrajectories">getAllTrajectories() (in module AdaptivePELE.clustering.clustering)</a>
 </li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.getAtom">getAtom() (AdaptivePELE.atomset.atomset.PDB method)</a>
 </li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.Atom.getAtomCoords">getAtomCoords() (AdaptivePELE.atomset.atomset.Atom method)</a>
+</li>
+      <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getAtomNames">getAtomNames() (in module AdaptivePELE.utilities.utilities)</a>
 </li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.getCentroid">getCentroid() (AdaptivePELE.atomset.atomset.PDB method)</a>
 </li>
@@ -603,8 +610,6 @@
         <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters.getCluster">(AdaptivePELE.clustering.clustering.Clusters method)</a>
 </li>
       </ul></li>
-      <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.numberOfClusters.getClusteringSummaryContent">getClusteringSummaryContent() (in module AdaptivePELE.analysis.numberOfClusters)</a>
-</li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.getCOM">getCOM() (AdaptivePELE.atomset.atomset.PDB method)</a>
 </li>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Cluster.getContacts">getContacts() (AdaptivePELE.clustering.clustering.Cluster method)</a>
@@ -645,8 +650,6 @@
       </ul></li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.getNumberOfAtoms">getNumberOfAtoms() (AdaptivePELE.atomset.atomset.PDB method)</a>
 </li>
-      <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.numberOfClusters.getNumberOfClustersPerEpochForGivenColumn">getNumberOfClustersPerEpochForGivenColumn() (in module AdaptivePELE.analysis.numberOfClusters)</a>
-</li>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.getOptimalMetric">getOptimalMetric() (AdaptivePELE.clustering.clustering.Clustering method)</a>
 </li>
       <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getPELEControlFileDict">getPELEControlFileDict() (in module AdaptivePELE.utilities.utilities)</a>
@@ -665,7 +668,7 @@
 </li>
       <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getStationaryDistr">getStationaryDistr() (in module AdaptivePELE.utilities.utilities)</a>
 </li>
-      <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.numberOfClusters.getTotalNumberOfClustersPerEpoch">getTotalNumberOfClustersPerEpoch() (in module AdaptivePELE.analysis.numberOfClusters)</a>
+      <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getTopologyFile">getTopologyFile() (in module AdaptivePELE.utilities.utilities)</a>
 </li>
       <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getTrajNum">getTrajNum() (in module AdaptivePELE.utilities.utilities)</a>
 </li>
@@ -705,19 +708,23 @@
 </li>
       <li><a href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.inverselyProportional">inverselyProportional (AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator">InverselyProportionalToPopulationCalculator (class in AdaptivePELE.spawning.spawning)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.CMClusteringEvaluator.isElement">isElement() (AdaptivePELE.clustering.clustering.CMClusteringEvaluator method)</a>
 
       <ul>
         <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator.isElement">(AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator method)</a>
 </li>
       </ul></li>
+      <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.isfromPDBFile">isfromPDBFile() (AdaptivePELE.atomset.atomset.PDB method)</a>
+</li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.Atom.isHeavyAtom">isHeavyAtom() (AdaptivePELE.atomset.atomset.Atom method)</a>
 </li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.Atom.isHeteroAtom">isHeteroAtom() (AdaptivePELE.atomset.atomset.Atom method)</a>
+</li>
+      <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.ispdb">ispdb (AdaptivePELE.atomset.atomset.PDB attribute)</a>
 </li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.Atom.isProtein">isProtein() (AdaptivePELE.atomset.atomset.Atom method)</a>
 </li>
@@ -730,6 +737,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clusteringTypes.SIMILARITY_TYPES.Jaccard">Jaccard (AdaptivePELE.clustering.clusteringTypes.SIMILARITY_TYPES attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.join_PDB_lines">join_PDB_lines() (AdaptivePELE.atomset.atomset.PDB method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -788,7 +799,7 @@
 </li>
         <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.foldersFirstBindingEvent.main">(in module AdaptivePELE.analysis.foldersFirstBindingEvent)</a>
 </li>
-        <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.numberOfClusters.main">(in module AdaptivePELE.analysis.numberOfClusters)</a>
+        <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.writeClusteringStructures.main">(in module AdaptivePELE.analysis.writeClusteringStructures)</a>
 </li>
         <li><a href="AdaptivePELE.html#AdaptivePELE.automateRoundsAdaptive.main">(in module AdaptivePELE.automateRoundsAdaptive)</a>
 </li>
@@ -871,17 +882,13 @@
       </ul></li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.pdb">pdb (AdaptivePELE.atomset.atomset.PDB attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB">PDB (class in AdaptivePELE.atomset.atomset)</a>
 </li>
       <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationTypes.SIMULATION_TYPE.PELE">PELE (AdaptivePELE.simulation.simulationTypes.SIMULATION_TYPE attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation">PeleSimulation (class in AdaptivePELE.simulation.simulationrunner)</a>
-</li>
-      <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.numberOfClusters.plotClustersPerValue">plotClustersPerValue() (in module AdaptivePELE.analysis.numberOfClusters)</a>
-</li>
-      <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.numberOfClusters.plotContactsHistogram">plotContactsHistogram() (in module AdaptivePELE.analysis.numberOfClusters)</a>
 </li>
       <li><a href="AdaptivePELE.html#AdaptivePELE.adaptiveSampling.preparePeleControlFile">preparePeleControlFile() (in module AdaptivePELE.adaptiveSampling)</a>
 </li>
@@ -892,8 +899,6 @@
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Cluster.printCluster">printCluster() (AdaptivePELE.clustering.clustering.Cluster method)</a>
 </li>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters.printClusters">printClusters() (AdaptivePELE.clustering.clustering.Clusters method)</a>
-</li>
-      <li><a href="AdaptivePELE.analysis.html#AdaptivePELE.analysis.numberOfClusters.printHelp">printHelp() (in module AdaptivePELE.analysis.numberOfClusters)</a>
 </li>
       <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.Atom.protein">protein (AdaptivePELE.atomset.atomset.Atom attribute)</a>
 </li>
@@ -963,9 +968,13 @@
 </li>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering">SequentialLastSnapshotClustering (class in AdaptivePELE.clustering.clustering)</a>
 </li>
+      <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.Atom.set_properties">set_properties() (AdaptivePELE.atomset.atomset.Atom method)</a>
+</li>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.setCol">setCol() (AdaptivePELE.clustering.clustering.Clustering method)</a>
 </li>
       <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.setZeroMapping">setZeroMapping() (AdaptivePELE.simulation.simulationrunner.SimulationRunner method)</a>
+</li>
+      <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.sign">sign() (in module AdaptivePELE.utilities.utilities)</a>
 </li>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clusteringTypes.SIMILARITY_TYPES">SIMILARITY_TYPES (class in AdaptivePELE.clustering.clusteringTypes)</a>
 </li>
@@ -975,10 +984,10 @@
 </li>
       <li><a href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator">SimulatedAnnealingCalculator (class in AdaptivePELE.spawning.spawning)</a>
 </li>
-      <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationTypes.SIMULATION_TYPE">SIMULATION_TYPE (class in AdaptivePELE.simulation.simulationTypes)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationTypes.SIMULATION_TYPE">SIMULATION_TYPE (class in AdaptivePELE.simulation.simulationTypes)</a>
+</li>
       <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters">SimulationParameters (class in AdaptivePELE.simulation.simulationrunner)</a>
 </li>
       <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner">SimulationRunner (class in AdaptivePELE.simulation.simulationrunner)</a>
@@ -1043,9 +1052,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.UCB">UCB (AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES attribute)</a>
 </li>
+      <li><a href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.UCBCalculator">UCBCalculator (class in AdaptivePELE.spawning.spawning)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.UCBCalculator">UCBCalculator (class in AdaptivePELE.spawning.spawning)</a>
+      <li><a href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB.updateCoords">updateCoords() (AdaptivePELE.atomset.atomset.PDB method)</a>
+</li>
+      <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.AltStructures.updateIndex">updateIndex() (AdaptivePELE.clustering.clustering.AltStructures method)</a>
 </li>
       <li><a href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.updateMappingProcessors">updateMappingProcessors() (AdaptivePELE.simulation.simulationrunner.SimulationRunner method)</a>
 </li>
@@ -1073,7 +1086,11 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.write_mdtraj_object_PDB">write_mdtraj_object_PDB() (in module AdaptivePELE.utilities.utilities)</a>
+</li>
       <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.write_PDB_clusters">write_PDB_clusters() (in module AdaptivePELE.utilities.utilities)</a>
+</li>
+      <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.write_xtc_to_pdb">write_xtc_to_pdb() (in module AdaptivePELE.utilities.utilities)</a>
 </li>
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.writeClusterMetric">writeClusterMetric() (AdaptivePELE.clustering.clustering.Clustering method)</a>
 </li>
@@ -1108,6 +1125,8 @@
       <li><a href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Cluster.writeSpawningStructure">writeSpawningStructure() (AdaptivePELE.clustering.clustering.Cluster method)</a>
 </li>
       <li><a href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.clusteringUtilities.writeStructures">writeStructures() (in module AdaptivePELE.utilities.clusteringUtilities)</a>
+</li>
+      <li><a href="AdaptivePELE.html#AdaptivePELE.adaptiveSampling.writeTopologyFile">writeTopologyFile() (in module AdaptivePELE.adaptiveSampling)</a>
 </li>
   </ul></td>
 </tr></table>

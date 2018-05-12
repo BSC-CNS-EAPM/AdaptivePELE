@@ -6,11 +6,16 @@
         3) A MSM_object.pkl obtained with pyemma in order to obtain the stationary distribution
         4) For the moment, it needs of a reweightingT, in order to do a histogram reweighting, but does not seem to work that well
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import numpy as np
 import glob
 import sys
 import argparse
-import cPickle
+try:
+    import cPickle
+except ImportError:
+    import pickle as cPickle
 from pyemma.coordinates.clustering import AssignCenters
 from AdaptivePELE.freeEnergies import runMarkovChainModel as run
 from AdaptivePELE.freeEnergies import utils
@@ -72,8 +77,8 @@ def reweightProbabilities(T, Torig, origProb):
     gpmf[gpmf == -np.inf] = np.inf
     gpmf -= gpmf.min()  # It does not make any difference here
 
-    print gpmf[gpmf == np.inf]
-    print gpmf[gpmf == -np.inf]
+    print(gpmf[gpmf == np.inf])
+    print(gpmf[gpmf == -np.inf])
     a = (T-Torig) / (kb * T * Torig)
     correction1 = np.exp(a * gpmf)
     beta = 1/kb/T
@@ -86,7 +91,7 @@ def reweightProbabilities(T, Torig, origProb):
 
 
 def loadMSM(MSMFile):
-    with open(MSMFile) as MSMfile:
+    with open(MSMFile, "rb") as MSMfile:
         MSM_object = cPickle.load(MSMfile)
     return MSM_object
 
@@ -104,7 +109,7 @@ def ensure_connectivity(MSMObject, allClusters):
         ######################
         # Reconstruct stationary distribution with pseudocounts to ensure
         # connectivity
-        print "Adding pseudocounts to enforce connectivity"
+        print("Adding pseudocounts to enforce connectivity")
         counts = MSMObject.count_matrix_full
         trans = reestimate_transition_matrix(counts)
         _, eic = run.getSortedEigen(trans)
@@ -140,7 +145,7 @@ def create_box(clusters, originalCoordinates, d):
         maxval = np.maximum(cmaxval, maxval)
         minval = np.minimum(cminval, minval)
 
-    print "Maximum bounds", maxval, "Minimum bounds", minval
+    print("Maximum bounds", maxval, "Minimum bounds", minval)
 
     # Rounded floor and ceiling in intervals of "d" (e.g., floor of 1.73 with d = 0.5, will be 1.5 instead of 1.0, in order to optimize box creation.
     # An extra box is included in the ceiling, so that all the points are contained in the range given by arange
@@ -155,7 +160,7 @@ def calculate_microstate_volumes(clusters, originalCoordinates, bins, d):
         Estimate the clusters volumes using a cubic discretization of volumes
     """
     numberOfClusters = clusters.shape[0]
-    print "Number of clusters", numberOfClusters
+    print("Number of clusters", numberOfClusters)
     histogram = np.array([])
     histograms = []
     microstateVolume = np.zeros(numberOfClusters)
@@ -214,7 +219,7 @@ def calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d):
         Estimate the clusters volumes using a cubic discretization of volumes
     """
     numberOfClusters = clusters.shape[0]
-    print "Number of clusters", numberOfClusters
+    print("Number of clusters", numberOfClusters)
 
     allCoords = []
     # The coordinates array is built through lists in order to be able to
@@ -235,7 +240,7 @@ def calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d):
             if indices.size > 0:
                 init = indices[0]
                 end = indices[-1]
-                centers_x.extend([[x_val, y_val, bins[2][zi]] for zi in xrange(init, end+1)])
+                centers_x.extend([[x_val, y_val, bins[2][zi]] for zi in range(init, end+1)])
         if len(centers_x):
             centers_trajs.append(np.array(centers_x))
 
@@ -261,13 +266,13 @@ def calculate_pmf(microstateVolume, pi):
     newDist = pi/microstateVolume
     newDist /= newDist[newDist != np.inf].sum()
     gpmf = -kb*T*np.log(newDist)
-    print gpmf[gpmf == -np.inf]
-    print gpmf[gpmf == np.inf]
+    print(gpmf[gpmf == -np.inf])
+    print(gpmf[gpmf == np.inf])
     gpmf[gpmf == -np.inf] = np.inf  # to avoid contribution later
     gpmf -= gpmf.min()
 
     deltaW = -gpmf[gpmf != np.inf].max()
-    print "bound    Delta G     Delta W     Binding Volume:     Binding Volume contribution"
+    print("bound    Delta G     Delta W     Binding Volume:     Binding Volume contribution")
 
     upperGpmfValues = np.arange(0, -deltaW, 0.5)
 
@@ -281,7 +286,7 @@ def calculate_pmf(microstateVolume, pi):
                 bindingVolume += np.exp(-beta * g) * volume
         deltaG = deltaW - kb*T*np.log(bindingVolume/1661)
         string = "%.1f\t%.3f\t%.3f\t%.3f\t%.3f" % (upperGpmfValue, deltaG, deltaW, bindingVolume, -kb*T*np.log(bindingVolume/1661))
-        print string
+        print(string)
     return gpmf, string
 
 
@@ -300,10 +305,10 @@ def main(trajWildcard, reweightingT=1000):
     bins = create_box(clusters, originalCoordinates, d)
     method = "new"
     if method == "new":
-        print "Using new volume estimation with radius %.2f" % d
+        print("Using new volume estimation with radius %.2f" % d)
         microstateVolume = calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d)
     else:
-        print "Using old volume estimation with radius %.2f" % d
+        print("Using old volume estimation with radius %.2f" % d)
         microstateVolume = calculate_microstate_volumes(clusters, originalCoordinates, bins, d)
     np.savetxt("volumeOfClusters.dat", microstateVolume)
 
