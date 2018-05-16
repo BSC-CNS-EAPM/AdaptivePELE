@@ -364,7 +364,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
     lig_resname = parseResname(atom_Ids, lig_resname)
 
-    sidechains = extractSidechainIndexes(sidechain_folder, lig_resname) if sidechains else False
+    sidechains = extractSidechainIndexes(sidechain_folder, lig_resname) if sidechains else []
 
     folderWithTrajs = folder_name
 
