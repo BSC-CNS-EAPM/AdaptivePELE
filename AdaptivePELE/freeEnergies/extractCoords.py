@@ -6,7 +6,7 @@ import argparse
 import glob
 import re
 import socket
-from prody import *
+import prody as pd
 import shutil
 import sys
 import mdtraj as md
@@ -352,17 +352,19 @@ def gatherTrajs(constants, folder_name, setNumber, non_Repeat):
 def extractSidechainIndexes(trajs, ligand_resname):
     sidechains_trajs = []
     for traj in glob.glob(trajs):
-        atoms = parsePDB(traj)
+        atoms = pd.parsePDB(traj)
         sidechains = atoms.select("within 5 of resname {}".format(ligand_resname))
         sidechains_trajs.extend([atom.getIndex() for atom in sidechains])
     return list(set(sidechains_trajs))
 
 
-def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, topology=None, sidechains=False, sidechain_folder="."):
+def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, parallelize=True, topology=None, sidechains=False, sidechain_folder="."):
 
     constants = Constants()
 
     lig_resname = parseResname(atom_Ids, lig_resname)
+
+    sidechains = extractSidechainIndexes(sidechain_folder, lig_resname) if sidechains else False
 
     folderWithTrajs = folder_name
 
@@ -370,23 +372,29 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
     # change atomId for list
 
-    allFolders = os.listdir(folderWithTrajs)
-    folders = [epoch for epoch in allFolders if epoch.isdigit()]
-    if len(folders) == 0:
-        folders = ["."]
+
+    if enforceSequential_run:
+        allFolders = os.listdir(folderWithTrajs)
+        folders = [epoch for epoch in allFolders if epoch.isdigit()]
+        if len(folders) == 0:
+            folders = ["."]
+    else:
+        allFolders = os.listdir(folderWithTrajs)
+        folders = [epoch for epoch in allFolders if epoch.isdigit()]
+        if len(folders) == 0:
+            folders = ["."]
 
     if nProcessors is None:
         nProcessors = getCpuCount()
-    nProcessors = max(1, nProcessors)
-
-    if sidechains:
-        sidechains = extractSidechainIndexes(sidechain_folder, lig_resname)
+        nProcessors = max(1, nProcessors)
 
     print("Running extractCoords with %d cores" % (nProcessors))
-    if enforceSequential_run==1:
+
+    if parallelize:
         pool = mp.Pool()
     else:
         pool = None
+
     for folder_it in folders:
         pathFolder = os.path.join(folderWithTrajs, folder_it)
         print("Extracting coords from folder %s" % folder_it)
