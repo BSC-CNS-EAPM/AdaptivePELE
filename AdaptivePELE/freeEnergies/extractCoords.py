@@ -374,10 +374,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
 
     if enforceSequential_run:
-        allFolders = os.listdir(folderWithTrajs)
-        folders = [epoch for epoch in allFolders if epoch.isdigit()]
-        if len(folders) == 0:
-            folders = ["."]
+        folders = ["."]
     else:
         allFolders = os.listdir(folderWithTrajs)
         folders = [epoch for epoch in allFolders if epoch.isdigit()]
@@ -386,7 +383,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
     if nProcessors is None:
         nProcessors = getCpuCount()
-        nProcessors = max(1, nProcessors)
+    nProcessors = max(1, nProcessors)
 
     print("Running extractCoords with %d cores" % (nProcessors))
 
