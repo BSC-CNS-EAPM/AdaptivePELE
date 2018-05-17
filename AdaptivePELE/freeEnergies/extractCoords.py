@@ -6,6 +6,7 @@ import argparse
 import glob
 import re
 import socket
+import prody as pd
 import shutil
 import sys
 import mdtraj as md
@@ -74,7 +75,7 @@ def getCpuCount():
     return cores or max(1, mp.cpu_count()-1)
 
 
-def loadAllResnameAtomsInPdb(filename, lig_resname, writeCA):
+def loadAllResnameAtomsInPdb(filename, lig_resname, writeCA, sidechains):
     prunedFileContent = []
     with open(filename) as f:
         prunedSnapshot = []
@@ -82,7 +83,7 @@ def loadAllResnameAtomsInPdb(filename, lig_resname, writeCA):
             if utils.is_model(line):
                 prunedFileContent.append("".join(prunedSnapshot))
                 prunedSnapshot = []
-            elif line[17:20] == lig_resname or utils.isAlphaCarbon(line, writeCA):
+            elif line[17:20] == lig_resname or utils.isAlphaCarbon(line, writeCA) or utils.isSidechain(line, bool(sidechains), sidechains):
                 prunedSnapshot.append(line)
         if prunedSnapshot:
             prunedFileContent.append("".join(prunedSnapshot))
@@ -101,17 +102,22 @@ def getOutputFilename(directory, filename, baseOutputFilename):
     return os.path.join(directory, baseOutputFilename+filenumber+".dat")
 
 
-def getLigandAlphaCarbonsCoords(allCoordinates, lig_resname):
+def getLigandAlphaCarbonsCoords(allCoordinates, lig_resname, sidechains=False):
     trajCoords = []
     for coordinates in allCoordinates:
         PDB = atomset.PDB()
         PDB.initialise(coordinates, resname=lig_resname)
         snapshotCoords = [coord for at in PDB.atomList for coord in PDB.atoms[at].getAtomCoords()]
         PDBCA = atomset.PDB()
-        PDBCA.initialise(coordinates, type="PROTEIN")
+        if not sidechains:
+            PDBCA.initialise(coordinates, type="PROTEIN")
+        else:
+            PDBCA.initialise(coordinates, type="PROTEIN", heavyAtoms=True)
         snapshotCoords.extend([coord for at in PDBCA.atomList for coord in PDBCA.atoms[at].getAtomCoords()])
         trajCoords.append(snapshotCoords)
     return trajCoords
+
+
 
 
 def getPDBCOM(allCoordinates, lig_resname):
@@ -169,16 +175,18 @@ def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology):
     return coordinates
 
 
-def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, topology=None):
+def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology=None):
     ext = os.path.splitext(filename)[1]
     if ext == ".pdb":
-        allCoordinates = loadAllResnameAtomsInPdb(filename, lig_resname, writeCA)
+        allCoordinates = loadAllResnameAtomsInPdb(filename, lig_resname, writeCA, sidechains)
         if writeLigandTrajectory:
             outputFilename = os.path.join(pathFolder, constants.ligandTrajectoryBasename % extractFilenumber(filename))
             with open(outputFilename, 'w') as f:
                 f.write("\nENDMDL\n".join(allCoordinates))
         if writeCA:
-            coords = getLigandAlphaCarbonsCoords(allCoordinates[:-1], lig_resname)
+            coords = getLigandAlphaCarbonsCoords(allCoordinates, lig_resname)
+        elif sidechains:
+            coords = getLigandAlphaCarbonsCoords(allCoordinates, lig_resname, sidechains=sidechains)
         else:
             # because of the way it's split, the last element is empty
             if atom_Ids is None or len(atom_Ids) == 0:
@@ -195,19 +203,19 @@ def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolde
     writeToFile(coords, outputFilename % pathFolder)
 
 
-def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, writeCA, pool=None, topology=None):
+def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, writeCA, sidechains, pool=None, topology=None):
     if not os.path.exists(constants.extractedTrajectoryFolder % pathFolder):
         os.makedirs(constants.extractedTrajectoryFolder % pathFolder)
 
-    originalPDBfiles = glob.glob(pathFolder+'/*traj*')
+    originalPDBfiles = glob.glob(pathFolder+'/*trajectory*')
     workers = []
     for filename in originalPDBfiles:
         if pool is None:
             # serial version
-            writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, topology=topology)
+            writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology=topology)
         else:
             # multiprocessor version
-            workers.append(pool.apply_async(writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, topology)))
+            workers.append(pool.apply_async(writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology)))
     for w in workers:
         w.get()
 
@@ -341,17 +349,29 @@ def gatherTrajs(constants, folder_name, setNumber, non_Repeat):
     copyTrajectories(nonRepeatedTrajs, constants.gatherNonRepeatedTrajsFilename, folder_name)
 
 
-def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, topology=None):
+def extractSidechainIndexes(trajs, ligand_resname):
+    sidechains_trajs = []
+    for traj in glob.glob(trajs):
+        atoms = pd.parsePDB(traj)
+        sidechains = atoms.select("within 5 of resname {}".format(ligand_resname))
+        sidechains_trajs.extend([atom.getIndex() for atom in sidechains])
+    return list(set(sidechains_trajs))
+
+
+def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, parallelize=True, topology=None, sidechains=False, sidechain_folder="."):
 
     constants = Constants()
 
     lig_resname = parseResname(atom_Ids, lig_resname)
+
+    sidechains = extractSidechainIndexes(sidechain_folder, lig_resname) if sidechains else []
 
     folderWithTrajs = folder_name
 
     makeGatheredTrajsFolder(constants)
 
     # change atomId for list
+
 
     if enforceSequential_run:
         folders = ["."]
@@ -364,8 +384,13 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
     if nProcessors is None:
         nProcessors = getCpuCount()
     nProcessors = max(1, nProcessors)
+
     print("Running extractCoords with %d cores" % (nProcessors))
-    pool = mp.Pool()
+
+    if parallelize:
+        pool = mp.Pool()
+    else:
+        pool = None
 
     for folder_it in folders:
         pathFolder = os.path.join(folderWithTrajs, folder_it)
@@ -373,7 +398,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
         ligand_trajs_folder = os.path.join(pathFolder, constants.ligandTrajectoryFolder)
         if writeLigandTrajectory and not os.path.exists(ligand_trajs_folder):
             os.makedirs(ligand_trajs_folder)
-        writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, protein_CA, pool=pool, topology=topology)
+        writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, protein_CA, sidechains, pool=pool, topology=topology)
         if not non_Repeat:
             print("Repeating snapshots from folder %s" % folder_it)
             repeatExtractedSnapshotsInFolder(pathFolder, constants, numtotalSteps, pool=None)
