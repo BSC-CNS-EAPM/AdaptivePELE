@@ -24,7 +24,7 @@ elif 'login' in machine:
     elif name == "nord3":
         releaseFolder = "/gpfs/projects/bsc72/adaptiveSampling/bin_nord"
 
-releaseName = "v1.4.2"
+releaseName = "v1.5"
 toOmit = ["tests", "runAllTests.py", "os", "sys", "TODO.txt", "Data", "Documents", "DataLocal", "epsilon_values.txt", "makeRelease.py", ".git", ".gitignore"]
 
 
