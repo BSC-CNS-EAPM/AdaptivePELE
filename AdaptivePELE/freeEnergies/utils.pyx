@@ -1,6 +1,8 @@
 import numpy as np
 from io import open
 cimport cython
+from cpython cimport array
+import array
 cimport numpy as np
 from libc.math cimport sqrt
 
@@ -75,6 +77,17 @@ def isAlphaCarbon(basestring string, bint writeCA):
     cdef basestring C = u"C"
 
     return writeCA and string[12:16].strip() == CA and string[76:80].strip() == C
+
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def isSidechain(basestring string, bint writeSide, list sidechains):
+    cdef basestring index = (string[6:11].strip())
+    if not writeSide or not index:
+        return False
+    else:
+        return int(index) in sidechains
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
