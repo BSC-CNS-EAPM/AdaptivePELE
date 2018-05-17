@@ -44,7 +44,7 @@ for tau, k in iterations:
                                        computeDetailedBalance=True,
                                        trajWildcard="traj_*",
                                        folderWithTraj="rawData",
-                                       lagtimes=[1, 10, 25, 50, 100, 250, 500, 1000],
+                                       lagtimes=[1, 10, 25, 50, 100, 250, 400, 500, 600, 1000],
                                        clusterCountsThreshold=0)
     try:
         estimateDG.estimateDG(parameters, cleanupClusterCentersAtStart=True)
