@@ -204,7 +204,7 @@ def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeL
     if not os.path.exists(constants.extractedTrajectoryFolder % pathFolder):
         os.makedirs(constants.extractedTrajectoryFolder % pathFolder)
 
-    originalPDBfiles = glob.glob(os.path.join(pathFolder, '*traj*'))
+    originalPDBfiles = glob.glob(os.path.join(pathFolder, '*traj*.pdb'))
     workers = []
     for filename in originalPDBfiles:
         if pool is None:
