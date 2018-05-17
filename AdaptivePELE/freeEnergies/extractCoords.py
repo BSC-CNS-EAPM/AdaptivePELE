@@ -118,8 +118,6 @@ def getLigandAlphaCarbonsCoords(allCoordinates, lig_resname, sidechains=False):
     return trajCoords
 
 
-
-
 def getPDBCOM(allCoordinates, lig_resname):
     COMs = []
     for coordinates in allCoordinates:
@@ -188,11 +186,10 @@ def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolde
         elif sidechains:
             coords = getLigandAlphaCarbonsCoords(allCoordinates, lig_resname, sidechains=sidechains)
         else:
-            # because of the way it's split, the last element is empty
             if atom_Ids is None or len(atom_Ids) == 0:
-                coords = getPDBCOM(allCoordinates[:-1], lig_resname)
+                coords = getPDBCOM(allCoordinates, lig_resname)
             else:
-                coords = getAtomCoord(allCoordinates[:-1], lig_resname, atom_Ids)
+                coords = getAtomCoord(allCoordinates, lig_resname, atom_Ids)
     elif ext == ".xtc":
         coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA, topology)
     else:
@@ -207,7 +204,7 @@ def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeL
     if not os.path.exists(constants.extractedTrajectoryFolder % pathFolder):
         os.makedirs(constants.extractedTrajectoryFolder % pathFolder)
 
-    originalPDBfiles = glob.glob(pathFolder+'/*trajectory*')
+    originalPDBfiles = glob.glob(os.path.join(pathFolder, '*traj*'))
     workers = []
     for filename in originalPDBfiles:
         if pool is None:
@@ -369,9 +366,6 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
     folderWithTrajs = folder_name
 
     makeGatheredTrajsFolder(constants)
-
-    # change atomId for list
-
 
     if enforceSequential_run:
         folders = ["."]
