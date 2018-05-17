@@ -70,17 +70,22 @@ def getCpuCount():
     elif "bsc.mn" in machine:
         # MNIV
         cores = os.getenv("SLURM_NPROC", None)
-    return cores or mp.cpu_count()
+    # Take 1 less than the count of processors, to not clog the machine
+    return cores or max(1, mp.cpu_count()-1)
 
 
 def loadAllResnameAtomsInPdb(filename, lig_resname, writeCA):
-    with open(filename) as f:
-        fileContent = f.read()
-    fileContent = fileContent.split('ENDMDL')
     prunedFileContent = []
-    for snapshot in fileContent:
-        prunedSnapshot = [line for line in snapshot.split('\n') if line[17:20] == lig_resname or utils.isAlphaCarbon(line, writeCA)]
-        prunedFileContent.append("\n".join(prunedSnapshot))
+    with open(filename) as f:
+        prunedSnapshot = []
+        for line in f:
+            if utils.is_model(line):
+                prunedFileContent.append("".join(prunedSnapshot))
+                prunedSnapshot = []
+            elif line[17:20] == lig_resname or utils.isAlphaCarbon(line, writeCA):
+                prunedSnapshot.append(line)
+        if prunedSnapshot:
+            prunedFileContent.append("".join(prunedSnapshot))
     return prunedFileContent
 
 
@@ -371,7 +376,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
         writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeLigandTrajectory, constants, protein_CA, pool=pool, topology=topology)
         if not non_Repeat:
             print("Repeating snapshots from folder %s" % folder_it)
-            repeatExtractedSnapshotsInFolder(pathFolder, constants, numtotalSteps, pool=pool)
+            repeatExtractedSnapshotsInFolder(pathFolder, constants, numtotalSteps, pool=None)
         print("Gathering trajs in %s" % constants.gatherTrajsFolder)
         gatherTrajs(constants, folder_it, setNumber, non_Repeat)
 

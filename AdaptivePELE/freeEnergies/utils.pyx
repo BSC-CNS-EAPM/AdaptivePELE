@@ -1,4 +1,5 @@
 import numpy as np
+from io import open
 cimport cython
 cimport numpy as np
 from libc.math cimport sqrt
@@ -74,3 +75,9 @@ def isAlphaCarbon(basestring string, bint writeCA):
     cdef basestring C = u"C"
 
     return writeCA and string[12:16].strip() == CA and string[76:80].strip() == C
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def is_model(basestring line):
+    cdef basestring check = "ENDMDL"
+    return check in line[:7]

@@ -26,7 +26,7 @@ def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1, nruns=10):
         parameters = estimateDG.Parameters(ntrajs=trajsPerEpoch*(epoch+1),
                                            length=None,
                                            lagtime=lagtime,
-                                           lagtimes=[1, 10, 25],
+                                           lagtimes=[1, 10, 25, 50, 100, 250, 400, 500, 600, 1000],
                                            nclusters=nclusters,
                                            nruns=nruns,
                                            useAllTrajInFirstRun=True,
