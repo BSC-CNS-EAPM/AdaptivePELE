@@ -11,7 +11,11 @@ import shutil
 import sys
 import mdtraj as md
 import numpy as np
-import multiprocess as mp
+try:
+    import multiprocess as mp
+    PARALELLIZATION = True
+except ImportError:
+    PARALELLIZATION = False
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.freeEnergies import utils
 # reload(sys)
@@ -357,6 +361,7 @@ def extractSidechainIndexes(trajs, ligand_resname):
 
 def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, parallelize=True, topology=None, sidechains=False, sidechain_folder="."):
 
+
     constants = Constants()
 
     lig_resname = parseResname(atom_Ids, lig_resname)
@@ -375,13 +380,15 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
         if len(folders) == 0:
             folders = ["."]
 
-    if nProcessors is None:
-        nProcessors = getCpuCount()
-    nProcessors = max(1, nProcessors)
-
-    print("Running extractCoords with %d cores" % (nProcessors))
+    # if multiprocess is not available, turn off parallelization
+    parallelize = PARALELLIZATION
 
     if parallelize:
+        if nProcessors is None:
+            nProcessors = getCpuCount()
+        nProcessors = max(1, nProcessors)
+
+        print("Running extractCoords with %d cores" % (nProcessors))
         pool = mp.Pool()
     else:
         pool = None
