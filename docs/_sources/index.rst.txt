@@ -22,8 +22,9 @@ Contents
    :maxdepth: 2
 
    Examples
-   Changelog
+   Problems
    AdaptivePELE
+   Changelog
 
 
 Indices and tables
