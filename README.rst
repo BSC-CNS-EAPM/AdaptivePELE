@@ -2,6 +2,16 @@
 AdaptivePELE
 ============
 
+
+|MIT license|
+
+.. code:: rst
+
+    |MIT license|
+
+    .. |MIT license| image:: https://img.shields.io/badge/License-MIT-blue.svg
+       :target: https://lbesson.mit-license.org/
+
 AdaptivePELE is a Python module to perform enhancing sampling of molecular
 simulation built around the Protein Energy Landscape Exploration method (`PELE <https:www.pele.bsc.es>`_) developed in the Electronic and Atomic Protein Modelling grop (`EAPM <https://www.bsc.es/discover-bsc/organisation/scientific-structure/electronic-and-atomic-protein-modeling-eapm>`_) at the Barcelona Supercomputing Center (`BSC <https://www.bsc.es>`_).
 
@@ -40,22 +50,31 @@ Documentation
 The documentation for AdaptivePELE can be found `here <https://adaptivepele.github.io/AdaptivePELE/>`_
 
 
-####  Citation [![DOI for Citing AdaptivePELE](https://img.shields.io/badge/DOI-10.1038%2s41598-017-08445-5-blue.svg)](http://doi.org/10.1038/s41598-017-08445-5)
+Citation 
+--------
 
-AdaptivePELE is research software. If you make use of AdaptivePELE in scientific publications, please cite it. The BibTeX reference is
-```
-@article{Lecina2017,
-author = {Lecina, Daniel and Gilabert, Joan Francesc and Guallar, Victor},
-doi = {10.1038/s41598-017-08445-5},
-issn = {2045-2322},
-journal = {Scientific Reports},
-number = {1},
-pages = {8466},
-pmid = {28814780},
-title = {{Adaptive simulations, towards interactive protein-ligand modeling}},
-url = {http://www.nature.com/articles/s41598-017-08445-5},
-volume = {7},
-year = {2017}
-}
-```
+|DOI|
 
+.. code:: rst
+
+   |DOI|
+
+   .. |DOI| image:: https://zenodo.org/badge/DOI/10.1038/s41598-017-08445-5.svg
+      :target: https://doi.org/10.1038/s41598-017-08445-5
+
+
+AdaptivePELE is research software. If you make use of AdaptivePELE in scientific publications, please cite it. The BibTeX reference is::
+
+    @article{Lecina2017,
+    author = {Lecina, Daniel and Gilabert, Joan Francesc and Guallar, Victor},
+    doi = {10.1038/s41598-017-08445-5},
+    issn = {2045-2322},
+    journal = {Scientific Reports},
+    number = {1},
+    pages = {8466},
+    pmid = {28814780},
+    title = {{Adaptive simulations, towards interactive protein-ligand modeling}},
+    url = {http://www.nature.com/articles/s41598-017-08445-5},
+    volume = {7},
+    year = {2017}
+    }
