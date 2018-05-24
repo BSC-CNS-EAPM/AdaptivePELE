@@ -8,7 +8,7 @@ Welcome to AdaptivePELE's documentation!
 ========================================
 
 AdaptivePELE is a Python module to perform enhancing sampling of molecular
-simulation built around the Protein Energy Landscape Exploration method (`PELE <https://www.pele.bsc.es>`_) developed in the Electronic and Atomic Protein Modelling grop (`EAPM <https://www.bsc.es/discover-bsc/organisation/scientific-structure/electronic-and-atomic-protein-modeling-eapm>`_) at the Barcelona Supercomputing Center (`BSC <https://www.bsc.es>`_). AdaptivePELE's 
+simulation built around the Protein Energy Landscape Exploration method (`PELE <https://pele.bsc.es/pele.wt>`_) developed in the Electronic and Atomic Protein Modelling grop (`EAPM <https://www.bsc.es/discover-bsc/organisation/scientific-structure/electronic-and-atomic-protein-modeling-eapm>`_) at the Barcelona Supercomputing Center (`BSC <https://www.bsc.es>`_). AdaptivePELE's 
 code is publicly available in `GitHub <https://github.com/AdaptivePELE/AdaptivePELE>`_ under the MIT license.
 
 .. image:: adaptiveDiagram.png
