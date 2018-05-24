@@ -40,7 +40,7 @@ Documentation
 The documentation for AdaptivePELE can be found `here <https://adaptivepele.github.io/AdaptivePELE/>`_
 
 
-####  Citation [![DOI for Citing AdaptivePELE](https://img.shields.io/badge/DOI-10.1016%2Fj.bpj.2015.08.015-blue.svg)](http://doi.org/10.1038/s41598-017-08445-5)
+####  Citation [![DOI for Citing AdaptivePELE](https://img.shields.io/badge/DOI-10.1038%2s41598-017-08445-5-blue.svg)](http://doi.org/10.1038/s41598-017-08445-5)
 
 AdaptivePELE is research software. If you make use of AdaptivePELE in scientific publications, please cite it. The BibTeX reference is
 ```
