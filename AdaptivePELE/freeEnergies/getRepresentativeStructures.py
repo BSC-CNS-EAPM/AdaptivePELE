@@ -24,7 +24,7 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
         clusters = ['a']
     # Load the representative structures file
     try:
-        clusters_info = np.loadtxt(representatives_files, skiprows=1)
+        clusters_info = np.loadtxt(representatives_files, skiprows=1, dtype=int)
     except IOError:
         raise IOError("Couldn't find a representative file in %s, please check that the path is correct" % representatives_files)
     # Organize to minimise pdb loading
@@ -33,6 +33,7 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
 
     extract_info = {}
     for row in clusters_info:
+        # write information as {[epoch, traj]: [cluster, snapshot]}
         index = (row[1], row[2])
         value = (row[0], row[3])
         if index in extract_info:
@@ -55,7 +56,8 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
             it += 1
         destFolder %= it
         os.makedirs(destFolder)
-    structureFolder = os.path.join(path_structures, "%d", trajNames+"_%d*")
+    structureFolder = os.path.join(path_structures, "%d", trajNames+"_%d.*")
+ 
     for trajFile, extraInfo in extract_info.items():
         pdbFile = glob.glob(structureFolder % trajFile)[0]
         try:
@@ -66,14 +68,13 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
             topology_contents = utilities.getTopologyFile(topology)
         else:
             topology_contents = None
-
         for pair in extraInfo:
             if topology_contents is None:
                 with open(os.path.join(destFolder, "cluster_%d.pdb" % pair[0]), "w") as fw:
-                    fw.write(snapshots[int(pair[1])])
+                    fw.write(snapshots[pair[1]])
                     fw.write("\n")
             else:
-                utilities.write_mdtraj_object_PDB(snapshots[int(pair[1])], os.path.join(destFolder, "cluster_%d.pdb" % pair[0]), topology=topology_contents)
+                utilities.write_mdtraj_object_PDB(snapshots[pair[1]], os.path.join(destFolder, "cluster_%d.pdb" % pair[0]), topology=topology_contents)
 
 
 if __name__ == "__main__":
