@@ -442,3 +442,8 @@ def convert_trajectory_to_pdb(trajectory, topology, output, output_folder):
             fw.write(PDB.pdb)
             fw.write("ENDMDL\n")
         fw.write("END\n")
+
+
+def writeObject(filename, object_to_write):
+    with open(filename, "wb") as f:
+        pickle.dump(object_to_write, f)
