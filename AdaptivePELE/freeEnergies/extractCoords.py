@@ -12,7 +12,7 @@ import sys
 import mdtraj as md
 import numpy as np
 try:
-    import multiprocess as mp
+    import multiprocessing as mp
     PARALELLIZATION = True
 except ImportError:
     PARALELLIZATION = False
@@ -158,7 +158,7 @@ def writeToFile(COMs, outputFilename):
 def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology):
     trajectory = md.load(file_name, top=topology)
     if writeCA:
-        selection = "(protein and name CA) or (resname '%s' and not element H)" % ligand
+        selection = "(protein and name CA) or (resname '%s')" % ligand
     elif atom_Ids and atom_Ids is not None:
         selection_list = []
         for atomID in atom_Ids:
