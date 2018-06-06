@@ -74,7 +74,11 @@ def getCpuCount():
         cores = os.getenv("LSB_DJOB_NUMPROC", None)
     elif "bsc.mn" in machine:
         # MNIV
-        cores = os.getenv("SLURM_NPROC", None)
+        cores = os.getenv("SLURM_NPROCS", None)
+    try:
+        cores = int(cores)
+    except TypeError:
+        cores = None
     # Take 1 less than the count of processors, to not clog the machine
     return cores or max(1, mp.cpu_count()-1)
 
