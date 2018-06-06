@@ -208,7 +208,7 @@ def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeL
     if not os.path.exists(constants.extractedTrajectoryFolder % pathFolder):
         os.makedirs(constants.extractedTrajectoryFolder % pathFolder)
 
-    originalPDBfiles = glob.glob(os.path.join(pathFolder, '*traj*.pdb'))
+    originalPDBfiles = glob.glob(os.path.join(pathFolder, '*traj*.*'))
     workers = []
     for filename in originalPDBfiles:
         if pool is None:
@@ -361,7 +361,6 @@ def extractSidechainIndexes(trajs, ligand_resname):
 
 def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, parallelize=True, topology=None, sidechains=False, sidechain_folder="."):
 
-
     constants = Constants()
 
     lig_resname = parseResname(atom_Ids, lig_resname)
@@ -381,7 +380,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
             folders = ["."]
 
     # if multiprocess is not available, turn off parallelization
-    parallelize = PARALELLIZATION
+    parallelize &= PARALELLIZATION
 
     if parallelize:
         if nProcessors is None:
