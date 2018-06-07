@@ -18,7 +18,6 @@ except ImportError:
     PARALELLIZATION = False
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.freeEnergies import utils
-from AdaptivePELE.utilities import utilities
 # reload(sys)
 # sys.setdefaultencoding('utf-8')
 
@@ -184,21 +183,13 @@ def extractIndexesTopology(topology, lig_resname, atoms, writeCA, sidechains):
 
 
 def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology, selected_indices, sidechains):
-    with md.formats.XTCTrajectoryFile(file_name) as f:
-        trajectory, _, _, _ = f.read()
-    n_frames = trajectory.shape[0]
+    trajectory = md.load(file_name, top=topology)
     if not writeCA and (atom_Ids is None or len(atom_Ids) == 0) and not sidechains:
-        topology_contents = utilities.getTopologyFile(topology)
         # getCOM case
         # convert nm to A
-        coordinates = []
-        for frame in trajectory:
-            pdb = atomset.PDB()
-            pdb.initialise(frame, resname=ligand, heavyAtoms=True, topology=topology_contents)
-            coordinates.append(pdb.extractCOM())
+        coordinates = 10*md.compute_center_of_mass(trajectory.atom_slice(selected_indices))
     else:
-        trajectory *= 10
-        coordinates = trajectory[:, selected_indices, :].reshape((n_frames, -1))
+        coordinates = 10*trajectory.xyz[:, selected_indices, :].reshape((trajectory.n_frames, -1))
     return coordinates
 
 
