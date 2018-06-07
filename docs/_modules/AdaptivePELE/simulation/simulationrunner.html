@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.5
+                v1.5.1
               </div>
             
           
@@ -616,7 +616,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">nPoints</span><span class="p">]</span>
         <span class="n">n_clusters</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Clustered equilibration output into </span><span class="si">%d</span><span class="s2"> clusters!&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Clustered equilibration output into </span><span class="si">%d</span><span class="s2"> clusters!&quot;</span> <span class="o">%</span> <span class="n">n_clusters</span><span class="p">)</span>
         <span class="n">clustersInfo</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;structure&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;minDist&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="n">e6</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">)}</span>
         <span class="k">for</span> <span class="n">conf</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">labels_</span><span class="p">):</span>
             <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">kmeans</span><span class="o">.</span><span class="n">cluster_centers_</span><span class="p">[</span><span class="n">cluster</span><span class="p">]</span><span class="o">-</span><span class="n">conf</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span>
