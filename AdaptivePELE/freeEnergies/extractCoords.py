@@ -6,9 +6,9 @@ import argparse
 import glob
 import re
 import socket
-import prody as pd
 import shutil
 import sys
+import prody as pd
 import mdtraj as md
 import numpy as np
 try:
@@ -88,13 +88,14 @@ def getCpuCount():
 
 def loadAllResnameAtomsInPdb(filename, lig_resname, writeCA, sidechains):
     prunedFileContent = []
+    sidechains_bool = bool(sidechains)
     with open(filename) as f:
         prunedSnapshot = []
         for line in f:
             if utils.is_model(line):
                 prunedFileContent.append("".join(prunedSnapshot))
                 prunedSnapshot = []
-            elif line[17:20] == lig_resname or utils.isAlphaCarbon(line, writeCA) or utils.isSidechain(line, bool(sidechains), sidechains):
+            elif line[17:20] == lig_resname or utils.isAlphaCarbon(line, writeCA) or utils.isSidechain(line, sidechains_bool, sidechains):
                 prunedSnapshot.append(line)
         if prunedSnapshot:
             prunedFileContent.append("".join(prunedSnapshot))
@@ -186,23 +187,9 @@ def extractIndexesTopology(topology, lig_resname, atoms, writeCA, sidechains):
     return selection
 
 
-def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology, sidechains):
+def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology, selected_indices, sidechains):
     trajectory = md.load(file_name, top=topology)
-    if writeCA:
-        selection = "(protein and name CA) or (resname '%s')" % ligand
-    elif atom_Ids and atom_Ids is not None:
-        selection_list = []
-        for atomID in atom_Ids:
-            _, name, residue = atomID.split(":")
-            selection_list.append("(name %s and resname '%s')" % (name, residue))
-        selection = " or ".join(selection_list)
-    else:
-        selection = "resname '%s' and not element H" % ligand
-    if sidechains:
-        selected_indices = sidechains
-    else:
-        selected_indices = trajectory.topology.select(selection)
-    if not writeCA and not sidechains and (atom_Ids is None or len(atom_Ids) == 0):
+    if not writeCA and (atom_Ids is None or len(atom_Ids) == 0) and not sidechains:
         # getCOM case
         # convert nm to A
         coordinates = 10*md.compute_center_of_mass(trajectory.atom_slice(selected_indices))
@@ -211,7 +198,7 @@ def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology, si
     return coordinates
 
 
-def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology=None):
+def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology=None, indexes=None):
     ext = os.path.splitext(filename)[1]
     if ext == ".pdb":
         allCoordinates = loadAllResnameAtomsInPdb(filename, lig_resname, writeCA, sidechains)
@@ -229,7 +216,7 @@ def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolde
             else:
                 coords = getAtomCoord(allCoordinates, lig_resname, atom_Ids)
     elif ext == ".xtc":
-        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA, topology, sidechains)
+        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA, topology, indexes, sidechains)
     else:
         raise ValueError("Unrecongnized file extension for %s" % filename)
 
@@ -244,16 +231,18 @@ def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeL
 
     originalPDBfiles = glob.glob(os.path.join(pathFolder, '*traj*.*'))
     ext = os.path.splitext(originalPDBfiles[0])[1]
-    if ext == ".xtc" and sidechains:
-        sidechains = extractIndexesTopology(topology, lig_resname, atom_Ids, writeCA, sidechains)
+    if ext == ".xtc":
+        indexes = extractIndexesTopology(topology, lig_resname, atom_Ids, writeCA, sidechains)
+    else:
+        indexes = None
     workers = []
     for filename in originalPDBfiles:
         if pool is None:
             # serial version
-            writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology=topology)
+            writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology=topology, indexes=indexes)
         else:
             # multiprocessor version
-            workers.append(pool.apply_async(writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology)))
+            workers.append(pool.apply_async(writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology, indexes)))
     for w in workers:
         w.get()
 
@@ -403,7 +392,6 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
     lig_resname = parseResname(atom_Ids, lig_resname)
 
     sidechains = extractSidechainIndexes(sidechain_folder, lig_resname) if sidechains else []
-
     folderWithTrajs = folder_name
 
     makeGatheredTrajsFolder(constants)

@@ -57,17 +57,18 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
         destFolder %= it
         os.makedirs(destFolder)
     structureFolder = os.path.join(path_structures, "%d", trajNames+"_%d.*")
- 
+
+    if topology is not None:
+        topology_contents = utilities.getTopologyFile(topology)
+    else:
+        topology_contents = None
+
     for trajFile, extraInfo in extract_info.items():
         pdbFile = glob.glob(structureFolder % trajFile)[0]
         try:
             snapshots = utilities.getSnapshots(pdbFile, topology=topology)
         except IOError:
             raise IOError("Unable to open %s, please check that the path to structures provided is correct" % pdbFile)
-        if not isinstance(snapshots[0], basestring):
-            topology_contents = utilities.getTopologyFile(topology)
-        else:
-            topology_contents = None
         for pair in extraInfo:
             if topology_contents is None:
                 with open(os.path.join(destFolder, "cluster_%d.pdb" % pair[0]), "w") as fw:
