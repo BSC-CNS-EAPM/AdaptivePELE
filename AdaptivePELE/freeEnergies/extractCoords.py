@@ -57,10 +57,13 @@ def parseArguments():
     parser.add_argument("-nR", "--noRepeat", action="store_true", help="Flag to avoid repeating the rejected steps")
     parser.add_argument("-n", "--numProcessors", type=int, default=None, help="Number of cpus to use")
     parser.add_argument("--top", type=str, default=None, help="Topology file for non-pdb trajectories")
+    parser.add_argument("--sidechains", action="store_true", help="Flag to extract sidechain coordinates")
+    parser.add_argument("-sf", "--sidechains_folder", default=".", type=str, help="Folder with the structures to obtain the sidechains to extract")
+    parser.add_argument("--serial", action="store_true", help="Flag to deactivate parallelization")
     # parser.add_argument("-f", nargs='+', help="Files to get coordinates")
     args = parser.parse_args()
 
-    return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors, args.top
+    return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors, args.top, args.sidechains, args.sidechains_folder, args.serial
 
 
 def getCpuCount():
@@ -155,7 +158,31 @@ def writeToFile(COMs, outputFilename):
             f.write(str(line[-1]) + '\n')
 
 
-def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology):
+def extractIndexesTopology(topology, lig_resname, atoms, writeCA, sidechains):
+    selection = []
+    if atoms:
+        atoms_set = set(atoms)
+    template = "%s:%s:%s"
+    iline = 0
+    bool_sidechains = bool(sidechains)
+    with open(topology) as f:
+        for line in f:
+            if not (line.startswith("ATOM") or line.startswith("HETATM")):
+                continue
+            if atoms:
+                serial_num = line[6:11].strip()
+                atom_name = line[12:16].strip()
+                residue_name = line[17:20].strip()
+                if template % (serial_num, atom_name, residue_name) in atoms_set:
+                    selection.append(iline)
+
+            elif (line[17:20] == lig_resname or utils.isAlphaCarbon(line, writeCA) or utils.isSidechain(line, bool_sidechains, sidechains)) and line[76:80].strip().upper() != "H":
+                selection.append(iline)
+            iline += 1
+    return selection
+
+
+def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology, sidechains):
     trajectory = md.load(file_name, top=topology)
     if writeCA:
         selection = "(protein and name CA) or (resname '%s')" % ligand
@@ -167,8 +194,11 @@ def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology):
         selection = " or ".join(selection_list)
     else:
         selection = "resname '%s' and not element H" % ligand
-    selected_indices = trajectory.topology.select(selection)
-    if not writeCA and (atom_Ids is None or len(atom_Ids) == 0):
+    if sidechains:
+        selected_indices = sidechains
+    else:
+        selected_indices = trajectory.topology.select(selection)
+    if not writeCA and not sidechains and (atom_Ids is None or len(atom_Ids) == 0):
         # getCOM case
         # convert nm to A
         coordinates = 10*md.compute_center_of_mass(trajectory.atom_slice(selected_indices))
@@ -195,7 +225,7 @@ def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolde
             else:
                 coords = getAtomCoord(allCoordinates, lig_resname, atom_Ids)
     elif ext == ".xtc":
-        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA, topology)
+        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA, topology, sidechains)
     else:
         raise ValueError("Unrecongnized file extension for %s" % filename)
 
@@ -209,6 +239,9 @@ def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeL
         os.makedirs(constants.extractedTrajectoryFolder % pathFolder)
 
     originalPDBfiles = glob.glob(os.path.join(pathFolder, '*traj*.*'))
+    ext = os.path.splitext(originalPDBfiles[0])[1]
+    if ext == ".xtc" and sidechains:
+        sidechains = extractIndexesTopology(topology, lig_resname, atom_Ids, writeCA, sidechains)
     workers = []
     for filename in originalPDBfiles:
         if pool is None:
@@ -407,5 +440,5 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
 
 if __name__ == "__main__":
-    folder, atomIds, resname, proteinCA, enforceSequential, writeLigandTraj, totalSteps, setNum, nonRepeat, n_processors, top = parseArguments()
-    main(folder, atomIds, resname, totalSteps, enforceSequential, writeLigandTraj, setNum, proteinCA, nonRepeat, n_processors, topology=top)
+    folder, atomIds, resname, proteinCA, enforceSequential, writeLigandTraj, totalSteps, setNum, nonRepeat, n_processors, top, side_chains, sideChain_folder, serial = parseArguments()
+    main(folder, atomIds, resname, totalSteps, enforceSequential, writeLigandTraj, setNum, proteinCA, nonRepeat, n_processors, topology=top, sidechains=side_chains, sidechain_folder=sideChain_folder, parallelize=(not serial))
