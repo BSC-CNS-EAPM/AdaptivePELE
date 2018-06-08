@@ -12,16 +12,16 @@ if "bsccv" in machine:
     PYTHON = "/data2/apps/PYTHON/2.7.5/bin/python2.7"
 
 elif "mn.bsc" in machine:
-    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/bin/rev12360/Pele_rev12360_mpi"
-    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/data/rev12360/Data"
-    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/Documents/rev12360"
+    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/nord/rev090518/bin/Pele-1.5_mpi"
+    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Data"
+    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Documents"
     PYTHON = "python"
     
 
 elif "bsc.mn" in machine:
-    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/bin/rev090518/PELE-1.5_mpi"
-    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/bin/rev090518/Data"
-    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/bin/rev090518/Documents"
+    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/bin/PELE-1.5_mpi"
+    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/Data"
+    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/Documents"
 
 elif machine == "bscls309":
     PELE_EXECUTABLE = "/home/jgilaber/PELE/PELE-1.5/bin/PELE-1.5_mpi"

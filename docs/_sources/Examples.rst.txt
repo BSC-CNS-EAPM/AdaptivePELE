@@ -7,12 +7,13 @@ Installation
 
 In order to have a running copy of AdaptivePELE [APELE]_, you need to install and compile cython files in the base folder with::
 
+    git clone https://github.com/AdaptivePELE/AdaptivePELE.git
     cd AdaptivePELE
     python setup.py build_ext --inplace
 
 Also, if AdaptivePELE was not installed in a typical library directory, a common option is to add it to your local PYTHONPATH::
 
-    export PYTHONPATH=<location_of_AdaptivePELE>
+    export PYTHONPATH="/location/of/AdaptivePELE:$PYTHONPATH"
 
 
 Overview

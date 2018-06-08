@@ -142,9 +142,10 @@ _AMINO_ACID_CODES =  {'ACE': None, 'NME':  None, '00C': 'C', '01W':  'X', '02K':
 'Y', 'YTH':  'T', 'Z01': 'A',  'ZAL': 'A', 'ZCL':  'F', 'ZFB': 'X',  'ZU0': 'T',
 'ZZJ': 'A'}
 
+REGEX_PATTERN = re.compile("[0-9]|\+|\-")
 
 cdef class Atom:
-    _chargePattern = re.compile("[0-9]|\+|\-")
+    _chargePattern = REGEX_PATTERN
     _ATOM_WEIGHTS = {u"H": 1.00794,
                     u"D": 2.01410178,  # deuterium
                     u"HE": 4.00,
@@ -275,11 +276,11 @@ cdef class Atom:
     def equivalentResname(self, resname):
         return _AMINO_ACID_CODES[self.resname] == _AMINO_ACID_CODES[resname]
 
-    def set_properties(self, bint isProtein, int atomSerial, basestring atomName, basestring resName, basestring resNum, float x, float y, float z, basestring element, int resChain):
-        self.atomSerial = u"%d" % atomSerial
+    def set_properties(self, bint isProtein, basestring atomSerial, basestring atomName, basestring resName, basestring resNum, float x, float y, float z, basestring element, basestring resChain):
+        self.atomSerial = atomSerial
         self.name = atomName
         self.resname = resName
-        self.resChain = u"%d" % resChain
+        self.resChain = resChain
         self.resnum = resNum
         self.x = x
         self.y = y
@@ -544,7 +545,7 @@ cdef class PDB:
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
-    def _initialiseXTC(self, object frame, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None):
+    def _initialiseXTC(self, np.ndarray[float, ndim=2] frame, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None):
         """
             Load the information from a loaded XTC file into a  mdtraj Trajectory
 
@@ -564,68 +565,62 @@ cdef class PDB:
             :type atomname: int
             :raises: ValueError if the pdb contained no atoms
         """
-        cdef list stringWithPDBContent
-        cdef int atomLineNum, atomIndex, atomSerial, resChain
-        cdef basestring atomName, resName, atomLine, resnumStr, selection_string, element_atom
+        cdef int atomLineNum, atomIndex
+        cdef basestring atomName, resName, atomLine, resnumStr, selection_string, element_atom, atomSerial, resChain
         cdef Atom atom
-        # cdef np.ndarray[int, ndim=1] selection_indexes
-        cdef set selection_indexes
         cdef bint isProtein
-        cdef object chain_obj, atomProv
         cdef float x, y, z
-        selection_string = self.createSelectionString(heavyAtoms, resname, atomname, type, chain, resnum, element)
+        cdef int iatom
         if resnum == 0:
             resnumStr = u""
         else:
-            resnumStr = str(resnum)
+            resnumStr = u"%d" % (resnum)
+        frame *= 10
         self.pdb = self.join_PDB_lines(topology, frame)  # in case one wants to write it
-        selection_indexes = set(frame.topology.select(selection_string))
-        for chain_obj in frame.topology.chains:
-            resChain = chain_obj.index
-            for atomProv in chain_obj.atoms:
-                if atomProv.index not in selection_indexes:
+        for iatom in range(len(topology)):
+            atomLine = topology[iatom]
+            if not atomLine.startswith(u"ATOM") and not atomLine.startswith(u"HETATM"):
+                continue
+            if type == self._typeCM:
+                atomName = atomLine[12:16].strip()
+                resName = atomLine[17:20].strip()
+                if resName not in self.CMAtoms:
                     continue
-                isProtein = atomProv.is_backbone or atomProv.is_sidechain
-                atomSerial = atomProv.serial
-                atomName = atomProv.name
-                resName = atomProv.residue.name
-                resNum = "%d" % atomProv.residue.resSeq
-                x = frame.xyz[0, atomProv.index, 0] * 10
-                y = frame.xyz[0, atomProv.index, 1] * 10
-                z = frame.xyz[0, atomProv.index, 2] * 10
-                element_atom = atomProv.element.symbol.upper()
-                atom = Atom()
-                atom.set_properties(isProtein, atomSerial, atomName, resName, resNum, x, y, z, element_atom, resChain)
+                if atomName != u"CA" and atomName != self.CMAtoms[resName]:
+                    continue
+            else:
+                # HUGE optimisation (not to create an atom each time ~ 2e-5 s/atom)
+                if resname != u"" and not atomLine[17:20].strip() == resname:
+                    continue
+                if atomname != u"" and not atomLine[12:16].strip() == atomname:
+                    continue
+                if chain != u"" and not atomLine[21:22].strip() == chain:
+                    continue
+                if resnumStr != u"" and not atomLine[22:26].strip() == resnumStr:
+                    continue
+                if element != u"" and not atomLine[58:60].strip() == element:
+                    continue
+            isProtein = atomLine[:4] == u"ATOM"
+            atomSerial = atomLine[6:11].strip()
+            atomName = atomLine[12:16].strip()
+            resName = atomLine[17:20].strip()
+            resNum = atomLine[22:26].strip()
+            resChain = atomLine[21]
+            x = frame[iatom, 0]
+            y = frame[iatom, 1]
+            z = frame[iatom, 2]
+            # due to the way the topology object is extracted the positions of
+            # the element in 58-60
+            element_atom = atomLine[58:60].strip().upper()
+            atom = Atom()
+            atom.set_properties(isProtein, atomSerial, atomName, resName, resNum, x, y, z, element_atom, resChain)
+            if (not heavyAtoms or atom.isHeavyAtom()) and\
+                (type == self._typeAll or type == self._typeCM or (type == self._typeProtein and atom.isProtein()) or (type == self._typeHetero and atom.isHeteroAtom())):
+
                 self.atoms.update({atom.id: atom})
                 self.atomList.append(atom.id)
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
-
-    def createSelectionString(self, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=""):
-        cdef list selection = []
-        if type == u"CM":
-            for res in self.CMAtoms:
-                if self.CMAtoms[res] != u"empty":
-                    selection.append(u"(resname %s and name %s)" % (res, self.CMAtoms[res]))
-            return u"((name CA and element C) or %s)" % u" or ".join(selection)
-        if atomname != u"":
-            selection.append(u"name %s" % atomname)
-        if heavyAtoms:
-            selection.append(u"not element H")
-        if resname != u"":
-            selection.append(u"resname '%s'" % resname)
-        if resnum != 0:
-            selection.append(u"residue %d" % resnum)
-        if type == u"HETERO":
-            selection.append(u"not protein")
-        elif type == u"PROTEIN":
-            selection.append(u"protein")
-        if element != u"":
-            selection.append(u"element %s" % element)
-        if selection != []:
-            return u" and ".join(selection)
-        else:
-            return u"all"
 
     def initialise(self, object coordinates, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None):
         """
@@ -769,16 +764,22 @@ cdef class PDB:
             return self.centroid
 
 
-    def join_PDB_lines(self, list topology=[], object frame=None):
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    def join_PDB_lines(self, list topology, np.ndarray[float, ndim=2] frame):
         cdef basestring prevLine = None
+        cdef basestring temp = u"%.3f"
         cdef list pdb = []
-        for line, atom in zip(topology, frame.topology.atoms):
+        cdef basestring line
+        cdef unsigned int natoms = len(topology)
+        cdef unsigned int i
+        for i in range(natoms):
+            line = topology[i]
             if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and (u"HOH" == line[17:20] or u"HOH" == prevLine[17:20]))):
                 pdb.append(u"TER\n")
-            x, y, z = tuple(10*frame.xyz[0, atom.index])
-            x = (u"%.3f" % x).rjust(8)
-            y = (u"%.3f" % y).rjust(8)
-            z = (u"%.3f" % z).rjust(8)
+            x = (temp % frame[i, 0]).rjust(8)
+            y = (temp % frame[i, 1]).rjust(8)
+            z = (temp % frame[i, 2]).rjust(8)
             prevLine = line
             pdb.append(line % (x, y, z))
         return "".join(pdb)

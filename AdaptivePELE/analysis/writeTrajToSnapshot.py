@@ -41,7 +41,7 @@ if __name__ == "__main__":
     filename = glob.glob(epoch+"/*traj*_%d*" % trajectory)
     snapshots = utilities.getSnapshots(filename[0], topology)
     snapshots = snapshots[:snapshot+1]
-    if not isinstance(basestring, snapshots[0]):
+    if not isinstance(snapshots[0], basestring):
         new_snapshots = []
         for snapshot in snapshots:
             PDB = atomset.PDB()
