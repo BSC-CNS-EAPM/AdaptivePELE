@@ -413,7 +413,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
         nProcessors = max(1, nProcessors)
 
         print("Running extractCoords with %d cores" % (nProcessors))
-        pool = mp.Pool()
+        pool = mp.Pool(nProcessors)
     else:
         pool = None
 
