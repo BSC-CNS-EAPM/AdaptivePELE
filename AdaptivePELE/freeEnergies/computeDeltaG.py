@@ -299,7 +299,7 @@ def main(trajWildcard, reweightingT=1000):
     d = 0.75
 
     originalFilenames = glob.glob(trajWildcard)
-    #originalFilenames = glob.glob("rawData/"+trajWildcard)
+    # originalFilenames = glob.glob("rawData/"+trajWildcard)
     originalCoordinates = gather_coordinates(originalFilenames)
 
     bins = create_box(clusters, originalCoordinates, d)
