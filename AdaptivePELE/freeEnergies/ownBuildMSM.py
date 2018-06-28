@@ -41,7 +41,6 @@ def main(control_file):
 
     # parameters
     trajectoryFolder, trajectoryBasename, numClusters, stride, lagtimes, _, _, numberOfITS, _, _, lagtime, clusterCountsThreshold = readParams(control_file)
-    trajectoryBasename = os.path.join("rawData", trajectoryBasename)
     # program
     clusteringObject = cluster.Cluster(numClusters, trajectoryFolder, trajectoryBasename, alwaysCluster=False, stride=stride)
     clusteringObject.clusterTrajectories()

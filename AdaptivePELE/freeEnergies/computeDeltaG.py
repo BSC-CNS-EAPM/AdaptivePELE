@@ -298,8 +298,8 @@ def main(trajWildcard, reweightingT=1000):
     # radius of the cube for volume determination
     d = 0.75
 
-    #originalFilenames = glob.glob(trajWildcard)
-    originalFilenames = glob.glob("rawData/"+trajWildcard)
+    originalFilenames = glob.glob(trajWildcard)
+    #originalFilenames = glob.glob("rawData/"+trajWildcard)
     originalCoordinates = gather_coordinates(originalFilenames)
 
     bins = create_box(clusters, originalCoordinates, d)
