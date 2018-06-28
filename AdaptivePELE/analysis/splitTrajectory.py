@@ -20,8 +20,9 @@ def parseArguments():
     return args.files, args.o, args.top, args.structs
 
 
-def main(outputDir, files, topology, structs):
-    utilities.makeFolder(outputDir)
+def main(outputDir, files, topology, structs, template=None):
+    if outputDir:
+        utilities.makeFolder(outputDir)
     if topology is not None:
         topology_contents = utilities.getTopologyFile(topology)
     else:
@@ -30,7 +31,7 @@ def main(outputDir, files, topology, structs):
         structs = set(structs)
     for f in files:
         name = os.path.split(f)[-1]
-        templateName = os.path.join(outputDir, name[:-4] + "_%d.pdb")
+        templateName = template if template else os.path.join(outputDir, name[:-4] + "_%d.pdb")
         snapshots = utilities.getSnapshots(f, topology=topology)
         for i, snapshot in enumerate(snapshots):
             if structs is not None and i+1 not in structs:
@@ -39,8 +40,12 @@ def main(outputDir, files, topology, structs):
                 PDB = atomset.PDB()
                 PDB.initialise(snapshot, topology=topology_contents)
                 snapshot = PDB.get_pdb_string(model_num=i+1)
-            with open(templateName % i, 'w') as of:
-                of.write(snapshot)
+            if template:
+                with open(templateName, 'w') as of:
+                    of.write(snapshot)
+            else:
+                with open(templateName % i, 'w') as of:
+                    of.write(snapshot)
 
 if __name__ == "__main__":
     traj_files, output_dir, top, conf = parseArguments()
