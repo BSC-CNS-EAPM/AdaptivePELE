@@ -183,7 +183,7 @@ class PeleSimulation(SimulationRunner):
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.documentsFolder + " Documents")
 
-    def getNextIterationBox(self, clusteringObject, outputFolder, resname, topology=None):
+    def getNextIterationBox(self, clusteringObject, outputFolder, resname, topologies=None, epoch=None):
         """
             Select the box for the next epoch, currently selecting the COM of
             the cluster with max SASA
@@ -194,8 +194,10 @@ class PeleSimulation(SimulationRunner):
             :type outputFolder: str
             :param resname: Name of the ligand in the pdb
             :type resname: str
-            :param topology: Topology file
-            :type topology: str
+            :param topologies: Topology object containing the set of topologies needed for the simulation
+            :type topologies: :py:class:`.Topology`
+            :param epoch: Epoch of the trajectories to analyse
+            :type epoch: int
 
             :returns str: -- string to be substitued in PELE control file
         """
@@ -216,15 +218,11 @@ class PeleSimulation(SimulationRunner):
             raise ValueError("%s should be either binding or unbinding, but %s is provided!!!" % (blockNames.SimulationParams.modeMovingBox, self.parameters.modeMovingBox))
         # If this lines are reached then a new extreme SASA value was
         # identified and we proceed to extract the corresponding center of mass
-        if topology is not None:
-            topology_content = utilities.getTopologyFile(topology)
-        else:
-            topology_content = None
         trajNum = metrics[SASAcluster, -2]
         snapshotNum = metrics[SASAcluster, -1]
-        snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum), topology=topology)[int(snapshotNum)]
+        snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum))[int(snapshotNum)]
         snapshotPDB = atomset.PDB()
-        snapshotPDB.initialise(snapshot, resname=resname, topology=topology_content)
+        snapshotPDB.initialise(snapshot, resname=resname, topology=topologies.getTopology(epoch, trajNum))
         self.parameters.boxCenter = str(snapshotPDB.getCOM())
         return
 
@@ -364,7 +362,7 @@ class PeleSimulation(SimulationRunner):
         # but no more than 50
         return min(stepsPerProc, 50)
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology=None):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topologies=None):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure and select appropiate
@@ -380,12 +378,13 @@ class PeleSimulation(SimulationRunner):
             :type outputPath: str
             :param resname: Residue name of the ligand in the system pdb
             :type resname: str
-            :param topology: Topology file for non-pdb trajectories
-            :type topology: str
+            :param topologies: Topology object containing the set of topologies needed for the simulation
+            :type topologies: :py:class:`.Topology`
 
             :returns: list --  List with initial structures
         """
         newInitialStructures = []
+        newStructure = []
         if self.parameters.equilibrationLength is None:
             self.parameters.equilibrationLength = self.calculateEquilibrationLength()
         equilibrationPeleDict = {"PELE_STEPS": self.parameters.equilibrationLength, "SEED": self.parameters.seed}
@@ -422,17 +421,21 @@ class PeleSimulation(SimulationRunner):
             reportNames = os.path.join(equilibrationOutput, reportWildcard)
             trajNames = os.path.join(equilibrationOutput, trajWildcard)
             if len(initialStructures) == 1 and self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationLastSnapshot:
-                newStructure = self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames, topology=topology)
+                newStructure.extend(self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames, topology=topologies.topologies[i]))
             elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationSelect:
-                newStructure = self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames, topology=topology)
+                newStructure.extend(self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames, topology=topologies.topologies[i]))
             elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationCluster:
-                newStructure = self.clusterEquilibrationStructures(resname, trajNames, reportNames, topology=topology)
+                newStructure.extend(self.clusterEquilibrationStructures(resname, trajNames, reportNames, topology=topologies.topologies[i]))
 
-            for j, struct in enumerate(newStructure):
-                newStructurePath = os.path.join(equilibrationOutput, 'equilibration_struc_%d_%d.pdb' % (i+1, j+1))
-                with open(newStructurePath, "w") as fw:
-                    fw.write(struct)
-                newInitialStructures.append(newStructurePath)
+        for j, struct in enumerate(newStructure):
+            if j > (self.processors-1):
+                # if for some reason the number of selected structures exceeds
+                # the number of available processors stop writing them
+                break
+            newStructurePath = os.path.join(equilibrationOutput, 'equilibration_struc_%d_%d.pdb' % (i+1, j+1))
+            with open(newStructurePath, "w") as fw:
+                fw.write(struct)
+            newInitialStructures.append(newStructurePath)
         return newInitialStructures
 
     def clusterEquilibrationStructures(self, resname, trajWildcard, reportWildcard, topology=None):
@@ -445,17 +448,13 @@ class PeleSimulation(SimulationRunner):
             :type trajWildcard: str
             :param reportWildcard: Templetized path to report files"
             :type reportWildcard: str
-            :param topology: Topology file for non-pdb trajectories
-            :type topology: str
+            :param topology: Topology for non-pdb trajectories
+            :type topology: list
 
             :returns: list -- List with the pdb snapshots of the representatives structures
         """
         if not SKLEARN:
             raise utilities.UnsatisfiedDependencyException("No installation of scikit-learn found. Please, install scikit-learn or select a different equilibrationMode.")
-        if topology is None:
-            topology_content = None
-        else:
-            topology_content = utilities.getTopologyFile(topology)
         energyColumn = 3
         # detect number of trajectories available
         nTrajs = len(glob.glob(trajWildcard.rsplit("_", 1)[0]+"*"))+1
@@ -464,10 +463,10 @@ class PeleSimulation(SimulationRunner):
             report = np.loadtxt(reportWildcard % i)
             if len(report.shape) < 2:
                 report = report[np.newaxis, :]
-            snapshots = utilities.getSnapshots(trajWildcard % i, topology=topology)
+            snapshots = utilities.getSnapshots(trajWildcard % i)
             for nSnap, (line, snapshot) in enumerate(zip(report, snapshots)):
                 conformation = atomset.PDB()
-                conformation.initialise(snapshot, resname=resname, topology=topology_content)
+                conformation.initialise(snapshot, resname=resname, topology=topology)
                 com = conformation.getCOM()
                 data.append([line[energyColumn], i, nSnap]+com)
         data = np.array(data)
@@ -489,9 +488,9 @@ class PeleSimulation(SimulationRunner):
                 # If a cluster has no structure assigned, skip it
                 continue
             traj, snap = clustersInfo[cl]["structure"]
-            conf = utilities.getSnapshots(trajWildcard % traj, topology=topology)[snap]
+            conf = utilities.getSnapshots(trajWildcard % traj)[snap]
             if not isinstance(conf, basestring):
-                conf = utilities.get_mdtraj_object_PDBstring(conf, topology_content)
+                conf = utilities.get_mdtraj_object_PDBstring(conf, topology)
             initialStructures.append(conf)
         return initialStructures
 
@@ -504,20 +503,16 @@ class PeleSimulation(SimulationRunner):
             :type nTrajs: int
             :param trajWildcard: Templetized path to trajectory files"
             :type trajWildcard: str
-            :param topology: Topology file for non-pdb trajectories
-            :type topology: str
+            :param topology: Topology for non-pdb trajectories
+            :type topology: list
 
             :returns: list -- List with the pdb snapshots of the representatives structures
         """
         initialStructures = []
-        if topology is not None:
-            topology_content = utilities.getTopologyFile(topology)
-        else:
-            topology_content = None
         for ij in range(1, nTrajs):
-            conf = utilities.getSnapshots(trajWildcard % ij, topology=topology)[-1]
+            conf = utilities.getSnapshots(trajWildcard % ij)[-1]
             if not isinstance(conf, basestring):
-                conf = utilities.get_mdtraj_object_PDBstring(conf, topology_content)
+                conf = utilities.get_mdtraj_object_PDBstring(conf, topology)
             initialStructures.append(conf)
 
         return initialStructures
@@ -538,6 +533,8 @@ class PeleSimulation(SimulationRunner):
             :type trajWildcard: str
             :param reportWildcard: Templetized path to report files"
             :type reportWildcard: str
+            :param topology: Topology for non-pdb trajectories
+            :type topology: list
 
             :returns: list -- List with the pdb snapshots of the representatives structures
         """
@@ -551,24 +548,19 @@ class PeleSimulation(SimulationRunner):
         else:
             cols = sorted([energyColumn, similarityColumn])
 
-        if topology is not None:
-            topology_content = utilities.getTopologyFile(topology)
-        else:
-            topology_content = None
-
         for i in range(1, nTrajs):
             indices.append(rowIndex)
             report = np.loadtxt(reportWildcard % i)
             if similarityColumn is None:
-                snapshots = utilities.getSnapshots(trajWildcard % i, topology=topology)
+                snapshots = utilities.getSnapshots(trajWildcard % i)
                 report_values = []
                 if i == 1:
-                    initial.initialise(snapshots.pop(0), resname=resname, topology=topology_content)
+                    initial.initialise(snapshots.pop(0), resname=resname, topology=topology)
                     report_values.append([0, report[0, energyColumn]])
                     report = report[1:, :]
                 for j, snap in enumerate(snapshots):
                     pdbConformation = atomset.PDB()
-                    pdbConformation.initialise(snap, resname=resname, topology=topology_content)
+                    pdbConformation.initialise(snap, resname=resname, topology=topology)
                     report_values.append([RMSDCalc.computeRMSD(initial, pdbConformation), report[j, energyColumn]])
             else:
                 report_values = report[:, cols]
@@ -607,9 +599,9 @@ class PeleSimulation(SimulationRunner):
         # trajectories are 1-indexed
         trajNum += 1
         # return as list for compatibility with selectEquilibrationLastSnapshot
-        conf = utilities.getSnapshots(trajWildcard % trajNum, topology=topology)[snapshotNum]
+        conf = utilities.getSnapshots(trajWildcard % trajNum)[snapshotNum]
         if not isinstance(conf, basestring):
-            conf = utilities.get_mdtraj_object_PDBstring(conf, topology_content)
+            conf = utilities.get_mdtraj_object_PDBstring(conf, topology)
         return [conf]
 
     def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):

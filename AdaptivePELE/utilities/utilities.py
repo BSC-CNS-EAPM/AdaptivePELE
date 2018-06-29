@@ -21,6 +21,79 @@ class UnsatisfiedDependencyException(Exception):
     __module__ = Exception.__module__
 
 
+class Toplogy:
+    """
+        Container object that points to the topology used in each trajectory
+    """
+    def __init__(self, path):
+        self.path = path
+        self.topologies = []
+        # the topologyMap maps each trajectory to its corresponding topology
+        # {0: [t1, t2.. tM], 1: [t2, t3, t4, t4...]}
+        self.topologyMap = {}
+
+    def cleanTopologies(self):
+        """
+            Remove the written topology files
+        """
+        files = os.path.join(self.path, "topology*.pdb")
+        for f in files:
+            os.remove(f)
+
+    def setTopologies(self, topologyFiles):
+        """
+            Set the topologies for the simulation. If topologies were set
+            before they are deleted and set again
+        """
+        if self.topologies:
+            self.topologies = []
+            self.cleanTopologies()
+        for top in topologyFiles:
+            self.topologies.append(getTopologyFile(top))
+
+    def mapEpochTopologies(self, epoch, trajectoryMapping):
+        """
+            Map the trajectories for the next epoch the the used topologies
+        """
+        mapping = trajectoryMapping[1:]+[trajectoryMapping]
+        self.topologyMap[epoch] = [self.topologyMap[i_epoch][i_traj-1] for i_epoch, i_traj, _ in mapping]
+
+    def getTopology(self, epoch, trajectory_number):
+        """
+            Get the topology for a particular epoch and trajectory number
+
+            :param epoch: Epoch of the trajectory of interest
+            :type epoch: int
+            :param trajectory_number: Number of the trajectory to select
+            :type trajectory_number: int
+        """
+        return self.topologyMapping[epoch][trajectory_number]
+
+    def writeMappingToDisk(self, epochDir, epoch):
+        """
+            Write the topology mapping to disk
+
+            :param epochDir: Name of the folder where to write the
+                mapping
+            :type epochDir: str
+        """
+        with open(epochDir+"/topologyMapping.txt", "w") as f:
+            f.write(':'.join(map(str, self.topologyMap[epoch])))
+
+    def readMappingFromDisk(self, epochDir, epoch):
+        """
+            Read the processorsToClusterMapping from disk
+
+            :param epochDir: Name of the folder where to write the
+                processorsToClusterMapping
+            :type epochDir: str
+        """
+        try:
+            with open(epochDir+"/topologyMapping.txt") as f:
+                self.topologyMap[epoch] = f.read().rstrip().split(':')
+        except IOError:
+            sys.stderr.write("WARNING: topologyMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
+
 def cleanup(tmpFolder):
     """
         Remove folder if exists
