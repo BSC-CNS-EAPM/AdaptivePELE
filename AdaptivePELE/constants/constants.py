@@ -28,6 +28,11 @@ elif machine == "bscls309":
     DATA_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Data"
     DOCUMENTS_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Documents"
 
+elif machine == "bscls444":
+    PELE_EXECUTABLE = ""
+    DATA_FOLDER = ""
+    DOCUMENTS_FOLDER = ""
+
 
 inputFileTemplate = "{ \"files\" : [ { \"path\" : \"%s\" } ] }"
 trajectoryBasename = "*traj*"
