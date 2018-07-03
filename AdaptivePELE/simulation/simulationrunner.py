@@ -641,6 +641,94 @@ class PeleSimulation(SimulationRunner):
         return "".join(jsonString)
 
 
+class MDSimulation(SimulationRunner):
+    def __init__(self, parameters):
+        SimulationRunner.__init__(self, parameters)
+        self.type = simulationTypes.SIMULATION_TYPE.MD
+
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology=None):
+        """
+            Run short simulation to equilibrate the system. It will run one
+            such simulation for every initial structure
+
+            :param initialStructures: Name of the initial structures to copy
+            :type initialStructures: list of str
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param reportBaseFilename: Name of the file that contains the metrics of the snapshots to cluster
+            :type reportBaseFilename: str
+            :param outputPath: Path where trajectories are found
+            :type outputPath: str
+            :param resname: Residue name of the ligand in the system pdb
+            :type resname: str
+            :param topology: Topology object
+            :type topology: :py:class:
+
+            :returns: list --  List with initial structures
+        """
+        # equilibration function for the md simulation, trying to mantain same structure order and input/outptu than the PELE one
+        newInitialStructures = []
+        Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.boxRadius}
+        ligandPDB = self.extractLigand(initialStructures[0], resname, outputPath)
+        antechamberDict = {}
+        parmchkDict = {}
+        self.prepareLigand(antechamberDict, parmchkDict)
+        with open(self.parameters.templetizedControlFile, "r") as inputFile:
+            Tleapstring = inputFile.read()
+        for i, structure in enumerate(initialStructures):
+            equilibrationOutput = os.path.join(outputPath, "equilibration_%d" % (i + 1))
+            # change outputpathconstants
+            TleapControlFile = outputPathConstants.tmpControlFilenameEqulibration % (i + 1)
+            utilities.makeFolder(equilibrationOutput)
+            self.makeWorkingControlFile(TleapControlFile, Tleapdict, Tleapstring)
+            # run tleap with control file
+            # update topology
+            prmtop, inpcrd = None, None  # temporal
+            self.runEquilibration(prmtop, inpcrd)
+            # save results
+            # append new pdbs to newInitialStructures
+        return newInitialStructures
+
+    def preparePDB(self, PDBtoOpen, outputpath):
+        """
+        Corrects problems in the pdb such as CONECT and wrong histidine codes
+
+        :param PDBtoOpen: string with the pdb to prepare
+        :type PDBtoOpen: str
+        :param outputPath: Path where the pdb is written
+        :type outputPath: str
+        """
+        pass
+
+    def extractLigand(self, PDBtoOpen, resname, outputpath):
+        """
+        Extracts the ligand from a given PDB
+
+        :param PDBtoOpen: string with the pdb to prepare
+        :type PDBtoOpen: str
+        :param resname: string with the code of the ligand
+        :type resname: str
+        :param outputPath: Path where the pdb is written
+        :type outputPath: str
+        :return: string with the ligand pdb
+        """
+        pass
+
+    def prepareLigand(self, antechamberDict, parmchkDict):
+        """
+        Runs antechamber and parmchk2 to obtain the mol2 and frcmod of the ligand
+
+        :param antechamberDict: Dictonary containing the parameters to substitute in the antechamber command
+        :type antechamberDict: dict
+        :param parmchkDict: Dictonary containing the parameters to substitute in the parmchk2 command
+        :type parmchkDict: dict
+        """
+        pass
+
+    def runEquilibration(self, prmtop, inpcrd):
+        pass
+
+
 class TestSimulation(SimulationRunner):
     """
         Class used for testing

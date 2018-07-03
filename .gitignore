@@ -26,3 +26,4 @@ AdaptivePELE/tests/data/3ptb_data/RestartTest/*/logFile*
 .DS_Store
 AdaptivePELE/__pycache__
 AdaptivePELE/*/__pycache__
+.idea
