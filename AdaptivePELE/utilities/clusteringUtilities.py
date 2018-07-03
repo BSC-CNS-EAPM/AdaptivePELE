@@ -3,7 +3,7 @@ import os
 from AdaptivePELE.utilities import utilities
 
 
-def writeStructures(clusteringObject, listStructures, checker=lambda x: True, outputPath="cluster.pdb", topology=None):
+def writeStructures(clusteringObject, listStructures, checker=lambda x: True, outputPath="cluster.pdb"):
     """
         Print all clusters in listStructures that meet the condition specified
         by the checker
@@ -14,8 +14,6 @@ def writeStructures(clusteringObject, listStructures, checker=lambda x: True, ou
         :type checker: function
         :param outputPath: Output cluster pdb filename
         :type outputPath: str
-        :param topology: Topology file for non-pdb trajectories
-        :type topology: str
     """
     clObject = utilities.readClusteringObject(clusteringObject)
     nameStructure = os.path.splitext(outputPath)
@@ -25,10 +23,6 @@ def writeStructures(clusteringObject, listStructures, checker=lambda x: True, ou
     if path[0]:
         utilities.makeFolder(path[0])
         pathToWrite = os.path.join(path[0], path[1])
-    if topology is not None:
-        topology_contents = utilities.getTopologyFile(topology)
-    else:
-        topology_contents = None
 
     if listStructures is None or len(listStructures) == 0:  # If no listStructures, write all
         listStructures = range(len(clObject.clusters.clusters))
@@ -37,4 +31,4 @@ def writeStructures(clusteringObject, listStructures, checker=lambda x: True, ou
         cluster = clObject.clusters.clusters[element]
         if checker is None or checker(cluster):
             print("Writing", pathToWrite % element)
-            cluster.writePDB(pathToWrite % element, topology=topology_contents)
+            cluster.writePDB(pathToWrite % element)

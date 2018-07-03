@@ -16,7 +16,7 @@ elif "mn.bsc" in machine:
     DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Data"
     DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Documents"
     PYTHON = "python"
-    
+
 
 elif "bsc.mn" in machine:
     PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/bin/PELE-1.5_mpi"
@@ -65,7 +65,7 @@ class OutputPathConstants():
         self.epochOutputPathTempletized = os.path.join(outputPath, "%d")
         self.clusteringOutputDir = os.path.join(self.epochOutputPathTempletized, "clustering")
         self.clusteringOutputObject = os.path.join(self.clusteringOutputDir, "object.pkl")
-        self.topologyFile = os.path.join(outputPath, "topology.pdb")
+        self.topologies = os.path.join(outputPath, "topologies")
 
     def buildTmpFolderConstants(self, tmpFolder):
         self.tmpInitialStructuresTemplate = tmpFolder+"/initial_%d_%d.pdb"
