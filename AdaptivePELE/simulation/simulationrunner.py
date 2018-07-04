@@ -50,6 +50,7 @@ class SimulationParameters:
         self.trajectoryName = None
         self.srun = False
         self.numberEquilibrationStructures = 10
+        self.ligandCharge = 0
 
 
 class SimulationRunner:
@@ -644,6 +645,9 @@ class MDSimulation(SimulationRunner):
     def __init__(self, parameters):
         SimulationRunner.__init__(self, parameters)
         self.type = simulationTypes.SIMULATION_TYPE.MD
+        self.antechamberTemplate = constants.AmberTemplates.antechamberTemplate
+        self.parmchkTemplate = constants.AmberTemplates.parmchk2Template
+        self.tleapTemplate = constants.AmberTemplates.tleapTemplate
 
     def getWorkingProcessors(self):
         """
@@ -671,28 +675,45 @@ class MDSimulation(SimulationRunner):
 
             :returns: list --  List with initial structures
         """
-        # equilibration function for the md simulation, trying to mantain same structure order and input/outptu than the PELE one
         newInitialStructures = []
-        Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.boxRadius}
-        ligandPDB = self.extractLigand(initialStructures[0], resname, outputPath)
-        antechamberDict = {}
-        parmchkDict = {}
+        ligandPDB = self.extractLigand(initialStructures[0], resname, outputPathConstants.tmpFolder)
+        equilibrationOutput = os.path.join(outputPath, "equilibration")
+        utilities.makeFolder(equilibrationOutput)
+        ligandmol2 = outputPathConstants.tmpMol2Ligand % resname
+        ligandfrcmod = outputPathConstants.tmpFrcmodLigand % resname
+        Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.boxRadius, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
+        antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
+        parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
         self.prepareLigand(antechamberDict, parmchkDict)
-        with open(self.parameters.templetizedControlFile, "r") as inputFile:
-            Tleapstring = inputFile.read()
         for i, structure in enumerate(initialStructures):
-            equilibrationOutput = os.path.join(outputPath, "equilibration_%d" % (i + 1))
-            # change outputpathconstants
-            TleapControlFile = outputPathConstants.tmpControlFilenameEqulibration % (i + 1)
-            utilities.makeFolder(equilibrationOutput)
-            self.makeWorkingControlFile(TleapControlFile, Tleapdict, Tleapstring)
-            # run tleap with control file
-            # update topology
-            prmtop, inpcrd = None, None  # temporal
-            self.runEquilibration(prmtop, inpcrd)
-            # save results
-            # append new pdbs to newInitialStructures
+            TleapControlFile = outputPathConstants.tmpTleapFilename % (i + 1)
+            prmtop = os.path.join(equilibrationOutput, "system_%d.prmtop" % (i + 1))
+            inpcrd = os.path.join(equilibrationOutput, "system_%d.inpcrd" % (i + 1))
+            finalPDB = os.path.join(equilibrationOutput, "system_%d.pdb" % (i + 1))
+            Tleapdict["COMPLEX"] = structure
+            Tleapdict["PRMTOP"] = prmtop
+            Tleapdict["INPCRD"] = inpcrd
+            Tleapdict["SOLVATED_PDB"] = finalPDB
+            self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
+            self.runTleap(TleapControlFile)
+            # update topology file
+
+        # Once all files are working run equilibration using multiprocess
+        # save results
+        # append new pdbs to newInitialStructures
         return newInitialStructures
+
+    def runTleap(self, TleapControlFile):
+        tleapCommand = "tleap -f %s" % TleapControlFile
+        print("System Preparation")
+        startTime = time.time()
+        proc = subprocess.Popen(tleapCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        (out, err) = proc.communicate()
+        print(out)
+        if err:
+            print(err)
+        endTime = time.time()
+        print("System preparation took %.2f sec" % (endTime - startTime))
 
     def preparePDB(self, PDBtoOpen, outputpath):
         """
@@ -707,7 +728,7 @@ class MDSimulation(SimulationRunner):
 
     def extractLigand(self, PDBtoOpen, resname, outputpath):
         """
-        Extracts the ligand from a given PDB
+        Extracts the ligand from a given PDB (provisional)
 
         :param PDBtoOpen: string with the pdb to prepare
         :type PDBtoOpen: str
@@ -717,7 +738,13 @@ class MDSimulation(SimulationRunner):
         :type outputPath: str
         :return: string with the ligand pdb
         """
-        pass
+        ligandpdb = os.path.join(outputpath, "raw_ligand.pdb")
+        with open(ligandpdb, "w") as out:
+            with open(PDBtoOpen, "r") as inp:
+                for line in inp:
+                    if resname in line:
+                        out.write(line)
+        return ligandpdb
 
     def prepareLigand(self, antechamberDict, parmchkDict):
         """
@@ -728,7 +755,25 @@ class MDSimulation(SimulationRunner):
         :param parmchkDict: Dictonary containing the parameters to substitute in the parmchk2 command
         :type parmchkDict: dict
         """
-        pass
+        antechamberCommand = string.Template(self.antechamberTemplate)
+        antechamberCommand = antechamberCommand.substitute(antechamberDict)
+        parmchkCommand = string.Template(self.parmchkTemplate)
+        parmchkCommand = parmchkCommand.substitute(parmchkDict)
+        print(antechamberCommand)
+        startTime = time.time()
+        proc = subprocess.Popen(antechamberCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        (out, err) = proc.communicate()
+        print(out)
+        if err:
+            print(err)
+        print(parmchkCommand)
+        proc = subprocess.Popen(parmchkCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        (out, err) = proc.communicate()
+        print(out)
+        if err:
+            print(err)
+        endTime = time.time()
+        print("Ligand preparation took %.2f sec" % (endTime - startTime))
 
     def runEquilibration(self, prmtop, inpcrd):
         pass
@@ -889,7 +934,8 @@ class RunnerBuilder:
 
             return PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
-            pass
+            params.runEquilibration = True
+            return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
             params.destination = paramsBlock[blockNames.SimulationParams.destination]
