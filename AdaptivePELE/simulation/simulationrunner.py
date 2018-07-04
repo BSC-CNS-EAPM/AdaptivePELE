@@ -50,7 +50,7 @@ class SimulationParameters:
         self.trajectoryName = None
         self.srun = False
         self.numberEquilibrationStructures = 10
-        self.ligandCharge = 0
+        self.ligandCharge = 1
 
 
 class SimulationRunner:
@@ -676,20 +676,23 @@ class MDSimulation(SimulationRunner):
             :returns: list --  List with initial structures
         """
         newInitialStructures = []
-        ligandPDB = self.extractLigand(initialStructures[0], resname, outputPathConstants.tmpFolder)
         equilibrationOutput = os.path.join(outputPath, "equilibration")
         utilities.makeFolder(equilibrationOutput)
-        ligandmol2 = outputPathConstants.tmpMol2Ligand % resname
-        ligandfrcmod = outputPathConstants.tmpFrcmodLigand % resname
+        # AmberTools generates intermediate files in the current directory
+        workingdirectory = os.getcwd()
+        os.chdir(outputPathConstants.tmpFolder)
+        ligandPDB = self.extractLigand(initialStructures[0], resname, outputpath="")
+        ligandmol2 = "%s.mol2" % resname
+        ligandfrcmod = "%s.frcmod" % resname
         Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.boxRadius, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
         antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
         parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
         self.prepareLigand(antechamberDict, parmchkDict)
         for i, structure in enumerate(initialStructures):
-            TleapControlFile = outputPathConstants.tmpTleapFilename % (i + 1)
-            prmtop = os.path.join(equilibrationOutput, "system_%d.prmtop" % (i + 1))
-            inpcrd = os.path.join(equilibrationOutput, "system_%d.inpcrd" % (i + 1))
-            finalPDB = os.path.join(equilibrationOutput, "system_%d.pdb" % (i + 1))
+            TleapControlFile = "tleap_equilibration_%d.in" % (i + 1)
+            prmtop = os.path.join(workingdirectory, equilibrationOutput, "system_%d.prmtop" % (i + 1))
+            inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % (i + 1))
+            finalPDB = os.path.join(workingdirectory, equilibrationOutput, "system_%d.pdb" % (i + 1))
             Tleapdict["COMPLEX"] = structure
             Tleapdict["PRMTOP"] = prmtop
             Tleapdict["INPCRD"] = inpcrd
@@ -698,9 +701,13 @@ class MDSimulation(SimulationRunner):
             self.runTleap(TleapControlFile)
             # update topology file
 
+
         # Once all files are working run equilibration using multiprocess
         # save results
         # append new pdbs to newInitialStructures
+        # changing back to the old working directory
+        os.chdir(workingdirectory)
+        exit(1)
         return newInitialStructures
 
     def runTleap(self, TleapControlFile):
@@ -728,7 +735,7 @@ class MDSimulation(SimulationRunner):
 
     def extractLigand(self, PDBtoOpen, resname, outputpath):
         """
-        Extracts the ligand from a given PDB (provisional)
+        Extracts the ligand from a given PDB
 
         :param PDBtoOpen: string with the pdb to prepare
         :type PDBtoOpen: str
@@ -763,12 +770,14 @@ class MDSimulation(SimulationRunner):
         startTime = time.time()
         proc = subprocess.Popen(antechamberCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
+        #proc.wait()
         print(out)
         if err:
             print(err)
         print(parmchkCommand)
         proc = subprocess.Popen(parmchkCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
+        #proc.wait()
         print(out)
         if err:
             print(err)
