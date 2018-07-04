@@ -63,7 +63,7 @@ class Topology:
             :param trajectoryMapping: Mapping of the trajectories and the corresponding topologies
             :type trajectoryMapping: list
         """
-        mapping = trajectoryMapping[1:]+[trajectoryMapping]
+        mapping = trajectoryMapping[1:]+[trajectoryMapping[0]]
         self.topologyMap[epoch] = [self.topologyMap[i_epoch][i_traj-1] for i_epoch, i_traj, _ in mapping]
 
     def getTopology(self, epoch, trajectory_number):
@@ -77,7 +77,7 @@ class Topology:
 
             :returns: list -- List with topology information
         """
-        return self.topologies[self.topologyMapping[epoch][trajectory_number]]
+        return self.topologies[self.topologyMap[epoch][trajectory_number-1]]
 
     def writeMappingToDisk(self, epochDir, epoch):
         """
@@ -100,7 +100,7 @@ class Topology:
         """
         try:
             with open(epochDir+"/topologyMapping.txt") as f:
-                self.topologyMap[epoch] = f.read().rstrip().split(':')
+                self.topologyMap[epoch] = map(int, f.read().rstrip().split(':'))
         except IOError:
             sys.stderr.write("WARNING: topologyMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
 

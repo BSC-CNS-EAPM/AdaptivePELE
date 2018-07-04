@@ -61,6 +61,12 @@ class SimulationRunner:
     def runSimulation(self, runningControlFile=""):
         pass
 
+    def getWorkingProcessors(self):
+        """
+            Return the number of working processors, i.e. number of trajectories
+        """
+        return self.parameters.processors
+
     def hasExitCondition(self):
         """
             Check if an exit condition has been set
@@ -649,12 +655,6 @@ class MDSimulation(SimulationRunner):
         self.parmchkTemplate = constants.AmberTemplates.parmchk2Template
         self.tleapTemplate = constants.AmberTemplates.tleapTemplate
 
-    def getWorkingProcessors(self):
-        """
-            Return the number of working processors, i.e. number of trajectories
-        """
-        return self.parameters.processors
-
     def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology=None):
         """
             Run short simulation to equilibrate the system. It will run one
@@ -788,6 +788,12 @@ class TestSimulation(SimulationRunner):
         self.type = simulationTypes.SIMULATION_TYPE.TEST
         self.copied = False
         self.parameters = parameters
+
+    def getWorkingProcessors(self):
+        """
+            Return the number of working processors, i.e. number of trajectories
+        """
+        return self.parameters.processors-1
 
     def runSimulation(self, runningControlFile=""):
         """
