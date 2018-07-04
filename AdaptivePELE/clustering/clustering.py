@@ -885,26 +885,26 @@ class Clustering:
             and self.resChain == other.resChain\
             and self.col == other.col
 
-    def cluster(self, paths, ignoreFirstRow=False, topology=None):
+    def cluster(self, paths, ignoreFirstRow=False, topology=None, epoch=None):
         """
             Cluster the snaptshots contained in the paths folder
 
             :param paths: List of folders with the snapshots
             :type paths: list
-            :param topology: Topology file for non-pdb trajectories
-            :type topology: str
+            :param ignoreFirstRow: Flag wether to ignore the first snapshot of a trajectory
+            :type ignoreFirstRow: bool
+            :param topology: Topology object containing the set of topologies needed for the simulation
+            :type topology: :py:class:`.Topology`
+            :param epoch: Epoch number
+            :type epoch: int
         """
         self.epoch += 1
-        if topology is None:
-            topology_contents = None
-        else:
-            topology_contents = utilities.getTopologyFile(topology)
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
             # origCluster = processorsToClusterMapping[trajNum-1]
             origCluster = None
-            snapshots = utilities.getSnapshots(trajectory, True, topology=topology)
+            snapshots = utilities.getSnapshots(trajectory, True)
 
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
@@ -915,7 +915,7 @@ class Clustering:
                     if ignoreFirstRow and num == 0:
                         continue
                     try:
-                        origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col, topology=topology_contents)
+                        origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col, topology=topology.getTopology(epoch, trajNum))
                     except IndexError as e:
                         message = (" in trajectory %d. This is usually caused by a mismatch between report files and trajectory files"
                                    " which in turn is usually caused by some problem in writing the files, e.g. quota")
@@ -927,7 +927,7 @@ class Clustering:
                 for num, snapshot in enumerate(snapshots):
                     if ignoreFirstRow and num == 0:
                         continue
-                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, topology=topology_contents)
+                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, topology=topology.getTopology(epoch, trajNum))
         for cluster in self.clusters.clusters:
             cluster.altStructure.cleanPQ()
 
@@ -1114,7 +1114,7 @@ class Clustering:
 
         return optimalMetricIndex
 
-    def writePathwayTrajectory(self, pathway, filename, topology=None):
+    def writePathwayTrajectory(self, pathway, filename):
         """
             Write a list of cluster forming a pathway into a trajectory pdb file
 
@@ -1122,11 +1122,7 @@ class Clustering:
             :type pathway: list
             :param filename: Path where to write the trajectory
             :type filename: str
-            :param topology: Lines of topology file
-            :type topology: list
         """
-        if topology is None:
-            topology = []
         with open(filename, "w") as pathwayFile:
             pathwayFile.write("REMARK 000 File created using PELE++\n")
             pathwayFile.write("REMARK 000 Pathway trajectory created using the FDT\n")
@@ -1329,27 +1325,24 @@ class SequentialLastSnapshotClustering(Clustering):
         Assigned  the last snapshot of the trajectory to a cluster.
         Only useful for PELE sequential runs
     """
-    def cluster(self, paths, topology=None):
+    def cluster(self, paths, topology=None, epoch=None):
         """
             Cluster the snaptshots contained in the paths folder
 
             :param paths: List of folders with the snapshots
             :type paths: list
-            :param topology: Topology file for non-pdb trajectories
-            :type topology: str
+            :param topology: Topology object containing the set of topologies needed for the simulation
+            :type topology: :py:class:`.Topology`
+            :param epoch: Epoch number
+            :type epoch: int
         """
         # Clean clusters at every step, so we only have the last snapshot of
         # each trajectory as clusters
-        if topology is None:
-            topology_contents = None
-        else:
-            topology_contents = utilities.getTopologyFile(topology)
         self.clusters = Clusters()
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
-
-            snapshots = utilities.getSnapshots(trajectory, True, topology=topology)
+            snapshots = utilities.getSnapshots(trajectory, True)
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
@@ -1359,9 +1352,9 @@ class SequentialLastSnapshotClustering(Clustering):
                 # check the exit condition
                 metrics = metrics.min(axis=0)
 
-                self.addSnapshotToCluster(snapshots[-1], metrics, self.col, topology=topology_contents)
+                self.addSnapshotToCluster(snapshots[-1], metrics, self.col, topology=topology.getTopology(epoch, trajNum))
             else:
-                self.addSnapshotToCluster(snapshots[-1], topology=topology_contents)
+                self.addSnapshotToCluster(snapshots[-1], topology=topology.getTopology(epoch, trajNum))
 
     def addSnapshotToCluster(self, snapshot, metrics=None, col=None, topology=None):
         """
