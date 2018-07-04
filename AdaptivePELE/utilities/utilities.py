@@ -21,7 +21,7 @@ class UnsatisfiedDependencyException(Exception):
     __module__ = Exception.__module__
 
 
-class Toplogy:
+class Topology:
     """
         Container object that points to the topology used in each trajectory
     """
@@ -44,6 +44,9 @@ class Toplogy:
         """
             Set the topologies for the simulation. If topologies were set
             before they are deleted and set again
+
+            :param topologyFiles: List of topology files
+            :type topologyFiles: list
         """
         if self.topologies:
             self.topologies = []
@@ -53,7 +56,12 @@ class Toplogy:
 
     def mapEpochTopologies(self, epoch, trajectoryMapping):
         """
-            Map the trajectories for the next epoch the the used topologies
+            Map the trajectories for the next epoch and the used topologies
+
+            :param epoch: Epoch of the trajectory selected
+            :type epoch: int
+            :param trajectoryMapping: Mapping of the trajectories and the corresponding topologies
+            :type trajectoryMapping: list
         """
         mapping = trajectoryMapping[1:]+[trajectoryMapping]
         self.topologyMap[epoch] = [self.topologyMap[i_epoch][i_traj-1] for i_epoch, i_traj, _ in mapping]
@@ -66,8 +74,10 @@ class Toplogy:
             :type epoch: int
             :param trajectory_number: Number of the trajectory to select
             :type trajectory_number: int
+
+            :returns: list -- List with topology information
         """
-        return self.topologyMapping[epoch][trajectory_number]
+        return self.topologies[self.topologyMapping[epoch][trajectory_number]]
 
     def writeMappingToDisk(self, epochDir, epoch):
         """
@@ -93,6 +103,7 @@ class Toplogy:
                 self.topologyMap[epoch] = f.read().rstrip().split(':')
         except IOError:
             sys.stderr.write("WARNING: topologyMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
+
 
 def cleanup(tmpFolder):
     """
@@ -222,19 +233,18 @@ def getRMSD(traj, nativePDB, resname, symmetries, topology=None):
         :type resname: str
         :param symmetries: Symmetries dictionary list with independent symmetry groups
         :type symmetries: list of dict
-        :param topology: Topology file for non-pdb trajectories
-        :type topology: str
+        :param topology: Topology for non-pdb trajectories
+        :type topology: list
 
         :return: np.array -- Array with the rmsd values of the trajectory
     """
 
     snapshots = getSnapshots(traj)
-    topology_contents = getTopologyFile(topology)
     rmsds = np.zeros(len(snapshots))
     RMSDCalc = RMSDCalculator.RMSDCalculator(symmetries)
     for i, snapshot in enumerate(snapshots):
         snapshotPDB = atomset.PDB()
-        snapshotPDB.initialise(snapshot, resname=resname, topology=topology_contents)
+        snapshotPDB.initialise(snapshot, resname=resname, topology=topology)
 
         rmsds[i] = RMSDCalc.computeRMSD(nativePDB, snapshotPDB)
 
