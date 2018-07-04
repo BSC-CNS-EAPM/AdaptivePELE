@@ -183,6 +183,12 @@ class PeleSimulation(SimulationRunner):
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.documentsFolder + " Documents")
 
+    def getWorkingProcessors(self):
+        """
+            Return the number of working processors, i.e. number of trajectories
+        """
+        return self.parameters.processors-1
+
     def getNextIterationBox(self, clusteringObject, outputFolder, resname, topologies=None, epoch=None):
         """
             Select the box for the next epoch, currently selecting the COM of
@@ -638,6 +644,12 @@ class MDSimulation(SimulationRunner):
     def __init__(self, parameters):
         SimulationRunner.__init__(self, parameters)
         self.type = simulationTypes.SIMULATION_TYPE.MD
+
+    def getWorkingProcessors(self):
+        """
+            Return the number of working processors, i.e. number of trajectories
+        """
+        return self.parameters.processors
 
     def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology=None):
         """
