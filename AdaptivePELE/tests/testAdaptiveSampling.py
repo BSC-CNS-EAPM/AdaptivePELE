@@ -145,11 +145,17 @@ class TestadaptiveSampling(unittest.TestCase):
             cluster.elements = elements[i]
             cluster.contacts = 0
             goldenClusters.append(cluster)
-        name = socket.gethostname()
+        # name = socket.gethostname()
         # if "bsccv" not in name and "login" not in name:
         #     print("Some integration can't be run due to not having PELE  installed")
         #     return True
-        self.integrationTest(controlFile, goldenPath, outputPath, goldenClusters)
+        # self.integrationTest(controlFile, goldenPath, outputPath, goldenClusters)
+        tmpFolder = "tmp_" + outputPath.replace("/", "_")
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(outputPath, 3)
+        # cleanup
+        shutil.rmtree(outputPath)
+        shutil.rmtree(tmpFolder)
 
     def testRestartEmptyClustering(self):
         controlFile = "tests/data/3ptb_data/restartTest.conf"
@@ -158,7 +164,7 @@ class TestadaptiveSampling(unittest.TestCase):
         clusteringObjectPath = os.path.join(outputPath, "2", "clustering", "object.pkl")
         if not os.path.exists(os.path.join(outputPath, "1", "clustering")):
             os.makedirs(os.path.join(outputPath, "1", "clustering"))
-        name = socket.gethostname()
+        # name = socket.gethostname()
         # if "bsccv" not in name and "login" not in name:
         #     print("Some integration can't be run due to not having PELE  installed")
         #     return True

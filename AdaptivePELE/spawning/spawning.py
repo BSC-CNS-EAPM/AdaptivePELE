@@ -235,7 +235,7 @@ class SpawningCalculator:
         """
         pass
 
-    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration, topology_file=None, topology=None):
+    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration, topologies=None):
         """
             Write initial structures for the next iteration
 
@@ -418,7 +418,7 @@ class IndependentRunsCalculator(SpawningCalculator):
         """
         pass
 
-    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration, topology_file=None, topology=None):
+    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration, topologies=None):
         """
             Write last trajectory structure as initial one for the next iteration
 
@@ -433,8 +433,8 @@ class IndependentRunsCalculator(SpawningCalculator):
             :type iteration: int
             :param topology_file: Topology file for non-pdb trajectories
             :type topology_file: str
-            :param topology: Topology for non-pdb trajectories
-            :type topology: list
+            :param topologies: Topology object containing the set of topologies needed for the simulation
+            :type topologies: :py:class:`.Topology`
 
             :returns: int, list -- number of processors, list with the
                 snapshot from which the trajectories will start in the next iteration
@@ -443,7 +443,7 @@ class IndependentRunsCalculator(SpawningCalculator):
         trajWildcard = os.path.join(outputPathConstants.epochOutputPathTempletized, constants.trajectoryBasename)
         trajectories = glob.glob(trajWildcard % (iteration-1))
         for num, trajectory in enumerate(trajectories):
-            snapshots = utilities.getSnapshots(trajectory, topology=topology_file)
+            snapshots = utilities.getSnapshots(trajectory)
             lastSnapshot = snapshots[-1]
             nSnapshots = len(snapshots)
             del snapshots
@@ -455,7 +455,7 @@ class IndependentRunsCalculator(SpawningCalculator):
                 with open(outputFilename, 'w') as f:
                     f.write(lastSnapshot)
             else:
-                utilities.write_mdtraj_PDB(lastSnapshot, outputFilename, topology)
+                utilities.write_mdtraj_object_PDB(lastSnapshot, outputFilename, topologies.getTopology(iteration-1, numTraj))
 
         return len(trajectories), procMapping
 
