@@ -40,7 +40,7 @@ trajectoryBasename = "*traj*"
 
 class AmberTemplates:
     antechamberTemplate = "antechamber -i $LIGAND -fi pdb -o $OUTPUT -fo mol2 -c bcc -pf y -nc $CHARGE"
-    parmchk2Template = "parmchk2 -i $MOL2 -o $OUTPUT"
+    parmchk2Template = "parmchk2 -i $MOL2 -f mol2 -o $OUTPUT"
     tleapTemplate = "source oldff/leaprc.ff99SB\n" \
                     "source leaprc.gaff\n" \
                     "source leaprc.water.tip3p\n" \
@@ -67,9 +67,6 @@ class OutputPathConstants():
         self.tmpControlFilename = ""
         self.tmpInitialStructuresEquilibrationTemplate = ""
         self.tmpControlFilenameEqulibration = ""
-        self.tmpMol2Ligand = ""
-        self.tmpFrcmodLigand = ""
-        self.tmpTleapFilename = ""
         self.buildConstants(outputPath)
 
     def buildConstants(self, outputPath):
@@ -91,6 +88,4 @@ class OutputPathConstants():
         self.tmpInitialStructuresEquilibrationTemplate = tmpFolder+"/initial_equilibration_%d.pdb"
         self.tmpControlFilename = tmpFolder+"/controlFile%d.conf"
         self.tmpControlFilenameEqulibration = tmpFolder+"/controlFile_equilibration_%d.conf"
-        self.tmpMol2Ligand = tmpFolder+"/%s.mol2"
-        self.tmpFrcmodLigand = tmpFolder+"/%s.frcmod"
-        self.tmpTleapFilename = tmpFolder+"/tleap_equilibration_%d.in"
+
