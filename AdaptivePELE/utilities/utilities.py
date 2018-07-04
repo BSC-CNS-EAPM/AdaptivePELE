@@ -21,7 +21,7 @@ class UnsatisfiedDependencyException(Exception):
     __module__ = Exception.__module__
 
 
-class Toplogy:
+class Topology:
     """
         Container object that points to the topology used in each trajectory
     """
