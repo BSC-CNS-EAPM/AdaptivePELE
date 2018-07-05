@@ -67,7 +67,7 @@ class SimulationRunner:
         self.parameters = parameters
         self.processorsToClusterMapping = []
 
-    def runSimulation(self, runningControlFile=""):
+    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
         pass
 
     def getWorkingProcessors(self):
@@ -298,15 +298,20 @@ class PeleSimulation(SimulationRunner):
         PDBinitial.initialise(initialStruct, resname=resname)
         return repr(PDBinitial.getCOM())
 
-    def runSimulation(self, runningControlFile=""):
+    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
         """
-            Run a short PELE simulation
+        Run a short PELE simulation
 
-            :param runningControlFile: PELE control file to run
-            :type runningControlFile: str
+        :param epoch: number of the epoch
+        :param outputPathConstants: outputpathConstants class
+        :param ControlFileDictionary: Dictionary with the values to substitute in the template
+        :param topologies: topology class
         """
+
+        print("Preparing Control File")
+        self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         self.createSymbolicLinks()
-
+        runningControlFile = outputPathConstants.tmpControlFilename % epoch
         if self.parameters.srun:
             toRun = ["srun", self.parameters.executable, runningControlFile]
         else:
@@ -932,7 +937,9 @@ class MDSimulation(SimulationRunner):
         simulation.step(simulation_steps)
         return simulation
 
-
+    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
+        # change signature
+        pass
 
 class TestSimulation(SimulationRunner):
     """
@@ -950,17 +957,18 @@ class TestSimulation(SimulationRunner):
         """
         return self.parameters.processors-1
 
-    def runSimulation(self, runningControlFile=""):
+    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
         """
             Copy file to test the rest of the AdaptivePELE procedure
         """
+        self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         if not self.copied:
             if os.path.exists(self.parameters.destination):
                 shutil.rmtree(self.parameters.destination)
             shutil.copytree(self.parameters.origin, self.parameters.destination)
             self.copied = True
 
-    def makeWorkingControlFile(self, workingControlFilename, dictionary):
+    def makeWorkingControlFile(self, workingControlFilename, dictionary, inputTemplate=None):
         pass
 
 
