@@ -11,14 +11,12 @@ import ast
 import glob
 import multiprocessing as mp
 from builtins import range
-import simtk.openmm as mm
-import simtk.openmm.app as app
-import simtk.unit as unit
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
 from AdaptivePELE.atomset import atomset, RMSDCalculator
 from AdaptivePELE.utilities import utilities
 SKLEARN = True
+OPENMM = True
 try:
     from sklearn.cluster import KMeans
 except ImportError:
@@ -27,6 +25,13 @@ try:
     basestring
 except NameError:
     basestring = str
+try:
+    import simtk.openmm as mm
+    import simtk.openmm.app as app
+    import simtk.unit as unit
+except ImportError:
+    OPENMM = False
+
 
 
 class SimulationParameters:
@@ -691,6 +696,8 @@ class MDSimulation(SimulationRunner):
         self.tleapTemplate = constants.AmberTemplates.tleapTemplate
         self.prmtopFiles = []
         self.ligandName = ""
+        if not OPENMM:
+            raise utilities.UnsatisfiedDependencyException("No installation of OpenMM found. Please, install OpenMM to run MD simulations.")
 
     def getWorkingProcessors(self):
         """
