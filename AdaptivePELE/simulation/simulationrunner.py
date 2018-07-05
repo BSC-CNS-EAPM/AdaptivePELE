@@ -9,7 +9,11 @@ import sys
 import numpy as np
 import ast
 import glob
+import multiprocessing as mp
 from builtins import range
+import simtk.openmm as mm
+import simtk.openmm.app as app
+import simtk.unit as unit
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
 from AdaptivePELE.atomset import atomset, RMSDCalculator
@@ -50,6 +54,12 @@ class SimulationParameters:
         self.trajectoryName = None
         self.srun = False
         self.numberEquilibrationStructures = 10
+        # parameters needed for MD simulations and their defaults
+        self.ligandCharge = 0
+        self.nonBondedCutoff = 8
+        self.Temperature = 300
+        self.runningPlatform = "CPU"
+        self.minimizationIterations = 2000
 
 
 class SimulationRunner:
@@ -59,6 +69,12 @@ class SimulationRunner:
 
     def runSimulation(self, runningControlFile=""):
         pass
+
+    def getWorkingProcessors(self):
+        """
+            Return the number of working processors, i.e. number of trajectories
+        """
+        return self.parameters.processors
 
     def hasExitCondition(self):
         """
@@ -168,6 +184,27 @@ class SimulationRunner:
         """
         pass
 
+    def prepareControlFile(self, epoch, outputPathConstants, peleControlFileDictionary):
+        """
+            Substitute the parameters in the PELE control file specified with the
+            provided in the control file
+
+            :param epoch: Epoch number
+            :type epoch: int
+            :param outputPathConstants: Object that has as attributes constant related to the outputPath that will be used to create the working control file
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param peleControlFileDictionary: Dictonary containing the values of the parameters to substitute in the control file
+            :type peleControlFileDictionary: dict
+        """
+        outputDir = outputPathConstants.epochOutputPathTempletized % epoch
+        utilities.makeFolder(outputDir)
+        peleControlFileDictionary["OUTPUT_PATH"] = outputDir
+        peleControlFileDictionary["SEED"] = self.parameters.seed + epoch * self.parameters.processors
+        if self.parameters.boxCenter is not None:
+            peleControlFileDictionary["BOX_RADIUS"] = self.parameters.boxRadius
+            peleControlFileDictionary["BOX_CENTER"] = self.parameters.boxCenter
+        self.makeWorkingControlFile(outputPathConstants.tmpControlFilename % epoch, peleControlFileDictionary)
+
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
@@ -183,7 +220,13 @@ class PeleSimulation(SimulationRunner):
         if not os.path.islink("Documents"):
             os.system("ln -s " + self.parameters.documentsFolder + " Documents")
 
-    def getNextIterationBox(self, clusteringObject, outputFolder, resname, topology=None):
+    def getWorkingProcessors(self):
+        """
+            Return the number of working processors, i.e. number of trajectories
+        """
+        return self.parameters.processors-1
+
+    def getNextIterationBox(self, clusteringObject, outputFolder, resname, topologies=None, epoch=None):
         """
             Select the box for the next epoch, currently selecting the COM of
             the cluster with max SASA
@@ -194,8 +237,10 @@ class PeleSimulation(SimulationRunner):
             :type outputFolder: str
             :param resname: Name of the ligand in the pdb
             :type resname: str
-            :param topology: Topology file
-            :type topology: str
+            :param topologies: Topology object containing the set of topologies needed for the simulation
+            :type topologies: :py:class:`.Topology`
+            :param epoch: Epoch of the trajectories to analyse
+            :type epoch: int
 
             :returns str: -- string to be substitued in PELE control file
         """
@@ -216,15 +261,11 @@ class PeleSimulation(SimulationRunner):
             raise ValueError("%s should be either binding or unbinding, but %s is provided!!!" % (blockNames.SimulationParams.modeMovingBox, self.parameters.modeMovingBox))
         # If this lines are reached then a new extreme SASA value was
         # identified and we proceed to extract the corresponding center of mass
-        if topology is not None:
-            topology_content = utilities.getTopologyFile(topology)
-        else:
-            topology_content = None
         trajNum = metrics[SASAcluster, -2]
         snapshotNum = metrics[SASAcluster, -1]
-        snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum), topology=topology)[int(snapshotNum)]
+        snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum))[int(snapshotNum)]
         snapshotPDB = atomset.PDB()
-        snapshotPDB.initialise(snapshot, resname=resname, topology=topology_content)
+        snapshotPDB.initialise(snapshot, resname=resname, topology=topologies.getTopology(epoch, trajNum))
         self.parameters.boxCenter = str(snapshotPDB.getCOM())
         return
 
@@ -364,7 +405,7 @@ class PeleSimulation(SimulationRunner):
         # but no more than 50
         return min(stepsPerProc, 50)
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology=None):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topologies=None):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure and select appropiate
@@ -380,12 +421,13 @@ class PeleSimulation(SimulationRunner):
             :type outputPath: str
             :param resname: Residue name of the ligand in the system pdb
             :type resname: str
-            :param topology: Topology file for non-pdb trajectories
-            :type topology: str
+            :param topologies: Topology object containing the set of topologies needed for the simulation
+            :type topologies: :py:class:`.Topology`
 
             :returns: list --  List with initial structures
         """
         newInitialStructures = []
+        newStructure = []
         if self.parameters.equilibrationLength is None:
             self.parameters.equilibrationLength = self.calculateEquilibrationLength()
         equilibrationPeleDict = {"PELE_STEPS": self.parameters.equilibrationLength, "SEED": self.parameters.seed}
@@ -422,17 +464,22 @@ class PeleSimulation(SimulationRunner):
             reportNames = os.path.join(equilibrationOutput, reportWildcard)
             trajNames = os.path.join(equilibrationOutput, trajWildcard)
             if len(initialStructures) == 1 and self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationLastSnapshot:
-                newStructure = self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames, topology=topology)
+                newStructure.extend(self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames, topology=topologies.topologies[i]))
             elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationSelect:
-                newStructure = self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames, topology=topology)
+                newStructure.extend(self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames, topology=topologies.topologies[i]))
             elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationCluster:
-                newStructure = self.clusterEquilibrationStructures(resname, trajNames, reportNames, topology=topology)
+                newStructure.extend(self.clusterEquilibrationStructures(resname, trajNames, reportNames, topology=topologies.topologies[i]))
 
-            for j, struct in enumerate(newStructure):
-                newStructurePath = os.path.join(equilibrationOutput, 'equilibration_struc_%d_%d.pdb' % (i+1, j+1))
-                with open(newStructurePath, "w") as fw:
-                    fw.write(struct)
-                newInitialStructures.append(newStructurePath)
+        if len(newStructure) > (self.processors-1):
+            # if for some reason the number of selected structures exceeds
+            # the number of available processors, randomly sample the initial
+            # structures
+            newStructure = np.random.choice(newStructure, self.processors-1, replace=False)
+        for j, struct in enumerate(newStructure):
+            newStructurePath = os.path.join(equilibrationOutput, 'equilibration_struc_%d_%d.pdb' % (i+1, j+1))
+            with open(newStructurePath, "w") as fw:
+                fw.write(struct)
+            newInitialStructures.append(newStructurePath)
         return newInitialStructures
 
     def clusterEquilibrationStructures(self, resname, trajWildcard, reportWildcard, topology=None):
@@ -445,17 +492,13 @@ class PeleSimulation(SimulationRunner):
             :type trajWildcard: str
             :param reportWildcard: Templetized path to report files"
             :type reportWildcard: str
-            :param topology: Topology file for non-pdb trajectories
-            :type topology: str
+            :param topology: Topology for non-pdb trajectories
+            :type topology: list
 
             :returns: list -- List with the pdb snapshots of the representatives structures
         """
         if not SKLEARN:
             raise utilities.UnsatisfiedDependencyException("No installation of scikit-learn found. Please, install scikit-learn or select a different equilibrationMode.")
-        if topology is None:
-            topology_content = None
-        else:
-            topology_content = utilities.getTopologyFile(topology)
         energyColumn = 3
         # detect number of trajectories available
         nTrajs = len(glob.glob(trajWildcard.rsplit("_", 1)[0]+"*"))+1
@@ -464,10 +507,10 @@ class PeleSimulation(SimulationRunner):
             report = np.loadtxt(reportWildcard % i)
             if len(report.shape) < 2:
                 report = report[np.newaxis, :]
-            snapshots = utilities.getSnapshots(trajWildcard % i, topology=topology)
+            snapshots = utilities.getSnapshots(trajWildcard % i)
             for nSnap, (line, snapshot) in enumerate(zip(report, snapshots)):
                 conformation = atomset.PDB()
-                conformation.initialise(snapshot, resname=resname, topology=topology_content)
+                conformation.initialise(snapshot, resname=resname, topology=topology)
                 com = conformation.getCOM()
                 data.append([line[energyColumn], i, nSnap]+com)
         data = np.array(data)
@@ -489,9 +532,9 @@ class PeleSimulation(SimulationRunner):
                 # If a cluster has no structure assigned, skip it
                 continue
             traj, snap = clustersInfo[cl]["structure"]
-            conf = utilities.getSnapshots(trajWildcard % traj, topology=topology)[snap]
+            conf = utilities.getSnapshots(trajWildcard % traj)[snap]
             if not isinstance(conf, basestring):
-                conf = utilities.get_mdtraj_object_PDBstring(conf, topology_content)
+                conf = utilities.get_mdtraj_object_PDBstring(conf, topology)
             initialStructures.append(conf)
         return initialStructures
 
@@ -504,20 +547,16 @@ class PeleSimulation(SimulationRunner):
             :type nTrajs: int
             :param trajWildcard: Templetized path to trajectory files"
             :type trajWildcard: str
-            :param topology: Topology file for non-pdb trajectories
-            :type topology: str
+            :param topology: Topology for non-pdb trajectories
+            :type topology: list
 
             :returns: list -- List with the pdb snapshots of the representatives structures
         """
         initialStructures = []
-        if topology is not None:
-            topology_content = utilities.getTopologyFile(topology)
-        else:
-            topology_content = None
         for ij in range(1, nTrajs):
-            conf = utilities.getSnapshots(trajWildcard % ij, topology=topology)[-1]
+            conf = utilities.getSnapshots(trajWildcard % ij)[-1]
             if not isinstance(conf, basestring):
-                conf = utilities.get_mdtraj_object_PDBstring(conf, topology_content)
+                conf = utilities.get_mdtraj_object_PDBstring(conf, topology)
             initialStructures.append(conf)
 
         return initialStructures
@@ -538,6 +577,8 @@ class PeleSimulation(SimulationRunner):
             :type trajWildcard: str
             :param reportWildcard: Templetized path to report files"
             :type reportWildcard: str
+            :param topology: Topology for non-pdb trajectories
+            :type topology: list
 
             :returns: list -- List with the pdb snapshots of the representatives structures
         """
@@ -551,24 +592,19 @@ class PeleSimulation(SimulationRunner):
         else:
             cols = sorted([energyColumn, similarityColumn])
 
-        if topology is not None:
-            topology_content = utilities.getTopologyFile(topology)
-        else:
-            topology_content = None
-
         for i in range(1, nTrajs):
             indices.append(rowIndex)
             report = np.loadtxt(reportWildcard % i)
             if similarityColumn is None:
-                snapshots = utilities.getSnapshots(trajWildcard % i, topology=topology)
+                snapshots = utilities.getSnapshots(trajWildcard % i)
                 report_values = []
                 if i == 1:
-                    initial.initialise(snapshots.pop(0), resname=resname, topology=topology_content)
+                    initial.initialise(snapshots.pop(0), resname=resname, topology=topology)
                     report_values.append([0, report[0, energyColumn]])
                     report = report[1:, :]
                 for j, snap in enumerate(snapshots):
                     pdbConformation = atomset.PDB()
-                    pdbConformation.initialise(snap, resname=resname, topology=topology_content)
+                    pdbConformation.initialise(snap, resname=resname, topology=topology)
                     report_values.append([RMSDCalc.computeRMSD(initial, pdbConformation), report[j, energyColumn]])
             else:
                 report_values = report[:, cols]
@@ -607,9 +643,9 @@ class PeleSimulation(SimulationRunner):
         # trajectories are 1-indexed
         trajNum += 1
         # return as list for compatibility with selectEquilibrationLastSnapshot
-        conf = utilities.getSnapshots(trajWildcard % trajNum, topology=topology)[snapshotNum]
+        conf = utilities.getSnapshots(trajWildcard % trajNum)[snapshotNum]
         if not isinstance(conf, basestring):
-            conf = utilities.get_mdtraj_object_PDBstring(conf, topology_content)
+            conf = utilities.get_mdtraj_object_PDBstring(conf, topology)
         return [conf]
 
     def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
@@ -641,6 +677,263 @@ class PeleSimulation(SimulationRunner):
         return "".join(jsonString)
 
 
+class MDSimulation(SimulationRunner):
+    def __init__(self, parameters):
+        SimulationRunner.__init__(self, parameters)
+        self.type = simulationTypes.SIMULATION_TYPE.MD
+        self.antechamberTemplate = constants.AmberTemplates.antechamberTemplate
+        self.parmchkTemplate = constants.AmberTemplates.parmchk2Template
+        self.tleapTemplate = constants.AmberTemplates.tleapTemplate
+        self.prmtopFiles = []
+        self.ligandName = ""
+
+    def getWorkingProcessors(self):
+        """
+            Return the number of working processors, i.e. number of trajectories
+        """
+        return self.parameters.processors
+
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology=None):
+        """
+            Run short simulation to equilibrate the system. It will run one
+            such simulation for every initial structure
+
+            :param initialStructures: Name of the initial structures to copy
+            :type initialStructures: list of str
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param reportBaseFilename: Name of the file that contains the metrics of the snapshots to cluster
+            :type reportBaseFilename: str
+            :param outputPath: Path where trajectories are found
+            :type outputPath: str
+            :param resname: Residue name of the ligand in the system pdb
+            :type resname: str
+            :param topology: Topology object
+            :type topology: :py:class:
+
+            :returns: list --  List with initial structures
+        """
+        self.ligandName = resname
+        newInitialStructures = []
+        solvatedStrcutures = []
+        equilibrationFiles = []
+        equilibrationOutput = os.path.join(outputPath, "equilibration")
+        utilities.makeFolder(equilibrationOutput)
+        # AmberTools generates intermediate files in the current directory, change to the tmp folder
+        workingdirectory = os.getcwd()
+        os.chdir(outputPathConstants.tmpFolder)
+        ligandPDB = self.extractLigand(initialStructures[0], resname, outputpath="")
+        ligandmol2 = "%s.mol2" % resname
+        ligandfrcmod = "%s.frcmod" % resname
+        Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.boxRadius, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
+        antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
+        parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
+        self.prepareLigand(antechamberDict, parmchkDict)
+
+        for i, structure in enumerate(initialStructures):
+            TleapControlFile = "tleap_equilibration_%d.in" % (i + 1)
+            prmtop = os.path.join(workingdirectory, equilibrationOutput, "system_%d.prmtop" % (i + 1))
+            inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % (i + 1))
+            finalPDB = os.path.join(workingdirectory, equilibrationOutput, "system_%d.pdb" % (i + 1))
+            Tleapdict["COMPLEX"] = structure
+            Tleapdict["PRMTOP"] = prmtop
+            Tleapdict["INPCRD"] = inpcrd
+            Tleapdict["SOLVATED_PDB"] = finalPDB
+            self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
+            self.runTleap(TleapControlFile)
+            solvatedStrcutures.append(finalPDB)
+            self.prmtopFiles.append(prmtop)
+            equilibrationFiles.append((prmtop, inpcrd))
+
+        os.chdir(workingdirectory)
+        pool = mp.Pool(self.getWorkingProcessors())
+        workers = []
+        startTime = time.time()
+        print("equilibrating System")
+        for i, equilibrationFilePair in enumerate(equilibrationFiles):
+            outputPDB = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % (i + 1))
+            workers.append(pool.apply_async(self.runEquilibration, args=(equilibrationFilePair, outputPDB)))
+
+        for worker in workers:
+            newInitialStructures.append(worker.get())
+        endTime = time.time()
+        print("Equilibration took %.2f sec" % (endTime - startTime))
+        return newInitialStructures
+
+    def runTleap(self, TleapControlFile):
+        tleapCommand = "tleap -f %s" % TleapControlFile
+        print("System Preparation")
+        startTime = time.time()
+        proc = subprocess.Popen(tleapCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        (out, err) = proc.communicate()
+        print(out)
+        if err:
+            print(err)
+        endTime = time.time()
+        print("System preparation took %.2f sec" % (endTime - startTime))
+
+    def preparePDB(self, PDBtoOpen, outputpath):
+        """
+        Corrects problems in the pdb such as CONECT and wrong histidine codes
+
+        :param PDBtoOpen: string with the pdb to prepare
+        :type PDBtoOpen: str
+        :param outputPath: Path where the pdb is written
+        :type outputPath: str
+        """
+        pass
+
+    def extractLigand(self, PDBtoOpen, resname, outputpath):
+        """
+        Extracts the ligand from a given PDB
+
+        :param PDBtoOpen: string with the pdb to prepare
+        :type PDBtoOpen: str
+        :param resname: string with the code of the ligand
+        :type resname: str
+        :param outputPath: Path where the pdb is written
+        :type outputPath: str
+        :return: string with the ligand pdb
+        """
+        ligandpdb = os.path.join(outputpath, "raw_ligand.pdb")
+        with open(ligandpdb, "w") as out:
+            with open(PDBtoOpen, "r") as inp:
+                for line in inp:
+                    if resname in line:
+                        out.write(line)
+        return ligandpdb
+
+    def prepareLigand(self, antechamberDict, parmchkDict):
+        """
+        Runs antechamber and parmchk2 to obtain the mol2 and frcmod of the ligand
+
+        :param antechamberDict: Dictonary containing the parameters to substitute in the antechamber command
+        :type antechamberDict: dict
+        :param parmchkDict: Dictonary containing the parameters to substitute in the parmchk2 command
+        :type parmchkDict: dict
+        """
+        antechamberCommand = string.Template(self.antechamberTemplate)
+        antechamberCommand = antechamberCommand.substitute(antechamberDict)
+        parmchkCommand = string.Template(self.parmchkTemplate)
+        parmchkCommand = parmchkCommand.substitute(parmchkDict)
+        print(antechamberCommand)
+        startTime = time.time()
+        proc = subprocess.Popen(antechamberCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        (out, err) = proc.communicate()
+        print(out)
+        if err:
+            print(err)
+        print(parmchkCommand)
+        proc = subprocess.Popen(parmchkCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        (out, err) = proc.communicate()
+        print(out)
+        if err:
+            print(err)
+        endTime = time.time()
+        print("Ligand preparation took %.2f sec" % (endTime - startTime))
+
+    def runEquilibration(self, equilibrationFiles, outputPDB):
+        """
+        Function that runs the whole equilibration process and returns the final pdb
+        :param equilibrationFiles: tuple with the topology (prmtop) in the first position and the coordinates
+        in the second (inpcrd)
+        :param outputPDB: string with the pdb to save
+        :return: a string with the outputPDB
+        """
+        prmtop , inpcrd = equilibrationFiles
+        prmtop = app.AmberPrmtopFile(prmtop)
+        inpcrd = app.AmberInpcrdFile(inpcrd)
+        PLATFORM = mm.Platform_getPlatformByName(self.parameters.runningPlatform)
+        simulation = self.minimization(prmtop, inpcrd, PLATFORM, constraints=5)
+        positions = simulation.context.getState(getPositions=True).getPositions()
+        velocities = simulation.context.getState(getVelocities=True).getVelocities()
+        simulation = self.NVTequilibration(prmtop, positions, PLATFORM, simulation_steps=2000, constraints=5, velocities=velocities)
+        positions = simulation.context.getState(getPositions=True).getPositions()
+        velocities = simulation.context.getState(getVelocities=True).getVelocities()
+        simulation = self.NPTequilibration(prmtop, positions, PLATFORM, simulation_steps=2000, constraints=0.5, velocities=velocities)
+        with open(outputPDB, 'w') as fw:
+            app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)
+        return outputPDB
+
+    def minimization(self, prmtop, inpcrd, PLATFORM, constraints):
+        # Thermostat
+        system = prmtop.createSystem(nonbondedMethod=app.PME,
+                                       nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms, constraints=app.HBonds)
+        # system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
+        integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+        if constraints:
+            # Add positional restraints to protein backbone
+            force = mm.CustomExternalForce("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
+            force.addGlobalParameter("k", constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
+            force.addPerParticleParameter("x0")
+            force.addPerParticleParameter("y0")
+            force.addPerParticleParameter("z0")
+            for j, atom in enumerate(prmtop.topology.atoms()):
+                if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (
+                        atom.residue.name == self.ligandName and atom.element.symbol != "H"):
+                    force.addParticle(j, inpcrd.positions[j].value_in_unit(unit.nanometers))
+            system.addForce(force)
+
+        simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
+        if inpcrd.boxVectors is not None:
+            simulation.context.setPeriodicBoxVectors(*inpcrd.boxVectors)
+        simulation.context.setPositions(inpcrd.positions)
+        simulation.minimizeEnergy(maxIterations=self.parameters.minimizationIterations)
+        return simulation
+
+    def NVTequilibration(self, topology, positions, PLATFORM, simulation_steps, constraints, velocities=None):
+        system = topology.createSystem(nonbondedMethod=app.PME,
+                                       nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms,
+                                       constraints=app.HBonds)
+        system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
+        integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+        if constraints:
+            force = mm.CustomExternalForce("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
+            force.addGlobalParameter("k", constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
+            force.addPerParticleParameter("x0")
+            force.addPerParticleParameter("y0")
+            force.addPerParticleParameter("z0")
+            for j, atom in enumerate(topology.topology.atoms()):
+                if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (atom.residue.name == self.ligandName and atom.element.symbol != "H"):
+                    force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
+            system.addForce(force)
+        simulation = app.Simulation(topology.topology, system, integrator, PLATFORM)
+        simulation.context.setPositions(positions)
+        if velocities:
+            simulation.context.setVelocities(velocities)
+        else:
+            simulation.context.setVelocitiesToTemperature(self.parameters.Temperature * unit.kelvin, 1)
+        simulation.step(simulation_steps)
+        return simulation
+
+    def NPTequilibration(self, topology, positions, PLATFORM, simulation_steps, constraints, velocities=None):
+        system = topology.createSystem(nonbondedMethod=app.PME,
+                                       nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms,
+                                       constraints=app.HBonds)
+        system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
+        integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+        system.addForce(mm.MonteCarloBarostat(1 * unit.bar, self.parameters.Temperature * unit.kelvin))
+        if constraints:
+            force = mm.CustomExternalForce("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
+            force.addGlobalParameter("k", constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
+            force.addPerParticleParameter("x0")
+            force.addPerParticleParameter("y0")
+            force.addPerParticleParameter("z0")
+            for j, atom in enumerate(topology.topology.atoms()):
+                if atom.name == 'CA' or (atom.residue.name == self.ligandName and atom.element.symbol != "H"):
+                    force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
+            system.addForce(force)
+        simulation = app.Simulation(topology.topology, system, integrator, PLATFORM)
+        simulation.context.setPositions(positions)
+        if velocities:
+            simulation.context.setVelocities(velocities)
+        else:
+            simulation.context.setVelocitiesToTemperature(self.parameters.Temperature * unit.kelvin, 1)
+        simulation.step(simulation_steps)
+        return simulation
+
+
+
 class TestSimulation(SimulationRunner):
     """
         Class used for testing
@@ -650,6 +943,12 @@ class TestSimulation(SimulationRunner):
         self.type = simulationTypes.SIMULATION_TYPE.TEST
         self.copied = False
         self.parameters = parameters
+
+    def getWorkingProcessors(self):
+        """
+            Return the number of working processors, i.e. number of trajectories
+        """
+        return self.parameters.processors-1
 
     def runSimulation(self, runningControlFile=""):
         """
@@ -796,7 +1095,15 @@ class RunnerBuilder:
 
             return PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
-            pass
+            params.processors = paramsBlock[blockNames.SimulationParams.processors]
+            params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
+            params.runEquilibration = True
+            params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
+            params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
+            params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
+            params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
+            params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
+            return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
             params.destination = paramsBlock[blockNames.SimulationParams.destination]
