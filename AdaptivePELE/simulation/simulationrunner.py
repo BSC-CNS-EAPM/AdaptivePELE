@@ -565,6 +565,8 @@ class PeleSimulation(SimulationRunner):
         for i in range(1, nTrajs):
             indices.append(rowIndex)
             report = np.loadtxt(reportWildcard % i)
+            if len(report.shape) < 2:
+                report = report[np.newaxis, :]
             if similarityColumn is None:
                 snapshots = utilities.getSnapshots(trajWildcard % i)
                 report_values = []
