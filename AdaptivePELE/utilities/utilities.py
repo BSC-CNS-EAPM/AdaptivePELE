@@ -4,6 +4,7 @@ from six import reraise as raise_
 import os
 import sys
 import shutil
+import glob
 import numpy as np
 import string
 import json
@@ -36,7 +37,7 @@ class Topology:
         """
             Remove the written topology files
         """
-        files = os.path.join(self.path, "topology*.pdb")
+        files = glob.glob(os.path.join(self.path, "topology*.pdb"))
         for f in files:
             os.remove(f)
 
