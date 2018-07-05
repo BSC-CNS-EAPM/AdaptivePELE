@@ -617,15 +617,9 @@ def main(jsonParams, clusteringHook=None):
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print("Iteration", i)
 
-        print("Preparing control file...")
-        simulationRunner.prepareControlFile(i, outputPathConstants, ControlFileDictionary)
-
         print("Production run...")
         if not debug:
-            startTime = time.time()
-            simulationRunner.runSimulation(outputPathConstants.tmpControlFilename % i)
-            endTime = time.time()
-            print("PELE %s sec" % (endTime - startTime))
+            simulationRunner.runSimulation(i, outputPathConstants, ControlFileDictionary, topologies)
 
         simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
         topologies.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i, i)
