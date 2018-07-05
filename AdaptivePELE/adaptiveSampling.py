@@ -47,7 +47,7 @@ def createMappingForFirstEpoch(initialStructures, topologies, processors):
     """
     topologyMapping = list(range(1, len(initialStructures)))+[0]
     topologyMapping = topologyMapping*int(np.ceil(processors/len(initialStructures)))
-    topologies.mapEpochTopologies(0, topologyMapping[:processors])
+    topologies.topologyMap[0] = topologyMapping[:processors]
 
 
 def writeTopologyFiles(topologies, destination):
@@ -59,8 +59,9 @@ def writeTopologyFiles(topologies, destination):
         :param destination: Path where to copy the toplogy files
         :type destination: str
     """
-    for topology in topologies:
-        shutil.copy(topology, destination)
+    destination = os.path.join(destination, "topology_%d.pdb")
+    for i, topology in enumerate(topologies):
+        shutil.copy(topology, destination % i)
 
 
 def checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputFolder, simulationRunner):
@@ -376,7 +377,7 @@ def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topol
     paths = ast.literal_eval(snapshotsJSONSelectionString)
     if len(glob.glob(paths[-1])) == 0:
         sys.exit("No trajectories to cluster! Matching path:%s" % paths[-1])
-    clusteringMethod.cluster(paths, topology=topologies)
+    clusteringMethod.cluster(paths, topology=topologies, epoch=epoch)
 
 
 def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner, topologies):
@@ -437,6 +438,8 @@ def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConsta
     else:
         clusteringMethod = oldClusteringMethod
         clusteringMethod.setCol(spawningParams.reportCol)
+        for ij in range(firstRun):
+            topologies.readMappingFromDisk(outputPathConstants.epochOutputPathTempletized % ij, ij)
 
     return clusteringMethod
 
@@ -470,8 +473,10 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
 
     degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.getWorkingProcessors(), spawningParams, firstRun)
     spawningCalculator.log()
-    print("Degeneracy", degeneracyOfRepresentatives)
     seedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun, topologies=topologies)
+    # for compatibility with old data
+    procMapping = [element if element is not None else (0, 0, 0) for element in procMapping]
+    topologies.mapEpochTopologies(firstRun, procMapping)
     initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(seedingPoints, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
     simulationRunner.updateMappingProcessors(procMapping)
 

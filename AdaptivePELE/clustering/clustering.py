@@ -905,6 +905,10 @@ class Clustering:
             # origCluster = processorsToClusterMapping[trajNum-1]
             origCluster = None
             snapshots = utilities.getSnapshots(trajectory, True)
+            if topology is not None:
+                top = topology.getTopology(epoch, trajNum)
+            else:
+                top = None
 
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
@@ -915,7 +919,7 @@ class Clustering:
                     if ignoreFirstRow and num == 0:
                         continue
                     try:
-                        origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col, topology=topology.getTopology(epoch, trajNum))
+                        origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, metrics[num], self.col, topology=top)
                     except IndexError as e:
                         message = (" in trajectory %d. This is usually caused by a mismatch between report files and trajectory files"
                                    " which in turn is usually caused by some problem in writing the files, e.g. quota")
@@ -927,7 +931,7 @@ class Clustering:
                 for num, snapshot in enumerate(snapshots):
                     if ignoreFirstRow and num == 0:
                         continue
-                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, topology=topology.getTopology(epoch, trajNum))
+                    origCluster = self.addSnapshotToCluster(trajNum, snapshot, origCluster, num, topology=top)
         for cluster in self.clusters.clusters:
             cluster.altStructure.cleanPQ()
 
@@ -1343,6 +1347,10 @@ class SequentialLastSnapshotClustering(Clustering):
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)
             snapshots = utilities.getSnapshots(trajectory, True)
+            if topology is not None:
+                top = topology.getTopology(epoch, trajNum)
+            else:
+                top = None
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
@@ -1352,9 +1360,9 @@ class SequentialLastSnapshotClustering(Clustering):
                 # check the exit condition
                 metrics = metrics.min(axis=0)
 
-                self.addSnapshotToCluster(snapshots[-1], metrics, self.col, topology=topology.getTopology(epoch, trajNum))
+                self.addSnapshotToCluster(snapshots[-1], metrics, self.col, topology=top)
             else:
-                self.addSnapshotToCluster(snapshots[-1], topology=topology.getTopology(epoch, trajNum))
+                self.addSnapshotToCluster(snapshots[-1], topology=top)
 
     def addSnapshotToCluster(self, snapshot, metrics=None, col=None, topology=None):
         """

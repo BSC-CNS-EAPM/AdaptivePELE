@@ -70,6 +70,12 @@ class SimulationRunner:
     def runSimulation(self, runningControlFile=""):
         pass
 
+    def getWorkingProcessors(self):
+        """
+            Return the number of working processors, i.e. number of trajectories
+        """
+        return self.parameters.processors
+
     def hasExitCondition(self):
         """
             Check if an exit condition has been set
@@ -666,7 +672,7 @@ class MDSimulation(SimulationRunner):
         """
         return self.parameters.processors
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology=None):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure
@@ -916,6 +922,12 @@ class TestSimulation(SimulationRunner):
         self.type = simulationTypes.SIMULATION_TYPE.TEST
         self.copied = False
         self.parameters = parameters
+
+    def getWorkingProcessors(self):
+        """
+            Return the number of working processors, i.e. number of trajectories
+        """
+        return self.parameters.processors-1
 
     def runSimulation(self, runningControlFile=""):
         """
