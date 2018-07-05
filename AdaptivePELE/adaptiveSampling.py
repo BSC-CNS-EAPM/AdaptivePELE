@@ -519,30 +519,6 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, controlFil
     return clusteringMethod, initialStructuresAsString, initialClusters
 
 
-def preparePeleControlFile(epoch, outputPathConstants, simulationRunner, peleControlFileDictionary):
-    """
-        Substitute the parameters in the PELE control file specified with the
-        provided in the control file
-
-        :param epoch: Epoch number
-        :type epoch: int
-        :param outputPathConstants: Object that has as attributes constant related to the outputPath that will be used to create the working control file
-        :type outputPathConstants: :py:class:`.OutputPathConstants`
-        :param simulationRunner: Simulation runner object
-        :type simulationRunner: `.SimulationRunner`
-        :param peleControlFileDictionary: Dictonary containing the values of the parameters to substitute in the control file
-        :type peleControlFileDictionary: dict
-    """
-    outputDir = outputPathConstants.epochOutputPathTempletized % epoch
-    utilities.makeFolder(outputDir)
-    peleControlFileDictionary["OUTPUT_PATH"] = outputDir
-    peleControlFileDictionary["SEED"] = simulationRunner.parameters.seed + epoch*simulationRunner.parameters.processors
-    if simulationRunner.parameters.boxCenter is not None:
-        peleControlFileDictionary["BOX_RADIUS"] = simulationRunner.parameters.boxRadius
-        peleControlFileDictionary["BOX_CENTER"] = simulationRunner.parameters.boxCenter
-    simulationRunner.makeWorkingControlFile(outputPathConstants.tmpControlFilename % epoch, peleControlFileDictionary)
-
-
 def main(jsonParams, clusteringHook=None):
     """
         Main body of the adaptive sampling program.
@@ -633,7 +609,7 @@ def main(jsonParams, clusteringHook=None):
         createMappingForFirstEpoch(initialStructures, topologies, simulationRunner.getWorkingProcessors())
 
         clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner)
-    peleControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps,
+    ControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps,
                                  "BOX_RADIUS": simulationRunner.parameters.boxRadius}
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
@@ -642,7 +618,7 @@ def main(jsonParams, clusteringHook=None):
         print("Iteration", i)
 
         print("Preparing control file...")
-        preparePeleControlFile(i, outputPathConstants, simulationRunner, peleControlFileDictionary)
+        simulationRunner.prepareControlFile(i, outputPathConstants, ControlFileDictionary)
 
         print("Production run...")
         if not debug:
@@ -699,7 +675,7 @@ def main(jsonParams, clusteringHook=None):
                 numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1, topologies=topologies)
                 simulationRunner.updateMappingProcessors(procMapping)
                 initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
-                peleControlFileDictionary["COMPLEXES"] = initialStructuresAsString
+                ControlFileDictionary["COMPLEXES"] = initialStructuresAsString
                 topologies.mapEpochTopologies(i+1, procMapping)
 
         if clusteringMethod.symmetries and nativeStructure:

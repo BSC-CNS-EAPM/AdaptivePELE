@@ -184,6 +184,27 @@ class SimulationRunner:
         """
         pass
 
+    def prepareControlFile(self, epoch, outputPathConstants, peleControlFileDictionary):
+        """
+            Substitute the parameters in the PELE control file specified with the
+            provided in the control file
+
+            :param epoch: Epoch number
+            :type epoch: int
+            :param outputPathConstants: Object that has as attributes constant related to the outputPath that will be used to create the working control file
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param peleControlFileDictionary: Dictonary containing the values of the parameters to substitute in the control file
+            :type peleControlFileDictionary: dict
+        """
+        outputDir = outputPathConstants.epochOutputPathTempletized % epoch
+        utilities.makeFolder(outputDir)
+        peleControlFileDictionary["OUTPUT_PATH"] = outputDir
+        peleControlFileDictionary["SEED"] = self.parameters.seed + epoch * self.parameters.processors
+        if self.parameters.boxCenter is not None:
+            peleControlFileDictionary["BOX_RADIUS"] = self.parameters.boxRadius
+            peleControlFileDictionary["BOX_CENTER"] = self.parameters.boxCenter
+        self.makeWorkingControlFile(outputPathConstants.tmpControlFilename % epoch, peleControlFileDictionary)
+
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
@@ -1075,6 +1096,7 @@ class RunnerBuilder:
             return PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
+            params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.runEquilibration = True
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
