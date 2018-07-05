@@ -9,7 +9,11 @@ import sys
 import numpy as np
 import ast
 import glob
+import multiprocessing as mp
 from builtins import range
+import simtk.openmm as mm
+import simtk.openmm.app as app
+import simtk.unit as unit
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
 from AdaptivePELE.atomset import atomset, RMSDCalculator
@@ -50,7 +54,12 @@ class SimulationParameters:
         self.trajectoryName = None
         self.srun = False
         self.numberEquilibrationStructures = 10
-        self.ligandCharge = 1
+        # parameters needed for MD simulations and their defaults
+        self.ligandCharge = 0
+        self.nonBondedCutoff = 8
+        self.Temperature = 300
+        self.runningPlatform = "CPU"
+        self.minimizationIterations = 2000
 
 
 class SimulationRunner:
@@ -648,6 +657,8 @@ class MDSimulation(SimulationRunner):
         self.antechamberTemplate = constants.AmberTemplates.antechamberTemplate
         self.parmchkTemplate = constants.AmberTemplates.parmchk2Template
         self.tleapTemplate = constants.AmberTemplates.tleapTemplate
+        self.prmtopFiles = []
+        self.ligandName = ""
 
     def getWorkingProcessors(self):
         """
@@ -655,7 +666,7 @@ class MDSimulation(SimulationRunner):
         """
         return self.parameters.processors
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology=None):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure
@@ -675,10 +686,13 @@ class MDSimulation(SimulationRunner):
 
             :returns: list --  List with initial structures
         """
+        self.ligandName = resname
         newInitialStructures = []
+        solvatedStrcutures = []
+        equilibrationFiles = []
         equilibrationOutput = os.path.join(outputPath, "equilibration")
         utilities.makeFolder(equilibrationOutput)
-        # AmberTools generates intermediate files in the current directory
+        # AmberTools generates intermediate files in the current directory, change to the tmp folder
         workingdirectory = os.getcwd()
         os.chdir(outputPathConstants.tmpFolder)
         ligandPDB = self.extractLigand(initialStructures[0], resname, outputpath="")
@@ -688,6 +702,7 @@ class MDSimulation(SimulationRunner):
         antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
         parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
         self.prepareLigand(antechamberDict, parmchkDict)
+
         for i, structure in enumerate(initialStructures):
             TleapControlFile = "tleap_equilibration_%d.in" % (i + 1)
             prmtop = os.path.join(workingdirectory, equilibrationOutput, "system_%d.prmtop" % (i + 1))
@@ -699,15 +714,23 @@ class MDSimulation(SimulationRunner):
             Tleapdict["SOLVATED_PDB"] = finalPDB
             self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
             self.runTleap(TleapControlFile)
-            # update topology file
+            solvatedStrcutures.append(finalPDB)
+            self.prmtopFiles.append(prmtop)
+            equilibrationFiles.append((prmtop, inpcrd))
 
-
-        # Once all files are working run equilibration using multiprocess
-        # save results
-        # append new pdbs to newInitialStructures
-        # changing back to the old working directory
         os.chdir(workingdirectory)
-        exit(1)
+        pool = mp.Pool(self.getWorkingProcessors())
+        workers = []
+        startTime = time.time()
+        print("equilibrating System")
+        for i, equilibrationFilePair in enumerate(equilibrationFiles):
+            outputPDB = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % (i + 1))
+            workers.append(pool.apply_async(self.runEquilibration, args=(equilibrationFilePair, outputPDB)))
+
+        for worker in workers:
+            newInitialStructures.append(worker.get())
+        endTime = time.time()
+        print("Equilibration took %.2f sec" % (endTime - startTime))
         return newInitialStructures
 
     def runTleap(self, TleapControlFile):
@@ -770,22 +793,118 @@ class MDSimulation(SimulationRunner):
         startTime = time.time()
         proc = subprocess.Popen(antechamberCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
-        #proc.wait()
         print(out)
         if err:
             print(err)
         print(parmchkCommand)
         proc = subprocess.Popen(parmchkCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
-        #proc.wait()
         print(out)
         if err:
             print(err)
         endTime = time.time()
         print("Ligand preparation took %.2f sec" % (endTime - startTime))
 
-    def runEquilibration(self, prmtop, inpcrd):
-        pass
+    def runEquilibration(self, equilibrationFiles, outputPDB):
+        """
+        Function that runs the whole equilibration process and returns the final pdb
+        :param equilibrationFiles: tuple with the topology (prmtop) in the first position and the coordinates
+        in the second (inpcrd)
+        :param outputPDB: string with the pdb to save
+        :return: a string with the outputPDB
+        """
+        prmtop , inpcrd = equilibrationFiles
+        prmtop = app.AmberPrmtopFile(prmtop)
+        inpcrd = app.AmberInpcrdFile(inpcrd)
+        PLATFORM = mm.Platform_getPlatformByName(self.parameters.runningPlatform)
+        simulation = self.minimization(prmtop, inpcrd, PLATFORM, constraints=5)
+        positions = simulation.context.getState(getPositions=True).getPositions()
+        velocities = simulation.context.getState(getVelocities=True).getVelocities()
+        simulation = self.NVTequilibration(prmtop, positions, PLATFORM, simulation_steps=2000, constraints=5, velocities=velocities)
+        positions = simulation.context.getState(getPositions=True).getPositions()
+        velocities = simulation.context.getState(getVelocities=True).getVelocities()
+        simulation = self.NPTequilibration(prmtop, positions, PLATFORM, simulation_steps=2000, constraints=0.5, velocities=velocities)
+        with open(outputPDB, 'w') as fw:
+            app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)
+        return outputPDB
+
+    def minimization(self, prmtop, inpcrd, PLATFORM, constraints):
+        # Thermostat
+        system = prmtop.createSystem(nonbondedMethod=app.PME,
+                                       nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms, constraints=app.HBonds)
+        # system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
+        integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+        if constraints:
+            # Add positional restraints to protein backbone
+            force = mm.CustomExternalForce("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
+            force.addGlobalParameter("k", constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
+            force.addPerParticleParameter("x0")
+            force.addPerParticleParameter("y0")
+            force.addPerParticleParameter("z0")
+            for j, atom in enumerate(prmtop.topology.atoms()):
+                if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (
+                        atom.residue.name == self.ligandName and atom.element.symbol != "H"):
+                    force.addParticle(j, inpcrd.positions[j].value_in_unit(unit.nanometers))
+            system.addForce(force)
+
+        simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
+        if inpcrd.boxVectors is not None:
+            simulation.context.setPeriodicBoxVectors(*inpcrd.boxVectors)
+        simulation.context.setPositions(inpcrd.positions)
+        simulation.minimizeEnergy(maxIterations=self.parameters.minimizationIterations)
+        return simulation
+
+    def NVTequilibration(self, topology, positions, PLATFORM, simulation_steps, constraints, velocities=None):
+        system = topology.createSystem(nonbondedMethod=app.PME,
+                                       nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms,
+                                       constraints=app.HBonds)
+        system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
+        integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+        if constraints:
+            force = mm.CustomExternalForce("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
+            force.addGlobalParameter("k", constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
+            force.addPerParticleParameter("x0")
+            force.addPerParticleParameter("y0")
+            force.addPerParticleParameter("z0")
+            for j, atom in enumerate(topology.topology.atoms()):
+                if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (atom.residue.name == self.ligandName and atom.element.symbol != "H"):
+                    force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
+            system.addForce(force)
+        simulation = app.Simulation(topology.topology, system, integrator, PLATFORM)
+        simulation.context.setPositions(positions)
+        if velocities:
+            simulation.context.setVelocities(velocities)
+        else:
+            simulation.context.setVelocitiesToTemperature(self.parameters.Temperature * unit.kelvin, 1)
+        simulation.step(simulation_steps)
+        return simulation
+
+    def NPTequilibration(self, topology, positions, PLATFORM, simulation_steps, constraints, velocities=None):
+        system = topology.createSystem(nonbondedMethod=app.PME,
+                                       nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms,
+                                       constraints=app.HBonds)
+        system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
+        integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+        system.addForce(mm.MonteCarloBarostat(1 * unit.bar, self.parameters.Temperature * unit.kelvin))
+        if constraints:
+            force = mm.CustomExternalForce("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
+            force.addGlobalParameter("k", constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
+            force.addPerParticleParameter("x0")
+            force.addPerParticleParameter("y0")
+            force.addPerParticleParameter("z0")
+            for j, atom in enumerate(topology.topology.atoms()):
+                if atom.name == 'CA' or (atom.residue.name == self.ligandName and atom.element.symbol != "H"):
+                    force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
+            system.addForce(force)
+        simulation = app.Simulation(topology.topology, system, integrator, PLATFORM)
+        simulation.context.setPositions(positions)
+        if velocities:
+            simulation.context.setVelocities(velocities)
+        else:
+            simulation.context.setVelocitiesToTemperature(self.parameters.Temperature * unit.kelvin, 1)
+        simulation.step(simulation_steps)
+        return simulation
+
 
 
 class TestSimulation(SimulationRunner):
@@ -943,7 +1062,13 @@ class RunnerBuilder:
 
             return PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
+            params.processors = paramsBlock[blockNames.SimulationParams.processors]
             params.runEquilibration = True
+            params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
+            params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
+            params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
+            params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
+            params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
