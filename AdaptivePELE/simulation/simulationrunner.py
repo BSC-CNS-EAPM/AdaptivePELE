@@ -89,6 +89,31 @@ class SimulationRunner:
         """
         return self.parameters.exitCondition is not None
 
+    def checkSimulationInterrupted(self, epoch):
+        """
+            Check wether the simulation was interrupted before finishing
+
+            :param epoch: Epoch number
+            :type epoch: int
+
+            :returns: bool -- True if the simulations where interrupted
+        """
+        # for Pele and Test simulation there is no proper way to check so return
+        # False and rely on the clustering for such check
+        return False
+
+    def cleanCheckpointFiles(self, epoch):
+        """
+            Clean the restart files generated if the simulation was interrupted
+            before finishing
+
+            :param epoch: Epoch number
+            :type epoch: int
+        """
+        # for Pele and Test simulation there is no proper way to restart, so
+        # just pass
+        pass
+
     def checkExitCondition(self, clustering, outputFolder):
         """
             Check if the exit condition has been met
@@ -947,6 +972,30 @@ class MDSimulation(SimulationRunner):
     def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
         # change signature
         pass
+
+    def checkSimulationInterrupted(self, epoch):
+        """
+            Check wether the simulation was interrupted before finishing
+
+            :param epoch: Epoch number
+            :type epoch: int
+
+            :returns: bool -- True if the simulations where interrupted
+        """
+        # to be implemented depending on implementation details
+        pass
+
+    def cleanCheckpointFiles(self, epoch):
+        """
+            Clean the restart files generated if the simulation was interrupted
+            before finishing
+
+            :param epoch: Epoch number
+            :type epoch: int
+        """
+        # to be implemented depending on implementation details
+        pass
+
 
 class TestSimulation(SimulationRunner):
     """
