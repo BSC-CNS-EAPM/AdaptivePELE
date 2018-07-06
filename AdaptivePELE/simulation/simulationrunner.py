@@ -11,14 +11,12 @@ import ast
 import glob
 import multiprocessing as mp
 from builtins import range
-import simtk.openmm as mm
-import simtk.openmm.app as app
-import simtk.unit as unit
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
 from AdaptivePELE.atomset import atomset, RMSDCalculator
 from AdaptivePELE.utilities import utilities
 SKLEARN = True
+OPENMM = True
 try:
     from sklearn.cluster import KMeans
 except ImportError:
@@ -27,6 +25,13 @@ try:
     basestring
 except NameError:
     basestring = str
+try:
+    import simtk.openmm as mm
+    import simtk.openmm.app as app
+    import simtk.unit as unit
+except ImportError:
+    OPENMM = False
+
 
 
 class SimulationParameters:
@@ -67,7 +72,7 @@ class SimulationRunner:
         self.parameters = parameters
         self.processorsToClusterMapping = []
 
-    def runSimulation(self, runningControlFile=""):
+    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
         pass
 
     def getWorkingProcessors(self):
@@ -184,6 +189,27 @@ class SimulationRunner:
         """
         pass
 
+    def prepareControlFile(self, epoch, outputPathConstants, peleControlFileDictionary):
+        """
+            Substitute the parameters in the PELE control file specified with the
+            provided in the control file
+
+            :param epoch: Epoch number
+            :type epoch: int
+            :param outputPathConstants: Object that has as attributes constant related to the outputPath that will be used to create the working control file
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param peleControlFileDictionary: Dictonary containing the values of the parameters to substitute in the control file
+            :type peleControlFileDictionary: dict
+        """
+        outputDir = outputPathConstants.epochOutputPathTempletized % epoch
+        utilities.makeFolder(outputDir)
+        peleControlFileDictionary["OUTPUT_PATH"] = outputDir
+        peleControlFileDictionary["SEED"] = self.parameters.seed + epoch * self.parameters.processors
+        if self.parameters.boxCenter is not None:
+            peleControlFileDictionary["BOX_RADIUS"] = self.parameters.boxRadius
+            peleControlFileDictionary["BOX_CENTER"] = self.parameters.boxCenter
+        self.makeWorkingControlFile(outputPathConstants.tmpControlFilename % epoch, peleControlFileDictionary)
+
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
@@ -277,15 +303,20 @@ class PeleSimulation(SimulationRunner):
         PDBinitial.initialise(initialStruct, resname=resname)
         return repr(PDBinitial.getCOM())
 
-    def runSimulation(self, runningControlFile=""):
+    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
         """
-            Run a short PELE simulation
+        Run a short PELE simulation
 
-            :param runningControlFile: PELE control file to run
-            :type runningControlFile: str
+        :param epoch: number of the epoch
+        :param outputPathConstants: outputpathConstants class
+        :param ControlFileDictionary: Dictionary with the values to substitute in the template
+        :param topologies: topology class
         """
+
+        print("Preparing Control File")
+        self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         self.createSymbolicLinks()
-
+        runningControlFile = outputPathConstants.tmpControlFilename % epoch
         if self.parameters.srun:
             toRun = ["srun", self.parameters.executable, runningControlFile]
         else:
@@ -665,6 +696,8 @@ class MDSimulation(SimulationRunner):
         self.tleapTemplate = constants.AmberTemplates.tleapTemplate
         self.prmtopFiles = []
         self.ligandName = ""
+        if not OPENMM:
+            raise utilities.UnsatisfiedDependencyException("No installation of OpenMM found. Please, install OpenMM to run MD simulations.")
 
     def getWorkingProcessors(self):
         """
@@ -911,7 +944,9 @@ class MDSimulation(SimulationRunner):
         simulation.step(simulation_steps)
         return simulation
 
-
+    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
+        # change signature
+        pass
 
 class TestSimulation(SimulationRunner):
     """
@@ -929,17 +964,18 @@ class TestSimulation(SimulationRunner):
         """
         return self.parameters.processors-1
 
-    def runSimulation(self, runningControlFile=""):
+    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
         """
             Copy file to test the rest of the AdaptivePELE procedure
         """
+        self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         if not self.copied:
             if os.path.exists(self.parameters.destination):
                 shutil.rmtree(self.parameters.destination)
             shutil.copytree(self.parameters.origin, self.parameters.destination)
             self.copied = True
 
-    def makeWorkingControlFile(self, workingControlFilename, dictionary):
+    def makeWorkingControlFile(self, workingControlFilename, dictionary, inputTemplate=None):
         pass
 
 
@@ -1075,6 +1111,7 @@ class RunnerBuilder:
             return PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
+            params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.runEquilibration = True
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
