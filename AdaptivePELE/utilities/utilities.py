@@ -38,7 +38,7 @@ class Topology:
 
     def __iter__(self):
         for top in self.topologies:
-            yield topologies
+            yield top
 
     def cleanTopologies(self):
         """
