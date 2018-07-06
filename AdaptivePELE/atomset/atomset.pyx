@@ -808,7 +808,8 @@ cdef class PDB:
         cdef object fileHandle, atom
         if self.ispdb:
             with open(path, 'w', encoding="utf-8") as fileHandle:
-                fileHandle.write(self.pdb)
+                # in old simulations it will fail without the unicode
+                fileHandle.write(unicode(self.pdb))
         else:
             with open(path, 'w', encoding="utf-8") as fileHandle:
                 fileHandle.write(u"MODEL %d\n" % model_num)
