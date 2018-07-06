@@ -609,17 +609,17 @@ def main(jsonParams, clusteringHook=None):
         createMappingForFirstEpoch(initialStructures, topologies, simulationRunner.getWorkingProcessors())
 
         clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner)
-    ControlFileDictionary = {"COMPLEXES": initialStructuresAsString, "PELE_STEPS": simulationRunner.parameters.peleSteps,
-                                 "BOX_RADIUS": simulationRunner.parameters.boxRadius}
+
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
 
     for i in range(firstRun, simulationRunner.parameters.iterations):
         print("Iteration", i)
-
+        outputDir = outputPathConstants.epochOutputPathTempletized % i
+        utilities.makeFolder(outputDir)
         print("Production run...")
         if not debug:
-            simulationRunner.runSimulation(i, outputPathConstants, ControlFileDictionary, topologies)
+            simulationRunner.runSimulation(i, outputPathConstants, initialStructuresAsString, topologies)
 
         simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
         topologies.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i, i)
@@ -669,7 +669,6 @@ def main(jsonParams, clusteringHook=None):
                 numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1, topologies=topologies)
                 simulationRunner.updateMappingProcessors(procMapping)
                 initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
-                ControlFileDictionary["COMPLEXES"] = initialStructuresAsString
                 topologies.mapEpochTopologies(i+1, procMapping)
 
         if clusteringMethod.symmetries and nativeStructure:

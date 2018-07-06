@@ -52,6 +52,8 @@ class AmberTemplates:
                     "saveamberparm COMPLX $PRMTOP $INPCRD\n" \
                     "savepdb COMPLX $SOLVATED_PDB\n" \
                     "quit"
+    trajectoryTemplate = "trajectory_%d.pdb"
+    StateDataReporterTemplate = "report_%d"
 
 
 class OutputPathConstants():

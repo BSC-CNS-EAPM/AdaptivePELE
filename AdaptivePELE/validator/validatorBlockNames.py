@@ -142,7 +142,15 @@ class SimulationParams:
         "equilibrationLength": "numbers.Real",
         "numberEquilibrationStructures": "numbers.Real",
         "useSrun": "bool",
-        "exitCondition": "dict"
+        "exitCondition": "dict",
+        "ligandCharge" : "numbers.Real",
+        "nonBondedCutoff": "int",
+        "temperature": "int",
+        "runningPlatform": "basestring",
+        "minimizationIterations": "int",
+        "reporterFrequency": "int",
+        "productionLength": "int",
+        "energyReport": "bool"
     }
     exitCondition = {
         "types": {

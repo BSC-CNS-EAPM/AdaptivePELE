@@ -142,6 +142,9 @@ class SimulationParams:
     Temperature = "temperature"
     runningPlatform = "runningPlatform"
     minimizationIterations = "minimizationIterations"
+    repoterfreq = "reporterFrequency"
+    productionLength = "productionLength"
+    energyReport = "energyReport"
 
 
 class ExitConditionType:

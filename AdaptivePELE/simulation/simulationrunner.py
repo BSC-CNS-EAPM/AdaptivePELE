@@ -9,6 +9,7 @@ import sys
 import numpy as np
 import ast
 import glob
+import itertools
 import multiprocessing as mp
 from builtins import range
 from AdaptivePELE.constants import constants, blockNames
@@ -65,6 +66,9 @@ class SimulationParameters:
         self.Temperature = 300
         self.runningPlatform = "CPU"
         self.minimizationIterations = 2000
+        self.reporterFreq = None
+        self.energyReport = True
+        self.productionLength = 0
 
 
 class SimulationRunner:
@@ -72,7 +76,7 @@ class SimulationRunner:
         self.parameters = parameters
         self.processorsToClusterMapping = []
 
-    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies):
         pass
 
     def getWorkingProcessors(self):
@@ -202,7 +206,6 @@ class SimulationRunner:
             :type peleControlFileDictionary: dict
         """
         outputDir = outputPathConstants.epochOutputPathTempletized % epoch
-        utilities.makeFolder(outputDir)
         peleControlFileDictionary["OUTPUT_PATH"] = outputDir
         peleControlFileDictionary["SEED"] = self.parameters.seed + epoch * self.parameters.processors
         if self.parameters.boxCenter is not None:
@@ -303,7 +306,7 @@ class PeleSimulation(SimulationRunner):
         PDBinitial.initialise(initialStruct, resname=resname)
         return repr(PDBinitial.getCOM())
 
-    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies):
         """
         Run a short PELE simulation
 
@@ -314,6 +317,9 @@ class PeleSimulation(SimulationRunner):
         """
 
         print("Preparing Control File")
+        ControlFileDictionary = {"COMPLEXES": initialStructuresAsString,
+                                 "PELE_STEPS": self.parameters.peleSteps,
+                                 "BOX_RADIUS": self.parameters.boxRadius}
         self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         self.createSymbolicLinks()
         runningControlFile = outputPathConstants.tmpControlFilename % epoch
@@ -758,7 +764,7 @@ class MDSimulation(SimulationRunner):
             equilibrationFiles.append((prmtop, inpcrd))
 
         os.chdir(workingdirectory)
-        pool = mp.Pool(self.getWorkingProcessors())
+        pool = mp.Pool(min(self.getWorkingProcessors(), len(equilibrationFiles)))
         workers = []
         startTime = time.time()
         print("equilibrating System")
@@ -859,10 +865,10 @@ class MDSimulation(SimulationRunner):
         simulation = self.minimization(prmtop, inpcrd, PLATFORM, constraints=5)
         positions = simulation.context.getState(getPositions=True).getPositions()
         velocities = simulation.context.getState(getVelocities=True).getVelocities()
-        simulation = self.NVTequilibration(prmtop, positions, PLATFORM, simulation_steps=2000, constraints=5, velocities=velocities)
+        simulation = self.NVTequilibration(prmtop, positions, PLATFORM, simulation_steps=self.parameters.equilibrationLength, constraints=5, velocities=velocities)
         positions = simulation.context.getState(getPositions=True).getPositions()
         velocities = simulation.context.getState(getVelocities=True).getVelocities()
-        simulation = self.NPTequilibration(prmtop, positions, PLATFORM, simulation_steps=2000, constraints=0.5, velocities=velocities)
+        simulation = self.NPTequilibration(prmtop, positions, PLATFORM, simulation_steps=self.parameters.equilibrationLength, constraints=0.5, velocities=velocities)
         with open(outputPDB, 'w') as fw:
             app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)
         return outputPDB
@@ -944,9 +950,73 @@ class MDSimulation(SimulationRunner):
         simulation.step(simulation_steps)
         return simulation
 
-    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies):
         # change signature
+        outputDir = outputPathConstants.epochOutputPathTempletized % epoch
+        processors = self.getWorkingProcessors()
+        structures_to_run = initialStructuresAsString.split(":")
+        startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, i)], structure)
+                              for i, structure in enumerate(structures_to_run)]
+        print("Starting OpenMM Production Run...")
+        startTime = time.time()
+        pool =  mp.Pool(self.getWorkingProcessors())
+        workers = []
+        for i, startingFiles in zip(range(processors), itertools.cycle(startingFilesPairs)):
+            workerNumber = i + 1
+            seed = self.parameters.seed + epoch * self.parameters.processors
+            workers.append(pool.apply_async(self.MDsimulationRunner, args=(startingFiles, workerNumber, outputDir, seed)))
+        for worker in workers:
+            worker.get()
+        endTime = time.time()
+        print("OpenMM took %.2f sec" % (endTime - startTime))
         pass
+
+    def MDsimulationRunner(self, equilibrationFiles, workerNumber, outputDir, seed):
+        prmtop, pdb = equilibrationFiles
+        prmtop = app.AmberPrmtopFile(prmtop)
+        PDBrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
+        stateReporter = os.path.join(outputDir, constants.AmberTemplates.StateDataReporterTemplate % workerNumber)
+        pdb = app.PDBFile(pdb)
+        PLATFORM = mm.Platform_getPlatformByName(self.parameters.runningPlatform)
+        system = prmtop.createSystem(nonbondedMethod=app.PME,
+                                     nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms,
+                                     constraints=app.HBonds)
+        system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
+        integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+        simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
+        simulation.context.setPositions(pdb.positions)
+        simulation.context.setVelocitiesToTemperature(self.parameters.Temperature * unit.kelvin, seed)
+        simulation.reporters.append(app.PDBReporter(PDBrepoter, self.parameters.reporterFreq, enforcePeriodicBox=True))
+        if self.parameters.energyReport:
+            simulation.reporters.append(app.StateDataReporter(stateReporter, self.parameters.reporterFreq, step=True, potentialEnergy=True,
+                                                              temperature=True, time=True, volume=True,
+                                                              remainingTime=True, speed=True, totalSteps=self.parameters.productionLength, separator="\t"))
+        if workerNumber == 1:
+            frequency = min(10 * self.parameters.reporterFreq, self.parameters.productionLength)
+            simulation.reporters.append(app.StateDataReporter(sys.stdout, frequency, step=True))
+        simulation.step(self.parameters.productionLength)
+
+    def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
+        """
+            Creates the string to substitute the complexes in the PELE control file
+
+            :param numberOfSnapshots: Number of complexes to write
+            :type numberOfSnapshots: int
+            :param tmpInitialStructuresTemplate: Template with the name of the initial strutctures
+            :type tmpInitialStructuresTemplate: str
+            :param iteration: Epoch number
+            :type iteration: int
+            :param equilibration: Flag to mark wether the complexes are part of an
+                equilibration run
+            :type equilibration: bool
+
+            :returns: str with the files to be used
+        """
+        initialStructures = []
+        for i in range(numberOfSnapshots-1):
+                initialStructures.append(tmpInitialStructuresTemplate % (iteration, i)+":")
+        initialStructures.append((tmpInitialStructuresTemplate % (iteration, numberOfSnapshots-1)))
+        return "".join(initialStructures)
 
 class TestSimulation(SimulationRunner):
     """
@@ -964,10 +1034,13 @@ class TestSimulation(SimulationRunner):
         """
         return self.parameters.processors-1
 
-    def runSimulation(self, epoch, outputPathConstants, ControlFileDictionary, topologies):
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies):
         """
             Copy file to test the rest of the AdaptivePELE procedure
         """
+        ControlFileDictionary = {"COMPLEXES": initialStructuresAsString,
+                                 "PELE_STEPS": self.parameters.peleSteps,
+                                 "BOX_RADIUS": self.parameters.boxRadius}
         self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         if not self.copied:
             if os.path.exists(self.parameters.destination):
@@ -1118,6 +1191,12 @@ class RunnerBuilder:
             params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
             params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
             params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
+            params.seed = paramsBlock[blockNames.SimulationParams.seed]
+            params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
+            params.productionLength = paramsBlock.get(blockNames.SimulationParams.productionLength, 0)
+            params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 4000)
+            params.energyReport = paramsBlock.get(blockNames.SimulationParams.energyReport, True)
+
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]

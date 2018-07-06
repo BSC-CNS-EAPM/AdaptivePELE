@@ -913,7 +913,10 @@ class Clustering:
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
-                metrics = np.loadtxt(reportFilename, ndmin=2)
+                # metrics = np.loadtxt(reportFilename, ndmin=2)
+                metrics = np.genfromtxt(reportFilename, missing_values="--", filling_values=0)
+                if len(metrics.shape) < 2:
+                    metrics = metrics[np.newaxis, :]
 
                 for num, snapshot in enumerate(snapshots):
                     if ignoreFirstRow and num == 0:
