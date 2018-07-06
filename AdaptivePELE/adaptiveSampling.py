@@ -238,7 +238,7 @@ def generateTrajectorySelectionString(epoch, epochOutputPathTempletized):
     return "[\"" + os.path.join(epochOutputPathTempletized % epoch, constants.trajectoryBasename) + "\"]"
 
 
-def findFirstRun(outputPath, clusteringOutputObject):
+def findFirstRun(outputPath, clusteringOutputObject, simulationRunner):
     """
         Find the last epoch that was properly simulated and clusterized and
         and return the first epoch to run in case of restart
@@ -247,6 +247,8 @@ def findFirstRun(outputPath, clusteringOutputObject):
         :type outputPath: str
         :param clusteringOutputObject: Templetized name of the clustering object
         :type clusteringOutputObject: str
+        :param simulationRunner: Simulation runner object
+        :type simulationRunner: :py:class:`.SimulationRunner
 
         :return: int -- Current epoch
     """
@@ -258,6 +260,11 @@ def findFirstRun(outputPath, clusteringOutputObject):
 
     objectsFound = []
     for epoch in epochFolders:
+        if simulationRunner.checkSimulationInterrupted(epoch):
+            # this should only happen in MD simulations, where checkpoints are
+            # periodically written in case the adaptive run dies at
+            # mid-simulation, be able to use the already computed trajectories
+            return epoch
         if os.path.exists(clusteringOutputObject % epoch):
             objectsFound.append(epoch)
         if objectsFound and epoch < (objectsFound[0]-5):
@@ -580,7 +587,7 @@ def main(jsonParams, clusteringHook=None):
     saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
     startFromScratch = False
     if restart:
-        firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject)
+        firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject, simulationRunner)
         if firstRun == 0:
             startFromScratch = True
         else:
@@ -654,6 +661,7 @@ def main(jsonParams, clusteringHook=None):
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
                                      outputPathConstants.clusteringOutputObject % i, writeAll)
+        simulationRunner.cleanCheckpointFiles(i)
 
         if i > 0:
             # Remove old clustering object, since we already have a newer one

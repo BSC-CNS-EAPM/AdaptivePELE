@@ -34,7 +34,6 @@ except ImportError:
     OPENMM = False
 
 
-
 class SimulationParameters:
     def __init__(self):
         self.processors = 0
@@ -92,6 +91,31 @@ class SimulationRunner:
             :returns: bool -- True if an exit condition is set
         """
         return self.parameters.exitCondition is not None
+
+    def checkSimulationInterrupted(self, epoch):
+        """
+            Check wether the simulation was interrupted before finishing
+
+            :param epoch: Epoch number
+            :type epoch: int
+
+            :returns: bool -- True if the simulations where interrupted
+        """
+        # for Pele and Test simulation there is no proper way to check so return
+        # False and rely on the clustering for such check
+        return False
+
+    def cleanCheckpointFiles(self, epoch):
+        """
+            Clean the restart files generated if the simulation was interrupted
+            before finishing
+
+            :param epoch: Epoch number
+            :type epoch: int
+        """
+        # for Pele and Test simulation there is no proper way to restart, so
+        # just pass
+        pass
 
     def checkExitCondition(self, clustering, outputFolder):
         """
@@ -729,7 +753,7 @@ class MDSimulation(SimulationRunner):
             :param topology: Topology object
             :type topology: :py:class:
 
-            :returns: list --  List with initial structures
+            :returns: list -- List with initial structures
         """
         self.ligandName = resname
         newInitialStructures = []
@@ -803,15 +827,16 @@ class MDSimulation(SimulationRunner):
 
     def extractLigand(self, PDBtoOpen, resname, outputpath):
         """
-        Extracts the ligand from a given PDB
+            Extracts the ligand from a given PDB
 
-        :param PDBtoOpen: string with the pdb to prepare
-        :type PDBtoOpen: str
-        :param resname: string with the code of the ligand
-        :type resname: str
-        :param outputPath: Path where the pdb is written
-        :type outputPath: str
-        :return: string with the ligand pdb
+            :param PDBtoOpen: string with the pdb to prepare
+            :type PDBtoOpen: str
+            :param resname: string with the code of the ligand
+            :type resname: str
+            :param outputPath: Path where the pdb is written
+            :type outputPath: str
+
+            :returns: str -- string with the ligand pdb
         """
         ligandpdb = os.path.join(outputpath, "raw_ligand.pdb")
         with open(ligandpdb, "w") as out:
@@ -852,13 +877,15 @@ class MDSimulation(SimulationRunner):
 
     def runEquilibration(self, equilibrationFiles, outputPDB):
         """
-        Function that runs the whole equilibration process and returns the final pdb
-        :param equilibrationFiles: tuple with the topology (prmtop) in the first position and the coordinates
-        in the second (inpcrd)
-        :param outputPDB: string with the pdb to save
-        :return: a string with the outputPDB
+            Function that runs the whole equilibration process and returns the final pdb
+
+            :param equilibrationFiles: tuple with the topology (prmtop) in the first position and the coordinates
+            in the second (inpcrd)
+            :param outputPDB: string with the pdb to save
+
+            :returns: str -- a string with the outputPDB
         """
-        prmtop , inpcrd = equilibrationFiles
+        prmtop, inpcrd = equilibrationFiles
         prmtop = app.AmberPrmtopFile(prmtop)
         inpcrd = app.AmberInpcrdFile(inpcrd)
         PLATFORM = mm.Platform_getPlatformByName(self.parameters.runningPlatform)
@@ -876,7 +903,7 @@ class MDSimulation(SimulationRunner):
     def minimization(self, prmtop, inpcrd, PLATFORM, constraints):
         # Thermostat
         system = prmtop.createSystem(nonbondedMethod=app.PME,
-                                       nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms, constraints=app.HBonds)
+                                     nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms, constraints=app.HBonds)
         # system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
         integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
         if constraints:
@@ -1017,6 +1044,30 @@ class MDSimulation(SimulationRunner):
                 initialStructures.append(tmpInitialStructuresTemplate % (iteration, i)+":")
         initialStructures.append((tmpInitialStructuresTemplate % (iteration, numberOfSnapshots-1)))
         return "".join(initialStructures)
+
+    def checkSimulationInterrupted(self, epoch):
+        """
+            Check wether the simulation was interrupted before finishing
+
+            :param epoch: Epoch number
+            :type epoch: int
+
+            :returns: bool -- True if the simulations where interrupted
+        """
+        # to be implemented depending on implementation details
+        pass
+
+    def cleanCheckpointFiles(self, epoch):
+        """
+            Clean the restart files generated if the simulation was interrupted
+            before finishing
+
+            :param epoch: Epoch number
+            :type epoch: int
+        """
+        # to be implemented depending on implementation details
+        pass
+
 
 class TestSimulation(SimulationRunner):
     """
