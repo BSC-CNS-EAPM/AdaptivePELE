@@ -4,6 +4,7 @@ from six import reraise as raise_
 import os
 import sys
 import shutil
+import glob
 import numpy as np
 import string
 import json
@@ -32,11 +33,18 @@ class Topology:
         # {0: [t1, t2.. tM], 1: [t2, t3, t4, t4...]}
         self.topologyMap = {}
 
+    def __getitem__(self, key):
+        return self.topologies[key]
+
+    def __iter__(self):
+        for top in self.topologies:
+            yield top
+
     def cleanTopologies(self):
         """
             Remove the written topology files
         """
-        files = os.path.join(self.path, "topology*.pdb")
+        files = glob.glob(os.path.join(self.path, "topology*.pdb"))
         for f in files:
             os.remove(f)
 
@@ -78,6 +86,30 @@ class Topology:
             :returns: list -- List with topology information
         """
         return self.topologies[self.topologyMap[epoch][trajectory_number-1]]
+
+    def getTopologyFromIndex(self, index):
+        """
+            Get the topology for a particular index
+
+            :param index: Index of the trajectory of interest
+            :type index: int
+
+            :returns: list -- List with topology information
+        """
+        return self.topologies[index]
+
+    def getTopologyIndex(self, epoch, trajectory_number):
+        """
+            Get the topology index for a particular epoch and trajectory number
+
+            :param epoch: Epoch of the trajectory of interest
+            :type epoch: int
+            :param trajectory_number: Number of the trajectory to select
+            :type trajectory_number: int
+
+            :returns: int -- Index of the corresponding topology
+        """
+        return self.topologyMap[epoch][trajectory_number-1]
 
     def writeMappingToDisk(self, epochDir, epoch):
         """
