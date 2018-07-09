@@ -149,8 +149,7 @@ class SimulationParams:
         "runningPlatform": "basestring",
         "minimizationIterations": "int",
         "reporterFrequency": "int",
-        "productionLength": "int",
-        "energyReport": "bool"
+        "productionLength": "int"
     }
     exitCondition = {
         "types": {

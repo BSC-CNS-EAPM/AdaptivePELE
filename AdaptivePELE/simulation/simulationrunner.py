@@ -75,7 +75,7 @@ class SimulationRunner:
         self.parameters = parameters
         self.processorsToClusterMapping = []
 
-    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies):
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName):
         pass
 
     def getWorkingProcessors(self):
@@ -92,7 +92,7 @@ class SimulationRunner:
         """
         return self.parameters.exitCondition is not None
 
-    def checkSimulationInterrupted(self, epoch):
+    def checkSimulationInterrupted(self, epoch, outputpath):
         """
             Check wether the simulation was interrupted before finishing
 
@@ -330,7 +330,7 @@ class PeleSimulation(SimulationRunner):
         PDBinitial.initialise(initialStruct, resname=resname)
         return repr(PDBinitial.getCOM())
 
-    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies):
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName):
         """
         Run a short PELE simulation
 
@@ -726,6 +726,8 @@ class MDSimulation(SimulationRunner):
         self.tleapTemplate = constants.AmberTemplates.tleapTemplate
         self.prmtopFiles = []
         self.ligandName = ""
+        self.restart = False
+
         if not OPENMM:
             raise utilities.UnsatisfiedDependencyException("No installation of OpenMM found. Please, install OpenMM to run MD simulations.")
 
@@ -977,8 +979,7 @@ class MDSimulation(SimulationRunner):
         simulation.step(simulation_steps)
         return simulation
 
-    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies):
-        # change signature
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName):
         outputDir = outputPathConstants.epochOutputPathTempletized % epoch
         processors = self.getWorkingProcessors()
         structures_to_run = initialStructuresAsString.split(":")
@@ -986,23 +987,26 @@ class MDSimulation(SimulationRunner):
                               for i, structure in enumerate(structures_to_run)]
         print("Starting OpenMM Production Run...")
         startTime = time.time()
-        pool =  mp.Pool(self.getWorkingProcessors())
+        pool = mp.Pool(processors)
         workers = []
         for i, startingFiles in zip(range(processors), itertools.cycle(startingFilesPairs)):
             workerNumber = i + 1
             seed = self.parameters.seed + epoch * self.parameters.processors
-            workers.append(pool.apply_async(self.MDsimulationRunner, args=(startingFiles, workerNumber, outputDir, seed)))
+            workers.append(pool.apply_async(self.MDsimulationRunner, args=(startingFiles, workerNumber, outputDir,
+                                                                           seed, reportFileName, self.restart)))
         for worker in workers:
             worker.get()
         endTime = time.time()
+        self.restart = False
         print("OpenMM took %.2f sec" % (endTime - startTime))
         pass
 
-    def MDsimulationRunner(self, equilibrationFiles, workerNumber, outputDir, seed):
+    def MDsimulationRunner(self, equilibrationFiles, workerNumber, outputDir, seed, reportFileName, restart=False):
         prmtop, pdb = equilibrationFiles
         prmtop = app.AmberPrmtopFile(prmtop)
-        PDBrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
-        stateReporter = os.path.join(outputDir, constants.AmberTemplates.StateDataReporterTemplate % workerNumber)
+        DCDrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
+        stateReporter = os.path.join(outputDir, "%s_%s" % (reportFileName, workerNumber))
+        checkpointReporter = os.path.join(outputDir, constants.AmberTemplates.CheckPointReporterTemplate % workerNumber)
         pdb = app.PDBFile(pdb)
         PLATFORM = mm.Platform_getPlatformByName(self.parameters.runningPlatform)
         system = prmtop.createSystem(nonbondedMethod=app.PME,
@@ -1013,11 +1017,12 @@ class MDSimulation(SimulationRunner):
         simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
         simulation.context.setPositions(pdb.positions)
         simulation.context.setVelocitiesToTemperature(self.parameters.Temperature * unit.kelvin, seed)
-        simulation.reporters.append(app.PDBReporter(PDBrepoter, self.parameters.reporterFreq, enforcePeriodicBox=True))
-        if self.parameters.energyReport:
-            simulation.reporters.append(app.StateDataReporter(stateReporter, self.parameters.reporterFreq, step=True, potentialEnergy=True,
-                                                              temperature=True, time=True, volume=True,
-                                                              remainingTime=True, speed=True, totalSteps=self.parameters.productionLength, separator="\t"))
+        simulation.reporters.append(app.DCDReporter(DCDrepoter, self.parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
+        simulation.reporters.append(app.CheckpointReporter(checkpointReporter, self.parameters.reporterFreq))
+        simulation.reporters.append(app.StateDataReporter(stateReporter, self.parameters.reporterFreq, step=True,
+                                                          potentialEnergy=True, temperature=True, time=True,
+                                                          volume=True, remainingTime=True, speed=True,
+                                                          totalSteps=self.parameters.productionLength, separator="\t"))
         if workerNumber == 1:
             frequency = min(10 * self.parameters.reporterFreq, self.parameters.productionLength)
             simulation.reporters.append(app.StateDataReporter(sys.stdout, frequency, step=True))
@@ -1045,7 +1050,7 @@ class MDSimulation(SimulationRunner):
         initialStructures.append((tmpInitialStructuresTemplate % (iteration, numberOfSnapshots-1)))
         return "".join(initialStructures)
 
-    def checkSimulationInterrupted(self, epoch):
+    def checkSimulationInterrupted(self, epoch, outputpath):
         """
             Check wether the simulation was interrupted before finishing
 
@@ -1055,18 +1060,26 @@ class MDSimulation(SimulationRunner):
             :returns: bool -- True if the simulations where interrupted
         """
         # to be implemented depending on implementation details
-        pass
+        simulationpath = os.path.join(outputpath, epoch, "checkpoint*")
+        if glob.glob(simulationpath):
+            self.restart = True
+            return True
+        else:
+            return False
 
-    def cleanCheckpointFiles(self, epoch):
+
+    def cleanCheckpointFiles(self, checkpointDir):
         """
             Clean the restart files generated if the simulation was interrupted
             before finishing
 
-            :param epoch: Epoch number
-            :type epoch: int
+            :param checkpointDir: Directory with the checkpoints
+            :type checkpointDir: str
         """
         # to be implemented depending on implementation details
-        pass
+        checkpointsToRemove = glob.glob(os.path.join(checkpointDir, "checkpoint*.chk"))
+        for file in checkpointsToRemove:
+            os.remove(file)
 
 
 class TestSimulation(SimulationRunner):
@@ -1085,7 +1098,7 @@ class TestSimulation(SimulationRunner):
         """
         return self.parameters.processors-1
 
-    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies):
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName):
         """
             Copy file to test the rest of the AdaptivePELE procedure
         """
@@ -1246,8 +1259,6 @@ class RunnerBuilder:
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
             params.productionLength = paramsBlock.get(blockNames.SimulationParams.productionLength, 0)
             params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 4000)
-            params.energyReport = paramsBlock.get(blockNames.SimulationParams.energyReport, True)
-
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]

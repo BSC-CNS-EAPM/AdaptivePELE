@@ -260,7 +260,7 @@ def findFirstRun(outputPath, clusteringOutputObject, simulationRunner):
 
     objectsFound = []
     for epoch in epochFolders:
-        if simulationRunner.checkSimulationInterrupted(epoch):
+        if simulationRunner.checkSimulationInterrupted(epoch, outputPath):
             # this should only happen in MD simulations, where checkpoints are
             # periodically written in case the adaptive run dies at
             # mid-simulation, be able to use the already computed trajectories
@@ -626,7 +626,7 @@ def main(jsonParams, clusteringHook=None):
         utilities.makeFolder(outputDir)
         print("Production run...")
         if not debug:
-            simulationRunner.runSimulation(i, outputPathConstants, initialStructuresAsString, topologies)
+            simulationRunner.runSimulation(i, outputPathConstants, initialStructuresAsString, topologies, spawningParams.reportFilename)
 
         simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
         topologies.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i, i)
@@ -661,7 +661,7 @@ def main(jsonParams, clusteringHook=None):
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
                                      outputPathConstants.clusteringOutputObject % i, writeAll)
-        simulationRunner.cleanCheckpointFiles(i)
+        simulationRunner.cleanCheckpointFiles(outputPathConstants.epochOutputPathTempletized % i)
 
         if i > 0:
             # Remove old clustering object, since we already have a newer one
