@@ -1002,6 +1002,7 @@ class MDSimulation(SimulationRunner):
     def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName):
         outputDir = outputPathConstants.epochOutputPathTempletized % epoch
         processors = self.getWorkingProcessors()
+        structures_to_run = initialStructuresAsString.split(":")
         startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, i)], structure)
                               for i, structure in enumerate(structures_to_run)]
         print("Starting OpenMM Production Run...")
