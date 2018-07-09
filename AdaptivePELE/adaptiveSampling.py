@@ -142,7 +142,7 @@ def expandInitialStructuresWildcard(initialStructuresWildcard):
     totalInitialStructures = []
     for initialStructureWildcard in initialStructuresWildcard:
         expandedStructures = glob.glob(initialStructureWildcard)
-        totalInitialStructures.extend(expandedStructures)
+        totalInitialStructures.extend(map(os.path.abspath, expandedStructures))
     return totalInitialStructures
 
 
