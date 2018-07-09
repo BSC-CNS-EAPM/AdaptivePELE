@@ -68,6 +68,7 @@ class SimulationParameters:
         self.reporterFreq = None
         self.energyReport = True
         self.productionLength = 0
+        self.ligandName = None
 
 
 class SimulationRunner:
@@ -757,7 +758,7 @@ class MDSimulation(SimulationRunner):
 
             :returns: list -- List with initial structures
         """
-        self.ligandName = resname
+        self.parameters.ligandName = resname
         newInitialStructures = []
         solvatedStrcutures = []
         equilibrationFiles = []
@@ -796,7 +797,7 @@ class MDSimulation(SimulationRunner):
         print("equilibrating System")
         for i, equilibrationFilePair in enumerate(equilibrationFiles):
             outputPDB = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % (i + 1))
-            workers.append(pool.apply_async(self.runEquilibration, args=(equilibrationFilePair, outputPDB)))
+            workers.append(pool.apply_async(runEquilibration, args=(equilibrationFilePair, outputPDB, self.parameters, i)))
 
         for worker in workers:
             newInitialStructures.append(worker.get())
@@ -877,152 +878,29 @@ class MDSimulation(SimulationRunner):
         endTime = time.time()
         print("Ligand preparation took %.2f sec" % (endTime - startTime))
 
-    def runEquilibration(self, equilibrationFiles, outputPDB):
-        """
-            Function that runs the whole equilibration process and returns the final pdb
-
-            :param equilibrationFiles: tuple with the topology (prmtop) in the first position and the coordinates
-            in the second (inpcrd)
-            :param outputPDB: string with the pdb to save
-
-            :returns: str -- a string with the outputPDB
-        """
-        prmtop, inpcrd = equilibrationFiles
-        prmtop = app.AmberPrmtopFile(prmtop)
-        inpcrd = app.AmberInpcrdFile(inpcrd)
-        PLATFORM = mm.Platform_getPlatformByName(self.parameters.runningPlatform)
-        simulation = self.minimization(prmtop, inpcrd, PLATFORM, constraints=5)
-        positions = simulation.context.getState(getPositions=True).getPositions()
-        velocities = simulation.context.getState(getVelocities=True).getVelocities()
-        simulation = self.NVTequilibration(prmtop, positions, PLATFORM, simulation_steps=self.parameters.equilibrationLength, constraints=5, velocities=velocities)
-        positions = simulation.context.getState(getPositions=True).getPositions()
-        velocities = simulation.context.getState(getVelocities=True).getVelocities()
-        simulation = self.NPTequilibration(prmtop, positions, PLATFORM, simulation_steps=self.parameters.equilibrationLength, constraints=0.5, velocities=velocities)
-        with open(outputPDB, 'w') as fw:
-            app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)
-        return outputPDB
-
-    def minimization(self, prmtop, inpcrd, PLATFORM, constraints):
-        # Thermostat
-        system = prmtop.createSystem(nonbondedMethod=app.PME,
-                                     nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms, constraints=app.HBonds)
-        # system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
-        integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
-        if constraints:
-            # Add positional restraints to protein backbone
-            force = mm.CustomExternalForce("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
-            force.addGlobalParameter("k", constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
-            force.addPerParticleParameter("x0")
-            force.addPerParticleParameter("y0")
-            force.addPerParticleParameter("z0")
-            for j, atom in enumerate(prmtop.topology.atoms()):
-                if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (
-                        atom.residue.name == self.ligandName and atom.element.symbol != "H"):
-                    force.addParticle(j, inpcrd.positions[j].value_in_unit(unit.nanometers))
-            system.addForce(force)
-
-        simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
-        if inpcrd.boxVectors is not None:
-            simulation.context.setPeriodicBoxVectors(*inpcrd.boxVectors)
-        simulation.context.setPositions(inpcrd.positions)
-        simulation.minimizeEnergy(maxIterations=self.parameters.minimizationIterations)
-        return simulation
-
-    def NVTequilibration(self, topology, positions, PLATFORM, simulation_steps, constraints, velocities=None):
-        system = topology.createSystem(nonbondedMethod=app.PME,
-                                       nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms,
-                                       constraints=app.HBonds)
-        system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
-        integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
-        if constraints:
-            force = mm.CustomExternalForce("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
-            force.addGlobalParameter("k", constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
-            force.addPerParticleParameter("x0")
-            force.addPerParticleParameter("y0")
-            force.addPerParticleParameter("z0")
-            for j, atom in enumerate(topology.topology.atoms()):
-                if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (atom.residue.name == self.ligandName and atom.element.symbol != "H"):
-                    force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
-            system.addForce(force)
-        simulation = app.Simulation(topology.topology, system, integrator, PLATFORM)
-        simulation.context.setPositions(positions)
-        if velocities:
-            simulation.context.setVelocities(velocities)
-        else:
-            simulation.context.setVelocitiesToTemperature(self.parameters.Temperature * unit.kelvin, 1)
-        simulation.step(simulation_steps)
-        return simulation
-
-    def NPTequilibration(self, topology, positions, PLATFORM, simulation_steps, constraints, velocities=None):
-        system = topology.createSystem(nonbondedMethod=app.PME,
-                                       nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms,
-                                       constraints=app.HBonds)
-        system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
-        integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
-        system.addForce(mm.MonteCarloBarostat(1 * unit.bar, self.parameters.Temperature * unit.kelvin))
-        if constraints:
-            force = mm.CustomExternalForce("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
-            force.addGlobalParameter("k", constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
-            force.addPerParticleParameter("x0")
-            force.addPerParticleParameter("y0")
-            force.addPerParticleParameter("z0")
-            for j, atom in enumerate(topology.topology.atoms()):
-                if atom.name == 'CA' or (atom.residue.name == self.ligandName and atom.element.symbol != "H"):
-                    force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
-            system.addForce(force)
-        simulation = app.Simulation(topology.topology, system, integrator, PLATFORM)
-        simulation.context.setPositions(positions)
-        if velocities:
-            simulation.context.setVelocities(velocities)
-        else:
-            simulation.context.setVelocitiesToTemperature(self.parameters.Temperature * unit.kelvin, 1)
-        simulation.step(simulation_steps)
-        return simulation
-
     def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies):
         # change signature
         outputDir = outputPathConstants.epochOutputPathTempletized % epoch
         processors = self.getWorkingProcessors()
         structures_to_run = initialStructuresAsString.split(":")
-        startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, i)], structure)
-                              for i, structure in enumerate(structures_to_run)]
-        print("Starting OpenMM Production Run...")
+        #To follow the same order as PELE (important for processor mapping)
+        structures_to_run = structures_to_run[1:]+[structures_to_run[0]]
+        startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, i)], structure) for i, structure in enumerate(structures_to_run)]
+        print("Starting OpenMM Production Run of %d steps..." % self.parameters.productionLength)
         startTime = time.time()
         pool = mp.Pool(self.getWorkingProcessors())
         workers = []
-        for i, startingFiles in zip(range(processors), itertools.cycle(startingFilesPairs)):
-            workerNumber = i + 1
-            seed = self.parameters.seed + epoch * self.parameters.processors
-            workers.append(pool.apply_async(self.MDsimulationRunner, args=(startingFiles, workerNumber, outputDir, seed)))
-        for worker in workers:
-            worker.get()
+        seed = self.parameters.seed + epoch * self.parameters.processors
+        runProductionSimulation(startingFilesPairs[0], 1, outputDir, seed, self.parameters)
+        # for i, startingFiles in zip(range(processors), itertools.cycle(startingFilesPairs)):
+        #     workerNumber = i + 1
+        #     seed = self.parameters.seed + epoch * self.parameters.processors
+        #     workers.append(pool.apply_async(runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters)))
+        # for worker in workers:
+        #     worker.get()
         endTime = time.time()
         print("OpenMM took %.2f sec" % (endTime - startTime))
 
-    def MDsimulationRunner(self, equilibrationFiles, workerNumber, outputDir, seed):
-        prmtop, pdb = equilibrationFiles
-        prmtop = app.AmberPrmtopFile(prmtop)
-        PDBrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
-        stateReporter = os.path.join(outputDir, constants.AmberTemplates.StateDataReporterTemplate % workerNumber)
-        pdb = app.PDBFile(pdb)
-        PLATFORM = mm.Platform_getPlatformByName(self.parameters.runningPlatform)
-        system = prmtop.createSystem(nonbondedMethod=app.PME,
-                                     nonbondedCutoff=self.parameters.nonBondedCutoff * unit.angstroms,
-                                     constraints=app.HBonds)
-        system.addForce(mm.AndersenThermostat(self.parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
-        integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
-        simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
-        simulation.context.setPositions(pdb.positions)
-        simulation.context.setVelocitiesToTemperature(self.parameters.Temperature * unit.kelvin, seed)
-        simulation.reporters.append(app.PDBReporter(PDBrepoter, self.parameters.reporterFreq, enforcePeriodicBox=True))
-        if self.parameters.energyReport:
-            simulation.reporters.append(app.StateDataReporter(stateReporter, self.parameters.reporterFreq, step=True, potentialEnergy=True,
-                                                              temperature=True, time=True, volume=True,
-                                                              remainingTime=True, speed=True, totalSteps=self.parameters.productionLength, separator="\t"))
-        if workerNumber == 1:
-            frequency = min(10 * self.parameters.reporterFreq, self.parameters.productionLength)
-            simulation.reporters.append(app.StateDataReporter(sys.stdout, frequency, step=True))
-        simulation.step(self.parameters.productionLength)
 
     def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
         """
@@ -1301,3 +1179,150 @@ class ExitConditionBuilder:
             return ClusteringExitCondition(ntrajs)
         else:
             sys.exit("Unknown exit condition type! Choices are: " + str(simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY.values()))
+
+
+######################################################################
+# Helper functions to run with OpenMM, these  function could be methods of the
+# MDSimulation class however because of limitations imposed by the
+# multiprocessing they need to be functions
+def runEquilibration(equilibrationFiles, outputPDB, parameters, worker):
+    """
+        Function that runs the whole equilibration process and returns the final pdb
+
+        :param equilibrationFiles: tuple with the topology (prmtop) in the first position and the coordinates
+        in the second (inpcrd)
+        :param outputPDB: string with the pdb to save
+
+        :returns: str -- a string with the outputPDB
+    """
+    prmtop, inpcrd = equilibrationFiles
+    prmtop = app.AmberPrmtopFile(prmtop)
+    inpcrd = app.AmberInpcrdFile(inpcrd)
+    PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
+    if worker == 0:
+        print("Running %d steps of minimization" % parameters.minimizationIterations)
+    simulation = minimization(prmtop, inpcrd, PLATFORM, 5, parameters)
+    positions = simulation.context.getState(getPositions=True).getPositions()
+    velocities = simulation.context.getState(getVelocities=True).getVelocities()
+    if worker == 0:
+        print("Running %d steps of NVT equilibration" % parameters.equilibrationLength)
+    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 5, parameters, velocities=velocities)
+    positions = simulation.context.getState(getPositions=True).getPositions()
+    velocities = simulation.context.getState(getVelocities=True).getVelocities()
+    if worker == 0:
+        print("Running %d steps of NPT equilibration" % parameters.equilibrationLength)
+    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 0.5, parameters, velocities=velocities)
+    with open(outputPDB, 'w') as fw:
+        app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)
+    return outputPDB
+
+
+def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
+    # Thermostat
+    system = prmtop.createSystem(nonbondedMethod=app.PME,
+                                 nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms, constraints=app.HBonds)
+    # system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
+    integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+    if constraints:
+        # Add positional restraints to protein backbone
+        force = mm.CustomExternalForce(str("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)"))
+        force.addGlobalParameter(str("k"), constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
+        force.addPerParticleParameter(str("x0"))
+        force.addPerParticleParameter(str("y0"))
+        force.addPerParticleParameter(str("z0"))
+        for j, atom in enumerate(prmtop.topology.atoms()):
+            if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (
+                    atom.residue.name == parameters.ligandName and atom.element.symbol != "H"):
+                force.addParticle(j, inpcrd.positions[j].value_in_unit(unit.nanometers))
+        system.addForce(force)
+
+    simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
+    if inpcrd.boxVectors is not None:
+        simulation.context.setPeriodicBoxVectors(*inpcrd.boxVectors)
+    simulation.context.setPositions(inpcrd.positions)
+    simulation.minimizeEnergy(maxIterations=parameters.minimizationIterations)
+    return simulation
+
+
+def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, velocities=None):
+    system = topology.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
+                                   constraints=app.HBonds)
+    system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
+    integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+    if constraints:
+        force = mm.CustomExternalForce(str("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)"))
+        force.addGlobalParameter(str("k"), constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
+        force.addPerParticleParameter(str("x0"))
+        force.addPerParticleParameter(str("y0"))
+        force.addPerParticleParameter(str("z0"))
+        for j, atom in enumerate(topology.topology.atoms()):
+            if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (atom.residue.name == parameters.ligandName and atom.element.symbol != "H"):
+                force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
+        system.addForce(force)
+    simulation = app.Simulation(topology.topology, system, integrator, PLATFORM)
+    simulation.context.setPositions(positions)
+    if velocities:
+        simulation.context.setVelocities(velocities)
+    else:
+        simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
+    simulation.step(simulation_steps)
+    return simulation
+
+
+def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, velocities=None):
+    system = topology.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
+                                   constraints=app.HBonds)
+    system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
+    integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+    system.addForce(mm.MonteCarloBarostat(1 * unit.bar, parameters.Temperature * unit.kelvin))
+    if constraints:
+        force = mm.CustomExternalForce(str("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)"))
+        force.addGlobalParameter(str("k"), constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
+        force.addPerParticleParameter(str("x0"))
+        force.addPerParticleParameter(str("y0"))
+        force.addPerParticleParameter(str("z0"))
+        for j, atom in enumerate(topology.topology.atoms()):
+            if atom.name == 'CA' or (atom.residue.name == parameters.ligandName and atom.element.symbol != "H"):
+                force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
+        system.addForce(force)
+    simulation = app.Simulation(topology.topology, system, integrator, PLATFORM)
+    simulation.context.setPositions(positions)
+    if velocities:
+        simulation.context.setVelocities(velocities)
+    else:
+        simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
+    simulation.step(simulation_steps)
+    return simulation
+
+
+def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters):
+    prmtop, pdb = equilibrationFiles
+    prmtop = app.AmberPrmtopFile(prmtop)
+    PDBrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
+    stateReporter = os.path.join(outputDir, constants.AmberTemplates.StateDataReporterTemplate % workerNumber)
+    # if the string is unicode the PDBReaders fails to read the file (this is
+    # probably due to the fact that openmm was built with python2 in my
+    # computer, will need to test thoroughly with python3)
+    pdb = app.PDBFile(str(pdb))
+    PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
+    system = prmtop.createSystem(nonbondedMethod=app.PME,
+                                    nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
+                                    constraints=app.HBonds)
+    system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
+    integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+    simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
+    simulation.context.setPositions(pdb.positions)
+    simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, seed)
+    simulation.reporters.append(app.PDBReporter(str(PDBrepoter), parameters.reporterFreq, enforcePeriodicBox=True))
+    if parameters.energyReport:
+        simulation.reporters.append(app.StateDataReporter(str(stateReporter), parameters.reporterFreq, step=True, potentialEnergy=True,
+                                                            temperature=True, time=True, volume=True,
+                                                            remainingTime=True, speed=True, totalSteps=parameters.productionLength, separator="\t"))
+    if workerNumber == 1:
+        frequency = min(10 * parameters.reporterFreq, parameters.productionLength)
+        simulation.reporters.append(app.StateDataReporter(sys.stdout, frequency, step=True))
+    simulation.step(parameters.productionLength)
+
+######################################################################
