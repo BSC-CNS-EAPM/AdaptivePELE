@@ -988,7 +988,7 @@ class MDSimulation(SimulationRunner):
                               for i, structure in enumerate(structures_to_run)]
         print("Starting OpenMM Production Run...")
         startTime = time.time()
-        pool =  mp.Pool(self.getWorkingProcessors())
+        pool = mp.Pool(self.getWorkingProcessors())
         workers = []
         for i, startingFiles in zip(range(processors), itertools.cycle(startingFilesPairs)):
             workerNumber = i + 1
@@ -998,7 +998,6 @@ class MDSimulation(SimulationRunner):
             worker.get()
         endTime = time.time()
         print("OpenMM took %.2f sec" % (endTime - startTime))
-        pass
 
     def MDsimulationRunner(self, equilibrationFiles, workerNumber, outputDir, seed):
         prmtop, pdb = equilibrationFiles
@@ -1043,7 +1042,7 @@ class MDSimulation(SimulationRunner):
         """
         initialStructures = []
         for i in range(numberOfSnapshots-1):
-                initialStructures.append(tmpInitialStructuresTemplate % (iteration, i)+":")
+            initialStructures.append(tmpInitialStructuresTemplate % (iteration, i)+":")
         initialStructures.append((tmpInitialStructuresTemplate % (iteration, numberOfSnapshots-1)))
         return "".join(initialStructures)
 
@@ -1241,12 +1240,13 @@ class RunnerBuilder:
             params.runEquilibration = True
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 8)
             params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
             params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
             params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
-            params.productionLength = paramsBlock.get(blockNames.SimulationParams.productionLength, 0)
+            params.productionLength = paramsBlock[blockNames.SimulationParams.productionLength]
             params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 4000)
             params.energyReport = paramsBlock.get(blockNames.SimulationParams.energyReport, True)
 
