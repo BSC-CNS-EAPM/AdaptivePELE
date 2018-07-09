@@ -7,13 +7,14 @@ from AdaptivePELE.tests import testClustering as tClustering
 from AdaptivePELE.tests import testAdaptiveSampling as tAdaptive
 from AdaptivePELE.tests import testThresholdcalculator as tThreshold
 from AdaptivePELE.tests import testDensityCalculator as tDensity
+from AdaptivePELE.tests import testMD as tMD
 
 
 def parse_args():
     desc = ("Run testing suite. Possible options are:\na  -- Run all tests\n"
             "at -- Run atomset tests\ns  -- Run spawning tests\nth -- Run threshold "
             "calculator tests\nd  -- Run density tests\nc  -- Run clustering tests\n"
-            "Ad -- Run adaptive integration tests")
+            "Ad -- Run adaptive integration tests\nMD -- Run adaptive MD tests")
     parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("--run", default=None, nargs="*", help="Tests to run")
     parser.add_argument("--exclude", default=[], nargs="*", help="Tests to exclude")
@@ -25,7 +26,7 @@ def parse_args():
 def main(run, exclude):
     testSuite = unittest.TestSuite()
     if run is None:
-        run = ["at", "s", "th", "d", "c", "Ad"]
+        run = ["at", "s", "th", "d", "c", "Ad", "md"]
     to_run = set(run)-set(exclude)
 
     if "at" in to_run or "a" in to_run:
@@ -46,6 +47,9 @@ def main(run, exclude):
     if "Ad" in to_run or "a" in to_run:
         print("Will run integration tests")
         testSuite.addTest(unittest.makeSuite(tAdaptive.TestadaptiveSampling))
+    if "md" in to_run or "a" in to_run:
+        print("Will run integration tests with md")
+        testSuite.addTest(unittest.makeSuite(tMD.TestMD))
 
     runner = unittest.TextTestRunner()
     runner.run(testSuite)
