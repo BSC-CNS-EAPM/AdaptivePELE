@@ -778,7 +778,8 @@ class MDSimulation(SimulationRunner):
 
         for i, structure in enumerate(initialStructures):
             TleapControlFile = "tleap_equilibration_%d.in" % (i + 1)
-            prmtop = os.path.join(workingdirectory, equilibrationOutput, "system_%d.prmtop" % (i + 1))
+            structure = self.preparePDB(i, structure, workingdirectory)
+            prmtop = os.path.join(workingdirectory, outputPathConstants.topologies, "system_%d.prmtop" % (i + 1))
             inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % (i + 1))
             finalPDB = os.path.join(workingdirectory, equilibrationOutput, "system_%d.pdb" % (i + 1))
             Tleapdict["COMPLEX"] = structure
@@ -818,16 +819,33 @@ class MDSimulation(SimulationRunner):
         endTime = time.time()
         print("System preparation took %.2f sec" % (endTime - startTime))
 
-    def preparePDB(self, PDBtoOpen, outputpath):
+    def preparePDB(self, structureNumber, PDBtoOpen, outputpath):
         """
-        Corrects problems in the pdb such as CONECT and wrong histidine codes
+        Corrects problems in the pdb such as CONECT and insertion codes
 
         :param PDBtoOpen: string with the pdb to prepare
         :type PDBtoOpen: str
         :param outputPath: Path where the pdb is written
         :type outputPath: str
         """
-        pass
+        outputPDB = os.path.join(outputpath, "initial_%d.pdb" % structureNumber)
+        currentResidueNumber = 0
+        newnumber = 0
+        with open(outputPDB, "w") as out:
+            with open(PDBtoOpen, "r") as inp:
+                for line in inp:
+                    if line.startswith("ATOM") or line.startswith("HETATM"):
+                        splitedLine = [line[:6], line[6:11], line[12:16], line[17:20], line[21], line[22:27],
+                                       line[30:38], line[38:46], line[46:54]]
+                        if splitedLine[5] != currentResidueNumber:
+                            newnumber += 1
+                            currentResidueNumber = splitedLine[5]
+                        splitedLine[5] = str(newnumber)
+                        out.write("%-6s%5s %4s %3s %s%4s    %8s%8s%8s\n" % tuple(splitedLine))
+                    elif line.startswith("TER"):
+                        newnumber = 0
+                        out.write("TER\n")
+        return outputPDB
 
     def extractLigand(self, PDBtoOpen, resname, outputpath):
         """
@@ -984,7 +1002,6 @@ class MDSimulation(SimulationRunner):
     def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName):
         outputDir = outputPathConstants.epochOutputPathTempletized % epoch
         processors = self.getWorkingProcessors()
-        structures_to_run = initialStructuresAsString.split(":")
         startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, i)], structure)
                               for i, structure in enumerate(structures_to_run)]
         print("Starting OpenMM Production Run...")
@@ -1062,7 +1079,7 @@ class MDSimulation(SimulationRunner):
             :returns: bool -- True if the simulations where interrupted
         """
         # to be implemented depending on implementation details
-        simulationpath = os.path.join(outputpath, epoch, "checkpoint*")
+        simulationpath = os.path.join(outputpath, str(epoch), "checkpoint*")
         if glob.glob(simulationpath):
             self.restart = True
             return True
@@ -1252,6 +1269,7 @@ class RunnerBuilder:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.runEquilibration = True
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 8)
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
             params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
@@ -1259,7 +1277,7 @@ class RunnerBuilder:
             params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
-            params.productionLength = paramsBlock.get(blockNames.SimulationParams.productionLength, 0)
+            params.productionLength = paramsBlock[blockNames.SimulationParams.productionLength]
             params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 4000)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
