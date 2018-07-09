@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.5
+                v1.5.1
               </div>
             
           
@@ -96,20 +96,20 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#simulation-block">simulation block</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#templetized-pele-control-file">Templetized PELE control file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id2">parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#clustering-block">clustering block</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#thresholdcalculator">thresholdCalculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rmsd-clustering">rmsd clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contactmap-clustering">contactMap clustering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id3">parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#spawning-block">spawning block</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#density-calculator">density calculator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id4">parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
@@ -270,12 +270,12 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 </div>
 <div class="section" id="simulation-block">
 <h2>simulation block<a class="headerlink" href="#simulation-block" title="Permalink to this headline">¶</a></h2>
-<p>Currently, there are two implemented simulation types:</p>
+<p>Currently, there are three implemented simulation types:</p>
 <ul class="simple">
 <li><strong>pele</strong>. <a class="reference external" href="https://pele.bsc.es/pele.wt">PELE</a> is a great tool to efficiently explore the energy landscape. Parameters have been optimized for its use.</li>
 <li><strong>test</strong>. The test type has no real use outside of testing.</li>
+<li><strong>MD</strong> Run molecular dynamics using the OpenMM <a class="reference internal" href="#openmm" id="id2">[OPENMM]</a> library.</li>
 </ul>
-<p>We plan to implement an MD type in future versions.</p>
 <div class="section" id="templetized-pele-control-file">
 <h3>Templetized PELE control file<a class="headerlink" href="#templetized-pele-control-file" title="Permalink to this headline">¶</a></h3>
 <p>In order to run adaptivePELE, PELE control file needs to be templetized. In particular:</p>
@@ -291,8 +291,8 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <li><strong>radius</strong>: The radius of the simulation box is templetized as <code class="docutils literal"><span class="pre">&quot;radius&quot;:</span> <span class="pre">$BOX_RADIUS</span></code></li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h3>parameters<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>parameters<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>When using PELE as a propagator, the following parameters are mandatory:</p>
 <ul class="simple">
 <li><strong>iterations</strong> (<em>integer</em>, mandatory): Number of adaptive sampling iterations to run</li>
@@ -322,6 +322,20 @@ best energy structures in the equilibration by the center of mass.</li>
 <li><strong>numberEquilibrationStructures</strong> (<em>int</em>, default=10): Number of clusters to
 obtain from the <em>equilibrationCluster</em> structure selection (see
 <strong>equilibrationMode</strong> for more details)</li>
+</ul>
+<p>When using MD as a progagator, the following parameters are mandatory:</p>
+<ul class="simple">
+<li><strong>iterations</strong> (<em>integer</em>, mandatory): Number of adaptive sampling iterations to run</li>
+<li><strong>processors</strong> (<em>integer</em>, mandatory): Number of processors to use</li>
+<li><strong>peleSteps</strong> (<em>integer</em>, mandatory):  Number of time steps in a epoch (iteration)</li>
+<li><strong>seed</strong> (<em>integer</em>, mandatory): Seed for the random number generator</li>
+</ul>
+<p>Optionally, you can also use the following parameters:</p>
+<ul class="simple">
+<li><strong>equilibrationLength</strong> (<em>int</em>, default=50): Number of steps for the
+equilibration run</li>
+<li><strong>timeStep</strong> (<em>float</em>, default=2): Value of the time step for the integration
+(in femtoseconds)</li>
 </ul>
 <p>Additionally, the block may have an exit condition that stops the execution:</p>
 <ul>
@@ -443,8 +457,8 @@ There are currently three implemented methods to evaluate the similarity of cont
 <li><strong>distance</strong>, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.</li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h3>parameters<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><strong>ligandResname</strong> (<em>string</em>, default=”“): Ligand residue name in the PDB (if necessary)</li>
 <li><strong>ligandChain</strong> (<em>string</em>, default=”“): Ligand chain (if necessary)</li>
@@ -522,8 +536,8 @@ There are two types of density calculators:</p>
 <li><strong>exitContinuous</strong>, which assings decreasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 1/8, otherwise, density = (-4 <strong>r</strong> + 6)^3/64.0</li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h3>parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>parameters<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. “report”.</li>
 <li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (zero indexed)</li>
@@ -571,7 +585,7 @@ There are two types of density calculators:</p>
 <h2>Control File Examples<a class="headerlink" href="#control-file-examples" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="example-1">
 <h3>Example 1<a class="headerlink" href="#example-1" title="Permalink to this headline">¶</a></h3>
-<p>The first example makes use of default parameters (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id5">[APELE]</a>).</p>
+<p>The first example makes use of default parameters (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id6">[APELE]</a>).</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
@@ -718,7 +732,7 @@ and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clus
 <div class="section" id="non-pdb-trajectories">
 <h2>Non-PDB trajectories<a class="headerlink" href="#non-pdb-trajectories" title="Permalink to this headline">¶</a></h2>
 <p>Starting from version 1.5, AdaptivePELE supports working with non-PDB
-trajectories by relying on the mdtraj library <a class="reference internal" href="#mdtraj" id="id6">[MDTRAJ]</a>, with only minor changes in
+trajectories by relying on the mdtraj library <a class="reference internal" href="#mdtraj" id="id7">[MDTRAJ]</a>, with only minor changes in
 the exposed interface of the atomset module. However, some caution is needed
 when using mdtraj to convert between formats:</p>
 <ul class="simple">
@@ -752,13 +766,22 @@ described with the file topology.pdb</p>
 <table class="docutils citation" frame="void" id="apele" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[APELE]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id5">2</a>)</em> Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></td></tr>
+<tr><td class="label">[APELE]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id6">2</a>)</em> Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></td></tr>
 </tbody>
 </table>
 <table class="docutils citation" frame="void" id="mdtraj" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id6">[MDTRAJ]</a></td><td>Robert&nbsp;T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, <a class="reference external" href="http://mdtraj.org">http://mdtraj.org</a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id7">[MDTRAJ]</a></td><td>Robert&nbsp;T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, <a class="reference external" href="http://mdtraj.org">http://mdtraj.org</a></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="openmm" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[OPENMM]</a></td><td><ol class="first last upperalpha simple" start="16">
+<li>Eastman, et. al. OpenMM 7: Rapid development of high performance algorithms for molecular dynamics.” PLOS Comp. Biol. 13(7): e1005659. (2017), <a class="reference external" href="http://openmm.org">http://openmm.org</a></li>
+</ol>
+</td></tr>
 </tbody>
 </table>
 </div>

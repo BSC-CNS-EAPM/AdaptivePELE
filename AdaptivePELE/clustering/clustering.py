@@ -495,7 +495,7 @@ class Cluster:
             :param path: Filename of the file to write
             :type path: str
         """
-        self.pdb.writePDB(str(path))
+        self.pdb.writePDB(path)
 
     def getContacts(self):
         """
@@ -517,11 +517,11 @@ class Cluster:
         """
         if not self.altSelection or self.altStructure.sizePQ() == 0:
             print("cluster center")
-            self.pdb.writePDB(str(path))
+            self.pdb.writePDB(path)
             return self.trajPosition
         else:
             spawnStruct, trajPosition = self.altStructure.altSpawnSelection((self.elements, self.pdb))
-            spawnStruct.writePDB(str(path))
+            spawnStruct.writePDB(path)
             if trajPosition is None:
                 trajPosition = self.trajPosition
             return trajPosition
@@ -1136,7 +1136,7 @@ class Clustering:
             pathwayFile.write("REMARK 000 List of cluster belonging to the pathway %s\n" % ' '.join(map(str, pathway)))
             for i, step_cluster in enumerate(pathway):
                 cluster = self.clusters.clusters[step_cluster]
-                pathwayFile.write("MODEL %d\n" % (i+1))
+                pathwayFile.write("MODEL    %4d\n" % (i+1))
                 pdbStr = cluster.pdb.get_pdb_string()
                 pdbList = pdbStr.split("\n")
                 for line in pdbList:

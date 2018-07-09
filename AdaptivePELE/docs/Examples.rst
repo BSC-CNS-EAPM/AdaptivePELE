@@ -113,13 +113,13 @@ Example::
 simulation block
 -----------------
 
-Currently, there are two implemented simulation types: 
+Currently, there are three implemented simulation types: 
 
 * **pele**. `PELE <https://pele.bsc.es/pele.wt>`_ is a great tool to efficiently explore the energy landscape. Parameters have been optimized for its use.
 
 * **test**. The test type has no real use outside of testing. 
 
-We plan to implement an MD type in future versions.
+* **MD** Run molecular dynamics using the OpenMM [OPENMM]_ library.
 
 
 Templetized PELE control file
@@ -173,6 +173,20 @@ Optionally, you can also use the following parameters:
 * **numberEquilibrationStructures** (*int*, default=10): Number of clusters to
   obtain from the *equilibrationCluster* structure selection (see
   **equilibrationMode** for more details)
+
+When using MD as a progagator, the following parameters are mandatory:
+
+* **iterations** (*integer*, mandatory): Number of adaptive sampling iterations to run
+* **processors** (*integer*, mandatory): Number of processors to use
+* **peleSteps** (*integer*, mandatory):  Number of time steps in a epoch (iteration)
+* **seed** (*integer*, mandatory): Seed for the random number generator
+
+Optionally, you can also use the following parameters:
+
+* **equilibrationLength** (*int*, default=50): Number of steps for the
+  equilibration run
+* **timeStep** (*float*, default=2): Value of the time step for the integration
+  (in femtoseconds)
 
 Additionally, the block may have an exit condition that stops the execution:
 
@@ -648,3 +662,4 @@ described with the file topology.pdb
 
 .. [APELE] Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, https://www.nature.com/articles/s41598-017-08445-5
 .. [MDTRAJ] Robert T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, http://mdtraj.org
+.. [OPENMM] P. Eastman, et. al. OpenMM 7: Rapid development of high performance algorithms for molecular dynamics.” PLOS Comp. Biol. 13(7): e1005659. (2017), http://openmm.org

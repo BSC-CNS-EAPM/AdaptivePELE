@@ -564,7 +564,7 @@ def convert_trajectory_to_pdb(trajectory, topology, output, output_folder):
             conf = traj.slice(i, copy=False)
             PDB = atomset.PDB()
             PDB.initialise(conf, topology=topology_contents)
-            fw.write("MODEL %d\n" % (i+1))
+            fw.write("MODEL     %4d\n" % (i+1))
             fw.write(PDB.pdb)
             fw.write("ENDMDL\n")
         fw.write("END\n")

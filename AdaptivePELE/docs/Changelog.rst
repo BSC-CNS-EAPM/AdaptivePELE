@@ -6,6 +6,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_.
 
+1.5.1 - 2018-06-07
+--------------------
+
+New features:
+.............
+
+    - The extractCoords script now works seemesly with pdb or xtc trajectories
+
+Behaviour changes from previous version:
+........................................
+
+
+    - Improve the speed of handling xtc trajectories by switching to the
+      low-level API of mdtraj
+    - Optimize and parallelize extractCoords script from the freeEnergies
+      subpackage, change the multiprocess module to multiprocessing
+
+Bug fixes:
+..........
+
+    - Fix several bugs in extractCoords script
+
 1.5 - 2018-05-11
 -------------------------------
 
