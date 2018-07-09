@@ -144,7 +144,6 @@ class SimulationParams:
     minimizationIterations = "minimizationIterations"
     repoterfreq = "reporterFrequency"
     productionLength = "productionLength"
-    energyReport = "energyReport"
 
 
 class ExitConditionType:
