@@ -494,7 +494,7 @@ each cluster</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures">
-<code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em>, <em>topology_file=None</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#IndependentRunsCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
+<code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em>, <em>topologies=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#IndependentRunsCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.IndependentRunsCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write last trajectory structure as initial one for the next iteration</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -507,7 +507,7 @@ each cluster (number of processors that will start from that state)</li>
 <li><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
 <li><strong>iteration</strong> (<em>int</em>) – Number of epoch</li>
 <li><strong>topology_file</strong> (<em>str</em>) – Topology file for non-pdb trajectories</li>
-<li><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
 </ul>
 </td>
 </tr>
@@ -850,7 +850,7 @@ each cluster</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures">
-<code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em>, <em>topology_file=None</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
+<code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em>, <em>topologies=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write initial structures for the next iteration</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

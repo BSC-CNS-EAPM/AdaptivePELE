@@ -635,9 +635,7 @@
 <span class="sd">            :param path: Filename of the file to write</span>
 <span class="sd">            :type path: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">topology</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Cluster.getContacts"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Cluster.getContacts">[docs]</a>    <span class="k">def</span> <span class="nf">getContacts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -659,11 +657,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">altSelection</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructure</span><span class="o">.</span><span class="n">sizePQ</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;cluster center&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajPosition</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">spawnStruct</span><span class="p">,</span> <span class="n">trajPosition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">altStructure</span><span class="o">.</span><span class="n">altSpawnSelection</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">))</span>
-            <span class="n">spawnStruct</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="n">spawnStruct</span><span class="o">.</span><span class="n">writePDB</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">trajPosition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">trajPosition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajPosition</span>
             <span class="k">return</span> <span class="n">trajPosition</span></div>
@@ -1027,37 +1025,44 @@
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">resChain</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">resChain</span>\
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">col</span>
 
-<div class="viewcode-block" id="Clustering.cluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.cluster">[docs]</a>    <span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">ignoreFirstRow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Clustering.cluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.cluster">[docs]</a>    <span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">ignoreFirstRow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Cluster the snaptshots contained in the paths folder</span>
 
 <span class="sd">            :param paths: List of folders with the snapshots</span>
 <span class="sd">            :type paths: list</span>
-<span class="sd">            :param topology: Topology file for non-pdb trajectories</span>
-<span class="sd">            :type topology: str</span>
+<span class="sd">            :param ignoreFirstRow: Flag wether to ignore the first snapshot of a trajectory</span>
+<span class="sd">            :type ignoreFirstRow: bool</span>
+<span class="sd">            :param topology: Topology object containing the set of topologies needed for the simulation</span>
+<span class="sd">            :type topology: :py:class:`.Topology`</span>
+<span class="sd">            :param epoch: Epoch number</span>
+<span class="sd">            :type epoch: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">topology_contents</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">topology_contents</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
         <span class="n">trajectories</span> <span class="o">=</span> <span class="n">getAllTrajectories</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">trajectory</span> <span class="ow">in</span> <span class="n">trajectories</span><span class="p">:</span>
             <span class="n">trajNum</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTrajNum</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)</span>
             <span class="c1"># origCluster = processorsToClusterMapping[trajNum-1]</span>
             <span class="n">origCluster</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+            <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">top</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">getTopology</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">top</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span><span class="p">:</span>
                 <span class="n">reportFilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
                                               <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">)</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">reportFilename</span><span class="p">,</span> <span class="n">ndmin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                <span class="c1"># metrics = np.loadtxt(reportFilename, ndmin=2)</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">reportFilename</span><span class="p">,</span> <span class="n">missing_values</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">filling_values</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
 
                 <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">ignoreFirstRow</span> <span class="ow">and</span> <span class="n">num</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="k">continue</span>
                     <span class="k">try</span><span class="p">:</span>
-                        <span class="n">origCluster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">trajNum</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">origCluster</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">metrics</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_contents</span><span class="p">)</span>
+                        <span class="n">origCluster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">trajNum</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">origCluster</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">metrics</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">top</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot; in trajectory </span><span class="si">%d</span><span class="s2">. This is usually caused by a mismatch between report files and trajectory files&quot;</span>
                                    <span class="s2">&quot; which in turn is usually caused by some problem in writing the files, e.g. quota&quot;</span><span class="p">)</span>
@@ -1069,7 +1074,7 @@
                 <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">ignoreFirstRow</span> <span class="ow">and</span> <span class="n">num</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="k">continue</span>
-                    <span class="n">origCluster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">trajNum</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">origCluster</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_contents</span><span class="p">)</span>
+                    <span class="n">origCluster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">trajNum</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">origCluster</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">top</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">:</span>
             <span class="n">cluster</span><span class="o">.</span><span class="n">altStructure</span><span class="o">.</span><span class="n">cleanPQ</span><span class="p">()</span></div>
 
@@ -1256,7 +1261,7 @@
 
         <span class="k">return</span> <span class="n">optimalMetricIndex</span></div>
 
-<div class="viewcode-block" id="Clustering.writePathwayTrajectory"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.writePathwayTrajectory">[docs]</a>    <span class="k">def</span> <span class="nf">writePathwayTrajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathway</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Clustering.writePathwayTrajectory"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.writePathwayTrajectory">[docs]</a>    <span class="k">def</span> <span class="nf">writePathwayTrajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathway</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Write a list of cluster forming a pathway into a trajectory pdb file</span>
 
@@ -1264,11 +1269,7 @@
 <span class="sd">            :type pathway: list</span>
 <span class="sd">            :param filename: Path where to write the trajectory</span>
 <span class="sd">            :type filename: str</span>
-<span class="sd">            :param topology: Lines of topology file</span>
-<span class="sd">            :type topology: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">topology</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pathwayFile</span><span class="p">:</span>
             <span class="n">pathwayFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;REMARK 000 File created using PELE++</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">pathwayFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;REMARK 000 Pathway trajectory created using the FDT</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1471,27 +1472,28 @@
 <span class="sd">        Assigned  the last snapshot of the trajectory to a cluster.</span>
 <span class="sd">        Only useful for PELE sequential runs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="SequentialLastSnapshotClustering.cluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.cluster">[docs]</a>    <span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SequentialLastSnapshotClustering.cluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.cluster">[docs]</a>    <span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Cluster the snaptshots contained in the paths folder</span>
 
 <span class="sd">            :param paths: List of folders with the snapshots</span>
 <span class="sd">            :type paths: list</span>
-<span class="sd">            :param topology: Topology file for non-pdb trajectories</span>
-<span class="sd">            :type topology: str</span>
+<span class="sd">            :param topology: Topology object containing the set of topologies needed for the simulation</span>
+<span class="sd">            :type topology: :py:class:`.Topology`</span>
+<span class="sd">            :param epoch: Epoch number</span>
+<span class="sd">            :type epoch: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Clean clusters at every step, so we only have the last snapshot of</span>
         <span class="c1"># each trajectory as clusters</span>
-        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">topology_contents</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">topology_contents</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="n">Clusters</span><span class="p">()</span>
         <span class="n">trajectories</span> <span class="o">=</span> <span class="n">getAllTrajectories</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">trajectory</span> <span class="ow">in</span> <span class="n">trajectories</span><span class="p">:</span>
             <span class="n">trajNum</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTrajNum</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)</span>
-
-            <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+            <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">top</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">getTopology</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">top</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span><span class="p">:</span>
                 <span class="n">reportFilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
                                               <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">)</span>
@@ -1501,9 +1503,9 @@
                 <span class="c1"># check the exit condition</span>
                 <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">metrics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_contents</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">metrics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">top</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_contents</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addSnapshotToCluster</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">topology</span><span class="o">=</span><span class="n">top</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SequentialLastSnapshotClustering.addSnapshotToCluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.addSnapshotToCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addSnapshotToCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
