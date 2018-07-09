@@ -122,7 +122,12 @@ class SimulationParams:
             "peleSteps": "numbers.Real",
             "iterations": "numbers.Real"
             },
-        "md": {}}
+        "md": {
+            "processors": "numbers.Real",
+            "seed": "numbers.Real",
+            "productionLength": "numbers.Real",
+            "iterations": "numbers.Real"
+        }}
     params = {
         "executable": "basestring",
         "data": "basestring",
@@ -143,9 +148,9 @@ class SimulationParams:
         "numberEquilibrationStructures": "numbers.Real",
         "useSrun": "bool",
         "exitCondition": "dict",
-        "ligandCharge" : "numbers.Real",
-        "nonBondedCutoff": "int",
-        "temperature": "int",
+        "ligandCharge": "numbers.Real",
+        "nonBondedCutoff": "numbers.Real",
+        "Temperature": "numbers.Real",
         "runningPlatform": "basestring",
         "minimizationIterations": "int",
         "reporterFrequency": "int",
