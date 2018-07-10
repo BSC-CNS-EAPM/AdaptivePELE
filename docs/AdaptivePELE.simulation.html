@@ -256,23 +256,8 @@ selected</td>
 <em class="property">class </em><code class="descclassname">AdaptivePELE.simulation.simulationrunner.</code><code class="descname">MDSimulation</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.simulation.simulationrunner.SimulationRunner</span></code></a></p>
 <dl class="method">
-<dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.MDsimulationRunner">
-<code class="descname">MDsimulationRunner</code><span class="sig-paren">(</span><em>equilibrationFiles</em>, <em>workerNumber</em>, <em>outputDir</em>, <em>seed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.MDsimulationRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.MDsimulationRunner" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.NPTequilibration">
-<code class="descname">NPTequilibration</code><span class="sig-paren">(</span><em>topology</em>, <em>positions</em>, <em>PLATFORM</em>, <em>simulation_steps</em>, <em>constraints</em>, <em>velocities=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.NPTequilibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.NPTequilibration" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.NVTequilibration">
-<code class="descname">NVTequilibration</code><span class="sig-paren">(</span><em>topology</em>, <em>positions</em>, <em>PLATFORM</em>, <em>simulation_steps</em>, <em>constraints</em>, <em>velocities=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.NVTequilibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.NVTequilibration" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.checkSimulationInterrupted">
-<code class="descname">checkSimulationInterrupted</code><span class="sig-paren">(</span><em>epoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.checkSimulationInterrupted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.checkSimulationInterrupted" title="Permalink to this definition">¶</a></dt>
+<code class="descname">checkSimulationInterrupted</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.checkSimulationInterrupted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.checkSimulationInterrupted" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check wether the simulation was interrupted before finishing</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -288,14 +273,14 @@ selected</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.cleanCheckpointFiles">
-<code class="descname">cleanCheckpointFiles</code><span class="sig-paren">(</span><em>epoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.cleanCheckpointFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.cleanCheckpointFiles" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cleanCheckpointFiles</code><span class="sig-paren">(</span><em>checkpointDir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.cleanCheckpointFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.cleanCheckpointFiles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean the restart files generated if the simulation was interrupted
 before finishing</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch</strong> (<em>int</em>) – Epoch number</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>checkpointDir</strong> (<em>str</em>) – Directory with the checkpoints</td>
 </tr>
 </tbody>
 </table>
@@ -380,11 +365,6 @@ such simulation for every initial structure</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.minimization">
-<code class="descname">minimization</code><span class="sig-paren">(</span><em>prmtop</em>, <em>inpcrd</em>, <em>PLATFORM</em>, <em>constraints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.minimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.minimization" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.prepareLigand">
 <code class="descname">prepareLigand</code><span class="sig-paren">(</span><em>antechamberDict</em>, <em>parmchkDict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.prepareLigand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.prepareLigand" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs antechamber and parmchk2 to obtain the mol2 and frcmod of the ligand</p>
@@ -404,8 +384,8 @@ such simulation for every initial structure</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.preparePDB">
-<code class="descname">preparePDB</code><span class="sig-paren">(</span><em>PDBtoOpen</em>, <em>outputpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.preparePDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.preparePDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Corrects problems in the pdb such as CONECT and wrong histidine codes</p>
+<code class="descname">preparePDB</code><span class="sig-paren">(</span><em>structureNumber</em>, <em>PDBtoOpen</em>, <em>outputpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.preparePDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.preparePDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Corrects problems in the pdb such as CONECT and insertion codes</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -421,32 +401,8 @@ such simulation for every initial structure</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.runEquilibration">
-<code class="descname">runEquilibration</code><span class="sig-paren">(</span><em>equilibrationFiles</em>, <em>outputPDB</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.runEquilibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.runEquilibration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that runs the whole equilibration process and returns the final pdb</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>equilibrationFiles</strong> – tuple with the topology (prmtop) in the first position and the coordinates</td>
-</tr>
-</tbody>
-</table>
-<p>in the second (inpcrd)
-:param outputPDB: string with the pdb to save</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str – a string with the outputPDB</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -657,7 +613,7 @@ the cluster with max SASA</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a short PELE simulation</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -798,7 +754,7 @@ selected</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.checkSimulationInterrupted">
-<code class="descname">checkSimulationInterrupted</code><span class="sig-paren">(</span><em>epoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.checkSimulationInterrupted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.checkSimulationInterrupted" title="Permalink to this definition">¶</a></dt>
+<code class="descname">checkSimulationInterrupted</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.checkSimulationInterrupted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.checkSimulationInterrupted" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check wether the simulation was interrupted before finishing</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -928,7 +884,7 @@ processorsToClusterMapping</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -988,7 +944,7 @@ processorsToClusterMapping</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#TestSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#TestSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copy file to test the rest of the AdaptivePELE procedure</p>
 </dd></dl>
 
