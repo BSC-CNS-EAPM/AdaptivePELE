@@ -216,6 +216,16 @@ def getTrajNum(trajFilename):
     """
     return int(trajFilename.split("_")[-1][:-4])
 
+def getPrmtopNum(prmtopFilename):
+    """
+        Gets the prmtop number
+
+        :param trajFilename: prmtop filename
+        :type trajFilename: str
+
+        :returns: int -- prmtop number
+    """
+    return int(prmtopFilename.split("_")[-1][:-7])
 
 def calculateContactMapEigen(contactMap):
     """
