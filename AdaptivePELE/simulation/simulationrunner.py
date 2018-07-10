@@ -779,7 +779,7 @@ class MDSimulation(SimulationRunner):
 
         for i, structure in enumerate(initialStructures):
             TleapControlFile = "tleap_equilibration_%d.in" % (i + 1)
-            structure = self.preparePDB(i, structure, workingdirectory)
+            structure = self.preparePDB(i, structure, os.getcwd())
             prmtop = os.path.join(workingdirectory, outputPathConstants.topologies, "system_%d.prmtop" % (i + 1))
             inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % (i + 1))
             finalPDB = os.path.join(workingdirectory, equilibrationOutput, "system_%d.pdb" % (i + 1))
@@ -907,22 +907,12 @@ class MDSimulation(SimulationRunner):
         startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, i)], structure) for i, structure in enumerate(structures_to_run)]
         print("Starting OpenMM Production Run of %d steps..." % self.parameters.productionLength)
         startTime = time.time()
-        pool = mp.Pool(self.getWorkingProcessors())
+        pool = mp.Pool(processors)
         workers = []
         seed = self.parameters.seed + epoch * self.parameters.processors
         for i, startingFiles in zip(range(processors), itertools.cycle(startingFilesPairs)):
             workerNumber = i + 1
-            seed = self.parameters.seed + epoch * self.parameters.processors
-            workers.append(pool.apply_async(runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters)))
-        for worker in workers:
-            worker.get()
-        pool = mp.Pool(processors)
-        workers = []
-        for i, startingFiles in zip(range(processors), itertools.cycle(startingFilesPairs)):
-            workerNumber = i + 1
-            seed = self.parameters.seed + epoch * self.parameters.processors
-            workers.append(pool.apply_async(self.MDsimulationRunner, args=(startingFiles, workerNumber, outputDir,
-                                                                           seed, reportFileName, self.restart)))
+            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, self.restart)))
         for worker in workers:
             worker.get()
         endTime = time.time()
