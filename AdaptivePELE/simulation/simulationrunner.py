@@ -188,7 +188,7 @@ class SimulationRunner:
         """
         try:
             with open(epochDir+"/processorMapping.txt") as f:
-                self.processorsToClusterMapping = map(ast.literal_eval, f.read().rstrip().split(':'))
+                self.processorsToClusterMapping = list(map(ast.literal_eval, f.read().rstrip().split(':')))
         except IOError:
             sys.stderr.write("WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
 

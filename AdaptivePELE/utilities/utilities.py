@@ -132,7 +132,7 @@ class Topology:
         """
         try:
             with open(epochDir+"/topologyMapping.txt") as f:
-                self.topologyMap[epoch] = map(int, f.read().rstrip().split(':'))
+                self.topologyMap[epoch] = list(map(int, f.read().rstrip().split(':')))
         except IOError:
             sys.stderr.write("WARNING: topologyMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
 
