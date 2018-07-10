@@ -1137,17 +1137,16 @@ class RunnerBuilder:
         elif simulationType == blockNames.SimulationType.md:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
-            params.runEquilibration = True
-            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 8)
-            params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
-            params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
-            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 8)
-            params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
-            params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
-            params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
             params.productionLength = paramsBlock[blockNames.SimulationParams.productionLength]
+            params.runEquilibration = True
+            params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 8)
+            params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
+            params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
+            params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
+            params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
             params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 4000)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
