@@ -509,11 +509,11 @@ class PeleSimulation(SimulationRunner):
             elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationCluster:
                 newStructure.extend(self.clusterEquilibrationStructures(resname, trajNames, reportNames, topology=topologies.topologies[i]))
 
-        if len(newStructure) > (self.processors-1):
+        if len(newStructure) > self.getWorkingProcessors():
             # if for some reason the number of selected structures exceeds
             # the number of available processors, randomly sample the initial
             # structures
-            newStructure = np.random.choice(newStructure, self.processors-1, replace=False)
+            newStructure = np.random.choice(newStructure, self.getWorkingProcessors(), replace=False)
         for j, struct in enumerate(newStructure):
             newStructurePath = os.path.join(equilibrationOutput, 'equilibration_struc_%d_%d.pdb' % (i+1, j+1))
             with open(newStructurePath, "w") as fw:
