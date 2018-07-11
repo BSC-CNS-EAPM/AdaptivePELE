@@ -788,7 +788,7 @@ class MDSimulation(SimulationRunner):
         newInitialStructures = []
         solvatedStrcutures = []
         equilibrationFiles = []
-        equilibrationOutput = os.path.join(outputPath, "equilibration")
+        equilibrationOutput = outputPathConstants.equilibrationDir
         utilities.makeFolder(equilibrationOutput)
         # AmberTools generates intermediate files in the current directory, change to the tmp folder
         workingdirectory = os.getcwd()
