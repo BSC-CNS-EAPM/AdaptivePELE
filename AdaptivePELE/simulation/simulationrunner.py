@@ -188,7 +188,7 @@ class SimulationRunner:
         """
         try:
             with open(epochDir+"/processorMapping.txt") as f:
-                self.processorsToClusterMapping = map(ast.literal_eval, f.read().rstrip().split(':'))
+                self.processorsToClusterMapping = list(map(ast.literal_eval, f.read().rstrip().split(':')))
         except IOError:
             sys.stderr.write("WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
 
@@ -801,11 +801,11 @@ class MDSimulation(SimulationRunner):
         self.prepareLigand(antechamberDict, parmchkDict)
 
         for i, structure in enumerate(initialStructures):
-            TleapControlFile = "tleap_equilibration_%d.in" % (i + 1)
+            TleapControlFile = "tleap_equilibration_%d.in" % i
             structure = self.preparePDB(i, structure, os.getcwd())
-            prmtop = os.path.join(workingdirectory, outputPathConstants.topologies, "system_%d.prmtop" % (i + 1))
-            inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % (i + 1))
-            finalPDB = os.path.join(workingdirectory, equilibrationOutput, "system_%d.pdb" % (i + 1))
+            prmtop = os.path.join(workingdirectory, outputPathConstants.topologies, "system_%d.prmtop" % i)
+            inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % i)
+            finalPDB = os.path.join(workingdirectory, equilibrationOutput, "system_%d.pdb" % i)
             Tleapdict["COMPLEX"] = structure
             Tleapdict["PRMTOP"] = prmtop
             Tleapdict["INPCRD"] = inpcrd
@@ -822,7 +822,7 @@ class MDSimulation(SimulationRunner):
         startTime = time.time()
         print("equilibrating System")
         for i, equilibrationFilePair in enumerate(equilibrationFiles):
-            outputPDB = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % (i + 1))
+            outputPDB = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % i)
             workers.append(pool.apply_async(sim.runEquilibration, args=(equilibrationFilePair, outputPDB, self.parameters, i)))
 
         for worker in workers:
@@ -925,17 +925,27 @@ class MDSimulation(SimulationRunner):
         outputDir = outputPathConstants.epochOutputPathTempletized % epoch
         processors = self.getWorkingProcessors()
         structures_to_run = initialStructuresAsString.split(":")
+        if self.restart:
+            prmtops = glob.glob(os.path.join(outputPathConstants.topologies, "*prmtop"))
+            # sort the prmtops according to the original topology order
+            self.prmtopFiles = sorted(prmtops, key=lambda x: utilities.getPrmtopNum(x))
+            checkpoints = glob.glob(os.path.join(outputDir, "checkpoint*.chk"))
+            checkpoints = sorted(checkpoints, key=lambda x: utilities.getTrajNum(x))
+            checkpoints = checkpoints[1:] + [checkpoints[0]]
         # To follow the same order as PELE (important for processor mapping)
         structures_to_run = structures_to_run[1:]+[structures_to_run[0]]
-        startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, i)], structure) for i, structure in enumerate(structures_to_run)]
+        startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, utilities.getTrajNum(structure))], structure) for structure in structures_to_run]
         print("Starting OpenMM Production Run of %d steps..." % self.parameters.productionLength)
         startTime = time.time()
         pool = mp.Pool(processors)
         workers = []
         seed = self.parameters.seed + epoch * self.parameters.processors
         for i, startingFiles in zip(range(processors), itertools.cycle(startingFilesPairs)):
+            checkpoint = None
+            if self.restart:
+                checkpoint = checkpoints[i]
             workerNumber = i + 1
-            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, self.restart)))
+            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.restart)))
         for worker in workers:
             worker.get()
         endTime = time.time()

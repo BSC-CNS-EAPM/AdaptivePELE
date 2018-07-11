@@ -124,7 +124,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     return simulation
 
 
-def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, restart=False):
+def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, restart=False):
     prmtop, pdb = equilibrationFiles
     prmtop = app.AmberPrmtopFile(prmtop)
     DCDrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
@@ -142,10 +142,18 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
     simulation.context.setPositions(pdb.positions)
-    simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, seed)
+
+    if restart:
+        with open(str(checkpoint), 'rb') as check:
+            simulation.context.loadCheckpoint(check.read())
+            stateData = open(str(stateReporter), "a")
+    else:
+        simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, seed)
+        stateData = open(str(stateReporter), "w")
+
     simulation.reporters.append(app.DCDReporter(str(DCDrepoter), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
     simulation.reporters.append(app.CheckpointReporter(str(checkpointReporter), parameters.reporterFreq))
-    simulation.reporters.append(app.StateDataReporter(str(stateReporter), parameters.reporterFreq, step=True,
+    simulation.reporters.append(app.StateDataReporter(stateData, parameters.reporterFreq, step=True,
                                                       potentialEnergy=True, temperature=True, time=True,
                                                       volume=True, remainingTime=True, speed=True,
                                                       totalSteps=parameters.productionLength, separator="\t"))
@@ -153,3 +161,4 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         frequency = min(10 * parameters.reporterFreq, parameters.productionLength)
         simulation.reporters.append(app.StateDataReporter(sys.stdout, frequency, step=True))
     simulation.step(parameters.productionLength)
+    stateData.close()

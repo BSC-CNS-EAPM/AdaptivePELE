@@ -132,7 +132,7 @@ class Topology:
         """
         try:
             with open(epochDir+"/topologyMapping.txt") as f:
-                self.topologyMap[epoch] = map(int, f.read().rstrip().split(':'))
+                self.topologyMap[epoch] = list(map(int, f.read().rstrip().split(':')))
         except IOError:
             sys.stderr.write("WARNING: topologyMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
 
@@ -216,6 +216,16 @@ def getTrajNum(trajFilename):
     """
     return int(trajFilename.split("_")[-1][:-4])
 
+def getPrmtopNum(prmtopFilename):
+    """
+        Gets the prmtop number
+
+        :param trajFilename: prmtop filename
+        :type trajFilename: str
+
+        :returns: int -- prmtop number
+    """
+    return int(prmtopFilename.split("_")[-1][:-7])
 
 def calculateContactMapEigen(contactMap):
     """
