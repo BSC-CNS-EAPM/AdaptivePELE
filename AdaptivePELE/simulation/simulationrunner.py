@@ -329,6 +329,31 @@ class PeleSimulation(SimulationRunner):
         PDBinitial.initialise(initialStruct, resname=resname)
         return repr(PDBinitial.getCOM())
 
+    def runEquilibrationPELE(self, runningControlFile):
+        """
+        Run a short PELE equilibration simulation
+
+        :param runningControlFile: Path of the control file to run
+        :type runningControlFile: str
+        """
+
+        self.createSymbolicLinks()
+        if self.parameters.srun:
+            toRun = ["srun", self.parameters.executable, runningControlFile]
+        else:
+            toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
+        toRun = " ".join(toRun)
+        print(toRun)
+        startTime = time.time()
+        proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        (out, err) = proc.communicate()
+        print(out)
+        if err:
+            print(err)
+
+        endTime = time.time()
+        print("PELE took %.2f sec" % (endTime - startTime))
+
     def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName):
         """
         Run a short PELE simulation
@@ -498,7 +523,7 @@ class PeleSimulation(SimulationRunner):
                 peleControlString = peleControlString.replace(value, "$%s" % key)
 
             self.makeWorkingControlFile(equilibrationControlFile, equilibrationPeleDict, peleControlString)
-            self.runSimulation(equilibrationControlFile)
+            self.runEquilibrationPELE(equilibrationControlFile)
             # Extract report, trajnames, metrics columns from pele control file
             reportNames = os.path.join(equilibrationOutput, reportWildcard)
             trajNames = os.path.join(equilibrationOutput, trajWildcard)
