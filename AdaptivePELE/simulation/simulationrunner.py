@@ -902,12 +902,15 @@ class MDSimulation(SimulationRunner):
         processors = self.getWorkingProcessors()
         structures_to_run = initialStructuresAsString.split(":")
         if self.restart:
+            if epoch == 0:
+                # if the epoch is 0 the original equilibrated pdb files are taken as intial structures
+                equilibrated_structures = glob.glob(os.path.join(outputPathConstants.equilibrationDir, "equilibrated*pdb"))
+                structures_to_run = sorted(equilibrated_structures, key=lambda x: utilities.getTrajNum(x))
             prmtops = glob.glob(os.path.join(outputPathConstants.topologies, "*prmtop"))
             # sort the prmtops according to the original topology order
             self.prmtopFiles = sorted(prmtops, key=lambda x: utilities.getPrmtopNum(x))
             checkpoints = glob.glob(os.path.join(outputDir, "checkpoint*.chk"))
             checkpoints = sorted(checkpoints, key=lambda x: utilities.getTrajNum(x))
-            checkpoints = checkpoints[1:] + [checkpoints[0]]
         # To follow the same order as PELE (important for processor mapping)
         structures_to_run = structures_to_run[1:]+[structures_to_run[0]]
         startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, utilities.getTrajNum(structure))], structure) for structure in structures_to_run]
@@ -919,7 +922,7 @@ class MDSimulation(SimulationRunner):
         for i, startingFiles in zip(range(processors), itertools.cycle(startingFilesPairs)):
             checkpoint = None
             if self.restart:
-                checkpoint = checkpoints[i]
+                checkpoint = checkpoints[utilities.getTrajNum(startingFiles[1])]
             workerNumber = i + 1
             workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.restart)))
         for worker in workers:

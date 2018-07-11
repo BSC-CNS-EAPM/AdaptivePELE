@@ -593,7 +593,11 @@ def main(jsonParams, clusteringHook=None):
         else:
             topology_files = glob.glob(os.path.join(outputPathConstants.topologies, "topology*.pdb"))
             topologies.setTopologies(topology_files)
-            clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner, topologies)
+            if firstRun == 0:
+                createMappingForFirstEpoch(initialStructures, topologies, simulationRunner.getWorkingProcessors())
+                clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner)
+            else:
+                clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner, topologies)
             checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner)
 
     if startFromScratch or not restart:
