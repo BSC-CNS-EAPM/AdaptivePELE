@@ -6,10 +6,67 @@ multiprocessing they need to be functions
 from __future__ import absolute_import, division, print_function
 import os
 import sys
+import time
 import simtk.openmm as mm
 import simtk.openmm.app as app
 import simtk.unit as unit
 from AdaptivePELE.constants import constants
+
+
+class CustomStateDataReporter(app.StateDataReporter):
+    # Added two new parameters append and intialsteps to properly handle the report file when the simulation is restarted
+    def __init__(self, file, reportInterval, step=False, time=False, potentialEnergy=False, kineticEnergy=False, totalEnergy=False, temperature=False, volume=False, density=False,
+                 progress=False, remainingTime=False, speed=False, elapsedTime=False, separator=',', systemMass=None, totalSteps=None, append=False, initialStep=0):
+        app.StateDataReporter.__init__(self, file, reportInterval, step, time, potentialEnergy, kineticEnergy, totalEnergy, temperature, volume, density,
+                 progress, remainingTime, speed, elapsedTime, separator, systemMass, totalSteps)
+        self._append = append
+        self.initialStep = initialStep
+
+    def report(self, simulation, state):
+        """Generate a report.
+
+        Parameters
+        ----------
+        simulation : Simulation
+            The Simulation to generate a report for
+        state : State
+            The current state of the simulation
+        """
+        if not self._hasInitialized:
+            self._initializeConstants(simulation)
+            headers = self._constructHeaders()
+            # extra line added to avoid printing the header again when the simulation is restarted
+            if not self._append:
+                print('#"%s"' % ('"' + self._separator + '"').join(headers), file=self._out)
+            try:
+                self._out.flush()
+            except AttributeError:
+                pass
+            self._initialClockTime = time.time()
+            self._initialSimulationTime = state.getTime()
+            self._initialSteps = simulation.currentStep
+            self._hasInitialized = True
+
+        # Check for errors.
+        self._checkForErrors(simulation, state)
+
+        # Query for the values
+        values = self._constructReportValues(simulation, state)
+
+        # Write the values.
+        print(self._separator.join(str(v) for v in values), file=self._out)
+        try:
+            self._out.flush()
+        except AttributeError:
+            pass
+
+    def _constructReportValues(self, simulation, state):
+        # Modifies the first value which is the step number information
+        values = super(CustomStateDataReporter, self)._constructReportValues(simulation, state)
+        values[0] = values[0] + self.initialStep
+        return values
+
+
 
 
 def runEquilibration(equilibrationFiles, outputPDB, parameters, worker):
@@ -130,6 +187,8 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     DCDrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
     stateReporter = os.path.join(outputDir, "%s_%s" % (reportFileName, workerNumber))
     checkpointReporter = os.path.join(outputDir, constants.AmberTemplates.CheckPointReporterTemplate % workerNumber)
+    lastStep = getLastStep(stateReporter)
+    simulation_length = parameters.productionLength - lastStep
     # if the string is unicode the PDBReaders fails to read the file (this is
     # probably due to the fact that openmm was built with python2 in my
     # computer, will need to test thoroughly with python3)
@@ -153,12 +212,23 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
 
     simulation.reporters.append(app.DCDReporter(str(DCDrepoter), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
     simulation.reporters.append(app.CheckpointReporter(str(checkpointReporter), parameters.reporterFreq))
-    simulation.reporters.append(app.StateDataReporter(stateData, parameters.reporterFreq, step=True,
+    simulation.reporters.append(CustomStateDataReporter(stateData, parameters.reporterFreq, step=True,
                                                       potentialEnergy=True, temperature=True, time=True,
                                                       volume=True, remainingTime=True, speed=True,
-                                                      totalSteps=parameters.productionLength, separator="\t"))
+                                                      totalSteps=parameters.productionLength, separator="\t",
+                                                        append=restart, initialStep=lastStep))
     if workerNumber == 1:
         frequency = min(10 * parameters.reporterFreq, parameters.productionLength)
         simulation.reporters.append(app.StateDataReporter(sys.stdout, frequency, step=True))
-    simulation.step(parameters.productionLength)
+    simulation.step(simulation_length)
     stateData.close()
+
+
+def getLastStep(reportfile):
+    try:
+        with open(reportfile, "r") as inp:
+            report = inp.read()
+        last_step = report.split("\n")[-2].split("\t")[0]
+    except FileNotFoundError:
+        last_step = 0
+    return int(last_step)
