@@ -144,6 +144,7 @@ class SimulationParams:
     minimizationIterations = "minimizationIterations"
     repoterfreq = "reporterFrequency"
     productionLength = "productionLength"
+    waterBoxSize = "WaterBoxSize"
 
 
 class ExitConditionType:

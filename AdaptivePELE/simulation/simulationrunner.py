@@ -67,6 +67,7 @@ class SimulationParameters:
         self.energyReport = True
         self.productionLength = 0
         self.ligandName = None
+        self.waterBoxSize = 8
 
 
 class SimulationRunner:
@@ -1177,7 +1178,7 @@ class RunnerBuilder:
             params.productionLength = paramsBlock[blockNames.SimulationParams.productionLength]
             params.runEquilibration = True
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
-            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 8)
+            params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
             params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
             params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
             params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")

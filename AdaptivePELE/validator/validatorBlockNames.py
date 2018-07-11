@@ -154,7 +154,8 @@ class SimulationParams:
         "runningPlatform": "basestring",
         "minimizationIterations": "int",
         "reporterFrequency": "int",
-        "productionLength": "int"
+        "productionLength": "int",
+        "WaterBoxSize": "int"
     }
     exitCondition = {
         "types": {
