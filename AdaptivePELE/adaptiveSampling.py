@@ -273,7 +273,7 @@ def findFirstRun(outputPath, clusteringOutputObject, simulationRunner):
         epoch = objectsFound.pop(0)
         if checkIntegrityClusteringObject(clusteringOutputObject % epoch):
             return epoch + 1
-    return 0
+    return None
 
 
 def checkIntegrityClusteringObject(objectPath):
@@ -588,7 +588,7 @@ def main(jsonParams, clusteringHook=None):
     startFromScratch = False
     if restart:
         firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject, simulationRunner)
-        if firstRun == 0:
+        if firstRun is None:
             startFromScratch = True
         else:
             topology_files = glob.glob(os.path.join(outputPathConstants.topologies, "topology*.pdb"))
