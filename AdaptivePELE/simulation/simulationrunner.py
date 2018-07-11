@@ -15,7 +15,7 @@ from builtins import range
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
 from AdaptivePELE.atomset import atomset, RMSDCalculator
-from AdaptivePELE.utilities import utilities
+from AdaptivePELE.utilities import utilities, PDBLoader
 SKLEARN = True
 OPENMM = True
 try:
@@ -796,14 +796,17 @@ class MDSimulation(SimulationRunner):
         ligandPDB = self.extractLigand(initialStructures[0], resname, outputpath="")
         ligandmol2 = "%s.mol2" % resname
         ligandfrcmod = "%s.frcmod" % resname
-        Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.boxRadius, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
+        Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.waterBoxSize, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
         antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
         parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
         self.prepareLigand(antechamberDict, parmchkDict)
 
         for i, structure in enumerate(initialStructures):
             TleapControlFile = "tleap_equilibration_%d.in" % i
-            structure = self.preparePDB(i, structure, os.getcwd())
+            pdb = PDBLoader.PDBManager(structure, resname)
+            pdb.renumber(starting_number=1)
+            pdb.checkprotonation()
+            structure = pdb.writeAll(outputpath=os.getcwd(), outputname="initial_%d.pdb" % i)
             prmtop = os.path.join(workingdirectory, outputPathConstants.topologies, "system_%d.prmtop" % i)
             inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % i)
             finalPDB = os.path.join(workingdirectory, equilibrationOutput, "system_%d.pdb" % i)
@@ -843,34 +846,6 @@ class MDSimulation(SimulationRunner):
             print(err)
         endTime = time.time()
         print("System preparation took %.2f sec" % (endTime - startTime))
-
-    def preparePDB(self, structureNumber, PDBtoOpen, outputpath):
-        """
-        Corrects problems in the pdb such as CONECT and insertion codes
-
-        :param PDBtoOpen: string with the pdb to prepare
-        :type PDBtoOpen: str
-        :param outputPath: Path where the pdb is written
-        :type outputPath: str
-        """
-        outputPDB = os.path.join(outputpath, "initial_%d.pdb" % structureNumber)
-        currentResidueNumber = 0
-        newnumber = 0
-        with open(outputPDB, "w") as out:
-            with open(PDBtoOpen, "r") as inp:
-                for line in inp:
-                    if line.startswith("ATOM") or line.startswith("HETATM"):
-                        splitedLine = [line[:6], line[6:11], line[12:16], line[17:20], line[21], line[22:27],
-                                       line[30:38], line[38:46], line[46:54]]
-                        if splitedLine[5] != currentResidueNumber:
-                            newnumber += 1
-                            currentResidueNumber = splitedLine[5]
-                        splitedLine[5] = str(newnumber)
-                        out.write("%-6s%5s %4s %3s %s%4s    %8s%8s%8s\n" % tuple(splitedLine))
-                    elif line.startswith("TER"):
-                        newnumber = 0
-                        out.write("TER\n")
-        return outputPDB
 
     def extractLigand(self, PDBtoOpen, resname, outputpath):
         """
