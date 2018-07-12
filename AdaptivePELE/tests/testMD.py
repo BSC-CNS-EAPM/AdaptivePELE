@@ -22,6 +22,7 @@ class TestMD(unittest.TestCase):
         adaptiveSampling.main(controlFile)
         self.check_succesful_simulation(output_path, 2, 4)
         # cleanup
+        print("1")
         shutil.rmtree(output_path)
 
     def testOpenMM1ab1(self):
@@ -30,4 +31,25 @@ class TestMD(unittest.TestCase):
         adaptiveSampling.main(controlFile)
         self.check_succesful_simulation(output_path, 2, 4)
         # cleanup
+        print("2")
+        shutil.rmtree(output_path)
+
+    def testRestartAt0(self):
+        output_path = "tests/data/openmm_restart_0"
+        controlFile = "tests/data/templetized_controlFile_restart_0_md.conf"
+        shutil.copytree("tests/data/restart_0", output_path)
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2, 4)
+        # cleanup
+        print("3")
+        shutil.rmtree(output_path)
+
+    def testRestartAt1(self):
+        output_path = "tests/data/openmm_restart_1"
+        controlFile = "tests/data/templetized_controlFile_restart_1_md.conf"
+        shutil.copytree("tests/data/restart_1", output_path)
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2, 4)
+        # cleanup
+        print("4")
         shutil.rmtree(output_path)

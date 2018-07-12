@@ -125,6 +125,8 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
         simulation.context.setPeriodicBoxVectors(*inpcrd.boxVectors)
     simulation.context.setPositions(inpcrd.positions)
     simulation.minimizeEnergy(maxIterations=parameters.minimizationIterations)
+    with open("/home/oriol/PycharmProjects/openMM_trials/debuguing.pdb", 'w') as fw:
+        app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)
     return simulation
 
 

@@ -26,7 +26,7 @@ def parse_args():
 def main(run, exclude):
     testSuite = unittest.TestSuite()
     if run is None:
-        run = ["at", "s", "th", "d", "c", "Ad", "md"]
+        run = ["at", "s", "th", "d", "c", "Ad", "MD"]
     to_run = set(run)-set(exclude)
 
     if "at" in to_run or "a" in to_run:
@@ -47,7 +47,7 @@ def main(run, exclude):
     if "Ad" in to_run or "a" in to_run:
         print("Will run integration tests")
         testSuite.addTest(unittest.makeSuite(tAdaptive.TestadaptiveSampling))
-    if "md" in to_run or "a" in to_run:
+    if "MD" in to_run or "a" in to_run:
         print("Will run integration tests with md")
         testSuite.addTest(unittest.makeSuite(tMD.TestMD))
 
