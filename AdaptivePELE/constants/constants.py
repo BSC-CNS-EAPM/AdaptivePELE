@@ -47,6 +47,7 @@ class AmberTemplates:
                     "$RESNAME = loadmol2 $MOL2\n" \
                     "loadamberparams $FRCMOD\n" \
                     "COMPLX = loadpdb $COMPLEX\n" \
+                    "$BONDS "\
                     "addions COMPLX Cl- 0\n" \
                     "solvatebox COMPLX TIP3PBOX $BOXSIZE\n" \
                     "saveamberparm COMPLX $PRMTOP $INPCRD\n" \

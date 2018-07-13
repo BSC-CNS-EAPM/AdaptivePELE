@@ -804,8 +804,7 @@ class MDSimulation(SimulationRunner):
         for i, structure in enumerate(initialStructures):
             TleapControlFile = "tleap_equilibration_%d.in" % i
             pdb = PDBLoader.PDBManager(structure, resname)
-            pdb.renumber(starting_number=1)
-            pdb.checkprotonation()
+            pdb.preparePDBforMD()
             structure = pdb.writeAll(outputpath=os.getcwd(), outputname="initial_%d.pdb" % i)
             prmtop = os.path.join(workingdirectory, outputPathConstants.topologies, "system_%d.prmtop" % i)
             inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % i)
@@ -814,6 +813,7 @@ class MDSimulation(SimulationRunner):
             Tleapdict["PRMTOP"] = prmtop
             Tleapdict["INPCRD"] = inpcrd
             Tleapdict["SOLVATED_PDB"] = finalPDB
+            Tleapdict["BONDS"] = pdb.getDisulphideBondsforTleapTemplate()
             self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
             self.runTleap(TleapControlFile)
             solvatedStrcutures.append(finalPDB)

@@ -1,4 +1,5 @@
 import os.path
+import numpy as np
 
 class PDBManager:
     """
@@ -12,6 +13,7 @@ class PDBManager:
         self.Other = Structure(parent=None, ID="other")
         self.POSITIONS = {"DBREF": 0, "IDCODE": 1, "ATOMNAME": 2, "RESNAME": 3, "CHAINID": 4, "RESNUMBER": 5,
                           "COORDX": 6, "COORDY": 7, "COORDZ": 8, "OCUPANCY": 9, "BFACTOR": 10}
+        self.bondedCYS = []
         self.loadPDB()
 
     def loadPDB(self):
@@ -30,8 +32,8 @@ class PDBManager:
                 line = line.rstrip()
                 if line.startswith("ATOM") or line.startswith("HETATM"):
                     columns = [line[:6].strip(), line[6:11].strip(), line[12:16].strip(), line[17:20].strip(),
-                            line[21].strip(), line[22:27].strip(), line[30:38].strip(), line[38:46].strip(),
-                            line[46:54].strip(), line[54:60].strip(), line[60:66].strip()]
+                               line[21].strip(), line[22:27].strip(), line[30:38].strip(), line[38:46].strip(),
+                               line[46:54].strip(), line[54:60].strip(), line[60:66].strip()]
 
                     if columns[self.POSITIONS["DBREF"]] == "ATOM" and currentStructureName != "protein":
                         currentStructureName = "protein"
@@ -60,10 +62,11 @@ class PDBManager:
                         currentResidueNumber = columns[self.POSITIONS["RESNUMBER"]]
                         currentResidueName = columns[self.POSITIONS["RESNAME"]]
                         currentResidue = Residue(currentChain, currentResidueName, currentResidueNumber)
-                    Atom(currentResidue, columns[self.POSITIONS["ATOMNAME"]], [columns[self.POSITIONS["COORDX"]],
-                                                                               columns[self.POSITIONS["COORDY"]],
-                                                                               columns[self.POSITIONS["COORDZ"]]],
-                         columns[self.POSITIONS["OCUPANCY"]], columns[self.POSITIONS["BFACTOR"]])
+                    Atom(currentResidue, columns[self.POSITIONS["ATOMNAME"]],[columns[self.POSITIONS["COORDX"]],
+                                                                              columns[self.POSITIONS["COORDY"]],
+                                                                              columns[self.POSITIONS["COORDZ"]]],
+                         columns[self.POSITIONS["OCUPANCY"]],
+                         columns[self.POSITIONS["BFACTOR"]])
 
     def writePDB(self, finalpdb, *args):
         """
@@ -106,6 +109,65 @@ class PDBManager:
                 residue.renumber(resnumber)
                 resnumber += 1
 
+    def joinChains(self):
+        # Tleap doesn't support chain identifiers
+        # This method unifies all the chains of the protein in one single chain
+        mainChain = self.Protein[0]
+        for chain in self.Protein[1:]:
+            mainChain.append(chain)
+            self.Protein.remove(chain)
+
+    def getDisulphideBondsforTleapTemplate(self):
+        tleapString = "bond COMPLX.%s.SG COMPLX.%s.SG\n"
+        bonds_to_return = []
+        for cys_pair in self.bondedCYS:
+            bonds_to_return.append(tleapString % (cys_pair[0].num, cys_pair[1].num))
+        return "".join(bonds_to_return)
+
+    def loadDisulphideBonds(self):
+        cysteines = {}
+        cheked_cys = set()
+        for chain in self.Protein:
+            for residue in chain:
+                if residue.id == "CYS" or residue.id == "CYX":
+                    for atom in residue:
+                        if atom.id == "SG":
+                            cysteines[residue] = atom.coords
+        for cystiene in cysteines:
+            cheked_cys.add(cystiene)
+            for cystiene_2 in cysteines:
+                if cystiene_2 not in cheked_cys:
+                    coords1 = np.array([float(x) for x in cysteines[cystiene]])
+                    coords2 = np.array([float(x) for x in cysteines[cystiene_2]])
+                    distance = np.linalg.norm(coords1-coords2)
+                    # 2.1 is the threshold for bonding
+                    if distance <= 2.1:
+                        self.bondedCYS.append((cystiene, cystiene_2))
+        self.renameBondedCysteines()
+
+    def renameBondedCysteines(self):
+        print(print("%d disulphide bounds found" % len(self.bondedCYS)))
+        for cys_pair in self.bondedCYS:
+            print("Disulphide bound between CYS number %s and CYS number %s" % (cys_pair[0].num, cys_pair[1].num))
+            for cys in cys_pair:
+                print("Cysteine number %s renamed to CYX" % cys.num)
+                cys.rename("CYX")
+
+    def preparePDBforMD(self):
+        """
+        Method that prepares the pdb to be used in adaptivePELE MD simulation
+
+        """
+        # Load the information of disulphidebonds
+        self.loadDisulphideBonds()
+        # check the protonation states of the histidines
+        self.checkprotonation()
+        # Make a unique chain for the protein to avoid problems with Tleap
+        # Because Tleap doesn't support chain ids
+        self.joinChains()
+        # Renumber the pdb to renumber properly the new chain and to remove insertion codes
+        self.renumber()
+
 
 class PDBase:
     """
@@ -125,6 +187,17 @@ class PDBase:
     def __iter__(self):
         for child in self.childs:
             yield child
+
+    def __getitem__(self, index):
+        return self.childs[index]
+
+    def append(self, target):
+        self.childs = self.childs + target.childs
+        for child in target:
+            child.parent = self
+
+    def remove(self, target):
+        self.childs.remove(target)
 
 
 class Structure(PDBase):
