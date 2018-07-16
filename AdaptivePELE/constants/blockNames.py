@@ -142,6 +142,9 @@ class SimulationParams:
     Temperature = "temperature"
     runningPlatform = "runningPlatform"
     minimizationIterations = "minimizationIterations"
+    repoterfreq = "reporterFrequency"
+    productionLength = "productionLength"
+    waterBoxSize = "WaterBoxSize"
 
 
 class ExitConditionType:

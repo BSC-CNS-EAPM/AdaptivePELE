@@ -795,7 +795,7 @@ cdef class PDB:
         if self.ispdb:
             return self.pdb
         else:
-            return "".join([u"MODEL %d\n" % model_num, self.pdb, u"ENDMDL\n", u"END\n"])
+            return "".join([u"MODEL    %4d\n" % model_num, self.pdb, u"ENDMDL\n", u"END\n"])
 
     def writePDB(self, basestring path, int model_num=1):
         """
@@ -808,10 +808,11 @@ cdef class PDB:
         cdef object fileHandle, atom
         if self.ispdb:
             with open(path, 'w', encoding="utf-8") as fileHandle:
-                fileHandle.write(self.pdb)
+                # in old simulations it will fail without the unicode
+                fileHandle.write(unicode(self.pdb))
         else:
             with open(path, 'w', encoding="utf-8") as fileHandle:
-                fileHandle.write(u"MODEL %d\n" % model_num)
+                fileHandle.write(u"MODEL    %4d\n" % model_num)
                 fileHandle.write(self.pdb)
                 fileHandle.write(u"ENDMDL\n")
                 fileHandle.write(u"END\n")

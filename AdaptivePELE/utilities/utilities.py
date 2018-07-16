@@ -33,6 +33,13 @@ class Topology:
         # {0: [t1, t2.. tM], 1: [t2, t3, t4, t4...]}
         self.topologyMap = {}
 
+    def __getitem__(self, key):
+        return self.topologies[key]
+
+    def __iter__(self):
+        for top in self.topologies:
+            yield top
+
     def cleanTopologies(self):
         """
             Remove the written topology files
@@ -80,6 +87,30 @@ class Topology:
         """
         return self.topologies[self.topologyMap[epoch][trajectory_number-1]]
 
+    def getTopologyFromIndex(self, index):
+        """
+            Get the topology for a particular index
+
+            :param index: Index of the trajectory of interest
+            :type index: int
+
+            :returns: list -- List with topology information
+        """
+        return self.topologies[index]
+
+    def getTopologyIndex(self, epoch, trajectory_number):
+        """
+            Get the topology index for a particular epoch and trajectory number
+
+            :param epoch: Epoch of the trajectory of interest
+            :type epoch: int
+            :param trajectory_number: Number of the trajectory to select
+            :type trajectory_number: int
+
+            :returns: int -- Index of the corresponding topology
+        """
+        return self.topologyMap[epoch][trajectory_number-1]
+
     def writeMappingToDisk(self, epochDir, epoch):
         """
             Write the topology mapping to disk
@@ -101,7 +132,7 @@ class Topology:
         """
         try:
             with open(epochDir+"/topologyMapping.txt") as f:
-                self.topologyMap[epoch] = map(int, f.read().rstrip().split(':'))
+                self.topologyMap[epoch] = list(map(int, f.read().rstrip().split(':')))
         except IOError:
             sys.stderr.write("WARNING: topologyMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
 
@@ -185,6 +216,16 @@ def getTrajNum(trajFilename):
     """
     return int(trajFilename.split("_")[-1][:-4])
 
+def getPrmtopNum(prmtopFilename):
+    """
+        Gets the prmtop number
+
+        :param trajFilename: prmtop filename
+        :type trajFilename: str
+
+        :returns: int -- prmtop number
+    """
+    return int(prmtopFilename.split("_")[-1][:-7])
 
 def calculateContactMapEigen(contactMap):
     """
@@ -533,7 +574,7 @@ def convert_trajectory_to_pdb(trajectory, topology, output, output_folder):
             conf = traj.slice(i, copy=False)
             PDB = atomset.PDB()
             PDB.initialise(conf, topology=topology_contents)
-            fw.write("MODEL %d\n" % (i+1))
+            fw.write("MODEL     %4d\n" % (i+1))
             fw.write(PDB.pdb)
             fw.write("ENDMDL\n")
         fw.write("END\n")

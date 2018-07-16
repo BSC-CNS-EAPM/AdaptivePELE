@@ -495,7 +495,7 @@ class Cluster:
             :param path: Filename of the file to write
             :type path: str
         """
-        self.pdb.writePDB(str(path))
+        self.pdb.writePDB(path)
 
     def getContacts(self):
         """
@@ -517,11 +517,11 @@ class Cluster:
         """
         if not self.altSelection or self.altStructure.sizePQ() == 0:
             print("cluster center")
-            self.pdb.writePDB(str(path))
+            self.pdb.writePDB(path)
             return self.trajPosition
         else:
             spawnStruct, trajPosition = self.altStructure.altSpawnSelection((self.elements, self.pdb))
-            spawnStruct.writePDB(str(path))
+            spawnStruct.writePDB(path)
             if trajPosition is None:
                 trajPosition = self.trajPosition
             return trajPosition
@@ -913,7 +913,10 @@ class Clustering:
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
-                metrics = np.loadtxt(reportFilename, ndmin=2)
+                # metrics = np.loadtxt(reportFilename, ndmin=2)
+                metrics = np.genfromtxt(reportFilename, missing_values="--", filling_values=0)
+                if len(metrics.shape) < 2:
+                    metrics = metrics[np.newaxis, :]
 
                 for num, snapshot in enumerate(snapshots):
                     if ignoreFirstRow and num == 0:
@@ -1133,7 +1136,7 @@ class Clustering:
             pathwayFile.write("REMARK 000 List of cluster belonging to the pathway %s\n" % ' '.join(map(str, pathway)))
             for i, step_cluster in enumerate(pathway):
                 cluster = self.clusters.clusters[step_cluster]
-                pathwayFile.write("MODEL %d\n" % (i+1))
+                pathwayFile.write("MODEL    %4d\n" % (i+1))
                 pdbStr = cluster.pdb.get_pdb_string()
                 pdbList = pdbStr.split("\n")
                 for line in pdbList:

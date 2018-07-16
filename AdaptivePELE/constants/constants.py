@@ -47,11 +47,14 @@ class AmberTemplates:
                     "$RESNAME = loadmol2 $MOL2\n" \
                     "loadamberparams $FRCMOD\n" \
                     "COMPLX = loadpdb $COMPLEX\n" \
+                    "$BONDS "\
                     "addions COMPLX Cl- 0\n" \
                     "solvatebox COMPLX TIP3PBOX $BOXSIZE\n" \
                     "saveamberparm COMPLX $PRMTOP $INPCRD\n" \
                     "savepdb COMPLX $SOLVATED_PDB\n" \
                     "quit"
+    trajectoryTemplate = "trajectory_%d.dcd"
+    CheckPointReporterTemplate = "checkpoint_%d.chk"
 
 
 class OutputPathConstants():
@@ -63,6 +66,7 @@ class OutputPathConstants():
         self.epochOutputPathTempletized = ""
         self.clusteringOutputDir = ""
         self.clusteringOutputObject = ""
+        self.equilibrationDir = ""
         self.tmpInitialStructuresTemplate = ""
         self.tmpControlFilename = ""
         self.tmpInitialStructuresEquilibrationTemplate = ""
@@ -82,6 +86,7 @@ class OutputPathConstants():
         self.clusteringOutputDir = os.path.join(self.epochOutputPathTempletized, "clustering")
         self.clusteringOutputObject = os.path.join(self.clusteringOutputDir, "object.pkl")
         self.topologies = os.path.join(outputPath, "topologies")
+        self.equilibrationDir = os.path.join(outputPath, "equilibration")
 
     def buildTmpFolderConstants(self, tmpFolder):
         self.tmpInitialStructuresTemplate = tmpFolder+"/initial_%d_%d.pdb"

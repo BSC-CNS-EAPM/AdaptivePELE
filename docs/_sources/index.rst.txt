@@ -15,6 +15,14 @@ code is publicly available in `GitHub <https://github.com/AdaptivePELE/AdaptiveP
     :align: center
     :alt: image trouble
 
+Contributors
+============
+`Daniel Lecina <https://github.com/lecina>`_, `Joan Francesc Gilabert <https://github.com/cescgina>`_, `Oriol Gracia <https://github.com/OriolGraCar>`_, `Daniel Soler <https://github.com/danielSoler93>`_
+
+Mantainer
+---------
+Joan Francesc Gilabert (cescgina@gmail.com)
+
 Contents
 ========
 
