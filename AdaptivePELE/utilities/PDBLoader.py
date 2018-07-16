@@ -146,7 +146,7 @@ class PDBManager:
         self.renameBondedCysteines()
 
     def renameBondedCysteines(self):
-        print(print("%d disulphide bounds found" % len(self.bondedCYS)))
+        print("%d disulphide bounds found" % len(self.bondedCYS))
         for cys_pair in self.bondedCYS:
             print("Disulphide bound between CYS number %s and CYS number %s" % (cys_pair[0].num, cys_pair[1].num))
             for cys in cys_pair:
