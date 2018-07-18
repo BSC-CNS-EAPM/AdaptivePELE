@@ -383,24 +383,6 @@ such simulation for every initial structure</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.preparePDB">
-<code class="descname">preparePDB</code><span class="sig-paren">(</span><em>structureNumber</em>, <em>PDBtoOpen</em>, <em>outputpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.preparePDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.preparePDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Corrects problems in the pdb such as CONECT and insertion codes</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>PDBtoOpen</strong> (<em>str</em>) – string with the pdb to prepare</li>
-<li><strong>outputPath</strong> (<em>str</em>) – Path where the pdb is written</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.runSimulation">
 <code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -609,6 +591,20 @@ the cluster with max SASA</p>
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.getWorkingProcessors">
 <code class="descname">getWorkingProcessors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.getWorkingProcessors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getWorkingProcessors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the number of working processors, i.e. number of trajectories</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.runEquilibrationPELE">
+<code class="descname">runEquilibrationPELE</code><span class="sig-paren">(</span><em>runningControlFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.runEquilibrationPELE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runEquilibrationPELE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a short PELE equilibration simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>runningControlFile</strong> (<em>str</em>) – Path of the control file to run</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">

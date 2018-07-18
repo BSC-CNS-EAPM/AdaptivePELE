@@ -14,9 +14,19 @@ from AdaptivePELE.constants import constants
 
 
 class CustomStateDataReporter(app.StateDataReporter):
+    """
+    New version of the StateDataReporter class that allows to append the md information to the last trajectory file
+    It has two new parameters: (append: bool, and initialStep: int). The first controls if the header has to be written
+    again and the second is the last step that was successfully done in the previous run.
+    """
     # Added two new parameters append and intialsteps to properly handle the report file when the simulation is restarted
     def __init__(self, file, reportInterval, step=False, time=False, potentialEnergy=False, kineticEnergy=False, totalEnergy=False, temperature=False, volume=False, density=False,
                  progress=False, remainingTime=False, speed=False, elapsedTime=False, separator=',', systemMass=None, totalSteps=None, append=False, initialStep=0):
+
+        # This new class doesn't properly support progress information. Because to do the restart it assumes that
+        # the first column has the step information, which is True as long as the progress value is False.
+
+        progress = False
         app.StateDataReporter.__init__(self, file, reportInterval, step, time, potentialEnergy, kineticEnergy, totalEnergy, temperature, volume, density,
                  progress, remainingTime, speed, elapsedTime, separator, systemMass, totalSteps)
         self._append = append
@@ -35,7 +45,7 @@ class CustomStateDataReporter(app.StateDataReporter):
         if not self._hasInitialized:
             self._initializeConstants(simulation)
             headers = self._constructHeaders()
-            # extra line added to avoid printing the header again when the simulation is restarted
+            # Extra line added to avoid printing the header again when the simulation is restarted
             if not self._append:
                 print('#"%s"' % ('"' + self._separator + '"').join(headers), file=self._out)
             try:
@@ -75,7 +85,13 @@ def runEquilibration(equilibrationFiles, outputPDB, parameters, worker):
 
         :param equilibrationFiles: tuple with the topology (prmtop) in the first position and the coordinates
         in the second (inpcrd)
+        :type equilibrationFiles: tuple
         :param outputPDB: string with the pdb to save
+        :type outputPDB: str
+        :param parameters: Object with the parameters for the simulation
+        :type parameters: :py:class:`/simulationrunner/SimulationParameters` -- SimulationParameters object
+        :param worker: Number of the subprocess
+        :type worker: int
 
         :returns: str -- a string with the outputPDB
     """
@@ -102,6 +118,22 @@ def runEquilibration(equilibrationFiles, outputPDB, parameters, worker):
 
 
 def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
+    """
+    Function that runs a minimization of the system
+    it uses the VerletIntegrator and applys to the heavy atoms of the
+    protein and ligand.
+
+    :param prmtop: OpenMM Topology object
+    :param inpcrd: OpenMM Positions object
+    :param PLATFORM: platform in which the minimization will run
+    :type PLATFORM: str
+    :param constraints: strength of the constrain (units: Kcal/mol)
+    :type constraints: int
+    :param parameters: Object with the parameters for the simulation
+    :type parameters: :py:class:`/simulationrunner/SimulationParameters` -- SimulationParameters object
+
+    :return: The minimized OpenMM simulation object
+    """
     # Thermostat
     system = prmtop.createSystem(nonbondedMethod=app.PME,
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms, constraints=app.HBonds)
@@ -129,6 +161,26 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
 
 
 def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, velocities=None):
+    """
+    Function that runs an equilibration at constant volume conditions.
+    It uses the AndersenThermostat, the VerletIntegrator and
+    applys constrains to the heavy atoms of the protein and ligands
+
+    :param topology: OpenMM Topology object
+    :param positions: OpenMM Positions object
+    :param PLATFORM: platform in which the minimization will run
+    :type PLATFORM: str
+    :param simulation_steps: number of steps to run
+    :type simulation_steps: int
+    :param constraints: strength of the constrain (units: Kcal/mol)
+    :type constraints: int
+    :param parameters: Object with the parameters for the simulation
+    :type parameters: :py:class:`/simulationrunner/SimulationParameters` -- SimulationParameters object
+    :param velocities: OpenMM object with the velocities of the system. Optional, if velocities are not given,
+    random velocities acording to the temperature will be used.
+
+    :return: The equilibrated OpenMM simulation object
+    """
     system = topology.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                    constraints=app.HBonds)
@@ -155,6 +207,26 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 
 
 def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, velocities=None):
+    """
+    Function that runs an equilibration at constant pressure conditions.
+    It uses the AndersenThermostat, the VerletIntegrator, the MonteCarlo Barostat and
+    apply's constrains to the backbone of the protein and to the heavy atoms of the ligand
+
+    :param topology: OpenMM Topology object
+    :param positions: OpenMM Positions object
+    :param PLATFORM: platform in which the minimization will run
+    :type PLATFORM: str
+    :param simulation_steps: number of steps to run
+    :type simulation_steps: int
+    :param constraints: strength of the constrain (units: Kcal/mol)
+    :type constraints: int
+    :param parameters: Object with the parameters for the simulation
+    :type parameters: :py:class:`/simulationrunner/SimulationParameters` -- SimulationParameters object
+    :param velocities: OpenMM object with the velocities of the system. Optional, if velocities are not given,
+    random velocities acording to the temperature will be used.
+
+    :return: The equilibrated OpenMM simulation object
+    """
     system = topology.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                    constraints=app.HBonds)
@@ -181,7 +253,31 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     return simulation
 
 
-def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, restart=False):
+def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, restart=False):
+    """
+    Functions that runs the production run at NVT conditions.
+    Ff a boxcenter is defined in the parameters section, Flat-bottom harmonic restrains will be applied to the ligand
+
+    :param equilibrationFiles: Tuple with the paths for the Amber topology file (prmtop) and the pdb for the system
+    :type equilibrationFiles: Tuple
+    :param workerNumber: Number of the subprocess
+    :type workerNumber: int
+    :param outputDir: path to the directory where the output will be written
+    :type outputDir: str
+    :param seed: Seed to use to generate the random numbers
+    :type seed: int
+    :param parameters: Object with the parameters for the simulation
+    :type parameters: :py:class:`/simulationrunner/SimulationParameters` -- SimulationParameters object
+    :param reportFileName: Name for the file where the energy report will be written
+    :type reportFileName: str
+    :param checkpoint: Path to the checkpoint from where the production run will be restarted (Optional)
+    :type checkpoint: str
+    :param ligandName: Code Name for the ligand
+    :type ligandName: str
+    :param restart: Whether the simulation run has to be restarted or not
+    :type restart: bool
+
+    """
     prmtop, pdb = equilibrationFiles
     prmtop = app.AmberPrmtopFile(prmtop)
     DCDrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
@@ -199,6 +295,18 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
                                  constraints=app.HBonds)
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+    if parameters.boxCenter:
+        # Harmonic flat-bottom restrain for the ligand
+        force = mm.CustomExternalForce('step(r-r0) * (k/2) * (r-r0)^2; r=sqrt((x-b0)^2+(y-b1)^2+(z-b2)^2)')
+        force.addGlobalParameter("k", 5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2)
+        force.addGlobalParameter("r0", parameters.boxRadius)
+        force.addGlobalParameter("b0", parameters.boxCenter[0])
+        force.addGlobalParameter("b1", parameters.boxCenter[1])
+        force.addGlobalParameter("b2", parameters.boxCenter[2])
+        for j, atom in enumerate(prmtop.topology.atoms()):
+            if atom.residue.name == ligandName:
+                force.addParticle(j, [])
+        system.addForce(force)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
     simulation.context.setPositions(pdb.positions)
 
@@ -225,6 +333,13 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
 
 
 def getLastStep(reportfile):
+    """
+    Function that given a MD report file extracts the last step that was properly done
+
+    :param reportfile: reportfile with the previous md simulation
+    :type reportfile: str
+    :return: The number of the last step that was successfully done
+    """
     try:
         with open(reportfile, "r") as inp:
             report = inp.read()

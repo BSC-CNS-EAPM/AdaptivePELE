@@ -725,7 +725,7 @@ class PeleSimulation(SimulationRunner):
             :type tmpInitialStructuresTemplate: str
             :param iteration: Epoch number
             :type iteration: int
-            :param equilibration: Flag to mark wether the complexes are part of an
+            :param equilibration: Flag to mark whether the complexes are part of an
                 equilibration run
             :type equilibration: bool
 
@@ -768,6 +768,8 @@ class MDSimulation(SimulationRunner):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure
+            (some of the arguments are not needed, such as (reportFilename, outputPath and topology) but they are kept
+            to follow the same structure has the Super class definition)
 
             :param initialStructures: Name of the initial structures to copy
             :type initialStructures: list of str
@@ -836,14 +838,22 @@ class MDSimulation(SimulationRunner):
         return newInitialStructures
 
     def runTleap(self, TleapControlFile):
+        """
+        Method that runs the Tleap software form Ambertools
+
+        :param TleapControlFile: Path to the Tleap.in file
+        :type TleapControlFile: str
+
+        """
         tleapCommand = "tleap -f %s" % TleapControlFile
         print("System Preparation")
         startTime = time.time()
-        proc = subprocess.Popen(tleapCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        proc = subprocess.Popen(tleapCommand, stdout=subprocess.PIPE,  stderr=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
         print(out)
         if err:
-            print(err)
+            print("Error Found: %s" % err)
+            raise utilities.UnsatisfiedDependencyException("Error Runing Tleap. Please check your installation of Ambertools.")
         endTime = time.time()
         print("System preparation took %.2f sec" % (endTime - startTime))
 
@@ -883,17 +893,19 @@ class MDSimulation(SimulationRunner):
         parmchkCommand = parmchkCommand.substitute(parmchkDict)
         print(antechamberCommand)
         startTime = time.time()
-        proc = subprocess.Popen(antechamberCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        proc = subprocess.Popen(antechamberCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
         print(out)
         if err:
-            print(err)
+            print("Error Found: %s" % err)
+            raise utilities.UnsatisfiedDependencyException("Error Runing Antechamber. Please check your installation of Ambertools.")
         print(parmchkCommand)
-        proc = subprocess.Popen(parmchkCommand, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        proc = subprocess.Popen(parmchkCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
         print(out)
         if err:
-            print(err)
+            print("Error Found: %s" % err)
+            raise utilities.UnsatisfiedDependencyException("Error Runing Parmchk2. Please check your installation of Ambertools.")
         endTime = time.time()
         print("Ligand preparation took %.2f sec" % (endTime - startTime))
 
@@ -924,7 +936,7 @@ class MDSimulation(SimulationRunner):
             if self.restart:
                 checkpoint = checkpoints[utilities.getTrajNum(startingFiles[1])]
             workerNumber = i + 1
-            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.restart)))
+            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint,self.ligandName, self.restart)))
         for worker in workers:
             worker.get()
         endTime = time.time()
@@ -1162,6 +1174,8 @@ class RunnerBuilder:
             params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
             params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
             params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 4000)
+            params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
