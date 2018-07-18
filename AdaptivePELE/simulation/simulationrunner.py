@@ -725,7 +725,7 @@ class PeleSimulation(SimulationRunner):
             :type tmpInitialStructuresTemplate: str
             :param iteration: Epoch number
             :type iteration: int
-            :param equilibration: Flag to mark wether the complexes are part of an
+            :param equilibration: Flag to mark whether the complexes are part of an
                 equilibration run
             :type equilibration: bool
 
@@ -768,6 +768,8 @@ class MDSimulation(SimulationRunner):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure
+            (some of the arguments are not needed, such as (reportFilename, outputPath and topology) but they are kept
+            to follow the same structure has the Super class definition)
 
             :param initialStructures: Name of the initial structures to copy
             :type initialStructures: list of str
