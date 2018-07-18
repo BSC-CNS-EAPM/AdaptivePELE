@@ -181,7 +181,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     return simulation
 
 
-def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, restart=False):
+def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, restart=False):
     prmtop, pdb = equilibrationFiles
     prmtop = app.AmberPrmtopFile(prmtop)
     DCDrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
@@ -199,6 +199,17 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
                                  constraints=app.HBonds)
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+    if parameters.boxCenter:
+        force = mm.CustomExternalForce('step(r-r0) * (k/2) * (r-r0)^2; r=sqrt((x-b0)^2+(y-b1)^2+(z-b2)^2)')
+        force.addGlobalParameter("k", 5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2)
+        force.addGlobalParameter("r0", parameters.boxRadius)
+        force.addGlobalParameter("b0", parameters.boxCenter[0])
+        force.addGlobalParameter("b1", parameters.boxCenter[1])
+        force.addGlobalParameter("b2", parameters.boxCenter[2])
+        for j, atom in enumerate(prmtop.topology.atoms()):
+            if atom.residue.name == ligandName:
+                force.addParticle(j, [])
+        system.addForce(force)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
     simulation.context.setPositions(pdb.positions)
 
