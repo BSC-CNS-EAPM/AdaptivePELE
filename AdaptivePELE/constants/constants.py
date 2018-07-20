@@ -44,6 +44,7 @@ class AmberTemplates:
     tleapTemplate = "source oldff/leaprc.ff99SB\n" \
                     "source leaprc.gaff\n" \
                     "source leaprc.water.tip3p\n" \
+                    "$MODIFIED_RES " \
                     "$RESNAME = loadmol2 $MOL2\n" \
                     "loadamberparams $FRCMOD\n" \
                     "COMPLX = loadpdb $COMPLEX\n" \

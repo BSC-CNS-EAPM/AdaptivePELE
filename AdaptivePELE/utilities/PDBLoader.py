@@ -1,11 +1,38 @@
 from __future__ import print_function
 import os.path
 import numpy as np
+import AdaptivePELE.constants
+
+
+class PDBLoadException(Exception):
+    __module__ = Exception.__module__
+
 
 class PDBManager:
     """
     Class that loads and processes a given pdb file
     """
+
+    VALID_RESNAMES = {"ALA", "ARG", "ASH", "ASN", "ASP", "CYM", "CYS", "CYX", "GLH", "GLN", "GLU", "GLY",
+                      "HID", "HIE", "HIP", "ILE", "LEU", "LYN", "LYS", "MET", "PHE", "PRO", "SER", "THR",
+                      "TRP", "TYR", "VAL", "CALA", "CARG", "CASN", "CASP", "CCYS", "CCYX", "CGLN", "CGLU",
+                      "CGLY", "CHID", "CHIE", "CHIP", "CILE", "CLEU", "CLYS", "CMET", "CPHE", "CPRO", "CSER",
+                      "CTHR", "CTRP", "CTYR", "CVAL", "NHE", "NME", "ACE", "NALA", "NARG", "NASN", "NASP",
+                      "NCYS", "NCYX", "NGLN", "NGLU", "NGLY", "NHID", "NHIE", "NHIP", "NILE", "NLEU", "NLYS",
+                      "NMET", "NPHE", "NPRO", "NSER", "NTHR", "NTRP", "NTYR", "NVAL", "HIS"}
+
+    VALID_NUCLEIC = {"DA", "DA3", "DA5", "DAN", "DC", "DC3", "DC5", "DCN", "DG", "DG3", "DG5", "DGN", "DT",
+                     "DT3", "DT5", "DTN", "RA", "RA3", "RA5", "RAN", "RC", "RC3", "RC5", "RCN", "RG", "RG3",
+                     "RG5", "RGN", "RU", "RU3", "RU5", " RUN"}
+
+    VALID_ION = {"AG", "AL", "Ag", "BA", "BR", "Be", "CA", "CD", "CE", "CL", "CO", "CR", "CS", "CU", "CU1",
+                 "Ce", "Cl-", "Cr", "Dy", "EU", "EU3", "Er", "F", "FE", "FE2", "GD3", "H3O+", "HE+", "HG",
+                 "HZ+", "Hf", "IN", "IOD", "K", "K+", "LA", "LI", "LU", "MG", "MN", "NA", "NH4", "NI", "Na+",
+                 "Nd", "PB", "PD", "PR", "PT", "Pu", "RB", "Ra", "SM", "SR", "Sm", "Sn", "TB", "TL", "Th",
+                 "Tl", "Tm", "U4+", "V2+", "Y", "YB2", "ZN", "Zr"}
+
+    VALID_MODIFIED_RES = {"SEP", "TPO", "TYP"}
+
     def __init__(self, PDBtoLoad, resname):
         self.PDBtoLoad = PDBtoLoad
         self.resname = resname
@@ -15,7 +42,18 @@ class PDBManager:
         self.POSITIONS = {"DBREF": 0, "IDCODE": 1, "ATOMNAME": 2, "RESNAME": 3, "CHAINID": 4, "RESNUMBER": 5,
                           "COORDX": 6, "COORDY": 7, "COORDZ": 8, "OCUPANCY": 9, "BFACTOR": 10}
         self.bondedCYS = []
+        self.modified_res = set()
+        self.AtomTemplates = self.loadTemplates()
         self.loadPDB()
+
+    def loadTemplates(self):
+        templates_dict = {}
+        template = os.path.join("".join(AdaptivePELE.constants.__path__), "MDtemplates/Template_PDB")
+        with open(template, "r") as temp:
+            for line in temp:
+                line = line.split()
+                templates_dict.setdefault(line[0], set()).add(line[1])
+        return templates_dict
 
     def loadPDB(self):
         """
@@ -25,9 +63,7 @@ class PDBManager:
             currentStructure = None
             currentChain = None
             currentResidue = None
-            currentStructureName = ''
             currentChainName = ''
-            currentResidueName = ''
             currentResidueNumber = ''
             for line in inp:
                 line = line.rstrip()
@@ -36,24 +72,40 @@ class PDBManager:
                                line[21].strip(), line[22:27].strip(), line[30:38].strip(), line[38:46].strip(),
                                line[46:54].strip(), line[54:60].strip(), line[60:66].strip()]
 
-                    if columns[self.POSITIONS["DBREF"]] == "ATOM" and currentStructureName != "protein":
-                        currentStructureName = "protein"
-                        currentStructure = self.Protein
-                        currentChainName = columns[self.POSITIONS["CHAINID"]]
-                        currentChain = Chain(currentStructure, currentChainName)
+                    if columns[self.POSITIONS["OCUPANCY"]]:
+                        if float(columns[self.POSITIONS["OCUPANCY"]]) < 1:
+                            if len(columns[self.POSITIONS["RESNAME"]]) > 3:
+                                columns[self.POSITIONS["RESNAME"]] = columns[self.POSITIONS["RESNAME"]][1:]
 
-                    elif columns[self.POSITIONS["DBREF"]] == "HETATM":
-                        if columns[self.POSITIONS["RESNAME"]] == self.resname:
-                            if currentStructureName != self.resname:
-                                currentStructureName = self.resname
+                    if columns[self.POSITIONS["RESNAME"]] in self.VALID_RESNAMES:
+                        if currentStructure != self.Protein:
+                            currentStructure = self.Protein
+                            currentChainName = columns[self.POSITIONS["CHAINID"]]
+                            currentChain = Chain(currentStructure, currentChainName)
+
+                    elif columns[self.POSITIONS["RESNAME"]] in self.VALID_MODIFIED_RES:
+                        self.modified_res.add(columns[self.POSITIONS["RESNAME"]])
+                        if currentStructure != self.Protein:
+                            currentStructure = self.Protein
+                            currentChainName = columns[self.POSITIONS["CHAINID"]]
+                            currentChain = Chain(currentStructure, currentChainName)
+
+                    elif columns[self.POSITIONS["RESNAME"]] == self.resname:
+                        if currentStructure != self.Ligand:
                                 currentStructure = self.Ligand
                                 currentChainName = columns[self.POSITIONS["CHAINID"]]
                                 currentChain = Chain(currentStructure, currentChainName)
-                        elif currentStructureName != "other":
+
+                    elif columns[self.POSITIONS["RESNAME"]] in self.VALID_ION or columns[self.POSITIONS["RESNAME"]]\
+                            in ["WAT", "HOH"] or columns[self.POSITIONS["RESNAME"]] in self.VALID_NUCLEIC:
+                        if currentStructure != self.Other:
                             currentStructure = self.Other
-                            currentStructureName = "other"
                             currentChainName = columns[self.POSITIONS["CHAINID"]]
                             currentChain = Chain(currentStructure, currentChainName)
+
+                    else:
+                        raise PDBLoadException("Residue %s of Chain %s is not in templates" % (columns[self.POSITIONS["RESNAME"]],
+                                                                              columns[self.POSITIONS["CHAINID"]]))
 
                     if currentChainName != columns[self.POSITIONS["CHAINID"]]:
                         currentChainName = columns[self.POSITIONS["CHAINID"]]
@@ -61,8 +113,8 @@ class PDBManager:
 
                     if currentResidueNumber != columns[self.POSITIONS["RESNUMBER"]]:
                         currentResidueNumber = columns[self.POSITIONS["RESNUMBER"]]
-                        currentResidueName = columns[self.POSITIONS["RESNAME"]]
-                        currentResidue = Residue(currentChain, currentResidueName, currentResidueNumber)
+                        currentResidue = Residue(currentChain, columns[self.POSITIONS["RESNAME"]], currentResidueNumber)
+
                     Atom(currentResidue, columns[self.POSITIONS["ATOMNAME"]],[columns[self.POSITIONS["COORDX"]],
                                                                               columns[self.POSITIONS["COORDY"]],
                                                                               columns[self.POSITIONS["COORDZ"]]],
@@ -98,7 +150,7 @@ class PDBManager:
         return finalpdb
 
     def checkprotonation(self):
-        print("Checking the Histidine protonation State for pdb %s" % self.PDBtoLoad)
+        print("Checking the Histidine protonation State")
         for chain in self.Protein:
             for residue in chain:
                 residue.checkHISProtonationState()
@@ -154,11 +206,41 @@ class PDBManager:
                 print("Cysteine number %s renamed to CYX" % cys.num)
                 cys.rename("CYX")
 
+    def checkMissingAtoms(self):
+        for chain in self.Protein:
+            for residue in chain:
+                if residue.id in self.AtomTemplates:
+                    atomsNames = set(residue.getChildNames())
+                    templateAtoms = self.AtomTemplates[residue.id]
+                    extra_atoms = atomsNames.difference(templateAtoms)
+                    missing_atoms = templateAtoms.difference(atomsNames)
+                    for atom in extra_atoms:
+                        if atom != "OXT" and "H" not in atom:
+                            raise PDBLoadException("ERROR: Atom %s of Residue %s in chain %s not in Templates" % (atom, residue.id, chain.id))
+                    for atom in missing_atoms:
+                        print("Warning: Residue %s of chain %s doesn't have the Atom %s" %(residue.id, chain.id, atom))
+
+    def getModifiedResiduesTleapTemplate(self):
+        templatespath = os.path.join("".join(AdaptivePELE.constants.__path__), "MDtemplates/amber_%s.lib")
+        tleapString = "loadoff %s\n" % templatespath
+        stringToReturn = []
+        for res in self.modified_res:
+            stringToReturn.append(tleapString % res)
+        return "".join(stringToReturn)
+
+    def correctAlternativePositions(self):
+        All = (self.Protein, self.Ligand, self.Other)
+        for structure in All:
+            for chain in structure:
+                for residue in chain:
+                    residue.alternativepositions()
+
     def preparePDBforMD(self):
         """
         Method that prepares the pdb to be used in adaptivePELE MD simulation
 
         """
+        self.correctAlternativePositions()
         # Load the information of disulphidebonds
         self.loadDisulphideBonds()
         # check the protonation states of the histidines
@@ -168,6 +250,8 @@ class PDBManager:
         self.joinChains()
         # Renumber the pdb to renumber properly the new chain and to remove insertion codes
         self.renumber()
+        # check for missing atoms
+        self.checkMissingAtoms()
 
 
 class PDBase:
@@ -192,6 +276,9 @@ class PDBase:
     def __getitem__(self, index):
         return self.childs[index]
 
+    def getChildNames(self):
+        return [child.id for child in self.childs]
+
     def append(self, target):
         self.childs = self.childs + target.childs
         for child in target:
@@ -214,8 +301,18 @@ class Chain(PDBase):
 class Residue(PDBase):
     def __init__(self, parent, ID, number):
         PDBase.__init__(self, parent, ID)
-        self.num = number
+        self.num, self.insertionCode = self.set_number(number)
         self.setHirearchy()
+
+    def set_number(self, number):
+        insertion = None
+        try:
+            num = int(number)
+        except ValueError:
+            num = int(number[:-1])
+            insertion = number[-1]
+        return num, insertion
+
 
     def checkHISProtonationState(self):
         """
@@ -241,6 +338,32 @@ class Residue(PDBase):
     def renumber(self, new_number):
         self.num = new_number
 
+    def alternativepositions(self):
+        atomsToRemove = []
+        alternativepositions = {}
+        for atom in self:
+            if atom.ocupancy:
+                if atom.ocupancy < 1:
+                    alternativepositions.setdefault(atom.id, []).append(atom)
+        for key in alternativepositions:
+            bigger = 0
+            lastAtom = None
+            for value in alternativepositions[key]:
+                if lastAtom:
+                    if value.ocupancy > bigger:
+                        bigger = value.ocupancy
+                        atomsToRemove.append(lastAtom)
+                        lastAtom = value
+                    else:
+                        atomsToRemove.append(value)
+                else:
+                    bigger = value.ocupancy
+                    lastAtom = value
+        if len(atomsToRemove) > 0:
+            print("Alternative positions found on residue %s %s. Keeping the positions with higher occupancy" % (self.id, self.num))
+        for atom in atomsToRemove:
+            self.childs.remove(atom)
+
 
 class Atom(PDBase):
     def __init__(self, parent, ID, coordinates, ocupancy, Bfactor):
@@ -248,4 +371,6 @@ class Atom(PDBase):
         self.setHirearchy()
         self.coords = coordinates
         self.ocupancy = ocupancy
+        if self.ocupancy:
+            self.ocupancy = float(self.ocupancy)
         self.Bfactor = Bfactor
