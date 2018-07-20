@@ -61,7 +61,7 @@ structures.
         }
 
 
-generalParams block
+GeneralParams block
 -------------------
 
 These parameters control the general aspects of the simulation, such as the initial structures or the output path.
@@ -110,16 +110,16 @@ Example::
         "initialStructures" : ["initial1.pdb", "initial2.pdb"]
     }
 
-simulation block
+Simulation block
 -----------------
 
-Currently, there are two implemented simulation types: 
+Currently, there are three implemented simulation types: 
 
 * **pele**. `PELE <https://pele.bsc.es/pele.wt>`_ is a great tool to efficiently explore the energy landscape. Parameters have been optimized for its use.
 
 * **test**. The test type has no real use outside of testing. 
 
-We plan to implement an MD type in future versions.
+* **MD** Run molecular dynamics using the OpenMM [OPENMM]_ library.
 
 
 Templetized PELE control file
@@ -141,7 +141,7 @@ Optionally other fields might be templetized as well:
 
 * **radius**: The radius of the simulation box is templetized as ``"radius": $BOX_RADIUS``  
 
-parameters
+Parameters
 ..........
 
 When using PELE as a propagator, the following parameters are mandatory:
@@ -173,6 +173,32 @@ Optionally, you can also use the following parameters:
 * **numberEquilibrationStructures** (*int*, default=10): Number of clusters to
   obtain from the *equilibrationCluster* structure selection (see
   **equilibrationMode** for more details)
+
+When using MD as a progagator, the following parameters are mandatory:
+
+* **iterations** (*integer*, mandatory): Number of adaptive sampling iterations to run
+* **processors** (*integer*, mandatory): Number of processors to use
+* **productionLength** (*integer*, mandatory):  Number of time steps in a epoch (iteration)
+* **seed** (*integer*, mandatory): Seed for the random number generator
+* **reporterFrequency** (*integer*, mandatory): Frequency to write the report
+  and trajectories (in time steps, see **timeStep** property)
+
+Optionally, you can also use the following parameters:
+
+* **equilibrationLength** (*int*, default=50): Number of steps for the
+  equilibration run
+* **timeStep** (*float*, default=2): Value of the time step for the integration
+  (in femtoseconds)
+* **boxRadius** (*float*, default=8): Distance of the edge of the solvation box
+  from the closest atom
+* **ligandCharge** (*integer*, default=0): Charge of the ligand
+* **nonBondedCutoff** (*float*, default=8): Radius for the nonBonded cutoff of
+  the long-range interactions
+* **temperature** (*float*, default=300): Temperature of the simulation
+* **runningPlatform** (*str*, default="CPU"): Platform on which to run the
+  simulation, see openmm documentation for more details
+* **minimizationIterations** (*float*, default=2000): Number of time steps to
+  run the energy minimization
 
 Additionally, the block may have an exit condition that stops the execution:
 
@@ -231,7 +257,7 @@ Example of a minimal simulation block::
     }
 
 
-clustering block
+Clustering block
 ----------------
 
 Currently there are two functional types of clustering:
@@ -262,7 +288,7 @@ We encourage the use of default parameters with very few exceptions such as in t
 of the diffusion of ions or tiny molecules (e.g. a oxygen molecule).
 
 
-thresholdCalculator
+ThresholdCalculator
 ...................
 
 * **constant**, where all clusters have the same threshold. A sound value may be 3Å.
@@ -275,7 +301,7 @@ thresholdCalculator
   optimizes the number of clusters, giving more importance to regions with more contacts and interactions, 
   where metastability occurs. Default values: [2,3,4,5], default conditions: [1, 0.75, 0.5].
 
-rmsd clustering
+Rmsd clustering
 ...............
 
 In the **rmsd** clustering, if the RMSD between two ligand conformations is less than 
@@ -283,7 +309,7 @@ a certain threshold, the conformation is added to the cluster, and otherwise, a 
 is generated.
 
 
-contactMap clustering
+ContactMap clustering
 .....................
 
 The **contactMap** uses the similarity between protein-ligand contact maps.
@@ -298,7 +324,7 @@ There are currently three implemented methods to evaluate the similarity of cont
 
 * **distance**, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.
 
-parameters
+Parameters
 ..........
 
 * **ligandResname** (*string*, default=""): Ligand residue name in the PDB (if necessary)
@@ -352,7 +378,7 @@ the cluster size will be smaller and therefore those regions will be more
 finely discretized.
 
 
-spawning block
+Spawning block
 ---------------
 
 Finally, trajectories are spawned in different *interesting* clusters, according to a reward function.
@@ -375,7 +401,7 @@ There are several implemented strategies:
 According to our experience, the best strategies are **inverselyProportional** and **epsilon**, guided with either PELE binding energy or the RMSD to the bound pose if available.
 
 
-density calculator
+Density calculator
 ..................
 
 Each cluster is assigned a relative density of points compared to other clusters.
@@ -390,7 +416,7 @@ There are two types of density calculators:
 
 * **exitContinuous**, which assings decreasing densities for an increasing number of contacts. Default values, if **r** > 1, density = 1/8, otherwise, density = (-4 **r** + 6)^3/64.0
 
-parameters
+Parameters
 ..........
 
 * **reportFilename** (*string*, mandatory): Basename to match the report file with metrics. E.g. "report". 
@@ -446,10 +472,10 @@ Examples
 Control File Examples
 ---------------------
 
-Example 1
-.........
+Example 1 -- PELE with default parameters
+.........................................
 
-The first example makes use of default parameters (used in the AdaptivePELE paper [APELE]_).
+The first example makes use of default parameters, using PELE as propagator (used in the AdaptivePELE paper [APELE]_).
 
 ::
 
@@ -489,10 +515,8 @@ The first example makes use of default parameters (used in the AdaptivePELE pape
     }
 
 
-To summarize, below there is a screenshot of a simple functional control file:
-
-Example 2
-.........
+Example 2 -- PELE with more specific parameters
+...............................................
 
 A more complete (although not so comprehensible) example::
 
@@ -551,6 +575,55 @@ A more complete (although not so comprehensible) example::
 
     }
 
+    
+Example 3 -- MD using OpenMM with default parameters
+.........................................................
+
+
+A simple example of running an MD simulation with OpenMM::
+
+    {
+        "generalParams" : {
+            "restart": true,
+            "debug" : false,
+            "outputPath":"tests/data/openmm_3ptb/",
+            "writeAllClusteringStructures" : false,
+            "initialStructures" : ["tests/data/md_data/3ptb_initial.pdb"]
+        },
+
+        "spawning" : {
+            "type" : "inverselyProportional",
+            "params" : {
+                "reportFilename" : "report",
+                "metricColumnInReport" : 5,
+                "epsilon": 0.0,
+                "T":1000
+            },
+            "density" : {
+                "type" : "continuous"
+            }
+        },
+
+        "simulation": {
+            "type" : "md",
+            "params" : {
+                "iterations" : 10,
+                "processors" : 200,
+                "reporterFrequency": 100,
+                "productionLength": 500,
+                "seed": 67890,
+                "ligandCharge": 1
+            }
+        },
+
+        "clustering" : {
+            "type" : "rmsd",
+            "params" : {
+                "ligandResname" : "BEN"
+            }
+        }
+    }
+
 
 Output
 ------
@@ -564,7 +637,7 @@ If we change a clustering parameter in a restart run, AdaptivePELE will recluste
 
 
 Analysis
-........
+--------
 
 In order to analyse simulation results, a bunch of scripts are provided in ``AdaptivePELE/analysis``. Get help to run them with: ``python <script> -h``
 
@@ -648,3 +721,4 @@ described with the file topology.pdb
 
 .. [APELE] Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, https://www.nature.com/articles/s41598-017-08445-5
 .. [MDTRAJ] Robert T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, http://mdtraj.org
+.. [OPENMM] P. Eastman, et. al. OpenMM 7: Rapid development of high performance algorithms for molecular dynamics.” PLOS Comp. Biol. 13(7): e1005659. (2017), http://openmm.org

@@ -136,6 +136,15 @@ class SimulationParams:
     numTrajs = "numberTrajectories"
     equilibrationLength = "equilibrationLength"
     srun = "useSrun"
+    # params for MD
+    ligandCharge = "ligandCharge"
+    nonBondedCutoff = "nonBondedCutoff"
+    Temperature = "temperature"
+    runningPlatform = "runningPlatform"
+    minimizationIterations = "minimizationIterations"
+    repoterfreq = "reporterFrequency"
+    productionLength = "productionLength"
+    waterBoxSize = "WaterBoxSize"
 
 
 class ExitConditionType:

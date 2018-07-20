@@ -239,7 +239,11 @@ cdef class Atom:
             self.z = float(atomContent[46:54])
 
             self.type = re.sub(self._chargePattern, u"", atomContent[76:80]).strip().upper()
-            self.mass = self._ATOM_WEIGHTS[self.type]
+            if self.type in self._ATOM_WEIGHTS:
+                self.mass = self._ATOM_WEIGHTS[self.type]
+            else:
+                print("WARNING!: Information about atom type not available, trying to guess from its name, mass properties might be wrong.")
+                self.mass = self._ATOM_WEIGHTS[self.name[0]]
 
             if atomContent.startswith(u'ATOM'):
                 self.protein = True
@@ -287,7 +291,11 @@ cdef class Atom:
         self.z = z
 
         self.type = element
-        self.mass = self._ATOM_WEIGHTS[self.type]
+        if self.type in self._ATOM_WEIGHTS:
+            self.mass = self._ATOM_WEIGHTS[self.type]
+        else:
+            print("WARNING!: Information about atom type not available, trying to guess from its name, mass properties might be wrong.")
+            self.mass = self._ATOM_WEIGHTS[self.name[0]]
 
         self.protein = isProtein
 
@@ -575,7 +583,6 @@ cdef class PDB:
             resnumStr = u""
         else:
             resnumStr = u"%d" % (resnum)
-        frame *= 10
         self.pdb = self.join_PDB_lines(topology, frame)  # in case one wants to write it
         for iatom in range(len(topology)):
             atomLine = topology[iatom]
@@ -788,7 +795,7 @@ cdef class PDB:
         if self.ispdb:
             return self.pdb
         else:
-            return "".join([u"MODEL %d\n" % model_num, self.pdb, u"ENDMDL\n", u"END\n"])
+            return "".join([u"MODEL    %4d\n" % model_num, self.pdb, u"ENDMDL\n", u"END\n"])
 
     def writePDB(self, basestring path, int model_num=1):
         """
@@ -801,10 +808,11 @@ cdef class PDB:
         cdef object fileHandle, atom
         if self.ispdb:
             with open(path, 'w', encoding="utf-8") as fileHandle:
-                fileHandle.write(self.pdb)
+                # in old simulations it will fail without the unicode
+                fileHandle.write(unicode(self.pdb))
         else:
             with open(path, 'w', encoding="utf-8") as fileHandle:
-                fileHandle.write(u"MODEL %d\n" % model_num)
+                fileHandle.write(u"MODEL    %4d\n" % model_num)
                 fileHandle.write(self.pdb)
                 fileHandle.write(u"ENDMDL\n")
                 fileHandle.write(u"END\n")
