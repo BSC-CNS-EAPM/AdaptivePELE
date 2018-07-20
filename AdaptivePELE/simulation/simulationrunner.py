@@ -816,12 +816,16 @@ class MDSimulation(SimulationRunner):
             Tleapdict["INPCRD"] = inpcrd
             Tleapdict["SOLVATED_PDB"] = finalPDB
             Tleapdict["BONDS"] = pdb.getDisulphideBondsforTleapTemplate()
+            Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
             self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
             self.runTleap(TleapControlFile)
             solvatedStrcutures.append(finalPDB)
             self.prmtopFiles.append(prmtop)
             equilibrationFiles.append((prmtop, inpcrd))
 
+        for initialFile in equilibrationFiles:
+            if not os.path.isfile(initialFile[1]):
+                raise FileNotFoundError("Error While running Tleap.")
         os.chdir(workingdirectory)
         pool = mp.Pool(min(self.getWorkingProcessors(), len(equilibrationFiles)))
         workers = []
