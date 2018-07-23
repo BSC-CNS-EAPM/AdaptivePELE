@@ -29,7 +29,7 @@ def parseArgs():
     return arg
 
 
-class EmptyInitialStructuresError(Exception):
+class InitialStructuresError(Exception):
     __module__ = Exception.__module__
 
 
@@ -572,7 +572,11 @@ def main(jsonParams, clusteringHook=None):
 
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
     if not initialStructures:
-        raise EmptyInitialStructuresError("No initial structures found!!!")
+        raise InitialStructuresError("No initial structures found!!!")
+
+    if len(initialStructures) > simulationRunner.getWorkingProcessors():
+        raise InitialStructuresError("Error: More initial structures than Working Processors found!!!")
+
     checkSymmetryDict(clusteringBlock, initialStructures, resname)
 
     outputPathConstants = constants.OutputPathConstants(outputPath)
