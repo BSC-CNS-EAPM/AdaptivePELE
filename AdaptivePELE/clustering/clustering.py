@@ -22,7 +22,7 @@ except ImportError:
     NETWORK = False
 
 
-class Clusters:
+class Clusters(object):
     def __init__(self):
         self.clusters = []
 
@@ -109,7 +109,7 @@ class Clusters:
             yield cluster
 
 
-class ConformationNetwork:
+class ConformationNetwork(object):
     """
         Object that contains the conformation network, a network with clusters as
         nodes and edges representing trantions between clusters. The network is
@@ -213,7 +213,7 @@ class ConformationNetwork:
         return pathway[::-1]
 
 
-class AltStructures:
+class AltStructures(object):
     """
         Helper class, each cluster will have an instance of AltStructures that
         will maintain a priority queue (pq) of alternative structures to spawn
@@ -338,7 +338,7 @@ class AltStructures:
         return len(self.altStructPQ)
 
 
-class Cluster:
+class Cluster(object):
     """
         A cluster contains a representative structure(pdb), the number of
         elements, its density, threshold, number of contacts,
@@ -534,7 +534,7 @@ class Cluster:
              and np.allclose(self.metrics, other.metrics)
 
 
-class ClusteringEvaluator:
+class ClusteringEvaluator(object):
     def __init__(self):
         self.contactMap = None
         self.contacts = None
@@ -745,7 +745,7 @@ class CMClusteringEvaluator(ClusteringEvaluator):
         #      return 25
 
 
-class Clustering:
+class Clustering(object):
     def __init__(self, resname="", resnum=0, resChain="", reportBaseFilename=None,
                  columnOfReportFile=None, contactThresholdDistance=8,
                  altSelection=False):
@@ -1398,7 +1398,7 @@ class SequentialLastSnapshotClustering(Clustering):
         self.clusters.addCluster(cluster)
 
 
-class ClusteringBuilder:
+class ClusteringBuilder(object):
     def buildClustering(self, clusteringBlock, reportBaseFilename=None, columnOfReportFile=None):
         """
             Builder to create the appropiate clustering object
@@ -1458,7 +1458,7 @@ class ClusteringBuilder:
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))
 
 
-class similarityEvaluatorBuilder:
+class similarityEvaluatorBuilder(object):
     def build(self, similarityEvaluatorType):
         """
             Builder to create the appropiate similarityEvaluator
@@ -1473,7 +1473,7 @@ class similarityEvaluatorBuilder:
             sys.exit("Unknown threshold calculator type! Choices are: " + str(clusteringTypes.SIMILARITY_TYPES_TO_STRING_DICTIONARY.values()))
 
 
-class CMSimilarityEvaluator:
+class CMSimilarityEvaluator(object):
     """
         Evaluate the similarity of two contactMaps by calculating the ratio of
         the number of differences over the average of elements in the contacts
