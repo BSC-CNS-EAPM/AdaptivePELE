@@ -795,6 +795,7 @@ class MDSimulation(SimulationRunner):
         # AmberTools generates intermediate files in the current directory, change to the tmp folder
         workingdirectory = os.getcwd()
         os.chdir(outputPathConstants.tmpFolder)
+        temporalFolder = os.getcwd()
         ligandPDB = self.extractLigand(initialStructures[0], resname, outputpath="")
         ligandmol2 = "%s.mol2" % resname
         ligandfrcmod = "%s.frcmod" % resname
@@ -807,7 +808,7 @@ class MDSimulation(SimulationRunner):
             TleapControlFile = "tleap_equilibration_%d.in" % i
             pdb = PDBLoader.PDBManager(structure, resname)
             pdb.preparePDBforMD()
-            structure = pdb.writeAll(outputpath=os.getcwd(), outputname="initial_%d.pdb" % i)
+            structure = pdb.writeAll(outputpath=temporalFolder, outputname="initial_%d.pdb" % i)
             prmtop = os.path.join(workingdirectory, outputPathConstants.topologies, "system_%d.prmtop" % i)
             inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % i)
             finalPDB = os.path.join(workingdirectory, equilibrationOutput, "system_%d.pdb" % i)
@@ -819,14 +820,14 @@ class MDSimulation(SimulationRunner):
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
             self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
             self.runTleap(TleapControlFile)
+            shutil.copy("leap.log", os.path.join(workingdirectory, equilibrationOutput,"leap_%d.log" % i))
             solvatedStrcutures.append(finalPDB)
+            if not os.path.isfile(inpcrd):
+                raise FileNotFoundError("Error While running Tleap, check %s/leap_%d.log for more information." %
+                                        (os.path.join(workingdirectory, equilibrationOutput), i))
             self.prmtopFiles.append(prmtop)
             equilibrationFiles.append((prmtop, inpcrd))
 
-        for initialFile in equilibrationFiles:
-            if not os.path.isfile(initialFile[1]):
-                raise FileNotFoundError("Error While running Tleap.")
-        os.chdir(workingdirectory)
         pool = mp.Pool(min(self.getWorkingProcessors(), len(equilibrationFiles)))
         workers = []
         startTime = time.time()
