@@ -12,6 +12,7 @@ class PDBManager:
     """
     Class that loads and processes a given pdb file
     """
+    # Residue Names that are recognized by the AMBER forcefields.
 
     VALID_RESNAMES = {"ALA", "ARG", "ASH", "ASN", "ASP", "CYM", "CYS", "CYX", "GLH", "GLN", "GLU", "GLY",
                       "HID", "HIE", "HIP", "ILE", "LEU", "LYN", "LYS", "MET", "PHE", "PRO", "SER", "THR",
@@ -31,22 +32,39 @@ class PDBManager:
                  "Nd", "PB", "PD", "PR", "PT", "Pu", "RB", "Ra", "SM", "SR", "Sm", "Sn", "TB", "TL", "Th",
                  "Tl", "Tm", "U4+", "V2+", "Y", "YB2", "ZN", "Zr"}
 
+    # Modified residues for which there is a template in AdaptivePELE/constants/MDtemplates/
+
     VALID_MODIFIED_RES = {"SEP", "TPO", "TYP"}
 
     def __init__(self, PDBtoLoad, resname):
+        """
+
+        :param PDBtoLoad: Path to the pdb to load into memory
+        :type PDBtoLoad: str
+        :param resname: Name of the ligand
+        :type resname: str
+        """
         self.PDBtoLoad = PDBtoLoad
         self.resname = resname
         self.Protein = Structure(parent=None, ID="protein")
         self.Ligand = Structure(parent=None, ID=self.resname)
         self.Other = Structure(parent=None, ID="other")
+        # Dictionary with the information that appears in each of the pdb fields. Used to avoid using magic numbers
         self.POSITIONS = {"DBREF": 0, "IDCODE": 1, "ATOMNAME": 2, "RESNAME": 3, "CHAINID": 4, "RESNUMBER": 5,
                           "COORDX": 6, "COORDY": 7, "COORDZ": 8, "OCUPANCY": 9, "BFACTOR": 10}
+        # List with the cysteines bonded with disulphite bonds
         self.bondedCYS = []
+        # Set with the modified residues
         self.modified_res = set()
+        # Dictionary with the valid Atom names for each of the heavy atoms of each residue
         self.AtomTemplates = self.loadTemplates()
         self.loadPDB()
 
     def loadTemplates(self):
+        """
+        Method that loads the Templates with the heavy atoms information
+        :return: Dictionary with each residue as key and its heavy atom names has values
+        """
         templates_dict = {}
         template = os.path.join("".join(AdaptivePELE.constants.__path__), "MDtemplates/Template_PDB")
         with open(template, "r") as temp:
@@ -68,14 +86,17 @@ class PDBManager:
             for line in inp:
                 line = line.rstrip()
                 if line.startswith("ATOM") or line.startswith("HETATM"):
+                    # This line splits the pdb into each one of its fields
                     columns = [line[:6].strip(), line[6:11].strip(), line[12:16].strip(), line[17:20].strip(),
                                line[21].strip(), line[22:27].strip(), line[30:38].strip(), line[38:46].strip(),
                                line[46:54].strip(), line[54:60].strip(), line[60:66].strip()]
 
+                    # Extract the additional letter that is placed sometimes into the residues that have alternative positions
                     if columns[self.POSITIONS["OCUPANCY"]]:
                         if float(columns[self.POSITIONS["OCUPANCY"]]) < 1:
                             if len(columns[self.POSITIONS["RESNAME"]]) > 3:
                                 columns[self.POSITIONS["RESNAME"]] = columns[self.POSITIONS["RESNAME"]][1:]
+
 
                     if columns[self.POSITIONS["RESNAME"]] in self.VALID_RESNAMES:
                         if currentStructure != self.Protein:
@@ -123,7 +144,7 @@ class PDBManager:
 
     def writePDB(self, finalpdb, *args):
         """
-        function that writes a pdb of the selected structures
+        Method that writes a pdb of the selected structures
         :param outputpath: name of the path to save the pdb
         :type: str
         :param outputname: name of the output pdb
@@ -145,17 +166,35 @@ class PDBManager:
                     out_pdb.write("TER\n")
 
     def writeAll(self, outputpath, outputname):
+        """
+        Method that writes the whole pdb
+
+        :param outputpath: name of the path to save the pdb
+        :type: str
+        :param outputname: name of the output pdb
+        :type: str
+        :return: the path of the new pdb
+        """
         finalpdb = os.path.join(outputpath, outputname)
         self.writePDB(finalpdb, self.Protein, self.Ligand, self.Other)
         return finalpdb
 
     def checkprotonation(self):
+        """
+        Method that change the HIS names to the correct name according to its actual protonation state
+        """
         print("Checking the Histidine protonation State")
         for chain in self.Protein:
             for residue in chain:
                 residue.checkHISProtonationState()
 
     def renumber(self, starting_number=1):
+        """
+        Renumbers the each one of the chains starting from the starting_number
+
+        :param starting_number: initial number for the structure
+        :type starting_number: int
+        """
         resnumber = starting_number
         for chain in self.Protein:
             for residue in chain:
@@ -163,14 +202,21 @@ class PDBManager:
                 resnumber += 1
 
     def joinChains(self):
-        # Tleap doesn't support chain identifiers
-        # This method unifies all the chains of the protein in one single chain
+        """
+        This method unifies all the chains of the protein in one single chain.
+        This is done because Tleap doesn't support chain identifiers, and, if different chains are provided,
+        Tleap renumbers them in an aribtary way, making impossible to keep track of the residue numbers.
+        """
         mainChain = self.Protein[0]
         for chain in self.Protein[1:]:
             mainChain.append(chain)
             self.Protein.remove(chain)
 
     def getDisulphideBondsforTleapTemplate(self):
+        """
+        This method converts the bonded cysteines information into a string to be substitued into the Tleap template
+        :return: string with the bonded cysteines written with Tleap syntaxis
+        """
         tleapString = "bond COMPLX.%s.SG COMPLX.%s.SG\n"
         bonds_to_return = []
         for cys_pair in self.bondedCYS:
@@ -178,6 +224,9 @@ class PDBManager:
         return "".join(bonds_to_return)
 
     def loadDisulphideBonds(self):
+        """
+        Method that checks the cysteines that are bonded using the euclidian distance between them as discriminator
+        """
         cysteines = {}
         cheked_cys = set()
         for chain in self.Protein:
@@ -199,6 +248,7 @@ class PDBManager:
         self.renameBondedCysteines()
 
     def renameBondedCysteines(self):
+        # Method that renames the cysteines
         print("%d disulphide bounds found" % len(self.bondedCYS))
         for cys_pair in self.bondedCYS:
             print("Disulphide bound between CYS number %s and CYS number %s" % (cys_pair[0].num, cys_pair[1].num))
@@ -207,6 +257,7 @@ class PDBManager:
                 cys.rename("CYX")
 
     def checkMissingAtoms(self):
+        # Method that check that all the heavy atoms are in the templates and also checks that all residues have all the heavy atoms
         for chain in self.Protein:
             for residue in chain:
                 if residue.id in self.AtomTemplates:
@@ -221,6 +272,10 @@ class PDBManager:
                         print("Warning: Residue %s of chain %s doesn't have the Atom %s" %(residue.id, chain.id, atom))
 
     def getModifiedResiduesTleapTemplate(self):
+        """
+        Method that creates an string to be used in Tleap to load the forcefield parameters for the modified residues found
+        :return: string with the templates to load in Tleap syntaxis
+        """
         templatespath = os.path.join("".join(AdaptivePELE.constants.__path__), "MDtemplates/amber_%s.lib")
         tleapString = "loadoff %s\n" % templatespath
         stringToReturn = []
@@ -229,17 +284,32 @@ class PDBManager:
         return "".join(stringToReturn)
 
     def correctAlternativePositions(self):
+        # This method selects the positions with higher occupancy when alternative positions are found
         All = (self.Protein, self.Ligand, self.Other)
         for structure in All:
             for chain in structure:
                 for residue in chain:
                     residue.alternativepositions()
 
+    def checkgaps(self):
+        # Method that checks for possible gaps in the structure by checking the number of the residues
+        for chain in self.Protein:
+            prev_residue = 0
+            for residue in chain:
+                if prev_residue and residue.num > prev_residue + 1:
+                    print("Warning: Possible gap found in chain %s between residue %s and %s" % (chain.id, prev_residue, residue.num))
+                prev_residue = residue.num
+
+
+
     def preparePDBforMD(self):
         """
         Method that prepares the pdb to be used in adaptivePELE MD simulation
 
         """
+        # Check if the structure has posible gaps
+        self.checkgaps()
+        # Select the positions with higher occupancy if alternative positions are found
         self.correctAlternativePositions()
         # Load the information of disulphidebonds
         self.loadDisulphideBonds()
@@ -248,9 +318,9 @@ class PDBManager:
         # Make a unique chain for the protein to avoid problems with Tleap
         # Because Tleap doesn't support chain ids
         self.joinChains()
-        # Renumber the pdb to renumber properly the new chain and to remove insertion codes
+        # Renumber the pdb and remove insertion codes
         self.renumber()
-        # check for missing atoms
+        # Check for missing atoms
         self.checkMissingAtoms()
 
 
@@ -259,14 +329,22 @@ class PDBase:
     Abstract class to hold the different pdb structures
     """
     def __init__(self, parent, ID):
+        """
+        :param parent: Object that is one step above in the hirearchy.
+        The used hirearchy is the following: Structure - Chain - Residue - Atom
+        :param ID: Name of the object to instance
+        """
         self.parent = parent
         self.id = ID
+        # List with the objects that are one step bellow
         self.childs = []
 
     def setHirearchy(self):
+        # Method that loads the current object to its father childs list
         self.parent.childs.append(self)
 
     def rename(self, newname):
+        # Method to rename the object
         self.id = newname
 
     def __iter__(self):
@@ -277,6 +355,7 @@ class PDBase:
         return self.childs[index]
 
     def getChildNames(self):
+        # Method that returns a list with the names of all the child objects that are one step bellow
         return [child.id for child in self.childs]
 
     def append(self, target):
