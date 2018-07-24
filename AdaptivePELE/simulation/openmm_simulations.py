@@ -11,6 +11,10 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 import simtk.unit as unit
 from AdaptivePELE.constants import constants
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
 
 
 class CustomStateDataReporter(app.StateDataReporter):
