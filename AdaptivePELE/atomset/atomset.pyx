@@ -467,7 +467,6 @@ cdef class PDB:
                  u"ispdb": self.ispdb}
         return state
 
-
     def __setstate__(self, state):
         # Restore instance attributes
         self.atoms = state[u'atoms']
