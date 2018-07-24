@@ -35,6 +35,8 @@ class TestMD(unittest.TestCase):
     def testRestartAt0(self):
         output_path = "tests/data/openmm_restart_0"
         controlFile = "tests/data/templetized_controlFile_restart_0_md.conf"
+        if os.path.exists(output_path):
+            shutil.rmtree(output_path)
         shutil.copytree("tests/data/restart_0", output_path)
         adaptiveSampling.main(controlFile)
         self.check_succesful_simulation(output_path, 2, 4)
@@ -44,6 +46,8 @@ class TestMD(unittest.TestCase):
     def testRestartAt1(self):
         output_path = "tests/data/openmm_restart_1"
         controlFile = "tests/data/templetized_controlFile_restart_1_md.conf"
+        if os.path.exists(output_path):
+            shutil.rmtree(output_path)
         shutil.copytree("tests/data/restart_1", output_path)
         adaptiveSampling.main(controlFile)
         self.check_succesful_simulation(output_path, 2, 4)
