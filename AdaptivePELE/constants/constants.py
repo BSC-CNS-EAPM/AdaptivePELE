@@ -12,7 +12,7 @@ if "bsccv" in machine:
     PYTHON = "/data2/apps/PYTHON/2.7.5/bin/python2.7"
 
 elif "mn.bsc" in machine:
-    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/nord/rev090518/bin/Pele-1.5_mpi"
+    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/nord/rev090518/bin/PELE-1.5_mpi"
     DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Data"
     DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Documents"
     PYTHON = "python"
