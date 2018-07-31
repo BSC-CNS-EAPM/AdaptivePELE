@@ -5,7 +5,6 @@ import os
 import argparse
 import glob
 import re
-import socket
 import shutil
 import sys
 import prody as pd
@@ -67,26 +66,6 @@ def parseArguments():
     args = parser.parse_args()
 
     return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors, args.top, args.sidechains, args.sidechains_folder, args.serial
-
-
-def getCpuCount():
-    machine = socket.getfqdn()
-    cores = None
-    if "bsccv" in machine:
-        # life cluster
-        cores = os.getenv("SLURM_NTASKS", None)
-    elif "mn.bsc" in machine:
-        # nord3
-        cores = os.getenv("LSB_DJOB_NUMPROC", None)
-    elif "bsc.mn" in machine:
-        # MNIV
-        cores = os.getenv("SLURM_NPROCS", None)
-    try:
-        cores = int(cores)
-    except TypeError:
-        cores = None
-    # Take 1 less than the count of processors, to not clog the machine
-    return cores or max(1, mp.cpu_count()-1)
 
 
 def loadAllResnameAtomsInPdb(filename, lig_resname, writeCA, sidechains):
@@ -411,7 +390,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
     if parallelize:
         if nProcessors is None:
-            nProcessors = getCpuCount()
+            nProcessors = utilities.getCpuCount()
         nProcessors = max(1, nProcessors)
 
         print("Running extractCoords with %d cores" % (nProcessors))
