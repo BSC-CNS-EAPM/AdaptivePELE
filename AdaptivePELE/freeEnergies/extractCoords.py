@@ -7,18 +7,21 @@ import glob
 import re
 import shutil
 import sys
-import prody as pd
 import mdtraj as md
 import numpy as np
-try:
-    import multiprocessing as mp
-    PARALELLIZATION = True
-except ImportError:
-    PARALELLIZATION = False
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.freeEnergies import utils
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
+from AdaptivePELE.utilities import utilities
+PARALELLIZATION = True
+try:
+    import multiprocessing as mp
+except ImportError:
+    PARALELLIZATION = False
+PRODY = True
+try:
+    import prody as pd
+except ImportError:
+    PRODY = False
 
 
 MDTRAJ_FORMATS = set(['.xtc', '.dcd', '.dtr', '.trr'])
@@ -358,6 +361,8 @@ def gatherTrajs(constants, folder_name, setNumber, non_Repeat):
 
 
 def extractSidechainIndexes(trajs, ligand_resname):
+    if not PRODY:
+        raise UnsatisfiedDependencyException("Prody module not found, will not be able to extract sidechain coordinates")
     sidechains_trajs = []
     for traj in glob.glob(trajs):
         atoms = pd.parsePDB(traj)
