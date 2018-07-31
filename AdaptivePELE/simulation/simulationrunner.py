@@ -828,13 +828,14 @@ class MDSimulation(SimulationRunner):
             self.prmtopFiles.append(prmtop)
             equilibrationFiles.append((prmtop, inpcrd))
 
+        os.chdir(workingdirectory)
         pool = mp.Pool(min(self.getWorkingProcessors(), len(equilibrationFiles)))
         workers = []
         startTime = time.time()
         print("equilibrating System")
         for i, equilibrationFilePair in enumerate(equilibrationFiles):
-            outputPDB = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % i)
-            workers.append(pool.apply_async(sim.runEquilibration, args=(equilibrationFilePair, outputPDB, self.parameters, i)))
+            reportName = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % i)
+            workers.append(pool.apply_async(sim.runEquilibration, args=(equilibrationFilePair, reportName, self.parameters, i)))
 
         for worker in workers:
             newInitialStructures.append(worker.get())

@@ -83,7 +83,7 @@ class CustomStateDataReporter(app.StateDataReporter):
 
 
 
-def runEquilibration(equilibrationFiles, outputPDB, parameters, worker):
+def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     """
         Function that runs the whole equilibration process and returns the final pdb
 
@@ -110,12 +110,13 @@ def runEquilibration(equilibrationFiles, outputPDB, parameters, worker):
     velocities = simulation.context.getState(getVelocities=True).getVelocities()
     if worker == 0:
         print("Running %d steps of NVT equilibration" % parameters.equilibrationLength)
-    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 5, parameters, velocities=velocities)
+    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 5, parameters, reportName, velocities=velocities)
     positions = simulation.context.getState(getPositions=True).getPositions()
     velocities = simulation.context.getState(getVelocities=True).getVelocities()
     if worker == 0:
         print("Running %d steps of NPT equilibration" % parameters.equilibrationLength)
-    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 0.5, parameters, velocities=velocities)
+    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 0.5, parameters, reportName, velocities=velocities)
+    outputPDB = "%s_NPT.pdb" % reportName
     with open(outputPDB, 'w') as fw:
         app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)
     return outputPDB
@@ -164,7 +165,7 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
     return simulation
 
 
-def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, velocities=None):
+def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, reportName, velocities=None):
     """
     Function that runs an equilibration at constant volume conditions.
     It uses the AndersenThermostat, the VerletIntegrator and
@@ -206,11 +207,16 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         simulation.context.setVelocities(velocities)
     else:
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
+    reportFile = "%s_report_NVT" % reportName
+    simulation.reporters.append(CustomStateDataReporter(reportFile, parameters.reporterFreq, step=True,
+                                                        potentialEnergy=True, temperature=True, time=True,
+                                                        volume=True, remainingTime=True, speed=True,
+                                                        totalSteps=parameters.equilibrationLength, separator="\t"))
     simulation.step(simulation_steps)
     return simulation
 
 
-def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, velocities=None):
+def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, reportName, velocities=None):
     """
     Function that runs an equilibration at constant pressure conditions.
     It uses the AndersenThermostat, the VerletIntegrator, the MonteCarlo Barostat and
@@ -253,6 +259,11 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         simulation.context.setVelocities(velocities)
     else:
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
+    reportFile = "%s_report_NPT" % reportName
+    simulation.reporters.append(CustomStateDataReporter(reportFile, parameters.reporterFreq, step=True,
+                                                        potentialEnergy=True, temperature=True, time=True,
+                                                        volume=True, remainingTime=True, speed=True,
+                                                        totalSteps=parameters.equilibrationLength, separator="\t"))
     simulation.step(simulation_steps)
     return simulation
 
