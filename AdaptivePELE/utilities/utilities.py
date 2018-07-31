@@ -3,6 +3,7 @@ from builtins import range
 from six import reraise as raise_
 import os
 import sys
+import socket
 import shutil
 import glob
 import numpy as np
@@ -16,6 +17,11 @@ except ImportError:
     import pickle
 from AdaptivePELE.atomset import RMSDCalculator, atomset
 from AdaptivePELE.freeEnergies import utils
+try:
+    import multiprocessing as mp
+    PARALELLIZATION = True
+except ImportError:
+    PARALELLIZATION = False
 
 
 class UnsatisfiedDependencyException(Exception):
@@ -218,6 +224,7 @@ def getTrajNum(trajFilename):
     """
     return int(trajFilename.split("_")[-1][:-4])
 
+
 def getPrmtopNum(prmtopFilename):
     """
         Gets the prmtop number
@@ -228,6 +235,7 @@ def getPrmtopNum(prmtopFilename):
         :returns: int -- prmtop number
     """
     return int(prmtopFilename.split("_")[-1][:-7])
+
 
 def calculateContactMapEigen(contactMap):
     """
@@ -585,3 +593,25 @@ def convert_trajectory_to_pdb(trajectory, topology, output, output_folder):
 def writeObject(filename, object_to_write, protocol=2):
     with open(filename, "wb") as f:
         pickle.dump(object_to_write, f, protocol)
+
+
+def getCpuCount():
+    if not PARALELLIZATION:
+        raise UnsatisfiedDependencyException("Multiprocessing module not found, will not be able to parallelize")
+    machine = socket.getfqdn()
+    cores = None
+    if "bsccv" in machine:
+        # life cluster
+        cores = os.getenv("SLURM_NTASKS", None)
+    elif "mn.bsc" in machine:
+        # nord3
+        cores = os.getenv("LSB_DJOB_NUMPROC", None)
+    elif "bsc.mn" in machine:
+        # MNIV
+        cores = os.getenv("SLURM_NPROCS", None)
+    try:
+        cores = int(cores)
+    except TypeError:
+        cores = None
+    # Take 1 less than the count of processors, to not clog the machine
+    return cores or max(1, mp.cpu_count()-1)
