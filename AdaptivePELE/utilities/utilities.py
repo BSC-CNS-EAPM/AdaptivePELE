@@ -208,6 +208,10 @@ def getSnapshots(trajectoryFile, verbose=False, topology=None):
     elif ext == ".mdcrd":
         with md.formats.MDCRDTrajectoryFile(trajectoryFile) as f:
             snapshotsWithInfo, _ = f.read()
+    elif ext == ".nc":
+        with md.formats.NetCDFTrajectoryFile(trajectoryFile) as f:
+            snapshotsWithInfo, _, _, _ = f.read()
+
     else:
         raise ValueError("Unrecongnized file extension for %s" % trajectoryFile)
     return snapshotsWithInfo
