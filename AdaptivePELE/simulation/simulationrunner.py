@@ -822,7 +822,7 @@ class MDSimulation(SimulationRunner):
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
             self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
             self.runTleap(TleapControlFile)
-            shutil.copy("leap.log", os.path.join(workingdirectory, equilibrationOutput,"leap_%d.log" % i))
+            shutil.copy("leap.log", os.path.join(workingdirectory, equilibrationOutput, "leap_%d.log" % i))
             solvatedStrcutures.append(finalPDB)
             if not os.path.isfile(inpcrd):
                 raise FileNotFoundError("Error While running Tleap, check %s/leap_%d.log for more information." %
@@ -856,7 +856,7 @@ class MDSimulation(SimulationRunner):
         tleapCommand = "tleap -f %s" % TleapControlFile
         print("System Preparation")
         startTime = time.time()
-        proc = subprocess.Popen(tleapCommand, stdout=subprocess.PIPE,  stderr=subprocess.PIPE, shell=True, universal_newlines=True)
+        proc = subprocess.Popen(tleapCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
         print(out)
         if err:
@@ -944,7 +944,7 @@ class MDSimulation(SimulationRunner):
             if self.restart:
                 checkpoint = checkpoints[utilities.getTrajNum(startingFiles[1])]
             workerNumber = i + 1
-            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint,self.ligandName, self.restart)))
+            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.ligandName, self.restart)))
         for worker in workers:
             worker.get()
         endTime = time.time()

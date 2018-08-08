@@ -32,7 +32,7 @@ class CustomStateDataReporter(app.StateDataReporter):
 
         progress = False
         app.StateDataReporter.__init__(self, file, reportInterval, step, time, potentialEnergy, kineticEnergy, totalEnergy, temperature, volume, density,
-                 progress, remainingTime, speed, elapsedTime, separator, systemMass, totalSteps)
+                                       progress, remainingTime, speed, elapsedTime, separator, systemMass, totalSteps)
         self._append = append
         self.initialStep = initialStep
 
@@ -79,8 +79,6 @@ class CustomStateDataReporter(app.StateDataReporter):
         values = super(CustomStateDataReporter, self)._constructReportValues(simulation, state)
         values[0] = values[0] + self.initialStep
         return values
-
-
 
 
 def runEquilibration(equilibrationFiles, reportName, parameters, worker):
@@ -336,9 +334,9 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     simulation.reporters.append(app.DCDReporter(str(DCDrepoter), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
     simulation.reporters.append(app.CheckpointReporter(str(checkpointReporter), parameters.reporterFreq))
     simulation.reporters.append(CustomStateDataReporter(stateData, parameters.reporterFreq, step=True,
-                                                      potentialEnergy=True, temperature=True, time=True,
-                                                      volume=True, remainingTime=True, speed=True,
-                                                      totalSteps=parameters.productionLength, separator="\t",
+                                                        potentialEnergy=True, temperature=True, time=True,
+                                                        volume=True, remainingTime=True, speed=True,
+                                                        totalSteps=parameters.productionLength, separator="\t",
                                                         append=restart, initialStep=lastStep))
     if workerNumber == 1:
         frequency = min(10 * parameters.reporterFreq, parameters.productionLength)
