@@ -6,7 +6,6 @@ import os
 import AdaptivePELE.adaptiveSampling as adaptiveSampling
 import AdaptivePELE.atomset.atomset as atomset
 from AdaptivePELE.clustering import clustering
-import socket
 
 
 class TestadaptiveSampling(unittest.TestCase):
@@ -221,6 +220,14 @@ class TestadaptiveSampling(unittest.TestCase):
     def testRMSDVarEpsilon_xtc(self):
         output_path = "tests/data/1f5k_adaptive_rmsd_vareps_xtc"
         controlFile = "tests/data/templetized_controlFile_1f5k_rmsd_vareps_xtc.conf"
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2)
+        # cleanup
+        shutil.rmtree(output_path)
+
+    def testNullIndependent_xtc(self):
+        output_path = "tests/data/1f5k_adaptive_null_cl_xtc/"
+        controlFile = "tests/data/templetized_controlFile_1f5k_null_cl_xtc.conf"
         adaptiveSampling.main(controlFile)
         self.check_succesful_simulation(output_path, 2)
         # cleanup
