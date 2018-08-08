@@ -53,6 +53,9 @@ class SpawningParams:
         "independent": {
             "reportFilename": "basestring"
         },
+        "independentMetric": {
+            "reportFilename": "basestring"
+        },
         "inverselyProportional": {
             "reportFilename": "basestring"
         },
@@ -174,19 +177,24 @@ class SimulationParams:
 
 class clusteringTypes:
     types = {
-        "rmsd": {
-        },
+        "rmsd": {},
         "contactMap": {
-            "similarityEvaluator": "basestring"
+            "similarityEvaluator": "basestring",
+            "ligandResname": "basestring"
         },
         "lastSnapshot": {
+            "ligandResname": "basestring"
+        },
+        "null": {
+            "ligandResname": "basestring"
         }
     }
     params = {
         "rmsd": "basestring",
         "contactMap": "basestring",
-        "contactThresholdDistance": "numbers.Real",
         "lastSnapshot": "basestring",
+        "null": "basestring",
+        "contactThresholdDistance": "numbers.Real",
         "ligandResname": "basestring",
         "ligandResnum": "numbers.Real",
         "ligandChain": "basestring",

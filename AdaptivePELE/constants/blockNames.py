@@ -4,6 +4,7 @@ class ClusteringTypes:
     rmsd = "rmsd"
     contactMap = "contactMap"
     lastSnapshot = "lastSnapshot"
+    null = "null"
     thresholdCalculator = "thresholdCalculator"
     ligandResname = "ligandResname"
     ligandResnum = "ligandResnum"
@@ -49,6 +50,7 @@ class DensityCalculatorParams:
 class StringSpawningTypes:
     type = "type"
     independent = "independent"
+    independentMetric = "independentMetric"
     sameWeight = "sameWeight"
     inverselyProportional = "inverselyProportional"
     epsilon = "epsilon"
