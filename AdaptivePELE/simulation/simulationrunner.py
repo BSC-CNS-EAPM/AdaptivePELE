@@ -30,6 +30,10 @@ try:
     from AdaptivePELE.simulation import openmm_simulations as sim
 except ImportError:
     OPENMM = False
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
 
 
 class SimulationParameters:
