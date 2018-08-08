@@ -663,8 +663,8 @@ def main(jsonParams, clusteringHook=None):
             print("Degeneracy", degeneracyOfRepresentatives)
             assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)
         else:
-            # When using null spawning the calculate method returns None
-            assert spawningCalculator.type == spawningTypes.SPAWNING_TYPES.null, "calculate returned None with spawning type %s" % spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]
+            # When using null or independent spawning the calculate method returns None
+            assert spawningCalculator.type in spawningTypes.SPAWNING_NO_DEGENERACY_TYPES, "calculate returned None with spawning type %s" % spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
@@ -682,9 +682,14 @@ def main(jsonParams, clusteringHook=None):
         # Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:
             if degeneracyOfRepresentatives is not None:
-                numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1, topologies=topologies)
+                numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants,
+                                                                                                       degeneracyOfRepresentatives,
+                                                                                                       clusteringMethod, i+1,
+                                                                                                       topologies=topologies)
                 simulationRunner.updateMappingProcessors(procMapping)
-                initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
+                initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(numberOfSeedingPoints,
+                                                                                              outputPathConstants.tmpInitialStructuresTemplate,
+                                                                                              i+1)
                 topologies.mapEpochTopologies(i+1, procMapping)
 
         if clusteringMethod.symmetries and nativeStructure:
