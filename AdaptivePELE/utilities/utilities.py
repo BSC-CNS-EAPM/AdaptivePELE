@@ -126,7 +126,7 @@ class Topology:
             :type epochDir: str
         """
         with open(epochDir+"/topologyMapping.txt", "w") as f:
-            f.write(':'.join(map(str, self.topologyMap[epoch])))
+            f.write("%s\n" % ':'.join(map(str, self.topologyMap[epoch])))
 
     def readMappingFromDisk(self, epochDir, epoch):
         """
