@@ -4,7 +4,6 @@ import sys
 import glob
 import numpy as np
 import os
-import pickle
 from six import reraise as raise_
 from AdaptivePELE.constants import blockNames
 from AdaptivePELE.utilities import utilities
@@ -984,8 +983,7 @@ class Clustering(object):
                                                                 metric)
                 summaryFile.write(writeString)
 
-        with open(outputObject, 'wb') as f:
-            pickle.dump(self, f, 2)
+        utilities.writeObject(outputObject, self, protocol=2)
 
     def addSnapshotToCluster(self, trajNum, snapshot, origCluster, snapshotNum, metrics=None, col=None, topology=None):
         """
