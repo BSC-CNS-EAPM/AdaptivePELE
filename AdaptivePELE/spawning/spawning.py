@@ -359,6 +359,9 @@ class SpawningCalculator:
             metrics[i] = cluster.getMetric()
         return metrics
 
+    def shouldWriteStructures(self):
+        return True
+
 
 class DensitySpawningCalculator(SpawningCalculator):
     """
@@ -1047,11 +1050,12 @@ class NullSpawningCalculator(SpawningCalculator):
             :type clusters: :py:class:`.Clusters`
             :param trajToDistribute: Number of processors to distribute
             :type trajToDistribute: int
-            :param spawningParams: Object containing the parameters of the spawning
-            :type spawningParams: :py:class:`.SpawningParams`
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
 
             :returns: None
         """
         return None
+
+    def shouldWriteStructures(self):
+        return False

@@ -681,7 +681,9 @@ def main(jsonParams, clusteringHook=None):
 
         # Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:
-            if degeneracyOfRepresentatives is not None:
+            if spawningCalculator.shouldWriteStructures():
+                # Differentiate between null spwaning and the rest of spawning
+                # methods
                 numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants,
                                                                                                        degeneracyOfRepresentatives,
                                                                                                        clusteringMethod, i+1,
