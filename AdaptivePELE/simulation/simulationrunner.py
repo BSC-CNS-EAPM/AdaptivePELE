@@ -258,13 +258,11 @@ class PeleSimulation(SimulationRunner):
         """
         return self.parameters.processors-1
 
-    def getNextIterationBox(self, clusteringObject, outputFolder, resname, topologies=None, epoch=None):
+    def getNextIterationBox(self, outputFolder, resname, topologies=None, epoch=None):
         """
             Select the box for the next epoch, currently selecting the COM of
             the cluster with max SASA
 
-            :param clusteringObject: Clustering object
-            :type clusteringObject: :py:class:`.Clustering`
             :param outputFolder: Folder to the trajectories
             :type outputFolder: str
             :param resname: Name of the ligand in the pdb
