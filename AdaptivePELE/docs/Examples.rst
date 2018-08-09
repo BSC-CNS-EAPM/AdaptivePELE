@@ -173,6 +173,13 @@ Optionally, you can also use the following parameters:
 * **numberEquilibrationStructures** (*int*, default=10): Number of clusters to
   obtain from the *equilibrationCluster* structure selection (see
   **equilibrationMode** for more details)
+* **useSrun** (*bool*, default=False): Whether to use srun to launch the PELE
+  simulation instead of mpirun. Using srun allows a finer control over the
+  resources used and might be helpful to deal with different cluster
+  configurations or SLURM installations.
+* **srunParameters** (*string*, default=None): String with parameters to pass
+  to srun, if not specified it will just run without any parameters, it is
+  important to avoid whitspaces both at the beginning and end of the string.
 
 Additionally, the block may have an exit condition that stops the execution:
 

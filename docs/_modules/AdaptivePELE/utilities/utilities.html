@@ -191,11 +191,10 @@
 <span class="sd">        :type trajectoryFile: str</span>
 <span class="sd">        :param verbose: Add verbose to snapshots</span>
 <span class="sd">        :type verbose: bool</span>
-<span class="sd">        :param topology: Topology file object</span>
-<span class="sd">        :type topology: str</span>
 
 <span class="sd">        :returns: iterable -- Snapshots with information</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># topology parameter is ignored, just here for compatibility purposes</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.pdb&quot;</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inputFile</span><span class="p">:</span>
@@ -210,10 +209,21 @@
         <span class="n">remarkInfo</span> <span class="o">=</span> <span class="s2">&quot;REMARK 000 File created using PELE++</span><span class="se">\n</span><span class="s2">REMARK source            : </span><span class="si">%s</span><span class="se">\n</span><span class="s2">REMARK original model nr : </span><span class="si">%d</span><span class="se">\n</span><span class="s2">REMARK First snapshot is 1, not 0 (as opposed to report)</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span>
         <span class="n">snapshotsWithInfo</span> <span class="o">=</span> <span class="p">[</span><span class="n">remarkInfo</span> <span class="o">%</span> <span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)]</span>
     <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.xtc&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Topology needed for loading xtc files&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">md</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">XTCTrajectoryFile</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">snapshotsWithInfo</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="c1"># formats xtc and trr are by default in nm, so we convert them to A</span>
+        <span class="n">snapshotsWithInfo</span> <span class="o">*=</span> <span class="mi">10</span>
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.trr&quot;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">md</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">TRRTrajectoryFile</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">snapshotsWithInfo</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">snapshotsWithInfo</span> <span class="o">*=</span> <span class="mi">10</span>
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.dcd&quot;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">md</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">DCDTrajectoryFile</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">snapshotsWithInfo</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.dtr&quot;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">md</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">DTRTrajectoryFile</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">snapshotsWithInfo</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecongnized file extension for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">trajectoryFile</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">snapshotsWithInfo</span></div>
@@ -285,7 +295,7 @@
 <span class="sd">        :return: np.array -- Array with the rmsd values of the trajectory</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">snapshots</span> <span class="o">=</span> <span class="n">getSnapshots</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+    <span class="n">snapshots</span> <span class="o">=</span> <span class="n">getSnapshots</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
     <span class="n">topology_contents</span> <span class="o">=</span> <span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
     <span class="n">rmsds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">snapshots</span><span class="p">))</span>
     <span class="n">RMSDCalc</span> <span class="o">=</span> <span class="n">RMSDCalculator</span><span class="o">.</span><span class="n">RMSDCalculator</span><span class="p">(</span><span class="n">symmetries</span><span class="p">)</span>

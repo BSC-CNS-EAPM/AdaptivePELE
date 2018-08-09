@@ -322,6 +322,13 @@ best energy structures in the equilibration by the center of mass.</li>
 <li><strong>numberEquilibrationStructures</strong> (<em>int</em>, default=10): Number of clusters to
 obtain from the <em>equilibrationCluster</em> structure selection (see
 <strong>equilibrationMode</strong> for more details)</li>
+<li><strong>useSrun</strong> (<em>bool</em>, default=False): Whether to use srun to launch the PELE
+simulation instead of mpirun. Using srun allows a finer control over the
+resources used and might be helpful to deal with different cluster
+configurations or SLURM installations.</li>
+<li><strong>srunParameters</strong> (<em>string</em>, default=None): String with parameters to pass
+to srun, if not specified it will just run without any parameters, it is
+important to avoid whitspaces both at the beginning and end of the string.</li>
 </ul>
 <p>Additionally, the block may have an exit condition that stops the execution:</p>
 <ul>
