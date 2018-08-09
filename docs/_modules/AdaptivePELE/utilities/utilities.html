@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.5
+                v1.5.1
               </div>
             
           
@@ -207,12 +207,13 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">snapshots</span>
 
-        <span class="n">remarkInfo</span> <span class="o">=</span> <span class="s2">&quot;REMARK 000 File created using PELE++</span><span class="se">\n</span><span class="s2">REMARK source            : </span><span class="si">%s</span><span class="se">\n</span><span class="s2">REMARK original model nr : </span><span class="si">%d</span><span class="se">\n</span><span class="s2">REMARK First snapshot is 1, not 0 (as opposed to report)</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">snapshotsWithInfo</span> <span class="o">=</span> <span class="p">[</span><span class="n">remarkInfo</span> <span class="o">%</span> <span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">snapshot</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)]</span>
+        <span class="n">remarkInfo</span> <span class="o">=</span> <span class="s2">&quot;REMARK 000 File created using PELE++</span><span class="se">\n</span><span class="s2">REMARK source            : </span><span class="si">%s</span><span class="se">\n</span><span class="s2">REMARK original model nr : </span><span class="si">%d</span><span class="se">\n</span><span class="s2">REMARK First snapshot is 1, not 0 (as opposed to report)</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span>
+        <span class="n">snapshotsWithInfo</span> <span class="o">=</span> <span class="p">[</span><span class="n">remarkInfo</span> <span class="o">%</span> <span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)]</span>
     <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.xtc&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Topology needed for loading xtc files&quot;</span><span class="p">)</span>
-        <span class="n">snapshotsWithInfo</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">md</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">XTCTrajectoryFile</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">snapshotsWithInfo</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecongnized file extension for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">trajectoryFile</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">snapshotsWithInfo</span></div>
@@ -582,6 +583,11 @@
             <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">PDB</span><span class="o">.</span><span class="n">pdb</span><span class="p">)</span>
             <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ENDMDL</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;END</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="writeObject"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.writeObject">[docs]</a><span class="k">def</span> <span class="nf">writeObject</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">object_to_write</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">object_to_write</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

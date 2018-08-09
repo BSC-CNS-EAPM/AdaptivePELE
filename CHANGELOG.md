@@ -16,11 +16,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Optimize and parallelize extractCoords script from the freeEnergies
       subpackage, change the multiprocess module to multiprocessing
 
-
 ### Bug fixes:
 
     - Fix several bugs in extractCoords script
-
 
 ## [1.5] - 2018-05-11
 

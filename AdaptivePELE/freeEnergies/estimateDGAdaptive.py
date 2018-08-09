@@ -5,7 +5,7 @@ from AdaptivePELE.freeEnergies import estimateDG
 import numpy as np
 
 
-def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1, nruns=10):
+def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1, nruns=10, lagtimes=[1, 10, 25, 50, 100, 250, 400, 500, 600, 1000]):
     allFolders = np.array(glob.glob("MSM_*"))
     epochs = [int(folder[4:]) for folder in allFolders]
     args = np.argsort(epochs)
@@ -26,7 +26,7 @@ def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1, nruns=10):
         parameters = estimateDG.Parameters(ntrajs=trajsPerEpoch*(epoch+1),
                                            length=None,
                                            lagtime=lagtime,
-                                           lagtimes=[1, 10, 25, 50, 100, 250, 400, 500, 600, 1000],
+                                           lagtimes=lagtimes,
                                            nclusters=nclusters,
                                            nruns=nruns,
                                            useAllTrajInFirstRun=True,
