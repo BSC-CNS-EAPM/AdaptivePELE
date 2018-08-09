@@ -49,6 +49,7 @@ class SimulationParameters:
         self.reportName = None
         self.trajectoryName = None
         self.srun = False
+        self.srunParameters = None
         self.numberEquilibrationStructures = 10
 
 
@@ -268,12 +269,14 @@ class PeleSimulation(SimulationRunner):
 
         if self.parameters.srun:
             toRun = ["srun", self.parameters.executable, runningControlFile]
+            if self.parameters.srunParameters is not None:
+                toRun.insert(1, self.parameters.srunParameters)
         else:
-            toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
-        toRun = " ".join(toRun)
-        print(toRun)
+            toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
+            toRun = map(str, toRun)
+        print(" ".join(toRun))
         startTime = time.time()
-        proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=False, universal_newlines=True)
         (out, err) = proc.communicate()
         print(out)
         if err:
@@ -789,6 +792,9 @@ class RunnerBuilder:
             params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength)
             params.numberEquilibrationStructures = paramsBlock.get(blockNames.SimulationParams.numberEquilibrationStructures, 10)
             params.srun = paramsBlock.get(blockNames.SimulationParams.srun, False)
+            params.srunParameters = paramsBlock.get(blockNames.SimulationParams.srunParameters, None)
+            if params.srunParameters is not None:
+                params.srunParameters = params.srunParameters.strip()
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()
