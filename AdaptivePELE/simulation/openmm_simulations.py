@@ -49,17 +49,27 @@ class CustomStateDataReporter(app.StateDataReporter):
     again and the second is the last step that was successfully done in the previous run.
     """
     # Added two new parameters append and intialsteps to properly handle the report file when the simulation is restarted
-    def __init__(self, file, reportInterval, step=False, time=False, potentialEnergy=False, kineticEnergy=False, totalEnergy=False, temperature=False, volume=False, density=False,
+    # changed the name of the file and time parameters to avoid overriding
+    # reserved names
+    def __init__(self, file_name, reportInterval, step=False, time_sim=False, potentialEnergy=False, kineticEnergy=False, totalEnergy=False, temperature=False, volume=False, density=False,
                  progress=False, remainingTime=False, speed=False, elapsedTime=False, separator=',', systemMass=None, totalSteps=None, append=False, initialStep=0):
 
         # This new class doesn't properly support progress information. Because to do the restart it assumes that
         # the first column has the step information, which is True as long as the progress value is False.
 
         progress = False
-        app.StateDataReporter.__init__(self, file, reportInterval, step, time, potentialEnergy, kineticEnergy, totalEnergy, temperature, volume, density,
+        if isinstance(file_name, basestring):
+            # if the file is passed as a string, wrap in a str call to avoid
+            # problems between different versions of python
+            file_name = str(file_name)
+
+        app.StateDataReporter.__init__(self, file_name, reportInterval, step, time_sim, potentialEnergy, kineticEnergy, totalEnergy, temperature, volume, density,
                                        progress, remainingTime, speed, elapsedTime, separator, systemMass, totalSteps)
         self._append = append
         self.initialStep = initialStep
+        self._initialClockTime = None
+        self._initialSimulationTime = None
+        self._initialSteps = None
 
     def report(self, simulation, state):
         """Generate a report.
@@ -233,7 +243,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
     reportFile = "%s_report_NVT" % reportName
     simulation.reporters.append(CustomStateDataReporter(reportFile, parameters.reporterFreq, step=True,
-                                                        potentialEnergy=True, temperature=True, time=True,
+                                                        potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=parameters.equilibrationLength, separator="\t"))
     simulation.step(simulation_steps)
@@ -285,7 +295,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
     reportFile = "%s_report_NPT" % reportName
     simulation.reporters.append(CustomStateDataReporter(reportFile, parameters.reporterFreq, step=True,
-                                                        potentialEnergy=True, temperature=True, time=True,
+                                                        potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=parameters.equilibrationLength, separator="\t"))
     simulation.step(simulation_steps)
@@ -360,7 +370,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     simulation.reporters.append(app.DCDReporter(str(DCDrepoter), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
     simulation.reporters.append(app.CheckpointReporter(str(checkpointReporter), parameters.reporterFreq))
     simulation.reporters.append(CustomStateDataReporter(stateData, parameters.reporterFreq, step=True,
-                                                        potentialEnergy=True, temperature=True, time=True,
+                                                        potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=parameters.productionLength, separator="\t",
                                                         append=restart, initialStep=lastStep))
