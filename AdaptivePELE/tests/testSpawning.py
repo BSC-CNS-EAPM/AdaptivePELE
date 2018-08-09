@@ -34,15 +34,16 @@ class TestSpawningCalculator(unittest.TestCase):
             cluster.elements = size
             clusters.addCluster(cluster)
 
-        inverselyProp = spawning.InverselyProportionalToPopulationCalculator()
-        clusteringParams = None
+        params = spawning.SpawningParams()
+        inverselyProp = spawning.InverselyProportionalToPopulationCalculator(params)
         trajs = 10
-        degeneracy = inverselyProp.calculate(clusters.clusters, trajs, clusteringParams)
+        degeneracy = inverselyProp.calculate(clusters.clusters, trajs)
         golden = [1, 2, 2, 5]
 
         self.assertEqual(degeneracy, golden)
 
     def testInverselyProportionalToPopulationCalculatorWithNullDensity(self):
+        params = spawning.SpawningParams()
         clusters = clustering.Clusters()
         sizes = [6, 2, 3, 1]
         for size in sizes:
@@ -52,10 +53,9 @@ class TestSpawningCalculator(unittest.TestCase):
 
         densityCalculator = densitycalculator.NullDensityCalculator()
 
-        inverselyProp = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
-        clusteringParams = None
+        inverselyProp = spawning.InverselyProportionalToPopulationCalculator(params, densityCalculator)
         trajs = 10
-        degeneracy = inverselyProp.calculate(clusters.clusters, trajs, clusteringParams)
+        degeneracy = inverselyProp.calculate(clusters.clusters, trajs)
         golden = [1, 2, 2, 5]
 
         self.assertEqual(degeneracy, golden)
@@ -82,21 +82,21 @@ class TestSpawningCalculator(unittest.TestCase):
         }
         densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
         densityCalculator = densityCalculatorBuilder.build(clusteringBlock)
+        params = spawning.SpawningParams()
 
-        inverselyProp = spawning.InverselyProportionalToPopulationCalculator(densityCalculator)
-        clusteringParams = None
+        inverselyProp = spawning.InverselyProportionalToPopulationCalculator(params, densityCalculator)
         trajs = 8
-        degeneracy = inverselyProp.calculate(clusters.clusters, trajs, clusteringParams)
+        degeneracy = inverselyProp.calculate(clusters.clusters, trajs)
         golden = [2, 2, 2, 2]
 
         self.assertEqual(degeneracy, golden)
 
     def testEpsilonCalculator(self):
-        epsilon = spawning.EpsilonDegeneracyCalculator()
         params = spawning.SpawningParams()
         params.epsilon = 0.5
         params.metricWeights = "linear"
         params.nclusters = 100
+        epsilon = spawning.EpsilonDegeneracyCalculator(params)
 
         clusters = clustering.Clusters()
         sizes = [6, 2, 3, 1]
@@ -108,7 +108,7 @@ class TestSpawningCalculator(unittest.TestCase):
             clusters.addCluster(cluster)
 
         trajs = 20
-        degeneracy = epsilon.calculate(clusters.clusters, trajs, params)
+        degeneracy = epsilon.calculate(clusters.clusters, trajs)
         golden = np.array([7, 4, 4, 5])
         np.testing.assert_array_equal(degeneracy, golden)
 
@@ -141,19 +141,19 @@ class TestSpawningCalculator(unittest.TestCase):
         densityCalculatorBuilder = densitycalculator.DensityCalculatorBuilder()
         densityCalculator = densityCalculatorBuilder.build(clusteringBlock)
 
-        epsilon = spawning.EpsilonDegeneracyCalculator(densityCalculator)
+        epsilon = spawning.EpsilonDegeneracyCalculator(params, densityCalculator)
         trajs = 16
-        degeneracy = epsilon.calculate(clusters.clusters, trajs, params)
+        degeneracy = epsilon.calculate(clusters.clusters, trajs)
         golden = np.array([6, 4, 4, 2])
         np.testing.assert_array_equal(degeneracy, golden)
 
     def testEpsilonCalculatorwithMaxValues(self):
-        epsilon = spawning.EpsilonDegeneracyCalculator()
         params = spawning.SpawningParams()
         params.epsilon = 0.5
         params.metricWeights = "linear"
         params.nclusters = 100
         params.condition = "max"
+        epsilon = spawning.EpsilonDegeneracyCalculator(params)
 
         clusters = clustering.Clusters()
         sizes = [6, 2, 3, 1]
@@ -165,13 +165,13 @@ class TestSpawningCalculator(unittest.TestCase):
             clusters.addCluster(cluster)
 
         trajs = 20
-        degeneracy = epsilon.calculate(clusters.clusters, trajs, params)
+        degeneracy = epsilon.calculate(clusters.clusters, trajs)
         golden = np.array([1, 5, 5, 9])
         np.testing.assert_array_equal(degeneracy, golden)
 
     def testSameWeightDegeneracyCalculator(self):
-        sameWeightDegCalculator = spawning.SameWeightDegeneracyCalculator()
-        params = None
+        params = spawning.SpawningParams()
+        sameWeightDegCalculator = spawning.SameWeightDegeneracyCalculator(params)
 
         clusters = clustering.Clusters()
         sizes = [6, 2, 3, 1]
@@ -181,13 +181,12 @@ class TestSpawningCalculator(unittest.TestCase):
             clusters.addCluster(cluster)
 
         trajs = 10
-        degeneracy = sameWeightDegCalculator.calculate(clusters.clusters, trajs, params)
+        degeneracy = sameWeightDegCalculator.calculate(clusters.clusters, trajs)
         golden = [1, 1, 1, 1]
 
         self.assertEqual(degeneracy, golden)
 
     def testVariableEpsilonCalculator(self):
-        variable_epsilon = spawning.VariableEpsilonDegeneracyCalculator()
         params = spawning.SpawningParams()
         params.epsilon = 0.5
         params.varEpsilonType = "linearVariation"
@@ -200,6 +199,7 @@ class TestSpawningCalculator(unittest.TestCase):
         params.period = params_test.get("period", params.variationWindow)
         params.nclusters = 100
         params.period += np.sign(np.abs(params.variationWindow-params.period))
+        variable_epsilon = spawning.VariableEpsilonDegeneracyCalculator(params)
         rateVariation = 0.25/3
         clusters = clustering.Clusters()
         sizes = [6, 2, 3, 1]
@@ -212,20 +212,19 @@ class TestSpawningCalculator(unittest.TestCase):
 
         trajs = 20
 
-        degeneracy6 = variable_epsilon.calculate(clusters.clusters, trajs, params, 0)
+        degeneracy6 = variable_epsilon.calculate(clusters.clusters, trajs, 0)
         golden6 = np.array([7, 4, 4, 5])
         np.testing.assert_array_equal(degeneracy6, golden6)
         self.assertAlmostEqual(params.epsilon, params.minEpsilon)
-        degeneracy7 = variable_epsilon.calculate(clusters.clusters, trajs, params, 1)
+        degeneracy7 = variable_epsilon.calculate(clusters.clusters, trajs, 1)
         # TODO: check degeneracy after next steps
         self.assertAlmostEqual(params.epsilon, params.minEpsilon+rateVariation)
-        degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 2)
+        degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, 2)
         self.assertAlmostEqual(params.epsilon, params.minEpsilon+2*rateVariation)
-        degeneracy9 = variable_epsilon.calculate(clusters.clusters, trajs, params, 9)
+        degeneracy9 = variable_epsilon.calculate(clusters.clusters, trajs, 9)
         self.assertAlmostEqual(params.epsilon, params.minEpsilon)
 
     def testPeriodicVariableEpsilonCalculator(self):
-        variable_epsilon = spawning.VariableEpsilonDegeneracyCalculator()
         params = spawning.SpawningParams()
         params.epsilon = 0.5
         params.varEpsilonType = "linearVariation"
@@ -238,7 +237,8 @@ class TestSpawningCalculator(unittest.TestCase):
         params_test = {"period": 8}
         params.period = params_test.get("period", params.variationWindow)
         params.period += np.sign(np.abs(params.variationWindow-params.period))
-        rateVariation = (params.maxEpsilon-params.minEpsilon)/3
+        variable_epsilon = spawning.VariableEpsilonDegeneracyCalculator(params)
+        # rateVariation = (params.maxEpsilon-params.minEpsilon)/3
         clusters = clustering.Clusters()
         sizes = [6, 2, 3, 1]
         energies = [-4, -2, -2, -1]
@@ -250,29 +250,29 @@ class TestSpawningCalculator(unittest.TestCase):
 
         trajs = 20
 
-        degeneracy6 = variable_epsilon.calculate(clusters.clusters, trajs, params, 0)
+        degeneracy6 = variable_epsilon.calculate(clusters.clusters, trajs, 0)
         golden6 = np.array([7, 4, 4, 5])
         np.testing.assert_array_equal(degeneracy6, golden6)
         self.assertAlmostEqual(params.epsilon, params.minEpsilon)
         for i in range(1, params.variationWindow):
-            degeneracy7 = variable_epsilon.calculate(clusters.clusters, trajs, params, i)
+            degeneracy7 = variable_epsilon.calculate(clusters.clusters, trajs, i)
         # TODO: check degeneracy after next steps
         # self.assertAlmostEqual(params.epsilon, params.minEpsilon+rateVariation)
-        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 2)
+        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, 2)
         # self.assertAlmostEqual(params.epsilon, params.maxEpsilon)
-        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 3)
+        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, 3)
         # self.assertAlmostEqual(params.epsilon,params.maxEpsilon-rateVariation/2)
-        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 4)
+        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, 4)
         # self.assertAlmostEqual(params.epsilon, params.minEpsilon)
-        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, params, 5)
+        # degeneracy8 = variable_epsilon.calculate(clusters.clusters, trajs, 5)
         # self.assertAlmostEqual(params.epsilon, params.minEpsilon)
-        # degeneracy9 = variable_epsilon.calculate(clusters.clusters, trajs, params, 9)
+        # degeneracy9 = variable_epsilon.calculate(clusters.clusters, trajs, 9)
         # self.assertAlmostEqual(params.epsilon, params.minEpsilon)
 
     def testUCBCalculator(self):
-        UCB = spawning.UCBCalculator()
         params = spawning.SpawningParams()
         params.alpha = 8.0
+        UCB = spawning.UCBCalculator(params)
 
         clusters = clustering.Clusters()
         sizes = [6, 2, 3, 1]
@@ -284,7 +284,7 @@ class TestSpawningCalculator(unittest.TestCase):
             clusters.addCluster(cluster)
 
         trajs = 20
-        degeneracy = UCB.calculate(clusters.clusters, trajs, params)
+        degeneracy = UCB.calculate(clusters.clusters, trajs)
         golden = np.array([3, 5, 3, 9])
         np.testing.assert_array_equal(degeneracy, golden)
 
