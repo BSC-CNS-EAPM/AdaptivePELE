@@ -54,6 +54,7 @@ class SpawningParams:
             "reportFilename": "basestring"
         },
         "independentMetric": {
+            "metricColumnInReport": "numbers.Real",
             "reportFilename": "basestring"
         },
         "inverselyProportional": {
