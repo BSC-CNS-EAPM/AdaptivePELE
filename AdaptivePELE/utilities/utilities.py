@@ -28,6 +28,10 @@ class UnsatisfiedDependencyException(Exception):
     __module__ = Exception.__module__
 
 
+class RequiredParameterMissingException(Exception):
+    __module__ = Exception.__module__
+
+
 class Topology:
     """
         Container object that points to the topology used in each trajectory

@@ -549,7 +549,7 @@ def main(jsonParams, clusteringHook=None):
     initialStructuresWildcard = generalParams[blockNames.GeneralParams.initialStructures]
     writeAll = generalParams.get(blockNames.GeneralParams.writeAllClustering, False)
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
-    resname = str(clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.ligandResname])
+    resname = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.ligandResname)
 
     print("================================")
     print("            PARAMS              ")
@@ -577,7 +577,8 @@ def main(jsonParams, clusteringHook=None):
     if len(initialStructures) > simulationRunner.getWorkingProcessors():
         raise InitialStructuresError("Error: More initial structures than Working Processors found!!!")
 
-    checkSymmetryDict(clusteringBlock, initialStructures, resname)
+    if resname is not None:
+        checkSymmetryDict(clusteringBlock, initialStructures, resname)
 
     outputPathConstants = constants.OutputPathConstants(outputPath)
 
@@ -618,6 +619,8 @@ def main(jsonParams, clusteringHook=None):
         writeTopologyFiles(initialStructures, outputPathConstants.topologies)
 
         if simulationRunner.parameters.runEquilibration:
+            if resname is None:
+                raise utilities.RequiredParameterMissingException("Resname not specified in clustering block!!!")
             initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningCalculator.parameters.reportFilename, outputPath, resname, topologies)
             topologies.setTopologies(initialStructures)
             writeTopologyFiles(initialStructures, outputPathConstants.topologies)
