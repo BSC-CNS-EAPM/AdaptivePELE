@@ -232,3 +232,11 @@ class TestadaptiveSampling(unittest.TestCase):
         self.check_succesful_simulation(output_path, 2)
         # cleanup
         shutil.rmtree(output_path)
+
+    def testNullIndependentMetric_xtc(self):
+        output_path = "tests/data/1f5k_adaptive_null_independent_metric_xtc/"
+        controlFile = "tests/data/templetized_controlFile_1f5k_null_independent_metric.conf"
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2)
+        # cleanup
+        shutil.rmtree(output_path)
