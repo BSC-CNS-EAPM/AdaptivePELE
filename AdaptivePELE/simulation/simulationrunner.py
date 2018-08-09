@@ -181,7 +181,7 @@ class SimulationRunner:
         if len(self.processorsToClusterMapping) == 0:
             return
         with open(epochDir+"/processorMapping.txt", "w") as f:
-            f.write(':'.join(map(str, self.processorsToClusterMapping)))
+            f.write("%s\n" % ':'.join(map(str, self.processorsToClusterMapping)))
 
     def readMappingFromDisk(self, epochDir):
         """
