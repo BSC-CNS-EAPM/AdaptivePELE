@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.6
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#thresholdcalculator">ThresholdCalculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rmsd-clustering">Rmsd clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contactmap-clustering">ContactMap clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#null-clustering">Null clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id4">Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 </ul>
@@ -413,12 +414,13 @@ file would look like:</p>
 </div>
 <div class="section" id="clustering-block">
 <h2>Clustering block<a class="headerlink" href="#clustering-block" title="Permalink to this headline">¶</a></h2>
-<p>Currently there are two functional types of clustering:</p>
+<p>Currently there are three functional types of clustering:</p>
 <ul class="simple">
 <li><strong>rmsd</strong>, which solely uses the ligand rmsd</li>
 <li><strong>contactMap</strong>, which uses a protein-ligand contact map matrix</li>
+<li><strong>null</strong>, which produces no clustering</li>
 </ul>
-<p>These clusterings are based on the leader algorithm, an extremely fast clustering method that in the
+<p>The first two clusterings are based on the leader algorithm, an extremely fast clustering method that in the
 worst case makes <em>kN</em> comparisons, where <em>N</em> is the number of snapshots to cluster and <em>k</em> the number of existing clusters.
 The procedure is as follows. Given some clusters, a conformation is said to belong to a cluster
 when it differs in less than a certain metric threshold (e.g. ligand RMSD)
@@ -467,6 +469,12 @@ There are currently three implemented methods to evaluate the similarity of cont
 <li><strong>correlation</strong>, which calculates the correlation between the two matrices</li>
 <li><strong>distance</strong>, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.</li>
 </ul>
+</div>
+<div class="section" id="null-clustering">
+<h3>Null clustering<a class="headerlink" href="#null-clustering" title="Permalink to this headline">¶</a></h3>
+<p>The <strong>null</strong> clustering produces no clustering, this is useful when running
+long simulations, were no spawning is needed, it saves memory and computional
+time.</p>
 </div>
 <div class="section" id="id4">
 <h3>Parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
@@ -531,6 +539,7 @@ There are several implemented strategies:</p>
 <li><strong>epsilon</strong>: An <em>epsilon</em> fraction of processors are distributed proportionally to the value of a metric, and the rest are inverselyProportional distributed.  A param <strong>n</strong> can be specified to only consider the <em>n</em> clusters with best metric.</li>
 <li><strong>variableEpsilon</strong>: Equivalent to epsilon, with an epsilon value changing over time</li>
 <li><strong>independent</strong>: Trajectories are run independently, as in the original PELE. It may be useful to restart simulations or to use the analysis scripts built for AdaptivePELE.</li>
+<li><strong>independentMetric</strong>: Trajectories are run independently, as in the original PELE. Howeveer in this method, instead of starting the next epoch from the last snapshot of the previous we start from the one that maximizes or minimizes a certain metric.</li>
 <li><strong>UCB</strong>: Upper confidence bound.</li>
 <li><strong>FAST</strong>: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).</li>
 </ul>
@@ -551,7 +560,7 @@ There are two types of density calculators:</p>
 <h3>Parameters<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. “report”.</li>
-<li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (zero indexed)</li>
+<li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (one indexed)</li>
 <li><strong>epsilon</strong> (<em>float</em>, mandatory in <strong>epsilon</strong> spawning): The fraction of the processors that will be assigned according to the selected metric</li>
 <li><strong>metricWeights</strong> (<em>string</em>, default=linear): Selects how to distribute the weights of the cluster according to its metric, two options: linear (proportional to metric) or Boltzmann weigths (proportional to exp(-metric/T). Needs to define the temperature <strong>T</strong>.</li>
 <li><strong>T</strong> (<em>float</em>, default=1000): Temperature, only used for Boltzmann weights</li>

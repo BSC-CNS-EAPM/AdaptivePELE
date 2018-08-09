@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.6
               </div>
             
           
@@ -314,7 +314,9 @@ equilibration run</li>
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.equilibrate">
 <code class="descname">equilibrate</code><span class="sig-paren">(</span><em>initialStructures</em>, <em>outputPathConstants</em>, <em>reportFilename</em>, <em>outputPath</em>, <em>resname</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.equilibrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run short simulation to equilibrate the system. It will run one
-such simulation for every initial structure</p>
+such simulation for every initial structure
+(some of the arguments are not needed, such as (reportFilename, outputPath and topology) but they are kept
+to follow the same structure has the Super class definition)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -390,7 +392,16 @@ such simulation for every initial structure</p>
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.runTleap">
 <code class="descname">runTleap</code><span class="sig-paren">(</span><em>TleapControlFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.runTleap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.runTleap" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Method that runs the Tleap software form Ambertools</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>TleapControlFile</strong> (<em>str</em>) – Path to the Tleap.in file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -484,7 +495,7 @@ to the available processors</p>
 <li><strong>numberOfSnapshots</strong> (<em>int</em>) – Number of complexes to write</li>
 <li><strong>tmpInitialStructuresTemplate</strong> (<em>str</em>) – Template with the name of the initial strutctures</li>
 <li><strong>iteration</strong> (<em>int</em>) – Epoch number</li>
-<li><strong>equilibration</strong> (<em>bool</em>) – Flag to mark wether the complexes are part of an
+<li><strong>equilibration</strong> (<em>bool</em>) – Flag to mark whether the complexes are part of an
 equilibration run</li>
 </ul>
 </td>
@@ -564,7 +575,7 @@ file for equilibration runs</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.getNextIterationBox">
-<code class="descname">getNextIterationBox</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>outputFolder</em>, <em>resname</em>, <em>topologies=None</em>, <em>epoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.getNextIterationBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getNextIterationBox" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getNextIterationBox</code><span class="sig-paren">(</span><em>outputFolder</em>, <em>resname</em>, <em>topologies=None</em>, <em>epoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.getNextIterationBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getNextIterationBox" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select the box for the next epoch, currently selecting the COM of
 the cluster with max SASA</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -572,7 +583,6 @@ the cluster with max SASA</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
 <li><strong>outputFolder</strong> (<em>str</em>) – Folder to the trajectories</li>
 <li><strong>resname</strong> (<em>str</em>) – Name of the ligand in the pdb</li>
 <li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>

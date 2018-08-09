@@ -260,13 +260,15 @@ Example of a minimal simulation block::
 Clustering block
 ----------------
 
-Currently there are two functional types of clustering:
+Currently there are three functional types of clustering:
 
 * **rmsd**, which solely uses the ligand rmsd
 
 * **contactMap**, which uses a protein-ligand contact map matrix
 
-These clusterings are based on the leader algorithm, an extremely fast clustering method that in the 
+* **null**, which produces no clustering
+
+The first two clusterings are based on the leader algorithm, an extremely fast clustering method that in the 
 worst case makes *kN* comparisons, where *N* is the number of snapshots to cluster and *k* the number of existing clusters.
 The procedure is as follows. Given some clusters, a conformation is said to belong to a cluster 
 when it differs in less than a certain metric threshold (e.g. ligand RMSD)
@@ -323,6 +325,14 @@ There are currently three implemented methods to evaluate the similarity of cont
 * **correlation**, which calculates the correlation between the two matrices
 
 * **distance**, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.
+
+
+Null clustering
+.....................
+
+The **null** clustering produces no clustering, this is useful when running
+long simulations, were no spawning is needed, it saves memory and computional
+time.
 
 Parameters
 ..........
@@ -394,6 +404,8 @@ There are several implemented strategies:
 
 * **independent**: Trajectories are run independently, as in the original PELE. It may be useful to restart simulations or to use the analysis scripts built for AdaptivePELE.
 
+* **independentMetric**: Trajectories are run independently, as in the original PELE. Howeveer in this method, instead of starting the next epoch from the last snapshot of the previous we start from the one that maximizes or minimizes a certain metric.
+
 * **UCB**: Upper confidence bound.
 
 * **FAST**: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).
@@ -421,7 +433,7 @@ Parameters
 
 * **reportFilename** (*string*, mandatory): Basename to match the report file with metrics. E.g. "report". 
 
-* **metricColumnInReport** (*integer*, mandatory): Column of the report file that contains the metric of interest (zero indexed)
+* **metricColumnInReport** (*integer*, mandatory): Column of the report file that contains the metric of interest (one indexed)
 
 * **epsilon** (*float*, mandatory in **epsilon** spawning): The fraction of the processors that will be assigned according to the selected metric
 

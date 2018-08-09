@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.6
               </div>
             
           
@@ -205,7 +205,9 @@
 <li>Add the possibility of running MD simulations using OpenMM</li>
 <li>Add new script analysis/identifyClusterSnapshot.py, to identify to which
 cluster belongs a given conformation within a simulation</li>
-<li>Add support for formats trr, dcd and dtr</li>
+<li>Add support for formats trr, dcd and dtr, mdcrd, nc</li>
+<li>Add the null clustering method</li>
+<li>Add independentMetric spawning</li>
 </ul>
 </div></blockquote>
 </div>
@@ -230,6 +232,8 @@ no accepted steps</li>
 referring to simulation, moved into SimulationRunner class</li>
 <li>Change how AdaptivePELE deals with topologies, now it supports several
 different topologies in a single simulation</li>
+<li>Change how the spawning parameters are used, now are an attribute of the
+spawning calculator</li>
 </ul>
 </div></blockquote>
 </div>

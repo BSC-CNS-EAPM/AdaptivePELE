@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.6
               </div>
             
           
@@ -143,6 +143,7 @@
 <span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">reraise</span> <span class="k">as</span> <span class="n">raise_</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">socket</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -156,9 +157,18 @@
     <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">RMSDCalculator</span><span class="p">,</span> <span class="n">atomset</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+    <span class="n">PARALELLIZATION</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">PARALELLIZATION</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <span class="k">class</span> <span class="nc">UnsatisfiedDependencyException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="n">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="n">__module__</span>
+
+
+<span class="k">class</span> <span class="nc">RequiredParameterMissingException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="n">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="n">__module__</span>
 
 
@@ -260,7 +270,7 @@
 <span class="sd">            :type epochDir: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">epochDir</span><span class="o">+</span><span class="s2">&quot;/topologyMapping.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topologyMap</span><span class="p">[</span><span class="n">epoch</span><span class="p">])))</span></div>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topologyMap</span><span class="p">[</span><span class="n">epoch</span><span class="p">])))</span></div>
 
 <div class="viewcode-block" id="Topology.readMappingFromDisk"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology.readMappingFromDisk">[docs]</a>    <span class="k">def</span> <span class="nf">readMappingFromDisk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epochDir</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -339,6 +349,12 @@
     <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.dtr&quot;</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">md</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">DTRTrajectoryFile</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">snapshotsWithInfo</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.mdcrd&quot;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">md</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">MDCRDTrajectoryFile</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">snapshotsWithInfo</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.nc&quot;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">md</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">NetCDFTrajectoryFile</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">snapshotsWithInfo</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecongnized file extension for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">trajectoryFile</span><span class="p">)</span>
@@ -356,6 +372,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">trajFilename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">4</span><span class="p">])</span></div>
 
+
 <div class="viewcode-block" id="getPrmtopNum"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getPrmtopNum">[docs]</a><span class="k">def</span> <span class="nf">getPrmtopNum</span><span class="p">(</span><span class="n">prmtopFilename</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the prmtop number</span>
@@ -366,6 +383,7 @@
 <span class="sd">        :returns: int -- prmtop number</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">prmtopFilename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">7</span><span class="p">])</span></div>
+
 
 <div class="viewcode-block" id="calculateContactMapEigen"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.calculateContactMapEigen">[docs]</a><span class="k">def</span> <span class="nf">calculateContactMapEigen</span><span class="p">(</span><span class="n">contactMap</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -720,9 +738,31 @@
         <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;END</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="writeObject"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.writeObject">[docs]</a><span class="k">def</span> <span class="nf">writeObject</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">object_to_write</span><span class="p">):</span>
+<div class="viewcode-block" id="writeObject"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.writeObject">[docs]</a><span class="k">def</span> <span class="nf">writeObject</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">object_to_write</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">object_to_write</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">object_to_write</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">protocol</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getCpuCount"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getCpuCount">[docs]</a><span class="k">def</span> <span class="nf">getCpuCount</span><span class="p">():</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">PARALELLIZATION</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UnsatisfiedDependencyException</span><span class="p">(</span><span class="s2">&quot;Multiprocessing module not found, will not be able to parallelize&quot;</span><span class="p">)</span>
+    <span class="n">machine</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">getfqdn</span><span class="p">()</span>
+    <span class="n">cores</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s2">&quot;bsccv&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># life cluster</span>
+        <span class="n">cores</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SLURM_NTASKS&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="s2">&quot;mn.bsc&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># nord3</span>
+        <span class="n">cores</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LSB_DJOB_NUMPROC&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="s2">&quot;bsc.mn&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># MNIV</span>
+        <span class="n">cores</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SLURM_NPROCS&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">cores</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cores</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="n">cores</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Take 1 less than the count of processors, to not clog the machine</span>
+    <span class="k">return</span> <span class="n">cores</span> <span class="ow">or</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">mp</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
