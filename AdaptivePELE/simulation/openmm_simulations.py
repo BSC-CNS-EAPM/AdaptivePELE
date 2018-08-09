@@ -7,6 +7,8 @@ from __future__ import absolute_import, division, print_function
 import os
 import sys
 import time
+import functools
+import traceback
 import simtk.openmm as mm
 import simtk.openmm.app as app
 import simtk.unit as unit
@@ -15,6 +17,29 @@ try:
     FileNotFoundError
 except NameError:
     FileNotFoundError = IOError
+try:
+    basestring
+except NameError:
+    basestring = str
+
+
+def get_traceback(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception, ex:
+            ret = '#' * 60
+            ret += "\nException caught:"
+            ret += "\n"+'-'*60
+            ret += "\n" + traceback.format_exc()
+            ret += "\n" + '-' * 60
+            ret += "\n" + "#" * 60
+            print(sys.stderr, ret)
+            sys.stderr.flush()
+            raise ex
+
+    return wrapper
 
 
 class CustomStateDataReporter(app.StateDataReporter):
@@ -81,6 +106,7 @@ class CustomStateDataReporter(app.StateDataReporter):
         return values
 
 
+@get_traceback
 def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     """
         Function that runs the whole equilibration process and returns the final pdb
