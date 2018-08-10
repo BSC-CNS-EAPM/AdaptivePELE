@@ -139,6 +139,7 @@ class SimulationParams:
     equilibrationLength = "equilibrationLength"
     trajectoryName = "trajectoryName"
     srun = "useSrun"
+    srunParameters = "srunParameters"
     # params for MD
     ligandCharge = "ligandCharge"
     nonBondedCutoff = "nonBondedCutoff"

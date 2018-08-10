@@ -151,6 +151,7 @@ class SimulationParams:
         "equilibrationLength": "numbers.Real",
         "numberEquilibrationStructures": "numbers.Real",
         "useSrun": "bool",
+        "srunParameters": "basestring",
         "exitCondition": "dict",
         "trajectoryName": "basestring",
         "ligandCharge": "numbers.Real",
