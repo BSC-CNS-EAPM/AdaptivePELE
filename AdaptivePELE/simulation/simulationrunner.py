@@ -357,15 +357,16 @@ class PeleSimulation(SimulationRunner):
 
         self.createSymbolicLinks()
         if self.parameters.srun:
-            toRun = ["srun", self.parameters.executable, runningControlFile]
+            toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
         else:
-            toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
-        toRun = " ".join(toRun)
-        print(toRun)
+            toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
+            toRun = map(str, toRun)
+        print(" ".join(toRun))
         startTime = time.time()
-        proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
         (out, err) = proc.communicate()
-        print(out)
+        if out:
+            print(out)
         if err:
             print(err)
 
@@ -392,7 +393,7 @@ class PeleSimulation(SimulationRunner):
         self.createSymbolicLinks()
         runningControlFile = outputPathConstants.tmpControlFilename % epoch
         if self.parameters.srun:
-            toRun = ["srun", "-n", str(self.parameters.processors)]+ self.parameters.srunParameters +[self.parameters.executable, runningControlFile]
+            toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
         else:
             toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
             toRun = map(str, toRun)
