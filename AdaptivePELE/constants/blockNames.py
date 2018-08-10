@@ -137,6 +137,7 @@ class SimulationParams:
     condition = "condition"
     numTrajs = "numberTrajectories"
     equilibrationLength = "equilibrationLength"
+    trajectoryName = "trajectoryName"
     srun = "useSrun"
     # params for MD
     ligandCharge = "ligandCharge"

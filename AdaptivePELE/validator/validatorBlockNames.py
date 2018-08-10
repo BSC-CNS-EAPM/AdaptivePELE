@@ -152,6 +152,7 @@ class SimulationParams:
         "numberEquilibrationStructures": "numbers.Real",
         "useSrun": "bool",
         "exitCondition": "dict",
+        "trajectoryName": "basestring",
         "ligandCharge": "numbers.Real",
         "nonBondedCutoff": "numbers.Real",
         "Temperature": "numbers.Real",
