@@ -240,3 +240,11 @@ class TestadaptiveSampling(unittest.TestCase):
         self.check_succesful_simulation(output_path, 2)
         # cleanup
         shutil.rmtree(output_path)
+
+    def testReport_xtc(self):
+        output_path = "tests/data/1f5k_adaptive_rmsd_inv_report_xtc"
+        controlFile = "tests/data/templetized_controlFile_1f5k_rmsd_inv_report_xtc.conf"
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2)
+        # cleanup
+        shutil.rmtree(output_path)
