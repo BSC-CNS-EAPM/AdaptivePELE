@@ -156,6 +156,7 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     return outputPDB
 
 
+@get_traceback
 def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
     """
     Function that runs a minimization of the system
@@ -199,6 +200,7 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
     return simulation
 
 
+@get_traceback
 def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, reportName, velocities=None):
     """
     Function that runs an equilibration at constant volume conditions.
@@ -250,6 +252,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     return simulation
 
 
+@get_traceback
 def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, reportName, velocities=None):
     """
     Function that runs an equilibration at constant pressure conditions.
@@ -302,6 +305,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     return simulation
 
 
+@get_traceback
 def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, restart=False):
     """
     Functions that runs the production run at NVT conditions.
