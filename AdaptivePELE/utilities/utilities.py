@@ -472,6 +472,8 @@ def getPELEControlFileDict(templetizedControlFile):
 
     templateNames = {ele[1]: '"$%s"' % ele[1] for ele in string.Template.pattern.findall(peleControlFile)}
     templateNames.pop("OUTPUT_PATH", None)
+    templateNames.pop("REPORT_NAME", None)
+    templateNames.pop("TRAJECTORY_NAME", None)
     return json.loads(string.Template(peleControlFile).safe_substitute(templateNames)), templateNames
 
 

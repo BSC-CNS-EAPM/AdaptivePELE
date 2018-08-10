@@ -61,6 +61,7 @@ class SimulationParameters:
         self.trajectoryName = None
         self.srun = False
         self.numberEquilibrationStructures = 10
+        self.reportName = ""
         # parameters needed for MD simulations and their defaults
         self.ligandCharge = 0
         self.nonBondedCutoff = 8
@@ -241,6 +242,19 @@ class SimulationRunner:
             peleControlFileDictionary["BOX_CENTER"] = self.parameters.boxCenter
         self.makeWorkingControlFile(outputPathConstants.tmpControlFilename % epoch, peleControlFileDictionary)
 
+    def unifyReportNames(self, spawningReportName):
+        """
+            Ensure that the reportName in the simulation parameters is the same
+            as the one provided in the spawning parameters
+
+            :param spawningReportName: Name of the report file provided in the spawning parameters
+            :type spawningReportName: str
+        """
+        baseReportName = self.parameters.reportName.split("_%d")
+        if baseReportName[0] != spawningReportName:
+            baseReportName[0] = spawningReportName
+            self.parameters.reportName = "_%d".join(baseReportName)
+
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
@@ -366,11 +380,13 @@ class PeleSimulation(SimulationRunner):
         :param ControlFileDictionary: Dictionary with the values to substitute in the template
         :param topologies: topology class
         """
-
+        trajName = "".join(self.parameters.trajectoryName.split("_%d"))
         print("Preparing Control File")
         ControlFileDictionary = {"COMPLEXES": initialStructuresAsString,
                                  "PELE_STEPS": self.parameters.peleSteps,
-                                 "BOX_RADIUS": self.parameters.boxRadius}
+                                 "BOX_RADIUS": self.parameters.boxRadius,
+                                 "REPORT_NAME": reportFileName,
+                                 "TRAJECTORY_NAME": trajName}
         self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         self.createSymbolicLinks()
         runningControlFile = outputPathConstants.tmpControlFilename % epoch
@@ -497,11 +513,11 @@ class PeleSimulation(SimulationRunner):
         newStructure = []
         if self.parameters.equilibrationLength is None:
             self.parameters.equilibrationLength = self.calculateEquilibrationLength()
+        trajName = "".join(self.parameters.trajectoryName.split("_%d"))
         equilibrationPeleDict = {"PELE_STEPS": self.parameters.equilibrationLength, "SEED": self.parameters.seed}
         peleControlFileDict, templateNames = utilities.getPELEControlFileDict(self.parameters.templetizedControlFile)
         peleControlFileDict = self.getEquilibrationControlFile(peleControlFileDict)
         similarityColumn = self.getMetricColumns(peleControlFileDict)
-        reportWildcard, trajWildcard = utilities.getReportAndTrajectoryWildcard(peleControlFileDict)
 
         for i, structure in enumerate(initialStructures):
             equilibrationOutput = os.path.join(outputPath, "equilibration_%d" % (i+1))
@@ -513,6 +529,8 @@ class PeleSimulation(SimulationRunner):
             equilibrationPeleDict["COMPLEXES"] = initialStructureString
             equilibrationPeleDict["BOX_CENTER"] = self.selectInitialBoxCenter(structure, resname)
             equilibrationPeleDict["BOX_RADIUS"] = 2
+            equilibrationPeleDict["REPORT_NAME"] = reportFilename
+            equilibrationPeleDict["TRAJECTORY_NAME"] = trajName
             for name in ["BOX_CENTER", "BOX_RADIUS"]:
                 # If the template PELE control file is not templetized with the
                 # box information, include it manually
@@ -528,8 +546,8 @@ class PeleSimulation(SimulationRunner):
             self.makeWorkingControlFile(equilibrationControlFile, equilibrationPeleDict, peleControlString)
             self.runEquilibrationPELE(equilibrationControlFile)
             # Extract report, trajnames, metrics columns from pele control file
-            reportNames = os.path.join(equilibrationOutput, reportWildcard)
-            trajNames = os.path.join(equilibrationOutput, trajWildcard)
+            reportNames = os.path.join(equilibrationOutput, self.parameters.reportName)
+            trajNames = os.path.join(equilibrationOutput, self.parameters.trajectoryName)
             if len(initialStructures) == 1 and self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationLastSnapshot:
                 newStructure.extend(self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames, topology=topologies.topologies[i]))
             elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationSelect:
@@ -951,6 +969,16 @@ class MDSimulation(SimulationRunner):
         self.restart = False
         print("OpenMM took %.2f sec" % (endTime - startTime))
 
+    def unifyReportNames(self, spawningReportName):
+        """
+            Ensure that the reportName in the simulation parameters is the same
+            as the one provided in the spawning parameters
+
+            :param spawningReportName: Name of the report file provided in the spawning parameters
+            :type spawningReportName: str
+        """
+        pass
+
     def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
         """
             Creates the string to substitute the complexes in the PELE control file
@@ -1146,14 +1174,19 @@ class RunnerBuilder:
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
+            params.trajectoryName = paramsBlock.get(blockNames.SimulationParams.trajectoryName)
+            peleDict, _ = utilities.getPELEControlFileDict(params.templetizedControlFile)
+            params.reportName, trajectoryName = utilities.getReportAndTrajectoryWildcard(peleDict)
+            if params.trajectoryName is None:
+                params.trajectoryName = trajectoryName
+            else:
+                params.trajectoryName = "_%d".join(os.path.splitext(params.trajectoryName))
             params.modeMovingBox = paramsBlock.get(blockNames.SimulationParams.modeMovingBox)
             if params.modeMovingBox is not None:
                 if params.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxBinding:
                     params.SASAforBox = 1.0
                 elif params.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxUnBinding:
                     params.SASAforBox = 0.0
-                peleDict, _ = utilities.getPELEControlFileDict(params.templetizedControlFile)
-                params.reportName, params.trajectoryName = utilities.getReportAndTrajectoryWildcard(peleDict)
                 params.columnSASA = utilities.getSASAcolumnFromControlFile(peleDict)
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
