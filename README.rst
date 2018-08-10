@@ -85,7 +85,7 @@ AdaptivePELE is research software. If you make use of AdaptivePELE in scientific
 .. |GitHub release| image:: https://img.shields.io/github/release/AdaptivePELE/AdaptivePELE.svg
     :target: https://github.com/AdaptivePELE/AdaptivePELE/releases/
 
-.. |PyPI release| image:: https://img.shields.io/pypi/v/nine.svg
+.. |PyPI release| image:: https://img.shields.io/pypi/v/ansicolortags.svg
     :target: https://pypi.org/project/AdaptivePELE/
 
 .. |DOI| image:: https://zenodo.org/badge/DOI/10.1038/s41598-017-08445-5.svg
