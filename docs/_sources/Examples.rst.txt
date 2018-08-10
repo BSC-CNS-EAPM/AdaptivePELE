@@ -141,6 +141,10 @@ Optionally other fields might be templetized as well:
 
 * **radius**: The radius of the simulation box is templetized as ``"radius": $BOX_RADIUS``  
 
+* **reportName**: The name of the report file is templetized as ``"reportPath": "$OUTPUT_PATH/$REPORT_NAME"``. Note that the value of the reportName is not a parameter of the simulation block, but is given by the **reportFilename** option of the spawning block
+
+* **trajectoryName**: The name of the trajectory file is templetized as ``"trajectoryPath": "$OUTPUT_PATH/$TRAJECTORY_NAME"``
+
 Parameters
 ..........
 
@@ -157,6 +161,8 @@ Optionally, you can also use the following parameters:
 * **data** (*string*, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE
 * **documents** (*string*, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE
 * **executable** (*string*, default=MareNostrum or Life cluster path): Path to the Pele executable folder
+* **trajectoryName** (*string*, default=None): Name of the trajectories to
+  substitute in the PELE control file
 * **modeMovingBox** (*string*, default=None, possible values={*unbinding*, *binding*}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation
 * **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center
 * **boxRadius** (*int*, default=20): Value of the simulation box radius

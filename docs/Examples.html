@@ -289,6 +289,8 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <ul class="simple">
 <li><strong>fixedCenter</strong>: The center of the simulation box is templetized as <code class="docutils literal"><span class="pre">&quot;fixedCenter&quot;:</span> <span class="pre">$BOX_CENTER</span></code></li>
 <li><strong>radius</strong>: The radius of the simulation box is templetized as <code class="docutils literal"><span class="pre">&quot;radius&quot;:</span> <span class="pre">$BOX_RADIUS</span></code></li>
+<li><strong>reportName</strong>: The name of the report file is templetized as <code class="docutils literal"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$REPORT_NAME&quot;</span></code>. Note that the value of the reportName is not a parameter of the simulation block, but is given by the <strong>reportFilename</strong> option of the spawning block</li>
+<li><strong>trajectoryName</strong>: The name of the trajectory file is templetized as <code class="docutils literal"><span class="pre">&quot;trajectoryPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$TRAJECTORY_NAME&quot;</span></code></li>
 </ul>
 </div>
 <div class="section" id="id3">
@@ -306,6 +308,8 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <li><strong>data</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE</li>
 <li><strong>documents</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE</li>
 <li><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder</li>
+<li><strong>trajectoryName</strong> (<em>string</em>, default=None): Name of the trajectories to
+substitute in the PELE control file</li>
 <li><strong>modeMovingBox</strong> (<em>string</em>, default=None, possible values={<em>unbinding</em>, <em>binding</em>}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation</li>
 <li><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</li>
 <li><strong>boxRadius</strong> (<em>int</em>, default=20): Value of the simulation box radius</li>

@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Add support for formats trr, dcd and dtr, mdcrd, nc
     - Add the null clustering method
     - Add independentMetric spawning
+    - Add reportName template for PELE control file
 
 ### Bug fixes:
 
@@ -21,7 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Fix bug in atomset that wrote MODEL lines in PDBs non-compliant with the
     standard
     - Fix minor bug in in select equilibration structure with trajectories with
-      no accepted steps 
+    no accepted steps 
 
 ### Behaviour changes from previous version:
 
@@ -30,7 +31,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Change how AdaptivePELE deals with topologies, now it supports several
     different topologies in a single simulation
     - Change how the spawning parameters are used, now are an attribute of the
-      spawning calculator
+    spawning calculator
+    - Update how the srun command is called when running PELE, also added
+    srunParameters to customize the call to srun
 
 ## [1.5.1] - 2018-06-07
 

@@ -18,6 +18,8 @@ New features:
     - Add support for formats trr, dcd and dtr, mdcrd, nc
     - Add the null clustering method
     - Add independentMetric spawning
+    - Add reportName template for PELE control file
+
 
 Bug fixes:
 ..........
@@ -38,6 +40,8 @@ Behaviour changes from previous version:
       different topologies in a single simulation
     - Change how the spawning parameters are used, now are an attribute of the
       spawning calculator
+    - Update how the srun command is called when running PELE, also added
+      srunParameters to customize the call to srun
 
 1.5.1 - 2018-06-07
 --------------------

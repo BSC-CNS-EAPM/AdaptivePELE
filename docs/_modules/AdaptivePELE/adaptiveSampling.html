@@ -725,6 +725,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
         <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">utilities</span><span class="o">.</span><span class="n">cleanup</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">)</span>
 
+    <span class="n">simulationRunner</span><span class="o">.</span><span class="n">unifyReportNames</span><span class="p">(</span><span class="n">spawningCalculator</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">reportFilename</span><span class="p">)</span>
     <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
     <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">)</span>
     <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">topologies</span><span class="p">)</span>
