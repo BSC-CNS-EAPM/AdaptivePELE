@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.6
               </div>
             
           
@@ -143,6 +143,14 @@
 simulation built around the Protein Energy Landscape Exploration method (<a class="reference external" href="https://pele.bsc.es/pele.wt">PELE</a>) developed in the Electronic and Atomic Protein Modelling grop (<a class="reference external" href="https://www.bsc.es/discover-bsc/organisation/scientific-structure/electronic-and-atomic-protein-modeling-eapm">EAPM</a>) at the Barcelona Supercomputing Center (<a class="reference external" href="https://www.bsc.es">BSC</a>). AdaptivePELE’s
 code is publicly available in <a class="reference external" href="https://github.com/AdaptivePELE/AdaptivePELE">GitHub</a> under the MIT license.</p>
 <img alt="image trouble" class="align-center" src="_images/adaptiveDiagram.png" />
+<div class="section" id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lecina">Daniel Lecina</a>, <a class="reference external" href="https://github.com/cescgina">Joan Francesc Gilabert</a>, <a class="reference external" href="https://github.com/OriolGraCar">Oriol Gracia</a>, <a class="reference external" href="https://github.com/danielSoler93">Daniel Soler</a></p>
+<div class="section" id="mantainer">
+<h3>Mantainer<a class="headerlink" href="#mantainer" title="Permalink to this headline">¶</a></h3>
+<p>Joan Francesc Gilabert (<a class="reference external" href="mailto:cescgina&#37;&#52;&#48;gmail&#46;com">cescgina<span>&#64;</span>gmail<span>&#46;</span>com</a>)</p>
+</div>
+</div>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -151,12 +159,13 @@ code is publicly available in <a class="reference external" href="https://github
 <li class="toctree-l2"><a class="reference internal" href="Examples.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Examples.html#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Examples.html#control-file-outline">Control file outline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Examples.html#generalparams-block">generalParams block</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Examples.html#simulation-block">simulation block</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Examples.html#clustering-block">clustering block</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Examples.html#spawning-block">spawning block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Examples.html#generalparams-block">GeneralParams block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Examples.html#simulation-block">Simulation block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Examples.html#clustering-block">Clustering block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Examples.html#spawning-block">Spawning block</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Examples.html#control-file-examples">Control File Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Examples.html#output">Output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Examples.html#analysis">Analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Examples.html#dynamical-hooks">Dynamical hooks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Examples.html#non-pdb-trajectories">Non-PDB trajectories</a></li>
 </ul>
@@ -169,14 +178,15 @@ code is publicly available in <a class="reference external" href="https://github
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Changelog.html#unreleased">1.6 - Unreleased</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Changelog.html#id1">1.5.1 - 2018-06-07</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id2">1.5 - 2018-05-11</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id6">1.4.2 - 2018-03-02</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id10">1.4 - 2018-01-30</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id14">1.3 - 2017-06-01</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id18">1.2 - 2017-05-09</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id22">1.1 - 2017-02-17</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id25">1.0 - 2017-01-19</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id5">1.5 - 2018-05-11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id9">1.4.2 - 2018-03-02</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id13">1.4 - 2018-01-30</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id17">1.3 - 2017-06-01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id21">1.2 - 2017-05-09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id25">1.1 - 2017-02-17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Changelog.html#id28">1.0 - 2017-01-19</a></li>
 </ul>
 </li>
 </ul>

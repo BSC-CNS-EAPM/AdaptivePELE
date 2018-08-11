@@ -3,6 +3,7 @@ from builtins import range
 from six import reraise as raise_
 import os
 import sys
+import socket
 import shutil
 import glob
 import numpy as np
@@ -16,9 +17,18 @@ except ImportError:
     import pickle
 from AdaptivePELE.atomset import RMSDCalculator, atomset
 from AdaptivePELE.freeEnergies import utils
+try:
+    import multiprocessing as mp
+    PARALELLIZATION = True
+except ImportError:
+    PARALELLIZATION = False
 
 
 class UnsatisfiedDependencyException(Exception):
+    __module__ = Exception.__module__
+
+
+class RequiredParameterMissingException(Exception):
     __module__ = Exception.__module__
 
 
@@ -120,7 +130,7 @@ class Topology:
             :type epochDir: str
         """
         with open(epochDir+"/topologyMapping.txt", "w") as f:
-            f.write(':'.join(map(str, self.topologyMap[epoch])))
+            f.write("%s\n" % ':'.join(map(str, self.topologyMap[epoch])))
 
     def readMappingFromDisk(self, epochDir, epoch):
         """
@@ -132,7 +142,7 @@ class Topology:
         """
         try:
             with open(epochDir+"/topologyMapping.txt") as f:
-                self.topologyMap[epoch] = map(int, f.read().rstrip().split(':'))
+                self.topologyMap[epoch] = list(map(int, f.read().rstrip().split(':')))
         except IOError:
             sys.stderr.write("WARNING: topologyMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
 
@@ -199,6 +209,12 @@ def getSnapshots(trajectoryFile, verbose=False, topology=None):
     elif ext == ".dtr":
         with md.formats.DTRTrajectoryFile(trajectoryFile) as f:
             snapshotsWithInfo, _, _ = f.read()
+    elif ext == ".mdcrd":
+        with md.formats.MDCRDTrajectoryFile(trajectoryFile) as f:
+            snapshotsWithInfo, _ = f.read()
+    elif ext == ".nc":
+        with md.formats.NetCDFTrajectoryFile(trajectoryFile) as f:
+            snapshotsWithInfo, _, _, _ = f.read()
 
     else:
         raise ValueError("Unrecongnized file extension for %s" % trajectoryFile)
@@ -215,6 +231,18 @@ def getTrajNum(trajFilename):
         :returns: int -- Trajectory number
     """
     return int(trajFilename.split("_")[-1][:-4])
+
+
+def getPrmtopNum(prmtopFilename):
+    """
+        Gets the prmtop number
+
+        :param trajFilename: prmtop filename
+        :type trajFilename: str
+
+        :returns: int -- prmtop number
+    """
+    return int(prmtopFilename.split("_")[-1][:-7])
 
 
 def calculateContactMapEigen(contactMap):
@@ -444,6 +472,8 @@ def getPELEControlFileDict(templetizedControlFile):
 
     templateNames = {ele[1]: '"$%s"' % ele[1] for ele in string.Template.pattern.findall(peleControlFile)}
     templateNames.pop("OUTPUT_PATH", None)
+    templateNames.pop("REPORT_NAME", None)
+    templateNames.pop("TRAJECTORY_NAME", None)
     return json.loads(string.Template(peleControlFile).safe_substitute(templateNames)), templateNames
 
 
@@ -564,12 +594,34 @@ def convert_trajectory_to_pdb(trajectory, topology, output, output_folder):
             conf = traj.slice(i, copy=False)
             PDB = atomset.PDB()
             PDB.initialise(conf, topology=topology_contents)
-            fw.write("MODEL %d\n" % (i+1))
+            fw.write("MODEL     %4d\n" % (i+1))
             fw.write(PDB.pdb)
             fw.write("ENDMDL\n")
         fw.write("END\n")
 
 
-def writeObject(filename, object_to_write):
+def writeObject(filename, object_to_write, protocol=2):
     with open(filename, "wb") as f:
-        pickle.dump(object_to_write, f)
+        pickle.dump(object_to_write, f, protocol)
+
+
+def getCpuCount():
+    if not PARALELLIZATION:
+        raise UnsatisfiedDependencyException("Multiprocessing module not found, will not be able to parallelize")
+    machine = socket.getfqdn()
+    cores = None
+    if "bsccv" in machine:
+        # life cluster
+        cores = os.getenv("SLURM_NTASKS", None)
+    elif "mn.bsc" in machine:
+        # nord3
+        cores = os.getenv("LSB_DJOB_NUMPROC", None)
+    elif "bsc.mn" in machine:
+        # MNIV
+        cores = os.getenv("SLURM_NPROCS", None)
+    try:
+        cores = int(cores)
+    except TypeError:
+        cores = None
+    # Take 1 less than the count of processors, to not clog the machine
+    return cores or max(1, mp.cpu_count()-1)

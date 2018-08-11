@@ -29,7 +29,7 @@ def parseArgs():
     return arg
 
 
-class EmptyInitialStructuresError(Exception):
+class InitialStructuresError(Exception):
     __module__ = Exception.__module__
 
 
@@ -142,7 +142,7 @@ def expandInitialStructuresWildcard(initialStructuresWildcard):
     totalInitialStructures = []
     for initialStructureWildcard in initialStructuresWildcard:
         expandedStructures = glob.glob(initialStructureWildcard)
-        totalInitialStructures.extend(expandedStructures)
+        totalInitialStructures.extend(map(os.path.abspath, expandedStructures))
     return totalInitialStructures
 
 
@@ -260,7 +260,7 @@ def findFirstRun(outputPath, clusteringOutputObject, simulationRunner):
 
     objectsFound = []
     for epoch in epochFolders:
-        if simulationRunner.checkSimulationInterrupted(epoch):
+        if simulationRunner.checkSimulationInterrupted(epoch, outputPath):
             # this should only happen in MD simulations, where checkpoints are
             # periodically written in case the adaptive run dies at
             # mid-simulation, be able to use the already computed trajectories
@@ -273,7 +273,7 @@ def findFirstRun(outputPath, clusteringOutputObject, simulationRunner):
         epoch = objectsFound.pop(0)
         if checkIntegrityClusteringObject(clusteringOutputObject % epoch):
             return epoch + 1
-    return 0
+    return None
 
 
 def checkIntegrityClusteringObject(objectPath):
@@ -478,7 +478,7 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
 
     clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies)
 
-    degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.getWorkingProcessors(), spawningParams, firstRun)
+    degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.getWorkingProcessors(), firstRun)
     spawningCalculator.log()
     seedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun, topologies=topologies)
     # for compatibility with old data
@@ -538,7 +538,7 @@ def main(jsonParams, clusteringHook=None):
     generalParams, spawningBlock, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
 
     spawningAlgorithmBuilder = spawning.SpawningAlgorithmBuilder()
-    spawningCalculator, spawningParams = spawningAlgorithmBuilder.build(spawningBlock)
+    spawningCalculator = spawningAlgorithmBuilder.build(spawningBlock)
 
     runnerbuilder = simulationrunner.RunnerBuilder()
     simulationRunner = runnerbuilder.build(simulationrunnerBlock)
@@ -549,7 +549,7 @@ def main(jsonParams, clusteringHook=None):
     initialStructuresWildcard = generalParams[blockNames.GeneralParams.initialStructures]
     writeAll = generalParams.get(blockNames.GeneralParams.writeAllClustering, False)
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
-    resname = str(clusteringBlock[blockNames.ClusteringTypes.params][blockNames.ClusteringTypes.ligandResname])
+    resname = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.ligandResname)
 
     print("================================")
     print("            PARAMS              ")
@@ -572,14 +572,20 @@ def main(jsonParams, clusteringHook=None):
 
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
     if not initialStructures:
-        raise EmptyInitialStructuresError("No initial structures found!!!")
-    checkSymmetryDict(clusteringBlock, initialStructures, resname)
+        raise InitialStructuresError("No initial structures found!!!")
+
+    if len(initialStructures) > simulationRunner.getWorkingProcessors():
+        raise InitialStructuresError("Error: More initial structures than Working Processors found!!!")
+
+    if resname is not None:
+        checkSymmetryDict(clusteringBlock, initialStructures, resname)
 
     outputPathConstants = constants.OutputPathConstants(outputPath)
 
     if not debug:
         atexit.register(utilities.cleanup, outputPathConstants.tmpFolder)
 
+    simulationRunner.unifyReportNames(spawningCalculator.parameters.reportFilename)
     utilities.makeFolder(outputPath)
     utilities.makeFolder(outputPathConstants.tmpFolder)
     utilities.makeFolder(outputPathConstants.topologies)
@@ -588,12 +594,16 @@ def main(jsonParams, clusteringHook=None):
     startFromScratch = False
     if restart:
         firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject, simulationRunner)
-        if firstRun == 0:
+        if firstRun is None:
             startFromScratch = True
         else:
             topology_files = glob.glob(os.path.join(outputPathConstants.topologies, "topology*.pdb"))
             topologies.setTopologies(topology_files)
-            clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningParams, spawningCalculator, simulationRunner, topologies)
+            if firstRun == 0:
+                createMappingForFirstEpoch(initialStructures, topologies, simulationRunner.getWorkingProcessors())
+                clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningCalculator.parameters, initialStructures, simulationRunner)
+            else:
+                clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningCalculator.parameters, spawningCalculator, simulationRunner, topologies)
             checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner)
 
     if startFromScratch or not restart:
@@ -610,12 +620,14 @@ def main(jsonParams, clusteringHook=None):
         writeTopologyFiles(initialStructures, outputPathConstants.topologies)
 
         if simulationRunner.parameters.runEquilibration:
-            initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningParams.reportFilename, outputPath, resname, topologies)
+            if resname is None:
+                raise utilities.RequiredParameterMissingException("Resname not specified in clustering block!!!")
+            initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningCalculator.parameters.reportFilename, outputPath, resname, topologies)
             topologies.setTopologies(initialStructures)
             writeTopologyFiles(initialStructures, outputPathConstants.topologies)
         createMappingForFirstEpoch(initialStructures, topologies, simulationRunner.getWorkingProcessors())
 
-        clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningParams, initialStructures, simulationRunner)
+        clusteringMethod, initialStructuresAsString, _ = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningCalculator.parameters, initialStructures, simulationRunner)
 
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
@@ -626,7 +638,7 @@ def main(jsonParams, clusteringHook=None):
         utilities.makeFolder(outputDir)
         print("Production run...")
         if not debug:
-            simulationRunner.runSimulation(i, outputPathConstants, initialStructuresAsString, topologies)
+            simulationRunner.runSimulation(i, outputPathConstants, initialStructuresAsString, topologies, spawningCalculator.parameters.reportFilename)
 
         simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
         topologies.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i, i)
@@ -641,12 +653,12 @@ def main(jsonParams, clusteringHook=None):
             clusteringHook(clusteringMethod, outputPathConstants, simulationRunner, i+1)
 
         if simulationRunner.parameters.modeMovingBox is not None:
-            simulationRunner.getNextIterationBox(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i, resname, topologies, i)
+            simulationRunner.getNextIterationBox(outputPathConstants.epochOutputPathTempletized % i, resname, topologies, i)
             clustersList, clustersFiltered = filterClustersAccordingToBox(simulationRunner.parameters, clusteringMethod)
         else:
             clustersList = clusteringMethod.clusters.clusters
 
-        degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), spawningParams, i)
+        degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), i)
         spawningCalculator.log()
 
         if degeneracyOfRepresentatives is not None:
@@ -655,13 +667,13 @@ def main(jsonParams, clusteringHook=None):
             print("Degeneracy", degeneracyOfRepresentatives)
             assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)
         else:
-            # When using null spawning the calculate method returns None
-            assert spawningCalculator.type == spawningTypes.SPAWNING_TYPES.null, "calculate returned None with spawning type %s" % spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]
+            # When using null or independent spawning the calculate method returns None
+            assert spawningCalculator.type in spawningTypes.SPAWNING_NO_DEGENERACY_TYPES, "calculate returned None with spawning type %s" % spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]
 
         clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                      degeneracyOfRepresentatives,
                                      outputPathConstants.clusteringOutputObject % i, writeAll)
-        simulationRunner.cleanCheckpointFiles(i)
+        simulationRunner.cleanCheckpointFiles(outputPathConstants.epochOutputPathTempletized % i)
 
         if i > 0:
             # Remove old clustering object, since we already have a newer one
@@ -673,10 +685,17 @@ def main(jsonParams, clusteringHook=None):
 
         # Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:
-            if degeneracyOfRepresentatives is not None:
-                numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, i+1, topologies=topologies)
+            if spawningCalculator.shouldWriteStructures():
+                # Differentiate between null spwaning and the rest of spawning
+                # methods
+                numberOfSeedingPoints, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants,
+                                                                                                       degeneracyOfRepresentatives,
+                                                                                                       clusteringMethod, i+1,
+                                                                                                       topologies=topologies)
                 simulationRunner.updateMappingProcessors(procMapping)
-                initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(numberOfSeedingPoints, outputPathConstants.tmpInitialStructuresTemplate, i+1)
+                initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(numberOfSeedingPoints,
+                                                                                              outputPathConstants.tmpInitialStructuresTemplate,
+                                                                                              i+1)
                 topologies.mapEpochTopologies(i+1, procMapping)
 
         if clusteringMethod.symmetries and nativeStructure:

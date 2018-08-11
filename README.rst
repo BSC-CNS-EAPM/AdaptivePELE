@@ -3,7 +3,7 @@ AdaptivePELE
 ============
 
 
-|MIT license| |GitHub release| |DOI|
+|MIT license| |GitHub release| |PyPI release| |DOI|
 
 AdaptivePELE is a Python module to perform enhancing sampling of molecular
 simulation built around the Protein Energy Landscape Exploration method (`PELE <https://pele.bsc.es/pele.wt>`_) developed in the Electronic and Atomic Protein Modelling grop (`EAPM <https://www.bsc.es/discover-bsc/organisation/scientific-structure/electronic-and-atomic-protein-modeling-eapm>`_) at the Barcelona Supercomputing Center (`BSC <https://www.bsc.es>`_).
@@ -27,7 +27,14 @@ An example of usage::
 Installation
 ------------
 
-In order to have a running copy of AdaptivePELE, you need to install and compile cython files in the base folder with::
+There are two methods to install AdaptivePELE, from PyPI (recommended) or
+directly from source.
+
+To install from PyPI simply run::
+
+    pip install AdaptivePELE
+
+To install from source, you need to install and compile cython files in the base folder with::
 
     git clone https://github.com/AdaptivePELE/AdaptivePELE.git
     cd AdaptivePELE
@@ -42,6 +49,14 @@ Documentation
 
 The documentation for AdaptivePELE can be found `here <https://adaptivepele.github.io/AdaptivePELE/>`_
 
+
+Contributors
+------------
+`Daniel Lecina <https://github.com/lecina>`_, `Joan Francesc Gilabert <https://github.com/cescgina>`_, `Oriol Gracia <https://github.com/OriolGraCar>`_, `Daniel Soler <https://github.com/danielSoler93>`_
+
+Mantainer
+---------
+Joan Francesc Gilabert (cescgina@gmail.com)
 
 Citation 
 --------
@@ -69,6 +84,9 @@ AdaptivePELE is research software. If you make use of AdaptivePELE in scientific
 
 .. |GitHub release| image:: https://img.shields.io/github/release/AdaptivePELE/AdaptivePELE.svg
     :target: https://github.com/AdaptivePELE/AdaptivePELE/releases/
+
+.. |PyPI release| image:: https://img.shields.io/pypi/v/AdaptivePELE.svg
+    :target: https://pypi.org/project/AdaptivePELE/
 
 .. |DOI| image:: https://zenodo.org/badge/DOI/10.1038/s41598-017-08445-5.svg
   :target: https://doi.org/10.1038/s41598-017-08445-5

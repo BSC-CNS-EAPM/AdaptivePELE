@@ -6,6 +6,43 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_.
 
+1.6 - Unreleased
+----------------
+
+New features:
+.............
+
+    - Add the possibility of running MD simulations using OpenMM
+    - Add new script analysis/identifyClusterSnapshot.py, to identify to which
+      cluster belongs a given conformation within a simulation
+    - Add support for formats trr, dcd and dtr, mdcrd, nc
+    - Add the null clustering method
+    - Add independentMetric spawning
+    - Add reportName template for PELE control file
+
+
+Bug fixes:
+..........
+
+    - Fix bug in PELE equilibration when number of initial structures selected
+      exceeded number of processors
+    - Fix bug in atomset that wrote MODEL lines in PDBs non-compliant with the
+      standard
+    - Fix minor bug in in select equilibration structure with trajectories with
+      no accepted steps 
+
+Behaviour changes from previous version:
+........................................
+
+    - Restructured a good part of the code in the adaptiveSampling main
+      referring to simulation, moved into SimulationRunner class
+    - Change how AdaptivePELE deals with topologies, now it supports several
+      different topologies in a single simulation
+    - Change how the spawning parameters are used, now are an attribute of the
+      spawning calculator
+    - Update how the srun command is called when running PELE, also added
+      srunParameters to customize the call to srun
+
 1.5.1 - 2018-06-07
 --------------------
 
@@ -16,7 +53,6 @@ New features:
 
 Behaviour changes from previous version:
 ........................................
-
 
     - Improve the speed of handling xtc trajectories by switching to the
       low-level API of mdtraj

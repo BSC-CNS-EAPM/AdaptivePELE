@@ -4,6 +4,7 @@ class ClusteringTypes:
     rmsd = "rmsd"
     contactMap = "contactMap"
     lastSnapshot = "lastSnapshot"
+    null = "null"
     thresholdCalculator = "thresholdCalculator"
     ligandResname = "ligandResname"
     ligandResnum = "ligandResnum"
@@ -49,6 +50,7 @@ class DensityCalculatorParams:
 class StringSpawningTypes:
     type = "type"
     independent = "independent"
+    independentMetric = "independentMetric"
     sameWeight = "sameWeight"
     inverselyProportional = "inverselyProportional"
     epsilon = "epsilon"
@@ -135,7 +137,9 @@ class SimulationParams:
     condition = "condition"
     numTrajs = "numberTrajectories"
     equilibrationLength = "equilibrationLength"
+    trajectoryName = "trajectoryName"
     srun = "useSrun"
+    srunParameters = "srunParameters"
     # params for MD
     ligandCharge = "ligandCharge"
     nonBondedCutoff = "nonBondedCutoff"
@@ -144,7 +148,7 @@ class SimulationParams:
     minimizationIterations = "minimizationIterations"
     repoterfreq = "reporterFrequency"
     productionLength = "productionLength"
-    energyReport = "energyReport"
+    waterBoxSize = "WaterBoxSize"
 
 
 class ExitConditionType:
