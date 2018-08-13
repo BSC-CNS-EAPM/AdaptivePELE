@@ -63,7 +63,7 @@ setup(
     package_data={"AdaptivePELE/atomset": ['*.pxd']},
     install_requires=['numpy', 'mdtraj', 'scipy'],
     cmdclass=cmdclass,
-    ext_modules=cythonize(ext_modules),  # accepts a glob pattern
+    ext_modules=ext_modules,  # accepts a glob pattern
     include_dirs=[numpy.get_include()],
     classifiers=(
         "Programming Language :: Python :: 3",

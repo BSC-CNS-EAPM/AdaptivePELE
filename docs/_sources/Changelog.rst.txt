@@ -20,7 +20,6 @@ New features:
     - Add independentMetric spawning
     - Add reportName template for PELE control file
 
-
 Bug fixes:
 ..........
 
@@ -42,6 +41,19 @@ Behaviour changes from previous version:
       spawning calculator
     - Update how the srun command is called when running PELE, also added
       srunParameters to customize the call to srun
+
+1.5.2 - 2018-08-13
+--------------------
+
+New features:
+.............
+
+    - AdaptivePELE can now be installed through pip
+
+Bug fixes:
+..........
+
+    - Fix bug in setup.py in environments without cython
 
 1.5.1 - 2018-06-07
 --------------------
