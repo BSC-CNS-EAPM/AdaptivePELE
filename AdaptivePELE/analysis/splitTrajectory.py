@@ -31,7 +31,7 @@ def main(outputDir, files, topology, structs, template=None):
         structs = set(structs)
     for f in files:
         name = os.path.split(f)[-1]
-        templateName = template if template else os.path.join(outputDir, name[:-4] + "_%d.pdb")
+        templateName = os.path.join(outputDir,template) if template else os.path.join(outputDir, name[:-4] + "_%d.pdb")
         snapshots = utilities.getSnapshots(f, topology=topology)
         for i, snapshot in enumerate(snapshots):
             if structs is not None and i+1 not in structs:
