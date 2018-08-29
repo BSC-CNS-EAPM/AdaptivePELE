@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.5.2
               </div>
             
           
@@ -189,6 +189,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reportName</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trajectoryName</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">srun</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srunParameters</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span> <span class="o">=</span> <span class="mi">10</span></div>
 
 
@@ -407,15 +408,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">createSymbolicLinks</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">srun</span><span class="p">:</span>
-            <span class="n">toRun</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;srun&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="n">runningControlFile</span><span class="p">]</span>
+            <span class="n">toRun</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;srun&quot;</span><span class="p">,</span> <span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">)]</span><span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">srunParameters</span> <span class="o">+</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="n">runningControlFile</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">toRun</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mpirun -np &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="n">runningControlFile</span><span class="p">]</span>
-        <span class="n">toRun</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">toRun</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">toRun</span><span class="p">)</span>
+            <span class="n">toRun</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mpirun&quot;</span><span class="p">,</span> <span class="s2">&quot;-np&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="n">runningControlFile</span><span class="p">]</span>
+            <span class="n">toRun</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">toRun</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">toRun</span><span class="p">))</span>
         <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">toRun</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">toRun</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 
@@ -929,6 +931,11 @@
             <span class="n">params</span><span class="o">.</span><span class="n">equilibrationLength</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">equilibrationLength</span><span class="p">)</span>
             <span class="n">params</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
             <span class="n">params</span><span class="o">.</span><span class="n">srun</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">srun</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">srunParameters</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">srunParameters</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">srunParameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">srunParameters</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">srunParameters</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">srunParameters</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">exitConditionBlock</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">exitCondition</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">exitConditionBlock</span><span class="p">:</span>
                 <span class="n">exitConditionBuilder</span> <span class="o">=</span> <span class="n">ExitConditionBuilder</span><span class="p">()</span>

@@ -51,11 +51,10 @@ def getSnapshots(trajectoryFile, verbose=False, topology=None):
         :type trajectoryFile: str
         :param verbose: Add verbose to snapshots
         :type verbose: bool
-        :param topology: Topology file object
-        :type topology: str
 
         :returns: iterable -- Snapshots with information
     """
+    # topology parameter is ignored, just here for compatibility purposes
     ext = os.path.splitext(trajectoryFile)[1]
     if ext == ".pdb":
         with open(trajectoryFile, "r") as inputFile:
@@ -70,10 +69,21 @@ def getSnapshots(trajectoryFile, verbose=False, topology=None):
         remarkInfo = "REMARK 000 File created using PELE++\nREMARK source            : %s\nREMARK original model nr : %d\nREMARK First snapshot is 1, not 0 (as opposed to report)\n%s"
         snapshotsWithInfo = [remarkInfo % (trajectoryFile, i+1, snapshot) for i, snapshot in enumerate(snapshots)]
     elif ext == ".xtc":
-        if topology is None:
-            raise ValueError("Topology needed for loading xtc files")
         with md.formats.XTCTrajectoryFile(trajectoryFile) as f:
             snapshotsWithInfo, _, _, _ = f.read()
+        # formats xtc and trr are by default in nm, so we convert them to A
+        snapshotsWithInfo *= 10
+    elif ext == ".trr":
+        with md.formats.TRRTrajectoryFile(trajectoryFile) as f:
+            snapshotsWithInfo, _, _, _, _ = f.read()
+        snapshotsWithInfo *= 10
+    elif ext == ".dcd":
+        with md.formats.DCDTrajectoryFile(trajectoryFile) as f:
+            snapshotsWithInfo, _, _ = f.read()
+    elif ext == ".dtr":
+        with md.formats.DTRTrajectoryFile(trajectoryFile) as f:
+            snapshotsWithInfo, _, _ = f.read()
+
     else:
         raise ValueError("Unrecongnized file extension for %s" % trajectoryFile)
     return snapshotsWithInfo
@@ -145,7 +155,7 @@ def getRMSD(traj, nativePDB, resname, symmetries, topology=None):
         :return: np.array -- Array with the rmsd values of the trajectory
     """
 
-    snapshots = getSnapshots(traj, topology=topology)
+    snapshots = getSnapshots(traj)
     topology_contents = getTopologyFile(topology)
     rmsds = np.zeros(len(snapshots))
     RMSDCalc = RMSDCalculator.RMSDCalculator(symmetries)
