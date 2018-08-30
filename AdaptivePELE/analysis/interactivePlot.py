@@ -187,8 +187,11 @@ class DataHandler(object):
         for epoch, step, report, value1, value2 in zip(epochs, step_indexes, file_ids, values1, values2)]
     for f_id, f_out, step, path in zip(file_ids, files_out, step_indexes, paths):
         f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.xtc".format(f_id)))
-        st.main(output, f_in, topology, [step % self.ad_steps/out_freq+1], template=f_out)
-        print("MODEL {} has been selected".format(f_out))
+        found = st.main(output, f_in, topology, [step % self.ad_steps/out_freq+1], template=f_out)
+        if found:
+            print("MODEL {} has been selected".format(f_out))
+        else:
+            print("MODEL {} not found. Check -f option".format(f_out))
 
 
   def retrieve_values(self):
