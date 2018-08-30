@@ -21,6 +21,7 @@ def parseArguments():
 
 
 def main(outputDir, files, topology, structs, template=None):
+    found=False
     if outputDir:
         utilities.makeFolder(outputDir)
     if topology is not None:
@@ -43,9 +44,12 @@ def main(outputDir, files, topology, structs, template=None):
             if template:
                 with open(templateName, 'w') as of:
                     of.write(snapshot)
+                found=True
             else:
                 with open(templateName % i, 'w') as of:
                     of.write(snapshot)
+                found=True
+    return found
 
 if __name__ == "__main__":
     traj_files, output_dir, top, conf = parseArguments()
