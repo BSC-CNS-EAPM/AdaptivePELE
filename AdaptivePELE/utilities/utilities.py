@@ -6,10 +6,10 @@ import sys
 import socket
 import shutil
 import glob
-import numpy as np
 import string
 import json
 from scipy import linalg
+import numpy as np
 import mdtraj as md
 try:
     import cPickle as pickle
