@@ -2,6 +2,11 @@ import os
 import time
 import fcntl
 
+try:
+    ProcessLookupError
+except NameError:
+    ProcessLookupError = OSError
+
 
 class ProcessesManager:
     """
@@ -19,6 +24,11 @@ class ProcessesManager:
         self.lockInfo = {}
         self.createLockFile()
         self.status = self.INIT
+
+    def __len__(self):
+        # define the size of the ProcessesManager object as the number of
+        # processes
+        return len(self.lockInfo)
 
     def createLockFile(self):
         """
@@ -149,3 +159,37 @@ class ProcessesManager:
                     time.sleep(2)
             self.lockInfo = self.getLockInfo(file_lock)
             file_lock.close()
+
+    def allRunning(self):
+        """
+            Check if all processes are still running
+        """
+        for pid in self.lockInfo:
+            try:
+                os.kill(pid, 0)
+            except ProcessLookupError:
+                return False
+        return True
+
+    def writeEquilibrationStructures(self, path, structures):
+        """
+            Write the equilibration structures for the current replica
+
+            :param path: Path where to write the structures
+            :type path: str
+            :param structures: Filename with the structures
+            :type structures: list
+        """
+        outfile = os.path.join(path, "structures_equilibration_%d.txt" % self.id)
+        with open(outfile, "w") as fw:
+            fw.write(",".join(structures))
+
+    def readEquilibrationStructures(self, path):
+        """
+            Read the equilibration structures for all replicas
+
+            :param path: Path from where to read the structures
+            :type path: str
+        """
+        files = glob.glob(os.path.join(path, "structures_equilibration_*.txt"))
+        assert len(files) == self.__len__(), "Missing files for some of the replicas"
