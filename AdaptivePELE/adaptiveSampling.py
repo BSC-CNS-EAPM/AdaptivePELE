@@ -669,6 +669,9 @@ def main(jsonParams, clusteringHook=None):
     if firstRun is None:
         firstRun = 0  # if restart false, but there were previous simulations
     for i in range(firstRun, simulationRunner.parameters.iterations):
+        if not processManager.allRunning():
+            print("Some process died, killing all replicas!")
+            sys.exit(1)
         processManager.setStatus(processManager.RUNNING)
         print("Iteration", i)
         if processManager.isMaster():
