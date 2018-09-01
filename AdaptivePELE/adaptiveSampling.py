@@ -636,12 +636,13 @@ def main(jsonParams, clusteringHook=None):
         print("Iteration", i)
         outputDir = outputPathConstants.epochOutputPathTempletized % i
         utilities.makeFolder(outputDir)
-        print("Production run...")
-        if not debug:
-            simulationRunner.runSimulation(i, outputPathConstants, initialStructuresAsString, topologies, spawningCalculator.parameters.reportFilename)
 
         simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
         topologies.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i, i)
+
+        print("Production run...")
+        if not debug:
+            simulationRunner.runSimulation(i, outputPathConstants, initialStructuresAsString, topologies, spawningCalculator.parameters.reportFilename)
 
         print("Clustering...")
         startTime = time.time()
