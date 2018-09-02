@@ -193,3 +193,8 @@ class ProcessesManager:
         """
         files = glob.glob(os.path.join(path, "structures_equilibration_*.txt"))
         assert len(files) == self.__len__(), "Missing files for some of the replicas"
+        structures = []
+        for i in range(self.__len__()):
+            with open(os.path.join(path, "structures_equilibration_%d.txt" % i)) as fr:
+                structures.extend(fr.read().rstrip().split(","))
+        return structures
