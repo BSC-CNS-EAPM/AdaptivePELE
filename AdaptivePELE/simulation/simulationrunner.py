@@ -81,7 +81,7 @@ class SimulationRunner:
         self.parameters = parameters
         self.processorsToClusterMapping = []
 
-    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName):
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName, processManager):
         pass
 
     def getWorkingProcessors(self):
@@ -373,14 +373,22 @@ class PeleSimulation(SimulationRunner):
         endTime = time.time()
         print("PELE took %.2f sec" % (endTime - startTime))
 
-    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName):
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName, processManager):
         """
-        Run a short PELE simulation
+            Run a short PELE simulation
 
-        :param epoch: number of the epoch
-        :param outputPathConstants: outputpathConstants class
-        :param ControlFileDictionary: Dictionary with the values to substitute in the template
-        :param topologies: topology class
+            :param epoch: number of the epoch
+            :type epoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param initialStructures: Name of the initial structures to copy
+            :type initialStructures: str
+            :param topologies: Topology object containing the set of topologies needed for the simulation
+            :type topologies: :py:class:`.Topology`
+            :param reportFileName: Name of the report file
+            :type reportFileName: str
+            :param processManager: Object to synchronize the possibly multiple processes
+            :type processManager: :py:class:`.ProcessesManager`
         """
         trajName = "".join(self.parameters.trajectoryName.split("_%d"))
         print("Preparing Control File")
@@ -491,7 +499,7 @@ class PeleSimulation(SimulationRunner):
         # but no more than 50
         return min(stepsPerProc, 50)
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topologies=None):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, processManager, topologies=None):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure and select appropiate
@@ -507,6 +515,8 @@ class PeleSimulation(SimulationRunner):
             :type outputPath: str
             :param resname: Residue name of the ligand in the system pdb
             :type resname: str
+            :param processManager: Object to synchronize the possibly multiple processes
+            :type processManager: :py:class:`.ProcessesManager`
             :param topologies: Topology object containing the set of topologies needed for the simulation
             :type topologies: :py:class:`.Topology`
 
@@ -787,7 +797,7 @@ class MDSimulation(SimulationRunner):
         """
         return self.parameters.processors
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, topology=None):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, processManager, topologies=None):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure
@@ -804,6 +814,8 @@ class MDSimulation(SimulationRunner):
             :type outputPath: str
             :param resname: Residue name of the ligand in the system pdb
             :type resname: str
+            :param processManager: Object to synchronize the possibly multiple processes
+            :type processManager: :py:class:`.ProcessesManager`
             :param topology: Topology object
             :type topology: :py:class:
 
@@ -938,7 +950,23 @@ class MDSimulation(SimulationRunner):
         endTime = time.time()
         print("Ligand preparation took %.2f sec" % (endTime - startTime))
 
-    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName):
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName, processManager):
+        """
+            Run a MD simulation using OpenMM
+
+            :param epoch: number of the epoch
+            :type epoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param initialStructures: Name of the initial structures to copy
+            :type initialStructures: str
+            :param topologies: Topology object containing the set of topologies needed for the simulation
+            :type topologies: :py:class:`.Topology`
+            :param reportFileName: Name of the report file
+            :type reportFileName: str
+            :param processManager: Object to synchronize the possibly multiple processes
+            :type processManager: :py:class:`.ProcessesManager`
+        """
         outputDir = outputPathConstants.epochOutputPathTempletized % epoch
         processors = self.getWorkingProcessors()
         structures_to_run = initialStructuresAsString.split(":")
@@ -1051,9 +1079,22 @@ class TestSimulation(SimulationRunner):
         """
         return self.parameters.processors-1
 
-    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName):
+    def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName, processManager):
         """
             Copy file to test the rest of the AdaptivePELE procedure
+
+            :param epoch: number of the epoch
+            :type epoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param initialStructures: Name of the initial structures to copy
+            :type initialStructures: str
+            :param topologies: Topology object containing the set of topologies needed for the simulation
+            :type topologies: :py:class:`.Topology`
+            :param reportFileName: Name of the report file
+            :type reportFileName: str
+            :param processManager: Object to synchronize the possibly multiple processes
+            :type processManager: :py:class:`.ProcessesManager`
         """
         ControlFileDictionary = {"COMPLEXES": initialStructuresAsString,
                                  "PELE_STEPS": self.parameters.peleSteps,
