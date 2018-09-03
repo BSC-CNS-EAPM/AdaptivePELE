@@ -7,6 +7,8 @@ from __future__ import absolute_import, division, print_function
 import os
 import sys
 import time
+import functools
+import traceback
 import simtk.openmm as mm
 import simtk.openmm.app as app
 import simtk.unit as unit
@@ -15,6 +17,29 @@ try:
     FileNotFoundError
 except NameError:
     FileNotFoundError = IOError
+try:
+    basestring
+except NameError:
+    basestring = str
+
+
+def get_traceback(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception, ex:
+            ret = '#' * 60
+            ret += "\nException caught:"
+            ret += "\n"+'-'*60
+            ret += "\n" + traceback.format_exc()
+            ret += "\n" + '-' * 60
+            ret += "\n" + "#" * 60
+            print(sys.stderr, ret)
+            sys.stderr.flush()
+            raise ex
+
+    return wrapper
 
 
 class CustomStateDataReporter(app.StateDataReporter):
@@ -24,17 +49,27 @@ class CustomStateDataReporter(app.StateDataReporter):
     again and the second is the last step that was successfully done in the previous run.
     """
     # Added two new parameters append and intialsteps to properly handle the report file when the simulation is restarted
-    def __init__(self, file, reportInterval, step=False, time=False, potentialEnergy=False, kineticEnergy=False, totalEnergy=False, temperature=False, volume=False, density=False,
+    # changed the name of the file and time parameters to avoid overriding
+    # reserved names
+    def __init__(self, file_name, reportInterval, step=False, time_sim=False, potentialEnergy=False, kineticEnergy=False, totalEnergy=False, temperature=False, volume=False, density=False,
                  progress=False, remainingTime=False, speed=False, elapsedTime=False, separator=',', systemMass=None, totalSteps=None, append=False, initialStep=0):
 
         # This new class doesn't properly support progress information. Because to do the restart it assumes that
         # the first column has the step information, which is True as long as the progress value is False.
 
         progress = False
-        app.StateDataReporter.__init__(self, file, reportInterval, step, time, potentialEnergy, kineticEnergy, totalEnergy, temperature, volume, density,
-                 progress, remainingTime, speed, elapsedTime, separator, systemMass, totalSteps)
+        if isinstance(file_name, basestring):
+            # if the file is passed as a string, wrap in a str call to avoid
+            # problems between different versions of python
+            file_name = str(file_name)
+
+        app.StateDataReporter.__init__(self, file_name, reportInterval, step, time_sim, potentialEnergy, kineticEnergy, totalEnergy, temperature, volume, density,
+                                       progress, remainingTime, speed, elapsedTime, separator, systemMass, totalSteps)
         self._append = append
         self.initialStep = initialStep
+        self._initialClockTime = None
+        self._initialSimulationTime = None
+        self._initialSteps = None
 
     def report(self, simulation, state):
         """Generate a report.
@@ -81,8 +116,7 @@ class CustomStateDataReporter(app.StateDataReporter):
         return values
 
 
-
-
+@get_traceback
 def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     """
         Function that runs the whole equilibration process and returns the final pdb
@@ -122,6 +156,7 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     return outputPDB
 
 
+@get_traceback
 def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
     """
     Function that runs a minimization of the system
@@ -165,6 +200,7 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
     return simulation
 
 
+@get_traceback
 def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, reportName, velocities=None):
     """
     Function that runs an equilibration at constant volume conditions.
@@ -209,13 +245,14 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
     reportFile = "%s_report_NVT" % reportName
     simulation.reporters.append(CustomStateDataReporter(reportFile, parameters.reporterFreq, step=True,
-                                                        potentialEnergy=True, temperature=True, time=True,
+                                                        potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=parameters.equilibrationLength, separator="\t"))
     simulation.step(simulation_steps)
     return simulation
 
 
+@get_traceback
 def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, reportName, velocities=None):
     """
     Function that runs an equilibration at constant pressure conditions.
@@ -261,13 +298,14 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
     reportFile = "%s_report_NPT" % reportName
     simulation.reporters.append(CustomStateDataReporter(reportFile, parameters.reporterFreq, step=True,
-                                                        potentialEnergy=True, temperature=True, time=True,
+                                                        potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=parameters.equilibrationLength, separator="\t"))
     simulation.step(simulation_steps)
     return simulation
 
 
+@get_traceback
 def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, restart=False):
     """
     Functions that runs the production run at NVT conditions.
@@ -336,9 +374,9 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     simulation.reporters.append(app.DCDReporter(str(DCDrepoter), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
     simulation.reporters.append(app.CheckpointReporter(str(checkpointReporter), parameters.reporterFreq))
     simulation.reporters.append(CustomStateDataReporter(stateData, parameters.reporterFreq, step=True,
-                                                      potentialEnergy=True, temperature=True, time=True,
-                                                      volume=True, remainingTime=True, speed=True,
-                                                      totalSteps=parameters.productionLength, separator="\t",
+                                                        potentialEnergy=True, temperature=True, time_sim=True,
+                                                        volume=True, remainingTime=True, speed=True,
+                                                        totalSteps=parameters.productionLength, separator="\t",
                                                         append=restart, initialStep=lastStep))
     if workerNumber == 1:
         frequency = min(10 * parameters.reporterFreq, parameters.productionLength)

@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.6
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#thresholdcalculator">ThresholdCalculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rmsd-clustering">Rmsd clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contactmap-clustering">ContactMap clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#null-clustering">Null clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id4">Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 </ul>
@@ -180,7 +181,12 @@
 <h1>User Manual<a class="headerlink" href="#user-manual" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>In order to have a running copy of AdaptivePELE <a class="reference internal" href="#apele" id="id1">[APELE]</a>, you need to install and compile cython files in the base folder with:</p>
+<p>There are two methods to install AdaptivePELE <a class="reference internal" href="#apele" id="id1">[APELE]</a>, from PyPI (recommended) or directly from source.</p>
+<p>To install from PyPI simply run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">AdaptivePELE</span>
+</pre></div>
+</div>
+<p>To install from source, you need to install and compile cython files in the base folder with:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">AdaptivePELE</span><span class="o">/</span><span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">git</span>
 <span class="n">cd</span> <span class="n">AdaptivePELE</span>
 <span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">inplace</span>
@@ -288,6 +294,8 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <ul class="simple">
 <li><strong>fixedCenter</strong>: The center of the simulation box is templetized as <code class="docutils literal"><span class="pre">&quot;fixedCenter&quot;:</span> <span class="pre">$BOX_CENTER</span></code></li>
 <li><strong>radius</strong>: The radius of the simulation box is templetized as <code class="docutils literal"><span class="pre">&quot;radius&quot;:</span> <span class="pre">$BOX_RADIUS</span></code></li>
+<li><strong>reportName</strong>: The name of the report file is templetized as <code class="docutils literal"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$REPORT_NAME&quot;</span></code>. Note that the value of the reportName is not a parameter of the simulation block, but is given by the <strong>reportFilename</strong> option of the spawning block</li>
+<li><strong>trajectoryName</strong>: The name of the trajectory file is templetized as <code class="docutils literal"><span class="pre">&quot;trajectoryPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$TRAJECTORY_NAME&quot;</span></code></li>
 </ul>
 </div>
 <div class="section" id="id3">
@@ -305,6 +313,8 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <li><strong>data</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE</li>
 <li><strong>documents</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE</li>
 <li><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder</li>
+<li><strong>trajectoryName</strong> (<em>string</em>, default=None): Name of the trajectories to
+substitute in the PELE control file</li>
 <li><strong>modeMovingBox</strong> (<em>string</em>, default=None, possible values={<em>unbinding</em>, <em>binding</em>}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation</li>
 <li><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</li>
 <li><strong>boxRadius</strong> (<em>int</em>, default=20): Value of the simulation box radius</li>
@@ -321,6 +331,13 @@ best energy structures in the equilibration by the center of mass.</li>
 <li><strong>numberEquilibrationStructures</strong> (<em>int</em>, default=10): Number of clusters to
 obtain from the <em>equilibrationCluster</em> structure selection (see
 <strong>equilibrationMode</strong> for more details)</li>
+<li><strong>useSrun</strong> (<em>bool</em>, default=False): Whether to use srun to launch the PELE
+simulation instead of mpirun. Using srun allows a finer control over the
+resources used and might be helpful to deal with different cluster
+configurations or SLURM installations.</li>
+<li><strong>srunParameters</strong> (<em>string</em>, default=None): String with parameters to pass
+to srun, if not specified it will just run without any parameters, it is
+important to avoid whitspaces both at the beginning and end of the string.</li>
 </ul>
 <p>When using MD as a progagator, the following parameters are mandatory:</p>
 <ul class="simple">
@@ -413,12 +430,13 @@ file would look like:</p>
 </div>
 <div class="section" id="clustering-block">
 <h2>Clustering block<a class="headerlink" href="#clustering-block" title="Permalink to this headline">¶</a></h2>
-<p>Currently there are two functional types of clustering:</p>
+<p>Currently there are three functional types of clustering:</p>
 <ul class="simple">
 <li><strong>rmsd</strong>, which solely uses the ligand rmsd</li>
 <li><strong>contactMap</strong>, which uses a protein-ligand contact map matrix</li>
+<li><strong>null</strong>, which produces no clustering</li>
 </ul>
-<p>These clusterings are based on the leader algorithm, an extremely fast clustering method that in the
+<p>The first two clusterings are based on the leader algorithm, an extremely fast clustering method that in the
 worst case makes <em>kN</em> comparisons, where <em>N</em> is the number of snapshots to cluster and <em>k</em> the number of existing clusters.
 The procedure is as follows. Given some clusters, a conformation is said to belong to a cluster
 when it differs in less than a certain metric threshold (e.g. ligand RMSD)
@@ -467,6 +485,12 @@ There are currently three implemented methods to evaluate the similarity of cont
 <li><strong>correlation</strong>, which calculates the correlation between the two matrices</li>
 <li><strong>distance</strong>, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.</li>
 </ul>
+</div>
+<div class="section" id="null-clustering">
+<h3>Null clustering<a class="headerlink" href="#null-clustering" title="Permalink to this headline">¶</a></h3>
+<p>The <strong>null</strong> clustering produces no clustering, this is useful when running
+long simulations, were no spawning is needed, it saves memory and computional
+time.</p>
 </div>
 <div class="section" id="id4">
 <h3>Parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
@@ -531,6 +555,7 @@ There are several implemented strategies:</p>
 <li><strong>epsilon</strong>: An <em>epsilon</em> fraction of processors are distributed proportionally to the value of a metric, and the rest are inverselyProportional distributed.  A param <strong>n</strong> can be specified to only consider the <em>n</em> clusters with best metric.</li>
 <li><strong>variableEpsilon</strong>: Equivalent to epsilon, with an epsilon value changing over time</li>
 <li><strong>independent</strong>: Trajectories are run independently, as in the original PELE. It may be useful to restart simulations or to use the analysis scripts built for AdaptivePELE.</li>
+<li><strong>independentMetric</strong>: Trajectories are run independently, as in the original PELE. Howeveer in this method, instead of starting the next epoch from the last snapshot of the previous we start from the one that maximizes or minimizes a certain metric.</li>
 <li><strong>UCB</strong>: Upper confidence bound.</li>
 <li><strong>FAST</strong>: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).</li>
 </ul>
@@ -551,7 +576,7 @@ There are two types of density calculators:</p>
 <h3>Parameters<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. “report”.</li>
-<li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (zero indexed)</li>
+<li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (one indexed)</li>
 <li><strong>epsilon</strong> (<em>float</em>, mandatory in <strong>epsilon</strong> spawning): The fraction of the processors that will be assigned according to the selected metric</li>
 <li><strong>metricWeights</strong> (<em>string</em>, default=linear): Selects how to distribute the weights of the cluster according to its metric, two options: linear (proportional to metric) or Boltzmann weigths (proportional to exp(-metric/T). Needs to define the temperature <strong>T</strong>.</li>
 <li><strong>T</strong> (<em>float</em>, default=1000): Temperature, only used for Boltzmann weights</li>

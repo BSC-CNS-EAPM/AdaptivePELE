@@ -26,6 +26,8 @@ AdaptivePELE/tmp_tests_data_3ptb_data_Test3/
 AdaptivePELE/tests/data/3ptb_data/Test3/
 AdaptivePELE/tests/data/3ptb_data/RestartTest/*/logFile*
 .DS_Store
+dist
+AdaptivePELE.egg-info/
 AdaptivePELE/__pycache__
 AdaptivePELE/*/__pycache__
 .idea

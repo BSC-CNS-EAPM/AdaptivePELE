@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.6
               </div>
             
           
@@ -144,7 +144,6 @@
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">reraise</span> <span class="k">as</span> <span class="n">raise_</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span>
@@ -162,7 +161,7 @@
     <span class="n">NETWORK</span> <span class="o">=</span> <span class="kc">False</span>
 
 
-<div class="viewcode-block" id="Clusters"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters">[docs]</a><span class="k">class</span> <span class="nc">Clusters</span><span class="p">:</span>
+<div class="viewcode-block" id="Clusters"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters">[docs]</a><span class="k">class</span> <span class="nc">Clusters</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -249,7 +248,7 @@
             <span class="k">yield</span> <span class="n">cluster</span></div>
 
 
-<div class="viewcode-block" id="ConformationNetwork"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ConformationNetwork">[docs]</a><span class="k">class</span> <span class="nc">ConformationNetwork</span><span class="p">:</span>
+<div class="viewcode-block" id="ConformationNetwork"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ConformationNetwork">[docs]</a><span class="k">class</span> <span class="nc">ConformationNetwork</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Object that contains the conformation network, a network with clusters as</span>
 <span class="sd">        nodes and edges representing trantions between clusters. The network is</span>
@@ -353,7 +352,7 @@
         <span class="k">return</span> <span class="n">pathway</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div></div>
 
 
-<div class="viewcode-block" id="AltStructures"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.AltStructures">[docs]</a><span class="k">class</span> <span class="nc">AltStructures</span><span class="p">:</span>
+<div class="viewcode-block" id="AltStructures"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.AltStructures">[docs]</a><span class="k">class</span> <span class="nc">AltStructures</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper class, each cluster will have an instance of AltStructures that</span>
 <span class="sd">        will maintain a priority queue (pq) of alternative structures to spawn</span>
@@ -478,7 +477,7 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Cluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Cluster">[docs]</a><span class="k">class</span> <span class="nc">Cluster</span><span class="p">:</span>
+<div class="viewcode-block" id="Cluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Cluster">[docs]</a><span class="k">class</span> <span class="nc">Cluster</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A cluster contains a representative structure(pdb), the number of</span>
 <span class="sd">        elements, its density, threshold, number of contacts,</span>
@@ -674,7 +673,7 @@
              <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ClusteringEvaluator"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ClusteringEvaluator">[docs]</a><span class="k">class</span> <span class="nc">ClusteringEvaluator</span><span class="p">:</span>
+<div class="viewcode-block" id="ClusteringEvaluator"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ClusteringEvaluator">[docs]</a><span class="k">class</span> <span class="nc">ClusteringEvaluator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contactMap</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span> <span class="o">=</span> <span class="kc">None</span>
@@ -885,7 +884,7 @@
         <span class="c1">#      return 25</span>
 
 
-<div class="viewcode-block" id="Clustering"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering">[docs]</a><span class="k">class</span> <span class="nc">Clustering</span><span class="p">:</span>
+<div class="viewcode-block" id="Clustering"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering">[docs]</a><span class="k">class</span> <span class="nc">Clustering</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
                  <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1124,8 +1123,7 @@
                                                                 <span class="n">metric</span><span class="p">)</span>
                 <span class="n">summaryFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeString</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputObject</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+        <span class="n">utilities</span><span class="o">.</span><span class="n">writeObject</span><span class="p">(</span><span class="n">outputObject</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Clustering.addSnapshotToCluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.addSnapshotToCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addSnapshotToCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">origCluster</span><span class="p">,</span> <span class="n">snapshotNum</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1472,6 +1470,16 @@
 <span class="sd">        Assigned  the last snapshot of the trajectory to a cluster.</span>
 <span class="sd">        Only useful for PELE sequential runs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                 <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">Clustering</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="n">resnum</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="n">resChain</span><span class="p">,</span>
+                            <span class="n">reportBaseFilename</span><span class="o">=</span><span class="n">reportBaseFilename</span><span class="p">,</span>
+                            <span class="n">columnOfReportFile</span><span class="o">=</span><span class="n">columnOfReportFile</span><span class="p">,</span>
+                            <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="n">contactThresholdDistance</span><span class="p">,</span>
+                            <span class="n">altSelection</span><span class="o">=</span><span class="n">altSelection</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">lastSnapshot</span>
+
 <div class="viewcode-block" id="SequentialLastSnapshotClustering.cluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.cluster">[docs]</a>    <span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Cluster the snaptshots contained in the paths folder</span>
@@ -1538,7 +1546,55 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">addCluster</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="ClusteringBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ClusteringBuilder">[docs]</a><span class="k">class</span> <span class="nc">ClusteringBuilder</span><span class="p">:</span>
+<div class="viewcode-block" id="NullClustering"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.NullClustering">[docs]</a><span class="k">class</span> <span class="nc">NullClustering</span><span class="p">(</span><span class="n">Clustering</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Don&#39;t generate any clustering, works essentially as a placeholder</span>
+<span class="sd">        for simulation when no clustering is desired</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Clustering</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">null</span>
+
+<div class="viewcode-block" id="NullClustering.cluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.NullClustering.cluster">[docs]</a>    <span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Cluster the snaptshots contained in the paths folder</span>
+
+<span class="sd">            :param paths: List of folders with the snapshots</span>
+<span class="sd">            :type paths: list</span>
+<span class="sd">            :param topology: Topology object containing the set of topologies needed for the simulation</span>
+<span class="sd">            :type topology: :py:class:`.Topology`</span>
+<span class="sd">            :param epoch: Epoch number</span>
+<span class="sd">            :type epoch: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="NullClustering.writeOutput"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.NullClustering.writeOutput">[docs]</a>    <span class="k">def</span> <span class="nf">writeOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">degeneracy</span><span class="p">,</span> <span class="n">outputObject</span><span class="p">,</span> <span class="n">writeAll</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Writes all the clustering information in outputPath</span>
+
+<span class="sd">            :param outputPath: Folder that will contain all the clustering information</span>
+<span class="sd">            :type outputPath: str</span>
+<span class="sd">            :param degeneracy: Degeneracy of each cluster. It must be in the same order</span>
+<span class="sd">                as in the self.clusters list</span>
+<span class="sd">            :type degeneracy: list</span>
+<span class="sd">            :param outputObject: Output name for the pickle object</span>
+<span class="sd">            :type outputObject: str</span>
+<span class="sd">            :param writeAll: Wether to write pdb files for all cluster in addition</span>
+<span class="sd">                of the summary</span>
+<span class="sd">            :type writeAll: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">utilities</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
+        <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
+
+        <span class="n">summaryFilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="s2">&quot;summary.txt&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">summaryFilename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">summaryFile</span><span class="p">:</span>
+            <span class="n">summaryFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;#cluster size degeneracy contacts threshold density metric</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">summaryFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Using null clustering, no clusters available</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">utilities</span><span class="o">.</span><span class="n">writeObject</span><span class="p">(</span><span class="n">outputObject</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ClusteringBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ClusteringBuilder">[docs]</a><span class="k">class</span> <span class="nc">ClusteringBuilder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <div class="viewcode-block" id="ClusteringBuilder.buildClustering"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ClusteringBuilder.buildClustering">[docs]</a>    <span class="k">def</span> <span class="nf">buildClustering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Builder to create the appropiate clustering object</span>
@@ -1556,11 +1612,11 @@
         <span class="n">paramsBlock</span> <span class="o">=</span> <span class="n">clusteringBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">clusteringType</span> <span class="o">=</span> <span class="n">clusteringBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
-            <span class="n">contactThresholdDistance</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-            <span class="n">altSelection</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">alternativeStructure</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="n">err</span><span class="o">.</span><span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot;: Need to provide mandatory parameter in clustering block&quot;</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">contactThresholdDistance</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">altSelection</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">alternativeStructure</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">resname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">ligandResname</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
         <span class="n">resnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">ligandResnum</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="n">resChain</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">ligandChain</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
@@ -1593,12 +1649,14 @@
                                                     <span class="n">resnum</span><span class="o">=</span><span class="n">resnum</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="n">resChain</span><span class="p">,</span>
                                                     <span class="n">reportBaseFilename</span><span class="o">=</span><span class="n">reportBaseFilename</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="n">columnOfReportFile</span><span class="p">,</span>
                                                     <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="n">contactThresholdDistance</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="n">symmetries</span><span class="p">,</span> <span class="n">altSelection</span><span class="o">=</span><span class="n">altSelection</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">clusteringType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">null</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">NullClustering</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown clustering method! Choices are: &quot;</span> <span class="o">+</span>
                      <span class="nb">str</span><span class="p">(</span><span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div></div>
 
 
-<div class="viewcode-block" id="similarityEvaluatorBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.similarityEvaluatorBuilder">[docs]</a><span class="k">class</span> <span class="nc">similarityEvaluatorBuilder</span><span class="p">:</span>
+<div class="viewcode-block" id="similarityEvaluatorBuilder"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.similarityEvaluatorBuilder">[docs]</a><span class="k">class</span> <span class="nc">similarityEvaluatorBuilder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <div class="viewcode-block" id="similarityEvaluatorBuilder.build"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.similarityEvaluatorBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">similarityEvaluatorType</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Builder to create the appropiate similarityEvaluator</span>
@@ -1613,7 +1671,7 @@
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown threshold calculator type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">clusteringTypes</span><span class="o">.</span><span class="n">SIMILARITY_TYPES_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div></div>
 
 
-<div class="viewcode-block" id="CMSimilarityEvaluator"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.CMSimilarityEvaluator">[docs]</a><span class="k">class</span> <span class="nc">CMSimilarityEvaluator</span><span class="p">:</span>
+<div class="viewcode-block" id="CMSimilarityEvaluator"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.CMSimilarityEvaluator">[docs]</a><span class="k">class</span> <span class="nc">CMSimilarityEvaluator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the similarity of two contactMaps by calculating the ratio of</span>
 <span class="sd">        the number of differences over the average of elements in the contacts</span>

@@ -5,7 +5,13 @@ User Manual
 Installation
 ------------
 
-In order to have a running copy of AdaptivePELE [APELE]_, you need to install and compile cython files in the base folder with::
+There are two methods to install AdaptivePELE [APELE]_, from PyPI (recommended) or directly from source.
+
+To install from PyPI simply run::
+
+    pip install AdaptivePELE
+
+To install from source, you need to install and compile cython files in the base folder with::
 
     git clone https://github.com/AdaptivePELE/AdaptivePELE.git
     cd AdaptivePELE
@@ -141,6 +147,10 @@ Optionally other fields might be templetized as well:
 
 * **radius**: The radius of the simulation box is templetized as ``"radius": $BOX_RADIUS``  
 
+* **reportName**: The name of the report file is templetized as ``"reportPath": "$OUTPUT_PATH/$REPORT_NAME"``. Note that the value of the reportName is not a parameter of the simulation block, but is given by the **reportFilename** option of the spawning block
+
+* **trajectoryName**: The name of the trajectory file is templetized as ``"trajectoryPath": "$OUTPUT_PATH/$TRAJECTORY_NAME"``
+
 Parameters
 ..........
 
@@ -157,6 +167,8 @@ Optionally, you can also use the following parameters:
 * **data** (*string*, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE
 * **documents** (*string*, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE
 * **executable** (*string*, default=MareNostrum or Life cluster path): Path to the Pele executable folder
+* **trajectoryName** (*string*, default=None): Name of the trajectories to
+  substitute in the PELE control file
 * **modeMovingBox** (*string*, default=None, possible values={*unbinding*, *binding*}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation
 * **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center
 * **boxRadius** (*int*, default=20): Value of the simulation box radius
@@ -173,6 +185,13 @@ Optionally, you can also use the following parameters:
 * **numberEquilibrationStructures** (*int*, default=10): Number of clusters to
   obtain from the *equilibrationCluster* structure selection (see
   **equilibrationMode** for more details)
+* **useSrun** (*bool*, default=False): Whether to use srun to launch the PELE
+  simulation instead of mpirun. Using srun allows a finer control over the
+  resources used and might be helpful to deal with different cluster
+  configurations or SLURM installations.
+* **srunParameters** (*string*, default=None): String with parameters to pass
+  to srun, if not specified it will just run without any parameters, it is
+  important to avoid whitspaces both at the beginning and end of the string.
 
 When using MD as a progagator, the following parameters are mandatory:
 
@@ -260,13 +279,15 @@ Example of a minimal simulation block::
 Clustering block
 ----------------
 
-Currently there are two functional types of clustering:
+Currently there are three functional types of clustering:
 
 * **rmsd**, which solely uses the ligand rmsd
 
 * **contactMap**, which uses a protein-ligand contact map matrix
 
-These clusterings are based on the leader algorithm, an extremely fast clustering method that in the 
+* **null**, which produces no clustering
+
+The first two clusterings are based on the leader algorithm, an extremely fast clustering method that in the 
 worst case makes *kN* comparisons, where *N* is the number of snapshots to cluster and *k* the number of existing clusters.
 The procedure is as follows. Given some clusters, a conformation is said to belong to a cluster 
 when it differs in less than a certain metric threshold (e.g. ligand RMSD)
@@ -323,6 +344,14 @@ There are currently three implemented methods to evaluate the similarity of cont
 * **correlation**, which calculates the correlation between the two matrices
 
 * **distance**, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.
+
+
+Null clustering
+.....................
+
+The **null** clustering produces no clustering, this is useful when running
+long simulations, were no spawning is needed, it saves memory and computional
+time.
 
 Parameters
 ..........
@@ -394,6 +423,8 @@ There are several implemented strategies:
 
 * **independent**: Trajectories are run independently, as in the original PELE. It may be useful to restart simulations or to use the analysis scripts built for AdaptivePELE.
 
+* **independentMetric**: Trajectories are run independently, as in the original PELE. Howeveer in this method, instead of starting the next epoch from the last snapshot of the previous we start from the one that maximizes or minimizes a certain metric.
+
 * **UCB**: Upper confidence bound.
 
 * **FAST**: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).
@@ -421,7 +452,7 @@ Parameters
 
 * **reportFilename** (*string*, mandatory): Basename to match the report file with metrics. E.g. "report". 
 
-* **metricColumnInReport** (*integer*, mandatory): Column of the report file that contains the metric of interest (zero indexed)
+* **metricColumnInReport** (*integer*, mandatory): Column of the report file that contains the metric of interest (one indexed)
 
 * **epsilon** (*float*, mandatory in **epsilon** spawning): The fraction of the processors that will be assigned according to the selected metric
 

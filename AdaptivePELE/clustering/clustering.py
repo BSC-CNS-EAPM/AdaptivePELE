@@ -4,7 +4,6 @@ import sys
 import glob
 import numpy as np
 import os
-import pickle
 from six import reraise as raise_
 from AdaptivePELE.constants import blockNames
 from AdaptivePELE.utilities import utilities
@@ -984,8 +983,7 @@ class Clustering(object):
                                                                 metric)
                 summaryFile.write(writeString)
 
-        with open(outputObject, 'wb') as f:
-            pickle.dump(self, f, 2)
+        utilities.writeObject(outputObject, self, protocol=2)
 
     def addSnapshotToCluster(self, trajNum, snapshot, origCluster, snapshotNum, metrics=None, col=None, topology=None):
         """
@@ -1332,6 +1330,16 @@ class SequentialLastSnapshotClustering(Clustering):
         Assigned  the last snapshot of the trajectory to a cluster.
         Only useful for PELE sequential runs
     """
+    def __init__(self, resname="", resnum=0, resChain="", reportBaseFilename=None,
+                 columnOfReportFile=None, contactThresholdDistance=8,
+                 altSelection=False):
+        Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain,
+                            reportBaseFilename=reportBaseFilename,
+                            columnOfReportFile=columnOfReportFile,
+                            contactThresholdDistance=contactThresholdDistance,
+                            altSelection=altSelection)
+        self.type = clusteringTypes.CLUSTERING_TYPES.lastSnapshot
+
     def cluster(self, paths, topology=None, epoch=None):
         """
             Cluster the snaptshots contained in the paths folder
@@ -1398,6 +1406,54 @@ class SequentialLastSnapshotClustering(Clustering):
         self.clusters.addCluster(cluster)
 
 
+class NullClustering(Clustering):
+    """
+        Don't generate any clustering, works essentially as a placeholder
+        for simulation when no clustering is desired
+    """
+    def __init__(self):
+        Clustering.__init__(self)
+        self.type = clusteringTypes.CLUSTERING_TYPES.null
+
+    def cluster(self, paths, topology=None, epoch=None):
+        """
+            Cluster the snaptshots contained in the paths folder
+
+            :param paths: List of folders with the snapshots
+            :type paths: list
+            :param topology: Topology object containing the set of topologies needed for the simulation
+            :type topology: :py:class:`.Topology`
+            :param epoch: Epoch number
+            :type epoch: int
+        """
+        pass
+
+    def writeOutput(self, outputPath, degeneracy, outputObject, writeAll):
+        """
+            Writes all the clustering information in outputPath
+
+            :param outputPath: Folder that will contain all the clustering information
+            :type outputPath: str
+            :param degeneracy: Degeneracy of each cluster. It must be in the same order
+                as in the self.clusters list
+            :type degeneracy: list
+            :param outputObject: Output name for the pickle object
+            :type outputObject: str
+            :param writeAll: Wether to write pdb files for all cluster in addition
+                of the summary
+            :type writeAll: bool
+        """
+        utilities.cleanup(outputPath)
+        utilities.makeFolder(outputPath)
+
+        summaryFilename = os.path.join(outputPath, "summary.txt")
+        with open(summaryFilename, 'w') as summaryFile:
+            summaryFile.write("#cluster size degeneracy contacts threshold density metric\n")
+            summaryFile.write("Using null clustering, no clusters available\n")
+
+        utilities.writeObject(outputObject, self, protocol=2)
+
+
 class ClusteringBuilder(object):
     def buildClustering(self, clusteringBlock, reportBaseFilename=None, columnOfReportFile=None):
         """
@@ -1416,11 +1472,11 @@ class ClusteringBuilder(object):
         paramsBlock = clusteringBlock[blockNames.ClusteringTypes.params]
         try:
             clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
-            contactThresholdDistance = paramsBlock.get(blockNames.ClusteringTypes.contactThresholdDistance, 8)
-            altSelection = paramsBlock.get(blockNames.ClusteringTypes.alternativeStructure, False)
         except KeyError as err:
             err.message += ": Need to provide mandatory parameter in clustering block"
             raise KeyError(err.message)
+        contactThresholdDistance = paramsBlock.get(blockNames.ClusteringTypes.contactThresholdDistance, 8)
+        altSelection = paramsBlock.get(blockNames.ClusteringTypes.alternativeStructure, False)
         resname = str(paramsBlock.get(blockNames.ClusteringTypes.ligandResname, "")).upper()
         resnum = int(paramsBlock.get(blockNames.ClusteringTypes.ligandResnum, 0))
         resChain = str(paramsBlock.get(blockNames.ClusteringTypes.ligandChain, "")).upper()
@@ -1453,6 +1509,8 @@ class ClusteringBuilder(object):
                                                     resnum=resnum, resChain=resChain,
                                                     reportBaseFilename=reportBaseFilename, columnOfReportFile=columnOfReportFile,
                                                     contactThresholdDistance=contactThresholdDistance, symmetries=symmetries, altSelection=altSelection)
+        elif clusteringType == blockNames.ClusteringTypes.null:
+            return NullClustering()
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))

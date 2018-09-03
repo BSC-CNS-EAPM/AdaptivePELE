@@ -28,6 +28,10 @@ class UnsatisfiedDependencyException(Exception):
     __module__ = Exception.__module__
 
 
+class RequiredParameterMissingException(Exception):
+    __module__ = Exception.__module__
+
+
 class Topology:
     """
         Container object that points to the topology used in each trajectory
@@ -126,7 +130,7 @@ class Topology:
             :type epochDir: str
         """
         with open(epochDir+"/topologyMapping.txt", "w") as f:
-            f.write(':'.join(map(str, self.topologyMap[epoch])))
+            f.write("%s\n" % ':'.join(map(str, self.topologyMap[epoch])))
 
     def readMappingFromDisk(self, epochDir, epoch):
         """
@@ -468,6 +472,8 @@ def getPELEControlFileDict(templetizedControlFile):
 
     templateNames = {ele[1]: '"$%s"' % ele[1] for ele in string.Template.pattern.findall(peleControlFile)}
     templateNames.pop("OUTPUT_PATH", None)
+    templateNames.pop("REPORT_NAME", None)
+    templateNames.pop("TRAJECTORY_NAME", None)
     return json.loads(string.Template(peleControlFile).safe_substitute(templateNames)), templateNames
 
 

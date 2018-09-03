@@ -53,6 +53,10 @@ class SpawningParams:
         "independent": {
             "reportFilename": "basestring"
         },
+        "independentMetric": {
+            "metricColumnInReport": "numbers.Real",
+            "reportFilename": "basestring"
+        },
         "inverselyProportional": {
             "reportFilename": "basestring"
         },
@@ -147,7 +151,9 @@ class SimulationParams:
         "equilibrationLength": "numbers.Real",
         "numberEquilibrationStructures": "numbers.Real",
         "useSrun": "bool",
+        "srunParameters": "basestring",
         "exitCondition": "dict",
+        "trajectoryName": "basestring",
         "ligandCharge": "numbers.Real",
         "nonBondedCutoff": "numbers.Real",
         "Temperature": "numbers.Real",
@@ -174,19 +180,24 @@ class SimulationParams:
 
 class clusteringTypes:
     types = {
-        "rmsd": {
-        },
+        "rmsd": {},
         "contactMap": {
-            "similarityEvaluator": "basestring"
+            "similarityEvaluator": "basestring",
+            "ligandResname": "basestring"
         },
         "lastSnapshot": {
+            "ligandResname": "basestring"
+        },
+        "null": {
+            "ligandResname": "basestring"
         }
     }
     params = {
         "rmsd": "basestring",
         "contactMap": "basestring",
-        "contactThresholdDistance": "numbers.Real",
         "lastSnapshot": "basestring",
+        "null": "basestring",
+        "contactThresholdDistance": "numbers.Real",
         "ligandResname": "basestring",
         "ligandResnum": "numbers.Real",
         "ligandChain": "basestring",

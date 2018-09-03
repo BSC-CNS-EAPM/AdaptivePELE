@@ -4,7 +4,7 @@
 #SBATCH --output=AdaptiveTest.out
 #SBATCH --error=AdaptiveTest.err
 #SBATCH --ntasks=5
-#SBATCH --time=00:40:00
+#SBATCH --time=00:50:00
 #SBATCH --qos=debug
 
 

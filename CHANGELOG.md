@@ -10,7 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Add the possibility of running MD simulations using OpenMM
     - Add new script analysis/identifyClusterSnapshot.py, to identify to which
     cluster belongs a given conformation within a simulation
-    - Add support for formats trr, dcd and dtr
+    - Add support for formats trr, dcd and dtr, mdcrd, nc
+    - Add the null clustering method
+    - Add independentMetric spawning
+    - Add reportName template for PELE control file
 
 ### Bug fixes:
 
@@ -19,7 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Fix bug in atomset that wrote MODEL lines in PDBs non-compliant with the
     standard
     - Fix minor bug in in select equilibration structure with trajectories with
-      no accepted steps 
+    no accepted steps 
 
 ### Behaviour changes from previous version:
 
@@ -27,7 +30,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     referring to simulation, moved into SimulationRunner class
     - Change how AdaptivePELE deals with topologies, now it supports several
     different topologies in a single simulation
+    - Change how the spawning parameters are used, now are an attribute of the
+    spawning calculator
+    - Update how the srun command is called when running PELE, also added
+    srunParameters to customize the call to srun
 
+## [1.5.2] - 2018-08-13
+
+### New features:
+
+    - AdaptivePELE can now be installed through pip
+
+### Bug fixes:
+
+    - Fix bug in setup.py in environments without cython
+    
 ## [1.5.1] - 2018-06-07
 
 ### New features:

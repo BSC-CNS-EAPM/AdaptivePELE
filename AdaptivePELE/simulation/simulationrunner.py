@@ -30,6 +30,10 @@ try:
     from AdaptivePELE.simulation import openmm_simulations as sim
 except ImportError:
     OPENMM = False
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
 
 
 class SimulationParameters:
@@ -56,7 +60,9 @@ class SimulationParameters:
         self.reportName = None
         self.trajectoryName = None
         self.srun = False
+        self.srunParameters = None
         self.numberEquilibrationStructures = 10
+        self.reportName = ""
         # parameters needed for MD simulations and their defaults
         self.ligandCharge = 0
         self.nonBondedCutoff = 8
@@ -177,7 +183,7 @@ class SimulationRunner:
         if len(self.processorsToClusterMapping) == 0:
             return
         with open(epochDir+"/processorMapping.txt", "w") as f:
-            f.write(':'.join(map(str, self.processorsToClusterMapping)))
+            f.write("%s\n" % ':'.join(map(str, self.processorsToClusterMapping)))
 
     def readMappingFromDisk(self, epochDir):
         """
@@ -237,6 +243,19 @@ class SimulationRunner:
             peleControlFileDictionary["BOX_CENTER"] = self.parameters.boxCenter
         self.makeWorkingControlFile(outputPathConstants.tmpControlFilename % epoch, peleControlFileDictionary)
 
+    def unifyReportNames(self, spawningReportName):
+        """
+            Ensure that the reportName in the simulation parameters is the same
+            as the one provided in the spawning parameters
+
+            :param spawningReportName: Name of the report file provided in the spawning parameters
+            :type spawningReportName: str
+        """
+        baseReportName = self.parameters.reportName.split("_%d")
+        if baseReportName[0] != spawningReportName:
+            baseReportName[0] = spawningReportName
+            self.parameters.reportName = "_%d".join(baseReportName)
+
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
@@ -258,13 +277,11 @@ class PeleSimulation(SimulationRunner):
         """
         return self.parameters.processors-1
 
-    def getNextIterationBox(self, clusteringObject, outputFolder, resname, topologies=None, epoch=None):
+    def getNextIterationBox(self, outputFolder, resname, topologies=None, epoch=None):
         """
             Select the box for the next epoch, currently selecting the COM of
             the cluster with max SASA
 
-            :param clusteringObject: Clustering object
-            :type clusteringObject: :py:class:`.Clustering`
             :param outputFolder: Folder to the trajectories
             :type outputFolder: str
             :param resname: Name of the ligand in the pdb
@@ -340,15 +357,16 @@ class PeleSimulation(SimulationRunner):
 
         self.createSymbolicLinks()
         if self.parameters.srun:
-            toRun = ["srun", self.parameters.executable, runningControlFile]
+            toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
         else:
-            toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
-        toRun = " ".join(toRun)
-        print(toRun)
+            toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
+            toRun = map(str, toRun)
+        print(" ".join(toRun))
         startTime = time.time()
-        proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
         (out, err) = proc.communicate()
-        print(out)
+        if out:
+            print(out)
         if err:
             print(err)
 
@@ -364,24 +382,27 @@ class PeleSimulation(SimulationRunner):
         :param ControlFileDictionary: Dictionary with the values to substitute in the template
         :param topologies: topology class
         """
-
+        trajName = "".join(self.parameters.trajectoryName.split("_%d"))
         print("Preparing Control File")
         ControlFileDictionary = {"COMPLEXES": initialStructuresAsString,
                                  "PELE_STEPS": self.parameters.peleSteps,
-                                 "BOX_RADIUS": self.parameters.boxRadius}
+                                 "BOX_RADIUS": self.parameters.boxRadius,
+                                 "REPORT_NAME": reportFileName,
+                                 "TRAJECTORY_NAME": trajName}
         self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         self.createSymbolicLinks()
         runningControlFile = outputPathConstants.tmpControlFilename % epoch
         if self.parameters.srun:
-            toRun = ["srun", self.parameters.executable, runningControlFile]
+            toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
         else:
-            toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
-        toRun = " ".join(toRun)
-        print(toRun)
+            toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
+            toRun = map(str, toRun)
+        print(" ".join(toRun))
         startTime = time.time()
-        proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
         (out, err) = proc.communicate()
-        print(out)
+        if out:
+            print(out)
         if err:
             print(err)
 
@@ -495,11 +516,11 @@ class PeleSimulation(SimulationRunner):
         newStructure = []
         if self.parameters.equilibrationLength is None:
             self.parameters.equilibrationLength = self.calculateEquilibrationLength()
+        trajName = "".join(self.parameters.trajectoryName.split("_%d"))
         equilibrationPeleDict = {"PELE_STEPS": self.parameters.equilibrationLength, "SEED": self.parameters.seed}
         peleControlFileDict, templateNames = utilities.getPELEControlFileDict(self.parameters.templetizedControlFile)
         peleControlFileDict = self.getEquilibrationControlFile(peleControlFileDict)
         similarityColumn = self.getMetricColumns(peleControlFileDict)
-        reportWildcard, trajWildcard = utilities.getReportAndTrajectoryWildcard(peleControlFileDict)
 
         for i, structure in enumerate(initialStructures):
             equilibrationOutput = os.path.join(outputPath, "equilibration_%d" % (i+1))
@@ -511,6 +532,8 @@ class PeleSimulation(SimulationRunner):
             equilibrationPeleDict["COMPLEXES"] = initialStructureString
             equilibrationPeleDict["BOX_CENTER"] = self.selectInitialBoxCenter(structure, resname)
             equilibrationPeleDict["BOX_RADIUS"] = 2
+            equilibrationPeleDict["REPORT_NAME"] = reportFilename
+            equilibrationPeleDict["TRAJECTORY_NAME"] = trajName
             for name in ["BOX_CENTER", "BOX_RADIUS"]:
                 # If the template PELE control file is not templetized with the
                 # box information, include it manually
@@ -526,8 +549,8 @@ class PeleSimulation(SimulationRunner):
             self.makeWorkingControlFile(equilibrationControlFile, equilibrationPeleDict, peleControlString)
             self.runEquilibrationPELE(equilibrationControlFile)
             # Extract report, trajnames, metrics columns from pele control file
-            reportNames = os.path.join(equilibrationOutput, reportWildcard)
-            trajNames = os.path.join(equilibrationOutput, trajWildcard)
+            reportNames = os.path.join(equilibrationOutput, self.parameters.reportName)
+            trajNames = os.path.join(equilibrationOutput, self.parameters.trajectoryName)
             if len(initialStructures) == 1 and self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationLastSnapshot:
                 newStructure.extend(self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames, topology=topologies.topologies[i]))
             elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationSelect:
@@ -820,7 +843,7 @@ class MDSimulation(SimulationRunner):
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
             self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
             self.runTleap(TleapControlFile)
-            shutil.copy("leap.log", os.path.join(workingdirectory, equilibrationOutput,"leap_%d.log" % i))
+            shutil.copy("leap.log", os.path.join(workingdirectory, equilibrationOutput, "leap_%d.log" % i))
             solvatedStrcutures.append(finalPDB)
             if not os.path.isfile(inpcrd):
                 raise FileNotFoundError("Error While running Tleap, check %s/leap_%d.log for more information." %
@@ -854,7 +877,7 @@ class MDSimulation(SimulationRunner):
         tleapCommand = "tleap -f %s" % TleapControlFile
         print("System Preparation")
         startTime = time.time()
-        proc = subprocess.Popen(tleapCommand, stdout=subprocess.PIPE,  stderr=subprocess.PIPE, shell=True, universal_newlines=True)
+        proc = subprocess.Popen(tleapCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
         print(out)
         if err:
@@ -942,12 +965,22 @@ class MDSimulation(SimulationRunner):
             if self.restart:
                 checkpoint = checkpoints[utilities.getTrajNum(startingFiles[1])]
             workerNumber = i + 1
-            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint,self.ligandName, self.restart)))
+            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.ligandName, self.restart)))
         for worker in workers:
             worker.get()
         endTime = time.time()
         self.restart = False
         print("OpenMM took %.2f sec" % (endTime - startTime))
+
+    def unifyReportNames(self, spawningReportName):
+        """
+            Ensure that the reportName in the simulation parameters is the same
+            as the one provided in the spawning parameters
+
+            :param spawningReportName: Name of the report file provided in the spawning parameters
+            :type spawningReportName: str
+        """
+        pass
 
     def createMultipleComplexesFilenames(self, numberOfSnapshots, tmpInitialStructuresTemplate, iteration, equilibration=False):
         """
@@ -1144,14 +1177,19 @@ class RunnerBuilder:
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
+            params.trajectoryName = paramsBlock.get(blockNames.SimulationParams.trajectoryName)
+            peleDict, _ = utilities.getPELEControlFileDict(params.templetizedControlFile)
+            params.reportName, trajectoryName = utilities.getReportAndTrajectoryWildcard(peleDict)
+            if params.trajectoryName is None:
+                params.trajectoryName = trajectoryName
+            else:
+                params.trajectoryName = "_%d".join(os.path.splitext(params.trajectoryName))
             params.modeMovingBox = paramsBlock.get(blockNames.SimulationParams.modeMovingBox)
             if params.modeMovingBox is not None:
                 if params.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxBinding:
                     params.SASAforBox = 1.0
                 elif params.modeMovingBox.lower() == blockNames.SimulationParams.modeMovingBoxUnBinding:
                     params.SASAforBox = 0.0
-                peleDict, _ = utilities.getPELEControlFileDict(params.templetizedControlFile)
-                params.reportName, params.trajectoryName = utilities.getReportAndTrajectoryWildcard(peleDict)
                 params.columnSASA = utilities.getSASAcolumnFromControlFile(peleDict)
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
@@ -1160,6 +1198,11 @@ class RunnerBuilder:
             params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength)
             params.numberEquilibrationStructures = paramsBlock.get(blockNames.SimulationParams.numberEquilibrationStructures, 10)
             params.srun = paramsBlock.get(blockNames.SimulationParams.srun, False)
+            params.srunParameters = paramsBlock.get(blockNames.SimulationParams.srunParameters, None)
+            if params.srunParameters is not None:
+                params.srunParameters = params.srunParameters.strip().split()
+            else:
+                params.srunParameters = []
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()
