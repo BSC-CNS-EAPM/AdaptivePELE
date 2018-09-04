@@ -49,10 +49,11 @@ def main(trajsPerEpoch, clusters, lagtimes, nruns):
             for folder in folders_MSM:
                 shutil.rmtree(folder)
         prepareMSMFolders.main(trajsPath=runFolder)
+        os.chdir("MSM_0")
         print("***************")
         print("Estimating dG value in folder" + os.getcwd())
         parameters = estimateDG.Parameters(ntrajs=None, length=None, lagtime=tau,
-                                           nclusters=k, nruns=10, skipFirstSteps=0,
+                                           nclusters=k, nruns=nruns, skipFirstSteps=0,
                                            useAllTrajInFirstRun=True,
                                            computeDetailedBalance=True,
                                            trajWildcard="traj_*",
