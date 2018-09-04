@@ -5,7 +5,13 @@ User Manual
 Installation
 ------------
 
-In order to have a running copy of AdaptivePELE [APELE]_, you need to install and compile cython files in the base folder with::
+There are two methods to install AdaptivePELE [APELE]_, from PyPI (recommended) or directly from source.
+
+To install from PyPI simply run::
+
+    pip install AdaptivePELE
+
+To install from source, you need to install and compile cython files in the base folder with::
 
     git clone https://github.com/AdaptivePELE/AdaptivePELE.git
     cd AdaptivePELE
