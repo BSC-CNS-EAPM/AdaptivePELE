@@ -149,6 +149,7 @@ class SimulationParams:
     repoterfreq = "reporterFrequency"
     productionLength = "productionLength"
     waterBoxSize = "WaterBoxSize"
+    trajsPerReplica = "trajectoriesPerReplica"
 
 
 class ExitConditionType:

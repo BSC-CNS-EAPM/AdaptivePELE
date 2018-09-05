@@ -130,7 +130,8 @@ class SimulationParams:
             "processors": "numbers.Real",
             "seed": "numbers.Real",
             "productionLength": "numbers.Real",
-            "iterations": "numbers.Real"
+            "iterations": "numbers.Real",
+            "trajectoriesPerReplica": "numbers.Real"
         }}
     params = {
         "executable": "basestring",

@@ -74,6 +74,7 @@ class SimulationParameters:
         self.productionLength = 0
         self.ligandName = None
         self.waterBoxSize = 8
+        self.trajsPerReplica = None
 
 
 class SimulationRunner:
@@ -1256,6 +1257,7 @@ class RunnerBuilder:
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
             params.productionLength = paramsBlock[blockNames.SimulationParams.productionLength]
+            params.trajsPerReplica = paramsBlock[blockNames.SimulationParams.trajsPerReplica]
             params.runEquilibration = True
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
