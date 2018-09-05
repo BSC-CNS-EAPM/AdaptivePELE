@@ -201,7 +201,7 @@ class ProcessesManager:
                 structures.extend(structure_partial)
         return structures
 
-    def getEquilibrationListPerReplica(self, initialStructures, trajsPerReplica):
+    def getStructureListPerReplica(self, initialStructures, trajsPerReplica):
         """
             Filter the list of initial structures to select only the ones
             corresponding to the current replica
