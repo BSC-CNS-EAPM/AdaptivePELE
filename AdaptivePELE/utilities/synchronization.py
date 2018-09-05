@@ -200,3 +200,19 @@ class ProcessesManager:
             if structure_partial != [""]:
                 structures.extend(structure_partial)
         return structures
+
+    def getEquilibrationListPerReplica(self, initialStructures, trajsPerReplica):
+        """
+            Filter the list of initial structures to select only the ones
+            corresponding to the current replica
+
+            :param initialStructures: Name of the initial structures to copy
+            :type initialStructures: list of str
+            :param trajsPerReplica: Number of trajectories that each replica has to calculate
+            :type trajsPerReplica: int
+
+            :returns: list -- List with a tuple containing the initial structures of the replica and their indices
+        """
+        n_structures = len(initialStructures)
+        end = min(n_structures, (self.id+1)*trajsPerReplica)
+        return [(i, initialStructures[i]) for i in range(self.id*trajsPerReplica, end)]
