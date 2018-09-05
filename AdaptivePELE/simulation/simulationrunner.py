@@ -822,23 +822,34 @@ class MDSimulation(SimulationRunner):
 
             :returns: list -- List with initial structures
         """
+        if self.parameters.trajsPerReplica*processManager.id > len(initialStructures):
+            # Only need to launch as many simulations as initial structures
+            return []
+        initialStructures = processManager.getEquilibrationListPerReplica(initialStructures)
+        # the new initialStructures list contains tuples in the form (i,
+        # structure) where i is the index of structure in the original list
         self.parameters.ligandName = resname
         newInitialStructures = []
         solvatedStrcutures = []
         equilibrationFiles = []
         equilibrationOutput = outputPathConstants.equilibrationDir
-        utilities.makeFolder(equilibrationOutput)
         # AmberTools generates intermediate files in the current directory, change to the tmp folder
         workingdirectory = os.getcwd()
         os.chdir(outputPathConstants.tmpFolder)
         temporalFolder = os.getcwd()
-        ligandPDB = self.extractLigand(initialStructures[0], resname, outputpath="")
+        utilities.makeFolder(equilibrationOutput)
+        ligandPDB = self.extractLigand(initialStructures[0], resname, outputpath="", processManager.id)
         ligandmol2 = "%s.mol2" % resname
         ligandfrcmod = "%s.frcmod" % resname
         Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.waterBoxSize, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
         antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
         parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
-        self.prepareLigand(antechamberDict, parmchkDict)
+        if processManager.isMaster():
+            self.prepareLigand(antechamberDict, parmchkDict)
+
+        processManager.setStatus(processManager.WAITING)
+        processManager.synchronize()
+        processManager.setStatus(processManager.RUNNING)
 
         for i, structure in enumerate(initialStructures):
             TleapControlFile = "tleap_equilibration_%d.in" % i
@@ -863,14 +874,15 @@ class MDSimulation(SimulationRunner):
                                         (os.path.join(workingdirectory, equilibrationOutput), i))
             self.prmtopFiles.append(prmtop)
             equilibrationFiles.append((prmtop, inpcrd))
-
+        assert len(equilibrationFiles) == len(initialStructures), "Equilibration files and initial structures don't match"
+        assert len(equilibrationFiles) <= self.parameters.trajsPerReplica, "Too many equilibration structures per replica"
         os.chdir(workingdirectory)
-        pool = mp.Pool(min(self.getWorkingProcessors(), len(equilibrationFiles)))
+        pool = mp.Pool(len(equilibrationFiles))
         workers = []
         startTime = time.time()
         print("equilibrating System")
         for i, equilibrationFilePair in enumerate(equilibrationFiles):
-            reportName = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % i)
+            reportName = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % i+processManager.id*self.parameters.trajsPerReplica)
             workers.append(pool.apply_async(sim.runEquilibration, args=(equilibrationFilePair, reportName, self.parameters, i)))
 
         for worker in workers:
@@ -899,7 +911,7 @@ class MDSimulation(SimulationRunner):
         endTime = time.time()
         print("System preparation took %.2f sec" % (endTime - startTime))
 
-    def extractLigand(self, PDBtoOpen, resname, outputpath):
+    def extractLigand(self, PDBtoOpen, resname, outputpath, id_replica):
         """
             Extracts the ligand from a given PDB
 
@@ -909,10 +921,14 @@ class MDSimulation(SimulationRunner):
             :type resname: str
             :param outputPath: Path where the pdb is written
             :type outputPath: str
+            :param id_replica: Id of the current replica
+            :type id_replica: int
 
             :returns: str -- string with the ligand pdb
         """
         ligandpdb = os.path.join(outputpath, "raw_ligand.pdb")
+        if id_replica:
+            return ligandpdb
         with open(ligandpdb, "w") as out:
             with open(PDBtoOpen, "r") as inp:
                 for line in inp:
