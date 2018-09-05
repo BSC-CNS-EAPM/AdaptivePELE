@@ -825,7 +825,7 @@ class MDSimulation(SimulationRunner):
         if self.parameters.trajsPerReplica*processManager.id > len(initialStructures):
             # Only need to launch as many simulations as initial structures
             return []
-        initialStructures = processManager.getEquilibrationListPerReplica(initialStructures)
+        initialStructures = processManager.getStructureListPerReplica(initialStructures)
         # the new initialStructures list contains tuples in the form (i,
         # structure) where i is the index of structure in the original list
         self.parameters.ligandName = resname
@@ -985,7 +985,6 @@ class MDSimulation(SimulationRunner):
             :type processManager: :py:class:`.ProcessesManager`
         """
         outputDir = outputPathConstants.epochOutputPathTempletized % epoch
-        processors = self.getWorkingProcessors()
         structures_to_run = initialStructuresAsString.split(":")
         if self.restart:
             if epoch == 0:
@@ -999,13 +998,15 @@ class MDSimulation(SimulationRunner):
             checkpoints = sorted(checkpoints, key=lambda x: utilities.getTrajNum(x))
         # To follow the same order as PELE (important for processor mapping)
         structures_to_run = structures_to_run[1:]+[structures_to_run[0]]
+        structures_to_run = [structure for i, structure in zip(range(self.parameters.processors), itertools.cycle(structures_to_run))]
+        structures_to_run = processManager.getStructureListPerReplica(structures_to_run, self.parameters.trajsPerReplica)
         startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, utilities.getTrajNum(structure))], structure) for structure in structures_to_run]
         print("Starting OpenMM Production Run of %d steps..." % self.parameters.productionLength)
         startTime = time.time()
-        pool = mp.Pool(processors)
+        pool = mp.Pool(self.parameters.trajsPerReplica)
         workers = []
         seed = self.parameters.seed + epoch * self.parameters.processors
-        for i, startingFiles in zip(range(processors), itertools.cycle(startingFilesPairs)):
+        for i, startingFiles in enumerate(startingFilesPairs, start=processManager.id*self.parameters.trajsPerReplica):
             checkpoint = None
             if self.restart:
                 checkpoint = checkpoints[utilities.getTrajNum(startingFiles[1])]

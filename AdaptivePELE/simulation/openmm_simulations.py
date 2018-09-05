@@ -357,6 +357,10 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     # computer, will need to test thoroughly with python3)
     pdb = app.PDBFile(str(pdb))
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
+    if parameters.runningPlatform == "CUDA":
+        platformProperties = {"Precision": "mixed", "DeviceIndex": "%d" % workerNumber, "UseCpuPme": "false"}
+    else:
+        platformProperties = {}
     system = prmtop.createSystem(nonbondedMethod=app.PME,
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                  constraints=app.HBonds)
@@ -374,7 +378,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
             if atom.residue.name == ligandName:
                 force.addParticle(j, [])
         system.addForce(force)
-    simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
+    simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(pdb.positions)
 
     if restart:
