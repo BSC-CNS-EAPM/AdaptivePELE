@@ -196,5 +196,7 @@ class ProcessesManager:
         structures = []
         for i in range(self.__len__()):
             with open(os.path.join(path, "structures_equilibration_%d.txt" % i)) as fr:
-                structures.extend(fr.read().rstrip().split(","))
+                structure_partial = fr.read().rstrip().split(",")
+            if structure_partial != [""]:
+                structures.extend(structure_partial)
         return structures
