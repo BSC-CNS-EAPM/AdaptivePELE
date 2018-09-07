@@ -310,9 +310,9 @@ class PeleSimulation(SimulationRunner):
             raise ValueError("%s should be either binding or unbinding, but %s is provided!!!" % (blockNames.SimulationParams.modeMovingBox, self.parameters.modeMovingBox))
         # If this lines are reached then a new extreme SASA value was
         # identified and we proceed to extract the corresponding center of mass
-        trajNum = metrics[SASAcluster, -2]
-        snapshotNum = metrics[SASAcluster, -1]
-        snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum))[int(snapshotNum)]
+        trajNum = int(metrics[SASAcluster, -2])
+        snapshotNum = int(metrics[SASAcluster, -1])
+        snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum))[snapshotNum]
         snapshotPDB = atomset.PDB()
         snapshotPDB.initialise(snapshot, resname=resname, topology=topologies.getTopology(epoch, trajNum))
         self.parameters.boxCenter = str(snapshotPDB.getCOM())
