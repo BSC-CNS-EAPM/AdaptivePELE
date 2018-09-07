@@ -151,13 +151,13 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     velocities = state.getVelocities()
     if worker == 0:
         print("Running %d steps of NVT equilibration" % parameters.equilibrationLength)
-    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 5, parameters, reportName, velocities=velocities)
+    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 5, parameters, reportName, platformProperties, velocities=velocities)
     state = simulation.context.getState(getPositions=True, getVelocities=True)
     positions = state.getPositions()
     velocities = state.getVelocities()
     if worker == 0:
         print("Running %d steps of NPT equilibration" % parameters.equilibrationLength)
-    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 0.5, parameters, reportName, velocities=velocities)
+    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 0.5, parameters, reportName, platformProperties, velocities=velocities)
     outputPDB = "%s_NPT.pdb" % reportName
     with open(outputPDB, 'w') as fw:
         app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)
