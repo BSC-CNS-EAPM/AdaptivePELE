@@ -833,11 +833,11 @@ class MDSimulation(SimulationRunner):
         solvatedStrcutures = []
         equilibrationFiles = []
         equilibrationOutput = outputPathConstants.equilibrationDir
+        utilities.makeFolder(equilibrationOutput)
         # AmberTools generates intermediate files in the current directory, change to the tmp folder
         workingdirectory = os.getcwd()
         os.chdir(outputPathConstants.tmpFolder)
         temporalFolder = os.getcwd()
-        utilities.makeFolder(equilibrationOutput)
         ligandPDB = self.extractLigand(initialStructures[0][1], resname, "", processManager.id)
         ligandmol2 = "%s.mol2" % resname
         ligandfrcmod = "%s.frcmod" % resname
