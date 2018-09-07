@@ -22,8 +22,8 @@ class ProcessesManager:
         self.pid = os.getpid()
         self.id = None
         self.lockInfo = {}
-        self.createLockFile()
         self.status = self.INIT
+        self.createLockFile()
 
     def __len__(self):
         # define the size of the ProcessesManager object as the number of
@@ -76,7 +76,7 @@ class ProcessesManager:
             if line == "0\n":
                 break
             pid, id_num, label = line.rstrip().split(":")
-            info[pid] = (id_num, label)
+            info[int(pid)] = (int(id_num), label)
         return info
 
     def writeLockInfo(self, file_descriptor):
