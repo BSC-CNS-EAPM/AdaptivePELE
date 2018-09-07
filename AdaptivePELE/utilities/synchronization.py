@@ -35,12 +35,10 @@ class ProcessesManager:
             Create the lock file and write the information for the current
             process
         """
-        if not os.path.exists(self.lockFile):
-            # create file
-            with open(self.lockFile, "w") as fw:
-                # write something so that the file is created, it will be later
-                # overwritten
-                fw.write("0\n")
+        with open(self.lockFile, "w") as fw:
+            # write something so that the file is created, it will be later
+            # overwritten
+            fw.write("0\n")
         file_lock = open(self.lockFile, "r+")
         while True:
             # loop until a lock can be aqcuired
