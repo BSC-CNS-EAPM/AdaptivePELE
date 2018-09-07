@@ -8,6 +8,7 @@ import shutil
 import glob
 import string
 import json
+import errno
 from scipy import linalg
 import numpy as np
 import mdtraj as md
@@ -165,8 +166,12 @@ def makeFolder(outputDir):
         :param outputDir: Folder filename
         :type outputDir: str
     """
-    if not os.path.exists(outputDir):
+    try:
         os.makedirs(outputDir)
+    except OSError as exc:
+        if exc.errno != errno.EEXIST:
+            raise
+        pass
 
 
 def getSnapshots(trajectoryFile, verbose=False, topology=None):
