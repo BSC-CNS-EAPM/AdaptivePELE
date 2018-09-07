@@ -851,7 +851,7 @@ class MDSimulation(SimulationRunner):
         processManager.synchronize()
         processManager.setStatus(processManager.RUNNING)
 
-        for i, structure in enumerate(initialStructures):
+        for i, structure in initialStructures:
             TleapControlFile = "tleap_equilibration_%d.in" % i
             pdb = PDBLoader.PDBManager(structure, resname)
             pdb.preparePDBforMD()
@@ -882,7 +882,7 @@ class MDSimulation(SimulationRunner):
         startTime = time.time()
         print("equilibrating System")
         for i, equilibrationFilePair in enumerate(equilibrationFiles):
-            reportName = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % i+processManager.id*self.parameters.trajsPerReplica)
+            reportName = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % (i+processManager.id*self.parameters.trajsPerReplica))
             workers.append(pool.apply_async(sim.runEquilibration, args=(equilibrationFilePair, reportName, self.parameters, i)))
 
         for worker in workers:
