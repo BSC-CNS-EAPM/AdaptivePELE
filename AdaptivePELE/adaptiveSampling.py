@@ -35,6 +35,42 @@ class InitialStructuresError(Exception):
     __module__ = Exception.__module__
 
 
+def printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusteringBlock, outputPath, initialStructuresWildcard):
+    """
+        Print a summary of the run paramaters
+        
+        :param restart: Flag on whether to continue a previous simulation
+        :type restart: bool
+        :param debug: Flag to mark whether simulation is run in debug mode
+        :type debug: bool
+        :param simulationRunner: Simulation runner object
+        :type simulationRunner: :py:class:`.SimulationRunner`
+        :param spawningCalculator: Spawning calculator object
+        :type spawningCalculator: :py:class:`.SpawningCalculator`
+        :param clusteringBlock: Block of the control file with clustering
+        options
+        :type clusteringBlock: dict
+        :param outputPath: Path where to write the simulation output
+        :type outputPath: str
+        :param initialStructuresWildcard: Wildcard expression to find the
+        initial structures
+        :type initialStructuresWildcard: str
+    """
+    print("================================")
+    print("            PARAMS              ")
+    print("================================")
+    print("Restarting simulations", restart)
+    print("Debug:", debug)
+    print("Iterations: %d, Mpi processors: %d, Pele steps: %d" % (simulationRunner.parameters.iterations, simulationRunner.parameters.processors, simulationRunner.parameters.peleSteps))
+    print("SpawningType:", spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type])
+    print("SimulationType:", simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY[simulationRunner.type])
+    if simulationRunner.hasExitCondition():
+        print("Exit condition:", simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY[simulationRunner.parameters.exitCondition.type])
+    print("Clustering method:", clusteringBlock[blockNames.ClusteringTypes.type])
+    print("Output path: ", outputPath)
+    print("Initial Structures: ", initialStructuresWildcard)
+    print("================================\n\n")
+
 def cleanPreviousSimulation(output_path):
     """
         Clean the uneeded data from a previous simulation
@@ -583,20 +619,6 @@ def main(jsonParams, clusteringHook=None):
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
     resname = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.ligandResname)
 
-    print("================================")
-    print("            PARAMS              ")
-    print("================================")
-    print("Restarting simulations", restart)
-    print("Debug:", debug)
-    print("Iterations: %d, Mpi processors: %d, Pele steps: %d" % (simulationRunner.parameters.iterations, simulationRunner.parameters.processors, simulationRunner.parameters.peleSteps))
-    print("SpawningType:", spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type])
-    print("SimulationType:", simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY[simulationRunner.type])
-    if simulationRunner.hasExitCondition():
-        print("Exit condition:", simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY[simulationRunner.parameters.exitCondition.type])
-    print("Clustering method:", clusteringBlock[blockNames.ClusteringTypes.type])
-    print("Output path: ", outputPath)
-    print("Initial Structures: ", initialStructuresWildcard)
-    print("================================\n\n")
 
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
     if not initialStructures:
@@ -619,6 +641,7 @@ def main(jsonParams, clusteringHook=None):
     firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject, simulationRunner)
     processManager.setStatus(processManager.RUNNING)
     if processManager.isMaster():
+        printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusteringBlock, outputPath, initialStructuresWildcard)
         utilities.makeFolder(outputPathConstants.tmpFolder)
         utilities.makeFolder(outputPathConstants.topologies)
         saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
