@@ -1,5 +1,6 @@
 import os
 import time
+import glob
 import fcntl
 
 try:
@@ -18,12 +19,13 @@ class ProcessesManager:
     INIT = "INIT"
 
     def __init__(self, output_path):
-        self.lockFile = os.path.join(output_path, "syncFile.lock")
+        self.lockFile = os.path.join(os.path.abspath(output_path), "syncFile.lock")
         self.pid = os.getpid()
         self.id = None
         self.lockInfo = {}
         self.status = self.INIT
         self.createLockFile()
+        self.initLockFile()
 
     def __len__(self):
         # define the size of the ProcessesManager object as the number of
@@ -32,13 +34,26 @@ class ProcessesManager:
 
     def createLockFile(self):
         """
-            Create the lock file and write the information for the current
-            process
+            Create the lock file
         """
-        with open(self.lockFile, "w") as fw:
-            # write something so that the file is created, it will be later
-            # overwritten
-            fw.write("0\n")
+        file_lock = open(self.lockFile, "w")
+        try:
+            # get lock
+            fcntl.lockf(file_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except (IOError, OSError):
+            file_lock.close()
+            return
+        # write something so that the file is created, it will be later
+        # overwritten
+        file_lock.write("0\n")
+        fcntl.lockf(file_lock, fcntl.LOCK_UN)
+        file_lock.close()
+
+    def initLockFile(self):
+        """
+            Initialize and write the information for the current process
+
+        """
         file_lock = open(self.lockFile, "r+")
         while True:
             # loop until a lock can be aqcuired
