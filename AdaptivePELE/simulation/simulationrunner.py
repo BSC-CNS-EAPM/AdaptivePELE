@@ -838,7 +838,7 @@ class MDSimulation(SimulationRunner):
         os.chdir(outputPathConstants.tmpFolder)
         temporalFolder = os.getcwd()
         utilities.makeFolder(equilibrationOutput)
-        ligandPDB = self.extractLigand(initialStructures[0], resname, "", processManager.id)
+        ligandPDB = self.extractLigand(initialStructures[0][1], resname, "", processManager.id)
         ligandmol2 = "%s.mol2" % resname
         ligandfrcmod = "%s.frcmod" % resname
         Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.waterBoxSize, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
