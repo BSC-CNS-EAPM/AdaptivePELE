@@ -825,7 +825,7 @@ class MDSimulation(SimulationRunner):
         if self.parameters.trajsPerReplica*processManager.id > len(initialStructures):
             # Only need to launch as many simulations as initial structures
             return []
-        initialStructures = processManager.getStructureListPerReplica(initialStructures)
+        initialStructures = processManager.getStructureListPerReplica(initialStructures, self.parameters.trajsPerReplica)
         # the new initialStructures list contains tuples in the form (i,
         # structure) where i is the index of structure in the original list
         self.parameters.ligandName = resname
@@ -838,7 +838,7 @@ class MDSimulation(SimulationRunner):
         os.chdir(outputPathConstants.tmpFolder)
         temporalFolder = os.getcwd()
         utilities.makeFolder(equilibrationOutput)
-        ligandPDB = self.extractLigand(initialStructures[0], resname, outputpath="", processManager.id)
+        ligandPDB = self.extractLigand(initialStructures[0], resname, "", processManager.id)
         ligandmol2 = "%s.mol2" % resname
         ligandfrcmod = "%s.frcmod" % resname
         Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.waterBoxSize, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
