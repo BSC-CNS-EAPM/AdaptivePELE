@@ -239,7 +239,11 @@ cdef class Atom:
             self.z = float(atomContent[46:54])
 
             self.type = re.sub(self._chargePattern, u"", atomContent[76:80]).strip().upper()
-            self.mass = self._ATOM_WEIGHTS[self.type]
+            if self.type in self._ATOM_WEIGHTS:
+                self.mass = self._ATOM_WEIGHTS[self.type]
+            else:
+                print("WARNING!: Information about atom type not available, trying to guess from its name, mass properties might be wrong.")
+                self.mass = self._ATOM_WEIGHTS[self.name[0]]
 
             if atomContent.startswith(u'ATOM'):
                 self.protein = True
@@ -287,7 +291,11 @@ cdef class Atom:
         self.z = z
 
         self.type = element
-        self.mass = self._ATOM_WEIGHTS[self.type]
+        if self.type in self._ATOM_WEIGHTS:
+            self.mass = self._ATOM_WEIGHTS[self.type]
+        else:
+            print("WARNING!: Information about atom type not available, trying to guess from its name, mass properties might be wrong.")
+            self.mass = self._ATOM_WEIGHTS[self.name[0]]
 
         self.protein = isProtein
 
@@ -575,7 +583,6 @@ cdef class PDB:
             resnumStr = u""
         else:
             resnumStr = u"%d" % (resnum)
-        frame *= 10
         self.pdb = self.join_PDB_lines(topology, frame)  # in case one wants to write it
         for iatom in range(len(topology)):
             atomLine = topology[iatom]
@@ -775,7 +782,7 @@ cdef class PDB:
         cdef unsigned int i
         for i in range(natoms):
             line = topology[i]
-            if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and (u"HOH" == line[17:20] or u"HOH" == prevLine[17:20]))):
+            if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and (u"HOH" == line[17:20] or u"HOH" == prevLine[17:20])) or (prevLine[22:26] != line[22:26] and line[:6] == u"HETATM")):
                 pdb.append(u"TER\n")
             x = (temp % frame[i, 0]).rjust(8)
             y = (temp % frame[i, 1]).rjust(8)
