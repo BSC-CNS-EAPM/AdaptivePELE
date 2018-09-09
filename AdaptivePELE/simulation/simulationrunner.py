@@ -75,6 +75,7 @@ class SimulationParameters:
         self.ligandName = None
         self.waterBoxSize = 8
         self.trajsPerReplica = None
+        self.numReplicas = 1
 
 
 class SimulationRunner:
@@ -90,6 +91,12 @@ class SimulationRunner:
             Return the number of working processors, i.e. number of trajectories
         """
         return self.parameters.processors
+
+    def getNumReplicas(self):
+        """
+            Return the number of replicas, only useful for MD simulations
+        """
+        return self.parameters.numReplicas
 
     def hasExitCondition(self):
         """
@@ -1277,6 +1284,7 @@ class RunnerBuilder:
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
             params.productionLength = paramsBlock[blockNames.SimulationParams.productionLength]
             params.trajsPerReplica = paramsBlock[blockNames.SimulationParams.trajsPerReplica]
+            params.numReplicas = paramsBlock[blockNames.SimulationParams.numReplicas]
             params.runEquilibration = True
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)

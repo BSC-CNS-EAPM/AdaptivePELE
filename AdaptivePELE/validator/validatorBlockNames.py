@@ -131,7 +131,8 @@ class SimulationParams:
             "seed": "numbers.Real",
             "productionLength": "numbers.Real",
             "iterations": "numbers.Real",
-            "trajectoriesPerReplica": "numbers.Real"
+            "trajectoriesPerReplica": "numbers.Real",
+            "numReplicas": "numbers.Real"
         }}
     params = {
         "executable": "basestring",
@@ -163,7 +164,8 @@ class SimulationParams:
         "reporterFrequency": "numbers.Real",
         "productionLength": "numbers.Real",
         "WaterBoxSize": "numbers.Real",
-        "trajectoriesPerReplica": "numbers.Real"
+        "trajectoriesPerReplica": "numbers.Real",
+        "numReplicas": "numbers.Real"
     }
     exitCondition = {
         "types": {
