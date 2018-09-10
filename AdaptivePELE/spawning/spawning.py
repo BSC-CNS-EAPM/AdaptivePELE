@@ -484,7 +484,7 @@ class IndependentMetricCalculator(SpawningCalculator):
             metric_array = np.genfromtxt(reportFilename, missing_values="--", filling_values=0)
             if len(metric_array.shape) < 2:
                 metric_array = metric_array[np.newaxis, :]
-            trajectory = glob.glob("%s%d.*" % (trajWildcard % (iteration-1), num+1))
+            trajectory = glob.glob("%s_%d.*" % (trajWildcard % (iteration-1), num+1))
             assert len(trajectory) == 1, "Too many trajectories found in IndependentMetricCalculator"
             trajectory = trajectory[0]
             if self.parameters.condition == blockNames.SpawningParams.minValue:
