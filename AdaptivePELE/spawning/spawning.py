@@ -221,6 +221,8 @@ class SpawningParams:
         if spawningType == blockNames.StringSpawningTypes.independentMetric:
             # Start counting the columns by 1
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]-1
+            self.condition = spawningParamsBlock.get(blockNames.SpawningParams.condition,
+                                                     blockNames.SpawningParams.minValue)
 
 
 class SpawningCalculator:
