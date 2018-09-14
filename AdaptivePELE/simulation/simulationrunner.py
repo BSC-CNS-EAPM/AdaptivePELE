@@ -7,7 +7,6 @@ import shutil
 import string
 import sys
 import numpy as np
-import ast
 import glob
 import itertools
 import multiprocessing as mp
@@ -190,8 +189,7 @@ class SimulationRunner:
         """
         if len(self.processorsToClusterMapping) == 0:
             return
-        with open(epochDir+"/processorMapping.txt", "w") as f:
-            f.write("%s\n" % ':'.join(map(str, self.processorsToClusterMapping)))
+        utilities.writeProcessorMappingToDisk(epochDir, "processorMapping.txt", self.processorsToClusterMapping)
 
     def readMappingFromDisk(self, epochDir):
         """
@@ -201,11 +199,7 @@ class SimulationRunner:
                 processorsToClusterMapping
             :type epochDir: str
         """
-        try:
-            with open(epochDir+"/processorMapping.txt") as f:
-                self.processorsToClusterMapping = list(map(ast.literal_eval, f.read().rstrip().split(':')))
-        except IOError:
-            sys.stderr.write("WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
+        self.processorsToClusterMapping = utilities.readProcessorMappingFromDisk(epochDir, "processorMapping.txt")
 
     def setZeroMapping(self):
         """
