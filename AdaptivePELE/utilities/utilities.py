@@ -34,6 +34,10 @@ class RequiredParameterMissingException(Exception):
     __module__ = Exception.__module__
 
 
+class ImproperParameterValueException(Exception):
+    __module__ = Exception.__module__
+
+
 class Topology:
     """
         Container object that points to the topology used in each trajectory
@@ -60,17 +64,20 @@ class Topology:
         for f in files:
             os.remove(f)
 
-    def setTopologies(self, topologyFiles):
+    def setTopologies(self, topologyFiles, cleanFiles=True):
         """
             Set the topologies for the simulation. If topologies were set
             before they are deleted and set again
 
             :param topologyFiles: List of topology files
             :type topologyFiles: list
+            :param cleanFiles: Flag wether to remove previous files
+            :type cleanFiles: bool
         """
         if self.topologies:
             self.topologies = []
-            self.cleanTopologies()
+            if cleanFiles:
+                self.cleanTopologies()
         for top in topologyFiles:
             self.topologies.append(getTopologyFile(top))
 
