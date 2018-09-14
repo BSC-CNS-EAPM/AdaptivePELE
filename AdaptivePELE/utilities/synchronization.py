@@ -2,6 +2,7 @@ import os
 import time
 import glob
 import fcntl
+from AdaptivePELE.utilities import utilities
 
 try:
     ProcessLookupError
@@ -15,38 +16,46 @@ class ProcessesManager:
         be able to use multiple nodes of a gpu cluster
     """
     RUNNING = "RUNNING"
-    WAITING = "WATING"
+    WAITING = "WAITING"
     INIT = "INIT"
 
-    def __init__(self, output_path):
-        self.lockFile = os.path.join(os.path.abspath(output_path), "syncFile.lock")
+    def __init__(self, output_path, num_replicas):
+        self.syncFolder =  os.path.join(os.path.abspath(output_path), "synchronization")
+        utilities.makeFolder(self.syncFolder)
+        self.lockFile = os.path.join(self.syncFolder,  "syncFile.lock")
         self.pid = os.getpid()
+        self.nReplicas = num_replicas
         self.id = None
         self.lockInfo = {}
+        self.stateStack = {}
         self.status = self.INIT
+        self.sleepTime = 0.5
         self.createLockFile()
+        self.writeProcessInfo()
         self.initLockFile()
+        self.syncStep = 0
 
     def __len__(self):
         # define the size of the ProcessesManager object as the number of
         # processes
         return len(self.lockInfo)
 
+    def writeProcessInfo(self):
+        with open(os.path.join(self.syncFolder, "%d.proc" % self.pid), "w") as fw:
+            fw.write("%d\n" % self.pid)
+
     def createLockFile(self):
         """
             Create the lock file
         """
-        file_lock = open(self.lockFile, "w")
         try:
-            # get lock
-            fcntl.lockf(file_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except (IOError, OSError):
-            file_lock.close()
+            # whith the flags set, if the file exists the open will fail
+            fd = os.open(self.lockFile, os.O_CREAT | os.O_EXCL)
+            os.close(fd)
+        except OSError:
             return
-        # write something so that the file is created, it will be later
-        # overwritten
+        file_lock = open(self.lockFile, "w")
         file_lock.write("0\n")
-        fcntl.lockf(file_lock, fcntl.LOCK_UN)
         file_lock.close()
 
     def initLockFile(self):
@@ -54,24 +63,53 @@ class ProcessesManager:
             Initialize and write the information for the current process
 
         """
+        while True:
+            processes = glob.glob(os.path.join(self.syncFolder, "*.proc"))
+            processes.sort()
+            if len(processes) > self.nReplicas:
+                raise utilities.ImproperParameterValueException("More processors files than replicas found, this could be due to wrong number of replicas chosen in the control file or files remaining from previous that were not clean properly")
+            if len(processes) != self.nReplicas:
+                time.sleep(self.sleepTime)
+                continue
+            # only reach this block if all processes have written their own
+            # files
+            for i, process_file in enumerate(processes):
+                process = int(os.path.splitext(os.path.split(process_file)[1])[0])
+                self.lockInfo[process] = (i, self.status)
+                if process == self.pid:
+                    self.id = i
+            break
         file_lock = open(self.lockFile, "r+")
         while True:
-            # loop until a lock can be aqcuired
-            try:
-                # get lock
-                fcntl.lockf(file_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                break
-            except (IOError, OSError):
-                time.sleep(2)
-        self.lockInfo = self.getLockInfo(file_lock)
-        if len(self.lockInfo):
-            self.id = len(self.lockInfo)
-        else:
-            self.id = 0
-        self.lockInfo[self.pid] = (self.id, self.status)
-        self.writeLockInfo(file_lock)
-        fcntl.lockf(file_lock, fcntl.LOCK_UN)
-        file_lock.close()
+            fcntl.lockf(file_lock, fcntl.LOCK_EX)
+            if self.isMaster():
+                self.writeLockInfo(file_lock)
+                fcntl.lockf(file_lock, fcntl.LOCK_UN)
+                self.createStateStack()
+                file_lock.close()
+                return
+            else:
+                lock_info = self.getLockInfo(file_lock)
+                fcntl.lockf(file_lock, fcntl.LOCK_UN)
+                # ensure that all process are created before continuing
+                if len(lock_info) == len(self.lockInfo):
+                    self.createStateStack()
+                    file_lock.close()
+                    return
+
+    def createStateStack(self):
+        """
+            Create a stack with all states that each replica has gone through
+        """
+        for pid in self.lockInfo:
+            self.stateStack[pid] = set([self.lockInfo[pid][1]])
+
+    def updateStateStack(self):
+        """
+            Update the stack with all states that each replica has gone through
+        """
+        for pid in self.lockInfo:
+            self.stateStack[pid].add(self.lockInfo[pid][1])
 
     def getLockInfo(self, file_descriptor):
         """
@@ -118,16 +156,11 @@ class ProcessesManager:
             :type status: str
         """
         self.status = status
-        self.lockInfo[self.pid] = (self.id, self.status)
         file_lock = open(self.lockFile, "r+")
-        while True:
-            # loop until a lock can be aqcuired
-            try:
-                # get lock
-                fcntl.lockf(file_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                break
-            except (IOError, OSError):
-                time.sleep(2)
+        fcntl.lockf(file_lock, fcntl.LOCK_EX)
+        self.lockInfo = self.getLockInfo(file_lock)
+        self.lockInfo[self.pid] = (self.id, self.status)
+        self.updateStateStack()
         self.writeLockInfo(file_lock)
         fcntl.lockf(file_lock, fcntl.LOCK_UN)
         file_lock.close()
@@ -149,28 +182,27 @@ class ProcessesManager:
             :returns: bool -- Whether all processes are synchronized
         """
         assert len(self.lockInfo) > 0, "No processes found in lockInfo!!!"
-        for pid in self.lockInfo:
-            if self.lockInfo[pid][1] != status:
+        for pid in self.stateStack:
+            if status not in self.lockInfo[pid]:
                 return False
         return True
 
-    def synchronize(self):
+    def synchronize(self, status):
         """
             Create a barrier-like situation to wait for all processes to finish
         """
         while True:
-            if self.isSynchronized(self.WAITING):
+            if self.isSynchronized(status):
+                # wait for some time before returning to avoid deadlocks caused
+                # by lock reaquisition by the same process due to poor
+                # load-balance between different syncronize calls
+                time.sleep(self.sleepTime)
                 return
             file_lock = open(self.lockFile, "r+")
-            while True:
-                # loop until a lock can be aqcuired
-                try:
-                    # get lock
-                    fcntl.lockf(file_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    break
-                except (IOError, OSError):
-                    time.sleep(2)
+            fcntl.lockf(file_lock, fcntl.LOCK_EX)
             self.lockInfo = self.getLockInfo(file_lock)
+            self.updateStateStack()
+            fcntl.lockf(file_lock, fcntl.LOCK_UN)
             file_lock.close()
 
     def allRunning(self):
@@ -181,6 +213,7 @@ class ProcessesManager:
             try:
                 os.kill(pid, 0)
             except ProcessLookupError:
+                print("Process %d not found!!!" % pid)
                 return False
         return True
 
@@ -229,3 +262,11 @@ class ProcessesManager:
         n_structures = len(initialStructures)
         end = min(n_structures, (self.id+1)*trajsPerReplica)
         return [(i, initialStructures[i]) for i in range(self.id*trajsPerReplica, end)]
+
+    def getBarrierName(self):
+        """
+            Create a unique status name so that every time we synchronize we do
+            it under a different name
+        """
+        self.syncStep += 1
+        return "%s-%d" % (self.WAITING, self.syncStep)
