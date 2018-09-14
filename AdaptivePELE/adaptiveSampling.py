@@ -35,6 +35,19 @@ class InitialStructuresError(Exception):
     __module__ = Exception.__module__
 
 
+def cleanProcessesFiles(folder):
+    """
+        Clean the processes files from a previous simulation
+        :param folder: Folder where the files are stored
+        :type folder: str
+    """
+    processes = glob.glob(os.path.join(folder, "*.proc"))
+    for process_file in processes:
+        try:
+            os.remove(process_file)
+        except OSError:
+            pass
+
 def printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusteringBlock, outputPath, initialStructuresWildcard):
     """
         Print a summary of the run paramaters
