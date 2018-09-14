@@ -93,10 +93,22 @@ def cleanPreviousSimulation(output_path):
     """
     equilibration_folders = glob.glob(os.path.join(output_path, "equilibration*"))
     for folder in equilibration_folders:
-        shutil.rmtree(folder)
+        try:
+            shutil.rmtree(folder)
+        except OSError as exc:
+            if exc.errno != errno.ENOENT:
+                raise
+            # If another process deleted the folder between the glob and the
+            # actual removing an OSError is raised
+            pass
     epochs = utilities.get_epoch_folders(output_path)
     for epoch in epochs:
-        shutil.rmtree(epoch)
+        try:
+            shutil.rmtree(os.path.join(output_path, epoch))
+        except OSError as exc:
+            if exc.errno != errno.ENOENT:
+                raise
+            pass
 
 
 def createMappingForFirstEpoch(initialStructures, topologies, processors):
