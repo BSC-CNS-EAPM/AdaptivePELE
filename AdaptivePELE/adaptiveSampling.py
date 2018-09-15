@@ -35,6 +35,19 @@ class InitialStructuresError(Exception):
     __module__ = Exception.__module__
 
 
+def cleanProcessesFiles(folder):
+    """
+        Clean the processes files from a previous simulation
+        :param folder: Folder where the files are stored
+        :type folder: str
+    """
+    processes = glob.glob(os.path.join(folder, "*.proc"))
+    for process_file in processes:
+        try:
+            os.remove(process_file)
+        except OSError:
+            pass
+
 def printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusteringBlock, outputPath, initialStructuresWildcard):
     """
         Print a summary of the run paramaters
@@ -80,10 +93,22 @@ def cleanPreviousSimulation(output_path):
     """
     equilibration_folders = glob.glob(os.path.join(output_path, "equilibration*"))
     for folder in equilibration_folders:
-        shutil.rmtree(folder)
+        try:
+            shutil.rmtree(folder)
+        except OSError as exc:
+            if exc.errno != errno.ENOENT:
+                raise
+            # If another process deleted the folder between the glob and the
+            # actual removing an OSError is raised
+            pass
     epochs = utilities.get_epoch_folders(output_path)
     for epoch in epochs:
-        shutil.rmtree(epoch)
+        try:
+            shutil.rmtree(os.path.join(output_path, epoch))
+        except OSError as exc:
+            if exc.errno != errno.ENOENT:
+                raise
+            pass
 
 
 def createMappingForFirstEpoch(initialStructures, topologies, processors):
@@ -530,7 +555,6 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
 
         :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames
     """
-    processManager.setStatus(processManager.RUNNING)
     if processManager.isMaster():
         clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies)
 
@@ -543,8 +567,9 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
         simulationRunner.updateMappingProcessors(procMapping)
     else:
         clusteringMethod = None
-    processManager.setStatus(processManager.WAITING)
-    processManager.synchronize()
+    status = processManager.getBarrierName()
+    processManager.setStatus(status)
+    processManager.synchronize(status)
     initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(simulationRunner.getWorkingProcessors(), outputPathConstants.tmpInitialStructuresTemplate, firstRun)
 
     return clusteringMethod, initialStructuresAsString
@@ -575,13 +600,13 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, controlFil
         :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames
     """
     firstRun = 0
-    processManager.setStatus(processManager.RUNNING)
     if processManager.isMaster():
         saveInitialControlFile(controlFile, outputPathConstants.originalControlFile)
 
         copyInitialStructures(initialStructures, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
-    processManager.setStatus(processManager.WAITING)
-    processManager.synchronize()
+    status = processManager.getBarrierName()
+    processManager.setStatus(status)
+    processManager.synchronize(status)
     initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(len(initialStructures), outputPathConstants.tmpInitialStructuresTemplate, firstRun)
 
     if processManager.isMaster():
@@ -601,7 +626,7 @@ def main(jsonParams, clusteringHook=None):
         :param jsonParams: A string with the name of the control file to use
         :type jsonParams: str
     """
-
+    
     controlFileValidator.validate(jsonParams)
     generalParams, spawningBlock, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
 
@@ -637,16 +662,19 @@ def main(jsonParams, clusteringHook=None):
 
     simulationRunner.unifyReportNames(spawningCalculator.parameters.reportFilename)
     utilities.makeFolder(outputPath)
-    processManager = ProcessesManager(outputPath)
+    processManager = ProcessesManager(outputPath, simulationRunner.getNumReplicas())
     firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject, simulationRunner)
-    processManager.setStatus(processManager.RUNNING)
     if processManager.isMaster():
         printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusteringBlock, outputPath, initialStructuresWildcard)
         utilities.makeFolder(outputPathConstants.tmpFolder)
         utilities.makeFolder(outputPathConstants.topologies)
         saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
-    processManager.setStatus(processManager.WAITING)
-    processManager.synchronize()
+    status = processManager.getBarrierName()
+    processManager.setStatus(status)
+    processManager.synchronize(status)
+    # once the replicas are properly syncronized there is no need for the
+    # process files, and erasing them allows us to restart simulations
+    cleanProcessesFiles(processManager.syncFolder)
 
     topologies = utilities.Topology(outputPathConstants.topologies)
     if restart and firstRun is not None:
@@ -657,65 +685,61 @@ def main(jsonParams, clusteringHook=None):
             clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningCalculator.parameters, initialStructures, simulationRunner, processManager)
         else:
             clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningCalculator.parameters, spawningCalculator, simulationRunner, topologies, processManager)
-        processManager.setStatus(processManager.RUNNING)
         if processManager.isMaster():
             checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner)
-        processManager.setStatus(processManager.WAITING)
-        processManager.synchronize()
+        status = processManager.getBarrierName()
+        processManager.setStatus(status)
+        processManager.synchronize(status)
 
     if firstRun is None or not restart:
-        processManager.setStatus(processManager.RUNNING)
         topologies.setTopologies(initialStructures)
         if processManager.isMaster():
             if not debug:
                 cleanPreviousSimulation(outputPath)
             writeTopologyFiles(initialStructures, outputPathConstants.topologies)
-        processManager.setStatus(processManager.WAITING)
-        processManager.synchronize()
+        status = processManager.getBarrierName()
+        processManager.setStatus(status)
+        processManager.synchronize(status)
 
         if simulationRunner.parameters.runEquilibration:
-            processManager.setStatus(processManager.RUNNING)
             if resname is None:
                 raise utilities.RequiredParameterMissingException("Resname not specified in clustering block!!!")
             initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningCalculator.parameters.reportFilename, outputPath, resname, processManager, topologies)
             # write the equilibration structures for each replica
             processManager.writeEquilibrationStructures(outputPathConstants.tmpFolder, initialStructures)
-            processManager.setStatus(processManager.WAITING)
-            processManager.synchronize()
+            status = processManager.getBarrierName()
+            processManager.setStatus(status)
+            processManager.synchronize(status)
             # read all the equilibration structures
             initialStructures = processManager.readEquilibrationStructures(outputPathConstants.tmpFolder)
-            topologies.setTopologies(initialStructures)
+            topologies.setTopologies(initialStructures, cleanFiles=processManager.isMaster())
             writeTopologyFiles(initialStructures, outputPathConstants.topologies)
         createMappingForFirstEpoch(initialStructures, topologies, simulationRunner.getWorkingProcessors())
 
         clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningCalculator.parameters, initialStructures, simulationRunner, processManager)
 
-    processManager.setStatus(processManager.RUNNING)
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
     if firstRun is None:
         firstRun = 0  # if restart false, but there were previous simulations
     for i in range(firstRun, simulationRunner.parameters.iterations):
-        if not processManager.allRunning():
-            print("Some process died, killing all replicas!")
-            sys.exit(1)
-        processManager.setStatus(processManager.RUNNING)
-        print("Iteration", i)
         if processManager.isMaster():
+            print("Iteration", i)
             outputDir = outputPathConstants.epochOutputPathTempletized % i
             utilities.makeFolder(outputDir)
 
             simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
             topologies.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i, i)
 
-        processManager.setStatus(processManager.WAITING)
-        processManager.synchronize()
+        status = processManager.getBarrierName()
+        processManager.setStatus(status)
+        processManager.synchronize(status)
         print("Production run...")
-        processManager.setStatus(processManager.RUNNING)
         if not debug:
             simulationRunner.runSimulation(i, outputPathConstants, initialStructuresAsString, topologies, spawningCalculator.parameters.reportFilename, processManager)
-        processManager.setStatus(processManager.WAITING)
-        processManager.synchronize()
+        status = processManager.getBarrierName()
+        processManager.setStatus(status)
+        processManager.synchronize(status)
 
         print("Clustering...")
         if processManager.isMaster():
@@ -763,16 +787,23 @@ def main(jsonParams, clusteringHook=None):
 
         # Prepare for next pele iteration
         if i != simulationRunner.parameters.iterations-1:
+            # Differentiate between null spawning and the rest of spawning
+            # methods
             if spawningCalculator.shouldWriteStructures():
-                # Differentiate between null spawning and the rest of spawning
-                # methods
                 if processManager.isMaster():
                     _, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants,
                                                                                        degeneracyOfRepresentatives,
-                                                                                       clusteringMethod, i+1,
+                                                                                       clusteringMethod,
+                                                                                       i+1,
                                                                                        topologies=topologies)
-                    simulationRunner.updateMappingProcessors(procMapping)
-                    topologies.mapEpochTopologies(i+1, procMapping)
+                    utilities.writeProcessorMappingToDisk(outputPathConstants.tmpFolder, "processMapping.txt", procMapping)
+                status = processManager.getBarrierName()
+                processManager.setStatus(status)
+                processManager.synchronize(status)
+                if not processManager.isMaster():
+                    procMapping = utilities.readProcessorMappingFromDisk(outputPathConstants.tmpFolder, "processMapping.txt")
+                simulationRunner.updateMappingProcessors(procMapping)
+                topologies.mapEpochTopologies(i+1, procMapping)
                 initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(simulationRunner.getWorkingProcessors(),
                                                                                               outputPathConstants.tmpInitialStructuresTemplate,
                                                                                               i+1)
@@ -786,8 +817,6 @@ def main(jsonParams, clusteringHook=None):
             if simulationRunner.hasExitCondition():
                 if simulationRunner.checkExitCondition(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i):
                     print("Simulation exit condition met at iteration %d, stopping" % i)
-                    processManager.setStatus(processManager.WAITING)
-                    processManager.synchronize()
                     # send a signal to all possible adaptivePELE copies to stop
                     for pid in processManager.lockInfo:
                         if pid != processManager.pid:
@@ -795,8 +824,9 @@ def main(jsonParams, clusteringHook=None):
                     break
                 else:
                     print("Simulation exit condition not met at iteration %d, continuing..." % i)
-        processManager.setStatus(processManager.WAITING)
-        processManager.synchronize()
+        status = processManager.getBarrierName()
+        processManager.setStatus(status)
+        processManager.synchronize(status)
 
 if __name__ == '__main__':
     args = parseArgs()

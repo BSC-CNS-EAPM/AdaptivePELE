@@ -7,7 +7,6 @@ import shutil
 import string
 import sys
 import numpy as np
-import ast
 import glob
 import itertools
 import multiprocessing as mp
@@ -75,6 +74,7 @@ class SimulationParameters:
         self.ligandName = None
         self.waterBoxSize = 8
         self.trajsPerReplica = None
+        self.numReplicas = 1
 
 
 class SimulationRunner:
@@ -90,6 +90,12 @@ class SimulationRunner:
             Return the number of working processors, i.e. number of trajectories
         """
         return self.parameters.processors
+
+    def getNumReplicas(self):
+        """
+            Return the number of replicas, only useful for MD simulations
+        """
+        return self.parameters.numReplicas
 
     def hasExitCondition(self):
         """
@@ -183,8 +189,7 @@ class SimulationRunner:
         """
         if len(self.processorsToClusterMapping) == 0:
             return
-        with open(epochDir+"/processorMapping.txt", "w") as f:
-            f.write("%s\n" % ':'.join(map(str, self.processorsToClusterMapping)))
+        utilities.writeProcessorMappingToDisk(epochDir, "processorMapping.txt", self.processorsToClusterMapping)
 
     def readMappingFromDisk(self, epochDir):
         """
@@ -194,11 +199,7 @@ class SimulationRunner:
                 processorsToClusterMapping
             :type epochDir: str
         """
-        try:
-            with open(epochDir+"/processorMapping.txt") as f:
-                self.processorsToClusterMapping = list(map(ast.literal_eval, f.read().rstrip().split(':')))
-        except IOError:
-            sys.stderr.write("WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
+        self.processorsToClusterMapping = utilities.readProcessorMappingFromDisk(epochDir, "processorMapping.txt")
 
     def setZeroMapping(self):
         """
@@ -824,6 +825,12 @@ class MDSimulation(SimulationRunner):
         """
         if self.parameters.trajsPerReplica*processManager.id > len(initialStructures):
             # Only need to launch as many simulations as initial structures
+            # synchronize the replicas that will not run equilibration with the
+            # replicas that will do, i.e with the synchronize in the middle of
+            # this method
+            status = processManager.getBarrierName()
+            processManager.setStatus(status)
+            processManager.synchronize(status)
             return []
         initialStructures = processManager.getStructureListPerReplica(initialStructures, self.parameters.trajsPerReplica)
         # the new initialStructures list contains tuples in the form (i,
@@ -847,9 +854,9 @@ class MDSimulation(SimulationRunner):
         if processManager.isMaster():
             self.prepareLigand(antechamberDict, parmchkDict)
 
-        processManager.setStatus(processManager.WAITING)
-        processManager.synchronize()
-        processManager.setStatus(processManager.RUNNING)
+        status = processManager.getBarrierName()
+        processManager.setStatus(status)
+        processManager.synchronize(status)
 
         for i, structure in initialStructures:
             TleapControlFile = "tleap_equilibration_%d.in" % i
@@ -991,17 +998,18 @@ class MDSimulation(SimulationRunner):
                 # if the epoch is 0 the original equilibrated pdb files are taken as intial structures
                 equilibrated_structures = glob.glob(os.path.join(outputPathConstants.equilibrationDir, "equilibrated*pdb"))
                 structures_to_run = sorted(equilibrated_structures, key=lambda x: utilities.getTrajNum(x))
-            prmtops = glob.glob(os.path.join(outputPathConstants.topologies, "*prmtop"))
-            # sort the prmtops according to the original topology order
-            self.prmtopFiles = sorted(prmtops, key=lambda x: utilities.getPrmtopNum(x))
             checkpoints = glob.glob(os.path.join(outputDir, "checkpoint*.chk"))
             checkpoints = sorted(checkpoints, key=lambda x: utilities.getTrajNum(x))
+        # always read the prmtop files from disk to serve as communication
+        # between diffrent processses
+        prmtops = glob.glob(os.path.join(outputPathConstants.topologies, "*prmtop"))
+        # sort the prmtops according to the original topology order
+        self.prmtopFiles = sorted(prmtops, key=lambda x: utilities.getPrmtopNum(x))
         # To follow the same order as PELE (important for processor mapping)
         structures_to_run = structures_to_run[1:]+[structures_to_run[0]]
         structures_to_run = [structure for i, structure in zip(range(self.parameters.processors), itertools.cycle(structures_to_run))]
         structures_to_run = processManager.getStructureListPerReplica(structures_to_run, self.parameters.trajsPerReplica)
-        startingFilesPairs =
-        [(self.prmtopFiles[topologies.getTopologyIndex(epoch, utilities.getTrajNum(structure[1]))], structure[1]) for structure in structures_to_run]
+        startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, utilities.getTrajNum(structure[1]))], structure[1]) for structure in structures_to_run]
         print("Starting OpenMM Production Run of %d steps..." % self.parameters.productionLength)
         startTime = time.time()
         pool = mp.Pool(self.parameters.trajsPerReplica)
@@ -1276,6 +1284,7 @@ class RunnerBuilder:
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
             params.productionLength = paramsBlock[blockNames.SimulationParams.productionLength]
             params.trajsPerReplica = paramsBlock[blockNames.SimulationParams.trajsPerReplica]
+            params.numReplicas = paramsBlock[blockNames.SimulationParams.numReplicas]
             params.runEquilibration = True
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
