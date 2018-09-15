@@ -320,7 +320,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 
 
 @get_traceback
-def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, restart=False):
+def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, replica_id, trajsPerReplica,restart=False):
     """
     Functions that runs the production run at NVT conditions.
     If a boxcenter is defined in the parameters section, Flat-bottom harmonic restrains will be applied to the ligand
@@ -341,10 +341,16 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     :type checkpoint: str
     :param ligandName: Code Name for the ligand
     :type ligandName: str
+    :param replica_id: Id of the replica running
+    :type replica_id: int
+    :param trajsPerReplica: Number of trajectories per replica
+    :type trajsPerReplica: int
     :param restart: Whether the simulation run has to be restarted or not
     :type restart: bool
 
     """
+    deviceIndex = workerNumber
+    workerNumber += replica_id*trajsPerReplica + 1 
     prmtop, pdb = equilibrationFiles
     prmtop = app.AmberPrmtopFile(prmtop)
     DCDrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
@@ -358,7 +364,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     pdb = app.PDBFile(str(pdb))
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
     if parameters.runningPlatform == "CUDA":
-        platformProperties = {"Precision": "mixed", "DeviceIndex": "%d" % workerNumber, "UseCpuPme": "false"}
+        platformProperties = {"Precision": "mixed", "DeviceIndex": "%d" % deviceIndex, "UseCpuPme": "false"}
     else:
         platformProperties = {}
     system = prmtop.createSystem(nonbondedMethod=app.PME,
