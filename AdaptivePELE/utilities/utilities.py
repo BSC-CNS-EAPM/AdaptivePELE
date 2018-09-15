@@ -163,8 +163,14 @@ def cleanup(tmpFolder):
         :param tmpFolder: Folder to remove
         :type tmpFolder: str
     """
-    if os.path.exists(tmpFolder):
+    try:
         shutil.rmtree(tmpFolder)
+    except OSError as exc:
+        if exc.errno != errno.ENOENT:
+            raise
+        # If another process deleted the folder between the glob and the
+        # actual removing an OSError is raised
+        pass
 
 
 def makeFolder(outputDir):
