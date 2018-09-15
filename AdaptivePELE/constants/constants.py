@@ -23,6 +23,13 @@ elif "bsc.mn" in machine:
     DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/Data"
     DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/Documents"
 
+elif "bullx" in machine:
+    # this values are not correct for the minoTauro hardware, just leaving it
+    # here as a placeholder
+    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/nord/rev090518/bin/PELE-1.5_mpi"
+    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Data"
+    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Documents"
+
 elif machine == "bscls309":
     PELE_EXECUTABLE = "/home/jgilaber/PELE/PELE-1.5/bin/PELE-1.5_mpi"
     DATA_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Data"
