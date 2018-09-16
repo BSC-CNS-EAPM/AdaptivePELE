@@ -644,12 +644,12 @@ def main(jsonParams, clusteringHook=None):
 
     simulationRunner.unifyReportNames(spawningCalculator.parameters.reportFilename)
     utilities.makeFolder(outputPath)
+    utilities.makeFolder(outputPathConstants.tmpFolder)
+    utilities.makeFolder(outputPathConstants.topologies)
     processManager = ProcessesManager(outputPath, simulationRunner.getNumReplicas())
     firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject, simulationRunner)
     if processManager.isMaster():
         printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusteringBlock, outputPath, initialStructuresWildcard)
-        utilities.makeFolder(outputPathConstants.tmpFolder)
-        utilities.makeFolder(outputPathConstants.topologies)
         saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
     processManager.barrier()
     # once the replicas are properly syncronized there is no need for the
