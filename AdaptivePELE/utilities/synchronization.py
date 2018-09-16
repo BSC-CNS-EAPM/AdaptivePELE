@@ -270,3 +270,11 @@ class ProcessesManager:
         """
         self.syncStep += 1
         return "%s-%d" % (self.WAITING, self.syncStep)
+
+    def barrier(self):
+        """
+            Create a barrier
+        """
+        status = self.getBarrierName()
+        self.setStatus(status)
+        self.synchronize(status)

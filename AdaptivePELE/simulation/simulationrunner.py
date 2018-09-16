@@ -828,9 +828,7 @@ class MDSimulation(SimulationRunner):
             # synchronize the replicas that will not run equilibration with the
             # replicas that will do, i.e with the synchronize in the middle of
             # this method
-            status = processManager.getBarrierName()
-            processManager.setStatus(status)
-            processManager.synchronize(status)
+            processManager.barrier()
             return []
         initialStructures = processManager.getStructureListPerReplica(initialStructures, self.parameters.trajsPerReplica)
         # the new initialStructures list contains tuples in the form (i,
@@ -854,9 +852,7 @@ class MDSimulation(SimulationRunner):
         if processManager.isMaster():
             self.prepareLigand(antechamberDict, parmchkDict)
 
-        status = processManager.getBarrierName()
-        processManager.setStatus(status)
-        processManager.synchronize(status)
+        processManager.barrier()
 
         for i, structure in initialStructures:
             TleapControlFile = "tleap_equilibration_%d.in" % i

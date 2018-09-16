@@ -553,9 +553,7 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
         simulationRunner.updateMappingProcessors(procMapping)
     else:
         clusteringMethod = None
-    status = processManager.getBarrierName()
-    processManager.setStatus(status)
-    processManager.synchronize(status)
+    processManager.barrier()
     initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(simulationRunner.getWorkingProcessors(), outputPathConstants.tmpInitialStructuresTemplate, firstRun)
 
     return clusteringMethod, initialStructuresAsString
@@ -590,9 +588,7 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, controlFil
         saveInitialControlFile(controlFile, outputPathConstants.originalControlFile)
 
         copyInitialStructures(initialStructures, outputPathConstants.tmpInitialStructuresTemplate, firstRun)
-    status = processManager.getBarrierName()
-    processManager.setStatus(status)
-    processManager.synchronize(status)
+    processManager.barrier()
     initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(len(initialStructures), outputPathConstants.tmpInitialStructuresTemplate, firstRun)
 
     if processManager.isMaster():
@@ -655,9 +651,7 @@ def main(jsonParams, clusteringHook=None):
         utilities.makeFolder(outputPathConstants.tmpFolder)
         utilities.makeFolder(outputPathConstants.topologies)
         saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
-    status = processManager.getBarrierName()
-    processManager.setStatus(status)
-    processManager.synchronize(status)
+    processManager.barrier()
     # once the replicas are properly syncronized there is no need for the
     # process files, and erasing them allows us to restart simulations
     cleanProcessesFiles(processManager.syncFolder)
@@ -673,9 +667,7 @@ def main(jsonParams, clusteringHook=None):
             clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathConstants, clusteringBlock, spawningCalculator.parameters, spawningCalculator, simulationRunner, topologies, processManager)
         if processManager.isMaster():
             checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner)
-        status = processManager.getBarrierName()
-        processManager.setStatus(status)
-        processManager.synchronize(status)
+        processManager.barrier()
 
     if firstRun is None or not restart:
         topologies.setTopologies(initialStructures)
@@ -683,9 +675,7 @@ def main(jsonParams, clusteringHook=None):
             if not debug:
                 cleanPreviousSimulation(outputPath)
             writeTopologyFiles(initialStructures, outputPathConstants.topologies)
-        status = processManager.getBarrierName()
-        processManager.setStatus(status)
-        processManager.synchronize(status)
+        processManager.barrier()
 
         if simulationRunner.parameters.runEquilibration:
             if resname is None:
@@ -693,9 +683,7 @@ def main(jsonParams, clusteringHook=None):
             initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningCalculator.parameters.reportFilename, outputPath, resname, processManager, topologies)
             # write the equilibration structures for each replica
             processManager.writeEquilibrationStructures(outputPathConstants.tmpFolder, initialStructures)
-            status = processManager.getBarrierName()
-            processManager.setStatus(status)
-            processManager.synchronize(status)
+            processManager.barrier()
             # read all the equilibration structures
             initialStructures = processManager.readEquilibrationStructures(outputPathConstants.tmpFolder)
             topologies.setTopologies(initialStructures, cleanFiles=processManager.isMaster())
@@ -717,15 +705,11 @@ def main(jsonParams, clusteringHook=None):
             simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
             topologies.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i, i)
 
-        status = processManager.getBarrierName()
-        processManager.setStatus(status)
-        processManager.synchronize(status)
+        processManager.barrier()
         print("Production run...")
         if not debug:
             simulationRunner.runSimulation(i, outputPathConstants, initialStructuresAsString, topologies, spawningCalculator.parameters.reportFilename, processManager)
-        status = processManager.getBarrierName()
-        processManager.setStatus(status)
-        processManager.synchronize(status)
+        processManager.barrier()
 
         print("Clustering...")
         if processManager.isMaster():
@@ -783,9 +767,7 @@ def main(jsonParams, clusteringHook=None):
                                                                                        i+1,
                                                                                        topologies=topologies)
                     utilities.writeProcessorMappingToDisk(outputPathConstants.tmpFolder, "processMapping.txt", procMapping)
-                status = processManager.getBarrierName()
-                processManager.setStatus(status)
-                processManager.synchronize(status)
+                processManager.barrier()
                 if not processManager.isMaster():
                     procMapping = utilities.readProcessorMappingFromDisk(outputPathConstants.tmpFolder, "processMapping.txt")
                 simulationRunner.updateMappingProcessors(procMapping)
@@ -810,9 +792,7 @@ def main(jsonParams, clusteringHook=None):
                     break
                 else:
                     print("Simulation exit condition not met at iteration %d, continuing..." % i)
-        status = processManager.getBarrierName()
-        processManager.setStatus(status)
-        processManager.synchronize(status)
+        processManager.barrier()
 
 if __name__ == '__main__':
     args = parseArgs()
