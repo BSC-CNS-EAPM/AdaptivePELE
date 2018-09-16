@@ -27,7 +27,6 @@ class ProcessesManager:
         self.nReplicas = num_replicas
         self.id = None
         self.lockInfo = {}
-        self.stateStack = {}
         self.status = self.INIT
         self.sleepTime = 0.5
         self.createLockFile()
@@ -75,7 +74,7 @@ class ProcessesManager:
             # files
             for i, process_file in enumerate(processes):
                 process = int(os.path.splitext(os.path.split(process_file)[1])[0])
-                self.lockInfo[process] = (i, self.status)
+                self.lockInfo[process] = (i, set([self.status]))
                 if process == self.pid:
                     self.id = i
             break
@@ -85,7 +84,6 @@ class ProcessesManager:
             if self.isMaster():
                 self.writeLockInfo(file_lock)
                 fcntl.lockf(file_lock, fcntl.LOCK_UN)
-                self.createStateStack()
                 file_lock.close()
                 return
             else:
@@ -93,23 +91,8 @@ class ProcessesManager:
                 fcntl.lockf(file_lock, fcntl.LOCK_UN)
                 # ensure that all process are created before continuing
                 if len(lock_info) == len(self.lockInfo):
-                    self.createStateStack()
                     file_lock.close()
                     return
-
-    def createStateStack(self):
-        """
-            Create a stack with all states that each replica has gone through
-        """
-        for pid in self.lockInfo:
-            self.stateStack[pid] = set([self.lockInfo[pid][1]])
-
-    def updateStateStack(self):
-        """
-            Update the stack with all states that each replica has gone through
-        """
-        for pid in self.lockInfo:
-            self.stateStack[pid].add(self.lockInfo[pid][1])
 
     def getLockInfo(self, file_descriptor):
         """
@@ -127,7 +110,7 @@ class ProcessesManager:
             if line == "0\n":
                 break
             pid, id_num, label = line.rstrip().split(":")
-            info[int(pid)] = (int(id_num), label)
+            info[int(pid)] = (int(id_num), set(label.split(";")))
         return info
 
     def writeLockInfo(self, file_descriptor):
@@ -139,7 +122,8 @@ class ProcessesManager:
         """
         file_descriptor.seek(0)
         for pid, data in self.lockInfo.items():
-            file_descriptor.write("%d:%d:%s\n" % ((pid,)+data))
+            id_num, status_set = data
+            file_descriptor.write("%d:%d:%s\n" % (pid, id_num, ";".join(status_set)))
         file_descriptor.truncate()
 
     def isMaster(self):
@@ -159,8 +143,7 @@ class ProcessesManager:
         file_lock = open(self.lockFile, "r+")
         fcntl.lockf(file_lock, fcntl.LOCK_EX)
         self.lockInfo = self.getLockInfo(file_lock)
-        self.lockInfo[self.pid] = (self.id, self.status)
-        self.updateStateStack()
+        self.lockInfo[self.pid][1].add(self.status)
         self.writeLockInfo(file_lock)
         fcntl.lockf(file_lock, fcntl.LOCK_UN)
         file_lock.close()
@@ -182,8 +165,8 @@ class ProcessesManager:
             :returns: bool -- Whether all processes are synchronized
         """
         assert len(self.lockInfo) > 0, "No processes found in lockInfo!!!"
-        for pid in self.stateStack:
-            if status not in self.lockInfo[pid]:
+        for pid in self.lockInfo:
+            if status not in self.lockInfo[pid][1]:
                 return False
         return True
 
@@ -193,15 +176,10 @@ class ProcessesManager:
         """
         while True:
             if self.isSynchronized(status):
-                # wait for some time before returning to avoid deadlocks caused
-                # by lock reaquisition by the same process due to poor
-                # load-balance between different syncronize calls
-                time.sleep(self.sleepTime)
                 return
             file_lock = open(self.lockFile, "r+")
             fcntl.lockf(file_lock, fcntl.LOCK_EX)
             self.lockInfo = self.getLockInfo(file_lock)
-            self.updateStateStack()
             fcntl.lockf(file_lock, fcntl.LOCK_UN)
             file_lock.close()
 
