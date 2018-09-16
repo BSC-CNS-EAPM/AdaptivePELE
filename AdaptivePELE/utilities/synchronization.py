@@ -90,7 +90,7 @@ class ProcessesManager:
                 lock_info = self.getLockInfo(file_lock)
                 fcntl.lockf(file_lock, fcntl.LOCK_UN)
                 # ensure that all process are created before continuing
-                if len(lock_info) == len(self.lockInfo):
+                if sorted(list(lock_info)) == sorted(list(self.lockInfo)):
                     file_lock.close()
                     return
 
