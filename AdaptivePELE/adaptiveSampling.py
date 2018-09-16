@@ -676,6 +676,7 @@ def main(jsonParams, clusteringHook=None):
                 cleanPreviousSimulation(outputPath)
             writeTopologyFiles(initialStructures, outputPathConstants.topologies)
         processManager.barrier()
+        firstRun = 0  # if restart false, but there were previous simulations
 
         if simulationRunner.parameters.runEquilibration:
             if resname is None:
@@ -694,8 +695,6 @@ def main(jsonParams, clusteringHook=None):
 
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
-    if firstRun is None:
-        firstRun = 0  # if restart false, but there were previous simulations
     for i in range(firstRun, simulationRunner.parameters.iterations):
         if processManager.isMaster():
             print("Iteration", i)
