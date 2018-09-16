@@ -370,20 +370,6 @@ def checkIntegrityClusteringObject(objectPath):
         return False
 
 
-def __unicodeToStr(data):
-    # convert dict
-    if isinstance(data, dict):
-        return {__unicodeToStr(key): __unicodeToStr(value) for key, value in data.items()}
-    # convert list
-    if isinstance(data, list):
-        return [__unicodeToStr(val) for val in data]
-    # convert unicode to str
-    if isinstance(data, unicode):
-        return data.encode('utf-8')
-
-    return data
-
-
 def loadParams(jsonParams):
     """
         Read the control file in JSON format and extract the blocks of simulation,
@@ -392,8 +378,8 @@ def loadParams(jsonParams):
         :param jsonParams: Control file in JSON format from where the parameters will be read
         :type jsonParams: json str
     """
-    jsonFile = open(jsonParams, 'r').read()
-    # parsedJSON = json.loads(jsonFile, object_hook=__unicodeToStr)
+    with open(jsonParams, 'r') as f:
+        jsonFile = f.read()
     parsedJSON = json.loads(jsonFile)
 
     return parsedJSON[blockNames.ControlFileParams.generalParams], parsedJSON[blockNames.ControlFileParams.spawningBlockname],\
