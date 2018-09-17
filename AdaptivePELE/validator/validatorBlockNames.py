@@ -130,7 +130,9 @@ class SimulationParams:
             "processors": "numbers.Real",
             "seed": "numbers.Real",
             "productionLength": "numbers.Real",
-            "iterations": "numbers.Real"
+            "iterations": "numbers.Real",
+            "trajectoriesPerReplica": "numbers.Real",
+            "numReplicas": "numbers.Real"
         }}
     params = {
         "executable": "basestring",
@@ -158,10 +160,12 @@ class SimulationParams:
         "nonBondedCutoff": "numbers.Real",
         "Temperature": "numbers.Real",
         "runningPlatform": "basestring",
-        "minimizationIterations": "int",
-        "reporterFrequency": "int",
-        "productionLength": "int",
-        "WaterBoxSize": "int"
+        "minimizationIterations": "numbers.Real",
+        "reporterFrequency": "numbers.Real",
+        "productionLength": "numbers.Real",
+        "WaterBoxSize": "numbers.Real",
+        "trajectoriesPerReplica": "numbers.Real",
+        "numReplicas": "numbers.Real"
     }
     exitCondition = {
         "types": {
@@ -170,7 +174,7 @@ class SimulationParams:
             "metricMultipleTrajectories": "basestring"
         },
         "params": {
-            "metricCol": "int",
+            "metricCol": "numbers.Real",
             "exitValue": "numbers.Real",
             "condition": "basestring",
             "numTrajs": "numbers.Real"

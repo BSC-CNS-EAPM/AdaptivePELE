@@ -137,19 +137,27 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     prmtop = app.AmberPrmtopFile(prmtop)
     inpcrd = app.AmberInpcrdFile(inpcrd)
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
+    if parameters.runningPlatform == "CUDA":
+        platformProperties = {"Precision": "mixed", "DeviceIndex": "%d" % worker, "UseCpuPme": "false"}
+    else:
+        platformProperties = {}
     if worker == 0:
         print("Running %d steps of minimization" % parameters.minimizationIterations)
-    simulation = minimization(prmtop, inpcrd, PLATFORM, 5, parameters)
-    positions = simulation.context.getState(getPositions=True).getPositions()
-    velocities = simulation.context.getState(getVelocities=True).getVelocities()
+    simulation = minimization(prmtop, inpcrd, PLATFORM, 5, parameters, platformProperties)
+    # Retrieving the state is expensive (especially when running on GPUs) so we
+    # only called it once and then separate positions and velocities
+    state = simulation.context.getState(getPositions=True, getVelocities=True)
+    positions = state.getPositions()
+    velocities = state.getVelocities()
     if worker == 0:
         print("Running %d steps of NVT equilibration" % parameters.equilibrationLength)
-    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 5, parameters, reportName, velocities=velocities)
-    positions = simulation.context.getState(getPositions=True).getPositions()
-    velocities = simulation.context.getState(getVelocities=True).getVelocities()
+    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 5, parameters, reportName, platformProperties, velocities=velocities)
+    state = simulation.context.getState(getPositions=True, getVelocities=True)
+    positions = state.getPositions()
+    velocities = state.getVelocities()
     if worker == 0:
         print("Running %d steps of NPT equilibration" % parameters.equilibrationLength)
-    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 0.5, parameters, reportName, velocities=velocities)
+    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 0.5, parameters, reportName, platformProperties, velocities=velocities)
     outputPDB = "%s_NPT.pdb" % reportName
     with open(outputPDB, 'w') as fw:
         app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)
@@ -157,7 +165,7 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
 
 
 @get_traceback
-def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
+def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters, platformProperties):
     """
     Function that runs a minimization of the system
     it uses the VerletIntegrator and applys to the heavy atoms of the
@@ -171,6 +179,8 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
     :type constraints: int
     :param parameters: Object with the parameters for the simulation
     :type parameters: :py:class:`/simulationrunner/SimulationParameters` -- SimulationParameters object
+    :param platformProperties: Properties specific to the OpenMM platform
+    :type platformProperties: dict
 
     :return: The minimized OpenMM simulation object
     """
@@ -192,7 +202,7 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
                 force.addParticle(j, inpcrd.positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
 
-    simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
+    simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     if inpcrd.boxVectors is not None:
         simulation.context.setPeriodicBoxVectors(*inpcrd.boxVectors)
     simulation.context.setPositions(inpcrd.positions)
@@ -201,7 +211,7 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters):
 
 
 @get_traceback
-def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, reportName, velocities=None):
+def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, reportName, platformProperties, velocities=None):
     """
     Function that runs an equilibration at constant volume conditions.
     It uses the AndersenThermostat, the VerletIntegrator and
@@ -217,6 +227,8 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     :type constraints: int
     :param parameters: Object with the parameters for the simulation
     :type parameters: :py:class:`/simulationrunner/SimulationParameters` -- SimulationParameters object
+    :param platformProperties: Properties specific to the OpenMM platform
+    :type platformProperties: dict
     :param velocities: OpenMM object with the velocities of the system. Optional, if velocities are not given,
     random velocities acording to the temperature will be used.
 
@@ -237,7 +249,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
             if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (atom.residue.name == parameters.ligandName and atom.element.symbol != "H"):
                 force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
-    simulation = app.Simulation(topology.topology, system, integrator, PLATFORM)
+    simulation = app.Simulation(topology.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(positions)
     if velocities:
         simulation.context.setVelocities(velocities)
@@ -253,7 +265,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 
 
 @get_traceback
-def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, reportName, velocities=None):
+def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraints, parameters, reportName, platformProperties, velocities=None):
     """
     Function that runs an equilibration at constant pressure conditions.
     It uses the AndersenThermostat, the VerletIntegrator, the MonteCarlo Barostat and
@@ -269,6 +281,8 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     :type constraints: int
     :param parameters: Object with the parameters for the simulation
     :type parameters: :py:class:`/simulationrunner/SimulationParameters` -- SimulationParameters object
+    :param platformProperties: Properties specific to the OpenMM platform
+    :type platformProperties: dict
     :param velocities: OpenMM object with the velocities of the system. Optional, if velocities are not given,
     random velocities acording to the temperature will be used.
 
@@ -290,7 +304,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
             if atom.name == 'CA' or (atom.residue.name == parameters.ligandName and atom.element.symbol != "H"):
                 force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
-    simulation = app.Simulation(topology.topology, system, integrator, PLATFORM)
+    simulation = app.Simulation(topology.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(positions)
     if velocities:
         simulation.context.setVelocities(velocities)
@@ -306,10 +320,10 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 
 
 @get_traceback
-def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, restart=False):
+def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, replica_id, trajsPerReplica, restart=False):
     """
     Functions that runs the production run at NVT conditions.
-    Ff a boxcenter is defined in the parameters section, Flat-bottom harmonic restrains will be applied to the ligand
+    If a boxcenter is defined in the parameters section, Flat-bottom harmonic restrains will be applied to the ligand
 
     :param equilibrationFiles: Tuple with the paths for the Amber topology file (prmtop) and the pdb for the system
     :type equilibrationFiles: Tuple
@@ -327,10 +341,16 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     :type checkpoint: str
     :param ligandName: Code Name for the ligand
     :type ligandName: str
+    :param replica_id: Id of the replica running
+    :type replica_id: int
+    :param trajsPerReplica: Number of trajectories per replica
+    :type trajsPerReplica: int
     :param restart: Whether the simulation run has to be restarted or not
     :type restart: bool
 
     """
+    deviceIndex = workerNumber
+    workerNumber += replica_id*trajsPerReplica + 1
     prmtop, pdb = equilibrationFiles
     prmtop = app.AmberPrmtopFile(prmtop)
     DCDrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
@@ -343,6 +363,10 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     # computer, will need to test thoroughly with python3)
     pdb = app.PDBFile(str(pdb))
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
+    if parameters.runningPlatform == "CUDA":
+        platformProperties = {"Precision": "mixed", "DeviceIndex": "%d" % deviceIndex, "UseCpuPme": "false"}
+    else:
+        platformProperties = {}
     system = prmtop.createSystem(nonbondedMethod=app.PME,
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                  constraints=app.HBonds)
@@ -360,7 +384,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
             if atom.residue.name == ligandName:
                 force.addParticle(j, [])
         system.addForce(force)
-    simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM)
+    simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(pdb.positions)
 
     if restart:

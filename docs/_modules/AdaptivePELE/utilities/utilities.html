@@ -142,14 +142,16 @@
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">reraise</span> <span class="k">as</span> <span class="n">raise_</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">socket</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">errno</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">linalg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">mdtraj</span> <span class="k">as</span> <span class="nn">md</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
@@ -169,6 +171,10 @@
 
 
 <span class="k">class</span> <span class="nc">RequiredParameterMissingException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="n">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="n">__module__</span>
+
+
+<span class="k">class</span> <span class="nc">ImproperParameterValueException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="n">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="n">__module__</span>
 
 
@@ -198,17 +204,20 @@
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Topology.setTopologies"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology.setTopologies">[docs]</a>    <span class="k">def</span> <span class="nf">setTopologies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topologyFiles</span><span class="p">):</span>
+<div class="viewcode-block" id="Topology.setTopologies"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology.setTopologies">[docs]</a>    <span class="k">def</span> <span class="nf">setTopologies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topologyFiles</span><span class="p">,</span> <span class="n">cleanFiles</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Set the topologies for the simulation. If topologies were set</span>
 <span class="sd">            before they are deleted and set again</span>
 
 <span class="sd">            :param topologyFiles: List of topology files</span>
 <span class="sd">            :type topologyFiles: list</span>
+<span class="sd">            :param cleanFiles: Flag wether to remove previous files</span>
+<span class="sd">            :type cleanFiles: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">topologies</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">topologies</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cleanTopologies</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">cleanFiles</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cleanTopologies</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">top</span> <span class="ow">in</span> <span class="n">topologyFiles</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">topologies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">top</span><span class="p">))</span></div>
 
@@ -294,8 +303,14 @@
 <span class="sd">        :param tmpFolder: Folder to remove</span>
 <span class="sd">        :type tmpFolder: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tmpFolder</span><span class="p">):</span>
-        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">tmpFolder</span><span class="p">)</span></div>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">tmpFolder</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">:</span>
+            <span class="k">raise</span>
+        <span class="c1"># If another process deleted the folder between the glob and the</span>
+        <span class="c1"># actual removing an OSError is raised</span>
+        <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="makeFolder"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.makeFolder">[docs]</a><span class="k">def</span> <span class="nf">makeFolder</span><span class="p">(</span><span class="n">outputDir</span><span class="p">):</span>
@@ -305,8 +320,12 @@
 <span class="sd">        :param outputDir: Folder filename</span>
 <span class="sd">        :type outputDir: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outputDir</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outputDir</span><span class="p">)</span></div>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outputDir</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span><span class="p">:</span>
+            <span class="k">raise</span>
+        <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="getSnapshots"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getSnapshots">[docs]</a><span class="k">def</span> <span class="nf">getSnapshots</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -765,6 +784,40 @@
         <span class="n">cores</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1"># Take 1 less than the count of processors, to not clog the machine</span>
     <span class="k">return</span> <span class="n">cores</span> <span class="ow">or</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">mp</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="writeProcessorMappingToDisk"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.writeProcessorMappingToDisk">[docs]</a><span class="k">def</span> <span class="nf">writeProcessorMappingToDisk</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">processorMapping</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the processorsToClusterMapping to disk</span>
+
+<span class="sd">        :param folder: Name of the folder where to write the</span>
+<span class="sd">            processorsToClusterMapping</span>
+<span class="sd">        :type folder: str</span>
+<span class="sd">        :param filename: Name of the file where to write the processorMapping</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param processorMapping: Mapping of the trajectories to processors</span>
+<span class="sd">        :type processorMapping: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">processorMapping</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="readProcessorMappingFromDisk"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.readProcessorMappingFromDisk">[docs]</a><span class="k">def</span> <span class="nf">readProcessorMappingFromDisk</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the processorsToClusterMapping from disk</span>
+
+<span class="sd">        :param folder: Name of the folder where to write the</span>
+<span class="sd">            processorsToClusterMapping</span>
+<span class="sd">        :type folder: str</span>
+<span class="sd">        :param filename: Name of the file where to write the processorMapping</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :returns: list -- List with the mapping of the trajectories to processors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)))</span>
+    <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

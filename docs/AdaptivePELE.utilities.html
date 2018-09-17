@@ -289,14 +289,18 @@ processorsToClusterMapping</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.setTopologies">
-<code class="descname">setTopologies</code><span class="sig-paren">(</span><em>topologyFiles</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.setTopologies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.setTopologies" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setTopologies</code><span class="sig-paren">(</span><em>topologyFiles</em>, <em>cleanFiles=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.setTopologies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.setTopologies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the topologies for the simulation. If topologies were set
 before they are deleted and set again</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>topologyFiles</strong> (<em>list</em>) – List of topology files</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>topologyFiles</strong> (<em>list</em>) – List of topology files</li>
+<li><strong>cleanFiles</strong> (<em>bool</em>) – Flag wether to remove previous files</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -634,6 +638,28 @@ trajectories and reports</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.readProcessorMappingFromDisk">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">readProcessorMappingFromDisk</code><span class="sig-paren">(</span><em>folder</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readProcessorMappingFromDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readProcessorMappingFromDisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the processorsToClusterMapping from disk</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
+processorsToClusterMapping</li>
+<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the processorMapping</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the mapping of the trajectories to processors</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.sign">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">sign</code><span class="sig-paren">(</span><em>x</em>, <em>tol=1e-07</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.sign" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the sign of a number</p>
@@ -658,6 +684,26 @@ trajectories and reports</p>
 <dt id="AdaptivePELE.utilities.utilities.writeObject">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">writeObject</code><span class="sig-paren">(</span><em>filename</em>, <em>object_to_write</em>, <em>protocol=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeObject" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.writeProcessorMappingToDisk">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">writeProcessorMappingToDisk</code><span class="sig-paren">(</span><em>folder</em>, <em>filename</em>, <em>processorMapping</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeProcessorMappingToDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeProcessorMappingToDisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the processorsToClusterMapping to disk</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
+processorsToClusterMapping</li>
+<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the processorMapping</li>
+<li><strong>processorMapping</strong> (<em>list</em>) – Mapping of the trajectories to processors</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.write_PDB_clusters">
