@@ -28,3 +28,14 @@ class TestMD_CUDA(unittest.TestCase):
         time.sleep(10)
         # cleanup
         utilities.cleanup(output_path)
+
+    def testOpenMM1ab1_CUDA(self):
+        output_path = "tests/data/openmm_1ab1_CUDA"
+        controlFile = "tests/data/templetized_controlFile_1ab1_md_CUDA.conf"
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2, 4)
+        # ensure all replicas have enough time to check the output before
+        # deleting it
+        time.sleep(10)
+        # cleanup
+        utilities.cleanup(output_path)
