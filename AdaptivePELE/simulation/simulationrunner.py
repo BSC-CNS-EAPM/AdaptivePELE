@@ -1262,6 +1262,8 @@ class RunnerBuilder:
             params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength)
             params.numberEquilibrationStructures = paramsBlock.get(blockNames.SimulationParams.numberEquilibrationStructures, 10)
             params.srun = paramsBlock.get(blockNames.SimulationParams.srun, False)
+            params.trajsPerReplica = params.processors
+            params.numReplicas = 1
             params.srunParameters = paramsBlock.get(blockNames.SimulationParams.srunParameters, None)
             if params.srunParameters is not None:
                 params.srunParameters = params.srunParameters.strip().split()
@@ -1299,6 +1301,8 @@ class RunnerBuilder:
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
+            params.trajsPerReplica = params.processors
+            params.numReplicas = 1
             return TestSimulation(params)
         else:
             sys.exit("Unknown simulation type! Choices are: " + str(simulationTypes.SIMULATION_TYPE_TO_STRING_DICTIONARY.values()))
