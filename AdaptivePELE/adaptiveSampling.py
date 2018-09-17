@@ -714,12 +714,14 @@ def main(jsonParams, clusteringHook=None):
             topologies.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i, i)
 
         processManager.barrier()
-        print("Production run...")
+        if processManager.isMaster():
+            print("Production run...")
         if not debug:
             simulationRunner.runSimulation(i, outputPathConstants, initialStructuresAsString, topologies, spawningCalculator.parameters.reportFilename, processManager)
         processManager.barrier()
 
-        print("Clustering...")
+        if processManager.isMaster():
+            print("Clustering...")
         if processManager.isMaster():
             startTime = time.time()
             clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies)
