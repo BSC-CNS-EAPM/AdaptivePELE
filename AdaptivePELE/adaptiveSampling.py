@@ -471,7 +471,7 @@ def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletiz
         clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized, topologies)
 
 
-def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies):
+def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies, processManager):
     """
         It reads the previous clustering method, and, if there are changes,
         it reclusters the previous trajectories. Returns the clustering object to use
@@ -486,11 +486,16 @@ def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConsta
         :type spawningParams: :py:class:`.SpawningParams`
         :param topologies: Topology object containing the set of topologies needed for the simulation
         :type topologies: :py:class:`.Topology`
+        :param processManager: Object to synchronize the possibly multiple processes
+        :type processManager: :py:class:`.ProcessesManager`
 
         :returns: :py:class:`.Clustering` -- The clustering method to use in the
             adaptive sampling simulation
     """
-
+    if not processManager.isMaster():
+        for ij in range(firstRun):
+            topologies.readMappingFromDisk(outputPathConstants.epochOutputPathTempletized % ij, ij)
+        return
     lastClusteringEpoch = firstRun - 1
     clusteringObjectPath = outputPathConstants.clusteringOutputObject % (lastClusteringEpoch)
     oldClusteringMethod = utilities.readClusteringObject(clusteringObjectPath)
@@ -541,18 +546,22 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
 
         :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames
     """
+    processorManagerFilename = "procMapping.txt"
+    clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies, processManager) 
     if processManager.isMaster():
-        clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies)
-
         degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.getWorkingProcessors(), firstRun)
         spawningCalculator.log()
         _, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun, topologies=topologies)
-        # for compatibility with old data
-        procMapping = [element if element is not None else (0, 0, 0) for element in procMapping]
-        topologies.mapEpochTopologies(firstRun, procMapping)
-        simulationRunner.updateMappingProcessors(procMapping)
+        utilities.writeProcessorMappingToDisk(outputPathConstants.tmpFolder, processorManagerFilename, procMapping)
     else:
         clusteringMethod = None
+    processManager.barrier()
+    if not processManager.isMaster():
+        procMapping = utilities.readProcessorMappingFromDisk(outputPathConstants.tmpFolder, processorManagerFilename)
+    # for compatibility with old data
+    procMapping = [element if element is not None else (0, 0, 0) for element in procMapping]
+    topologies.mapEpochTopologies(firstRun, procMapping)
+    simulationRunner.updateMappingProcessors(procMapping)
     processManager.barrier()
     initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(simulationRunner.getWorkingProcessors(), outputPathConstants.tmpInitialStructuresTemplate, firstRun)
 
