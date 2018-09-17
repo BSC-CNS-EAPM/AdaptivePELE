@@ -158,7 +158,7 @@
 <span id="adaptivesampling-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">adaptiveSampling</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.adaptiveSampling" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInNewSimulation">
-<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">buildNewClusteringAndWriteInitialStructuresInNewSimulation</code><span class="sig-paren">(</span><em>debug</em>, <em>controlFile</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>initialStructures</em>, <em>simulationRunner</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#buildNewClusteringAndWriteInitialStructuresInNewSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInNewSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">buildNewClusteringAndWriteInitialStructuresInNewSimulation</code><span class="sig-paren">(</span><em>debug</em>, <em>controlFile</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>initialStructures</em>, <em>simulationRunner</em>, <em>processManager</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#buildNewClusteringAndWriteInitialStructuresInNewSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInNewSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build the clustering object and copies initial structures from control file.
 Returns the clustering object to use and the initial structures filenames as string</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -173,6 +173,7 @@ Returns the clustering object to use and the initial structures filenames as str
 <li><strong>spawningParams</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) – Spawning params</li>
 <li><strong>initialStructures</strong> (<em>list</em>) – Control file initial structures</li>
 <li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a> Simulation runner object</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
 </ul>
 </td>
 </tr>
@@ -185,7 +186,7 @@ Returns the clustering object to use and the initial structures filenames as str
 
 <dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInRestart">
-<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">buildNewClusteringAndWriteInitialStructuresInRestart</code><span class="sig-paren">(</span><em>firstRun</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>spawningCalculator</em>, <em>simulationRunner</em>, <em>topologies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#buildNewClusteringAndWriteInitialStructuresInRestart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInRestart" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">buildNewClusteringAndWriteInitialStructuresInRestart</code><span class="sig-paren">(</span><em>firstRun</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>spawningCalculator</em>, <em>simulationRunner</em>, <em>topologies</em>, <em>processManager</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#buildNewClusteringAndWriteInitialStructuresInRestart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.buildNewClusteringAndWriteInitialStructuresInRestart" title="Permalink to this definition">¶</a></dt>
 <dd><p>It reads the previous clustering method, and if there are changes (clustering method or related to thresholds),
 reclusters the previous trajectories. Returns the clustering object to use,
 and the initial structure filenames as strings</p>
@@ -201,6 +202,7 @@ and the initial structure filenames as strings</p>
 <li><strong>spawningCalculator</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">SpawningCalculator</span></code></a>) – Spawning calculator object</li>
 <li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a> Simulation runner object</li>
 <li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
 </ul>
 </td>
 </tr>
@@ -267,6 +269,28 @@ multiple trajectory metric exit condition</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.adaptiveSampling.cleanPreviousSimulation">
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">cleanPreviousSimulation</code><span class="sig-paren">(</span><em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#cleanPreviousSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.cleanPreviousSimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean the uneeded data from a previous simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_path</strong> (<em>str</em>) – Path where the data is stored</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.adaptiveSampling.cleanProcessesFiles">
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">cleanProcessesFiles</code><span class="sig-paren">(</span><em>folder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#cleanProcessesFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.cleanProcessesFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean the processes files from a previous simulation
+:param folder: Folder where the files are stored
+:type folder: str</p>
 </dd></dl>
 
 <dl class="function">
@@ -558,6 +582,34 @@ or distance</p>
 <dt id="AdaptivePELE.adaptiveSampling.parseArgs">
 <code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">parseArgs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.parseArgs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.adaptiveSampling.printRunInfo">
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">printRunInfo</code><span class="sig-paren">(</span><em>restart</em>, <em>debug</em>, <em>simulationRunner</em>, <em>spawningCalculator</em>, <em>clusteringBlock</em>, <em>outputPath</em>, <em>initialStructuresWildcard</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#printRunInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.printRunInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a summary of the run paramaters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>restart</strong> (<em>bool</em>) – Flag on whether to continue a previous simulation</li>
+<li><strong>debug</strong> (<em>bool</em>) – Flag to mark whether simulation is run in debug mode</li>
+<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – Simulation runner object</li>
+<li><strong>spawningCalculator</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">SpawningCalculator</span></code></a>) – Spawning calculator object</li>
+<li><strong>clusteringBlock</strong> – Block of the control file with clustering</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>options
+:type clusteringBlock: dict
+:param outputPath: Path where to write the simulation output
+:type outputPath: str
+:param initialStructuresWildcard: Wildcard expression to find the
+initial structures
+:type initialStructuresWildcard: str</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.saveInitialControlFile">

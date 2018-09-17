@@ -320,7 +320,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 
 
 @get_traceback
-def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, replica_id, trajsPerReplica,restart=False):
+def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, replica_id, trajsPerReplica, restart=False):
     """
     Functions that runs the production run at NVT conditions.
     If a boxcenter is defined in the parameters section, Flat-bottom harmonic restrains will be applied to the ligand
@@ -350,7 +350,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
 
     """
     deviceIndex = workerNumber
-    workerNumber += replica_id*trajsPerReplica + 1 
+    workerNumber += replica_id*trajsPerReplica + 1
     prmtop, pdb = equilibrationFiles
     prmtop = app.AmberPrmtopFile(prmtop)
     DCDrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
