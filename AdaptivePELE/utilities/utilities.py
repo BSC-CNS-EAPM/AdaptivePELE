@@ -2,14 +2,16 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from builtins import range
 from six import reraise as raise_
 import os
+import ast
 import sys
 import socket
 import shutil
 import glob
-import numpy as np
 import string
 import json
+import errno
 from scipy import linalg
+import numpy as np
 import mdtraj as md
 try:
     import cPickle as pickle
@@ -29,6 +31,10 @@ class UnsatisfiedDependencyException(Exception):
 
 
 class RequiredParameterMissingException(Exception):
+    __module__ = Exception.__module__
+
+
+class ImproperParameterValueException(Exception):
     __module__ = Exception.__module__
 
 
@@ -58,17 +64,20 @@ class Topology:
         for f in files:
             os.remove(f)
 
-    def setTopologies(self, topologyFiles):
+    def setTopologies(self, topologyFiles, cleanFiles=True):
         """
             Set the topologies for the simulation. If topologies were set
             before they are deleted and set again
 
             :param topologyFiles: List of topology files
             :type topologyFiles: list
+            :param cleanFiles: Flag wether to remove previous files
+            :type cleanFiles: bool
         """
         if self.topologies:
             self.topologies = []
-            self.cleanTopologies()
+            if cleanFiles:
+                self.cleanTopologies()
         for top in topologyFiles:
             self.topologies.append(getTopologyFile(top))
 
@@ -154,8 +163,14 @@ def cleanup(tmpFolder):
         :param tmpFolder: Folder to remove
         :type tmpFolder: str
     """
-    if os.path.exists(tmpFolder):
+    try:
         shutil.rmtree(tmpFolder)
+    except OSError as exc:
+        if exc.errno != errno.ENOENT:
+            raise
+        # If another process deleted the folder between the glob and the
+        # actual removing an OSError is raised
+        pass
 
 
 def makeFolder(outputDir):
@@ -165,8 +180,12 @@ def makeFolder(outputDir):
         :param outputDir: Folder filename
         :type outputDir: str
     """
-    if not os.path.exists(outputDir):
+    try:
         os.makedirs(outputDir)
+    except OSError as exc:
+        if exc.errno != errno.EEXIST:
+            raise
+        pass
 
 
 def getSnapshots(trajectoryFile, verbose=False, topology=None):
@@ -625,3 +644,37 @@ def getCpuCount():
         cores = None
     # Take 1 less than the count of processors, to not clog the machine
     return cores or max(1, mp.cpu_count()-1)
+
+
+def writeProcessorMappingToDisk(folder, filename, processorMapping):
+    """
+        Write the processorsToClusterMapping to disk
+
+        :param folder: Name of the folder where to write the
+            processorsToClusterMapping
+        :type folder: str
+        :param filename: Name of the file where to write the processorMapping
+        :type filename: str
+        :param processorMapping: Mapping of the trajectories to processors
+        :type processorMapping: list
+    """
+    with open(os.path.join(folder, filename), "w") as f:
+        f.write("%s\n" % ':'.join(map(str, processorMapping)))
+
+
+def readProcessorMappingFromDisk(folder, filename):
+    """
+        Read the processorsToClusterMapping from disk
+
+        :param folder: Name of the folder where to write the
+            processorsToClusterMapping
+        :type folder: str
+        :param filename: Name of the file where to write the processorMapping
+        :type filename: str
+        :returns: list -- List with the mapping of the trajectories to processors
+    """
+    try:
+        with open(os.path.join(folder, filename)) as f:
+            return list(map(ast.literal_eval, f.read().rstrip().split(':')))
+    except IOError:
+        sys.stderr.write("WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")

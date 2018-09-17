@@ -31,3 +31,4 @@ AdaptivePELE.egg-info/
 AdaptivePELE/__pycache__
 AdaptivePELE/*/__pycache__
 .idea
+AdaptivePELE/AdaptiveTest_CUDA.*

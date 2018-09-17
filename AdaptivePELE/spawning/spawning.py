@@ -469,8 +469,6 @@ class IndependentMetricCalculator(SpawningCalculator):
             :type clustering: :py:class:`.Clustering`
             :param iteration: Number of epoch
             :type iteration: int
-            :param topology_file: Topology file for non-pdb trajectories
-            :type topology_file: str
             :param topologies: Topology object containing the set of topologies needed for the simulation
             :type topologies: :py:class:`.Topology`
 
