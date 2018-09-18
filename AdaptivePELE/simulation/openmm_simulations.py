@@ -28,7 +28,7 @@ def get_traceback(f):
     def wrapper(*args, **kwargs):
         try:
             return f(*args, **kwargs)
-        except Exception, ex:
+        except Exception as ex:
             ret = '#' * 60
             ret += "\nException caught:"
             ret += "\n"+'-'*60
