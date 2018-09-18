@@ -3,7 +3,8 @@
 #SBATCH -D .
 #SBATCH --output=AdaptiveTest.out
 #SBATCH --error=AdaptiveTest.err
-#SBATCH --ntasks=5
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=5
 #SBATCH --time=00:50:00
 #SBATCH --qos=debug
 

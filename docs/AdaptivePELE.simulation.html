@@ -312,7 +312,7 @@ equilibration run</li>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.equilibrate">
-<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>initialStructures</em>, <em>outputPathConstants</em>, <em>reportFilename</em>, <em>outputPath</em>, <em>resname</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.equilibrate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>initialStructures</em>, <em>outputPathConstants</em>, <em>reportFilename</em>, <em>outputPath</em>, <em>resname</em>, <em>processManager</em>, <em>topologies=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.equilibrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run short simulation to equilibrate the system. It will run one
 such simulation for every initial structure
 (some of the arguments are not needed, such as (reportFilename, outputPath and topology) but they are kept
@@ -327,6 +327,7 @@ to follow the same structure has the Super class definition)</p>
 <li><strong>reportBaseFilename</strong> (<em>str</em>) – Name of the file that contains the metrics of the snapshots to cluster</li>
 <li><strong>outputPath</strong> (<em>str</em>) – Path where trajectories are found</li>
 <li><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the system pdb</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
 <li><strong>topology</strong> (<em>:py:class:</em>) – Topology object</li>
 </ul>
 </td>
@@ -340,7 +341,7 @@ to follow the same structure has the Super class definition)</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.extractLigand">
-<code class="descname">extractLigand</code><span class="sig-paren">(</span><em>PDBtoOpen</em>, <em>resname</em>, <em>outputpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.extractLigand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.extractLigand" title="Permalink to this definition">¶</a></dt>
+<code class="descname">extractLigand</code><span class="sig-paren">(</span><em>PDBtoOpen</em>, <em>resname</em>, <em>outputpath</em>, <em>id_replica</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.extractLigand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.extractLigand" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the ligand from a given PDB</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -350,6 +351,7 @@ to follow the same structure has the Super class definition)</p>
 <li><strong>PDBtoOpen</strong> (<em>str</em>) – string with the pdb to prepare</li>
 <li><strong>resname</strong> (<em>str</em>) – string with the code of the ligand</li>
 <li><strong>outputPath</strong> (<em>str</em>) – Path where the pdb is written</li>
+<li><strong>id_replica</strong> (<em>int</em>) – Id of the current replica</li>
 </ul>
 </td>
 </tr>
@@ -386,8 +388,25 @@ to follow the same structure has the Super class definition)</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em>, <em>processManager</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a MD simulation using OpenMM</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>epoch</strong> (<em>int</em>) – number of the epoch</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>initialStructures</strong> (<em>str</em>) – Name of the initial structures to copy</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>reportFileName</strong> (<em>str</em>) – Name of the report file</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.runTleap">
@@ -530,7 +549,7 @@ equilibration run</li>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate">
-<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>initialStructures</em>, <em>outputPathConstants</em>, <em>reportFilename</em>, <em>outputPath</em>, <em>resname</em>, <em>topologies=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>initialStructures</em>, <em>outputPathConstants</em>, <em>reportFilename</em>, <em>outputPath</em>, <em>resname</em>, <em>processManager</em>, <em>topologies=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.equilibrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run short simulation to equilibrate the system. It will run one
 such simulation for every initial structure and select appropiate
 structures to start the simulation</p>
@@ -544,6 +563,7 @@ structures to start the simulation</p>
 <li><strong>reportBaseFilename</strong> (<em>str</em>) – Name of the file that contains the metrics of the snapshots to cluster</li>
 <li><strong>outputPath</strong> (<em>str</em>) – Path where trajectories are found</li>
 <li><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the system pdb</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
 <li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
 </ul>
 </td>
@@ -634,17 +654,19 @@ the cluster with max SASA</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em>, <em>processManager</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a short PELE simulation</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>epoch</strong> – number of the epoch</li>
-<li><strong>outputPathConstants</strong> – outputpathConstants class</li>
-<li><strong>ControlFileDictionary</strong> – Dictionary with the values to substitute in the template</li>
-<li><strong>topologies</strong> – topology class</li>
+<li><strong>epoch</strong> (<em>int</em>) – number of the epoch</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>initialStructures</strong> (<em>str</em>) – Name of the initial structures to copy</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>reportFileName</strong> (<em>str</em>) – Name of the report file</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
 </ul>
 </td>
 </tr>
@@ -829,6 +851,12 @@ equilibration run</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.getNumReplicas">
+<code class="descname">getNumReplicas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.getNumReplicas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.getNumReplicas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of replicas, only useful for MD simulations</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.getWorkingProcessors">
 <code class="descname">getWorkingProcessors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.getWorkingProcessors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.getWorkingProcessors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the number of working processors, i.e. number of trajectories</p>
@@ -905,7 +933,7 @@ processorsToClusterMapping</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em>, <em>processManager</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -980,8 +1008,24 @@ processorsToClusterMapping</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation">
-<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#TestSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em>, <em>processManager</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#TestSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.TestSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copy file to test the rest of the AdaptivePELE procedure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>epoch</strong> (<em>int</em>) – number of the epoch</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>initialStructures</strong> (<em>str</em>) – Name of the initial structures to copy</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>reportFileName</strong> (<em>str</em>) – Name of the report file</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

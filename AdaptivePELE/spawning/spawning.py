@@ -221,6 +221,8 @@ class SpawningParams:
         if spawningType == blockNames.StringSpawningTypes.independentMetric:
             # Start counting the columns by 1
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]-1
+            self.condition = spawningParamsBlock.get(blockNames.SpawningParams.condition,
+                                                     blockNames.SpawningParams.minValue)
 
 
 class SpawningCalculator:
@@ -467,8 +469,6 @@ class IndependentMetricCalculator(SpawningCalculator):
             :type clustering: :py:class:`.Clustering`
             :param iteration: Number of epoch
             :type iteration: int
-            :param topology_file: Topology file for non-pdb trajectories
-            :type topology_file: str
             :param topologies: Topology object containing the set of topologies needed for the simulation
             :type topologies: :py:class:`.Topology`
 
@@ -484,7 +484,7 @@ class IndependentMetricCalculator(SpawningCalculator):
             metric_array = np.genfromtxt(reportFilename, missing_values="--", filling_values=0)
             if len(metric_array.shape) < 2:
                 metric_array = metric_array[np.newaxis, :]
-            trajectory = glob.glob("%s%d.*" % (trajWildcard % (iteration-1), num+1))
+            trajectory = glob.glob("%s_%d.*" % (trajWildcard % (iteration-1), num+1))
             assert len(trajectory) == 1, "Too many trajectories found in IndependentMetricCalculator"
             trajectory = trajectory[0]
             if self.parameters.condition == blockNames.SpawningParams.minValue:

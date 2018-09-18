@@ -96,7 +96,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#simulation-block">Simulation block</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#templetized-pele-control-file">Templetized PELE control file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id3">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pele-parameters">PELE Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#md-parameters">MD Parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#clustering-block">Clustering block</a><ul>
@@ -104,13 +105,14 @@
 <li class="toctree-l3"><a class="reference internal" href="#rmsd-clustering">Rmsd clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contactmap-clustering">ContactMap clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#null-clustering">Null clustering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id4">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#spawning-block">Spawning block</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#spawning-types">Spawning types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#density-calculator">Density calculator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id5">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
@@ -124,6 +126,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#analysis">Analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dynamical-hooks">Dynamical hooks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#non-pdb-trajectories">Non-PDB trajectories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-adaptivepele-with-gpus">Running AdaptivePELE with GPUs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
@@ -298,8 +301,8 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <li><strong>trajectoryName</strong>: The name of the trajectory file is templetized as <code class="docutils literal"><span class="pre">&quot;trajectoryPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$TRAJECTORY_NAME&quot;</span></code></li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="pele-parameters">
+<h3>PELE Parameters<a class="headerlink" href="#pele-parameters" title="Permalink to this headline">¶</a></h3>
 <p>When using PELE as a propagator, the following parameters are mandatory:</p>
 <ul class="simple">
 <li><strong>iterations</strong> (<em>integer</em>, mandatory): Number of adaptive sampling iterations to run</li>
@@ -339,6 +342,9 @@ configurations or SLURM installations.</li>
 to srun, if not specified it will just run without any parameters, it is
 important to avoid whitspaces both at the beginning and end of the string.</li>
 </ul>
+</div>
+<div class="section" id="md-parameters">
+<h3>MD Parameters<a class="headerlink" href="#md-parameters" title="Permalink to this headline">¶</a></h3>
 <p>When using MD as a progagator, the following parameters are mandatory:</p>
 <ul class="simple">
 <li><strong>iterations</strong> (<em>integer</em>, mandatory): Number of adaptive sampling iterations to run</li>
@@ -347,6 +353,10 @@ important to avoid whitspaces both at the beginning and end of the string.</li>
 <li><strong>seed</strong> (<em>integer</em>, mandatory): Seed for the random number generator</li>
 <li><strong>reporterFrequency</strong> (<em>integer</em>, mandatory): Frequency to write the report
 and trajectories (in time steps, see <strong>timeStep</strong> property)</li>
+<li><strong>numReplicas</strong> (<em>integer</em>, mandatory): Number of replicas to run (see <a class="reference internal" href="#running-adaptivepele-with-gpus">Running AdaptivePELE with GPUs</a> section)</li>
+<li><strong>trajectoriesPerReplica</strong> (<em>integer</em>, mandatory): Number of trajectories to
+run in each replica, the equation <strong>numReplicas</strong> * <strong>trajectoriesPerReplica</strong>
+= <strong>processors</strong> should be always satisfied</li>
 </ul>
 <p>Optionally, you can also use the following parameters:</p>
 <ul class="simple">
@@ -492,8 +502,8 @@ There are currently three implemented methods to evaluate the similarity of cont
 long simulations, were no spawning is needed, it saves memory and computional
 time.</p>
 </div>
-<div class="section" id="id4">
-<h3>Parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><strong>ligandResname</strong> (<em>string</em>, default=”“): Ligand residue name in the PDB (if necessary)</li>
 <li><strong>ligandChain</strong> (<em>string</em>, default=”“): Ligand chain (if necessary)</li>
@@ -547,6 +557,8 @@ finely discretized.</p>
 </div>
 <div class="section" id="spawning-block">
 <h2>Spawning block<a class="headerlink" href="#spawning-block" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="spawning-types">
+<h3>Spawning types<a class="headerlink" href="#spawning-types" title="Permalink to this headline">¶</a></h3>
 <p>Finally, trajectories are spawned in different <em>interesting</em> clusters, according to a reward function.
 There are several implemented strategies:</p>
 <ul class="simple">
@@ -555,11 +567,12 @@ There are several implemented strategies:</p>
 <li><strong>epsilon</strong>: An <em>epsilon</em> fraction of processors are distributed proportionally to the value of a metric, and the rest are inverselyProportional distributed.  A param <strong>n</strong> can be specified to only consider the <em>n</em> clusters with best metric.</li>
 <li><strong>variableEpsilon</strong>: Equivalent to epsilon, with an epsilon value changing over time</li>
 <li><strong>independent</strong>: Trajectories are run independently, as in the original PELE. It may be useful to restart simulations or to use the analysis scripts built for AdaptivePELE.</li>
-<li><strong>independentMetric</strong>: Trajectories are run independently, as in the original PELE. Howeveer in this method, instead of starting the next epoch from the last snapshot of the previous we start from the one that maximizes or minimizes a certain metric.</li>
+<li><strong>independentMetric</strong>: Trajectories are run independently, as in the original PELE. However in this method, instead of starting the next epoch from the last snapshot of the previous we start from the one that maximizes or minimizes a certain metric.</li>
 <li><strong>UCB</strong>: Upper confidence bound.</li>
 <li><strong>FAST</strong>: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).</li>
 </ul>
 <p>According to our experience, the best strategies are <strong>inverselyProportional</strong> and <strong>epsilon</strong>, guided with either PELE binding energy or the RMSD to the bound pose if available.</p>
+</div>
 <div class="section" id="density-calculator">
 <h3>Density calculator<a class="headerlink" href="#density-calculator" title="Permalink to this headline">¶</a></h3>
 <p>Each cluster is assigned a relative density of points compared to other clusters.
@@ -572,8 +585,8 @@ There are two types of density calculators:</p>
 <li><strong>exitContinuous</strong>, which assings decreasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 1/8, otherwise, density = (-4 <strong>r</strong> + 6)^3/64.0</li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. “report”.</li>
 <li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (one indexed)</li>
@@ -621,7 +634,7 @@ There are two types of density calculators:</p>
 <h2>Control File Examples<a class="headerlink" href="#control-file-examples" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="example-1-pele-with-default-parameters">
 <h3>Example 1 – PELE with default parameters<a class="headerlink" href="#example-1-pele-with-default-parameters" title="Permalink to this headline">¶</a></h3>
-<p>The first example makes use of default parameters, using PELE as propagator (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id6">[APELE]</a>).</p>
+<p>The first example makes use of default parameters, using PELE as propagator (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id5">[APELE]</a>).</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
@@ -814,7 +827,7 @@ and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clus
 <div class="section" id="non-pdb-trajectories">
 <h2>Non-PDB trajectories<a class="headerlink" href="#non-pdb-trajectories" title="Permalink to this headline">¶</a></h2>
 <p>Starting from version 1.5, AdaptivePELE supports working with non-PDB
-trajectories by relying on the mdtraj library <a class="reference internal" href="#mdtraj" id="id7">[MDTRAJ]</a>, with only minor changes in
+trajectories by relying on the mdtraj library <a class="reference internal" href="#mdtraj" id="id6">[MDTRAJ]</a>, with only minor changes in
 the exposed interface of the atomset module. However, some caution is needed
 when using mdtraj to convert between formats:</p>
 <ul class="simple">
@@ -845,16 +858,95 @@ convertTrajectory script, also in the analysis subpackage:</p>
 <p>As before, the top parameter stands for topology. The
 call shown above will convert the file 0/trajectory_3.xtc into the file output_pdb/trajectory_0_3.pdb, for a system that can be
 described with the file topology.pdb</p>
+</div>
+<div class="section" id="running-adaptivepele-with-gpus">
+<h2>Running AdaptivePELE with GPUs<a class="headerlink" href="#running-adaptivepele-with-gpus" title="Permalink to this headline">¶</a></h2>
+<p>Starting from version 1.6, adaptivePELE runs in different replicas (ony for MD
+simulations), this is necessary for running multinode GPU simulations, to run
+such simulation only two extra parameters are necessary, <em>numReplicas</em> and
+<em>trajectoriesPerReplica</em> (see <a class="reference internal" href="#simulation-block">Simulation block</a> section for more details).
+Here we show and example control file to run an MD simulation with 2 replicas
+and 4 trajectories per replica (8 trajectories total):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+        <span class="s2">&quot;debug&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+        <span class="s2">&quot;outputPath&quot;</span><span class="p">:</span><span class="s2">&quot;simulation/3ptb_md_parallel_mt/&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;writeAllClusteringStructures&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+        <span class="s2">&quot;initialStructures&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;3ptb_initial*.pdb&quot;</span><span class="p">]</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;epsilon&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;metricColumnInReport&quot;</span> <span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;epsilon&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;T&quot;</span><span class="p">:</span><span class="mi">1000</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;density&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;continuous&quot;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;md&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;iterations&quot;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">&quot;processors&quot;</span> <span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+            <span class="s2">&quot;trajectoriesPerReplica&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;numReplicas&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;productionLength&quot;</span> <span class="p">:</span> <span class="mi">5000</span><span class="p">,</span>
+            <span class="s2">&quot;reporterFrequency&quot;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
+            <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">67891</span><span class="p">,</span>
+            <span class="s2">&quot;runningPlatform&quot;</span><span class="p">:</span> <span class="s2">&quot;CUDA&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ligandCharge&quot;</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;clustering&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;alternativeStructure&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s2">&quot;ligandResname&quot;</span> <span class="p">:</span> <span class="s2">&quot;BEN&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This setup will be quite typical for running in clusters like MinoTauro where
+nodes contain 4 gpus. To launch this simulation we need to ensure that we run
+one replica of adaptivePELE in each node. We can do it by using the srun
+command in cluster that use slurm, for clusters with different software you
+will need to contact the cluster support team. An example slurm file would look
+like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#SBATCH --job-name=&quot;3ptb_Ad_MD_mt&quot;</span>
+<span class="c1">#SBATCH -D .</span>
+<span class="c1">#SBATCH --output=test_3ptb_Ad_MD_mt.out</span>
+<span class="c1">#SBATCH --error=test_3ptb_Ad_MD_mt.err</span>
+<span class="c1">#SBATCH --ntasks=2</span>
+<span class="c1">#SBATCH --cpus-per-task=8</span>
+<span class="c1">#SBATCH --time=00:10:00</span>
+<span class="c1">#SBATCH --constraint=k80</span>
+<span class="c1">#SBATCH --gres gpu:4</span>
+
+
+<span class="n">srun</span> <span class="n">python</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">bsc72</span><span class="o">/</span><span class="n">bsc72021</span><span class="o">/</span><span class="n">AdaptiveMT</span><span class="o">/</span><span class="n">adaptivePELE</span><span class="o">/</span><span class="n">AdaptivePELE</span><span class="o">/</span><span class="n">adaptiveSampling</span><span class="o">.</span><span class="n">py</span> <span class="n">control_file_MD_3ptb_mt</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>Note also that this job requests 8 cpus per replica. At least a number of cpus
+per replica equal to the number of trajectories per replica are required.</p>
 <table class="docutils citation" frame="void" id="apele" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[APELE]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id6">2</a>)</em> Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></td></tr>
+<tr><td class="label">[APELE]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id5">2</a>)</em> Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></td></tr>
 </tbody>
 </table>
 <table class="docutils citation" frame="void" id="mdtraj" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id7">[MDTRAJ]</a></td><td>Robert&nbsp;T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, <a class="reference external" href="http://mdtraj.org">http://mdtraj.org</a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id6">[MDTRAJ]</a></td><td>Robert&nbsp;T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, <a class="reference external" href="http://mdtraj.org">http://mdtraj.org</a></td></tr>
 </tbody>
 </table>
 <table class="docutils citation" frame="void" id="openmm" rules="none">

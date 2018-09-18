@@ -41,6 +41,8 @@ Behaviour changes from previous version:
       spawning calculator
     - Update how the srun command is called when running PELE, also added
       srunParameters to customize the call to srun
+    - AdaptivePELE now runs with replicas synchronized via files, needed for
+      running MD in GPU clusters
 
 1.5.2 - 2018-08-13
 --------------------

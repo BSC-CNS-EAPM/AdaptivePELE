@@ -151,8 +151,8 @@ Optionally other fields might be templetized as well:
 
 * **trajectoryName**: The name of the trajectory file is templetized as ``"trajectoryPath": "$OUTPUT_PATH/$TRAJECTORY_NAME"``
 
-Parameters
-..........
+PELE Parameters
+...............
 
 When using PELE as a propagator, the following parameters are mandatory:
 
@@ -193,6 +193,9 @@ Optionally, you can also use the following parameters:
   to srun, if not specified it will just run without any parameters, it is
   important to avoid whitspaces both at the beginning and end of the string.
 
+MD Parameters
+.............
+
 When using MD as a progagator, the following parameters are mandatory:
 
 * **iterations** (*integer*, mandatory): Number of adaptive sampling iterations to run
@@ -201,6 +204,10 @@ When using MD as a progagator, the following parameters are mandatory:
 * **seed** (*integer*, mandatory): Seed for the random number generator
 * **reporterFrequency** (*integer*, mandatory): Frequency to write the report
   and trajectories (in time steps, see **timeStep** property)
+* **numReplicas** (*integer*, mandatory): Number of replicas to run (see `Running AdaptivePELE with GPUs`_ section)
+* **trajectoriesPerReplica** (*integer*, mandatory): Number of trajectories to
+  run in each replica, the equation **numReplicas** * **trajectoriesPerReplica**
+  = **processors** should be always satisfied
 
 Optionally, you can also use the following parameters:
 
@@ -410,6 +417,9 @@ finely discretized.
 Spawning block
 ---------------
 
+Spawning types
+..............
+
 Finally, trajectories are spawned in different *interesting* clusters, according to a reward function.
 There are several implemented strategies:
 
@@ -423,7 +433,7 @@ There are several implemented strategies:
 
 * **independent**: Trajectories are run independently, as in the original PELE. It may be useful to restart simulations or to use the analysis scripts built for AdaptivePELE.
 
-* **independentMetric**: Trajectories are run independently, as in the original PELE. Howeveer in this method, instead of starting the next epoch from the last snapshot of the previous we start from the one that maximizes or minimizes a certain metric.
+* **independentMetric**: Trajectories are run independently, as in the original PELE. However in this method, instead of starting the next epoch from the last snapshot of the previous we start from the one that maximizes or minimizes a certain metric.
 
 * **UCB**: Upper confidence bound.
 
@@ -748,6 +758,88 @@ convertTrajectory script, also in the analysis subpackage::
 As before, the top parameter stands for topology. The
 call shown above will convert the file 0/trajectory_3.xtc into the file output_pdb/trajectory_0_3.pdb, for a system that can be
 described with the file topology.pdb
+
+
+Running AdaptivePELE with GPUs
+------------------------------
+
+Starting from version 1.6, adaptivePELE runs in different replicas (ony for MD
+simulations), this is necessary for running multinode GPU simulations, to run
+such simulation only two extra parameters are necessary, *numReplicas* and
+*trajectoriesPerReplica* (see `Simulation block`_ section for more details).
+Here we show and example control file to run an MD simulation with 2 replicas
+and 4 trajectories per replica (8 trajectories total)::
+
+    {
+        "generalParams" : {
+            "restart": true,
+            "debug" : false,
+            "outputPath":"simulation/3ptb_md_parallel_mt/",
+            "writeAllClusteringStructures" : false,
+            "initialStructures" : ["3ptb_initial*.pdb"]
+        },
+
+        "spawning" : {
+            "type" : "epsilon",
+            "params" : {
+                "reportFilename" : "report",
+                "metricColumnInReport" : 5,
+                "epsilon": 0.0,
+                "T":1000
+            },
+            "density" : {
+                "type" : "continuous"
+            }
+        },
+
+        "simulation": {
+            "type" : "md",
+            "params" : {
+                "iterations" : 10,
+                "processors" : 8,
+                "trajectoriesPerReplica": 4,
+                "numReplicas": 2,
+                "productionLength" : 5000,
+                "reporterFrequency": 2000,
+                "seed": 67891,
+                "runningPlatform": "CUDA",
+                "ligandCharge": 1
+            }
+        },
+
+        "clustering" : {
+            "type" : "rmsd",
+            "params" : {
+                "alternativeStructure": true,
+                "ligandResname" : "BEN"
+            }
+        }
+    }
+
+
+This setup will be quite typical for running in clusters like MinoTauro where
+nodes contain 4 gpus. To launch this simulation we need to ensure that we run
+one replica of adaptivePELE in each node. We can do it by using the srun
+command in cluster that use slurm, for clusters with different software you
+will need to contact the cluster support team. An example slurm file would look
+like::
+
+    #!/bin/bash
+    #SBATCH --job-name="3ptb_Ad_MD_mt"
+    #SBATCH -D .
+    #SBATCH --output=test_3ptb_Ad_MD_mt.out
+    #SBATCH --error=test_3ptb_Ad_MD_mt.err
+    #SBATCH --ntasks=2
+    #SBATCH --cpus-per-task=8
+    #SBATCH --time=00:10:00
+    #SBATCH --constraint=k80
+    #SBATCH --gres gpu:4
+
+
+    srun python /home/bsc72/bsc72021/AdaptiveMT/adaptivePELE/AdaptivePELE/adaptiveSampling.py control_file_MD_3ptb_mt.conf
+
+Note also that this job requests 8 cpus per replica. At least a number of cpus
+per replica equal to the number of trajectories per replica are required.
 
 
 .. [APELE] Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, https://www.nature.com/articles/s41598-017-08445-5
