@@ -211,18 +211,25 @@ When using MD as a progagator, the following parameters are mandatory:
 
 Optionally, you can also use the following parameters:
 
-* **equilibrationLength** (*int*, default=50): Number of steps for the
-  equilibration run
+* **equilibrationLengthNVT** (*int*, default=200000): Number of steps for the constant volume 
+  equilibration run (default corresponds to 400 ps)
+* **equilibrationLengthNPT** (*int*, default=500000): Number of steps for the constant pressure 
+  equilibration run (default corresponds to 1 ns)
 * **timeStep** (*float*, default=2): Value of the time step for the integration
   (in femtoseconds)
-* **boxRadius** (*float*, default=8): Distance of the edge of the solvation box
-  from the closest atom
+* **boxRadius** (*float*, default=8): Radius  of the center of the spherical 
+  flat-bottomed potential for the ligand (if specified, in angstroms)
+* **boxCenter** (*list*, default=None): Coordinates of the center of the spherical 
+  flat-bottomed potential for the ligand (if specified, in angstroms)
 * **ligandCharge** (*integer*, default=0): Charge of the ligand
+* **waterBoxSize** (*float*, default=8): Distance of the edge of the solvation
+  box from the closest atom (in angstroms)
 * **nonBondedCutoff** (*float*, default=8): Radius for the nonBonded cutoff of
-  the long-range interactions
-* **temperature** (*float*, default=300): Temperature of the simulation
-* **runningPlatform** (*str*, default="CPU"): Platform on which to run the
-  simulation, see openmm documentation for more details
+  the long-range interactions (in angstroms)
+* **temperature** (*float*, default=300): Temperature of the simulation (in
+  Kelvin)
+* **runningPlatform** (*str*, default=CPU): Platform on which to run the
+  simulation, options are {*CPU*, *CUDA*, *OpenCL*, *Reference*}, see openmm documentation for more details
 * **minimizationIterations** (*float*, default=2000): Number of time steps to
   run the energy minimization
 

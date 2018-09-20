@@ -360,18 +360,25 @@ run in each replica, the equation <strong>numReplicas</strong> * <strong>traject
 </ul>
 <p>Optionally, you can also use the following parameters:</p>
 <ul class="simple">
-<li><strong>equilibrationLength</strong> (<em>int</em>, default=50): Number of steps for the
-equilibration run</li>
+<li><strong>equilibrationLengthNVT</strong> (<em>int</em>, default=200000): Number of steps for the constant volume
+equilibration run (default corresponds to 400 ps)</li>
+<li><strong>equilibrationLengthNPT</strong> (<em>int</em>, default=500000): Number of steps for the constant pressure
+equilibration run (default corresponds to 1 ns)</li>
 <li><strong>timeStep</strong> (<em>float</em>, default=2): Value of the time step for the integration
 (in femtoseconds)</li>
-<li><strong>boxRadius</strong> (<em>float</em>, default=8): Distance of the edge of the solvation box
-from the closest atom</li>
+<li><strong>boxRadius</strong> (<em>float</em>, default=8): Radius  of the center of the spherical
+flat-bottomed potential for the ligand (if specified, in angstroms)</li>
+<li><strong>boxCenter</strong> (<em>list</em>, default=None): Coordinates of the center of the spherical
+flat-bottomed potential for the ligand (if specified, in angstroms)</li>
 <li><strong>ligandCharge</strong> (<em>integer</em>, default=0): Charge of the ligand</li>
+<li><strong>waterBoxSize</strong> (<em>float</em>, default=8): Distance of the edge of the solvation
+box from the closest atom (in angstroms)</li>
 <li><strong>nonBondedCutoff</strong> (<em>float</em>, default=8): Radius for the nonBonded cutoff of
-the long-range interactions</li>
-<li><strong>temperature</strong> (<em>float</em>, default=300): Temperature of the simulation</li>
-<li><strong>runningPlatform</strong> (<em>str</em>, default=”CPU”): Platform on which to run the
-simulation, see openmm documentation for more details</li>
+the long-range interactions (in angstroms)</li>
+<li><strong>temperature</strong> (<em>float</em>, default=300): Temperature of the simulation (in
+Kelvin)</li>
+<li><strong>runningPlatform</strong> (<em>str</em>, default=CPU): Platform on which to run the
+simulation, options are {<em>CPU</em>, <em>CUDA</em>, <em>OpenCL</em>, <em>Reference</em>}, see openmm documentation for more details</li>
 <li><strong>minimizationIterations</strong> (<em>float</em>, default=2000): Number of time steps to
 run the energy minimization</li>
 </ul>
