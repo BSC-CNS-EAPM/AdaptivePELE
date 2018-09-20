@@ -1127,9 +1127,12 @@ class TestSimulation(SimulationRunner):
                                  "BOX_RADIUS": self.parameters.boxRadius}
         self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         if not self.copied:
+            tmp_sync = os.path.join(outputPathConstants.tmpFolder, os.path.split(processManager.syncFolder)[1])
+            shutil.copytree(processManager.syncFolder, tmp_sync)
             if os.path.exists(self.parameters.destination):
                 shutil.rmtree(self.parameters.destination)
             shutil.copytree(self.parameters.origin, self.parameters.destination)
+            shutil.copytree(tmp_sync, processManager.syncFolder)
             self.copied = True
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary, inputTemplate=None):
