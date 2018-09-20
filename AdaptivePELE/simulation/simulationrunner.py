@@ -63,6 +63,7 @@ class SimulationParameters:
         self.numberEquilibrationStructures = 10
         self.reportName = ""
         # parameters needed for MD simulations and their defaults
+        self.timeStep = 2
         self.ligandCharge = 0
         self.nonBondedCutoff = 8
         self.Temperature = 300
@@ -75,6 +76,8 @@ class SimulationParameters:
         self.waterBoxSize = 8
         self.trajsPerReplica = None
         self.numReplicas = 1
+        self.equilibrationLengthNVT = 200000
+        self.equilibrationLengthNPT = 500000
 
 
 class SimulationRunner:
@@ -1276,23 +1279,25 @@ class RunnerBuilder:
 
             return PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
-            params.processors = paramsBlock[blockNames.SimulationParams.processors]
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
+            params.processors = paramsBlock[blockNames.SimulationParams.processors]
+            params.productionLength = paramsBlock[blockNames.SimulationParams.productionLength]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
-            params.productionLength = paramsBlock[blockNames.SimulationParams.productionLength]
-            params.trajsPerReplica = paramsBlock[blockNames.SimulationParams.trajsPerReplica]
             params.numReplicas = paramsBlock[blockNames.SimulationParams.numReplicas]
+            params.trajsPerReplica = paramsBlock[blockNames.SimulationParams.trajsPerReplica]
             params.runEquilibration = True
+            params.equilibrationLengthNVT = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 200000)
+            params.equilibrationLengthNPT = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 500000)
+            params.timeStep = paramsBlock.get(blockNames.SimulationParams.timeStep, 2)
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
+            params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
             params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
             params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
             params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
             params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
-            params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 4000)
-            params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
-            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
