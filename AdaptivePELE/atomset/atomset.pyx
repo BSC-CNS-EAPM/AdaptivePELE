@@ -782,7 +782,7 @@ cdef class PDB:
         cdef unsigned int i
         for i in range(natoms):
             line = topology[i]
-            if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and (u"HOH" == line[17:20] or u"HOH" == prevLine[17:20])) or (prevLine[22:26] != line[22:26] and line[:6] == u"HETATM")):
+            if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and (u"HOH" == line[17:20] or u"HOH" == prevLine[17:20])) or (prevLine[0:4] == "ATOM" and line[0:6] == "HETATM") or (prevLine[0:6] == "HETATM" and line[0:6] == "HETATM" and (prevLine[22:26] != line[22:26]))):
                 pdb.append(u"TER\n")
             x = (temp % frame[i, 0]).rjust(8)
             y = (temp % frame[i, 1]).rjust(8)
