@@ -273,16 +273,15 @@ def buildFullTrajectory(steps, trajectory, numtotalSteps, inputTrajectory):
     counter = 0
     if len(trajectory) > 0:
         sthWrongInTraj = False
-        for i in range(len(trajectory) - 1):
-            try:
-                repeated = steps[i+1] - steps[i]
-            except IndexError:
-                print("sth wrong in trajectory %s. This is likely to disagreement between report and trajectory files. Please, fix it manually" % inputTrajectory)
-                sthWrongInTraj = True
-                break
-
+        for i in range(len(steps) - 1):
+            repeated = steps[i+1, 0] - steps[i, 0]
             for _ in range(repeated):
-                snapshot = trajectory[i].split()
+                try:
+                    snapshot = trajectory[steps[i, 1]].split()
+                except IndexError:
+                    print("sth wrong in trajectory %s. This is likely to disagreement between report and trajectory files. Please, fix it manually" % inputTrajectory)
+                    sthWrongInTraj = True
+                    break
                 snapshot[0] = str(counter)
                 snapshot = ' '.join(snapshot)
                 completeTrajectory.append(snapshot)
@@ -320,16 +319,15 @@ def repeatExtractedSnapshotsInTrajectory(inputTrajectory, constants, numtotalSte
     with open(inputTrajectory) as f:
         trajectory = f.read().splitlines()
 
-    acceptedSteps = np.loadtxt(reportFile, dtype='int', comments='#', usecols=(1,))
+    acceptedSteps = np.loadtxt(reportFile, dtype='int', comments='#', usecols=(1, 2))
 
     fullTrajectory = buildFullTrajectory(acceptedSteps, trajectory, numtotalSteps, inputTrajectory)
 
     if len(fullTrajectory) > 0:
         outputFilename = os.path.join(constants.outputTrajectoryFolder % origDataFolder, constants.baseExtractedTrajectoryName + trajectoryNumber + '.dat')
-        outputFile = open(outputFilename, 'w')
-        for snapshot in fullTrajectory:
-            outputFile.write("%s\n" % snapshot)
-        outputFile.close()
+        with open(outputFilename, "w") as outputFile:
+            for snapshot in fullTrajectory:
+                outputFile.write("%s\n" % snapshot)
 
 
 def repeatExtractedSnapshotsInFolder(folder_name, constants, numtotalSteps, pool=None):
