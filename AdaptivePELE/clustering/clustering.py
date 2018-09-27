@@ -912,10 +912,7 @@ class Clustering(object):
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
-                # metrics = np.loadtxt(reportFilename, ndmin=2)
-                metrics = np.genfromtxt(reportFilename, missing_values="--", filling_values=0)
-                if len(metrics.shape) < 2:
-                    metrics = metrics[np.newaxis, :]
+                metrics = loadReportFile(reportFilename)
 
                 for num, snapshot in enumerate(snapshots):
                     if ignoreFirstRow and num == 0:
@@ -1365,7 +1362,7 @@ class SequentialLastSnapshotClustering(Clustering):
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
-                metrics = np.loadtxt(reportFilename, ndmin=2)
+                metrics = loadReportFile(reportFilename)
                 # Pass as cluster metrics the minimum value for each metric,
                 # thus the metrics are not valid to do any spawning, only to
                 # check the exit condition
@@ -1578,3 +1575,39 @@ def getAllTrajectories(paths):
     # sort the files obtained by glob by name, so that the results will be the
     # same on all computers
     return sorted(files)
+
+
+def filterRepeatedReports(metrics, column=2):
+    """
+        Filter the matrix containing the report information to avoid rejected
+        steps
+
+        :param metrics: Contents of the report file
+        :type metrics: np.ndarray
+        :param column: Column to check for repeats
+        :type column: int
+        :returns: np.ndarray -- Contents of the report file filtered
+    """
+    new_metrics = []
+    accepted_steps = set()
+    for row in metrics:
+        if row[2] in accepted_steps:
+            continue
+        else:
+            accepted_steps.add(row[2])
+            new_metrics.append(row.tolist())
+    return np.array(new_metrics)
+
+
+def loadReportFile(reportFile):
+    """
+        Load a report file and filter it
+
+        :param reportFile: Name of the report file
+        :type reportFile: str
+        :returns: np.ndarray -- Contents of the report file
+    """
+    metrics = np.genfromtxt(reportFile, missing_values="--", filling_values=0)
+    if len(metrics.shape) < 2:
+        metrics = metrics[np.newaxis, :]
+    return filterRepeatedReports(metrics)
