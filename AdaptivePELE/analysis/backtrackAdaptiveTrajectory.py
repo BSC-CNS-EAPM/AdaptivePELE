@@ -61,7 +61,6 @@ def main(trajectory, snapshot, epoch, outputPath, out_filename, topology):
     sys.stderr.write("Creating pathway...\n")
     while True:
         filename = glob.glob(os.path.join(pathPrefix, epoch, "*traj*_%d.*" % trajectory))
-        print(filename)
         snapshots = utilities.getSnapshots(filename[0])
         if not isinstance(snapshots[0], basestring):
             new_snapshots = []
