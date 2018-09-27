@@ -64,7 +64,10 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
         topology_contents = None
 
     for trajFile, extraInfo in extract_info.items():
-        pdbFile = glob.glob(structureFolder % trajFile)[0]
+        try:
+            pdbFile = glob.glob(structureFolder % trajFile)[0]
+        except IndexError:
+            raise ValueError("Structure %s not found" % (structureFolder % trajFile))
         try:
             snapshots = utilities.getSnapshots(pdbFile, topology=topology)
         except IOError:

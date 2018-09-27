@@ -53,6 +53,10 @@ class SpawningParams:
         "independent": {
             "reportFilename": "basestring"
         },
+        "independentMetric": {
+            "metricColumnInReport": "numbers.Real",
+            "reportFilename": "basestring"
+        },
         "inverselyProportional": {
             "reportFilename": "basestring"
         },
@@ -122,7 +126,14 @@ class SimulationParams:
             "peleSteps": "numbers.Real",
             "iterations": "numbers.Real"
             },
-        "md": {}}
+        "md": {
+            "processors": "numbers.Real",
+            "seed": "numbers.Real",
+            "productionLength": "numbers.Real",
+            "iterations": "numbers.Real",
+            "trajectoriesPerReplica": "numbers.Real",
+            "numReplicas": "numbers.Real"
+        }}
     params = {
         "executable": "basestring",
         "data": "basestring",
@@ -143,7 +154,21 @@ class SimulationParams:
         "numberEquilibrationStructures": "numbers.Real",
         "useSrun": "bool",
         "srunParameters": "basestring",
-        "exitCondition": "dict"
+        "exitCondition": "dict",
+        "trajectoryName": "basestring",
+        "ligandCharge": "numbers.Real",
+        "nonBondedCutoff": "numbers.Real",
+        "timeStep": "numbers.Real",
+        "Temperature": "numbers.Real",
+        "runningPlatform": "basestring",
+        "minimizationIterations": "numbers.Real",
+        "reporterFrequency": "numbers.Real",
+        "productionLength": "numbers.Real",
+        "WaterBoxSize": "numbers.Real",
+        "trajectoriesPerReplica": "numbers.Real",
+        "equilibrationLengthNVT": "numbers.Real",
+        "equilibrationLengthNPT": "numbers.Real",
+        "numReplicas": "numbers.Real"
     }
     exitCondition = {
         "types": {
@@ -152,7 +177,7 @@ class SimulationParams:
             "metricMultipleTrajectories": "basestring"
         },
         "params": {
-            "metricCol": "int",
+            "metricCol": "numbers.Real",
             "exitValue": "numbers.Real",
             "condition": "basestring",
             "numTrajs": "numbers.Real"
@@ -162,19 +187,24 @@ class SimulationParams:
 
 class clusteringTypes:
     types = {
-        "rmsd": {
-        },
+        "rmsd": {},
         "contactMap": {
-            "similarityEvaluator": "basestring"
+            "similarityEvaluator": "basestring",
+            "ligandResname": "basestring"
         },
         "lastSnapshot": {
+            "ligandResname": "basestring"
+        },
+        "null": {
+            "ligandResname": "basestring"
         }
     }
     params = {
         "rmsd": "basestring",
         "contactMap": "basestring",
-        "contactThresholdDistance": "numbers.Real",
         "lastSnapshot": "basestring",
+        "null": "basestring",
+        "contactThresholdDistance": "numbers.Real",
         "ligandResname": "basestring",
         "ligandResnum": "numbers.Real",
         "ligandChain": "basestring",

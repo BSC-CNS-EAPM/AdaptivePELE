@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.5.2
+                v1.6
               </div>
             
           
@@ -165,7 +165,7 @@
 <span id="clusteringutilities-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">clusteringUtilities</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.clusteringUtilities" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.utilities.clusteringUtilities.writeStructures">
-<code class="descclassname">AdaptivePELE.utilities.clusteringUtilities.</code><code class="descname">writeStructures</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>listStructures</em>, <em>checker=&lt;function &lt;lambda&gt;&gt;</em>, <em>outputPath=u'cluster.pdb'</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/clusteringUtilities.html#writeStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.clusteringUtilities.writeStructures" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.utilities.clusteringUtilities.</code><code class="descname">writeStructures</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>listStructures</em>, <em>checker=&lt;function &lt;lambda&gt;&gt;</em>, <em>outputPath=u'cluster.pdb'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/clusteringUtilities.html#writeStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.clusteringUtilities.writeStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print all clusters in listStructures that meet the condition specified
 by the checker</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -176,7 +176,6 @@ by the checker</p>
 <li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object with clusters to print</li>
 <li><strong>checker</strong> (<em>function</em>) – Lambda function with the checker that should evaluate to True for intersted structures</li>
 <li><strong>outputPath</strong> (<em>str</em>) – Output cluster pdb filename</li>
-<li><strong>topology</strong> (<em>str</em>) – Topology file for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
@@ -187,6 +186,143 @@ by the checker</p>
 </div>
 <div class="section" id="module-AdaptivePELE.utilities.utilities">
 <span id="utilities-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">utilities</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AdaptivePELE.utilities.utilities.Topology">
+<em class="property">class </em><code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">Topology</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Container object that points to the topology used in each trajectory</p>
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.Topology.cleanTopologies">
+<code class="descname">cleanTopologies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.cleanTopologies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.cleanTopologies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the written topology files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.Topology.getTopology">
+<code class="descname">getTopology</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the topology for a particular epoch and trajectory number</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
+<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with topology information</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.Topology.getTopologyFromIndex">
+<code class="descname">getTopologyFromIndex</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopologyFromIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopologyFromIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the topology for a particular index</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>int</em>) – Index of the trajectory of interest</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list – List with topology information</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.Topology.getTopologyIndex">
+<code class="descname">getTopologyIndex</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopologyIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopologyIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the topology index for a particular epoch and trajectory number</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
+<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Index of the corresponding topology</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.Topology.mapEpochTopologies">
+<code class="descname">mapEpochTopologies</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectoryMapping</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.mapEpochTopologies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.mapEpochTopologies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map the trajectories for the next epoch and the used topologies</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory selected</li>
+<li><strong>trajectoryMapping</strong> (<em>list</em>) – Mapping of the trajectories and the corresponding topologies</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.Topology.readMappingFromDisk">
+<code class="descname">readMappingFromDisk</code><span class="sig-paren">(</span><em>epochDir</em>, <em>epoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.readMappingFromDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.readMappingFromDisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the processorsToClusterMapping from disk</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) – Name of the folder where to write the
+processorsToClusterMapping</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.Topology.setTopologies">
+<code class="descname">setTopologies</code><span class="sig-paren">(</span><em>topologyFiles</em>, <em>cleanFiles=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.setTopologies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.setTopologies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the topologies for the simulation. If topologies were set
+before they are deleted and set again</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>topologyFiles</strong> (<em>list</em>) – List of topology files</li>
+<li><strong>cleanFiles</strong> (<em>bool</em>) – Flag wether to remove previous files</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.Topology.writeMappingToDisk">
+<code class="descname">writeMappingToDisk</code><span class="sig-paren">(</span><em>epochDir</em>, <em>epoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.writeMappingToDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.writeMappingToDisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the topology mapping to disk</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) – Name of the folder where to write the
+mapping</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.assertSymmetriesDict">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">assertSymmetriesDict</code><span class="sig-paren">(</span><em>symmetries</em>, <em>PDB</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#assertSymmetriesDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.assertSymmetriesDict" title="Permalink to this definition">¶</a></dt>
@@ -291,6 +427,11 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.getCpuCount">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getCpuCount</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getCpuCount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getCpuCount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.getMetricsFromReportsInEpoch">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getMetricsFromReportsInEpoch</code><span class="sig-paren">(</span><em>reportName</em>, <em>outputFolder</em>, <em>nTrajs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getMetricsFromReportsInEpoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getMetricsFromReportsInEpoch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract the metrics in report file from an epoch to a numpy array</p>
@@ -300,6 +441,22 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <dt id="AdaptivePELE.utilities.utilities.getPELEControlFileDict">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getPELEControlFileDict</code><span class="sig-paren">(</span><em>templetizedControlFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getPELEControlFileDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getPELEControlFileDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse a PELE control file into a python dictionary</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.getPrmtopNum">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getPrmtopNum</code><span class="sig-paren">(</span><em>prmtopFilename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getPrmtopNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getPrmtopNum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the prmtop number</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajFilename</strong> (<em>str</em>) – prmtop filename</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – prmtop number</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -315,7 +472,7 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <li><strong>nativePDB</strong> – Native PDB object</li>
 <li><strong>resname</strong> (<em>str</em>) – Resname to compute its RMSD</li>
 <li><strong>symmetries</strong> (<em>list of dict</em>) – Symmetries dictionary list with independent symmetry groups</li>
-<li><strong>topology</strong> (<em>str</em>) – Topology file for non-pdb trajectories</li>
+<li><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
@@ -481,6 +638,28 @@ trajectories and reports</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.readProcessorMappingFromDisk">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">readProcessorMappingFromDisk</code><span class="sig-paren">(</span><em>folder</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readProcessorMappingFromDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readProcessorMappingFromDisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the processorsToClusterMapping from disk</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
+processorsToClusterMapping</li>
+<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the processorMapping</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the mapping of the trajectories to processors</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.sign">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">sign</code><span class="sig-paren">(</span><em>x</em>, <em>tol=1e-07</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.sign" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the sign of a number</p>
@@ -503,8 +682,28 @@ trajectories and reports</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.writeObject">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">writeObject</code><span class="sig-paren">(</span><em>filename</em>, <em>object_to_write</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeObject" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">writeObject</code><span class="sig-paren">(</span><em>filename</em>, <em>object_to_write</em>, <em>protocol=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeObject" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.writeProcessorMappingToDisk">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">writeProcessorMappingToDisk</code><span class="sig-paren">(</span><em>folder</em>, <em>filename</em>, <em>processorMapping</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeProcessorMappingToDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeProcessorMappingToDisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the processorsToClusterMapping to disk</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
+processorsToClusterMapping</li>
+<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the processorMapping</li>
+<li><strong>processorMapping</strong> (<em>list</em>) – Mapping of the trajectories to processors</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.write_PDB_clusters">

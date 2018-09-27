@@ -16,21 +16,53 @@ elif "mn.bsc" in machine:
     DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Data"
     DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Documents"
     PYTHON = "python"
-    
+
 
 elif "bsc.mn" in machine:
     PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/bin/PELE-1.5_mpi"
     DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/Data"
     DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/Documents"
 
+elif "bullx" in machine:
+    # this values are not correct for the minoTauro hardware, just leaving it
+    # here as a placeholder
+    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/nord/rev090518/bin/PELE-1.5_mpi"
+    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Data"
+    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Documents"
+
 elif machine == "bscls309":
     PELE_EXECUTABLE = "/home/jgilaber/PELE/PELE-1.5/bin/PELE-1.5_mpi"
     DATA_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Data"
     DOCUMENTS_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Documents"
 
+elif machine == "bscls444":
+    PELE_EXECUTABLE = ""
+    DATA_FOLDER = ""
+    DOCUMENTS_FOLDER = ""
+
 
 inputFileTemplate = "{ \"files\" : [ { \"path\" : \"%s\" } ] }"
 trajectoryBasename = "*traj*"
+
+
+class AmberTemplates:
+    antechamberTemplate = "antechamber -i $LIGAND -fi pdb -o $OUTPUT -fo mol2 -c bcc -pf y -nc $CHARGE"
+    parmchk2Template = "parmchk2 -i $MOL2 -f mol2 -o $OUTPUT"
+    tleapTemplate = "source oldff/leaprc.ff99SB\n" \
+                    "source leaprc.gaff\n" \
+                    "source leaprc.water.tip3p\n" \
+                    "$MODIFIED_RES " \
+                    "$RESNAME = loadmol2 $MOL2\n" \
+                    "loadamberparams $FRCMOD\n" \
+                    "COMPLX = loadpdb $COMPLEX\n" \
+                    "$BONDS "\
+                    "addions COMPLX Cl- 0\n" \
+                    "solvatebox COMPLX TIP3PBOX $BOXSIZE\n" \
+                    "saveamberparm COMPLX $PRMTOP $INPCRD\n" \
+                    "savepdb COMPLX $SOLVATED_PDB\n" \
+                    "quit"
+    trajectoryTemplate = "trajectory_%d.dcd"
+    CheckPointReporterTemplate = "checkpoint_%d.chk"
 
 
 class OutputPathConstants():
@@ -42,6 +74,7 @@ class OutputPathConstants():
         self.epochOutputPathTempletized = ""
         self.clusteringOutputDir = ""
         self.clusteringOutputObject = ""
+        self.equilibrationDir = ""
         self.tmpInitialStructuresTemplate = ""
         self.tmpControlFilename = ""
         self.tmpInitialStructuresEquilibrationTemplate = ""
@@ -60,10 +93,12 @@ class OutputPathConstants():
         self.epochOutputPathTempletized = os.path.join(outputPath, "%d")
         self.clusteringOutputDir = os.path.join(self.epochOutputPathTempletized, "clustering")
         self.clusteringOutputObject = os.path.join(self.clusteringOutputDir, "object.pkl")
-        self.topologyFile = os.path.join(outputPath, "topology.pdb")
+        self.topologies = os.path.join(outputPath, "topologies")
+        self.equilibrationDir = os.path.join(outputPath, "equilibration")
 
     def buildTmpFolderConstants(self, tmpFolder):
         self.tmpInitialStructuresTemplate = tmpFolder+"/initial_%d_%d.pdb"
         self.tmpInitialStructuresEquilibrationTemplate = tmpFolder+"/initial_equilibration_%d.pdb"
         self.tmpControlFilename = tmpFolder+"/controlFile%d.conf"
         self.tmpControlFilenameEqulibration = tmpFolder+"/controlFile_equilibration_%d.conf"
+
