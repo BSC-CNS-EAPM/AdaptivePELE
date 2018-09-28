@@ -13,6 +13,7 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 import simtk.unit as unit
 from AdaptivePELE.constants import constants
+from AdaptivePELE.utilities import utilities
 try:
     FileNotFoundError
 except NameError:
@@ -142,7 +143,7 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     else:
         platformProperties = {}
     if worker == 0:
-        print("Running %d steps of minimization" % parameters.minimizationIterations)
+        utilities.print_unbuffered("Running %d steps of minimization" % parameters.minimizationIterations)
     simulation = minimization(prmtop, inpcrd, PLATFORM, 5, parameters, platformProperties)
     # Retrieving the state is expensive (especially when running on GPUs) so we
     # only called it once and then separate positions and velocities
@@ -150,13 +151,13 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     positions = state.getPositions()
     velocities = state.getVelocities()
     if worker == 0:
-        print("Running %d steps of NVT equilibration" % parameters.equilibrationLengthNVT)
+        utilities.print_unbuffered("Running %d steps of NVT equilibration" % parameters.equilibrationLengthNVT)
     simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNVT, 5, parameters, reportName, platformProperties, velocities=velocities)
     state = simulation.context.getState(getPositions=True, getVelocities=True)
     positions = state.getPositions()
     velocities = state.getVelocities()
     if worker == 0:
-        print("Running %d steps of NPT equilibration" % parameters.equilibrationLengthNPT)
+        utilities.print_unbuffered("Running %d steps of NPT equilibration" % parameters.equilibrationLengthNPT)
     simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNPT, 0.5, parameters, reportName, platformProperties, velocities=velocities)
     outputPDB = "%s_NPT.pdb" % reportName
     with open(outputPDB, 'w') as fw:

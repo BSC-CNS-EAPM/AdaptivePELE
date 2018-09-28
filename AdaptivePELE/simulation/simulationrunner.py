@@ -366,7 +366,7 @@ class PeleSimulation(SimulationRunner):
         else:
             toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
             toRun = map(str, toRun)
-        print(" ".join(toRun))
+        utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
         (out, err) = proc.communicate()
@@ -376,7 +376,7 @@ class PeleSimulation(SimulationRunner):
             print(err)
 
         endTime = time.time()
-        print("PELE took %.2f sec" % (endTime - startTime))
+        utilities.print_unbuffered("PELE took %.2f sec" % (endTime - startTime))
 
     def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName, processManager):
         """
@@ -396,7 +396,6 @@ class PeleSimulation(SimulationRunner):
             :type processManager: :py:class:`.ProcessesManager`
         """
         trajName = "".join(self.parameters.trajectoryName.split("_%d"))
-        print("Preparing Control File")
         ControlFileDictionary = {"COMPLEXES": initialStructuresAsString,
                                  "PELE_STEPS": self.parameters.peleSteps,
                                  "BOX_RADIUS": self.parameters.boxRadius,
@@ -410,7 +409,7 @@ class PeleSimulation(SimulationRunner):
         else:
             toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
             toRun = map(str, toRun)
-        print(" ".join(toRun))
+        utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
         (out, err) = proc.communicate()
@@ -420,7 +419,7 @@ class PeleSimulation(SimulationRunner):
             print(err)
 
         endTime = time.time()
-        print("PELE took %.2f sec" % (endTime - startTime))
+        utilities.print_unbuffered("PELE took %.2f sec" % (endTime - startTime))
 
     def getEquilibrationControlFile(self, peleControlFileDict):
         """
@@ -554,7 +553,7 @@ class PeleSimulation(SimulationRunner):
                 # box information, include it manually
                 if name not in templateNames:
                     templateNames[name] = '"$%s"' % name
-            print("Running equilibration for initial structure number %d" % (i+1))
+            utilities.print_unbuffered("Running equilibration for initial structure number %d" % (i+1))
             peleControlString = json.dumps(peleControlFileDict, indent=4)
             for key, value in templateNames.items():
                 # Remove double quote around template keys, so that PELE
@@ -622,7 +621,7 @@ class PeleSimulation(SimulationRunner):
         data = data[:nPoints]
         n_clusters = min(self.parameters.numberEquilibrationStructures, data.shape[0])
         kmeans = KMeans(n_clusters=n_clusters).fit(data[:, 3:])
-        print("Clustered equilibration output into %d clusters!" % n_clusters)
+        utilities.print_unbuffered("Clustered equilibration output into %d clusters!" % n_clusters)
         clustersInfo = {x: {"structure": None, "minDist": 1e6} for x in range(self.parameters.numberEquilibrationStructures)}
         for conf, cluster in zip(data, kmeans.labels_):
             dist = np.linalg.norm(kmeans.cluster_centers_[cluster]-conf[3:])
@@ -886,7 +885,7 @@ class MDSimulation(SimulationRunner):
         pool = mp.Pool(len(equilibrationFiles))
         workers = []
         startTime = time.time()
-        print("equilibrating System")
+        utilities.print_unbuffered("Equilibrating System")
         for i, equilibrationFilePair in enumerate(equilibrationFiles):
             reportName = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % (i+processManager.id*self.parameters.trajsPerReplica))
             workers.append(pool.apply_async(sim.runEquilibration, args=(equilibrationFilePair, reportName, self.parameters, i)))
@@ -894,7 +893,7 @@ class MDSimulation(SimulationRunner):
         for worker in workers:
             newInitialStructures.append(worker.get())
         endTime = time.time()
-        print("Equilibration took %.2f sec" % (endTime - startTime))
+        utilities.print_unbuffered("Equilibration took %.2f sec" % (endTime - startTime))
         return newInitialStructures
 
     def runTleap(self, TleapControlFile):
@@ -1009,7 +1008,7 @@ class MDSimulation(SimulationRunner):
         structures_to_run = [structure for i, structure in zip(range(self.parameters.processors), itertools.cycle(structures_to_run))]
         structures_to_run = processManager.getStructureListPerReplica(structures_to_run, self.parameters.trajsPerReplica)
         startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, utilities.getTrajNum(structure[1]))], structure[1]) for structure in structures_to_run]
-        print("Starting OpenMM Production Run of %d steps..." % self.parameters.productionLength)
+        utilities.print_unbuffered("Starting OpenMM Production Run of %d steps..." % self.parameters.productionLength)
         startTime = time.time()
         pool = mp.Pool(self.parameters.trajsPerReplica)
         workers = []
@@ -1024,7 +1023,7 @@ class MDSimulation(SimulationRunner):
             worker.get()
         endTime = time.time()
         self.restart = False
-        print("OpenMM took %.2f sec" % (endTime - startTime))
+        utilities.print_unbuffered("OpenMM took %.2f sec" % (endTime - startTime))
 
     def unifyReportNames(self, spawningReportName):
         """

@@ -191,7 +191,7 @@ class ProcessesManager:
             try:
                 os.kill(pid, 0)
             except ProcessLookupError:
-                print("Process %d not found!!!" % pid)
+                utilities.print_unbuffered("Process %d not found!!!" % pid)
                 return False
         return True
 
