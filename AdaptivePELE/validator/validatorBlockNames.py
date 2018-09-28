@@ -131,7 +131,6 @@ class SimulationParams:
             "seed": "numbers.Real",
             "productionLength": "numbers.Real",
             "iterations": "numbers.Real",
-            "trajectoriesPerReplica": "numbers.Real",
             "numReplicas": "numbers.Real"
         }}
     params = {
