@@ -678,3 +678,11 @@ def readProcessorMappingFromDisk(folder, filename):
             return list(map(ast.literal_eval, f.read().rstrip().split(':')))
     except IOError:
         sys.stderr.write("WARNING: processorMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
+
+
+def print_unbuffered(*args):
+    """
+        Call print and immediately after flush the buffer
+    """
+    print(*args)
+    sys.stdout.flush()

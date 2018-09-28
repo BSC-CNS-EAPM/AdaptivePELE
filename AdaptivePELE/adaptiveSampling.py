@@ -83,6 +83,8 @@ def printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusterin
     print("Output path: ", outputPath)
     print("Initial Structures: ", initialStructuresWildcard)
     print("================================\n\n")
+    sys.stdout.flush()
+
 
 def cleanPreviousSimulation(output_path):
     """
@@ -506,11 +508,11 @@ def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConsta
                                                          spawningParams.reportCol)
 
     if needToRecluster(oldClusteringMethod, clusteringMethod):
-        print("Reclustering!")
+        utilities.print_unbuffered("Reclustering!")
         startTime = time.time()
         clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner, topologies)
         endTime = time.time()
-        print("Reclustering took %s sec" % (endTime - startTime))
+        utilities.print_unbuffered("Reclustering took %s sec" % (endTime - startTime))
     else:
         clusteringMethod = oldClusteringMethod
         clusteringMethod.setCol(spawningParams.reportCol)
@@ -706,7 +708,7 @@ def main(jsonParams, clusteringHook=None):
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
     for i in range(firstRun, simulationRunner.parameters.iterations):
         if processManager.isMaster():
-            print("Iteration", i)
+            utilities.print_unbuffered("Iteration", i)
             outputDir = outputPathConstants.epochOutputPathTempletized % i
             utilities.makeFolder(outputDir)
 
@@ -715,18 +717,18 @@ def main(jsonParams, clusteringHook=None):
 
         processManager.barrier()
         if processManager.isMaster():
-            print("Production run...")
+            utilities.print_unbuffered("Production run...")
         if not debug:
             simulationRunner.runSimulation(i, outputPathConstants, initialStructuresAsString, topologies, spawningCalculator.parameters.reportFilename, processManager)
         processManager.barrier()
 
         if processManager.isMaster():
-            print("Clustering...")
+            utilities.print_unbuffered("Clustering...")
         if processManager.isMaster():
             startTime = time.time()
             clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies)
             endTime = time.time()
-            print("Clustering ligand: %s sec" % (endTime - startTime))
+            utilities.print_unbuffered("Clustering ligand: %s sec" % (endTime - startTime))
 
             if clusteringHook is not None:
                 clusteringHook(clusteringMethod, outputPathConstants, simulationRunner, i+1)
@@ -746,7 +748,7 @@ def main(jsonParams, clusteringHook=None):
             if degeneracyOfRepresentatives is not None:
                 if simulationRunner.parameters.modeMovingBox is not None:
                     degeneracyOfRepresentatives = mergeFilteredClustersAccordingToBox(degeneracyOfRepresentatives, clustersFiltered)
-                print("Degeneracy", degeneracyOfRepresentatives)
+                utilities.print_unbuffered("Degeneracy", degeneracyOfRepresentatives)
                 assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)
             else:
                 # When using null or independent spawning the calculate method returns None
@@ -794,14 +796,14 @@ def main(jsonParams, clusteringHook=None):
             # check exit condition, if defined
             if simulationRunner.hasExitCondition():
                 if simulationRunner.checkExitCondition(clusteringMethod, outputPathConstants.epochOutputPathTempletized % i):
-                    print("Simulation exit condition met at iteration %d, stopping" % i)
+                    utilities.print_unbuffered("Simulation exit condition met at iteration %d, stopping" % i)
                     # send a signal to all possible adaptivePELE copies to stop
                     for pid in processManager.lockInfo:
                         if pid != processManager.pid:
                             os.kill(pid, signal.SIGTERM)
                     break
                 else:
-                    print("Simulation exit condition not met at iteration %d, continuing..." % i)
+                    utilities.print_unbuffered("Simulation exit condition not met at iteration %d, continuing..." % i)
         processManager.barrier()
 
 if __name__ == '__main__':
