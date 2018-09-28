@@ -98,6 +98,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#templetized-pele-control-file">Templetized PELE control file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pele-parameters">PELE Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#md-parameters">MD Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#exit-condition">Exit condition</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#clustering-block">Clustering block</a><ul>
@@ -353,10 +354,7 @@ important to avoid whitspaces both at the beginning and end of the string.</li>
 <li><strong>seed</strong> (<em>integer</em>, mandatory): Seed for the random number generator</li>
 <li><strong>reporterFrequency</strong> (<em>integer</em>, mandatory): Frequency to write the report
 and trajectories (in time steps, see <strong>timeStep</strong> property)</li>
-<li><strong>numReplicas</strong> (<em>integer</em>, mandatory): Number of replicas to run (see <a class="reference internal" href="#running-adaptivepele-with-gpus">Running AdaptivePELE with GPUs</a> section)</li>
-<li><strong>trajectoriesPerReplica</strong> (<em>integer</em>, mandatory): Number of trajectories to
-run in each replica, the equation <strong>numReplicas</strong> * <strong>trajectoriesPerReplica</strong>
-= <strong>processors</strong> should be always satisfied</li>
+<li><strong>numReplicas</strong> (<em>integer</em>, mandatory): Number of replicas to run (see <a class="reference internal" href="#running-adaptivepele-with-gpus">Running AdaptivePELE with GPUs</a> section), each replica will run the same number of trajectories, calculated as <strong>t = p/n</strong>, where <em>t</em> is the number of the trajectories per replica, <em>p</em> is the number of processors and <em>n</em> is the number of replicas</li>
 </ul>
 <p>Optionally, you can also use the following parameters:</p>
 <ul class="simple">
@@ -382,7 +380,10 @@ simulation, options are {<em>CPU</em>, <em>CUDA</em>, <em>OpenCL</em>, <em>Refer
 <li><strong>minimizationIterations</strong> (<em>float</em>, default=2000): Number of time steps to
 run the energy minimization</li>
 </ul>
-<p>Additionally, the block may have an exit condition that stops the execution:</p>
+</div>
+<div class="section" id="exit-condition">
+<h3>Exit condition<a class="headerlink" href="#exit-condition" title="Permalink to this headline">¶</a></h3>
+<p>Additionally, the simulation block may have an exit condition that stops the execution:</p>
 <ul>
 <li><p class="first"><strong>exitCondition</strong> (<em>dict</em>, default=None): Block that specifies an exit condition for the simulation.
 Currently two types are implemented: <em>metric</em> and
@@ -768,9 +769,10 @@ There are two types of density calculators:</p>
         <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;md&quot;</span><span class="p">,</span>
         <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;iterations&quot;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-            <span class="s2">&quot;processors&quot;</span> <span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+            <span class="s2">&quot;processors&quot;</span> <span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
             <span class="s2">&quot;reporterFrequency&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
             <span class="s2">&quot;productionLength&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+            <span class="s2">&quot;numReplicas&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
             <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">67890</span><span class="p">,</span>
             <span class="s2">&quot;ligandCharge&quot;</span><span class="p">:</span> <span class="mi">1</span>
         <span class="p">}</span>
@@ -868,10 +870,10 @@ described with the file topology.pdb</p>
 </div>
 <div class="section" id="running-adaptivepele-with-gpus">
 <h2>Running AdaptivePELE with GPUs<a class="headerlink" href="#running-adaptivepele-with-gpus" title="Permalink to this headline">¶</a></h2>
-<p>Starting from version 1.6, adaptivePELE runs in different replicas (ony for MD
+<p>Starting from version 1.6, AdaptivePELE runs in different replicas (ony for MD
 simulations), this is necessary for running multinode GPU simulations, to run
-such simulation only two extra parameters are necessary, <em>numReplicas</em> and
-<em>trajectoriesPerReplica</em> (see <a class="reference internal" href="#simulation-block">Simulation block</a> section for more details).
+such simulation only one extra parameter is necessary, <em>numReplicas</em> (see
+<a class="reference internal" href="#simulation-block">Simulation block</a> section for more details).
 Here we show and example control file to run an MD simulation with 2 replicas
 and 4 trajectories per replica (8 trajectories total):</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -901,7 +903,6 @@ and 4 trajectories per replica (8 trajectories total):</p>
         <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;iterations&quot;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
             <span class="s2">&quot;processors&quot;</span> <span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
-            <span class="s2">&quot;trajectoriesPerReplica&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
             <span class="s2">&quot;numReplicas&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
             <span class="s2">&quot;productionLength&quot;</span> <span class="p">:</span> <span class="mi">5000</span><span class="p">,</span>
             <span class="s2">&quot;reporterFrequency&quot;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>

@@ -1214,6 +1214,28 @@ Only useful for PELE sequential runs</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.clustering.clustering.filterRepeatedReports">
+<code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">filterRepeatedReports</code><span class="sig-paren">(</span><em>metrics</em>, <em>column=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#filterRepeatedReports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.filterRepeatedReports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the matrix containing the report information to avoid rejected
+steps</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>metrics</strong> (<em>np.ndarray</em>) – Contents of the report file</li>
+<li><strong>column</strong> (<em>int</em>) – Column to check for repeats</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.ndarray – Contents of the report file filtered</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.clustering.clustering.getAllTrajectories">
 <code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">getAllTrajectories</code><span class="sig-paren">(</span><em>paths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#getAllTrajectories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.getAllTrajectories" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find all the trajectory files in the paths specified</p>
@@ -1224,6 +1246,22 @@ Only useful for PELE sequential runs</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>str</em>) – The path where to find the trajectories</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list – A list with the names of all th trajectories in paths</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.clustering.clustering.loadReportFile">
+<code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">loadReportFile</code><span class="sig-paren">(</span><em>reportFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#loadReportFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.loadReportFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a report file and filter it</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>reportFile</strong> (<em>str</em>) – Name of the report file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray – Contents of the report file</td>
 </tr>
 </tbody>
 </table>

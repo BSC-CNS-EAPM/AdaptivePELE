@@ -204,10 +204,7 @@ When using MD as a progagator, the following parameters are mandatory:
 * **seed** (*integer*, mandatory): Seed for the random number generator
 * **reporterFrequency** (*integer*, mandatory): Frequency to write the report
   and trajectories (in time steps, see **timeStep** property)
-* **numReplicas** (*integer*, mandatory): Number of replicas to run (see `Running AdaptivePELE with GPUs`_ section)
-* **trajectoriesPerReplica** (*integer*, mandatory): Number of trajectories to
-  run in each replica, the equation **numReplicas** * **trajectoriesPerReplica**
-  = **processors** should be always satisfied
+* **numReplicas** (*integer*, mandatory): Number of replicas to run (see `Running AdaptivePELE with GPUs`_ section), each replica will run the same number of trajectories, calculated as **t = p/n**, where *t* is the number of the trajectories per replica, *p* is the number of processors and *n* is the number of replicas
 
 Optionally, you can also use the following parameters:
 
@@ -233,7 +230,10 @@ Optionally, you can also use the following parameters:
 * **minimizationIterations** (*float*, default=2000): Number of time steps to
   run the energy minimization
 
-Additionally, the block may have an exit condition that stops the execution:
+Exit condition
+..............
+
+Additionally, the simulation block may have an exit condition that stops the execution:
 
 * **exitCondition** (*dict*, default=None): Block that specifies an exit condition for the simulation.
   Currently two types are implemented: *metric* and
@@ -625,7 +625,7 @@ A more complete (although not so comprehensible) example::
 
     
 Example 3 -- MD using OpenMM with default parameters
-.........................................................
+....................................................
 
 
 A simple example of running an MD simulation with OpenMM::
@@ -656,9 +656,10 @@ A simple example of running an MD simulation with OpenMM::
             "type" : "md",
             "params" : {
                 "iterations" : 10,
-                "processors" : 200,
+                "processors" : 20,
                 "reporterFrequency": 100,
                 "productionLength": 500,
+                "numReplicas": 5,
                 "seed": 67890,
                 "ligandCharge": 1
             }
@@ -770,10 +771,10 @@ described with the file topology.pdb
 Running AdaptivePELE with GPUs
 ------------------------------
 
-Starting from version 1.6, adaptivePELE runs in different replicas (ony for MD
+Starting from version 1.6, AdaptivePELE runs in different replicas (ony for MD
 simulations), this is necessary for running multinode GPU simulations, to run
-such simulation only two extra parameters are necessary, *numReplicas* and
-*trajectoriesPerReplica* (see `Simulation block`_ section for more details).
+such simulation only one extra parameter is necessary, *numReplicas* (see 
+`Simulation block`_ section for more details).
 Here we show and example control file to run an MD simulation with 2 replicas
 and 4 trajectories per replica (8 trajectories total)::
 
@@ -804,7 +805,6 @@ and 4 trajectories per replica (8 trajectories total)::
             "params" : {
                 "iterations" : 10,
                 "processors" : 8,
-                "trajectoriesPerReplica": 4,
                 "numReplicas": 2,
                 "productionLength" : 5000,
                 "reporterFrequency": 2000,
