@@ -222,7 +222,9 @@
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Clustering method:&quot;</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">type</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Output path: &quot;</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial Structures: &quot;</span><span class="p">,</span> <span class="n">initialStructuresWildcard</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;================================</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;================================</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
 
 <div class="viewcode-block" id="cleanPreviousSimulation"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.cleanPreviousSimulation">[docs]</a><span class="k">def</span> <span class="nf">cleanPreviousSimulation</span><span class="p">(</span><span class="n">output_path</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -611,7 +613,7 @@
         <span class="n">clusterEpochTrajs</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">epochOutputPathTempletized</span><span class="p">,</span> <span class="n">topologies</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="getWorkingClusteringObjectAndReclusterIfNecessary"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.getWorkingClusteringObjectAndReclusterIfNecessary">[docs]</a><span class="k">def</span> <span class="nf">getWorkingClusteringObjectAndReclusterIfNecessary</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
+<div class="viewcode-block" id="getWorkingClusteringObjectAndReclusterIfNecessary"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.getWorkingClusteringObjectAndReclusterIfNecessary">[docs]</a><span class="k">def</span> <span class="nf">getWorkingClusteringObjectAndReclusterIfNecessary</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">,</span> <span class="n">topologies</span><span class="p">,</span> <span class="n">processManager</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        It reads the previous clustering method, and, if there are changes,</span>
 <span class="sd">        it reclusters the previous trajectories. Returns the clustering object to use</span>
@@ -626,11 +628,16 @@
 <span class="sd">        :type spawningParams: :py:class:`.SpawningParams`</span>
 <span class="sd">        :param topologies: Topology object containing the set of topologies needed for the simulation</span>
 <span class="sd">        :type topologies: :py:class:`.Topology`</span>
+<span class="sd">        :param processManager: Object to synchronize the possibly multiple processes</span>
+<span class="sd">        :type processManager: :py:class:`.ProcessesManager`</span>
 
 <span class="sd">        :returns: :py:class:`.Clustering` -- The clustering method to use in the</span>
 <span class="sd">            adaptive sampling simulation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">ij</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">firstRun</span><span class="p">):</span>
+            <span class="n">topologies</span><span class="o">.</span><span class="n">readMappingFromDisk</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">ij</span><span class="p">,</span> <span class="n">ij</span><span class="p">)</span>
+        <span class="k">return</span>
     <span class="n">lastClusteringEpoch</span> <span class="o">=</span> <span class="n">firstRun</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="n">clusteringObjectPath</span> <span class="o">=</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">clusteringOutputObject</span> <span class="o">%</span> <span class="p">(</span><span class="n">lastClusteringEpoch</span><span class="p">)</span>
     <span class="n">oldClusteringMethod</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">readClusteringObject</span><span class="p">(</span><span class="n">clusteringObjectPath</span><span class="p">)</span>
@@ -641,11 +648,11 @@
                                                          <span class="n">spawningParams</span><span class="o">.</span><span class="n">reportCol</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">needToRecluster</span><span class="p">(</span><span class="n">oldClusteringMethod</span><span class="p">,</span> <span class="n">clusteringMethod</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reclustering!&quot;</span><span class="p">)</span>
+        <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Reclustering!&quot;</span><span class="p">)</span>
         <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">clusterPreviousEpochs</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">firstRun</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">,</span> <span class="n">topologies</span><span class="p">)</span>
         <span class="n">endTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reclustering took </span><span class="si">%s</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">))</span>
+        <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Reclustering took </span><span class="si">%s</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">clusteringMethod</span> <span class="o">=</span> <span class="n">oldClusteringMethod</span>
         <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">setCol</span><span class="p">(</span><span class="n">spawningParams</span><span class="o">.</span><span class="n">reportCol</span><span class="p">)</span>
@@ -681,18 +688,22 @@
 
 <span class="sd">        :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">processorManagerFilename</span> <span class="o">=</span> <span class="s2">&quot;procMapping.txt&quot;</span>
+    <span class="n">clusteringMethod</span> <span class="o">=</span> <span class="n">getWorkingClusteringObjectAndReclusterIfNecessary</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">,</span> <span class="n">topologies</span><span class="p">,</span> <span class="n">processManager</span><span class="p">)</span> 
     <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
-        <span class="n">clusteringMethod</span> <span class="o">=</span> <span class="n">getWorkingClusteringObjectAndReclusterIfNecessary</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">spawningParams</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">,</span> <span class="n">topologies</span><span class="p">)</span>
-
         <span class="n">degeneracyOfRepresentatives</span> <span class="o">=</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">getWorkingProcessors</span><span class="p">(),</span> <span class="n">firstRun</span><span class="p">)</span>
         <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">procMapping</span> <span class="o">=</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">writeSpawningInitialStructures</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span><span class="p">,</span> <span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">firstRun</span><span class="p">,</span> <span class="n">topologies</span><span class="o">=</span><span class="n">topologies</span><span class="p">)</span>
-        <span class="c1"># for compatibility with old data</span>
-        <span class="n">procMapping</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span> <span class="k">if</span> <span class="n">element</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">procMapping</span><span class="p">]</span>
-        <span class="n">topologies</span><span class="o">.</span><span class="n">mapEpochTopologies</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">procMapping</span><span class="p">)</span>
-        <span class="n">simulationRunner</span><span class="o">.</span><span class="n">updateMappingProcessors</span><span class="p">(</span><span class="n">procMapping</span><span class="p">)</span>
+        <span class="n">utilities</span><span class="o">.</span><span class="n">writeProcessorMappingToDisk</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">,</span> <span class="n">processorManagerFilename</span><span class="p">,</span> <span class="n">procMapping</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">clusteringMethod</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">processManager</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
+        <span class="n">procMapping</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">readProcessorMappingFromDisk</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">,</span> <span class="n">processorManagerFilename</span><span class="p">)</span>
+    <span class="c1"># for compatibility with old data</span>
+    <span class="n">procMapping</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span> <span class="k">if</span> <span class="n">element</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">procMapping</span><span class="p">]</span>
+    <span class="n">topologies</span><span class="o">.</span><span class="n">mapEpochTopologies</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">procMapping</span><span class="p">)</span>
+    <span class="n">simulationRunner</span><span class="o">.</span><span class="n">updateMappingProcessors</span><span class="p">(</span><span class="n">procMapping</span><span class="p">)</span>
     <span class="n">processManager</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
     <span class="n">initialStructuresAsString</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">createMultipleComplexesFilenames</span><span class="p">(</span><span class="n">simulationRunner</span><span class="o">.</span><span class="n">getWorkingProcessors</span><span class="p">(),</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span> <span class="n">firstRun</span><span class="p">)</span>
 
@@ -837,7 +848,7 @@
         <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">boxCenter</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">selectInitialBoxCenter</span><span class="p">(</span><span class="n">initialStructuresAsString</span><span class="p">,</span> <span class="n">resname</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">iterations</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Iteration&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Iteration&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">outputDir</span> <span class="o">=</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span>
             <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">outputDir</span><span class="p">)</span>
 
@@ -845,17 +856,19 @@
             <span class="n">topologies</span><span class="o">.</span><span class="n">writeMappingToDisk</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
 
         <span class="n">processManager</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Production run...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
+            <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Production run...&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
             <span class="n">simulationRunner</span><span class="o">.</span><span class="n">runSimulation</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">initialStructuresAsString</span><span class="p">,</span> <span class="n">topologies</span><span class="p">,</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">reportFilename</span><span class="p">,</span> <span class="n">processManager</span><span class="p">)</span>
         <span class="n">processManager</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Clustering...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
+            <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Clustering...&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
             <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="n">clusterEpochTrajs</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span><span class="p">,</span> <span class="n">topologies</span><span class="p">)</span>
             <span class="n">endTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Clustering ligand: </span><span class="si">%s</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">))</span>
+            <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Clustering ligand: </span><span class="si">%s</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="n">clusteringHook</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">clusteringHook</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
@@ -875,7 +888,7 @@
             <span class="k">if</span> <span class="n">degeneracyOfRepresentatives</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">modeMovingBox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">degeneracyOfRepresentatives</span> <span class="o">=</span> <span class="n">mergeFilteredClustersAccordingToBox</span><span class="p">(</span><span class="n">degeneracyOfRepresentatives</span><span class="p">,</span> <span class="n">clustersFiltered</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Degeneracy&quot;</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span><span class="p">)</span>
+                <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Degeneracy&quot;</span><span class="p">,</span> <span class="n">degeneracyOfRepresentatives</span><span class="p">)</span>
                 <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">degeneracyOfRepresentatives</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># When using null or independent spawning the calculate method returns None</span>
@@ -923,14 +936,14 @@
             <span class="c1"># check exit condition, if defined</span>
             <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">hasExitCondition</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">checkExitCondition</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">):</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Simulation exit condition met at iteration </span><span class="si">%d</span><span class="s2">, stopping&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Simulation exit condition met at iteration </span><span class="si">%d</span><span class="s2">, stopping&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
                     <span class="c1"># send a signal to all possible adaptivePELE copies to stop</span>
                     <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">processManager</span><span class="o">.</span><span class="n">lockInfo</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">pid</span> <span class="o">!=</span> <span class="n">processManager</span><span class="o">.</span><span class="n">pid</span><span class="p">:</span>
                             <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">)</span>
                     <span class="k">break</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Simulation exit condition not met at iteration </span><span class="si">%d</span><span class="s2">, continuing...&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Simulation exit condition not met at iteration </span><span class="si">%d</span><span class="s2">, continuing...&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
         <span class="n">processManager</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span></div>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>

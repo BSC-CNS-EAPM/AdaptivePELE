@@ -16,7 +16,7 @@ def parse_args():
             "at -- Run atomset tests\ns  -- Run spawning tests\nth -- Run threshold "
             "calculator tests\nd  -- Run density tests\nc  -- Run clustering tests\n"
             "Ad -- Run adaptive integration tests\nMD -- Run adaptive MD tests\nMD_CUDA"
-            "Run adaptive MD tests with CUDA\n")
+            " -- Run adaptive MD tests with CUDA\n")
     parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("--run", default=None, nargs="*", help="Tests to run")
     parser.add_argument("--exclude", default=[], nargs="*", help="Tests to exclude")

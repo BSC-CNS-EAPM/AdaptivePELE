@@ -63,6 +63,7 @@ class SimulationParameters:
         self.numberEquilibrationStructures = 10
         self.reportName = ""
         # parameters needed for MD simulations and their defaults
+        self.timeStep = 2
         self.ligandCharge = 0
         self.nonBondedCutoff = 8
         self.Temperature = 300
@@ -75,6 +76,8 @@ class SimulationParameters:
         self.waterBoxSize = 8
         self.trajsPerReplica = None
         self.numReplicas = 1
+        self.equilibrationLengthNVT = 200000
+        self.equilibrationLengthNPT = 500000
 
 
 class SimulationRunner:
@@ -363,7 +366,7 @@ class PeleSimulation(SimulationRunner):
         else:
             toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
             toRun = map(str, toRun)
-        print(" ".join(toRun))
+        utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
         (out, err) = proc.communicate()
@@ -373,7 +376,7 @@ class PeleSimulation(SimulationRunner):
             print(err)
 
         endTime = time.time()
-        print("PELE took %.2f sec" % (endTime - startTime))
+        utilities.print_unbuffered("PELE took %.2f sec" % (endTime - startTime))
 
     def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName, processManager):
         """
@@ -393,7 +396,6 @@ class PeleSimulation(SimulationRunner):
             :type processManager: :py:class:`.ProcessesManager`
         """
         trajName = "".join(self.parameters.trajectoryName.split("_%d"))
-        print("Preparing Control File")
         ControlFileDictionary = {"COMPLEXES": initialStructuresAsString,
                                  "PELE_STEPS": self.parameters.peleSteps,
                                  "BOX_RADIUS": self.parameters.boxRadius,
@@ -407,7 +409,7 @@ class PeleSimulation(SimulationRunner):
         else:
             toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
             toRun = map(str, toRun)
-        print(" ".join(toRun))
+        utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
         (out, err) = proc.communicate()
@@ -417,7 +419,7 @@ class PeleSimulation(SimulationRunner):
             print(err)
 
         endTime = time.time()
-        print("PELE took %.2f sec" % (endTime - startTime))
+        utilities.print_unbuffered("PELE took %.2f sec" % (endTime - startTime))
 
     def getEquilibrationControlFile(self, peleControlFileDict):
         """
@@ -551,7 +553,7 @@ class PeleSimulation(SimulationRunner):
                 # box information, include it manually
                 if name not in templateNames:
                     templateNames[name] = '"$%s"' % name
-            print("Running equilibration for initial structure number %d" % (i+1))
+            utilities.print_unbuffered("Running equilibration for initial structure number %d" % (i+1))
             peleControlString = json.dumps(peleControlFileDict, indent=4)
             for key, value in templateNames.items():
                 # Remove double quote around template keys, so that PELE
@@ -619,7 +621,7 @@ class PeleSimulation(SimulationRunner):
         data = data[:nPoints]
         n_clusters = min(self.parameters.numberEquilibrationStructures, data.shape[0])
         kmeans = KMeans(n_clusters=n_clusters).fit(data[:, 3:])
-        print("Clustered equilibration output into %d clusters!" % n_clusters)
+        utilities.print_unbuffered("Clustered equilibration output into %d clusters!" % n_clusters)
         clustersInfo = {x: {"structure": None, "minDist": 1e6} for x in range(self.parameters.numberEquilibrationStructures)}
         for conf, cluster in zip(data, kmeans.labels_):
             dist = np.linalg.norm(kmeans.cluster_centers_[cluster]-conf[3:])
@@ -883,7 +885,7 @@ class MDSimulation(SimulationRunner):
         pool = mp.Pool(len(equilibrationFiles))
         workers = []
         startTime = time.time()
-        print("equilibrating System")
+        utilities.print_unbuffered("Equilibrating System")
         for i, equilibrationFilePair in enumerate(equilibrationFiles):
             reportName = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % (i+processManager.id*self.parameters.trajsPerReplica))
             workers.append(pool.apply_async(sim.runEquilibration, args=(equilibrationFilePair, reportName, self.parameters, i)))
@@ -891,7 +893,7 @@ class MDSimulation(SimulationRunner):
         for worker in workers:
             newInitialStructures.append(worker.get())
         endTime = time.time()
-        print("Equilibration took %.2f sec" % (endTime - startTime))
+        utilities.print_unbuffered("Equilibration took %.2f sec" % (endTime - startTime))
         return newInitialStructures
 
     def runTleap(self, TleapControlFile):
@@ -1006,7 +1008,7 @@ class MDSimulation(SimulationRunner):
         structures_to_run = [structure for i, structure in zip(range(self.parameters.processors), itertools.cycle(structures_to_run))]
         structures_to_run = processManager.getStructureListPerReplica(structures_to_run, self.parameters.trajsPerReplica)
         startingFilesPairs = [(self.prmtopFiles[topologies.getTopologyIndex(epoch, utilities.getTrajNum(structure[1]))], structure[1]) for structure in structures_to_run]
-        print("Starting OpenMM Production Run of %d steps..." % self.parameters.productionLength)
+        utilities.print_unbuffered("Starting OpenMM Production Run of %d steps..." % self.parameters.productionLength)
         startTime = time.time()
         pool = mp.Pool(self.parameters.trajsPerReplica)
         workers = []
@@ -1021,7 +1023,7 @@ class MDSimulation(SimulationRunner):
             worker.get()
         endTime = time.time()
         self.restart = False
-        print("OpenMM took %.2f sec" % (endTime - startTime))
+        utilities.print_unbuffered("OpenMM took %.2f sec" % (endTime - startTime))
 
     def unifyReportNames(self, spawningReportName):
         """
@@ -1124,9 +1126,12 @@ class TestSimulation(SimulationRunner):
                                  "BOX_RADIUS": self.parameters.boxRadius}
         self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         if not self.copied:
+            tmp_sync = os.path.join(outputPathConstants.tmpFolder, os.path.split(processManager.syncFolder)[1])
+            shutil.copytree(processManager.syncFolder, tmp_sync)
             if os.path.exists(self.parameters.destination):
                 shutil.rmtree(self.parameters.destination)
             shutil.copytree(self.parameters.origin, self.parameters.destination)
+            shutil.copytree(tmp_sync, processManager.syncFolder)
             self.copied = True
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary, inputTemplate=None):
@@ -1276,23 +1281,25 @@ class RunnerBuilder:
 
             return PeleSimulation(params)
         elif simulationType == blockNames.SimulationType.md:
-            params.processors = paramsBlock[blockNames.SimulationParams.processors]
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
+            params.processors = paramsBlock[blockNames.SimulationParams.processors]
+            params.productionLength = paramsBlock[blockNames.SimulationParams.productionLength]
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
-            params.productionLength = paramsBlock[blockNames.SimulationParams.productionLength]
-            params.trajsPerReplica = paramsBlock[blockNames.SimulationParams.trajsPerReplica]
             params.numReplicas = paramsBlock[blockNames.SimulationParams.numReplicas]
+            params.trajsPerReplica = int(params.processors/params.numReplicas)
             params.runEquilibration = True
+            params.equilibrationLengthNVT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNVT, 200000)
+            params.equilibrationLengthNPT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNPT, 500000)
+            params.timeStep = paramsBlock.get(blockNames.SimulationParams.timeStep, 2)
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
+            params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
             params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
             params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
             params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
             params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
-            params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength, 4000)
-            params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
-            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]

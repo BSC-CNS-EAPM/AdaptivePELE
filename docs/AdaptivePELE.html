@@ -483,7 +483,7 @@ epoch</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.getWorkingClusteringObjectAndReclusterIfNecessary">
-<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">getWorkingClusteringObjectAndReclusterIfNecessary</code><span class="sig-paren">(</span><em>firstRun</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>simulationRunner</em>, <em>topologies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#getWorkingClusteringObjectAndReclusterIfNecessary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.getWorkingClusteringObjectAndReclusterIfNecessary" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">getWorkingClusteringObjectAndReclusterIfNecessary</code><span class="sig-paren">(</span><em>firstRun</em>, <em>outputPathConstants</em>, <em>clusteringBlock</em>, <em>spawningParams</em>, <em>simulationRunner</em>, <em>topologies</em>, <em>processManager</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#getWorkingClusteringObjectAndReclusterIfNecessary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.getWorkingClusteringObjectAndReclusterIfNecessary" title="Permalink to this definition">¶</a></dt>
 <dd><p>It reads the previous clustering method, and, if there are changes,
 it reclusters the previous trajectories. Returns the clustering object to use</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -496,6 +496,7 @@ it reclusters the previous trajectories. Returns the clustering object to use</p
 <li><strong>clusteringBlock</strong> (<em>json</em>) – Contains the new clustering block</li>
 <li><strong>spawningParams</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) – Spawning params, to know what reportFile and column to read</li>
 <li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
 </ul>
 </td>
 </tr>

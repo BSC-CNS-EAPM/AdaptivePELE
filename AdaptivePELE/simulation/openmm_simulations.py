@@ -13,6 +13,7 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 import simtk.unit as unit
 from AdaptivePELE.constants import constants
+from AdaptivePELE.utilities import utilities
 try:
     FileNotFoundError
 except NameError:
@@ -28,7 +29,7 @@ def get_traceback(f):
     def wrapper(*args, **kwargs):
         try:
             return f(*args, **kwargs)
-        except Exception, ex:
+        except Exception as ex:
             ret = '#' * 60
             ret += "\nException caught:"
             ret += "\n"+'-'*60
@@ -142,7 +143,7 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     else:
         platformProperties = {}
     if worker == 0:
-        print("Running %d steps of minimization" % parameters.minimizationIterations)
+        utilities.print_unbuffered("Running %d steps of minimization" % parameters.minimizationIterations)
     simulation = minimization(prmtop, inpcrd, PLATFORM, 5, parameters, platformProperties)
     # Retrieving the state is expensive (especially when running on GPUs) so we
     # only called it once and then separate positions and velocities
@@ -150,14 +151,14 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     positions = state.getPositions()
     velocities = state.getVelocities()
     if worker == 0:
-        print("Running %d steps of NVT equilibration" % parameters.equilibrationLength)
-    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 5, parameters, reportName, platformProperties, velocities=velocities)
+        utilities.print_unbuffered("Running %d steps of NVT equilibration" % parameters.equilibrationLengthNVT)
+    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNVT, 5, parameters, reportName, platformProperties, velocities=velocities)
     state = simulation.context.getState(getPositions=True, getVelocities=True)
     positions = state.getPositions()
     velocities = state.getVelocities()
     if worker == 0:
-        print("Running %d steps of NPT equilibration" % parameters.equilibrationLength)
-    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLength, 0.5, parameters, reportName, platformProperties, velocities=velocities)
+        utilities.print_unbuffered("Running %d steps of NPT equilibration" % parameters.equilibrationLengthNPT)
+    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNPT, 0.5, parameters, reportName, platformProperties, velocities=velocities)
     outputPDB = "%s_NPT.pdb" % reportName
     with open(outputPDB, 'w') as fw:
         app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)
@@ -188,7 +189,7 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters, platformProp
     system = prmtop.createSystem(nonbondedMethod=app.PME,
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms, constraints=app.HBonds)
     # system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
-    integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+    integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     if constraints:
         # Add positional restraints to protein backbone
         force = mm.CustomExternalForce(str("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)"))
@@ -238,7 +239,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
                                    nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                    constraints=app.HBonds)
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
-    integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+    integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     if constraints:
         force = mm.CustomExternalForce(str("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)"))
         force.addGlobalParameter(str("k"), constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
@@ -259,7 +260,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     simulation.reporters.append(CustomStateDataReporter(reportFile, parameters.reporterFreq, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
-                                                        totalSteps=parameters.equilibrationLength, separator="\t"))
+                                                        totalSteps=parameters.equilibrationLengthNVT, separator="\t"))
     simulation.step(simulation_steps)
     return simulation
 
@@ -292,7 +293,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
                                    nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                    constraints=app.HBonds)
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
-    integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+    integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     system.addForce(mm.MonteCarloBarostat(1 * unit.bar, parameters.Temperature * unit.kelvin))
     if constraints:
         force = mm.CustomExternalForce(str("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)"))
@@ -314,7 +315,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     simulation.reporters.append(CustomStateDataReporter(reportFile, parameters.reporterFreq, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
-                                                        totalSteps=parameters.equilibrationLength, separator="\t"))
+                                                        totalSteps=parameters.equilibrationLengthNPT, separator="\t"))
     simulation.step(simulation_steps)
     return simulation
 
@@ -371,15 +372,15 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                  constraints=app.HBonds)
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
-    integrator = mm.VerletIntegrator(2 * unit.femtoseconds)
+    integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     if parameters.boxCenter:
         # Harmonic flat-bottom restrain for the ligand
         force = mm.CustomExternalForce('step(r-r0) * (k/2) * (r-r0)^2; r=sqrt((x-b0)^2+(y-b1)^2+(z-b2)^2)')
         force.addGlobalParameter("k", 5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2)
-        force.addGlobalParameter("r0", parameters.boxRadius)
-        force.addGlobalParameter("b0", parameters.boxCenter[0])
-        force.addGlobalParameter("b1", parameters.boxCenter[1])
-        force.addGlobalParameter("b2", parameters.boxCenter[2])
+        force.addGlobalParameter("r0", parameters.boxRadius * unit.angstroms)
+        force.addGlobalParameter("b0", parameters.boxCenter[0] * unit.angstroms)
+        force.addGlobalParameter("b1", parameters.boxCenter[1] * unit.angstroms)
+        force.addGlobalParameter("b2", parameters.boxCenter[2] * unit.angstroms)
         for j, atom in enumerate(prmtop.topology.atoms()):
             if atom.residue.name == ligandName:
                 force.addParticle(j, [])

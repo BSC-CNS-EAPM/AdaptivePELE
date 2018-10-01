@@ -131,7 +131,6 @@ class SimulationParams:
             "seed": "numbers.Real",
             "productionLength": "numbers.Real",
             "iterations": "numbers.Real",
-            "trajectoriesPerReplica": "numbers.Real",
             "numReplicas": "numbers.Real"
         }}
     params = {
@@ -158,6 +157,7 @@ class SimulationParams:
         "trajectoryName": "basestring",
         "ligandCharge": "numbers.Real",
         "nonBondedCutoff": "numbers.Real",
+        "timeStep": "numbers.Real",
         "Temperature": "numbers.Real",
         "runningPlatform": "basestring",
         "minimizationIterations": "numbers.Real",
@@ -165,6 +165,8 @@ class SimulationParams:
         "productionLength": "numbers.Real",
         "WaterBoxSize": "numbers.Real",
         "trajectoriesPerReplica": "numbers.Real",
+        "equilibrationLengthNVT": "numbers.Real",
+        "equilibrationLengthNPT": "numbers.Real",
         "numReplicas": "numbers.Real"
     }
     exitCondition = {

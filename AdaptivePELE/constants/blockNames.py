@@ -151,6 +151,9 @@ class SimulationParams:
     waterBoxSize = "WaterBoxSize"
     trajsPerReplica = "trajectoriesPerReplica"
     numReplicas = "numReplicas"
+    timeStep = "timeStep"
+    equilibrationLengthNVT = "equilibrationLengthNVT"
+    equilibrationLengthNPT = "equilibrationLengthNPT"
 
 
 class ExitConditionType:

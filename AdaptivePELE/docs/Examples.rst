@@ -204,29 +204,36 @@ When using MD as a progagator, the following parameters are mandatory:
 * **seed** (*integer*, mandatory): Seed for the random number generator
 * **reporterFrequency** (*integer*, mandatory): Frequency to write the report
   and trajectories (in time steps, see **timeStep** property)
-* **numReplicas** (*integer*, mandatory): Number of replicas to run (see `Running AdaptivePELE with GPUs`_ section)
-* **trajectoriesPerReplica** (*integer*, mandatory): Number of trajectories to
-  run in each replica, the equation **numReplicas** * **trajectoriesPerReplica**
-  = **processors** should be always satisfied
+* **numReplicas** (*integer*, mandatory): Number of replicas to run (see `Running AdaptivePELE with GPUs`_ section), each replica will run the same number of trajectories, calculated as **t = p/n**, where *t* is the number of the trajectories per replica, *p* is the number of processors and *n* is the number of replicas
 
 Optionally, you can also use the following parameters:
 
-* **equilibrationLength** (*int*, default=50): Number of steps for the
-  equilibration run
+* **equilibrationLengthNVT** (*int*, default=200000): Number of steps for the constant volume 
+  equilibration run (default corresponds to 400 ps)
+* **equilibrationLengthNPT** (*int*, default=500000): Number of steps for the constant pressure 
+  equilibration run (default corresponds to 1 ns)
 * **timeStep** (*float*, default=2): Value of the time step for the integration
   (in femtoseconds)
-* **boxRadius** (*float*, default=8): Distance of the edge of the solvation box
-  from the closest atom
+* **boxRadius** (*float*, default=8): Radius  of the center of the spherical 
+  flat-bottomed potential for the ligand (if specified, in angstroms)
+* **boxCenter** (*list*, default=None): Coordinates of the center of the spherical 
+  flat-bottomed potential for the ligand (if specified, in angstroms)
 * **ligandCharge** (*integer*, default=0): Charge of the ligand
+* **waterBoxSize** (*float*, default=8): Distance of the edge of the solvation
+  box from the closest atom (in angstroms)
 * **nonBondedCutoff** (*float*, default=8): Radius for the nonBonded cutoff of
-  the long-range interactions
-* **temperature** (*float*, default=300): Temperature of the simulation
-* **runningPlatform** (*str*, default="CPU"): Platform on which to run the
-  simulation, see openmm documentation for more details
+  the long-range interactions (in angstroms)
+* **temperature** (*float*, default=300): Temperature of the simulation (in
+  Kelvin)
+* **runningPlatform** (*str*, default=CPU): Platform on which to run the
+  simulation, options are {*CPU*, *CUDA*, *OpenCL*, *Reference*}, see openmm documentation for more details
 * **minimizationIterations** (*float*, default=2000): Number of time steps to
   run the energy minimization
 
-Additionally, the block may have an exit condition that stops the execution:
+Exit condition
+..............
+
+Additionally, the simulation block may have an exit condition that stops the execution:
 
 * **exitCondition** (*dict*, default=None): Block that specifies an exit condition for the simulation.
   Currently two types are implemented: *metric* and
@@ -618,7 +625,7 @@ A more complete (although not so comprehensible) example::
 
     
 Example 3 -- MD using OpenMM with default parameters
-.........................................................
+....................................................
 
 
 A simple example of running an MD simulation with OpenMM::
@@ -649,9 +656,10 @@ A simple example of running an MD simulation with OpenMM::
             "type" : "md",
             "params" : {
                 "iterations" : 10,
-                "processors" : 200,
+                "processors" : 20,
                 "reporterFrequency": 100,
                 "productionLength": 500,
+                "numReplicas": 5,
                 "seed": 67890,
                 "ligandCharge": 1
             }
@@ -763,10 +771,10 @@ described with the file topology.pdb
 Running AdaptivePELE with GPUs
 ------------------------------
 
-Starting from version 1.6, adaptivePELE runs in different replicas (ony for MD
+Starting from version 1.6, AdaptivePELE runs in different replicas (ony for MD
 simulations), this is necessary for running multinode GPU simulations, to run
-such simulation only two extra parameters are necessary, *numReplicas* and
-*trajectoriesPerReplica* (see `Simulation block`_ section for more details).
+such simulation only one extra parameter is necessary, *numReplicas* (see 
+`Simulation block`_ section for more details).
 Here we show and example control file to run an MD simulation with 2 replicas
 and 4 trajectories per replica (8 trajectories total)::
 
@@ -797,7 +805,6 @@ and 4 trajectories per replica (8 trajectories total)::
             "params" : {
                 "iterations" : 10,
                 "processors" : 8,
-                "trajectoriesPerReplica": 4,
                 "numReplicas": 2,
                 "productionLength" : 5000,
                 "reporterFrequency": 2000,
