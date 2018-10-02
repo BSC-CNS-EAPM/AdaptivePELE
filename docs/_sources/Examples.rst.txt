@@ -204,7 +204,7 @@ When using MD as a progagator, the following parameters are mandatory:
 * **seed** (*integer*, mandatory): Seed for the random number generator
 * **reporterFrequency** (*integer*, mandatory): Frequency to write the report
   and trajectories (in time steps, see **timeStep** property)
-* **numReplicas** (*integer*, mandatory): Number of replicas to run (see `Running AdaptivePELE with GPUs`_ section), each replica will run the same number of trajectories, calculated as **t = p/(n*d)**, where *t* is the number of the trajectories per replica, *p* is the number of processors, *n* is the number of replicas and *d* is the number of devices to use per each trajectory (see **devicesPerTrajectory** parameter for detail)
+* **numReplicas** (*integer*, mandatory): Number of replicas to run (see `Running AdaptivePELE with GPUs`_ section), each replica will run the same number of trajectories, calculated as **t = p/n**, where *t* is the number of the trajectories per replica, *p* is the number of processors and *n* is the number of replicas
 
 Optionally, you can also use the following parameters:
 
@@ -227,11 +227,12 @@ Optionally, you can also use the following parameters:
   Kelvin)
 * **runningPlatform** (*str*, default=CPU): Platform on which to run the
   simulation, options are {*CPU*, *CUDA*, *OpenCL*, *Reference*}, see  `openmm documentation <http://docs.openmm.org/7.1.0/userguide/library.html#platform-specific-properties>`_ for more details
-  
 * **minimizationIterations** (*float*, default=2000): Number of time steps to
   run the energy minimization
 * **devicesPerTrajectory** (*int*, default=1): Number of gpus to use for each
-  trajectory, this parameter only applies if using the *CUDA* platformn
+  trajectory, this parameter only applies if using the *CUDA* platformn. Note
+  that **devicesPerTrajectory*numReplicas** should correspond to the number of
+  gpus per node that you have available
 
 Exit condition
 ..............
