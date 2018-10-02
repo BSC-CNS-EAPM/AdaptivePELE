@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os.path
 import numpy as np
+import glob
 import AdaptivePELE.constants
 
 
@@ -33,8 +34,9 @@ class PDBManager:
                  "Tl", "Tm", "U4+", "V2+", "Y", "YB2", "ZN", "Zr"}
 
     # Modified residues for which there is a template in AdaptivePELE/constants/MDtemplates/
+    TEMPLATE_PATH = os.path.join("".join(AdaptivePELE.constants.__path__), "MDtemplates/amber_*.lib")
 
-    VALID_MODIFIED_RES = {"SEP", "TPO", "TYP"}
+    VALID_MODIFIED_RES = [name.split("_")[-1][:-4] for name in glob.glob(TEMPLATE_PATH)]
 
     def __init__(self, PDBtoLoad, resname):
         """
@@ -259,15 +261,22 @@ class PDBManager:
     def checkMissingAtoms(self):
         # Method that check that all the heavy atoms are in the templates and also checks that all residues have all the heavy atoms
         for chain in self.Protein:
-            for residue in chain:
+            for i, residue in enumerate(chain):
                 if residue.id in self.AtomTemplates:
                     atomsNames = set(residue.getChildNames())
-                    templateAtoms = self.AtomTemplates[residue.id]
+                    if i == 0:
+                        templateAtoms = self.AtomTemplates["N%s" % residue.id]
+                    else:
+                        templateAtoms = self.AtomTemplates[residue.id]
                     extra_atoms = atomsNames.difference(templateAtoms)
                     missing_atoms = templateAtoms.difference(atomsNames)
                     for atom in extra_atoms:
-                        if atom != "OXT" and "H" not in atom:
-                            raise PDBLoadException("ERROR: Atom %s of Residue %s in chain %s not in Templates" % (atom, residue.id, chain.id))
+                        if atom != "OXT":
+                            if "H" in atom:
+                                print("Warning: Atom %s of Residue %s in chain %s not in Templates.\nRemoving Hydrogen" % (atom, residue.id, chain.id))
+                                residue.remove(residue[atom])
+                            else:
+                                raise PDBLoadException("ERROR: Atom %s of Residue %s in chain %s not in Templates" % (atom, residue.id, chain.id))
                     for atom in missing_atoms:
                         print("Warning: Residue %s of chain %s doesn't have the Atom %s" %(residue.id, chain.id, atom))
 
@@ -300,7 +309,14 @@ class PDBManager:
                     print("Warning: Possible gap found in chain %s between residue %s and %s" % (chain.id, prev_residue, residue.num))
                 prev_residue = residue.num
 
-
+    def checkLigand(self):
+        for chain in self.Ligand:
+            for residue in chain:
+                for atom in residue:
+                    if atom.id.startswith("CL"):
+                        oldname = atom.id
+                        atom.id = "Cl%s" % oldname[2:]
+                        print("Atom %s of %s rename to %s" % (oldname, self.resname, atom.id))
 
     def preparePDBforMD(self):
         """
@@ -315,6 +331,8 @@ class PDBManager:
         self.loadDisulphideBonds()
         # check the protonation states of the histidines
         self.checkprotonation()
+        # Rename atoms from the ligand to match parmchk atom names
+        self.checkLigand()
         # Make a unique chain for the protein to avoid problems with Tleap
         # Because Tleap doesn't support chain ids
         self.joinChains()
@@ -338,10 +356,12 @@ class PDBase:
         self.id = ID
         # List with the objects that are one step bellow
         self.childs = []
+        self.child_dict = {}
 
     def setHirearchy(self):
         # Method that loads the current object to its father childs list
         self.parent.childs.append(self)
+        self.parent.child_dict[self.id] = self
 
     def rename(self, newname):
         # Method to rename the object
@@ -352,7 +372,10 @@ class PDBase:
             yield child
 
     def __getitem__(self, index):
-        return self.childs[index]
+        try:
+            return self.childs[index]
+        except TypeError:
+            return self.child_dict[index]
 
     def getChildNames(self):
         # Method that returns a list with the names of all the child objects that are one step bellow
@@ -453,3 +476,4 @@ class Atom(PDBase):
         if self.ocupancy:
             self.ocupancy = float(self.ocupancy)
         self.Bfactor = Bfactor
+
