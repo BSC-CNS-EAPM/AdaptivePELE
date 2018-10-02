@@ -154,6 +154,7 @@ class SimulationParams:
     timeStep = "timeStep"
     equilibrationLengthNVT = "equilibrationLengthNVT"
     equilibrationLengthNPT = "equilibrationLengthNPT"
+    devicesPerTrajectory = "devicesPerTrajectory"
 
 
 class ExitConditionType:

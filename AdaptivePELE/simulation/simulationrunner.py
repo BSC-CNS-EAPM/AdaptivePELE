@@ -78,6 +78,7 @@ class SimulationParameters:
         self.numReplicas = 1
         self.equilibrationLengthNVT = 200000
         self.equilibrationLengthNPT = 500000
+        self.devicesPerTrajectory = 1
 
 
 class SimulationRunner:
@@ -1287,7 +1288,8 @@ class RunnerBuilder:
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
             params.numReplicas = paramsBlock[blockNames.SimulationParams.numReplicas]
-            params.trajsPerReplica = int(params.processors/params.numReplicas)
+            params.devicesPerTrajectory = paramsBlock.get(blockNames.SimulationParams.devicesPerTrajectory, 1)
+            params.trajsPerReplica = int(params.processors/(params.numReplicas*params.devicesPerTrajectory))
             params.runEquilibration = True
             params.equilibrationLengthNVT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNVT, 200000)
             params.equilibrationLengthNPT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNPT, 500000)
