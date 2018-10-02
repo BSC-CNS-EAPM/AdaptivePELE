@@ -995,14 +995,14 @@ class MDSimulation(SimulationRunner):
             if epoch == 0:
                 # if the epoch is 0 the original equilibrated pdb files are taken as intial structures
                 equilibrated_structures = glob.glob(os.path.join(outputPathConstants.equilibrationDir, "equilibrated*pdb"))
-                structures_to_run = sorted(equilibrated_structures, key=lambda x: utilities.getTrajNum(x))
+                structures_to_run = sorted(equilibrated_structures, key=utilities.getTrajNum)
             checkpoints = glob.glob(os.path.join(outputDir, "checkpoint*.chk"))
-            checkpoints = sorted(checkpoints, key=lambda x: utilities.getTrajNum(x))
+            checkpoints = sorted(checkpoints, key=utilities.getTrajNum)
         # always read the prmtop files from disk to serve as communication
         # between diffrent processses
         prmtops = glob.glob(os.path.join(outputPathConstants.topologies, "*prmtop"))
         # sort the prmtops according to the original topology order
-        self.prmtopFiles = sorted(prmtops, key=lambda x: utilities.getPrmtopNum(x))
+        self.prmtopFiles = sorted(prmtops, key=utilities.getPrmtopNum)
         # To follow the same order as PELE (important for processor mapping)
         structures_to_run = structures_to_run[1:]+[structures_to_run[0]]
         structures_to_run = [structure for i, structure in zip(range(self.parameters.processors), itertools.cycle(structures_to_run))]
