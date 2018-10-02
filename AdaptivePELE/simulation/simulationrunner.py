@@ -1289,7 +1289,8 @@ class RunnerBuilder:
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
             params.numReplicas = paramsBlock[blockNames.SimulationParams.numReplicas]
             params.devicesPerTrajectory = paramsBlock.get(blockNames.SimulationParams.devicesPerTrajectory, 1)
-            params.trajsPerReplica = int(params.processors/(params.numReplicas*params.devicesPerTrajectory))
+            params.trajsPerReplica = int(params.processors/params.numReplicas)
+            assert params.trajsPerReplica*params.numReplicas == params.processors, "Number of trajectories requested does not match the number of replicas"
             params.runEquilibration = True
             params.equilibrationLengthNVT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNVT, 200000)
             params.equilibrationLengthNPT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNPT, 500000)
