@@ -309,6 +309,15 @@ class PDBManager:
                     print("Warning: Possible gap found in chain %s between residue %s and %s" % (chain.id, prev_residue, residue.num))
                 prev_residue = residue.num
 
+    def checkLigand(self):
+        for chain in self.Ligand:
+            for residue in chain:
+                for atom in residue:
+                    if atom.id.startswith("CL"):
+                        oldname = atom.id
+                        atom.id = "Cl%s" % oldname[2:]
+                        print("Atom %s of %s rename to %s" % (oldname, self.resname, atom.id))
+
     def preparePDBforMD(self):
         """
         Method that prepares the pdb to be used in adaptivePELE MD simulation
@@ -322,6 +331,8 @@ class PDBManager:
         self.loadDisulphideBonds()
         # check the protonation states of the histidines
         self.checkprotonation()
+        # Rename atoms from the ligand to match parmchk atom names
+        self.checkLigand()
         # Make a unique chain for the protein to avoid problems with Tleap
         # Because Tleap doesn't support chain ids
         self.joinChains()
@@ -466,7 +477,3 @@ class Atom(PDBase):
             self.ocupancy = float(self.ocupancy)
         self.Bfactor = Bfactor
 
-
-if __name__ == "__main__":
-    pdb = PDBManager("/home/Oriol/PycharmProjects/analyzemd/probas/initial_31.pdb","L01")
-    pdb.preparePDBforMD()
