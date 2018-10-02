@@ -139,7 +139,7 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     inpcrd = app.AmberInpcrdFile(inpcrd)
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
     if parameters.runningPlatform == "CUDA":
-        platformProperties = {"Precision": "mixed", "DeviceIndex": "%d" % worker, "UseCpuPme": "false"}
+        platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(worker, parameters.devicesPerTrajectory), "UseCpuPme": "false"}
     else:
         platformProperties = {}
     if worker == 0:
@@ -365,7 +365,8 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     pdb = app.PDBFile(str(pdb))
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
     if parameters.runningPlatform == "CUDA":
-        platformProperties = {"Precision": "mixed", "DeviceIndex": "%d" % deviceIndex, "UseCpuPme": "false"}
+        platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(deviceIndex, parameters.devicesPerTrajectory), "UseCpuPme": "false"}
+
     else:
         platformProperties = {}
     system = prmtop.createSystem(nonbondedMethod=app.PME,
@@ -425,3 +426,18 @@ def getLastStep(reportfile):
     except FileNotFoundError:
         last_step = 0
     return int(last_step)
+
+
+def getDeviceIndexStr(deviceIndex, devicesPerReplica):
+    """
+        Create a string to pass to OpenMM platform to select the resources to use
+
+        :param deviceIndex: Index of the trajectory in the replica
+        :type deviceIndex: int
+        :param devicesPerReplica: Number of devices to use per trajectory
+        :type devicesPerReplica: int
+
+        :returns: str -- String that tells OpenMM how to use the resources
+    """
+    devices = map(str, list(range(deviceIndex, deviceIndex+devicesPerReplica)))
+    return ",".join(devices)
