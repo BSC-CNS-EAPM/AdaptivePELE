@@ -795,6 +795,17 @@ class MDSimulation(SimulationRunner):
 
         if not OPENMM:
             raise utilities.UnsatisfiedDependencyException("No installation of OpenMM found. Please, install OpenMM to run MD simulations.")
+        if not self.checkAmbertools():
+            raise utilities.UnsatisfiedDependencyException("No installation of AmberTools found. Please, install AmberTools to run MD simulations.")
+
+    def checkAmbertools(self):
+        try:
+            subprocess.Popen(['antechamber'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            return True
+        except OSError:
+            # If antechamber is not defined (i.e. ambertools not available)
+            # popen raises an OSError
+            return False
 
     def getWorkingProcessors(self):
         """
@@ -959,14 +970,16 @@ class MDSimulation(SimulationRunner):
         startTime = time.time()
         proc = subprocess.Popen(antechamberCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
-        print(out)
+        if out:
+            print(out)
         if err:
             print("Error Found: %s" % err)
             raise utilities.UnsatisfiedDependencyException("Error Runing Antechamber. Please check your installation of Ambertools.")
         print(parmchkCommand)
         proc = subprocess.Popen(parmchkCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
-        print(out)
+        if out:
+            print(out)
         if err:
             print("Error Found: %s" % err)
             raise utilities.UnsatisfiedDependencyException("Error Runing Parmchk2. Please check your installation of Ambertools.")
