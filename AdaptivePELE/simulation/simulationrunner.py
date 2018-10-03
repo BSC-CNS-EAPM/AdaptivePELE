@@ -826,7 +826,7 @@ class MDSimulation(SimulationRunner):
 
             :returns: list -- List with initial structures
         """
-        if self.parameters.trajsPerReplica*processManager.id > len(initialStructures):
+        if self.parameters.trajsPerReplica*processManager.id >= len(initialStructures):
             # Only need to launch as many simulations as initial structures
             # synchronize the replicas that will not run equilibration with the
             # replicas that will do, i.e with the synchronize in the middle of
