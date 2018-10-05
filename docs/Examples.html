@@ -128,6 +128,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#dynamical-hooks">Dynamical hooks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#non-pdb-trajectories">Non-PDB trajectories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ligand-preparation-for-md">Ligand preparation for MD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#equilibration-procedure-in-md">Equilibration procedure in MD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-adaptivepele-with-gpus">Running AdaptivePELE with GPUs</a></li>
 </ul>
 </li>
@@ -384,6 +385,13 @@ run the energy minimization</li>
 trajectory, this parameter only applies if using the <em>CUDA</em> platformn. Note
 that <strong>devicesPerTrajectory*numReplicas</strong> should correspond to the number of
 gpus per node that you have available</li>
+<li><strong>constraintsMinimization</strong> (<em>float</em>, default=5.0): Value of the constraints
+for the minimization (in kcal/(mol*A<sup>2</sup>)), see <a class="reference internal" href="#equilibration-procedure-in-md">Equilibration procedure in MD</a> section
+for more details on the equilibration procedure</li>
+<li><strong>constraintsNVT</strong> (<em>float</em>, default=5.0): Value of the constraints
+for the NVT equilibration (in kcal/(mol*A**2))</li>
+<li><strong>constraintsNPT</strong> (<em>float</em>, default=0.5): Value of the constraints
+for the NPT equilibration (in kcal/(mol*A**2))</li>
 </ul>
 </div>
 <div class="section" id="exit-condition">
@@ -878,6 +886,33 @@ described with the file topology.pdb</p>
 <p>Currently for running MD with protein-ligand systems we use AmberTools and the
 gaff forcefield for the ligand, and the Amber99 forcefield for the protein.</p>
 </div>
+<div class="section" id="equilibration-procedure-in-md">
+<h2>Equilibration procedure in MD<a class="headerlink" href="#equilibration-procedure-in-md" title="Permalink to this headline">¶</a></h2>
+<p>The equilibration procedure followed in the MD simulations in AdaptivePELE will
+be run for each initial structure independently (note that this imposes the
+restriction that the <strong>processors</strong> parameter (i.e. the number of trajectories
+in the simulation) has to be greater or equal than the number of initial
+structures.</p>
+<p>For each structure the following process is run:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Energy minimization with constraints on the ligand and protein heavy
+atoms. The length of the minimiation is determined by the
+<strong>minimizationIterations</strong> parameter and the strength of the constraints
+is determined by the <strong>constraintsMinimization</strong> parameter</li>
+<li>Constant volume and temperature equilibration (NVT) with constraints on the ligand and protein heavy
+atoms. The length of the minimiation is determined by the
+<strong>equilibrationLengthNVT</strong> parameter and the strength of the constraints
+is determined by the <strong>constraintsNVT</strong> parameter</li>
+<li>Constant pressure and temperature equilibration (NPT) with constraints on the ligand heavy
+atoms and the protein alpha carbons. The length of the minimiation is determined by the
+<strong>equilibrationLengthNPT</strong> parameter and the strength of the constraints
+is determined by the <strong>constraintsNPT</strong> parameter. Note that typically
+the strength of the constraints in this last step will be lower to
+produce a gradual transition into the unconstrained production run</li>
+</ol>
+</div></blockquote>
+</div>
 <div class="section" id="running-adaptivepele-with-gpus">
 <h2>Running AdaptivePELE with GPUs<a class="headerlink" href="#running-adaptivepele-with-gpus" title="Permalink to this headline">¶</a></h2>
 <p>Starting from version 1.6, AdaptivePELE runs in different replicas (ony for MD
@@ -918,6 +953,7 @@ and 4 trajectories per replica (8 trajectories total):</p>
             <span class="s2">&quot;reporterFrequency&quot;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
             <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">67891</span><span class="p">,</span>
             <span class="s2">&quot;runningPlatform&quot;</span><span class="p">:</span> <span class="s2">&quot;CUDA&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;devicesPerTrajectory&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
             <span class="s2">&quot;ligandCharge&quot;</span><span class="p">:</span> <span class="mi">1</span>
         <span class="p">}</span>
     <span class="p">},</span>

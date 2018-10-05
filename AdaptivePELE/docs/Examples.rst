@@ -233,6 +233,14 @@ Optionally, you can also use the following parameters:
   trajectory, this parameter only applies if using the *CUDA* platformn. Note
   that **devicesPerTrajectory*numReplicas** should correspond to the number of
   gpus per node that you have available
+* **constraintsMinimization** (*float*, default=5.0): Value of the constraints
+  for the minimization (in kcal/(mol*A\ :sup:`2`)), see `Equilibration procedure in MD`_ section 
+  for more details on the equilibration procedure
+* **constraintsNVT** (*float*, default=5.0): Value of the constraints
+  for the NVT equilibration (in kcal/(mol*A\ :sup:`2`))
+* **constraintsNPT** (*float*, default=0.5): Value of the constraints
+  for the NPT equilibration (in kcal/(mol*A\ :sup:`2`))
+
 
 Exit condition
 ..............
@@ -779,6 +787,35 @@ Currently for running MD with protein-ligand systems we use AmberTools and the
 gaff forcefield for the ligand, and the Amber99 forcefield for the protein.
 
 
+Equilibration procedure in MD
+-----------------------------
+
+The equilibration procedure followed in the MD simulations in AdaptivePELE will
+be run for each initial structure independently (note that this imposes the
+restriction that the **processors** parameter (i.e. the number of trajectories
+in the simulation) has to be greater or equal than the number of initial
+structures.
+
+For each structure the following process is run:
+
+    1) Energy minimization with constraints on the ligand and protein heavy
+       atoms. The length of the minimiation is determined by the
+       **minimizationIterations** parameter and the strength of the constraints
+       is determined by the **constraintsMinimization** parameter
+
+    2) Constant volume and temperature equilibration (NVT) with constraints on the ligand and protein heavy
+       atoms. The length of the minimiation is determined by the
+       **equilibrationLengthNVT** parameter and the strength of the constraints
+       is determined by the **constraintsNVT** parameter
+
+    3) Constant pressure and temperature equilibration (NPT) with constraints on the ligand heavy
+       atoms and the protein alpha carbons. The length of the minimiation is determined by the
+       **equilibrationLengthNPT** parameter and the strength of the constraints
+       is determined by the **constraintsNPT** parameter. Note that typically
+       the strength of the constraints in this last step will be lower to
+       produce a gradual transition into the unconstrained production run
+
+
 Running AdaptivePELE with GPUs
 ------------------------------
 
@@ -821,6 +858,7 @@ and 4 trajectories per replica (8 trajectories total)::
                 "reporterFrequency": 2000,
                 "seed": 67891,
                 "runningPlatform": "CUDA",
+                "devicesPerTrajectory": 1,
                 "ligandCharge": 1
             }
         },
