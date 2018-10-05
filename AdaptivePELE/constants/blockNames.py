@@ -154,6 +154,9 @@ class SimulationParams:
     timeStep = "timeStep"
     equilibrationLengthNVT = "equilibrationLengthNVT"
     equilibrationLengthNPT = "equilibrationLengthNPT"
+    constraintsMin = "constraintsMinimization"
+    constraintsNVT = "constraintsNVT"
+    constraintsNPT = "constraintsNPT"
     devicesPerTrajectory = "devicesPerTrajectory"
 
 

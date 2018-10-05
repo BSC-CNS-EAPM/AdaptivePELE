@@ -144,7 +144,7 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
         platformProperties = {}
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of minimization" % parameters.minimizationIterations)
-    simulation = minimization(prmtop, inpcrd, PLATFORM, 5, parameters, platformProperties)
+    simulation = minimization(prmtop, inpcrd, PLATFORM, parameters.constraintsMin, parameters, platformProperties)
     # Retrieving the state is expensive (especially when running on GPUs) so we
     # only called it once and then separate positions and velocities
     state = simulation.context.getState(getPositions=True, getVelocities=True)
@@ -152,13 +152,13 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     velocities = state.getVelocities()
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of NVT equilibration" % parameters.equilibrationLengthNVT)
-    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNVT, 5, parameters, reportName, platformProperties, velocities=velocities)
+    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNVT, parameters.constraintsNVT, parameters, reportName, platformProperties, velocities=velocities)
     state = simulation.context.getState(getPositions=True, getVelocities=True)
     positions = state.getPositions()
     velocities = state.getVelocities()
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of NPT equilibration" % parameters.equilibrationLengthNPT)
-    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNPT, 0.5, parameters, reportName, platformProperties, velocities=velocities)
+    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNPT, parameters.constraintsNPT, parameters, reportName, platformProperties, velocities=velocities)
     outputPDB = "%s_NPT.pdb" % reportName
     with open(outputPDB, 'w') as fw:
         app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)

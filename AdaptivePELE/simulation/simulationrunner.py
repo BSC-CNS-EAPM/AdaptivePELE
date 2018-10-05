@@ -79,6 +79,9 @@ class SimulationParameters:
         self.equilibrationLengthNVT = 200000
         self.equilibrationLengthNPT = 500000
         self.devicesPerTrajectory = 1
+        self.constraintsMin = 5
+        self.constraintsNVT = 5
+        self.constraintsNPT = 0.5
 
 
 class SimulationRunner:
@@ -1316,6 +1319,9 @@ class RunnerBuilder:
             params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
             params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
             params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
+            params.constraintsMin = paramsBlock.get(blockNames.SimulationParams.constraintsMin, 5)
+            params.constraintsNVT = paramsBlock.get(blockNames.SimulationParams.constraintsNVT, 5)
+            params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
