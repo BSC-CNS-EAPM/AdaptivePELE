@@ -127,6 +127,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#analysis">Analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dynamical-hooks">Dynamical hooks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#non-pdb-trajectories">Non-PDB trajectories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ligand-preparation-for-md">Ligand preparation for MD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-adaptivepele-with-gpus">Running AdaptivePELE with GPUs</a></li>
 </ul>
 </li>
@@ -872,6 +873,11 @@ convertTrajectory script, also in the analysis subpackage:</p>
 call shown above will convert the file 0/trajectory_3.xtc into the file output_pdb/trajectory_0_3.pdb, for a system that can be
 described with the file topology.pdb</p>
 </div>
+<div class="section" id="ligand-preparation-for-md">
+<h2>Ligand preparation for MD<a class="headerlink" href="#ligand-preparation-for-md" title="Permalink to this headline">¶</a></h2>
+<p>Currently for running MD with protein-ligand systems we use AmberTools and the
+gaff forcefield for the ligand, and the Amber99 forcefield for the protein.</p>
+</div>
 <div class="section" id="running-adaptivepele-with-gpus">
 <h2>Running AdaptivePELE with GPUs<a class="headerlink" href="#running-adaptivepele-with-gpus" title="Permalink to this headline">¶</a></h2>
 <p>Starting from version 1.6, AdaptivePELE runs in different replicas (ony for MD
@@ -938,8 +944,9 @@ like:</p>
 <span class="c1">#SBATCH --output=test_3ptb_Ad_MD_mt.out</span>
 <span class="c1">#SBATCH --error=test_3ptb_Ad_MD_mt.err</span>
 <span class="c1">#SBATCH --ntasks=2</span>
-<span class="c1">#SBATCH --cpus-per-task=8</span>
-<span class="c1">#SBATCH --time=00:10:00</span>
+<span class="c1">#SBATCH --nodes=2</span>
+<span class="c1">#SBATCH --cpus-per-task=16</span>
+<span class="c1">#SBATCH --time=01:00:00</span>
 <span class="c1">#SBATCH --constraint=k80</span>
 <span class="c1">#SBATCH --gres gpu:4</span>
 

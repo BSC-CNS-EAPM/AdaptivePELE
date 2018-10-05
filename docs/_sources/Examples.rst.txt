@@ -772,6 +772,13 @@ call shown above will convert the file 0/trajectory_3.xtc into the file output_p
 described with the file topology.pdb
 
 
+Ligand preparation for MD
+-------------------------
+
+Currently for running MD with protein-ligand systems we use AmberTools and the
+gaff forcefield for the ligand, and the Amber99 forcefield for the protein.
+
+
 Running AdaptivePELE with GPUs
 ------------------------------
 
@@ -841,8 +848,9 @@ like::
     #SBATCH --output=test_3ptb_Ad_MD_mt.out
     #SBATCH --error=test_3ptb_Ad_MD_mt.err
     #SBATCH --ntasks=2
-    #SBATCH --cpus-per-task=8
-    #SBATCH --time=00:10:00
+    #SBATCH --nodes=2
+    #SBATCH --cpus-per-task=16
+    #SBATCH --time=01:00:00
     #SBATCH --constraint=k80
     #SBATCH --gres gpu:4
 
