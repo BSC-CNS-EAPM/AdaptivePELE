@@ -9,6 +9,7 @@ import sys
 import numpy as np
 import ast
 import glob
+import subprocess32
 from builtins import range
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
@@ -36,6 +37,7 @@ class SimulationParameters:
         self.peleSteps = 0
         self.seed = 0
         self.exitCondition = None
+	self.time = None
         self.boxCenter = None
         self.boxRadius = 20
         self.modeMovingBox = None
@@ -270,16 +272,24 @@ class PeleSimulation(SimulationRunner):
         if self.parameters.srun:
             toRun = ["srun", "-n", str(self.parameters.processors)]+ self.parameters.srunParameters +[self.parameters.executable, runningControlFile]
         else:
-            toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
-            toRun = map(str, toRun)
-        print(" ".join(toRun))
+            toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
+        toRun = " ".join(toRun)
+        print(toRun)
         startTime = time.time()
-        proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
-        (out, err) = proc.communicate()
-        if out:
-            print(out)
-        if err:
-            print(err)
+	if self.parameters.time:
+		try:
+        		proc = subprocess32.Popen(toRun, stdout=subprocess.PIPE,  shell=True,  universal_newlines=True)
+        		(out, err) = proc.communicate(timeout=self.parameters.time)
+		except subprocess32.TimeoutExpired:
+			print("killing")
+			proc.kill()
+	else:		
+        	proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+        	(out, err) = proc.communicate()
+        	print(out)
+        	if err:
+            		print(err)
+
 
         endTime = time.time()
         print("PELE took %.2f sec" % (endTime - startTime))
@@ -768,6 +778,7 @@ class RunnerBuilder:
         params = SimulationParameters()
         if simulationType == blockNames.SimulationType.pele:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
+            params.time = paramsBlock.get(blockNames.SimulationParams.time, None)
             params.dataFolder = paramsBlock.get(blockNames.SimulationParams.dataFolder, constants.DATA_FOLDER)
             params.documentsFolder = paramsBlock.get(blockNames.SimulationParams.documentsFolder, constants.DOCUMENTS_FOLDER)
             params.executable = paramsBlock.get(blockNames.SimulationParams.executable, constants.PELE_EXECUTABLE)
