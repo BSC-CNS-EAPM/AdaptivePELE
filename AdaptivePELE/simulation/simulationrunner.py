@@ -1259,6 +1259,8 @@ class RunnerBuilder:
             params.dataFolder = paramsBlock.get(blockNames.SimulationParams.dataFolder, constants.DATA_FOLDER)
             params.documentsFolder = paramsBlock.get(blockNames.SimulationParams.documentsFolder, constants.DOCUMENTS_FOLDER)
             params.executable = paramsBlock.get(blockNames.SimulationParams.executable, constants.PELE_EXECUTABLE)
+            if params.dataFolder is None or params.documentsFolder is None or params.executable is None:
+                raise utilities.ImproperParameterValueException("PELE parameters not defined! Please ensure that you have defined the path to the PELE executable, the Data and Documents paths")
             params.templetizedControlFile = paramsBlock[blockNames.SimulationParams.templetizedControlFile]
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
