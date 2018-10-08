@@ -1011,7 +1011,7 @@ class MDSimulation(SimulationRunner):
         if self.restart:
             if epoch == 0:
                 # if the epoch is 0 the original equilibrated pdb files are taken as intial structures
-                equilibrated_structures = glob.glob(os.path.join(outputPathConstants.equilibrationDir, "equilibrated*pdb"))
+                equilibrated_structures = glob.glob(os.path.join(outputPathConstants.topologies, "top*pdb"))
                 structures_to_run = sorted(equilibrated_structures, key=utilities.getTrajNum)
             checkpoints = glob.glob(os.path.join(outputDir, "checkpoint*.chk"))
             checkpoints = sorted(checkpoints, key=utilities.getTrajNum)
