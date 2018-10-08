@@ -78,6 +78,10 @@ class SimulationParameters:
         self.numReplicas = 1
         self.equilibrationLengthNVT = 200000
         self.equilibrationLengthNPT = 500000
+        self.devicesPerTrajectory = 1
+        self.constraintsMin = 5
+        self.constraintsNVT = 5
+        self.constraintsNPT = 0.5
 
 
 class SimulationRunner:
@@ -794,6 +798,17 @@ class MDSimulation(SimulationRunner):
 
         if not OPENMM:
             raise utilities.UnsatisfiedDependencyException("No installation of OpenMM found. Please, install OpenMM to run MD simulations.")
+        if not self.checkAmbertools():
+            raise utilities.UnsatisfiedDependencyException("No installation of AmberTools found. Please, install AmberTools to run MD simulations.")
+
+    def checkAmbertools(self):
+        try:
+            subprocess.Popen(['antechamber'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            return True
+        except OSError:
+            # If antechamber is not defined (i.e. ambertools not available)
+            # popen raises an OSError
+            return False
 
     def getWorkingProcessors(self):
         """
@@ -825,7 +840,7 @@ class MDSimulation(SimulationRunner):
 
             :returns: list -- List with initial structures
         """
-        if self.parameters.trajsPerReplica*processManager.id > len(initialStructures):
+        if self.parameters.trajsPerReplica*processManager.id >= len(initialStructures):
             # Only need to launch as many simulations as initial structures
             # synchronize the replicas that will not run equilibration with the
             # replicas that will do, i.e with the synchronize in the middle of
@@ -958,14 +973,16 @@ class MDSimulation(SimulationRunner):
         startTime = time.time()
         proc = subprocess.Popen(antechamberCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
-        print(out)
+        if out:
+            print(out)
         if err:
             print("Error Found: %s" % err)
             raise utilities.UnsatisfiedDependencyException("Error Runing Antechamber. Please check your installation of Ambertools.")
         print(parmchkCommand)
         proc = subprocess.Popen(parmchkCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
         (out, err) = proc.communicate()
-        print(out)
+        if out:
+            print(out)
         if err:
             print("Error Found: %s" % err)
             raise utilities.UnsatisfiedDependencyException("Error Runing Parmchk2. Please check your installation of Ambertools.")
@@ -995,14 +1012,14 @@ class MDSimulation(SimulationRunner):
             if epoch == 0:
                 # if the epoch is 0 the original equilibrated pdb files are taken as intial structures
                 equilibrated_structures = glob.glob(os.path.join(outputPathConstants.equilibrationDir, "equilibrated*pdb"))
-                structures_to_run = sorted(equilibrated_structures, key=lambda x: utilities.getTrajNum(x))
+                structures_to_run = sorted(equilibrated_structures, key=utilities.getTrajNum)
             checkpoints = glob.glob(os.path.join(outputDir, "checkpoint*.chk"))
-            checkpoints = sorted(checkpoints, key=lambda x: utilities.getTrajNum(x))
+            checkpoints = sorted(checkpoints, key=utilities.getTrajNum)
         # always read the prmtop files from disk to serve as communication
         # between diffrent processses
         prmtops = glob.glob(os.path.join(outputPathConstants.topologies, "*prmtop"))
         # sort the prmtops according to the original topology order
-        self.prmtopFiles = sorted(prmtops, key=lambda x: utilities.getPrmtopNum(x))
+        self.prmtopFiles = sorted(prmtops, key=utilities.getPrmtopNum)
         # To follow the same order as PELE (important for processor mapping)
         structures_to_run = structures_to_run[1:]+[structures_to_run[0]]
         structures_to_run = [structure for i, structure in zip(range(self.parameters.processors), itertools.cycle(structures_to_run))]
@@ -1242,6 +1259,8 @@ class RunnerBuilder:
             params.dataFolder = paramsBlock.get(blockNames.SimulationParams.dataFolder, constants.DATA_FOLDER)
             params.documentsFolder = paramsBlock.get(blockNames.SimulationParams.documentsFolder, constants.DOCUMENTS_FOLDER)
             params.executable = paramsBlock.get(blockNames.SimulationParams.executable, constants.PELE_EXECUTABLE)
+            if params.dataFolder is None or params.documentsFolder is None or params.executable is None:
+                raise utilities.ImproperParameterValueException("PELE parameters not defined! Please ensure that you have defined the path to the PELE executable, the Data and Documents paths")
             params.templetizedControlFile = paramsBlock[blockNames.SimulationParams.templetizedControlFile]
             params.iterations = paramsBlock[blockNames.SimulationParams.iterations]
             params.peleSteps = paramsBlock[blockNames.SimulationParams.peleSteps]
@@ -1287,7 +1306,9 @@ class RunnerBuilder:
             params.seed = paramsBlock[blockNames.SimulationParams.seed]
             params.reporterFreq = paramsBlock[blockNames.SimulationParams.repoterfreq]
             params.numReplicas = paramsBlock[blockNames.SimulationParams.numReplicas]
+            params.devicesPerTrajectory = paramsBlock.get(blockNames.SimulationParams.devicesPerTrajectory, 1)
             params.trajsPerReplica = int(params.processors/params.numReplicas)
+            assert params.trajsPerReplica*params.numReplicas == params.processors, "Number of trajectories requested does not match the number of replicas"
             params.runEquilibration = True
             params.equilibrationLengthNVT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNVT, 200000)
             params.equilibrationLengthNPT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNPT, 500000)
@@ -1300,6 +1321,9 @@ class RunnerBuilder:
             params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
             params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
             params.minimizationIterations = paramsBlock.get(blockNames.SimulationParams.minimizationIterations, 2000)
+            params.constraintsMin = paramsBlock.get(blockNames.SimulationParams.constraintsMin, 5)
+            params.constraintsNVT = paramsBlock.get(blockNames.SimulationParams.constraintsNVT, 5)
+            params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]

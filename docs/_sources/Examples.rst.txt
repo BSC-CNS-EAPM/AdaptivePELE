@@ -226,9 +226,21 @@ Optionally, you can also use the following parameters:
 * **temperature** (*float*, default=300): Temperature of the simulation (in
   Kelvin)
 * **runningPlatform** (*str*, default=CPU): Platform on which to run the
-  simulation, options are {*CPU*, *CUDA*, *OpenCL*, *Reference*}, see openmm documentation for more details
+  simulation, options are {*CPU*, *CUDA*, *OpenCL*, *Reference*}, see  `openmm documentation <http://docs.openmm.org/7.1.0/userguide/library.html#platform-specific-properties>`_ for more details
 * **minimizationIterations** (*float*, default=2000): Number of time steps to
   run the energy minimization
+* **devicesPerTrajectory** (*int*, default=1): Number of gpus to use for each
+  trajectory, this parameter only applies if using the *CUDA* platformn. Note
+  that **devicesPerTrajectory*numReplicas** should correspond to the number of
+  gpus per node that you have available
+* **constraintsMinimization** (*float*, default=5.0): Value of the constraints
+  for the minimization (in kcal/(mol*A\ :sup:`2`)), see `Equilibration procedure in MD`_ section 
+  for more details on the equilibration procedure
+* **constraintsNVT** (*float*, default=5.0): Value of the constraints
+  for the NVT equilibration (in kcal/(mol*A\ :sup:`2`))
+* **constraintsNPT** (*float*, default=0.5): Value of the constraints
+  for the NPT equilibration (in kcal/(mol*A\ :sup:`2`))
+
 
 Exit condition
 ..............
@@ -768,6 +780,42 @@ call shown above will convert the file 0/trajectory_3.xtc into the file output_p
 described with the file topology.pdb
 
 
+Ligand preparation for MD
+-------------------------
+
+Currently for running MD with protein-ligand systems we use AmberTools and the
+gaff forcefield for the ligand, and the Amber99 forcefield for the protein.
+
+
+Equilibration procedure in MD
+-----------------------------
+
+The equilibration procedure followed in the MD simulations in AdaptivePELE will
+be run for each initial structure independently (note that this imposes the
+restriction that the **processors** parameter (i.e. the number of trajectories
+in the simulation) has to be greater or equal than the number of initial
+structures.
+
+For each structure the following process is run:
+
+    1) Energy minimization with constraints on the ligand and protein heavy
+       atoms. The length of the minimiation is determined by the
+       **minimizationIterations** parameter and the strength of the constraints
+       is determined by the **constraintsMinimization** parameter
+
+    2) Constant volume and temperature equilibration (NVT) with constraints on the ligand and protein heavy
+       atoms. The length of the minimiation is determined by the
+       **equilibrationLengthNVT** parameter and the strength of the constraints
+       is determined by the **constraintsNVT** parameter
+
+    3) Constant pressure and temperature equilibration (NPT) with constraints on the ligand heavy
+       atoms and the protein alpha carbons. The length of the minimiation is determined by the
+       **equilibrationLengthNPT** parameter and the strength of the constraints
+       is determined by the **constraintsNPT** parameter. Note that typically
+       the strength of the constraints in this last step will be lower to
+       produce a gradual transition into the unconstrained production run
+
+
 Running AdaptivePELE with GPUs
 ------------------------------
 
@@ -810,6 +858,7 @@ and 4 trajectories per replica (8 trajectories total)::
                 "reporterFrequency": 2000,
                 "seed": 67891,
                 "runningPlatform": "CUDA",
+                "devicesPerTrajectory": 1,
                 "ligandCharge": 1
             }
         },
@@ -837,13 +886,15 @@ like::
     #SBATCH --output=test_3ptb_Ad_MD_mt.out
     #SBATCH --error=test_3ptb_Ad_MD_mt.err
     #SBATCH --ntasks=2
-    #SBATCH --cpus-per-task=8
-    #SBATCH --time=00:10:00
+    #SBATCH --nodes=2
+    #SBATCH --cpus-per-task=16
+    #SBATCH --time=01:00:00
     #SBATCH --constraint=k80
     #SBATCH --gres gpu:4
 
-
-    srun python /home/bsc72/bsc72021/AdaptiveMT/adaptivePELE/AdaptivePELE/adaptiveSampling.py control_file_MD_3ptb_mt.conf
+    module load intel/16.0.2 amber/16 python/2.7.2 2> /dev/null
+    export PYTHONPATH="/gpfs/projects/bsc72/AdaptiveSampling/bin_mt/v1.6:/gpfs/projects/bsc72/lib/site-packages_minot"
+    srun python -m AdaptivePELE.adaptiveSampling control_file_MD_3ptb_mt.conf
 
 Note also that this job requests 8 cpus per replica. At least a number of cpus
 per replica equal to the number of trajectories per replica are required.

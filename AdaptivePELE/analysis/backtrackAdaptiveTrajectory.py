@@ -20,9 +20,8 @@ def parseArguments():
     """
         Parse the command-line options
 
-        :returns: :py:class:`.Clustering`, int, int, int, str -- Clustering
-            object, number of trajectory, number of snapshot, number of epoch,
-            output path where to write the files
+        :returns: int, int, int, str, str, str --  number of trajectory, number of snapshot, number of epoch,
+            output path where to write the files, name of the files, name of the topology
     """
     desc = "Write the information related to the conformation network to file\n"
     parser = argparse.ArgumentParser(description=desc)
@@ -64,15 +63,20 @@ def main(trajectory, snapshot, epoch, outputPath, out_filename, topology):
         if not filename:
             raise ValueError("Trajectory %s not found!" % os.path.join(pathPrefix, epoch, "*traj*_%d.*" % trajectory))
         snapshots = utilities.getSnapshots(filename[0])
+        if epoch == '0':
+            initial = 0
+        else:
+            # avoid repeating the initial snapshot
+            initial = 1
         if not isinstance(snapshots[0], basestring):
             new_snapshots = []
-            for i in range(snapshot+1):
+            for i in range(initial, snapshot+1):
                 PDB = atomset.PDB()
                 PDB.initialise(snapshots[i], topology=topology_contents)
                 new_snapshots.append(PDB.pdb)
             snapshots = new_snapshots
         else:
-            snapshots = snapshots[:snapshot+1]
+            snapshots = snapshots[initial:snapshot+1]
         pathway.insert(0, snapshots)
         if epoch == '0':
             # Once we get to epoch 0, we just need to append the trajectory

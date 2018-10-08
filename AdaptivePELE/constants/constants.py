@@ -35,10 +35,10 @@ elif machine == "bscls309":
     DATA_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Data"
     DOCUMENTS_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Documents"
 
-elif machine == "bscls444":
-    PELE_EXECUTABLE = ""
-    DATA_FOLDER = ""
-    DOCUMENTS_FOLDER = ""
+else:
+    PELE_EXECUTABLE = None
+    DATA_FOLDER = None
+    DOCUMENTS_FOLDER = None
 
 
 inputFileTemplate = "{ \"files\" : [ { \"path\" : \"%s\" } ] }"
@@ -80,6 +80,7 @@ class OutputPathConstants():
         self.tmpInitialStructuresEquilibrationTemplate = ""
         self.tmpControlFilenameEqulibration = ""
         self.buildConstants(outputPath)
+        self.topologies = ""
 
     def buildConstants(self, outputPath):
         self.buildOutputPathConstants(outputPath)
@@ -101,4 +102,3 @@ class OutputPathConstants():
         self.tmpInitialStructuresEquilibrationTemplate = tmpFolder+"/initial_equilibration_%d.pdb"
         self.tmpControlFilename = tmpFolder+"/controlFile%d.conf"
         self.tmpControlFilenameEqulibration = tmpFolder+"/controlFile_equilibration_%d.conf"
-

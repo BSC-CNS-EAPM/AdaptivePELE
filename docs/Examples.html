@@ -127,6 +127,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#analysis">Analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dynamical-hooks">Dynamical hooks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#non-pdb-trajectories">Non-PDB trajectories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ligand-preparation-for-md">Ligand preparation for MD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#equilibration-procedure-in-md">Equilibration procedure in MD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-adaptivepele-with-gpus">Running AdaptivePELE with GPUs</a></li>
 </ul>
 </li>
@@ -376,9 +378,20 @@ the long-range interactions (in angstroms)</li>
 <li><strong>temperature</strong> (<em>float</em>, default=300): Temperature of the simulation (in
 Kelvin)</li>
 <li><strong>runningPlatform</strong> (<em>str</em>, default=CPU): Platform on which to run the
-simulation, options are {<em>CPU</em>, <em>CUDA</em>, <em>OpenCL</em>, <em>Reference</em>}, see openmm documentation for more details</li>
+simulation, options are {<em>CPU</em>, <em>CUDA</em>, <em>OpenCL</em>, <em>Reference</em>}, see  <a class="reference external" href="http://docs.openmm.org/7.1.0/userguide/library.html#platform-specific-properties">openmm documentation</a> for more details</li>
 <li><strong>minimizationIterations</strong> (<em>float</em>, default=2000): Number of time steps to
 run the energy minimization</li>
+<li><strong>devicesPerTrajectory</strong> (<em>int</em>, default=1): Number of gpus to use for each
+trajectory, this parameter only applies if using the <em>CUDA</em> platformn. Note
+that <strong>devicesPerTrajectory*numReplicas</strong> should correspond to the number of
+gpus per node that you have available</li>
+<li><strong>constraintsMinimization</strong> (<em>float</em>, default=5.0): Value of the constraints
+for the minimization (in kcal/(mol*A<sup>2</sup>)), see <a class="reference internal" href="#equilibration-procedure-in-md">Equilibration procedure in MD</a> section
+for more details on the equilibration procedure</li>
+<li><strong>constraintsNVT</strong> (<em>float</em>, default=5.0): Value of the constraints
+for the NVT equilibration (in kcal/(mol*A<sup>2</sup>))</li>
+<li><strong>constraintsNPT</strong> (<em>float</em>, default=0.5): Value of the constraints
+for the NPT equilibration (in kcal/(mol*A<sup>2</sup>))</li>
 </ul>
 </div>
 <div class="section" id="exit-condition">
@@ -868,6 +881,38 @@ convertTrajectory script, also in the analysis subpackage:</p>
 call shown above will convert the file 0/trajectory_3.xtc into the file output_pdb/trajectory_0_3.pdb, for a system that can be
 described with the file topology.pdb</p>
 </div>
+<div class="section" id="ligand-preparation-for-md">
+<h2>Ligand preparation for MD<a class="headerlink" href="#ligand-preparation-for-md" title="Permalink to this headline">¶</a></h2>
+<p>Currently for running MD with protein-ligand systems we use AmberTools and the
+gaff forcefield for the ligand, and the Amber99 forcefield for the protein.</p>
+</div>
+<div class="section" id="equilibration-procedure-in-md">
+<h2>Equilibration procedure in MD<a class="headerlink" href="#equilibration-procedure-in-md" title="Permalink to this headline">¶</a></h2>
+<p>The equilibration procedure followed in the MD simulations in AdaptivePELE will
+be run for each initial structure independently (note that this imposes the
+restriction that the <strong>processors</strong> parameter (i.e. the number of trajectories
+in the simulation) has to be greater or equal than the number of initial
+structures.</p>
+<p>For each structure the following process is run:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Energy minimization with constraints on the ligand and protein heavy
+atoms. The length of the minimiation is determined by the
+<strong>minimizationIterations</strong> parameter and the strength of the constraints
+is determined by the <strong>constraintsMinimization</strong> parameter</li>
+<li>Constant volume and temperature equilibration (NVT) with constraints on the ligand and protein heavy
+atoms. The length of the minimiation is determined by the
+<strong>equilibrationLengthNVT</strong> parameter and the strength of the constraints
+is determined by the <strong>constraintsNVT</strong> parameter</li>
+<li>Constant pressure and temperature equilibration (NPT) with constraints on the ligand heavy
+atoms and the protein alpha carbons. The length of the minimiation is determined by the
+<strong>equilibrationLengthNPT</strong> parameter and the strength of the constraints
+is determined by the <strong>constraintsNPT</strong> parameter. Note that typically
+the strength of the constraints in this last step will be lower to
+produce a gradual transition into the unconstrained production run</li>
+</ol>
+</div></blockquote>
+</div>
 <div class="section" id="running-adaptivepele-with-gpus">
 <h2>Running AdaptivePELE with GPUs<a class="headerlink" href="#running-adaptivepele-with-gpus" title="Permalink to this headline">¶</a></h2>
 <p>Starting from version 1.6, AdaptivePELE runs in different replicas (ony for MD
@@ -908,6 +953,7 @@ and 4 trajectories per replica (8 trajectories total):</p>
             <span class="s2">&quot;reporterFrequency&quot;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
             <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">67891</span><span class="p">,</span>
             <span class="s2">&quot;runningPlatform&quot;</span><span class="p">:</span> <span class="s2">&quot;CUDA&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;devicesPerTrajectory&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
             <span class="s2">&quot;ligandCharge&quot;</span><span class="p">:</span> <span class="mi">1</span>
         <span class="p">}</span>
     <span class="p">},</span>
@@ -934,13 +980,15 @@ like:</p>
 <span class="c1">#SBATCH --output=test_3ptb_Ad_MD_mt.out</span>
 <span class="c1">#SBATCH --error=test_3ptb_Ad_MD_mt.err</span>
 <span class="c1">#SBATCH --ntasks=2</span>
-<span class="c1">#SBATCH --cpus-per-task=8</span>
-<span class="c1">#SBATCH --time=00:10:00</span>
+<span class="c1">#SBATCH --nodes=2</span>
+<span class="c1">#SBATCH --cpus-per-task=16</span>
+<span class="c1">#SBATCH --time=01:00:00</span>
 <span class="c1">#SBATCH --constraint=k80</span>
 <span class="c1">#SBATCH --gres gpu:4</span>
 
-
-<span class="n">srun</span> <span class="n">python</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">bsc72</span><span class="o">/</span><span class="n">bsc72021</span><span class="o">/</span><span class="n">AdaptiveMT</span><span class="o">/</span><span class="n">adaptivePELE</span><span class="o">/</span><span class="n">AdaptivePELE</span><span class="o">/</span><span class="n">adaptiveSampling</span><span class="o">.</span><span class="n">py</span> <span class="n">control_file_MD_3ptb_mt</span><span class="o">.</span><span class="n">conf</span>
+<span class="n">module</span> <span class="n">load</span> <span class="n">intel</span><span class="o">/</span><span class="mf">16.0</span><span class="o">.</span><span class="mi">2</span> <span class="n">amber</span><span class="o">/</span><span class="mi">16</span> <span class="n">python</span><span class="o">/</span><span class="mf">2.7</span><span class="o">.</span><span class="mi">2</span> <span class="mi">2</span><span class="o">&gt;</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">null</span>
+<span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;/gpfs/projects/bsc72/AdaptiveSampling/bin_mt/v1.6:/gpfs/projects/bsc72/lib/site-packages_minot&quot;</span>
+<span class="n">srun</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">adaptiveSampling</span> <span class="n">control_file_MD_3ptb_mt</span><span class="o">.</span><span class="n">conf</span>
 </pre></div>
 </div>
 <p>Note also that this job requests 8 cpus per replica. At least a number of cpus

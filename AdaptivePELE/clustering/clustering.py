@@ -897,7 +897,10 @@ class Clustering(object):
             :param epoch: Epoch number
             :type epoch: int
         """
-        self.epoch += 1
+        if epoch is None:
+            self.epoch += 1
+        else:
+            self.epoch = epoch
         trajectories = getAllTrajectories(paths)
         for trajectory in trajectories:
             trajNum = utilities.getTrajNum(trajectory)

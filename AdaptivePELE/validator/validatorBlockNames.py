@@ -167,6 +167,10 @@ class SimulationParams:
         "trajectoriesPerReplica": "numbers.Real",
         "equilibrationLengthNVT": "numbers.Real",
         "equilibrationLengthNPT": "numbers.Real",
+        "devicesPerTrajectory": "int",
+        "constraintsMinimization": "numbers.Real",
+        "constraintsNVT": "numbers.Real",
+        "constraintsNPT": "numbers.Real",
         "numReplicas": "numbers.Real"
     }
     exitCondition = {

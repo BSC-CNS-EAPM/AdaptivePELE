@@ -139,12 +139,12 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     inpcrd = app.AmberInpcrdFile(inpcrd)
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
     if parameters.runningPlatform == "CUDA":
-        platformProperties = {"Precision": "mixed", "DeviceIndex": "%d" % worker, "UseCpuPme": "false"}
+        platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(worker, parameters.devicesPerTrajectory), "UseCpuPme": "false"}
     else:
         platformProperties = {}
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of minimization" % parameters.minimizationIterations)
-    simulation = minimization(prmtop, inpcrd, PLATFORM, 5, parameters, platformProperties)
+    simulation = minimization(prmtop, inpcrd, PLATFORM, parameters.constraintsMin, parameters, platformProperties)
     # Retrieving the state is expensive (especially when running on GPUs) so we
     # only called it once and then separate positions and velocities
     state = simulation.context.getState(getPositions=True, getVelocities=True)
@@ -152,13 +152,13 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     velocities = state.getVelocities()
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of NVT equilibration" % parameters.equilibrationLengthNVT)
-    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNVT, 5, parameters, reportName, platformProperties, velocities=velocities)
+    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNVT, parameters.constraintsNVT, parameters, reportName, platformProperties, velocities=velocities)
     state = simulation.context.getState(getPositions=True, getVelocities=True)
     positions = state.getPositions()
     velocities = state.getVelocities()
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of NPT equilibration" % parameters.equilibrationLengthNPT)
-    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNPT, 0.5, parameters, reportName, platformProperties, velocities=velocities)
+    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNPT, parameters.constraintsNPT, parameters, reportName, platformProperties, velocities=velocities)
     outputPDB = "%s_NPT.pdb" % reportName
     with open(outputPDB, 'w') as fw:
         app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions(), fw)
@@ -365,7 +365,8 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     pdb = app.PDBFile(str(pdb))
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
     if parameters.runningPlatform == "CUDA":
-        platformProperties = {"Precision": "mixed", "DeviceIndex": "%d" % deviceIndex, "UseCpuPme": "false"}
+        platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(deviceIndex, parameters.devicesPerTrajectory), "UseCpuPme": "false"}
+
     else:
         platformProperties = {}
     system = prmtop.createSystem(nonbondedMethod=app.PME,
@@ -425,3 +426,18 @@ def getLastStep(reportfile):
     except FileNotFoundError:
         last_step = 0
     return int(last_step)
+
+
+def getDeviceIndexStr(deviceIndex, devicesPerReplica):
+    """
+        Create a string to pass to OpenMM platform to select the resources to use
+
+        :param deviceIndex: Index of the trajectory in the replica
+        :type deviceIndex: int
+        :param devicesPerReplica: Number of devices to use per trajectory
+        :type devicesPerReplica: int
+
+        :returns: str -- String that tells OpenMM how to use the resources
+    """
+    devices = map(str, list(range(deviceIndex, deviceIndex+devicesPerReplica)))
+    return ",".join(devices)
