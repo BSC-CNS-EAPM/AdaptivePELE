@@ -237,9 +237,9 @@ Optionally, you can also use the following parameters:
   for the minimization (in kcal/(mol*A\ :sup:`2`)), see `Equilibration procedure in MD`_ section 
   for more details on the equilibration procedure
 * **constraintsNVT** (*float*, default=5.0): Value of the constraints
-  for the NVT equilibration (in kcal/(mol*A**2))
+  for the NVT equilibration (in kcal/(mol*A\ :sup:`2`))
 * **constraintsNPT** (*float*, default=0.5): Value of the constraints
-  for the NPT equilibration (in kcal/(mol*A**2))
+  for the NPT equilibration (in kcal/(mol*A\ :sup:`2`))
 
 
 Exit condition

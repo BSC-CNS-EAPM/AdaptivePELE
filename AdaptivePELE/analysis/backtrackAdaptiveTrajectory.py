@@ -20,9 +20,8 @@ def parseArguments():
     """
         Parse the command-line options
 
-        :returns: :py:class:`.Clustering`, int, int, int, str -- Clustering
-            object, number of trajectory, number of snapshot, number of epoch,
-            output path where to write the files
+        :returns: int, int, int, str, str, str --  number of trajectory, number of snapshot, number of epoch,
+            output path where to write the files, name of the files, name of the topology
     """
     desc = "Write the information related to the conformation network to file\n"
     parser = argparse.ArgumentParser(description=desc)

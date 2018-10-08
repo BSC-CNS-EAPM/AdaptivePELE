@@ -100,7 +100,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.numberOfClusters"><code class="docutils literal"><span class="pre">numberOfClusters</span></code> Module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.plotAdaptive"><code class="docutils literal"><span class="pre">plotAdaptive</span></code> Module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.writeClusteringStructures"><code class="docutils literal"><span class="pre">writeClusteringStructures</span></code> Module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.writePrecisePathToSnapshot"><code class="docutils literal"><span class="pre">writePrecisePathToSnapshot</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.backtrackAdaptiveTrajectory"><code class="docutils literal"><span class="pre">backtrackAdaptiveTrajectory</span></code> Module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.atomset.html">atomset Package</a></li>
@@ -612,21 +612,25 @@ as points, wether to plot the data as lines</td>
 </dd></dl>
 
 </div>
-<div class="section" id="module-AdaptivePELE.analysis.writePrecisePathToSnapshot">
-<span id="writeprecisepathtosnapshot-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">writePrecisePathToSnapshot</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.writePrecisePathToSnapshot" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-AdaptivePELE.analysis.backtrackAdaptiveTrajectory">
+<span id="backtrackadaptivetrajectory-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">backtrackAdaptiveTrajectory</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.backtrackAdaptiveTrajectory" title="Permalink to this headline">¶</a></h2>
 <p>Recreate the trajectory fragments to the led to the discovery of a snapshot,
 specified by the tuple (epoch, trajectory, snapshot) and write as a pdb file</p>
 <dl class="function">
-<dt id="AdaptivePELE.analysis.writePrecisePathToSnapshot.parseArguments">
-<code class="descclassname">AdaptivePELE.analysis.writePrecisePathToSnapshot.</code><code class="descname">parseArguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.analysis.writePrecisePathToSnapshot.parseArguments" title="Permalink to this definition">¶</a></dt>
+<dt id="AdaptivePELE.analysis.backtrackAdaptiveTrajectory.main">
+<code class="descclassname">AdaptivePELE.analysis.backtrackAdaptiveTrajectory.</code><code class="descname">main</code><span class="sig-paren">(</span><em>trajectory</em>, <em>snapshot</em>, <em>epoch</em>, <em>outputPath</em>, <em>out_filename</em>, <em>topology</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/backtrackAdaptiveTrajectory.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.backtrackAdaptiveTrajectory.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.analysis.backtrackAdaptiveTrajectory.parseArguments">
+<code class="descclassname">AdaptivePELE.analysis.backtrackAdaptiveTrajectory.</code><code class="descname">parseArguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/backtrackAdaptiveTrajectory.html#parseArguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.backtrackAdaptiveTrajectory.parseArguments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse the command-line options</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>, int, int, int, str – Clustering
-object, number of trajectory, number of snapshot, number of epoch,
-output path where to write the files</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int, int, int, str, str, str –  number of trajectory, number of snapshot, number of epoch,
+output path where to write the files, name of the files, name of the topology</td>
 </tr>
 </tbody>
 </table>

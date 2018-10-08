@@ -1037,7 +1037,10 @@
 <span class="sd">            :param epoch: Epoch number</span>
 <span class="sd">            :type epoch: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">epoch</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">epoch</span>
         <span class="n">trajectories</span> <span class="o">=</span> <span class="n">getAllTrajectories</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">trajectory</span> <span class="ow">in</span> <span class="n">trajectories</span><span class="p">:</span>
             <span class="n">trajNum</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTrajNum</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)</span>
