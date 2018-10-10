@@ -5,6 +5,7 @@ class ClusteringTypes:
     contactMap = "contactMap"
     lastSnapshot = "lastSnapshot"
     null = "null"
+    MSMClustering = "MSM"
     thresholdCalculator = "thresholdCalculator"
     ligandResname = "ligandResname"
     ligandResnum = "ligandResnum"

@@ -200,6 +200,9 @@ class clusteringTypes:
         },
         "null": {
             "ligandResname": "basestring"
+        },
+        "MSM": {
+            "ligandResname": "basestring"
         }
     }
     params = {

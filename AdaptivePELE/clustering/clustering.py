@@ -1,9 +1,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from builtins import range
+import os
 import sys
 import glob
+import heapq
 import numpy as np
-import os
+from scipy import stats
+from builtins import range
 from six import reraise as raise_
 from AdaptivePELE.constants import blockNames
 from AdaptivePELE.utilities import utilities
@@ -12,13 +14,17 @@ from AdaptivePELE.atomset import RMSDCalculator
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.clustering import clusteringTypes
 from AdaptivePELE.clustering import thresholdcalculator
-from scipy import stats
-import heapq
+from AdaptivePELE.freeEnergies import extractCoords as coord
 try:
     import networkx as nx
     NETWORK = True
 except ImportError:
     NETWORK = False
+PARALELLIZATION = True
+try:
+    import multiprocessing as mp
+except ImportError:
+    PARALELLIZATION = False
 
 
 class Clusters(object):
@@ -851,6 +857,9 @@ class Clustering(object):
         """
         return self.clusters.getCluster(clusterNum)
 
+    def setProcessors(self, processors):
+        pass
+
     def emptyClustering(self):
         """
             Delete previous results of clustering object
@@ -884,7 +893,7 @@ class Clustering(object):
             and self.resChain == other.resChain\
             and self.col == other.col
 
-    def cluster(self, paths, ignoreFirstRow=False, topology=None, epoch=None):
+    def cluster(self, paths, ignoreFirstRow=False, topology=None, epoch=None, allTrajs=None):
         """
             Cluster the snaptshots contained in the paths folder
 
@@ -896,6 +905,8 @@ class Clustering(object):
             :type topology: :py:class:`.Topology`
             :param epoch: Epoch number
             :type epoch: int
+            :param allTrajs: Folder to store the processed coordinates (only useful for MSMClustering)
+            :type allTrajs: str
         """
         if epoch is None:
             self.epoch += 1
@@ -1340,7 +1351,7 @@ class SequentialLastSnapshotClustering(Clustering):
                             altSelection=altSelection)
         self.type = clusteringTypes.CLUSTERING_TYPES.lastSnapshot
 
-    def cluster(self, paths, topology=None, epoch=None):
+    def cluster(self, paths, topology=None, epoch=None, allTrajs=None):
         """
             Cluster the snaptshots contained in the paths folder
 
@@ -1350,6 +1361,8 @@ class SequentialLastSnapshotClustering(Clustering):
             :type topology: :py:class:`.Topology`
             :param epoch: Epoch number
             :type epoch: int
+            :param allTrajs: Folder to store the processed coordinates (only useful for MSMClustering)
+            :type allTrajs: str
         """
         # Clean clusters at every step, so we only have the last snapshot of
         # each trajectory as clusters
@@ -1415,7 +1428,7 @@ class NullClustering(Clustering):
         Clustering.__init__(self)
         self.type = clusteringTypes.CLUSTERING_TYPES.null
 
-    def cluster(self, paths, topology=None, epoch=None):
+    def cluster(self, paths, topology=None, epoch=None, allTrajs=None):
         """
             Cluster the snaptshots contained in the paths folder
 
@@ -1425,6 +1438,8 @@ class NullClustering(Clustering):
             :type topology: :py:class:`.Topology`
             :param epoch: Epoch number
             :type epoch: int
+            :param allTrajs: Folder to store the processed coordinates (only useful for MSMClustering)
+            :type allTrajs: str
         """
         pass
 
@@ -1452,6 +1467,87 @@ class NullClustering(Clustering):
             summaryFile.write("Using null clustering, no clusters available\n")
 
         utilities.writeObject(outputObject, self, protocol=2)
+
+
+class MSMClustering(Clustering):
+    """
+        Cluster the trajectories to estimate a Markov State Model (MSM)
+    """
+    def __init__(self, tica=False, resname="", resnum=0, resChain="", symmetries=None):
+        Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain)
+        self.type = clusteringTypes.CLUSTERING_TYPES.MSMClustering
+        self.nprocessors = None
+        self.tica = tica
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"type": self.type, "clusters": self.clusters,
+                 "reportBaseFilename": self.reportBaseFilename,
+                 "resname": self.resname, "resnum": self.resnum,
+                 "resChain": self.resChain, "col": self.col,
+                 "epoch": self.epoch, "symmetries": self.symmetries}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.type = state['type']
+        self.clusters = state['clusters']
+        self.reportBaseFilename = state.get('reportBaseFilename')
+        self.resname = state.get('resname', "")
+        self.resnum = state.get('resnum', 0)
+        self.resChain = state.get('resChain', "")
+        self.col = state.get('col')
+        self.epoch = state.get('epoch', -1)
+        self.symmetries = state.get('symmetries', [])
+        if isinstance(self.symmetries, dict):
+            self.symmetries = [self.symmetries]
+
+    def setProcessors(self, processors):
+        self.nprocessors = processors
+
+    def cluster(self, paths, topology=None, epoch=None, allTrajs=None):
+        """
+            Cluster the snaptshots contained in the paths folder
+
+            :param paths: List of folders with the snapshots
+            :type paths: list
+            :param topology: Topology object containing the set of topologies needed for the simulation
+            :type topology: :py:class:`.Topology`
+            :param epoch: Epoch number
+            :type epoch: int
+            :param allTrajs: Folder to store the processed coordinates (only useful for MSMClustering)
+            :type allTrajs: str
+        """
+        if epoch is None:
+            self.epoch += 1
+        else:
+            self.epoch = epoch
+        trajectories = getAllTrajectories(paths)
+        # extract coordinates
+        constants = coord.Constants()
+        if PARALELLIZATION and self.nprocessors is not None:
+            pool = mp.Pool(self.nprocessors)
+        else:
+            pool = None
+        workers = []
+        for filename in trajectories:
+            if pool is None:
+                # serial version
+                coord.writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, False, constants, writeCA, sidechains, topology=topology, indexes=indexes)
+            else:
+                # multiprocessor version
+                workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology, indexes)))
+        for w in workers:
+            w.get()
+
+        # apply tica
+        if self.tica:
+            pass
+        # cluster the coordinates
+
+        # create Adaptive clusters from the kmeans result
 
 
 class ClusteringBuilder(object):
@@ -1511,6 +1607,8 @@ class ClusteringBuilder(object):
                                                     contactThresholdDistance=contactThresholdDistance, symmetries=symmetries, altSelection=altSelection)
         elif clusteringType == blockNames.ClusteringTypes.null:
             return NullClustering()
+        elif clusteringType == blockNames.ClusteringTypes.MSMClustering:
+            return MSMClustering()
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))
