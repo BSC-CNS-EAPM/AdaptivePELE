@@ -32,6 +32,7 @@ class Constants:
         self.extractedTrajectoryFolder = "%s/extractedCoordinates"
         self.baseExtractedTrajectoryName = "coord_"
         self.reportName = '*report_'
+        self.baseGatheredFilename = "traj_*.dat"
         self.outputTrajectoryFolder = "%s/repeatedExtractedCoordinates"
         self.ligandTrajectoryFolder = "ligand_trajs"
         self.ligandTrajectoryBasename = os.path.join(self.ligandTrajectoryFolder, "traj_ligand_%s.pdb")
@@ -184,7 +185,11 @@ def extractCoordinatesXTCFile(file_name, ligand, atom_Ids, writeCA, topology, se
 
 
 def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology=None, indexes=None):
-    ext = os.path.splitext(filename)[1]
+    """
+        Process the coordinates of a trajectory
+
+    """
+    ext = utilities.getFileExtension(filename)
     if ext == ".pdb":
         allCoordinates = loadAllResnameAtomsInPdb(filename, lig_resname, writeCA, sidechains)
         if writeLigandTrajectory:

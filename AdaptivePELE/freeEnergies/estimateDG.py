@@ -188,12 +188,7 @@ def __getMeanAndStdFromList(l, accessFunction=lambda x: x):
     return np.mean(values), np.std(values)
 
 
-def getRepresentativePDBs(filesWildcard, run):
-    files = glob.glob(filesWildcard)
-    trajs = [np.loadtxt(f)[:, 1:] for f in files]
-    cl = cluster.Cluster(0, "", "")
-    cl.clusterCenters = np.loadtxt(cl.clusterCentersFile)
-    dtrajs = cl.assignNewTrajectories(trajs)
+def getCentersInfo(cl, trajs, files, dtrajs):
     numClusters = cl.clusterCenters.shape[0]
     centersInfo = {x: {"structure": None, "minDist": 1e6} for x in range(numClusters)}
     for i, traj in enumerate(trajs):
@@ -205,6 +200,17 @@ def getRepresentativePDBs(filesWildcard, run):
             if dist < centersInfo[clusterInd]['minDist']:
                 centersInfo[clusterInd]["minDist"] = dist
                 centersInfo[clusterInd]["structure"] = (epochNum, trajNum, str(nSnap))
+    return centersInfo
+
+
+def getRepresentativePDBs(filesWildcard, run):
+    files = glob.glob(filesWildcard)
+    trajs = [np.loadtxt(f)[:, 1:] for f in files]
+    cl = cluster.Cluster(0, "", "")
+    cl.clusterCenters = np.loadtxt(cl.clusterCentersFile)
+    dtrajs = cl.assignNewTrajectories(trajs)
+    numClusters = cl.clusterCenters.shape[0]
+    centersInfo = getCentersInfo(cl, trajs, files, dtrajs)
 
     if not os.path.exists("representative_structures"):
         os.makedirs("representative_structures")
