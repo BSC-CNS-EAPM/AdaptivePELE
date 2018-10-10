@@ -15,16 +15,25 @@ from AdaptivePELE.atomset import atomset
 from AdaptivePELE.clustering import clusteringTypes
 from AdaptivePELE.clustering import thresholdcalculator
 from AdaptivePELE.freeEnergies import extractCoords as coord
+from AdaptivePELE.freeEnergies import estimateDG as estimate
+from AdaptivePELE.freeEnergies import getRepresentativeStructures as getRepr
 try:
     import networkx as nx
     NETWORK = True
 except ImportError:
     NETWORK = False
-PARALELLIZATION = True
+
 try:
     import multiprocessing as mp
+    PARALELLIZATION = True
 except ImportError:
     PARALELLIZATION = False
+
+try:
+    from AdaptivePELE.freeEnergies import cluster as pyemma_cluster
+    PYEMMA = True
+except ImportError:
+    PYEMMA = False
 
 
 class Clusters(object):
@@ -1474,10 +1483,14 @@ class MSMClustering(Clustering):
         Cluster the trajectories to estimate a Markov State Model (MSM)
     """
     def __init__(self, tica=False, resname="", resnum=0, resChain="", symmetries=None):
+        if not PYEMMA:
+            raise utilities.UnsatisfiedDependencyException("No installation of PyEMMA found. Please, install PyEMMA to use MSMClustering option.")
         Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain)
         self.type = clusteringTypes.CLUSTERING_TYPES.MSMClustering
         self.nprocessors = None
         self.tica = tica
+        self.constantsExtract = coord.Constants()
+        self.indexes = None
 
     def __getstate__(self):
         # Defining pickling interface to avoid problems when working with old
@@ -1521,24 +1534,30 @@ class MSMClustering(Clustering):
             :type allTrajs: str
         """
         if epoch is None:
-            self.epoch += 1
-        else:
-            self.epoch = epoch
+            epoch = self.epoch + 1
+        # clean clusters from previous iteration
+        self.emptyClustering()
+        self.epoch = epoch
         trajectories = getAllTrajectories(paths)
+        if self.indexes is None and utilities.getFileExtension(trajectories[0]) in coord.MDTRAJ_FORMATS:
+            self.indexes = []
+            # select indexes for all topologies
+            for top in topology:
+                self.indexes.append(coord.extractIndexesTopology(top, self.resname, self.atom_Ids, self.writeCA, self.sidechains))
         # extract coordinates
-        constants = coord.Constants()
         if PARALELLIZATION and self.nprocessors is not None:
             pool = mp.Pool(self.nprocessors)
         else:
             pool = None
         workers = []
         for filename in trajectories:
+            trajNum = utilities.getTrajNum(filename)
             if pool is None:
                 # serial version
-                coord.writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, False, constants, writeCA, sidechains, topology=topology, indexes=indexes)
+                coord.writeFilenameExtractedCoordinates(filename, self.resname, self.atom_Ids, allTrajs, False, self.constantsExtract, self.writeCA, self.sidechains, topology=topology.getTopology(self.epoch, trajNum), indexes=self.indexes[topology.getTopologyIndex(self.epoch, trajNum)])
             else:
                 # multiprocessor version
-                workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology, indexes)))
+                workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, self.resname, self.atom_Ids, allTrajs, False, self.constantsExtract, self.writeCA, self.sidechains, topology.getTopology(self.epoch, trajNum), self.indexes[topology.getTopologyIndex(self.epoch, trajNum)])))
         for w in workers:
             w.get()
 
@@ -1546,8 +1565,37 @@ class MSMClustering(Clustering):
         if self.tica:
             pass
         # cluster the coordinates
+        clustering = pyemma_cluster.Cluster(self.n_clusters, allTrajs, self.constantsExtract.baseGatheredFilename, discretizedPath=os.path.join(allTrajs, "discretized"))
+        clustering.cleanDiscretizedFolder()
+        clustering.clusterTrajectories()
 
         # create Adaptive clusters from the kmeans result
+        trajectory_files = glob.glob(os.path.join(allTrajs, self.constantsExtract.baseGatheredFilename))
+        trajectories = [np.loadtxt(f)[:, 1:] for f in trajectory_files]
+
+        centersInfo = estimate.getCentersInfo(clustering, trajectories, trajectory_files, clustering.dtrajs)
+        extractInfo = getRepr.getExtractInfo(centersInfo)
+        # extractInfo is a dictionary organized as {[epoch, traj]: [cluster, snapshot]}
+
+        # assign cluster dummies so that then clusters can be assigned in proper
+        # order
+        for _ in range(self.n_clusters):
+            self.addCluster(Cluster(""))
+        structureFolder = os.path.join(outputPathConstants.epochOutputPathTempletized, "*traj*_%d*")
+        for trajFile, extraInfo in extractInfo.items():
+            try:
+                pdbFile = glob.glob(structureFolder % trajFile)[0]
+            except IndexError:
+                raise ValueError("Structure %s not found" % (structureFolder % trajFile))
+            try:
+                snapshots = utilities.getSnapshots(pdbFile, topology=topology)
+            except IOError:
+                raise IOError("Unable to open %s, please check that the path to structures provided is correct" % pdbFile)
+            for pair in extraInfo:
+                pdb = atomset.PDB()
+                pdb.initialise(snapshots[pair[1]], resname=self.ligand, topology=topology.getTopologyFile(*trajFile))
+                cluster = Cluster(pdb, trajPosition=(trajFile[0], trajFile[1], pair[1]))
+                self.clusters[pair[0]] = cluster
 
 
 class ClusteringBuilder(object):
