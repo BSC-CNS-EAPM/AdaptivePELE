@@ -1,14 +1,15 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-import sys
-import shutil
 import os
+import sys
+import ast
 import json
 import time
 import glob
-import argparse
 import atexit
-import ast
+import shutil
 import signal
+import errno
+import argparse
 import numpy as np
 from builtins import range
 from AdaptivePELE.constants import blockNames, constants
@@ -48,10 +49,11 @@ def cleanProcessesFiles(folder):
         except OSError:
             pass
 
+
 def printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusteringBlock, outputPath, initialStructuresWildcard):
     """
         Print a summary of the run paramaters
-        
+
         :param restart: Flag on whether to continue a previous simulation
         :type restart: bool
         :param debug: Flag to mark whether simulation is run in debug mode
@@ -102,7 +104,6 @@ def cleanPreviousSimulation(output_path):
                 raise
             # If another process deleted the folder between the glob and the
             # actual removing an OSError is raised
-            pass
     epochs = utilities.get_epoch_folders(output_path)
     for epoch in epochs:
         try:
@@ -110,7 +111,6 @@ def cleanPreviousSimulation(output_path):
         except OSError as exc:
             if exc.errno != errno.ENOENT:
                 raise
-            pass
 
 
 def createMappingForFirstEpoch(initialStructures, topologies, processors):
@@ -432,7 +432,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return oldClusteringMethod.similarityEvaluator.typeEvaluator != newClusteringMethod.similarityEvaluator.typeEvaluator
 
 
-def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topologies):
+def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topologies, allTrajsPath):
     """
         Cluster the trajecotories of a given epoch
 
@@ -444,16 +444,18 @@ def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topol
         :type epochOutputPathTempletized: str
         :param topologies: Topology object containing the set of topologies needed for the simulation
         :type topologies: :py:class:`.Topology`
+        :param allTrajsPath: Folder where the processed trajectories are stored (usefule for MSMClustering)
+        :type allTrajsPath: str
 """
 
     snapshotsJSONSelectionString = generateTrajectorySelectionString(epoch, epochOutputPathTempletized)
     paths = ast.literal_eval(snapshotsJSONSelectionString)
     if len(glob.glob(paths[-1])) == 0:
         sys.exit("No trajectories to cluster! Matching path:%s" % paths[-1])
-    clusteringMethod.cluster(paths, topology=topologies, epoch=epoch)
+    clusteringMethod.cluster(paths, topology=topologies, epoch=epoch, allTrajs=allTrajsPath)
 
 
-def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner, topologies):
+def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner, topologies, allTrajsPath):
     """
         Cluster all previous epochs using the clusteringMethod object
 
@@ -465,12 +467,15 @@ def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletiz
         :type epochOutputPathTempletized: str
         :param simulationRunner: Simulation runner object
         :type simulationRunner: :py:class:`.SimulationRunner`
-        :param topologies: Topology object containing the set of topologies needed for the simulatioies        :type topologies: :py:class:`.Topology`
+        :param topologies: Topology object containing the set of topologies needed for the simulatioies
+        :type topologies: :py:class:`.Topology`
+        :param allTrajsPath: Folder where the processed trajectories are stored (usefule for MSMClustering)
+        :type allTrajsPath: str
 """
     for i in range(finalEpoch):
         simulationRunner.readMappingFromDisk(epochOutputPathTempletized % i)
         topologies.readMappingFromDisk(epochOutputPathTempletized % i, i)
-        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized, topologies)
+        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized, topologies, allTrajsPath)
 
 
 def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies, processManager):
@@ -507,10 +512,11 @@ def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConsta
                                                          spawningParams.reportFilename,
                                                          spawningParams.reportCol)
 
+    clusteringMethod.setProcessors(simulationRunner.getWorkingProcessors())
     if needToRecluster(oldClusteringMethod, clusteringMethod):
         utilities.print_unbuffered("Reclustering!")
         startTime = time.time()
-        clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner, topologies)
+        clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner, topologies, outputPathConstants.allTrajsPath)
         endTime = time.time()
         utilities.print_unbuffered("Reclustering took %s sec" % (endTime - startTime))
     else:
@@ -549,7 +555,7 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
         :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames
     """
     processorManagerFilename = "procMapping.txt"
-    clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies, processManager) 
+    clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies, processManager)
     if processManager.isMaster():
         degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.getWorkingProcessors(), firstRun)
         spawningCalculator.log()
@@ -619,7 +625,7 @@ def main(jsonParams, clusteringHook=None):
         :param jsonParams: A string with the name of the control file to use
         :type jsonParams: str
     """
-    
+
     controlFileValidator.validate(jsonParams)
     generalParams, spawningBlock, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
 
@@ -636,7 +642,6 @@ def main(jsonParams, clusteringHook=None):
     writeAll = generalParams.get(blockNames.GeneralParams.writeAllClustering, False)
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
     resname = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.ligandResname)
-
 
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
     if not initialStructures:
@@ -704,6 +709,7 @@ def main(jsonParams, clusteringHook=None):
 
         clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningCalculator.parameters, initialStructures, simulationRunner, processManager)
 
+    clusteringMethod.setProcessors(simulationRunner.getWorkingProcessors())
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
     for i in range(firstRun, simulationRunner.parameters.iterations):
@@ -726,7 +732,7 @@ def main(jsonParams, clusteringHook=None):
             utilities.print_unbuffered("Clustering...")
         if processManager.isMaster():
             startTime = time.time()
-            clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies)
+            clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies, outputPathConstants.allTrajsPath)
             endTime = time.time()
             utilities.print_unbuffered("Clustering ligand: %s sec" % (endTime - startTime))
 
