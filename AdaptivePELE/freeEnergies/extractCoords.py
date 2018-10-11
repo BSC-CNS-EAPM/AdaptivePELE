@@ -24,7 +24,7 @@ except ImportError:
     PRODY = False
 
 
-MDTRAJ_FORMATS = set(['.xtc', '.dcd', '.dtr', '.trr'])
+MDTRAJ_FORMATS = set(['.xtc', '.dcd', '.dtr', '.trr', 'mdcrd', 'nc'])
 
 
 class Constants:
@@ -363,14 +363,29 @@ def gatherTrajs(constants, folder_name, setNumber, non_Repeat):
     copyTrajectories(nonRepeatedTrajs, constants.gatherNonRepeatedTrajsFilename, folder_name)
 
 
-def extractSidechainIndexes(trajs, ligand_resname):
-    if not PRODY:
-        raise utilities.UnsatisfiedDependencyException("Prody module not found, will not be able to extract sidechain coordinates")
+# def extractSidechainIndexes(trajs, ligand_resname, topology=None):
+#     if not PRODY:
+#         raise utilities.UnsatisfiedDependencyException("Prody module not found, will not be able to extract sidechain coordinates")
+#     sidechains_trajs = []
+#     for traj in glob.glob(trajs):
+#         atoms = pd.parsePDB(traj)
+#         print(traj)
+#         sidechains = atoms.select("within 5 of resname {}".format(ligand_resname))
+#         sidechains_trajs.extend([atom.getIndex() for atom in sidechains])
+#     return list(set(sidechains_trajs))
+
+
+def extractSidechainIndexes(trajs, lig_resname, topology=None):
     sidechains_trajs = []
     for traj in glob.glob(trajs):
-        atoms = pd.parsePDB(traj)
-        sidechains = atoms.select("within 5 of resname {}".format(ligand_resname))
-        sidechains_trajs.extend([atom.getIndex() for atom in sidechains])
+        print(traj)
+        atoms = md.load(traj, top=topology)
+        ligand_indices = atoms.top.select("resname '{lig}'".format(lig=lig_resname))
+        # the distance is specified in nm
+        sidechains = md.compute_neighbors(atoms, 0.5, ligand_indices)
+        sidechains_trajs.extend(sidechains[0].tolist())
+        # for i, sidechain in enumerate(sidechains):
+        #     sidechains_trajs.extend(sidechain.tolist())
     return list(set(sidechains_trajs))
 
 
@@ -380,7 +395,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
     lig_resname = parseResname(atom_Ids, lig_resname)
 
-    sidechains = extractSidechainIndexes(sidechain_folder, lig_resname) if sidechains else []
+    sidechains = extractSidechainIndexes(sidechain_folder, lig_resname, topology=topology) if sidechains else []
     folderWithTrajs = folder_name
 
     makeGatheredTrajsFolder(constants)
