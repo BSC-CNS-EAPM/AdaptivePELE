@@ -432,7 +432,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return oldClusteringMethod.similarityEvaluator.typeEvaluator != newClusteringMethod.similarityEvaluator.typeEvaluator
 
 
-def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topologies, allTrajsPath):
+def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topologies, outputPathConstants):
     """
         Cluster the trajecotories of a given epoch
 
@@ -444,18 +444,18 @@ def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topol
         :type epochOutputPathTempletized: str
         :param topologies: Topology object containing the set of topologies needed for the simulation
         :type topologies: :py:class:`.Topology`
-        :param allTrajsPath: Folder where the processed trajectories are stored (usefule for MSMClustering)
-        :type allTrajsPath: str
+        :param outputPathConstants: Contains outputPath-related constants
+        :type outputPathConstants: :py:class:`.OutputPathConstants`
 """
 
     snapshotsJSONSelectionString = generateTrajectorySelectionString(epoch, epochOutputPathTempletized)
     paths = ast.literal_eval(snapshotsJSONSelectionString)
     if len(glob.glob(paths[-1])) == 0:
         sys.exit("No trajectories to cluster! Matching path:%s" % paths[-1])
-    clusteringMethod.cluster(paths, topology=topologies, epoch=epoch, allTrajs=allTrajsPath)
+    clusteringMethod.cluster(paths, topology=topologies, epoch=epoch, outputPathConstants=outputPathConstants)
 
 
-def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner, topologies, allTrajsPath):
+def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner, topologies, outputPathConstants):
     """
         Cluster all previous epochs using the clusteringMethod object
 
@@ -469,13 +469,13 @@ def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletiz
         :type simulationRunner: :py:class:`.SimulationRunner`
         :param topologies: Topology object containing the set of topologies needed for the simulatioies
         :type topologies: :py:class:`.Topology`
-        :param allTrajsPath: Folder where the processed trajectories are stored (usefule for MSMClustering)
-        :type allTrajsPath: str
+        :param outputPathConstants: Contains outputPath-related constants
+        :type outputPathConstants: :py:class:`.OutputPathConstants`
 """
     for i in range(finalEpoch):
         simulationRunner.readMappingFromDisk(epochOutputPathTempletized % i)
         topologies.readMappingFromDisk(epochOutputPathTempletized % i, i)
-        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized, topologies, allTrajsPath)
+        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized, topologies, outputPathConstants)
 
 
 def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies, processManager):
@@ -732,7 +732,7 @@ def main(jsonParams, clusteringHook=None):
             utilities.print_unbuffered("Clustering...")
         if processManager.isMaster():
             startTime = time.time()
-            clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies, outputPathConstants.allTrajsPath)
+            clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies, outputPathConstants)
             endTime = time.time()
             utilities.print_unbuffered("Clustering ligand: %s sec" % (endTime - startTime))
 

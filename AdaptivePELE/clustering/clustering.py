@@ -902,7 +902,7 @@ class Clustering(object):
             and self.resChain == other.resChain\
             and self.col == other.col
 
-    def cluster(self, paths, ignoreFirstRow=False, topology=None, epoch=None, allTrajs=None):
+    def cluster(self, paths, ignoreFirstRow=False, topology=None, epoch=None, outputPathConstants=None):
         """
             Cluster the snaptshots contained in the paths folder
 
@@ -914,8 +914,8 @@ class Clustering(object):
             :type topology: :py:class:`.Topology`
             :param epoch: Epoch number
             :type epoch: int
-            :param allTrajs: Folder to store the processed coordinates (only useful for MSMClustering)
-            :type allTrajs: str
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
         """
         if epoch is None:
             self.epoch += 1
@@ -1360,7 +1360,7 @@ class SequentialLastSnapshotClustering(Clustering):
                             altSelection=altSelection)
         self.type = clusteringTypes.CLUSTERING_TYPES.lastSnapshot
 
-    def cluster(self, paths, topology=None, epoch=None, allTrajs=None):
+    def cluster(self, paths, topology=None, epoch=None, outputPathConstants=None):
         """
             Cluster the snaptshots contained in the paths folder
 
@@ -1370,8 +1370,8 @@ class SequentialLastSnapshotClustering(Clustering):
             :type topology: :py:class:`.Topology`
             :param epoch: Epoch number
             :type epoch: int
-            :param allTrajs: Folder to store the processed coordinates (only useful for MSMClustering)
-            :type allTrajs: str
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
         """
         # Clean clusters at every step, so we only have the last snapshot of
         # each trajectory as clusters
@@ -1437,7 +1437,7 @@ class NullClustering(Clustering):
         Clustering.__init__(self)
         self.type = clusteringTypes.CLUSTERING_TYPES.null
 
-    def cluster(self, paths, topology=None, epoch=None, allTrajs=None):
+    def cluster(self, paths, topology=None, epoch=None, outputPathConstants=None):
         """
             Cluster the snaptshots contained in the paths folder
 
@@ -1447,8 +1447,8 @@ class NullClustering(Clustering):
             :type topology: :py:class:`.Topology`
             :param epoch: Epoch number
             :type epoch: int
-            :param allTrajs: Folder to store the processed coordinates (only useful for MSMClustering)
-            :type allTrajs: str
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
         """
         pass
 
@@ -1520,7 +1520,7 @@ class MSMClustering(Clustering):
     def setProcessors(self, processors):
         self.nprocessors = processors
 
-    def cluster(self, paths, topology=None, epoch=None, allTrajs=None):
+    def cluster(self, paths, topology=None, epoch=None, outputPathConstants=None):
         """
             Cluster the snaptshots contained in the paths folder
 
@@ -1530,8 +1530,8 @@ class MSMClustering(Clustering):
             :type topology: :py:class:`.Topology`
             :param epoch: Epoch number
             :type epoch: int
-            :param allTrajs: Folder to store the processed coordinates (only useful for MSMClustering)
-            :type allTrajs: str
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
         """
         if epoch is None:
             epoch = self.epoch + 1
@@ -1554,10 +1554,10 @@ class MSMClustering(Clustering):
             trajNum = utilities.getTrajNum(filename)
             if pool is None:
                 # serial version
-                coord.writeFilenameExtractedCoordinates(filename, self.resname, self.atom_Ids, allTrajs, False, self.constantsExtract, self.writeCA, self.sidechains, topology=topology.getTopology(self.epoch, trajNum), indexes=self.indexes[topology.getTopologyIndex(self.epoch, trajNum)])
+                coord.writeFilenameExtractedCoordinates(filename, self.resname, self.atom_Ids, outputPathConstants.allTrajsPath, False, self.constantsExtract, self.writeCA, self.sidechains, topology=topology.getTopology(self.epoch, trajNum), indexes=self.indexes[topology.getTopologyIndex(self.epoch, trajNum)])
             else:
                 # multiprocessor version
-                workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, self.resname, self.atom_Ids, allTrajs, False, self.constantsExtract, self.writeCA, self.sidechains, topology.getTopology(self.epoch, trajNum), self.indexes[topology.getTopologyIndex(self.epoch, trajNum)])))
+                workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, self.resname, self.atom_Ids, outputPathConstants.allTrajsPath, False, self.constantsExtract, self.writeCA, self.sidechains, topology.getTopology(self.epoch, trajNum), self.indexes[topology.getTopologyIndex(self.epoch, trajNum)])))
         for w in workers:
             w.get()
 
@@ -1565,12 +1565,12 @@ class MSMClustering(Clustering):
         if self.tica:
             pass
         # cluster the coordinates
-        clustering = pyemma_cluster.Cluster(self.n_clusters, allTrajs, self.constantsExtract.baseGatheredFilename, discretizedPath=os.path.join(allTrajs, "discretized"))
+        clustering = pyemma_cluster.Cluster(self.n_clusters, outputPathConstants.allTrajsPath, self.constantsExtract.baseGatheredFilename, discretizedPath=os.path.join(outputPathConstants.allTrajsPath, "discretized"))
         clustering.cleanDiscretizedFolder()
         clustering.clusterTrajectories()
 
         # create Adaptive clusters from the kmeans result
-        trajectory_files = glob.glob(os.path.join(allTrajs, self.constantsExtract.baseGatheredFilename))
+        trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, self.constantsExtract.baseGatheredFilename))
         trajectories = [np.loadtxt(f)[:, 1:] for f in trajectory_files]
 
         centersInfo = estimate.getCentersInfo(clustering, trajectories, trajectory_files, clustering.dtrajs)
