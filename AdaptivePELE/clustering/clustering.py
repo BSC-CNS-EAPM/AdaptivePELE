@@ -31,6 +31,7 @@ except ImportError:
 
 try:
     from AdaptivePELE.freeEnergies import cluster as pyemma_cluster
+    import pyemma.coordinates as coor
     PYEMMA = True
 except ImportError:
     PYEMMA = False
@@ -1482,15 +1483,23 @@ class MSMClustering(Clustering):
     """
         Cluster the trajectories to estimate a Markov State Model (MSM)
     """
-    def __init__(self, tica=False, resname="", resnum=0, resChain="", symmetries=None):
+    def __init__(self, n_clusters, tica=False, resname="", resnum=0, resChain="", symmetries=None, atom_Ids="", writeCA=False, sidechains=False, tica_lagtime=10, tica_nICs=3, tica_kinetic_map=True, tica_commute_map=False):
         if not PYEMMA:
             raise utilities.UnsatisfiedDependencyException("No installation of PyEMMA found. Please, install PyEMMA to use MSMClustering option.")
         Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain)
         self.type = clusteringTypes.CLUSTERING_TYPES.MSMClustering
         self.nprocessors = None
+        self.n_clusters = n_clusters
         self.tica = tica
         self.constantsExtract = coord.Constants()
         self.indexes = None
+        self.atom_Ids = atom_Ids
+        self.writeCA = writeCA
+        self.sidechains = False  # sidechains, temporarily set it to false because the extractCoords block for the sidechains is too slow
+        self.tica_lagtime = tica_lagtime
+        self.tica_nICs = tica_nICs
+        self.tica_kinetic_map = tica_kinetic_map
+        self.tica_commute_map = tica_commute_map
 
     def __getstate__(self):
         # Defining pickling interface to avoid problems when working with old
@@ -1500,7 +1509,14 @@ class MSMClustering(Clustering):
                  "reportBaseFilename": self.reportBaseFilename,
                  "resname": self.resname, "resnum": self.resnum,
                  "resChain": self.resChain, "col": self.col,
-                 "epoch": self.epoch, "symmetries": self.symmetries}
+                 "epoch": self.epoch, "symmetries": self.symmetries,
+                 "nprocessors": self.nprocessors, "n_clusters": self.n_clusters,
+                 "tica": self.tica, "constantsExtract": self.constantsExtract,
+                 "indexes": self.indexes, "atom_Ids": self.atom_Ids,
+                 "writeCA": self.writeCA, "sidechains": self.sidechains,
+                 "tica_lagtime": self.tica_lagtime, "tica_nICs": self.tica_nICs,
+                 "tica_kinetic_map": self.tica_kinetic_map,
+                 "tica_commute_map": self.tica_commute_map}
         return state
 
     def __setstate__(self, state):
@@ -1516,6 +1532,18 @@ class MSMClustering(Clustering):
         self.symmetries = state.get('symmetries', [])
         if isinstance(self.symmetries, dict):
             self.symmetries = [self.symmetries]
+        self.nprocessors = state.get('nprocessors')
+        self.n_clusters = state['n_clusters']
+        self.tica = state.get('tica', False)
+        self.constantsExtract = state.get('constantsExtract', coord.Constants())
+        self.indexes = state.get('indexes')
+        self.atom_Ids = state.get('atom_Ids', "")
+        self.writeCA = state.get('writeCA', False)
+        self.sidechains = state.get('sidechains', False)
+        self.tica_lagtime = state.get('tica_lagtime', 10)
+        self.tica_nICs = state.get('tica_nICs', 3)
+        self.tica_kinetic_map = state.get('tica_kinetic_map', True)
+        self.tica_commute_map = state.get('tica_commute_map', False)
 
     def setProcessors(self, processors):
         self.nprocessors = processors
@@ -1563,7 +1591,16 @@ class MSMClustering(Clustering):
 
         # apply tica
         if self.tica:
-            pass
+            trajectories = []
+            trajs = glob.glob(os.path.join(outputPathConstants.allTrajsPath, self.constantsExtract.baseGatheredFilename))
+            for trajectory in trajs:
+                trajectories.append(np.loadtxt(trajectory))
+            tica = coor.tica(data=trajectories, lag=self.tica_lagtime, kinetic_map=self.tica_kinetic_map, commute_map=self.tica_commute_map)
+            projected = tica.get_output(dimensions=range(self.tica_nICs))
+            for traj_name, projected_traj in zip(trajs, projected):
+                auxArr = np.array(range(len(projected_traj)))
+                np.savetxt(traj_name, np.hstack(auxArr.reshape(-1, 1), projected_traj))
+
         # cluster the coordinates
         clustering = pyemma_cluster.Cluster(self.n_clusters, outputPathConstants.allTrajsPath, self.constantsExtract.baseGatheredFilename, discretizedPath=os.path.join(outputPathConstants.allTrajsPath, "discretized"))
         clustering.cleanDiscretizedFolder()
@@ -1593,7 +1630,7 @@ class MSMClustering(Clustering):
                 raise IOError("Unable to open %s, please check that the path to structures provided is correct" % pdbFile)
             for pair in extraInfo:
                 pdb = atomset.PDB()
-                pdb.initialise(snapshots[pair[1]], resname=self.ligand, topology=topology.getTopologyFile(*trajFile))
+                pdb.initialise(snapshots[pair[1]], resname=self.resname, topology=topology.getTopologyFile(*trajFile))
                 cluster = Cluster(pdb, trajPosition=(trajFile[0], trajFile[1], pair[1]))
                 self.clusters[pair[0]] = cluster
 
