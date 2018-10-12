@@ -1600,15 +1600,20 @@ class MSMClustering(Clustering):
             trajectories = []
             trajs = glob.glob(os.path.join(outputPathConstants.allTrajsPath, self.constantsExtract.baseGatheredFilename))
             for trajectory in trajs:
+                if "tica" in trajectory:
+                    continue
                 trajectories.append(np.loadtxt(trajectory))
             tica = coor.tica(data=trajectories, lag=self.tica_lagtime, kinetic_map=self.tica_kinetic_map, commute_map=self.tica_commute_map)
             projected = tica.get_output(dimensions=range(self.tica_nICs))
             for traj_name, projected_traj in zip(trajs, projected):
                 auxArr = np.array(range(len(projected_traj)))
-                np.savetxt(traj_name, np.hstack(auxArr.reshape(-1, 1), projected_traj))
+                np.savetxt("tica_%s" % traj_name, np.hstack(auxArr.reshape(-1, 1), projected_traj))
+            base_traj_names = "tica_%s" % self.constantsExtract.baseGatheredFilename
+        else:
+            base_traj_names = self.constantsExtract.baseGatheredFilename
 
         # cluster the coordinates
-        clustering = pyemma_cluster.Cluster(self.n_clusters, outputPathConstants.allTrajsPath, self.constantsExtract.baseGatheredFilename, discretizedPath=os.path.join(outputPathConstants.allTrajsPath, "discretized"))
+        clustering = pyemma_cluster.Cluster(self.n_clusters, outputPathConstants.allTrajsPath, base_traj_names, discretizedPath=os.path.join(outputPathConstants.allTrajsPath, "discretized"))
         clustering.cleanDiscretizedFolder()
         clustering.clusterTrajectories()
 
