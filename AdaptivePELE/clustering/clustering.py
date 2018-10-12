@@ -1495,7 +1495,7 @@ class MSMClustering(Clustering):
         self.indexes = None
         self.atom_Ids = atom_Ids
         self.writeCA = writeCA
-        self.sidechains = False  # sidechains, temporarily set it to false because the extractCoords block for the sidechains is too slow
+        self.sidechains = sidechains
         self.tica_lagtime = tica_lagtime
         self.tica_nICs = tica_nICs
         self.tica_kinetic_map = tica_kinetic_map
@@ -1577,6 +1577,12 @@ class MSMClustering(Clustering):
             pool = mp.Pool(self.nprocessors)
         else:
             pool = None
+        if self.sidechains:
+            # for the moment pass the topology for the first trajectory of the
+            # first epoch, when extractCoords gets proper topology
+            # handling this should change
+            new_sidechains = coord.extractSidechainIndexes(trajectories, self.ligand, topology=topology.getTopologyFile(0, 1), pool=pool)
+            self.sidechains = list(set(self.sidechains).intersection(set(new_sidechains)))
         workers = []
         for filename in trajectories:
             trajNum = utilities.getTrajNum(filename)
