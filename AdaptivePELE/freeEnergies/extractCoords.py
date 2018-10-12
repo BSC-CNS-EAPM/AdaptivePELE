@@ -363,29 +363,39 @@ def gatherTrajs(constants, folder_name, setNumber, non_Repeat):
     copyTrajectories(nonRepeatedTrajs, constants.gatherNonRepeatedTrajsFilename, folder_name)
 
 
-# def extractSidechainIndexes(trajs, ligand_resname, topology=None):
-#     if not PRODY:
-#         raise utilities.UnsatisfiedDependencyException("Prody module not found, will not be able to extract sidechain coordinates")
-#     sidechains_trajs = []
-#     for traj in glob.glob(trajs):
-#         atoms = pd.parsePDB(traj)
-#         print(traj)
-#         sidechains = atoms.select("within 5 of resname {}".format(ligand_resname))
-#         sidechains_trajs.extend([atom.getIndex() for atom in sidechains])
-#     return list(set(sidechains_trajs))
+def extractSidechainIndexes_prody(trajs, ligand_resname, topology=None):
+    if not PRODY:
+        raise utilities.UnsatisfiedDependencyException("Prody module not found, will not be able to extract sidechain coordinates")
+    atoms = pd.parsePDB(traj)
+    sidechains = atoms.select("within 5 of resname {}".format(ligand_resname))
+    return [atom.getIndex() for atom in sidechains]
+
+
+def extractSidechainIndexes_mdtraj(trajs, lig_resname, topology=None):
+    atoms = md.load(traj, top=topology)
+    ligand_indices = atoms.top.select("resname '{lig}'".format(lig=lig_resname))
+    # the distance is specified in nm
+    sidechains = md.compute_neighbors(atoms, 0.5, ligand_indices)
+    sidechains_trajs = sidechains[0].tolist()
+    for i, sidechain in enumerate(sidechains):
+        sidechains_trajs.extend(sidechain.tolist())
+    return sidechains_trajs
 
 
 def extractSidechainIndexes(trajs, lig_resname, topology=None):
     sidechains_trajs = []
-    for traj in glob.glob(trajs):
-        print(traj)
-        atoms = md.load(traj, top=topology)
-        ligand_indices = atoms.top.select("resname '{lig}'".format(lig=lig_resname))
-        # the distance is specified in nm
-        sidechains = md.compute_neighbors(atoms, 0.5, ligand_indices)
-        sidechains_trajs.extend(sidechains[0].tolist())
-        # for i, sidechain in enumerate(sidechains):
-        #     sidechains_trajs.extend(sidechain.tolist())
+    trajectory_files = glob.glob(trajs)
+    for traj in trajectory_files:
+        ext = utilities.getFileExtension(traj)
+        if ext == ".pdb":
+            if PRODY:
+                sidechains_trajs.extend(extractSidechainIndexes_prody(traj, lig_resname))
+            else:
+                sidechains_trajs.extend(extractSidechainIndexes_mdtraj(traj, lig_resname))
+        elif ext in MDTRAJ_FORMATS:
+            sidechains_trajs.extend(extractSidechainIndexes_mdtraj(traj, lig_resname, topology=topology))
+        else:
+            raise ValueError("Unrecongnized file extension for %s" % traj)
     return list(set(sidechains_trajs))
 
 
