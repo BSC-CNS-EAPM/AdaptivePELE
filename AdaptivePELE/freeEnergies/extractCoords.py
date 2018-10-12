@@ -382,20 +382,31 @@ def extractSidechainIndexes_mdtraj(trajs, lig_resname, topology=None):
     return sidechains_trajs
 
 
-def extractSidechainIndexes(trajs, lig_resname, topology=None):
+def extractSidechainIndexes(trajs, lig_resname, topology=None, pool=None):
     sidechains_trajs = []
-    trajectory_files = glob.glob(trajs)
-    for traj in trajectory_files:
+    workers = []
+    for traj in trajs:
         ext = utilities.getFileExtension(traj)
         if ext == ".pdb":
             if PRODY:
-                sidechains_trajs.extend(extractSidechainIndexes_prody(traj, lig_resname))
+                if pool is None:
+                    sidechains_trajs.extend(extractSidechainIndexes_prody(traj, lig_resname))
+                else:
+                    workers.append(pool.apply_async(extractSidechainIndexes_prody, args=(traj, lig_resname)))
             else:
-                sidechains_trajs.extend(extractSidechainIndexes_mdtraj(traj, lig_resname))
+                if pool is None:
+                    sidechains_trajs.extend(extractSidechainIndexes_mdtraj(traj, lig_resname))
+                else:
+                    workers.append(pool.apply_async(extractSidechainIndexes_mdtraj, args=(traj, lig_resname)))
         elif ext in MDTRAJ_FORMATS:
-            sidechains_trajs.extend(extractSidechainIndexes_mdtraj(traj, lig_resname, topology=topology))
+            if pool is None:
+                sidechains_trajs.extend(extractSidechainIndexes_mdtraj(traj, lig_resname, topology=topology))
+            else:
+                workers.append(pool.apply_async(extractSidechainIndexes_mdtraj(traj, lig_resname, topology)))
         else:
             raise ValueError("Unrecongnized file extension for %s" % traj)
+    for w in workers:
+        sidechains_trajs.extend(w.get())
     return list(set(sidechains_trajs))
 
 
@@ -405,7 +416,6 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
     lig_resname = parseResname(atom_Ids, lig_resname)
 
-    sidechains = extractSidechainIndexes(sidechain_folder, lig_resname, topology=topology) if sidechains else []
     folderWithTrajs = folder_name
 
     makeGatheredTrajsFolder(constants)
@@ -430,6 +440,8 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
         pool = mp.Pool(nProcessors)
     else:
         pool = None
+
+    sidechains = extractSidechainIndexes(glob.glob(sidechain_folder), lig_resname, topology=topology, pool=pool) if sidechains else []
 
     for folder_it in folders:
         pathFolder = os.path.join(folderWithTrajs, folder_it)
