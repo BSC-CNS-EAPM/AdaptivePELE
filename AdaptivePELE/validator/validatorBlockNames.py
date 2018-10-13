@@ -203,6 +203,7 @@ class clusteringTypes:
         },
         "MSM": {
             "ligandResname": "basestring"
+            "nclusters": "numbers.Real"
         }
     }
     params = {
@@ -217,7 +218,15 @@ class clusteringTypes:
         "similarityEvaluator": "basestring",
         "symmetries": "list",
         "alternativeStructure": "bool",
-        "nclusters": "numbers.Real"
+        "nclusters": "numbers.Real",
+        "tica": "bool",
+        "atom_Ids": "list",
+        "writeCA": "bool",
+        "sidechains": "bool",
+        "tica_lagtime": "numbers.Real",
+        "tica_nICs": "numbers.Real",
+        "tica_kinetic_map": "bool",
+        "tica_commute_map": "bool"
     }
     thresholdCalculator = {
         "types": {

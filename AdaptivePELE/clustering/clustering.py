@@ -1704,7 +1704,17 @@ class ClusteringBuilder(object):
         elif clusteringType == blockNames.ClusteringTypes.null:
             return NullClustering()
         elif clusteringType == blockNames.ClusteringTypes.MSMClustering:
-            return MSMClustering()
+            n_clusters = paramsBlock[blockNames.ClusteringTypes.nclusters]
+            symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries, [])
+            tica = paramsBlock.get(blockNames.ClusteringTypes.tica, False)
+            atom_Ids = paramsBlock.get(blockNames.ClusteringTypes.atom_Ids, "")
+            writeCA = paramsBlock.get(blockNames.ClusteringTypes.writeCA, False)
+            sidechains = paramsBlock.get(blockNames.ClusteringTypes.sidechains, False)
+            tica_lagtime = paramsBlock.get(blockNames.ClusteringTypes.tica_lagtime, 10)
+            tica_nICs = paramsBlock.get(blockNames.ClusteringTypes.tica_nICs, 3)
+            tica_kinetic_map = paramsBlock.get(blockNames.ClusteringTypes.tica_kinetic_map, True)
+            tica_commute_map = paramsBlock.get(blockNames.ClusteringTypes.tica_commute_map, False)
+            return MSMClustering(n_clusters, tica, resname, resnum, resChain, symmetries, atom_Ids, writeCA, sidechains, tica_lagtime, tica_nICs, tica_kinetic_map, tica_commute_map)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))
