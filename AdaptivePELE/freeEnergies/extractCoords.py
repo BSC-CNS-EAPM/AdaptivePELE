@@ -215,8 +215,7 @@ def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolde
             else:
                 coords = getAtomCoord(allCoordinates, lig_resname, atom_Ids)
     elif ext in MDTRAJ_FORMATS:
-        epoch, traj_num = get_epoch_traj_num(filename)
-        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA, topology.getTopologyFile(epoch, traj_num), indexes, sidechains)
+        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA, topology, indexes, sidechains)
     else:
         raise ValueError("Unrecongnized file extension for %s" % filename)
 
@@ -237,12 +236,17 @@ def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeL
         indexes = None
     workers = []
     for filename in originalPDBfiles:
+        if topology is not None:
+            epoch, traj_num = get_epoch_traj_num(filename)
+            topology_file = topology.getTopologyFile(epoch, traj_num)
+        else:
+            topology_file = None
         if pool is None:
             # serial version
-            writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology=topology, indexes=indexes)
+            writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology=topology_file, indexes=indexes)
         else:
             # multiprocessor version
-            workers.append(pool.apply_async(writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology, indexes)))
+            workers.append(pool.apply_async(writeFilenameExtractedCoordinates, args=(filename, lig_resname, atom_Ids, pathFolder, writeLigandTrajectory, constants, writeCA, sidechains, topology_file, indexes)))
     for w in workers:
         w.get()
 

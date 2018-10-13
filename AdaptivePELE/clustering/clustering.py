@@ -1565,6 +1565,7 @@ class MSMClustering(Clustering):
             epoch = self.epoch + 1
         # clean clusters from previous iteration
         self.emptyClustering()
+        # when cleaning the clusters, the epoch attribute is reset
         self.epoch = epoch
         trajectories = getAllTrajectories(paths)
         if self.indexes is None and utilities.getFileExtension(trajectories[0]) in coord.MDTRAJ_FORMATS:
@@ -1572,16 +1573,14 @@ class MSMClustering(Clustering):
             # select indexes for all topologies
             for top in topology:
                 self.indexes.append(coord.extractIndexesTopology(top, self.resname, self.atom_Ids, self.writeCA, self.sidechains))
+            self.indexes = list(set(self.indexes))
         # extract coordinates
         if PARALELLIZATION and self.nprocessors is not None:
             pool = mp.Pool(self.nprocessors)
         else:
             pool = None
         if self.sidechains:
-            # for the moment pass the topology for the first trajectory of the
-            # first epoch, when extractCoords gets proper topology
-            # handling this should change
-            new_sidechains = coord.extractSidechainIndexes(trajectories, self.ligand, topology=topology.getTopologyFile(0, 1), pool=pool)
+            new_sidechains = coord.extractSidechainIndexes(trajectories, self.ligand, topology, pool=pool)
             self.sidechains = list(set(self.sidechains).intersection(set(new_sidechains)))
         workers = []
         for filename in trajectories:
@@ -1636,7 +1635,7 @@ class MSMClustering(Clustering):
             except IndexError:
                 raise ValueError("Structure %s not found" % (structureFolder % trajFile))
             try:
-                snapshots = utilities.getSnapshots(pdbFile, topology=topology)
+                snapshots = utilities.getSnapshots(pdbFile)
             except IOError:
                 raise IOError("Unable to open %s, please check that the path to structures provided is correct" % pdbFile)
             for pair in extraInfo:
