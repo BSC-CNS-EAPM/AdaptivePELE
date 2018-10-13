@@ -27,7 +27,7 @@ except ImportError:
 MDTRAJ_FORMATS = set(['.xtc', '.dcd', '.dtr', '.trr', 'mdcrd', 'nc'])
 
 
-class Constants:
+class Constants(object):
     def __init__(self):
         self.extractedTrajectoryFolder = "%s/extractedCoordinates"
         self.baseExtractedTrajectoryName = "coord_"
@@ -40,6 +40,15 @@ class Constants:
         self.gatherTrajsFilename = os.path.join(self.gatherTrajsFolder, "traj_%s_%s.dat")
         self.gatherNonRepeatedFolder = os.path.join(self.gatherTrajsFolder, "extractedCoordinates")
         self.gatherNonRepeatedTrajsFilename = os.path.join(self.gatherNonRepeatedFolder, "traj_%s_%s.dat")
+
+
+class TopologyCompat(object):
+    def __init__(self, pdb_file):
+        self.path = os.path.split(os.path.abspath(pdb_file))[0]
+        self.topologyFiles = pdb_file
+
+    def getTopologyFile(self, epoch, trajectory_number):
+        return self.topologyFiles
 
 
 def parseArguments():
@@ -62,7 +71,7 @@ def parseArguments():
     parser.add_argument("-t", "--totalSteps", type=int, default=0, help="Total number of steps in traj. Equivalent to epoch length in adaptive runs")
     parser.add_argument("-nR", "--noRepeat", action="store_true", help="Flag to avoid repeating the rejected steps")
     parser.add_argument("-n", "--numProcessors", type=int, default=None, help="Number of cpus to use")
-    parser.add_argument("--top", type=str, default=None, help="Topology file for non-pdb trajectories")
+    parser.add_argument("--top", type=str, default=None, help="Topology file for non-pdb trajectories or path to Adaptive topology object")
     parser.add_argument("--sidechains", action="store_true", help="Flag to extract sidechain coordinates")
     parser.add_argument("-sf", "--sidechains_folder", default=".", type=str, help="Folder with the structures to obtain the sidechains to extract")
     parser.add_argument("--serial", action="store_true", help="Flag to deactivate parallelization")
@@ -206,7 +215,8 @@ def writeFilenameExtractedCoordinates(filename, lig_resname, atom_Ids, pathFolde
             else:
                 coords = getAtomCoord(allCoordinates, lig_resname, atom_Ids)
     elif ext in MDTRAJ_FORMATS:
-        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA, topology, indexes, sidechains)
+        epoch, traj_num = get_epoch_traj_num(filename)
+        coords = extractCoordinatesXTCFile(filename, lig_resname, atom_Ids, writeCA, topology.getTopologyFile(epoch, traj_num), indexes, sidechains)
     else:
         raise ValueError("Unrecongnized file extension for %s" % filename)
 
@@ -363,7 +373,7 @@ def gatherTrajs(constants, folder_name, setNumber, non_Repeat):
     copyTrajectories(nonRepeatedTrajs, constants.gatherNonRepeatedTrajsFilename, folder_name)
 
 
-def extractSidechainIndexes_prody(trajs, ligand_resname, topology=None):
+def extractSidechainIndexes_prody(traj, ligand_resname, topology=None):
     if not PRODY:
         raise utilities.UnsatisfiedDependencyException("Prody module not found, will not be able to extract sidechain coordinates")
     atoms = pd.parsePDB(traj)
@@ -371,7 +381,7 @@ def extractSidechainIndexes_prody(trajs, ligand_resname, topology=None):
     return [atom.getIndex() for atom in sidechains]
 
 
-def extractSidechainIndexes_mdtraj(trajs, lig_resname, topology=None):
+def extractSidechainIndexes_mdtraj(traj, lig_resname, topology=None):
     atoms = md.load(traj, top=topology)
     ligand_indices = atoms.top.select("resname '{lig}'".format(lig=lig_resname))
     water_indices = set(atoms.top.select("not protein or not resname '{lig}'".format(lig=lig_resname)))
@@ -388,6 +398,7 @@ def extractSidechainIndexes(trajs, lig_resname, topology=None, pool=None):
     workers = []
     for traj in trajs:
         ext = utilities.getFileExtension(traj)
+
         if ext == ".pdb":
             if PRODY:
                 if pool is None:
@@ -400,8 +411,9 @@ def extractSidechainIndexes(trajs, lig_resname, topology=None, pool=None):
                 else:
                     workers.append(pool.apply_async(extractSidechainIndexes_mdtraj, args=(traj, lig_resname)))
         elif ext in MDTRAJ_FORMATS:
+            epoch, traj_num = get_epoch_traj_num(traj)
             if pool is None:
-                sidechains_trajs.extend(extractSidechainIndexes_mdtraj(traj, lig_resname, topology=topology))
+                sidechains_trajs.extend(extractSidechainIndexes_mdtraj(traj, lig_resname, topology=topology.getTopologyFile(epoch, traj_num)))
             else:
                 workers.append(pool.apply_async(extractSidechainIndexes_mdtraj(traj, lig_resname, topology)))
         else:
@@ -411,9 +423,40 @@ def extractSidechainIndexes(trajs, lig_resname, topology=None, pool=None):
     return list(set(sidechains_trajs))
 
 
+def get_epoch_traj_num(filename):
+    # assumes trajectories come from an Adaptive simulation
+    path, traj_name = os.path.split(traj)
+    try:
+        epoch = int(os.path.split(path))
+    except ValueError:
+        # if for some reason epoch number can't be inferred, assume first
+        # epoch
+        epoch = 0
+    try:
+        traj_num = utilities.getTrajNum(traj)
+    except ValueError:
+        # if for some reason trajectory number can't be inferred, assume
+        # first trajectory
+        traj_num = 1
+    return epoch, traj_num
+
+
+def getTopologyObject(topology_file):
+    ext = utilities.getFileExtension(topology_file)
+    if ext == ".pdb":
+        return TopologyCompat(topology_file)
+    elif ext == ".pkl":
+        return utilities.readClusteringObject(topology_file)
+    else:
+        raise ValueError("The topology parameter needs to be the path to a pickled Topology object or a pdb!")
+
+
 def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, parallelize=True, topology=None, sidechains=False, sidechain_folder="."):
 
     constants = Constants()
+
+    if topology is not None:
+        topology = getTopologyObject(topology)
 
     lig_resname = parseResname(atom_Ids, lig_resname)
 
