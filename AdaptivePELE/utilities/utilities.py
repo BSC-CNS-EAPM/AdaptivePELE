@@ -65,6 +65,12 @@ class Topology:
         for f in files:
             os.remove(f)
 
+    def writeTopologyObject(self):
+        """
+            Dump the contents of the topology object using pickle
+        """
+        writeObject(os.path.join(self.path, "topologies.pkl"), self)
+
     def setTopologies(self, topologyFiles, cleanFiles=True):
         """
             Set the topologies for the simulation. If topologies were set

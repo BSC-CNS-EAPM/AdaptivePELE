@@ -795,6 +795,7 @@ def main(jsonParams, clusteringHook=None):
                                                                                               i+1)
 
         if processManager.isMaster():
+            topologies.writeTopologyObject()
             if clusteringMethod.symmetries and nativeStructure:
                 fixReportsSymmetry(outputPathConstants.epochOutputPathTempletized % i, resname,
                                    nativeStructure, clusteringMethod.symmetries, topologies)
