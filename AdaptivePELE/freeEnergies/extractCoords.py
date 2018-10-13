@@ -367,18 +367,19 @@ def extractSidechainIndexes_prody(trajs, ligand_resname, topology=None):
     if not PRODY:
         raise utilities.UnsatisfiedDependencyException("Prody module not found, will not be able to extract sidechain coordinates")
     atoms = pd.parsePDB(traj)
-    sidechains = atoms.select("within 5 of resname {}".format(ligand_resname))
+    sidechains = atoms.select("protein within 5 of resname {}".format(ligand_resname))
     return [atom.getIndex() for atom in sidechains]
 
 
 def extractSidechainIndexes_mdtraj(trajs, lig_resname, topology=None):
     atoms = md.load(traj, top=topology)
     ligand_indices = atoms.top.select("resname '{lig}'".format(lig=lig_resname))
+    water_indices = set(atoms.top.select("not protein or not resname '{lig}'".format(lig=lig_resname)))
     # the distance is specified in nm
     sidechains = md.compute_neighbors(atoms, 0.5, ligand_indices)
-    sidechains_trajs = sidechains[0].tolist()
+    sidechains_trajs = []
     for i, sidechain in enumerate(sidechains):
-        sidechains_trajs.extend(sidechain.tolist())
+        sidechains_trajs.extend(list(set(sidechain.tolist())-water_indices))
     return sidechains_trajs
 
 
