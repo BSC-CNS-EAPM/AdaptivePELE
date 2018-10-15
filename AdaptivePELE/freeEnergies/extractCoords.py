@@ -392,7 +392,7 @@ def extractSidechainIndexes_mdtraj(traj, lig_resname, topology=None):
     # the distance is specified in nm
     sidechains = md.compute_neighbors(atoms, 0.5, ligand_indices)
     sidechains_trajs = []
-    for i, sidechain in enumerate(sidechains):
+    for _, sidechain in enumerate(sidechains):
         sidechains_trajs.extend(list(set(sidechain.tolist())-water_indices))
     return sidechains_trajs
 
@@ -429,7 +429,7 @@ def extractSidechainIndexes(trajs, lig_resname, topology=None, pool=None):
 
 def get_epoch_traj_num(filename):
     # assumes trajectories come from an Adaptive simulation
-    path, traj_name = os.path.split(traj)
+    path, traj_name = os.path.split(filename)
     try:
         epoch = int(os.path.split(path))
     except ValueError:
@@ -437,7 +437,7 @@ def get_epoch_traj_num(filename):
         # epoch
         epoch = 0
     try:
-        traj_num = utilities.getTrajNum(traj)
+        traj_num = utilities.getTrajNum(traj_name)
     except ValueError:
         # if for some reason trajectory number can't be inferred, assume
         # first trajectory
