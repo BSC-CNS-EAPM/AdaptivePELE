@@ -1319,7 +1319,7 @@ class RunnerBuilder:
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
-            params.forcefields = paramsBlock.get(blockNames.SimulationParams.forcefields, "ff99SB")
+            params.forcefields = paramsBlock.get(blockNames.SimulationParams.forcefield, "ff99SB")
             params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
             params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
             params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
