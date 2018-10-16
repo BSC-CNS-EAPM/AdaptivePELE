@@ -70,6 +70,7 @@ class StringSpawningTypes:
     UCB = "UCB"
     REAP = "REAP"
     null = "null"
+    ProbabilityMSMCalculator = "ProbabilityMSMCalculator"
 
 
 class SpawningParams:
@@ -97,6 +98,7 @@ class SpawningParams:
     alpha = "alpha"
     nclusters = "n"
     metricsInd = "metricsInd"
+    lagtim = "lagtime"
 
 
 class SpawningDensity:

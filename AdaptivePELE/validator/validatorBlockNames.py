@@ -44,7 +44,8 @@ class SpawningParams:
         "metricWeights": "basestring",
         "metricsInd": "list",
         "condition": "basestring",
-        "n": "numbers.Real"
+        "n": "numbers.Real",
+        "lagtime": "numbers.Real"
     }
     types = {
         "sameWeight": {
@@ -87,6 +88,9 @@ class SpawningParams:
         "REAP": {
             "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real"
+        },
+        "ProbabilityMSMCalculator": {
+            "lagtime": "numbers.Real"
         }
     }
     density = {
@@ -202,7 +206,7 @@ class clusteringTypes:
             "ligandResname": "basestring"
         },
         "MSM": {
-            "ligandResname": "basestring"
+            "ligandResname": "basestring",
             "nclusters": "numbers.Real"
         }
     }
