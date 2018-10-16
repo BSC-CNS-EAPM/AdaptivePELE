@@ -737,14 +737,12 @@ def main(jsonParams, clusteringHook=None):
 
             if clusteringHook is not None:
                 clusteringHook(clusteringMethod, outputPathConstants, simulationRunner, i+1)
+            clustersList = clusteringMethod.getClusterListForSpawning()
 
         if simulationRunner.parameters.modeMovingBox is not None:
             simulationRunner.getNextIterationBox(outputPathConstants.epochOutputPathTempletized % i, resname, topologies, i)
             if processManager.isMaster():
                 clustersList, clustersFiltered = filterClustersAccordingToBox(simulationRunner.parameters, clusteringMethod)
-        else:
-            if processManager.isMaster():
-                clustersList = clusteringMethod.clusters.clusters
 
         if processManager.isMaster():
             degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), i)
@@ -754,7 +752,7 @@ def main(jsonParams, clusteringHook=None):
                 if simulationRunner.parameters.modeMovingBox is not None:
                     degeneracyOfRepresentatives = mergeFilteredClustersAccordingToBox(degeneracyOfRepresentatives, clustersFiltered)
                 utilities.print_unbuffered("Degeneracy", degeneracyOfRepresentatives)
-                assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)
+                assert len(degeneracyOfRepresentatives) == len(clusteringMethod)
             else:
                 # When using null or independent spawning the calculate method returns None
                 assert spawningCalculator.type in spawningTypes.SPAWNING_NO_DEGENERACY_TYPES, "calculate returned None with spawning type %s" % spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]

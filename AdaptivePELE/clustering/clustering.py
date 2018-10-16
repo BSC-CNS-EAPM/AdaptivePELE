@@ -859,6 +859,14 @@ class Clustering(object):
         for cluster in self.clusters.clusters:
             cluster.metricCol = col
 
+    def getClusterListForSpawning(self):
+        """
+            Return the clusters object to be used in the spawning
+
+            :returns: :py:class:`.Clusters` -- Container object for the clusters
+        """
+        return self.clusters
+
     def getCluster(self, clusterNum):
         """
             Get the cluster at index clusterNum
@@ -1544,6 +1552,14 @@ class MSMClustering(Clustering):
         self.tica_nICs = state.get('tica_nICs', 3)
         self.tica_kinetic_map = state.get('tica_kinetic_map', True)
         self.tica_commute_map = state.get('tica_commute_map', False)
+
+    def getClusterListForSpawning(self):
+        """
+            Return the clusters object to be used in the spawning
+
+            :returns: :py:class:`.Clusters` -- Container object for the clusters
+        """
+        return self.clusters
 
     def setProcessors(self, processors):
         self.nprocessors = processors
