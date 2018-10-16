@@ -730,7 +730,6 @@ def main(jsonParams, clusteringHook=None):
 
         if processManager.isMaster():
             utilities.print_unbuffered("Clustering...")
-        if processManager.isMaster():
             startTime = time.time()
             clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies, outputPathConstants)
             endTime = time.time()
