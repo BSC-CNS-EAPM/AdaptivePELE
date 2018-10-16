@@ -1687,6 +1687,57 @@ class MSMClustering(Clustering):
                 cluster = Cluster(pdb, trajPosition=(trajFile[0], trajFile[1], pair[1]))
                 self.clusters[pair[0]] = cluster
 
+    def writeOutput(self, outputPath, degeneracy, outputObject, writeAll):
+        """
+            Writes all the clustering information in outputPath
+
+            :param outputPath: Folder that will contain all the clustering information
+            :type outputPath: str
+            :param degeneracy: Degeneracy of each cluster. It must be in the same order
+                as in the self.clusters list
+            :type degeneracy: list
+            :param outputObject: Output name for the pickle object
+            :type outputObject: str
+            :param writeAll: Wether to write pdb files for all cluster in addition
+                of the summary
+            :type writeAll: bool
+        """
+        utilities.cleanup(outputPath)
+        utilities.makeFolder(outputPath)
+
+        summaryFilename = os.path.join(outputPath, "summary.txt")
+        with open(summaryFilename, 'w') as summaryFile:
+            summaryFile.write("#cluster degeneracy cluster center\n")
+
+            for i, cluster in enumerate(self.clusters.clusters):
+                if writeAll:
+                    outputFilename = "cluster_%d.pdb" % i
+                    outputFilename = os.path.join(outputPath, outputFilename)
+                    cluster.writePDB(outputFilename)
+
+                degeneracy_cluster = 0
+                if degeneracy is not None:
+                    # degeneracy will be None if null spawning is used
+                    degeneracy_cluster = degeneracy[i]
+                center_str = " ".join(["%.3f" for _ in self.pyemma_clustering.clusterCenters[i]])
+                writeString = "%d %d %s\n" % (i, degeneracy_cluster, center_str % tuple(self.pyemma_clustering.clusterCenters[i]))
+                summaryFile.write(writeString)
+
+        utilities.writeObject(outputObject, self, protocol=2)
+
+    def filterClustersAccordingToBox(self, simulationRunnerParams):
+        """
+            Filter the clusters to select only the ones whose representative
+            structures will fit into the selected box
+
+            :param simulationRunnerParams: :py:class:`.SimulationParameters` Simulation parameters object
+            :type simulationRunnerParams: :py:class:`.SimulationParameters`
+
+            :returns list, list: -- list of the filtered clusters, list of bools flagging wether the cluster is selected or not
+
+        """
+        pass
+
 
 class ClusteringBuilder(object):
     def buildClustering(self, clusteringBlock, reportBaseFilename=None, columnOfReportFile=None):
