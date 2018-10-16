@@ -2,6 +2,7 @@ import os
 import time
 import glob
 import fcntl
+import errno
 from AdaptivePELE.utilities import utilities
 
 try:
@@ -30,6 +31,8 @@ class ProcessesManager:
         self.status = self.INIT
         self.sleepTime = 0.5
         self.createLockFile()
+        self.lock_available = True
+        self.testLock()
         self.writeProcessInfo()
         self.initLockFile()
         self.syncStep = 0
@@ -39,7 +42,31 @@ class ProcessesManager:
         # processes
         return len(self.lockInfo)
 
+    def testLock(self):
+        """
+            Run a test to check if the file systems supports lockf and store it
+            in the lock_available attribute
+        """
+        file_lock = open(self.lockFile, "r+")
+        try:
+            fcntl.lockf(file_lock, fcntl.LOCK_EX)
+        except (IOError, OSError) as exc:
+            if exc.errno != errno.ENOLCK:
+                raise
+            # if only one replica is running we don't need synchronization,
+            # so we can still run even if we are using a filesystem that
+            # does not support lockf
+            if self.nReplicas > 1:
+                raise ValueError("There was a problem allocating a lock, this usually happens when the filesystem used does not support lockf, such as NFS")
+            else:
+                self.lock_available = False
+                return
+        self.lock_available = True
+
     def writeProcessInfo(self):
+        """
+            Write the information of the running process to create the sync file
+        """
         with open(os.path.join(self.syncFolder, "%d.proc" % self.pid), "w") as fw:
             fw.write("%d\n" % self.pid)
 
@@ -80,15 +107,21 @@ class ProcessesManager:
             break
         file_lock = open(self.lockFile, "r+")
         while True:
-            fcntl.lockf(file_lock, fcntl.LOCK_EX)
+            if self.lock_available:
+                # if the filesystem does not support locks but only one replica
+                # is running we will use no locks
+                fcntl.lockf(file_lock, fcntl.LOCK_EX)
+
             if self.isMaster():
                 self.writeLockInfo(file_lock)
-                fcntl.lockf(file_lock, fcntl.LOCK_UN)
+                if self.lock_available:
+                    fcntl.lockf(file_lock, fcntl.LOCK_UN)
                 file_lock.close()
                 return
             else:
                 lock_info = self.getLockInfo(file_lock)
-                fcntl.lockf(file_lock, fcntl.LOCK_UN)
+                if self.lock_available:
+                    fcntl.lockf(file_lock, fcntl.LOCK_UN)
                 # ensure that all process are created before continuing
                 if sorted(list(lock_info)) == sorted(list(self.lockInfo)):
                     file_lock.close()
@@ -129,6 +162,8 @@ class ProcessesManager:
     def isMaster(self):
         """
             Return wether the current process is the master process
+
+            :returns: bool -- Whether the current process is master
         """
         return self.id == 0
 
@@ -141,16 +176,20 @@ class ProcessesManager:
         """
         self.status = status
         file_lock = open(self.lockFile, "r+")
-        fcntl.lockf(file_lock, fcntl.LOCK_EX)
+        if self.lock_available:
+            fcntl.lockf(file_lock, fcntl.LOCK_EX)
         self.lockInfo = self.getLockInfo(file_lock)
         self.lockInfo[self.pid][1].add(self.status)
         self.writeLockInfo(file_lock)
-        fcntl.lockf(file_lock, fcntl.LOCK_UN)
+        if self.lock_available:
+            fcntl.lockf(file_lock, fcntl.LOCK_UN)
         file_lock.close()
 
     def getStatus(self):
         """
             Return the current status of the process
+
+            :returns: str -- Status of the process
         """
         return self.status
 
@@ -178,9 +217,11 @@ class ProcessesManager:
             if self.isSynchronized(status):
                 return
             file_lock = open(self.lockFile, "r+")
-            fcntl.lockf(file_lock, fcntl.LOCK_EX)
+            if self.lock_available:
+                fcntl.lockf(file_lock, fcntl.LOCK_EX)
             self.lockInfo = self.getLockInfo(file_lock)
-            fcntl.lockf(file_lock, fcntl.LOCK_UN)
+            if self.lock_available:
+                fcntl.lockf(file_lock, fcntl.LOCK_UN)
             file_lock.close()
 
     def allRunning(self):
