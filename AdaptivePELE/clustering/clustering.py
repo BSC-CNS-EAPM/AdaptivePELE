@@ -1532,6 +1532,7 @@ class MSMClustering(Clustering):
         self.tica_nICs = tica_nICs
         self.tica_kinetic_map = tica_kinetic_map
         self.tica_commute_map = tica_commute_map
+        self.pyemma_clustering = None
 
     def __getstate__(self):
         # Defining pickling interface to avoid problems when working with old
@@ -1548,7 +1549,8 @@ class MSMClustering(Clustering):
                  "writeCA": self.writeCA, "sidechains": self.sidechains,
                  "tica_lagtime": self.tica_lagtime, "tica_nICs": self.tica_nICs,
                  "tica_kinetic_map": self.tica_kinetic_map,
-                 "tica_commute_map": self.tica_commute_map}
+                 "tica_commute_map": self.tica_commute_map,
+                 "pyemma_clustering": self.pyemma_clustering}
         return state
 
     def __setstate__(self, state):
@@ -1576,6 +1578,7 @@ class MSMClustering(Clustering):
         self.tica_nICs = state.get('tica_nICs', 3)
         self.tica_kinetic_map = state.get('tica_kinetic_map', True)
         self.tica_commute_map = state.get('tica_commute_map', False)
+        self.pyemma_clustering = state.get('pyemma_clustering')
 
     def getClusterListForSpawning(self):
         """
@@ -1583,7 +1586,7 @@ class MSMClustering(Clustering):
 
             :returns: :py:class:`.Clusters` -- Container object for the clusters
         """
-        return self.clusters
+        return self.pyemma_clustering
 
     def setProcessors(self, processors):
         self.nprocessors = processors
@@ -1652,15 +1655,15 @@ class MSMClustering(Clustering):
             base_traj_names = self.constantsExtract.baseGatheredFilename
 
         # cluster the coordinates
-        clustering = pyemma_cluster.Cluster(self.n_clusters, outputPathConstants.allTrajsPath, base_traj_names, discretizedPath=os.path.join(outputPathConstants.allTrajsPath, "discretized"))
-        clustering.cleanDiscretizedFolder()
-        clustering.clusterTrajectories()
+        self.pyemma_clustering = pyemma_cluster.Cluster(self.n_clusters, outputPathConstants.allTrajsPath, base_traj_names, discretizedPath=os.path.join(outputPathConstants.allTrajsPath, "discretized"))
+        self.pyemma_clustering.cleanDiscretizedFolder()
+        self.pyemma_clustering.clusterTrajectories()
 
         # create Adaptive clusters from the kmeans result
         trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, self.constantsExtract.baseGatheredFilename))
         trajectories = [np.loadtxt(f)[:, 1:] for f in trajectory_files]
 
-        centersInfo = estimate.getCentersInfo(clustering, trajectories, trajectory_files, clustering.dtrajs)
+        centersInfo = estimate.getCentersInfo(self.pyemma_clustering, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)
         extractInfo = getRepr.getExtractInfo(centersInfo)
         # extractInfo is a dictionary organized as {[epoch, traj]: [cluster, snapshot]}
 
