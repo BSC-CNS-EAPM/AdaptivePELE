@@ -164,6 +164,7 @@ class SimulationParams:
         "reporterFrequency": "numbers.Real",
         "productionLength": "numbers.Real",
         "WaterBoxSize": "numbers.Real",
+        "forcefields": "basestring",
         "trajectoriesPerReplica": "numbers.Real",
         "equilibrationLengthNVT": "numbers.Real",
         "equilibrationLengthNPT": "numbers.Real",

@@ -158,6 +158,7 @@ class SimulationParams:
     constraintsNVT = "constraintsNVT"
     constraintsNPT = "constraintsNPT"
     devicesPerTrajectory = "devicesPerTrajectory"
+    forcefields = "forcefields"
 
 
 class ExitConditionType:

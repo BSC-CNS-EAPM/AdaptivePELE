@@ -82,6 +82,7 @@ class SimulationParameters:
         self.constraintsMin = 5
         self.constraintsNVT = 5
         self.constraintsNPT = 0.5
+        self.forcefields = "ff99SB"
 
 
 class SimulationRunner:
@@ -879,6 +880,7 @@ class MDSimulation(SimulationRunner):
             prmtop = os.path.join(workingdirectory, outputPathConstants.topologies, "system_%d.prmtop" % i)
             inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % i)
             finalPDB = os.path.join(workingdirectory, equilibrationOutput, "system_%d.pdb" % i)
+            Tleapdict["FORCEFIELD"] = constants.AmberTemplates.forcefields[self.parameters.forcefield]
             Tleapdict["COMPLEX"] = structure
             Tleapdict["PRMTOP"] = prmtop
             Tleapdict["INPCRD"] = inpcrd
@@ -1317,6 +1319,7 @@ class RunnerBuilder:
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
+            params.forcefields = paramsBlock.get(blockNames.SimulationParams.forcefields, "ff99SB")
             params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
             params.Temperature = paramsBlock.get(blockNames.SimulationParams.Temperature, 300)
             params.runningPlatform = paramsBlock.get(blockNames.SimulationParams.runningPlatform, "CPU")
