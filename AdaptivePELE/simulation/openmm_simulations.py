@@ -371,9 +371,10 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         platformProperties = {}
     system = prmtop.createSystem(nonbondedMethod=app.PME,
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
-                                 constraints=app.HBonds)
+                                 constraints=app.HBonds, removeCMMotion=True)
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
+    system.addForce(mm.MonteCarloBarostat(1 * unit.bar, parameters.Temperature * unit.kelvin))
     if parameters.boxCenter:
         # Harmonic flat-bottom restrain for the ligand
         force = mm.CustomExternalForce('step(r-r0) * (k/2) * (r-r0)^2; r=sqrt((x-b0)^2+(y-b1)^2+(z-b2)^2)')

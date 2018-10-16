@@ -80,8 +80,8 @@ class OutputPathConstants():
         self.tmpControlFilename = ""
         self.tmpInitialStructuresEquilibrationTemplate = ""
         self.tmpControlFilenameEqulibration = ""
-        self.buildConstants(outputPath)
         self.topologies = ""
+        self.buildConstants(outputPath)
 
     def buildConstants(self, outputPath):
         self.buildOutputPathConstants(outputPath)
