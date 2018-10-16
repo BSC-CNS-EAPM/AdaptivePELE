@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import sys
+import ast
 import glob
 import heapq
 import numpy as np
@@ -910,6 +911,29 @@ class Clustering(object):
             and self.resnum == other.resnum\
             and self.resChain == other.resChain\
             and self.col == other.col
+
+    def filterClustersAccordingToBox(self, simulationRunnerParams):
+        """
+            Filter the clusters to select only the ones whose representative
+            structures will fit into the selected box
+
+            :param simulationRunnerParams: :py:class:`.SimulationParameters` Simulation parameters object
+            :type simulationRunnerParams: :py:class:`.SimulationParameters`
+
+            :returns list, list: -- list of the filtered clusters, list of bools flagging wether the cluster is selected or not
+
+        """
+        box_center = ast.literal_eval(simulationRunnerParams.boxCenter)
+        box_radius = simulationRunnerParams.boxRadius
+        clustersFiltered = []
+        clustersSelected = []
+        for cluster in self.clusters:
+            if utilities.distanceCOM(box_center, cluster.pdb.getCOM()) < (box_radius-1):
+                clustersFiltered.append(cluster)
+                clustersSelected.append(True)
+            else:
+                clustersSelected.append(False)
+        return clustersFiltered, clustersSelected
 
     def cluster(self, paths, ignoreFirstRow=False, topology=None, epoch=None, outputPathConstants=None):
         """

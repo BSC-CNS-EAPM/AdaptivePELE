@@ -163,32 +163,6 @@ def checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputFolder, simul
             simulationRunner.parameters.exitCondition.checkExitCondition(outputFolder % i)
 
 
-def filterClustersAccordingToBox(simulationRunnerParams, clusteringObject):
-    """
-        Filter the clusters to select only the ones whose representative
-        structures will fit into the selected box
-
-        :param simulationRunnerParams: :py:class:`.SimulationParameters` Simulation parameters object
-        :type simulationRunnerParams: :py:class:`.SimulationParameters`
-        :param clusteringObject: Clustering object
-        :type clusteringObject: :py:class:`.Clustering`
-
-        :returns list, list: -- list of the filtered clusters, list of bools flagging wether the cluster is selected or not
-
-    """
-    box_center = ast.literal_eval(simulationRunnerParams.boxCenter)
-    box_radius = simulationRunnerParams.boxRadius
-    clustersFiltered = []
-    clustersSelected = []
-    for cluster in clusteringObject.clusters.clusters:
-        if utilities.distanceCOM(box_center, cluster.pdb.getCOM()) < (box_radius-1):
-            clustersFiltered.append(cluster)
-            clustersSelected.append(True)
-        else:
-            clustersSelected.append(False)
-    return clustersFiltered, clustersSelected
-
-
 def mergeFilteredClustersAccordingToBox(degeneracy, clustersFiltering):
     """
         Merge the (possibly) partial degeneracy to obtain a complete list,
@@ -742,7 +716,7 @@ def main(jsonParams, clusteringHook=None):
         if simulationRunner.parameters.modeMovingBox is not None:
             simulationRunner.getNextIterationBox(outputPathConstants.epochOutputPathTempletized % i, resname, topologies, i)
             if processManager.isMaster():
-                clustersList, clustersFiltered = filterClustersAccordingToBox(simulationRunner.parameters, clusteringMethod)
+                clustersList, clustersFiltered = clusteringMethod.filterClustersAccordingToBox(simulationRunner.parameters)
 
         if processManager.isMaster():
             degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), i)
