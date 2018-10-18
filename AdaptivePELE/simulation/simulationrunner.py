@@ -2,14 +2,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import time
 import os
 import json
-import subprocess
 import shutil
 import string
 import sys
 import numpy as np
 import ast
 import glob
-import subprocess32
 from builtins import range
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
@@ -20,6 +18,12 @@ try:
     from sklearn.cluster import KMeans
 except ImportError:
     SKLEARN = False
+
+try:
+    import subprocess32 as subprocess
+except ImportError:
+    import subprocess
+
 try:
     basestring
 except NameError:
@@ -37,7 +41,7 @@ class SimulationParameters:
         self.peleSteps = 0
         self.seed = 0
         self.exitCondition = None
-	self.time = None
+        self.time = None
         self.boxCenter = None
         self.boxRadius = 20
         self.modeMovingBox = None
@@ -270,26 +274,25 @@ class PeleSimulation(SimulationRunner):
         self.createSymbolicLinks()
 
         if self.parameters.srun:
-            toRun = ["srun", "-n", str(self.parameters.processors)]+ self.parameters.srunParameters +[self.parameters.executable, runningControlFile]
+            toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters +[self.parameters.executable, runningControlFile]
         else:
             toRun = ["mpirun -np " + str(self.parameters.processors), self.parameters.executable, runningControlFile]
         toRun = " ".join(toRun)
         print(toRun)
         startTime = time.time()
-	if self.parameters.time:
-		try:
-        		proc = subprocess32.Popen(toRun, stdout=subprocess.PIPE,  shell=True,  universal_newlines=True)
-        		(out, err) = proc.communicate(timeout=self.parameters.time)
-		except subprocess32.TimeoutExpired:
-			print("killing")
-			proc.kill()
-	else:		
-        	proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
-        	(out, err) = proc.communicate()
-        	print(out)
-        	if err:
-            		print(err)
-
+        if self.parameters.time:
+            try:
+                proc = subprocess.Popen(toRun, stdout=subprocess.PIPE,  shell=True,  universal_newlines=True)
+                (out, err) = proc.communicate(timeout=self.parameters.time)
+            except subprocess.TimeoutExpired:
+                print("killing")
+                proc.kill()
+        else:
+            proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+            (out, err) = proc.communicate()
+            print(out)
+            if err:
+                    print(err)
 
         endTime = time.time()
         print("PELE took %.2f sec" % (endTime - startTime))
