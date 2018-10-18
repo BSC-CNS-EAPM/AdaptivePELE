@@ -292,7 +292,7 @@ class PeleSimulation(SimulationRunner):
             (out, err) = proc.communicate()
             print(out)
             if err:
-                    print(err)
+                print(err)
 
         endTime = time.time()
         print("PELE took %.2f sec" % (endTime - startTime))
