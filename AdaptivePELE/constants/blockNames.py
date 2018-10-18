@@ -108,6 +108,7 @@ class SimulationType:
 class SimulationParams:
     params = "params"
     processors = "processors"
+    time = "time"
     executable = "executable"
     templetizedControlFile = "controlFile"
     dataFolder = "data"
