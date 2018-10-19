@@ -1610,6 +1610,11 @@ class MSMClustering(Clustering):
         self.emptyClustering()
         # when cleaning the clusters, the epoch attribute is reset
         self.epoch = epoch
+
+        utilities.makeFolder(outputPathConstants.allTrajsPath)
+        extractedFolder = self.constantsExtract.extractedTrajectoryFolder % outputPathConstants.epochOutputPathTempletized % self.epoch
+        self.constantsExtract.gatherNonRepeatedTrajsFilename = os.path.join(outputPathConstants.allTrajsPath, "traj_%s_%s.dat")
+        utilities.makeFolder(extractedFolder)
         trajectories = getAllTrajectories(paths)
         if self.indexes is None and utilities.getFileExtension(trajectories[0]) in coord.MDTRAJ_FORMATS:
             self.indexes = []
@@ -1625,22 +1630,34 @@ class MSMClustering(Clustering):
         if self.sidechains:
             new_sidechains = coord.extractSidechainIndexes(trajectories, self.ligand, topology, pool=pool)
             self.sidechains = list(set(self.sidechains).intersection(set(new_sidechains)))
+        else:
+            self.sidechains = []
+
         workers = []
         for filename in trajectories:
             trajNum = utilities.getTrajNum(filename)
+            if self.indexes is not None:
+                indexes_traj = self.indexes[topology.getTopologyIndex(self.epoch, trajNum)]
+            else:
+                indexes_traj = self.indexes
+            if topology is not None:
+                topology_traj = topology.getTopology(self.epoch, trajNum)
+            else:
+                topology_traj = None
+
             if pool is None:
                 # serial version
-                coord.writeFilenameExtractedCoordinates(filename, self.resname, self.atom_Ids, outputPathConstants.allTrajsPath, False, self.constantsExtract, self.writeCA, self.sidechains, topology=topology.getTopology(self.epoch, trajNum), indexes=self.indexes[topology.getTopologyIndex(self.epoch, trajNum)])
+                coord.writeFilenameExtractedCoordinates(filename, self.resname, self.atom_Ids, outputPathConstants.epochOutputPathTempletized % self.epoch, False, self.constantsExtract, self.writeCA, self.sidechains, topology=topology_traj, indexes=indexes_traj)
             else:
                 # multiprocessor version
-                workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, self.resname, self.atom_Ids, outputPathConstants.allTrajsPath, False, self.constantsExtract, self.writeCA, self.sidechains, topology.getTopology(self.epoch, trajNum), self.indexes[topology.getTopologyIndex(self.epoch, trajNum)])))
+                workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, self.resname, self.atom_Ids, outputPathConstants.epochOutputPathTempletized % self.epoch, False, self.constantsExtract, self.writeCA, self.sidechains, topology_traj, indexes_traj)))
         for w in workers:
             w.get()
-
+        coord.gatherTrajs(self.constantsExtract, outputPathConstants.epochOutputPathTempletized % self.epoch, self.epoch, True, self.epoch)
         # apply tica
         if self.tica:
             trajectories = []
-            trajs = glob.glob(os.path.join(outputPathConstants.allTrajsPath, self.constantsExtract.baseGatheredFilename))
+            trajs = glob.glob(os.path.join(outputPathConstants.allTrajsPath, self.constantsExtract.baseExtractedTrajectoryName+"*"))
             for trajectory in trajs:
                 if "tica" in trajectory:
                     continue
@@ -1660,17 +1677,21 @@ class MSMClustering(Clustering):
         self.pyemma_clustering.clusterTrajectories()
 
         # create Adaptive clusters from the kmeans result
-        trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, self.constantsExtract.baseGatheredFilename))
+        trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, base_traj_names))
         trajectories = [np.loadtxt(f)[:, 1:] for f in trajectory_files]
 
         centersInfo = estimate.getCentersInfo(self.pyemma_clustering, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)
-        extractInfo = getRepr.getExtractInfo(centersInfo)
+        centersInfo_processed = []
+        for cluster in centersInfo:
+            epoch_num, traj_num, snapshot_num = centersInfo[cluster]["structure"]
+            centersInfo_processed.append([cluster, int(epoch_num), int(traj_num), int(snapshot_num)])
+        extractInfo = getRepr.getExtractInfo(centersInfo_processed)
         # extractInfo is a dictionary organized as {[epoch, traj]: [cluster, snapshot]}
 
         # assign cluster dummies so that then clusters can be assigned in proper
         # order
         for _ in range(self.n_clusters):
-            self.addCluster(Cluster(""))
+            self.clusters.addCluster(Cluster(""))
         structureFolder = os.path.join(outputPathConstants.epochOutputPathTempletized, "*traj*_%d*")
         for trajFile, extraInfo in extractInfo.items():
             try:
@@ -1683,7 +1704,11 @@ class MSMClustering(Clustering):
                 raise IOError("Unable to open %s, please check that the path to structures provided is correct" % pdbFile)
             for pair in extraInfo:
                 pdb = atomset.PDB()
-                pdb.initialise(snapshots[pair[1]], resname=self.resname, topology=topology.getTopologyFile(*trajFile))
+                if topology is not None:
+                    top_traj = topology.getTopologyFile(*trajFile)
+                else:
+                    top_traj = None
+                pdb.initialise(snapshots[pair[1]], resname=self.resname, topology=top_traj)
                 cluster = Cluster(pdb, trajPosition=(trajFile[0], trajFile[1], pair[1]))
                 self.clusters[pair[0]] = cluster
 
