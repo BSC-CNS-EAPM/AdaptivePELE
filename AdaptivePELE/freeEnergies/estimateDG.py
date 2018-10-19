@@ -193,7 +193,7 @@ def getCentersInfo(cl, trajs, files, dtrajs):
     centersInfo = {x: {"structure": None, "minDist": 1e6} for x in range(numClusters)}
     for i, traj in enumerate(trajs):
         traj_name = files[i]
-        _, epochNum, trajNum = os.path.splitext(traj_name)[0].split("_", 2)
+        _, epochNum, trajNum = os.path.splitext(traj_name)[0].rsplit("_", 2)
         for nSnap, snapshot in enumerate(traj):
             clusterInd = dtrajs[i][nSnap]
             dist = np.linalg.norm(cl.clusterCenters[clusterInd]-snapshot)
