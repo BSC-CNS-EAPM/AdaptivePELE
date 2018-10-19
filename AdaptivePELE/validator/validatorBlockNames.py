@@ -89,7 +89,7 @@ class SpawningParams:
             "reportFilename": "basestring",
             "metricColumnInReport": "numbers.Real"
         },
-        "ProbabilityMSMCalculator": {
+        "ProbabilityMSM": {
             "lagtime": "numbers.Real"
         }
     }
