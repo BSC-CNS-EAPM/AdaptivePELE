@@ -358,23 +358,23 @@ def makeGatheredTrajsFolder(constants):
         os.makedirs(constants.gatherNonRepeatedFolder)
 
 
-def copyTrajectories(traj_names, destFolderTempletized, folderName):
+def copyTrajectories(traj_names, destFolderTempletized, folderName, setNumber=0, epochNum=None):
     for inputTrajectory in traj_names:
         trajectoryNumber = extractFilenumber(os.path.split(inputTrajectory)[1])
         if folderName != ".":  # if not sequential
             setNumber = folderName
+        if epochNum is not None:
+            setNumber = epochNum
         shutil.copyfile(inputTrajectory, destFolderTempletized % (setNumber, trajectoryNumber))
 
 
-def gatherTrajs(constants, folder_name, setNumber, non_Repeat):
-    if non_Repeat:
-        trajectoriesFilenames = os.path.join(constants.extractedTrajectoryFolder % folder_name, constants.baseExtractedTrajectoryName + "*")
-    else:
+def gatherTrajs(constants, folder_name, setNumber, non_Repeat, epochNum=None):
+    if not non_Repeat:
         trajectoriesFilenames = os.path.join(constants.outputTrajectoryFolder % folder_name, constants.baseExtractedTrajectoryName + "*")
-    trajectories = glob.glob(trajectoriesFilenames)
-    copyTrajectories(trajectories, constants.gatherTrajsFilename, folder_name)
+        trajectories = glob.glob(trajectoriesFilenames)
+        copyTrajectories(trajectories, constants.gatherTrajsFilename, folder_name, setNumber)
     nonRepeatedTrajs = glob.glob(os.path.join(constants.extractedTrajectoryFolder % folder_name, constants.baseExtractedTrajectoryName + "*"))
-    copyTrajectories(nonRepeatedTrajs, constants.gatherNonRepeatedTrajsFilename, folder_name)
+    copyTrajectories(nonRepeatedTrajs, constants.gatherNonRepeatedTrajsFilename, folder_name, setNumber, epochNum=epochNum)
 
 
 def extractSidechainIndexes_prody(traj, ligand_resname, topology=None):
