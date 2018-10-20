@@ -1705,7 +1705,7 @@ class MSMClustering(Clustering):
             for pair in extraInfo:
                 pdb = atomset.PDB()
                 if topology is not None:
-                    top_traj = topology.getTopologyFile(*trajFile)
+                    top_traj = topology.getTopology(*trajFile)
                 else:
                     top_traj = None
                 pdb.initialise(snapshots[pair[1]], resname=self.resname, topology=top_traj)
@@ -1745,7 +1745,7 @@ class MSMClustering(Clustering):
                     # degeneracy will be None if null spawning is used
                     degeneracy_cluster = degeneracy[i]
                 center_str = " ".join(["%.3f" for _ in self.pyemma_clustering.clusterCenters[i]])
-                writeString = "%d %d %d %d %d %s\n" % ((i, degeneracy_cluster) + cluster.trajPosition + (center_str % tuple(self.pyemma_clustering.clusterCenters[i])))
+                writeString = "%d %d %d %d %d %s\n" % ((i, degeneracy_cluster) + cluster.trajPosition + (center_str % tuple(self.pyemma_clustering.clusterCenters[i]),))
                 summaryFile.write(writeString)
 
         utilities.writeObject(outputObject, self, protocol=2)
