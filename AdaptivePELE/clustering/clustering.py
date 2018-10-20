@@ -1732,7 +1732,7 @@ class MSMClustering(Clustering):
 
         summaryFilename = os.path.join(outputPath, "summary.txt")
         with open(summaryFilename, 'w') as summaryFile:
-            summaryFile.write("#cluster degeneracy cluster center\n")
+            summaryFile.write("#cluster degeneracy epoch trajectory snapshot cluster center\n")
 
             for i, cluster in enumerate(self.clusters.clusters):
                 if writeAll:
@@ -1745,7 +1745,7 @@ class MSMClustering(Clustering):
                     # degeneracy will be None if null spawning is used
                     degeneracy_cluster = degeneracy[i]
                 center_str = " ".join(["%.3f" for _ in self.pyemma_clustering.clusterCenters[i]])
-                writeString = "%d %d %s\n" % (i, degeneracy_cluster, center_str % tuple(self.pyemma_clustering.clusterCenters[i]))
+                writeString = "%d %d %d %d %d %s\n" % ((i, degeneracy_cluster) + cluster.trajPosition + (center_str % tuple(self.pyemma_clustering.clusterCenters[i])))
                 summaryFile.write(writeString)
 
         utilities.writeObject(outputObject, self, protocol=2)
