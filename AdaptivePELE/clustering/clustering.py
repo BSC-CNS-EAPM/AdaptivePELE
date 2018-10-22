@@ -1,9 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from builtins import range
-import sys
-import glob
-import numpy as np
 import os
+import sys
+import ast
+import glob
+import heapq
+import numpy as np
+from scipy import stats
+from builtins import range
 from six import reraise as raise_
 from AdaptivePELE.constants import blockNames
 from AdaptivePELE.utilities import utilities
@@ -12,13 +15,27 @@ from AdaptivePELE.atomset import RMSDCalculator
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.clustering import clusteringTypes
 from AdaptivePELE.clustering import thresholdcalculator
-from scipy import stats
-import heapq
+from AdaptivePELE.freeEnergies import extractCoords as coord
+from AdaptivePELE.freeEnergies import estimateDG as estimate
+from AdaptivePELE.freeEnergies import getRepresentativeStructures as getRepr
 try:
     import networkx as nx
     NETWORK = True
 except ImportError:
     NETWORK = False
+
+try:
+    import multiprocessing as mp
+    PARALELLIZATION = True
+except ImportError:
+    PARALELLIZATION = False
+
+try:
+    from AdaptivePELE.freeEnergies import cluster as pyemma_cluster
+    import pyemma.coordinates as coor
+    PYEMMA = True
+except ImportError:
+    PYEMMA = False
 
 
 class Clusters(object):
@@ -843,6 +860,14 @@ class Clustering(object):
         for cluster in self.clusters.clusters:
             cluster.metricCol = col
 
+    def getClusterListForSpawning(self):
+        """
+            Return the clusters object to be used in the spawning
+
+            :returns: :py:class:`.Clusters` -- Container object for the clusters
+        """
+        return self.clusters
+
     def getCluster(self, clusterNum):
         """
             Get the cluster at index clusterNum
@@ -850,6 +875,9 @@ class Clustering(object):
             :returns: :py:class:`.Cluster` -- Cluster at clusterNum
         """
         return self.clusters.getCluster(clusterNum)
+
+    def setProcessors(self, processors):
+        pass
 
     def emptyClustering(self):
         """
@@ -884,7 +912,30 @@ class Clustering(object):
             and self.resChain == other.resChain\
             and self.col == other.col
 
-    def cluster(self, paths, ignoreFirstRow=False, topology=None, epoch=None):
+    def filterClustersAccordingToBox(self, simulationRunnerParams):
+        """
+            Filter the clusters to select only the ones whose representative
+            structures will fit into the selected box
+
+            :param simulationRunnerParams: :py:class:`.SimulationParameters` Simulation parameters object
+            :type simulationRunnerParams: :py:class:`.SimulationParameters`
+
+            :returns list, list: -- list of the filtered clusters, list of bools flagging wether the cluster is selected or not
+
+        """
+        box_center = ast.literal_eval(simulationRunnerParams.boxCenter)
+        box_radius = simulationRunnerParams.boxRadius
+        clustersFiltered = []
+        clustersSelected = []
+        for cluster in self.clusters:
+            if utilities.distanceCOM(box_center, cluster.pdb.getCOM()) < (box_radius-1):
+                clustersFiltered.append(cluster)
+                clustersSelected.append(True)
+            else:
+                clustersSelected.append(False)
+        return clustersFiltered, clustersSelected
+
+    def cluster(self, paths, ignoreFirstRow=False, topology=None, epoch=None, outputPathConstants=None):
         """
             Cluster the snaptshots contained in the paths folder
 
@@ -896,6 +947,8 @@ class Clustering(object):
             :type topology: :py:class:`.Topology`
             :param epoch: Epoch number
             :type epoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
         """
         if epoch is None:
             self.epoch += 1
@@ -1340,7 +1393,7 @@ class SequentialLastSnapshotClustering(Clustering):
                             altSelection=altSelection)
         self.type = clusteringTypes.CLUSTERING_TYPES.lastSnapshot
 
-    def cluster(self, paths, topology=None, epoch=None):
+    def cluster(self, paths, topology=None, epoch=None, outputPathConstants=None):
         """
             Cluster the snaptshots contained in the paths folder
 
@@ -1350,6 +1403,8 @@ class SequentialLastSnapshotClustering(Clustering):
             :type topology: :py:class:`.Topology`
             :param epoch: Epoch number
             :type epoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
         """
         # Clean clusters at every step, so we only have the last snapshot of
         # each trajectory as clusters
@@ -1415,7 +1470,7 @@ class NullClustering(Clustering):
         Clustering.__init__(self)
         self.type = clusteringTypes.CLUSTERING_TYPES.null
 
-    def cluster(self, paths, topology=None, epoch=None):
+    def cluster(self, paths, topology=None, epoch=None, outputPathConstants=None):
         """
             Cluster the snaptshots contained in the paths folder
 
@@ -1425,6 +1480,8 @@ class NullClustering(Clustering):
             :type topology: :py:class:`.Topology`
             :param epoch: Epoch number
             :type epoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
         """
         pass
 
@@ -1452,6 +1509,259 @@ class NullClustering(Clustering):
             summaryFile.write("Using null clustering, no clusters available\n")
 
         utilities.writeObject(outputObject, self, protocol=2)
+
+
+class MSMClustering(Clustering):
+    """
+        Cluster the trajectories to estimate a Markov State Model (MSM)
+    """
+    def __init__(self, n_clusters, tica=False, resname="", resnum=0, resChain="", symmetries=None, atom_Ids="", writeCA=False, sidechains=False, tica_lagtime=10, tica_nICs=3, tica_kinetic_map=True, tica_commute_map=False):
+        if not PYEMMA:
+            raise utilities.UnsatisfiedDependencyException("No installation of PyEMMA found. Please, install PyEMMA to use MSMClustering option.")
+        Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain)
+        self.type = clusteringTypes.CLUSTERING_TYPES.MSMClustering
+        self.nprocessors = None
+        self.n_clusters = n_clusters
+        self.tica = tica
+        self.constantsExtract = coord.Constants()
+        self.indexes = None
+        self.atom_Ids = atom_Ids
+        self.writeCA = writeCA
+        self.sidechains = sidechains
+        self.tica_lagtime = tica_lagtime
+        self.tica_nICs = tica_nICs
+        self.tica_kinetic_map = tica_kinetic_map
+        self.tica_commute_map = tica_commute_map
+        self.pyemma_clustering = None
+
+    def __getstate__(self):
+        # Defining pickling interface to avoid problems when working with old
+        # simulations if the properties of the clustering-related classes have
+        # changed
+        state = {"type": self.type, "clusters": self.clusters,
+                 "reportBaseFilename": self.reportBaseFilename,
+                 "resname": self.resname, "resnum": self.resnum,
+                 "resChain": self.resChain, "col": self.col,
+                 "epoch": self.epoch, "symmetries": self.symmetries,
+                 "nprocessors": self.nprocessors, "n_clusters": self.n_clusters,
+                 "tica": self.tica, "constantsExtract": self.constantsExtract,
+                 "indexes": self.indexes, "atom_Ids": self.atom_Ids,
+                 "writeCA": self.writeCA, "sidechains": self.sidechains,
+                 "tica_lagtime": self.tica_lagtime, "tica_nICs": self.tica_nICs,
+                 "tica_kinetic_map": self.tica_kinetic_map,
+                 "tica_commute_map": self.tica_commute_map,
+                 "pyemma_clustering": self.pyemma_clustering}
+        return state
+
+    def __setstate__(self, state):
+        # Restore instance attributes
+        self.type = state['type']
+        self.clusters = state['clusters']
+        self.reportBaseFilename = state.get('reportBaseFilename')
+        self.resname = state.get('resname', "")
+        self.resnum = state.get('resnum', 0)
+        self.resChain = state.get('resChain', "")
+        self.col = state.get('col')
+        self.epoch = state.get('epoch', -1)
+        self.symmetries = state.get('symmetries', [])
+        if isinstance(self.symmetries, dict):
+            self.symmetries = [self.symmetries]
+        self.nprocessors = state.get('nprocessors')
+        self.n_clusters = state['n_clusters']
+        self.tica = state.get('tica', False)
+        self.constantsExtract = state.get('constantsExtract', coord.Constants())
+        self.indexes = state.get('indexes')
+        self.atom_Ids = state.get('atom_Ids', "")
+        self.writeCA = state.get('writeCA', False)
+        self.sidechains = state.get('sidechains', False)
+        self.tica_lagtime = state.get('tica_lagtime', 10)
+        self.tica_nICs = state.get('tica_nICs', 3)
+        self.tica_kinetic_map = state.get('tica_kinetic_map', True)
+        self.tica_commute_map = state.get('tica_commute_map', False)
+        self.pyemma_clustering = state.get('pyemma_clustering')
+
+    def getClusterListForSpawning(self):
+        """
+            Return the clusters object to be used in the spawning
+
+            :returns: :py:class:`.Clusters` -- Container object for the clusters
+        """
+        return self.pyemma_clustering
+
+    def setProcessors(self, processors):
+        self.nprocessors = processors
+
+    def cluster(self, paths, topology=None, epoch=None, outputPathConstants=None):
+        """
+            Cluster the snaptshots contained in the paths folder
+
+            :param paths: List of folders with the snapshots
+            :type paths: list
+            :param topology: Topology object containing the set of topologies needed for the simulation
+            :type topology: :py:class:`.Topology`
+            :param epoch: Epoch number
+            :type epoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+        """
+        if epoch is None:
+            epoch = self.epoch + 1
+        # clean clusters from previous iteration
+        self.emptyClustering()
+        # when cleaning the clusters, the epoch attribute is reset
+        self.epoch = epoch
+
+        utilities.makeFolder(outputPathConstants.allTrajsPath)
+        extractedFolder = self.constantsExtract.extractedTrajectoryFolder % outputPathConstants.epochOutputPathTempletized % self.epoch
+        self.constantsExtract.gatherNonRepeatedTrajsFilename = os.path.join(outputPathConstants.allTrajsPath, "traj_%s_%s.dat")
+        utilities.makeFolder(extractedFolder)
+        trajectories = getAllTrajectories(paths)
+        if self.indexes is None and utilities.getFileExtension(trajectories[0]) in coord.MDTRAJ_FORMATS:
+            self.indexes = []
+            # select indexes for all topologies
+            for top in topology:
+                self.indexes.append(coord.extractIndexesTopology(top, self.resname, self.atom_Ids, self.writeCA, self.sidechains))
+            self.indexes = list(set(self.indexes))
+        # extract coordinates
+        if PARALELLIZATION and self.nprocessors is not None:
+            pool = mp.Pool(self.nprocessors)
+        else:
+            pool = None
+        if self.sidechains:
+            new_sidechains = coord.extractSidechainIndexes(trajectories, self.ligand, topology, pool=pool)
+            self.sidechains = list(set(self.sidechains).intersection(set(new_sidechains)))
+        else:
+            self.sidechains = []
+
+        workers = []
+        for filename in trajectories:
+            trajNum = utilities.getTrajNum(filename)
+            if self.indexes is not None:
+                indexes_traj = self.indexes[topology.getTopologyIndex(self.epoch, trajNum)]
+            else:
+                indexes_traj = self.indexes
+            if topology is not None:
+                topology_traj = topology.getTopology(self.epoch, trajNum)
+            else:
+                topology_traj = None
+
+            if pool is None:
+                # serial version
+                coord.writeFilenameExtractedCoordinates(filename, self.resname, self.atom_Ids, outputPathConstants.epochOutputPathTempletized % self.epoch, False, self.constantsExtract, self.writeCA, self.sidechains, topology=topology_traj, indexes=indexes_traj)
+            else:
+                # multiprocessor version
+                workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, self.resname, self.atom_Ids, outputPathConstants.epochOutputPathTempletized % self.epoch, False, self.constantsExtract, self.writeCA, self.sidechains, topology_traj, indexes_traj)))
+        for w in workers:
+            w.get()
+        coord.gatherTrajs(self.constantsExtract, outputPathConstants.epochOutputPathTempletized % self.epoch, self.epoch, True, self.epoch)
+        # apply tica
+        if self.tica:
+            trajectories = []
+            trajs = glob.glob(os.path.join(outputPathConstants.allTrajsPath, self.constantsExtract.baseExtractedTrajectoryName+"*"))
+            for trajectory in trajs:
+                if "tica" in trajectory:
+                    continue
+                trajectories.append(np.loadtxt(trajectory))
+            tica = coor.tica(data=trajectories, lag=self.tica_lagtime, kinetic_map=self.tica_kinetic_map, commute_map=self.tica_commute_map)
+            projected = tica.get_output(dimensions=range(self.tica_nICs))
+            for traj_name, projected_traj in zip(trajs, projected):
+                auxArr = np.array(range(len(projected_traj)))
+                np.savetxt("tica_%s" % traj_name, np.hstack(auxArr.reshape(-1, 1), projected_traj))
+            base_traj_names = "tica_%s" % self.constantsExtract.baseGatheredFilename
+        else:
+            base_traj_names = self.constantsExtract.baseGatheredFilename
+
+        # cluster the coordinates
+        self.pyemma_clustering = pyemma_cluster.Cluster(self.n_clusters, outputPathConstants.allTrajsPath, base_traj_names, discretizedPath=os.path.join(outputPathConstants.allTrajsPath, "discretized"))
+        self.pyemma_clustering.cleanDiscretizedFolder()
+        self.pyemma_clustering.clusterTrajectories()
+
+        # create Adaptive clusters from the kmeans result
+        trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, base_traj_names))
+        trajectories = [np.loadtxt(f)[:, 1:] for f in trajectory_files]
+
+        centersInfo = estimate.getCentersInfo(self.pyemma_clustering, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)
+        centersInfo_processed = []
+        for cluster in centersInfo:
+            epoch_num, traj_num, snapshot_num = centersInfo[cluster]["structure"]
+            centersInfo_processed.append([cluster, int(epoch_num), int(traj_num), int(snapshot_num)])
+        extractInfo = getRepr.getExtractInfo(centersInfo_processed)
+        # extractInfo is a dictionary organized as {[epoch, traj]: [cluster, snapshot]}
+
+        # assign cluster dummies so that then clusters can be assigned in proper
+        # order
+        for _ in range(self.n_clusters):
+            self.clusters.addCluster(Cluster(""))
+        structureFolder = os.path.join(outputPathConstants.epochOutputPathTempletized, "*traj*_%d*")
+        for trajFile, extraInfo in extractInfo.items():
+            try:
+                pdbFile = glob.glob(structureFolder % trajFile)[0]
+            except IndexError:
+                raise ValueError("Structure %s not found" % (structureFolder % trajFile))
+            try:
+                snapshots = utilities.getSnapshots(pdbFile)
+            except IOError:
+                raise IOError("Unable to open %s, please check that the path to structures provided is correct" % pdbFile)
+            for pair in extraInfo:
+                pdb = atomset.PDB()
+                if topology is not None:
+                    top_traj = topology.getTopology(*trajFile)
+                else:
+                    top_traj = None
+                pdb.initialise(snapshots[pair[1]], resname=self.resname, topology=top_traj)
+                cluster = Cluster(pdb, trajPosition=(trajFile[0], trajFile[1], pair[1]))
+                self.clusters[pair[0]] = cluster
+
+    def writeOutput(self, outputPath, degeneracy, outputObject, writeAll):
+        """
+            Writes all the clustering information in outputPath
+
+            :param outputPath: Folder that will contain all the clustering information
+            :type outputPath: str
+            :param degeneracy: Degeneracy of each cluster. It must be in the same order
+                as in the self.clusters list
+            :type degeneracy: list
+            :param outputObject: Output name for the pickle object
+            :type outputObject: str
+            :param writeAll: Wether to write pdb files for all cluster in addition
+                of the summary
+            :type writeAll: bool
+        """
+        utilities.cleanup(outputPath)
+        utilities.makeFolder(outputPath)
+
+        summaryFilename = os.path.join(outputPath, "summary.txt")
+        with open(summaryFilename, 'w') as summaryFile:
+            summaryFile.write("#cluster degeneracy epoch trajectory snapshot cluster center\n")
+
+            for i, cluster in enumerate(self.clusters.clusters):
+                if writeAll:
+                    outputFilename = "cluster_%d.pdb" % i
+                    outputFilename = os.path.join(outputPath, outputFilename)
+                    cluster.writePDB(outputFilename)
+
+                degeneracy_cluster = 0
+                if degeneracy is not None:
+                    # degeneracy will be None if null spawning is used
+                    degeneracy_cluster = degeneracy[i]
+                center_str = " ".join(["%.3f" for _ in self.pyemma_clustering.clusterCenters[i]])
+                writeString = "%d %d %d %d %d %s\n" % ((i, degeneracy_cluster) + cluster.trajPosition + (center_str % tuple(self.pyemma_clustering.clusterCenters[i]),))
+                summaryFile.write(writeString)
+
+        utilities.writeObject(outputObject, self, protocol=2)
+
+    def filterClustersAccordingToBox(self, simulationRunnerParams):
+        """
+            Filter the clusters to select only the ones whose representative
+            structures will fit into the selected box
+
+            :param simulationRunnerParams: :py:class:`.SimulationParameters` Simulation parameters object
+            :type simulationRunnerParams: :py:class:`.SimulationParameters`
+
+            :returns list, list: -- list of the filtered clusters, list of bools flagging wether the cluster is selected or not
+
+        """
+        pass
 
 
 class ClusteringBuilder(object):
@@ -1511,6 +1821,18 @@ class ClusteringBuilder(object):
                                                     contactThresholdDistance=contactThresholdDistance, symmetries=symmetries, altSelection=altSelection)
         elif clusteringType == blockNames.ClusteringTypes.null:
             return NullClustering()
+        elif clusteringType == blockNames.ClusteringTypes.MSMClustering:
+            n_clusters = paramsBlock[blockNames.ClusteringTypes.nclusters]
+            symmetries = paramsBlock.get(blockNames.ClusteringTypes.symmetries, [])
+            tica = paramsBlock.get(blockNames.ClusteringTypes.tica, False)
+            atom_Ids = paramsBlock.get(blockNames.ClusteringTypes.atom_Ids, "")
+            writeCA = paramsBlock.get(blockNames.ClusteringTypes.writeCA, False)
+            sidechains = paramsBlock.get(blockNames.ClusteringTypes.sidechains, False)
+            tica_lagtime = paramsBlock.get(blockNames.ClusteringTypes.tica_lagtime, 10)
+            tica_nICs = paramsBlock.get(blockNames.ClusteringTypes.tica_nICs, 3)
+            tica_kinetic_map = paramsBlock.get(blockNames.ClusteringTypes.tica_kinetic_map, True)
+            tica_commute_map = paramsBlock.get(blockNames.ClusteringTypes.tica_commute_map, False)
+            return MSMClustering(n_clusters, tica, resname, resnum, resChain, symmetries, atom_Ids, writeCA, sidechains, tica_lagtime, tica_nICs, tica_kinetic_map, tica_commute_map)
         else:
             sys.exit("Unknown clustering method! Choices are: " +
                      str(clusteringTypes.CLUSTERING_TYPE_TO_STRING_DICTIONARY.values()))

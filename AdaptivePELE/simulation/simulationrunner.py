@@ -261,6 +261,8 @@ class SimulationRunner:
             :param spawningReportName: Name of the report file provided in the spawning parameters
             :type spawningReportName: str
         """
+        if spawningReportName is None:
+            return
         baseReportName = self.parameters.reportName.split("_%d")
         if baseReportName[0] != spawningReportName:
             baseReportName[0] = spawningReportName

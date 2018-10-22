@@ -13,6 +13,11 @@ from AdaptivePELE.utilities import utilities
 from AdaptivePELE.spawning import spawningTypes
 from AdaptivePELE.spawning import densitycalculator
 from abc import abstractmethod
+PYEMMA = True
+try:
+    import pyemma.msm as msm
+except ImportError:
+    PYEMMA = False
 
 
 def reward(x, rews):
@@ -139,6 +144,8 @@ class SpawningBuilder:
             spawningCalculator = REAPCalculator(spawningParams)
         elif spawningTypeString == blockNames.StringSpawningTypes.null:
             spawningCalculator = NullSpawningCalculator(spawningParams)
+        elif spawningTypeString == blockNames.StringSpawningTypes.ProbabilityMSMCalculator:
+            spawningCalculator = ProbabilityMSMCalculator(spawningParams)
         else:
             sys.exit("Unknown spawning type! Choices are: " + str(spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
         return spawningCalculator
@@ -164,6 +171,7 @@ class SpawningParams:
         self.period = None
         self.metricInd = None
         self.condition = blockNames.SpawningParams.minValue  # wether to consider min or max values in epsilon
+        self.lagtime = None
 
     def buildSpawningParameters(self, spawningBlock):
         """
@@ -178,9 +186,10 @@ class SpawningParams:
         spawningParamsBlock = spawningBlock[blockNames.SpawningParams.params]
         spawningType = spawningBlock[blockNames.StringSpawningTypes.type]
 
-        # Params general to all
-        # reportFilename is now mandatory for all spawning
-        self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
+        if spawningType != blockNames.StringSpawningTypes.ProbabilityMSMCalculator:
+            # reportFilename is now mandatory for all spawning not related to
+            # MSM
+            self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
         # Params specific to epsilon related spawning
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon:
@@ -221,6 +230,10 @@ class SpawningParams:
         if spawningType == blockNames.StringSpawningTypes.independentMetric:
             # Start counting the columns by 1
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]-1
+            self.condition = spawningParamsBlock.get(blockNames.SpawningParams.condition,
+                                                     blockNames.SpawningParams.minValue)
+        if spawningType == blockNames.StringSpawningTypes.ProbabilityMSMCalculator:
+            self.lagtime = spawningParamsBlock[blockNames.SpawningParams.lagtime]
             self.condition = spawningParamsBlock.get(blockNames.SpawningParams.condition,
                                                      blockNames.SpawningParams.minValue)
 
@@ -1086,3 +1099,65 @@ class NullSpawningCalculator(SpawningCalculator):
 
     def shouldWriteStructures(self):
         return False
+
+
+class MSMCalculator(SpawningCalculator):
+
+    def __init__(self, parameters):
+        SpawningCalculator.__init__(self)
+        self.type = "BaseClass"  # change for abstract attribute
+        self.parameters = parameters
+
+    def estimateMSM(self, dtrajs):
+        """
+            Estimate and MSM using PyEMMA
+
+            :param dtrajs: Discretized trajectories to estimate the Markov model
+            :type dtrajs: np.ndarray
+
+            :return: object -- Object containing the estimated MSM
+        """
+        return msm.estimate_markov_model(dtrajs, self.parameters.lagtime)
+
+
+class ProbabilityMSMCalculator(MSMCalculator):
+    def __init__(self, parameters):
+        MSMCalculator.__init__(self, parameters)
+        self.type = spawningTypes.SPAWNING_TYPES.ProbabilityMSMCalculator
+        self.parameters = parameters
+
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+        """
+            Calculate the degeneracy of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
+        # estimate MSM from clustering object
+        msm_object = self.estimateMSM(clusters.dtrajs)
+        nclusters = msm_object.nstates_full
+        # distribute seeds using the MSM
+        probabilities = np.zeros(nclusters)
+        for i, index in enumerate(msm_object.active_set):
+            probabilities[index] = msm_object.stationary_distribution[i]
+        if self.parameters.condition == blockNames.SpawningParams.minValue:
+            sortedProbs = np.argsort(probabilities)
+            # set the value of the clusters to avoid considering them when
+            # distributing, when taking the min set them to 1, when taking the
+            # max to 0
+            neutral = 1.0
+        else:
+            sortedProbs = np.argsort(probabilities)[::-1]
+            neutral = 0.0
+        probabilities[sortedProbs[trajToDistribute:]] = neutral
+        if abs(probabilities.sum()) < 1e-8:
+            probabilities = np.ones(nclusters)/nclusters
+        else:
+            probabilities /= sum(probabilities)
+        return self.divideTrajAccordingToWeights(probabilities, trajToDistribute)

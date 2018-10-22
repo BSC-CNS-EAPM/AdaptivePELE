@@ -295,7 +295,7 @@ multiple trajectory metric exit condition</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.clusterEpochTrajs">
-<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">clusterEpochTrajs</code><span class="sig-paren">(</span><em>clusteringMethod</em>, <em>epoch</em>, <em>epochOutputPathTempletized</em>, <em>topologies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#clusterEpochTrajs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.clusterEpochTrajs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">clusterEpochTrajs</code><span class="sig-paren">(</span><em>clusteringMethod</em>, <em>epoch</em>, <em>epochOutputPathTempletized</em>, <em>topologies</em>, <em>outputPathConstants</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#clusterEpochTrajs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.clusterEpochTrajs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the trajecotories of a given epoch</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -306,6 +306,7 @@ multiple trajectory metric exit condition</p>
 <li><strong>epoch</strong> (<em>int</em>) – Number of the epoch to cluster</li>
 <li><strong>epochOutputPathTempletized</strong> (<em>str</em>) – Path where to find the trajectories</li>
 <li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -315,7 +316,7 @@ multiple trajectory metric exit condition</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.clusterPreviousEpochs">
-<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">clusterPreviousEpochs</code><span class="sig-paren">(</span><em>clusteringMethod</em>, <em>finalEpoch</em>, <em>epochOutputPathTempletized</em>, <em>simulationRunner</em>, <em>topologies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#clusterPreviousEpochs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.clusterPreviousEpochs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">clusterPreviousEpochs</code><span class="sig-paren">(</span><em>clusteringMethod</em>, <em>finalEpoch</em>, <em>epochOutputPathTempletized</em>, <em>simulationRunner</em>, <em>topologies</em>, <em>outputPathConstants</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#clusterPreviousEpochs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.clusterPreviousEpochs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster all previous epochs using the clusteringMethod object</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -326,7 +327,8 @@ multiple trajectory metric exit condition</p>
 <li><strong>finalEpoch</strong> (<em>int</em>) – Last epoch to cluster (not included)</li>
 <li><strong>epochOutputPathTempletized</strong> (<em>str</em>) – Path where to find the trajectories</li>
 <li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – Simulation runner object</li>
-<li><strong>topologies</strong> – Topology object containing the set of topologies needed for the simulatioies        :type topologies: <a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a></li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulatioies</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -383,29 +385,6 @@ multiple trajectory metric exit condition</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>initialStructureWildcard</strong> (<em>str</em>) – Wildcard that matches the initial structures</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of str – The expanded initial structures</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="AdaptivePELE.adaptiveSampling.filterClustersAccordingToBox">
-<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">filterClustersAccordingToBox</code><span class="sig-paren">(</span><em>simulationRunnerParams</em>, <em>clusteringObject</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#filterClustersAccordingToBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.filterClustersAccordingToBox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter the clusters to select only the ones whose representative
-structures will fit into the selected box</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>simulationRunnerParams</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a>) – <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a> Simulation parameters object</li>
-<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name" colspan="2">Returns list, list:</th></tr>
-<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first last">– list of the filtered clusters, list of bools flagging wether the cluster is selected or not</p>
-</td>
 </tr>
 </tbody>
 </table>

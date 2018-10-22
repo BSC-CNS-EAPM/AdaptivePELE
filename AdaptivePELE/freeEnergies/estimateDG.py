@@ -188,6 +188,21 @@ def __getMeanAndStdFromList(l, accessFunction=lambda x: x):
     return np.mean(values), np.std(values)
 
 
+def getCentersInfo(cl, trajs, files, dtrajs):
+    numClusters = cl.clusterCenters.shape[0]
+    centersInfo = {x: {"structure": None, "minDist": 1e6} for x in range(numClusters)}
+    for i, traj in enumerate(trajs):
+        traj_name = files[i]
+        _, epochNum, trajNum = os.path.splitext(traj_name)[0].rsplit("_", 2)
+        for nSnap, snapshot in enumerate(traj):
+            clusterInd = dtrajs[i][nSnap]
+            dist = np.linalg.norm(cl.clusterCenters[clusterInd]-snapshot)
+            if dist < centersInfo[clusterInd]['minDist']:
+                centersInfo[clusterInd]["minDist"] = dist
+                centersInfo[clusterInd]["structure"] = (epochNum, trajNum, str(nSnap))
+    return centersInfo
+
+
 def getRepresentativePDBs(filesWildcard, run):
     files = glob.glob(filesWildcard)
     trajs = [np.loadtxt(f)[:, 1:] for f in files]
@@ -195,16 +210,7 @@ def getRepresentativePDBs(filesWildcard, run):
     cl.clusterCenters = np.loadtxt(cl.clusterCentersFile)
     dtrajs = cl.assignNewTrajectories(trajs)
     numClusters = cl.clusterCenters.shape[0]
-    centersInfo = {x: {"structure": None, "minDist": 1e6} for x in range(numClusters)}
-    for i, traj in enumerate(trajs):
-        traj_name = files[i]
-        _, epochNum, trajNum = os.path.splitext(traj_name)[0].split("_", 2)
-        for nSnap, snapshot in enumerate(traj):
-            clusterInd = dtrajs[i][nSnap]
-            dist = np.linalg.norm(cl.clusterCenters[clusterInd]-snapshot)
-            if dist < centersInfo[clusterInd]['minDist']:
-                centersInfo[clusterInd]["minDist"] = dist
-                centersInfo[clusterInd]["structure"] = (epochNum, trajNum, str(nSnap))
+    centersInfo = getCentersInfo(cl, trajs, files, dtrajs)
 
     if not os.path.exists("representative_structures"):
         os.makedirs("representative_structures")

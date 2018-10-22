@@ -1,14 +1,15 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-import sys
-import shutil
 import os
+import sys
+import ast
 import json
 import time
 import glob
-import argparse
 import atexit
-import ast
+import shutil
 import signal
+import errno
+import argparse
 import numpy as np
 from builtins import range
 from AdaptivePELE.constants import blockNames, constants
@@ -48,10 +49,11 @@ def cleanProcessesFiles(folder):
         except OSError:
             pass
 
+
 def printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusteringBlock, outputPath, initialStructuresWildcard):
     """
         Print a summary of the run paramaters
-        
+
         :param restart: Flag on whether to continue a previous simulation
         :type restart: bool
         :param debug: Flag to mark whether simulation is run in debug mode
@@ -102,7 +104,6 @@ def cleanPreviousSimulation(output_path):
                 raise
             # If another process deleted the folder between the glob and the
             # actual removing an OSError is raised
-            pass
     epochs = utilities.get_epoch_folders(output_path)
     for epoch in epochs:
         try:
@@ -110,7 +111,6 @@ def cleanPreviousSimulation(output_path):
         except OSError as exc:
             if exc.errno != errno.ENOENT:
                 raise
-            pass
 
 
 def createMappingForFirstEpoch(initialStructures, topologies, processors):
@@ -161,32 +161,6 @@ def checkMetricExitConditionMultipleTrajsinRestart(firstRun, outputFolder, simul
             return
         for i in range(firstRun):
             simulationRunner.parameters.exitCondition.checkExitCondition(outputFolder % i)
-
-
-def filterClustersAccordingToBox(simulationRunnerParams, clusteringObject):
-    """
-        Filter the clusters to select only the ones whose representative
-        structures will fit into the selected box
-
-        :param simulationRunnerParams: :py:class:`.SimulationParameters` Simulation parameters object
-        :type simulationRunnerParams: :py:class:`.SimulationParameters`
-        :param clusteringObject: Clustering object
-        :type clusteringObject: :py:class:`.Clustering`
-
-        :returns list, list: -- list of the filtered clusters, list of bools flagging wether the cluster is selected or not
-
-    """
-    box_center = ast.literal_eval(simulationRunnerParams.boxCenter)
-    box_radius = simulationRunnerParams.boxRadius
-    clustersFiltered = []
-    clustersSelected = []
-    for cluster in clusteringObject.clusters.clusters:
-        if utilities.distanceCOM(box_center, cluster.pdb.getCOM()) < (box_radius-1):
-            clustersFiltered.append(cluster)
-            clustersSelected.append(True)
-        else:
-            clustersSelected.append(False)
-    return clustersFiltered, clustersSelected
 
 
 def mergeFilteredClustersAccordingToBox(degeneracy, clustersFiltering):
@@ -432,7 +406,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return oldClusteringMethod.similarityEvaluator.typeEvaluator != newClusteringMethod.similarityEvaluator.typeEvaluator
 
 
-def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topologies):
+def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topologies, outputPathConstants):
     """
         Cluster the trajecotories of a given epoch
 
@@ -444,16 +418,18 @@ def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topol
         :type epochOutputPathTempletized: str
         :param topologies: Topology object containing the set of topologies needed for the simulation
         :type topologies: :py:class:`.Topology`
+        :param outputPathConstants: Contains outputPath-related constants
+        :type outputPathConstants: :py:class:`.OutputPathConstants`
 """
 
     snapshotsJSONSelectionString = generateTrajectorySelectionString(epoch, epochOutputPathTempletized)
     paths = ast.literal_eval(snapshotsJSONSelectionString)
     if len(glob.glob(paths[-1])) == 0:
         sys.exit("No trajectories to cluster! Matching path:%s" % paths[-1])
-    clusteringMethod.cluster(paths, topology=topologies, epoch=epoch)
+    clusteringMethod.cluster(paths, topology=topologies, epoch=epoch, outputPathConstants=outputPathConstants)
 
 
-def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner, topologies):
+def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner, topologies, outputPathConstants):
     """
         Cluster all previous epochs using the clusteringMethod object
 
@@ -465,12 +441,15 @@ def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletiz
         :type epochOutputPathTempletized: str
         :param simulationRunner: Simulation runner object
         :type simulationRunner: :py:class:`.SimulationRunner`
-        :param topologies: Topology object containing the set of topologies needed for the simulatioies        :type topologies: :py:class:`.Topology`
+        :param topologies: Topology object containing the set of topologies needed for the simulatioies
+        :type topologies: :py:class:`.Topology`
+        :param outputPathConstants: Contains outputPath-related constants
+        :type outputPathConstants: :py:class:`.OutputPathConstants`
 """
     for i in range(finalEpoch):
         simulationRunner.readMappingFromDisk(epochOutputPathTempletized % i)
         topologies.readMappingFromDisk(epochOutputPathTempletized % i, i)
-        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized, topologies)
+        clusterEpochTrajs(clusteringMethod, i, epochOutputPathTempletized, topologies, outputPathConstants)
 
 
 def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies, processManager):
@@ -507,10 +486,11 @@ def getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConsta
                                                          spawningParams.reportFilename,
                                                          spawningParams.reportCol)
 
+    clusteringMethod.setProcessors(simulationRunner.getWorkingProcessors())
     if needToRecluster(oldClusteringMethod, clusteringMethod):
         utilities.print_unbuffered("Reclustering!")
         startTime = time.time()
-        clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner, topologies)
+        clusterPreviousEpochs(clusteringMethod, firstRun, outputPathConstants.epochOutputPathTempletized, simulationRunner, topologies, outputPathConstants.allTrajsPath)
         endTime = time.time()
         utilities.print_unbuffered("Reclustering took %s sec" % (endTime - startTime))
     else:
@@ -549,7 +529,7 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
         :returns: :py:class:`.Clustering`, str -- The clustering method to use in the adaptive sampling simulation and the initial structures filenames
     """
     processorManagerFilename = "procMapping.txt"
-    clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies, processManager) 
+    clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies, processManager)
     if processManager.isMaster():
         degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.getWorkingProcessors(), firstRun)
         spawningCalculator.log()
@@ -619,7 +599,7 @@ def main(jsonParams, clusteringHook=None):
         :param jsonParams: A string with the name of the control file to use
         :type jsonParams: str
     """
-    
+
     controlFileValidator.validate(jsonParams)
     generalParams, spawningBlock, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
 
@@ -636,7 +616,6 @@ def main(jsonParams, clusteringHook=None):
     writeAll = generalParams.get(blockNames.GeneralParams.writeAllClustering, False)
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
     resname = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.ligandResname)
-
 
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
     if not initialStructures:
@@ -704,6 +683,7 @@ def main(jsonParams, clusteringHook=None):
 
         clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningCalculator.parameters, initialStructures, simulationRunner, processManager)
 
+    clusteringMethod.setProcessors(simulationRunner.getWorkingProcessors())
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
     for i in range(firstRun, simulationRunner.parameters.iterations):
@@ -724,22 +704,19 @@ def main(jsonParams, clusteringHook=None):
 
         if processManager.isMaster():
             utilities.print_unbuffered("Clustering...")
-        if processManager.isMaster():
             startTime = time.time()
-            clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies)
+            clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies, outputPathConstants)
             endTime = time.time()
             utilities.print_unbuffered("Clustering ligand: %s sec" % (endTime - startTime))
 
             if clusteringHook is not None:
                 clusteringHook(clusteringMethod, outputPathConstants, simulationRunner, i+1)
+            clustersList = clusteringMethod.getClusterListForSpawning()
 
         if simulationRunner.parameters.modeMovingBox is not None:
             simulationRunner.getNextIterationBox(outputPathConstants.epochOutputPathTempletized % i, resname, topologies, i)
             if processManager.isMaster():
-                clustersList, clustersFiltered = filterClustersAccordingToBox(simulationRunner.parameters, clusteringMethod)
-        else:
-            if processManager.isMaster():
-                clustersList = clusteringMethod.clusters.clusters
+                clustersList, clustersFiltered = clusteringMethod.filterClustersAccordingToBox(simulationRunner.parameters)
 
         if processManager.isMaster():
             degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), i)
@@ -749,7 +726,7 @@ def main(jsonParams, clusteringHook=None):
                 if simulationRunner.parameters.modeMovingBox is not None:
                     degeneracyOfRepresentatives = mergeFilteredClustersAccordingToBox(degeneracyOfRepresentatives, clustersFiltered)
                 utilities.print_unbuffered("Degeneracy", degeneracyOfRepresentatives)
-                assert len(degeneracyOfRepresentatives) == len(clusteringMethod.clusters.clusters)
+                assert len(degeneracyOfRepresentatives) == len(clusteringMethod)
             else:
                 # When using null or independent spawning the calculate method returns None
                 assert spawningCalculator.type in spawningTypes.SPAWNING_NO_DEGENERACY_TYPES, "calculate returned None with spawning type %s" % spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY[spawningCalculator.type]
@@ -789,6 +766,7 @@ def main(jsonParams, clusteringHook=None):
                                                                                               i+1)
 
         if processManager.isMaster():
+            topologies.writeTopologyObject()
             if clusteringMethod.symmetries and nativeStructure:
                 fixReportsSymmetry(outputPathConstants.epochOutputPathTempletized % i, resname,
                                    nativeStructure, clusteringMethod.symmetries, topologies)

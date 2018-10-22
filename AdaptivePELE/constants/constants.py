@@ -81,6 +81,7 @@ class OutputPathConstants():
         self.tmpInitialStructuresEquilibrationTemplate = ""
         self.tmpControlFilenameEqulibration = ""
         self.topologies = ""
+        self.allTrajsPath = ""
         self.buildConstants(outputPath)
 
     def buildConstants(self, outputPath):
@@ -97,6 +98,7 @@ class OutputPathConstants():
         self.clusteringOutputObject = os.path.join(self.clusteringOutputDir, "object.pkl")
         self.topologies = os.path.join(outputPath, "topologies")
         self.equilibrationDir = os.path.join(outputPath, "equilibration")
+        self.allTrajsPath = os.path.join(outputPath, "allTrajs")
 
     def buildTmpFolderConstants(self, tmpFolder):
         self.tmpInitialStructuresTemplate = tmpFolder+"/initial_%d_%d.pdb"

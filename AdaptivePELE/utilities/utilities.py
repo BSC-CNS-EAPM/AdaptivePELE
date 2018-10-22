@@ -48,6 +48,7 @@ class Topology:
         # the topologyMap maps each trajectory to its corresponding topology
         # {0: [t1, t2.. tM], 1: [t2, t3, t4, t4...]}
         self.topologyMap = {}
+        self.topologyFiles = []
 
     def __getitem__(self, key):
         return self.topologies[key]
@@ -64,6 +65,12 @@ class Topology:
         for f in files:
             os.remove(f)
 
+    def writeTopologyObject(self):
+        """
+            Dump the contents of the topology object using pickle
+        """
+        writeObject(os.path.join(self.path, "topologies.pkl"), self)
+
     def setTopologies(self, topologyFiles, cleanFiles=True):
         """
             Set the topologies for the simulation. If topologies were set
@@ -76,10 +83,12 @@ class Topology:
         """
         if self.topologies:
             self.topologies = []
+            self.topologyFiles = []
             if cleanFiles:
                 self.cleanTopologies()
         for top in topologyFiles:
             self.topologies.append(getTopologyFile(top))
+            self.topologyFiles.append(top)
 
     def mapEpochTopologies(self, epoch, trajectoryMapping):
         """
@@ -105,6 +114,19 @@ class Topology:
             :returns: list -- List with topology information
         """
         return self.topologies[self.topologyMap[epoch][trajectory_number-1]]
+
+    def getTopologyFile(self, epoch, trajectory_number):
+        """
+            Get the topology file for a particular epoch and trajectory number
+
+            :param epoch: Epoch of the trajectory of interest
+            :type epoch: int
+            :param trajectory_number: Number of the trajectory to select
+            :type trajectory_number: int
+
+            :returns: str -- Path to the topology file
+        """
+        return self.topologyFiles[self.topologyMap[epoch][trajectory_number-1]]
 
     def getTopologyFromIndex(self, index):
         """
@@ -166,11 +188,10 @@ def cleanup(tmpFolder):
     try:
         shutil.rmtree(tmpFolder)
     except OSError as exc:
-        if exc.errno != errno.ENOENT:
-            raise
         # If another process deleted the folder between the glob and the
         # actual removing an OSError is raised
-        pass
+        if exc.errno != errno.ENOENT:
+            raise
 
 
 def makeFolder(outputDir):
@@ -185,7 +206,6 @@ def makeFolder(outputDir):
     except OSError as exc:
         if exc.errno != errno.EEXIST:
             raise
-        pass
 
 
 def getSnapshots(trajectoryFile, verbose=False, topology=None):
@@ -200,7 +220,7 @@ def getSnapshots(trajectoryFile, verbose=False, topology=None):
         :returns: iterable -- Snapshots with information
     """
     # topology parameter is ignored, just here for compatibility purposes
-    ext = os.path.splitext(trajectoryFile)[1]
+    ext = getFileExtension(trajectoryFile)
     if ext == ".pdb":
         with open(trajectoryFile, "r") as inputFile:
             inputFileContent = inputFile.read()
@@ -234,7 +254,6 @@ def getSnapshots(trajectoryFile, verbose=False, topology=None):
     elif ext == ".nc":
         with md.formats.NetCDFTrajectoryFile(trajectoryFile) as f:
             snapshotsWithInfo, _, _, _ = f.read()
-
     else:
         raise ValueError("Unrecongnized file extension for %s" % trajectoryFile)
     return snapshotsWithInfo
@@ -686,3 +705,15 @@ def print_unbuffered(*args):
     """
     print(*args)
     sys.stdout.flush()
+
+
+def getFileExtension(trajectoryFile):
+    """
+        Extract the extension of a trajectory
+
+        :param trajectoryFile: Name of the trajectory file
+        :type trajectoryFile: str
+
+        :returns: str -- Extension of the trajectory
+    """
+    return os.path.splitext(trajectoryFile)[1]

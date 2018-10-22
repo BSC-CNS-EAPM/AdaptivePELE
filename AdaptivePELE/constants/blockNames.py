@@ -5,6 +5,7 @@ class ClusteringTypes:
     contactMap = "contactMap"
     lastSnapshot = "lastSnapshot"
     null = "null"
+    MSMClustering = "MSM"
     thresholdCalculator = "thresholdCalculator"
     ligandResname = "ligandResname"
     ligandResnum = "ligandResnum"
@@ -17,6 +18,14 @@ class ClusteringTypes:
     Jaccard = "Jaccard"
     correlation = "correlation"
     symmetries = "symmetries"
+    tica = "tica"
+    atom_Ids = "atom_Ids"
+    writeCA = "writeCA"
+    sidechains = "sidechains"
+    tica_lagtime = "tica_lagtime"
+    tica_nICs = "tica_nICs"
+    tica_kinetic_map = "tica_kinetic_map"
+    tica_commute_map = "tica_commute_map"
 
 
 class ThresholdCalculator:
@@ -61,6 +70,7 @@ class StringSpawningTypes:
     UCB = "UCB"
     REAP = "REAP"
     null = "null"
+    ProbabilityMSMCalculator = "ProbabilityMSM"
 
 
 class SpawningParams:
@@ -88,6 +98,7 @@ class SpawningParams:
     alpha = "alpha"
     nclusters = "n"
     metricsInd = "metricsInd"
+    lagtime = "lagtime"
 
 
 class SpawningDensity:

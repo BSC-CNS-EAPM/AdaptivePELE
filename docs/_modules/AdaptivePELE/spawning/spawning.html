@@ -153,6 +153,11 @@
 <span class="kn">from</span> <span class="nn">AdaptivePELE.spawning</span> <span class="k">import</span> <span class="n">spawningTypes</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.spawning</span> <span class="k">import</span> <span class="n">densitycalculator</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span>
+<span class="n">PYEMMA</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pyemma.msm</span> <span class="k">as</span> <span class="nn">msm</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">PYEMMA</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <div class="viewcode-block" id="reward"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.reward">[docs]</a><span class="k">def</span> <span class="nf">reward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">rews</span><span class="p">):</span>
@@ -279,6 +284,8 @@
             <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">REAPCalculator</span><span class="p">(</span><span class="n">spawningParams</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">spawningTypeString</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">null</span><span class="p">:</span>
             <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">NullSpawningCalculator</span><span class="p">(</span><span class="n">spawningParams</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">spawningTypeString</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">ProbabilityMSMCalculator</span><span class="p">:</span>
+            <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">ProbabilityMSMCalculator</span><span class="p">(</span><span class="n">spawningParams</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown spawning type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
         <span class="k">return</span> <span class="n">spawningCalculator</span></div></div>
@@ -304,6 +311,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metricInd</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">minValue</span>  <span class="c1"># wether to consider min or max values in epsilon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lagtime</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="SpawningParams.buildSpawningParameters"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams.buildSpawningParameters">[docs]</a>    <span class="k">def</span> <span class="nf">buildSpawningParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spawningBlock</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -318,9 +326,10 @@
         <span class="n">spawningParamsBlock</span> <span class="o">=</span> <span class="n">spawningBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
         <span class="n">spawningType</span> <span class="o">=</span> <span class="n">spawningBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
 
-        <span class="c1"># Params general to all</span>
-        <span class="c1"># reportFilename is now mandatory for all spawning</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reportFilename</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">report_filename</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">spawningType</span> <span class="o">!=</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">ProbabilityMSMCalculator</span><span class="p">:</span>
+            <span class="c1"># reportFilename is now mandatory for all spawning not related to</span>
+            <span class="c1"># MSM</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reportFilename</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">report_filename</span><span class="p">]</span>
         <span class="c1"># Params specific to epsilon related spawning</span>
         <span class="k">if</span> <span class="n">spawningType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">epsilon</span> <span class="ow">or</span> \
                 <span class="n">spawningType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">variableEpsilon</span><span class="p">:</span>
@@ -361,6 +370,10 @@
         <span class="k">if</span> <span class="n">spawningType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">independentMetric</span><span class="p">:</span>
             <span class="c1"># Start counting the columns by 1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reportCol</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">report_col</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">condition</span><span class="p">,</span>
+                                                     <span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">minValue</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">spawningType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">ProbabilityMSMCalculator</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lagtime</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">lagtime</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">spawningParamsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">condition</span><span class="p">,</span>
                                                      <span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">minValue</span><span class="p">)</span></div></div>
 
@@ -1226,6 +1239,68 @@
 
 <div class="viewcode-block" id="NullSpawningCalculator.shouldWriteStructures"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.NullSpawningCalculator.shouldWriteStructures">[docs]</a>    <span class="k">def</span> <span class="nf">shouldWriteStructures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span></div></div>
+
+
+<div class="viewcode-block" id="MSMCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.MSMCalculator">[docs]</a><span class="k">class</span> <span class="nc">MSMCalculator</span><span class="p">(</span><span class="n">SpawningCalculator</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="n">SpawningCalculator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;BaseClass&quot;</span>  <span class="c1"># change for abstract attribute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
+
+<div class="viewcode-block" id="MSMCalculator.estimateMSM"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.MSMCalculator.estimateMSM">[docs]</a>    <span class="k">def</span> <span class="nf">estimateMSM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtrajs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Estimate and MSM using PyEMMA</span>
+
+<span class="sd">            :param dtrajs: Discretized trajectories to estimate the Markov model</span>
+<span class="sd">            :type dtrajs: np.ndarray</span>
+
+<span class="sd">            :return: object -- Object containing the estimated MSM</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">msm</span><span class="o">.</span><span class="n">estimate_markov_model</span><span class="p">(</span><span class="n">dtrajs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">lagtime</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ProbabilityMSMCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.ProbabilityMSMCalculator">[docs]</a><span class="k">class</span> <span class="nc">ProbabilityMSMCalculator</span><span class="p">(</span><span class="n">MSMCalculator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="n">MSMCalculator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">ProbabilityMSMCalculator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
+
+<div class="viewcode-block" id="ProbabilityMSMCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.ProbabilityMSMCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the degeneracy of the clusters</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+
+<span class="sd">            :returns: list -- List containing the degeneracy of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># estimate MSM from clustering object</span>
+        <span class="n">msm_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimateMSM</span><span class="p">(</span><span class="n">clusters</span><span class="o">.</span><span class="n">dtrajs</span><span class="p">)</span>
+        <span class="n">nclusters</span> <span class="o">=</span> <span class="n">msm_object</span><span class="o">.</span><span class="n">nstates_full</span>
+        <span class="c1"># distribute seeds using the MSM</span>
+        <span class="n">probabilities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nclusters</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">msm_object</span><span class="o">.</span><span class="n">active_set</span><span class="p">):</span>
+            <span class="n">probabilities</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">msm_object</span><span class="o">.</span><span class="n">stationary_distribution</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">condition</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SpawningParams</span><span class="o">.</span><span class="n">minValue</span><span class="p">:</span>
+            <span class="n">sortedProbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">probabilities</span><span class="p">)</span>
+            <span class="c1"># set the value of the clusters to avoid considering them when</span>
+            <span class="c1"># distributing, when taking the min set them to 1, when taking the</span>
+            <span class="c1"># max to 0</span>
+            <span class="n">neutral</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sortedProbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">probabilities</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">neutral</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">probabilities</span><span class="p">[</span><span class="n">sortedProbs</span><span class="p">[</span><span class="n">trajToDistribute</span><span class="p">:]]</span> <span class="o">=</span> <span class="n">neutral</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">probabilities</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">8</span><span class="p">:</span>
+            <span class="n">probabilities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nclusters</span><span class="p">)</span><span class="o">/</span><span class="n">nclusters</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">probabilities</span> <span class="o">/=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">probabilities</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">divideTrajAccordingToWeights</span><span class="p">(</span><span class="n">probabilities</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

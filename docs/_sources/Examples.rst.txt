@@ -305,13 +305,16 @@ Example of a minimal simulation block::
 Clustering block
 ----------------
 
-Currently there are three functional types of clustering:
+Currently there are four functional types of clustering:
 
 * **rmsd**, which solely uses the ligand rmsd
 
 * **contactMap**, which uses a protein-ligand contact map matrix
 
 * **null**, which produces no clustering
+
+* **MSM**, which uses a kmeans clustering to estimate a Markov State
+  Model (MSM)
 
 The first two clusterings are based on the leader algorithm, an extremely fast clustering method that in the 
 worst case makes *kN* comparisons, where *N* is the number of snapshots to cluster and *k* the number of existing clusters.
@@ -373,11 +376,17 @@ There are currently three implemented methods to evaluate the similarity of cont
 
 
 Null clustering
-.....................
+...............
 
 The **null** clustering produces no clustering, this is useful when running
 long simulations, were no spawning is needed, it saves memory and computional
 time.
+
+MSM Clustering
+..............
+
+The **MSM** clusters a simulation in order to estimate an MSM, this includes
+the possibility of preprocessing the trajectories with the TICA method [TICA]_
 
 Parameters
 ..........
@@ -387,11 +396,29 @@ Parameters
 * **ligandResnum** (*int*, default=0): Ligand residue number (if necessary). If 0 or not specified, it is ignored. The ligand ought to be univoquely identified with any combination of this and the two former parameters
 * **contactThresholdDistance** (*float*, default=8): Maximum distance at which two atoms have to
   be separated to be considered in contact
-* **symmetries** (*list*, default=[]) List of symmetry groups of key:value maps with the names of atoms
+* **symmetries** (*list*, default=[]): List of symmetry groups of key:value maps with the names of atoms
   that are symmetrical in the ligand
-* **similarityEvaluator** (*string*, mandatory)  Name of the method to evaluate the similarity
+* **similarityEvaluator** (*string*, mandatory):  Name of the method to evaluate the similarity
   of contactMaps, only available and mandatory in the contactMap clustering
 * **alternativeStructure** (*bool*, default=False): It stores alternative spawning structures within each cluster to be used in the spawning (see below). Any two pairs of alternative structures within a cluster are separated a minimum distance of cluster_threshold_distance/2.
+* **nclusters** (*int*, mandatory for MSM): Number of clusters to generate
+* **tica** (*bool*, default=False): Whether to use TICA to preprocess the
+  trajectories, only used for MSM clustering
+* **atom_Ids** (*list*, default=[]): List of atoms whose coordinates should be
+  used for the clustering, specifed as serial:atomname:residue, e.g.
+  3232:C1:696, only used for MSM clustering
+* **writeCA** (*bool*, default=False): Whether to use the alpha carbons in the
+  clustering, this is typically used when using tica, only used for MSM clustering
+* **sidechains** (*bool*, default=False): Whether to use the sidechains in
+  contact with the ligand for clustering, this is typically used when using tica, only used for MSM clustering
+* **tica_lagtime** (*int*, default=10): Lagtime to use in the tica method , only used for MSM clustering
+* **tica_nICs** (*int*, default=3): Number of independent components from tica
+  to use in the clustering, only used for MSM clustering
+* **tica_kinetic_map** (*bool*, default=True): Whether to use the kinetic map
+  distance with TICA
+* **tica_commute_map** (*bool*, default=False): Whether to use the commute map
+  distance with TICA
+
 
 Example
 .......
@@ -457,6 +484,9 @@ There are several implemented strategies:
 * **UCB**: Upper confidence bound.
 
 * **FAST**: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).
+
+* **ProbabilityMSM**: Distributes the processors with a weight that is
+  proportional to the stationary probability of each cluster in an MSM (see [MSM]_ for more details, needs to be used with `MSM Clustering`_)
 
 According to our experience, the best strategies are **inverselyProportional** and **epsilon**, guided with either PELE binding energy or the RMSD to the bound pose if available.
 
@@ -903,3 +933,5 @@ per replica equal to the number of trajectories per replica are required.
 .. [APELE] Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, https://www.nature.com/articles/s41598-017-08445-5
 .. [MDTRAJ] Robert T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, http://mdtraj.org
 .. [OPENMM] P. Eastman, et. al. OpenMM 7: Rapid development of high performance algorithms for molecular dynamics.” PLOS Comp. Biol. 13(7): e1005659. (2017), http://openmm.org
+.. [TICA] Perez-Hernandez G, F Paul, T Giorgino, G De Fabritiis and F Noe. 2013. Identification of slow molecular order parameters for Markov model construction J. Chem. Phys. 139, 015102. doi:10.1063/1.4811489
+.. [MSM] Prinz, J H, H Wu, M Sarich, B Keller, M Senne, M Held, J D Chodera, C Schuette and F Noe. 2011. Markov models of molecular kinetics: Generation and validation. J Chem Phys 134: 174105
