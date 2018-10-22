@@ -321,6 +321,8 @@ def repeatExtractedSnapshotsInTrajectory(inputTrajectory, constants, numtotalSte
         trajectory = f.read().splitlines()
 
     acceptedSteps = np.loadtxt(reportFile, dtype='int', comments='#', usecols=(1, 2))
+    if len(acceptedSteps.shape) < 2:
+        acceptedSteps = acceptedSteps[np.newaxis, :]
 
     fullTrajectory = buildFullTrajectory(acceptedSteps, trajectory, numtotalSteps, inputTrajectory)
 
