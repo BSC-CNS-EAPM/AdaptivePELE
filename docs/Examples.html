@@ -106,14 +106,15 @@
 <li class="toctree-l3"><a class="reference internal" href="#rmsd-clustering">Rmsd clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contactmap-clustering">ContactMap clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#null-clustering">Null clustering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id3">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#msm-clustering">MSM Clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#spawning-block">Spawning block</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#spawning-types">Spawning types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#density-calculator">Density calculator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id4">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
@@ -461,11 +462,13 @@ file would look like:</p>
 </div>
 <div class="section" id="clustering-block">
 <h2>Clustering block<a class="headerlink" href="#clustering-block" title="Permalink to this headline">¶</a></h2>
-<p>Currently there are three functional types of clustering:</p>
+<p>Currently there are four functional types of clustering:</p>
 <ul class="simple">
 <li><strong>rmsd</strong>, which solely uses the ligand rmsd</li>
 <li><strong>contactMap</strong>, which uses a protein-ligand contact map matrix</li>
 <li><strong>null</strong>, which produces no clustering</li>
+<li><strong>MSM</strong>, which uses a kmeans clustering to estimate a Markov State
+Model (MSM)</li>
 </ul>
 <p>The first two clusterings are based on the leader algorithm, an extremely fast clustering method that in the
 worst case makes <em>kN</em> comparisons, where <em>N</em> is the number of snapshots to cluster and <em>k</em> the number of existing clusters.
@@ -523,19 +526,41 @@ There are currently three implemented methods to evaluate the similarity of cont
 long simulations, were no spawning is needed, it saves memory and computional
 time.</p>
 </div>
-<div class="section" id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="msm-clustering">
+<h3>MSM Clustering<a class="headerlink" href="#msm-clustering" title="Permalink to this headline">¶</a></h3>
+<p>The <strong>MSM</strong> clusters a simulation in order to estimate an MSM, this includes
+the possibility of preprocessing the trajectories with the TICA method <a class="reference internal" href="#tica" id="id3">[TICA]</a></p>
+</div>
+<div class="section" id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><strong>ligandResname</strong> (<em>string</em>, default=”“): Ligand residue name in the PDB (if necessary)</li>
 <li><strong>ligandChain</strong> (<em>string</em>, default=”“): Ligand chain (if necessary)</li>
 <li><strong>ligandResnum</strong> (<em>int</em>, default=0): Ligand residue number (if necessary). If 0 or not specified, it is ignored. The ligand ought to be univoquely identified with any combination of this and the two former parameters</li>
 <li><strong>contactThresholdDistance</strong> (<em>float</em>, default=8): Maximum distance at which two atoms have to
 be separated to be considered in contact</li>
-<li><strong>symmetries</strong> (<em>list</em>, default=[]) List of symmetry groups of key:value maps with the names of atoms
+<li><strong>symmetries</strong> (<em>list</em>, default=[]): List of symmetry groups of key:value maps with the names of atoms
 that are symmetrical in the ligand</li>
-<li><strong>similarityEvaluator</strong> (<em>string</em>, mandatory)  Name of the method to evaluate the similarity
+<li><strong>similarityEvaluator</strong> (<em>string</em>, mandatory):  Name of the method to evaluate the similarity
 of contactMaps, only available and mandatory in the contactMap clustering</li>
 <li><strong>alternativeStructure</strong> (<em>bool</em>, default=False): It stores alternative spawning structures within each cluster to be used in the spawning (see below). Any two pairs of alternative structures within a cluster are separated a minimum distance of cluster_threshold_distance/2.</li>
+<li><strong>nclusters</strong> (<em>int</em>, mandatory for MSM): Number of clusters to generate</li>
+<li><strong>tica</strong> (<em>bool</em>, default=False): Whether to use TICA to preprocess the
+trajectories, only used for MSM clustering</li>
+<li><strong>atom_Ids</strong> (<em>list</em>, default=[]): List of atoms whose coordinates should be
+used for the clustering, specifed as serial:atomname:residue, e.g.
+3232:C1:696, only used for MSM clustering</li>
+<li><strong>writeCA</strong> (<em>bool</em>, default=False): Whether to use the alpha carbons in the
+clustering, this is typically used when using tica, only used for MSM clustering</li>
+<li><strong>sidechains</strong> (<em>bool</em>, default=False): Whether to use the sidechains in
+contact with the ligand for clustering, this is typically used when using tica, only used for MSM clustering</li>
+<li><strong>tica_lagtime</strong> (<em>int</em>, default=10): Lagtime to use in the tica method , only used for MSM clustering</li>
+<li><strong>tica_nICs</strong> (<em>int</em>, default=3): Number of independent components from tica
+to use in the clustering, only used for MSM clustering</li>
+<li><strong>tica_kinetic_map</strong> (<em>bool</em>, default=True): Whether to use the kinetic map
+distance with TICA</li>
+<li><strong>tica_commute_map</strong> (<em>bool</em>, default=False): Whether to use the commute map
+distance with TICA</li>
 </ul>
 </div>
 <div class="section" id="example">
@@ -591,6 +616,8 @@ There are several implemented strategies:</p>
 <li><strong>independentMetric</strong>: Trajectories are run independently, as in the original PELE. However in this method, instead of starting the next epoch from the last snapshot of the previous we start from the one that maximizes or minimizes a certain metric.</li>
 <li><strong>UCB</strong>: Upper confidence bound.</li>
 <li><strong>FAST</strong>: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).</li>
+<li><strong>ProbabilityMSM</strong>: Distributes the processors with a weight that is
+proportional to the stationary probability of each cluster in an MSM (see <a class="reference internal" href="#msm" id="id5">[MSM]</a> for more details, needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</li>
 </ul>
 <p>According to our experience, the best strategies are <strong>inverselyProportional</strong> and <strong>epsilon</strong>, guided with either PELE binding energy or the RMSD to the bound pose if available.</p>
 </div>
@@ -606,8 +633,8 @@ There are two types of density calculators:</p>
 <li><strong>exitContinuous</strong>, which assings decreasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 1/8, otherwise, density = (-4 <strong>r</strong> + 6)^3/64.0</li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h3>Parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. “report”.</li>
 <li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (one indexed)</li>
@@ -655,7 +682,7 @@ There are two types of density calculators:</p>
 <h2>Control File Examples<a class="headerlink" href="#control-file-examples" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="example-1-pele-with-default-parameters">
 <h3>Example 1 – PELE with default parameters<a class="headerlink" href="#example-1-pele-with-default-parameters" title="Permalink to this headline">¶</a></h3>
-<p>The first example makes use of default parameters, using PELE as propagator (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id5">[APELE]</a>).</p>
+<p>The first example makes use of default parameters, using PELE as propagator (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id7">[APELE]</a>).</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
@@ -849,7 +876,7 @@ and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clus
 <div class="section" id="non-pdb-trajectories">
 <h2>Non-PDB trajectories<a class="headerlink" href="#non-pdb-trajectories" title="Permalink to this headline">¶</a></h2>
 <p>Starting from version 1.5, AdaptivePELE supports working with non-PDB
-trajectories by relying on the mdtraj library <a class="reference internal" href="#mdtraj" id="id6">[MDTRAJ]</a>, with only minor changes in
+trajectories by relying on the mdtraj library <a class="reference internal" href="#mdtraj" id="id8">[MDTRAJ]</a>, with only minor changes in
 the exposed interface of the atomset module. However, some caution is needed
 when using mdtraj to convert between formats:</p>
 <ul class="simple">
@@ -996,13 +1023,13 @@ per replica equal to the number of trajectories per replica are required.</p>
 <table class="docutils citation" frame="void" id="apele" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[APELE]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id5">2</a>)</em> Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></td></tr>
+<tr><td class="label">[APELE]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id7">2</a>)</em> Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></td></tr>
 </tbody>
 </table>
 <table class="docutils citation" frame="void" id="mdtraj" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id6">[MDTRAJ]</a></td><td>Robert&nbsp;T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, <a class="reference external" href="http://mdtraj.org">http://mdtraj.org</a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id8">[MDTRAJ]</a></td><td>Robert&nbsp;T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, <a class="reference external" href="http://mdtraj.org">http://mdtraj.org</a></td></tr>
 </tbody>
 </table>
 <table class="docutils citation" frame="void" id="openmm" rules="none">
@@ -1012,6 +1039,18 @@ per replica equal to the number of trajectories per replica are required.</p>
 <li>Eastman, et. al. OpenMM 7: Rapid development of high performance algorithms for molecular dynamics.” PLOS Comp. Biol. 13(7): e1005659. (2017), <a class="reference external" href="http://openmm.org">http://openmm.org</a></li>
 </ol>
 </td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="tica" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[TICA]</a></td><td>Perez-Hernandez G, F Paul, T Giorgino, G De Fabritiis and F Noe. 2013. Identification of slow molecular order parameters for Markov model construction J. Chem. Phys. 139, 015102. doi:10.1063/1.4811489</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="msm" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[MSM]</a></td><td>Prinz, J H, H Wu, M Sarich, B Keller, M Senne, M Held, J D Chodera, C Schuette and F Noe. 2011. Markov models of molecular kinetics: Generation and validation. J Chem Phys 134: 174105</td></tr>
 </tbody>
 </table>
 </div>

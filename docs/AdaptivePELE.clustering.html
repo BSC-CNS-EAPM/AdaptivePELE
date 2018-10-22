@@ -564,7 +564,7 @@ considered in contact(default 8)</li>
 
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.Clustering.cluster">
-<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em>, <em>ignoreFirstRow=False</em>, <em>topology=None</em>, <em>epoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.cluster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em>, <em>ignoreFirstRow=False</em>, <em>topology=None</em>, <em>epoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the snaptshots contained in the paths folder</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -575,6 +575,7 @@ considered in contact(default 8)</li>
 <li><strong>ignoreFirstRow</strong> (<em>bool</em>) – Flag wether to ignore the first snapshot of a trajectory</li>
 <li><strong>topology</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
 <li><strong>epoch</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -595,6 +596,24 @@ considered in contact(default 8)</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.Clustering.filterClustersAccordingToBox">
+<code class="descname">filterClustersAccordingToBox</code><span class="sig-paren">(</span><em>simulationRunnerParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.filterClustersAccordingToBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.filterClustersAccordingToBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the clusters to select only the ones whose representative
+structures will fit into the selected box</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>simulationRunnerParams</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a>) – <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a> Simulation parameters object</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Returns list, list:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">– list of the filtered clusters, list of bools flagging wether the cluster is selected or not</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.Clustering.getCluster">
 <code class="descname">getCluster</code><span class="sig-paren">(</span><em>clusterNum</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.getCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.getCluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the cluster at index clusterNum</p>
@@ -603,6 +622,20 @@ considered in contact(default 8)</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.clustering.clustering.Cluster" title="AdaptivePELE.clustering.clustering.Cluster"><code class="xref py py-class docutils literal"><span class="pre">Cluster</span></code></a> – Cluster at clusterNum</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.Clustering.getClusterListForSpawning">
+<code class="descname">getClusterListForSpawning</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.getClusterListForSpawning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.getClusterListForSpawning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the clusters object to be used in the spawning</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a> – Container object for the clusters</td>
 </tr>
 </tbody>
 </table>
@@ -657,6 +690,11 @@ if not specified, the cluster metric is chosen</li>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.Clustering.setProcessors">
+<code class="descname">setProcessors</code><span class="sig-paren">(</span><em>processors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.setProcessors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.setProcessors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.Clustering.writeClusterMetric">
@@ -1114,14 +1152,13 @@ conformations</td>
 </dd></dl>
 
 <dl class="class">
-<dt id="AdaptivePELE.clustering.clustering.NullClustering">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">NullClustering</code><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#NullClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.NullClustering" title="Permalink to this definition">¶</a></dt>
+<dt id="AdaptivePELE.clustering.clustering.MSMClustering">
+<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">MSMClustering</code><span class="sig-paren">(</span><em>n_clusters</em>, <em>tica=False</em>, <em>resname=u''</em>, <em>resnum=0</em>, <em>resChain=u''</em>, <em>symmetries=None</em>, <em>atom_Ids=u''</em>, <em>writeCA=False</em>, <em>sidechains=False</em>, <em>tica_lagtime=10</em>, <em>tica_nICs=3</em>, <em>tica_kinetic_map=True</em>, <em>tica_commute_map=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#MSMClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.MSMClustering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.clustering.clustering.Clustering</span></code></a></p>
-<p>Don’t generate any clustering, works essentially as a placeholder
-for simulation when no clustering is desired</p>
+<p>Cluster the trajectories to estimate a Markov State Model (MSM)</p>
 <dl class="method">
-<dt id="AdaptivePELE.clustering.clustering.NullClustering.cluster">
-<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em>, <em>topology=None</em>, <em>epoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#NullClustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.NullClustering.cluster" title="Permalink to this definition">¶</a></dt>
+<dt id="AdaptivePELE.clustering.clustering.MSMClustering.cluster">
+<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em>, <em>topology=None</em>, <em>epoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#MSMClustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.MSMClustering.cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the snaptshots contained in the paths folder</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1131,6 +1168,94 @@ for simulation when no clustering is desired</p>
 <li><strong>paths</strong> (<em>list</em>) – List of folders with the snapshots</li>
 <li><strong>topology</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
 <li><strong>epoch</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.MSMClustering.filterClustersAccordingToBox">
+<code class="descname">filterClustersAccordingToBox</code><span class="sig-paren">(</span><em>simulationRunnerParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#MSMClustering.filterClustersAccordingToBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.MSMClustering.filterClustersAccordingToBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the clusters to select only the ones whose representative
+structures will fit into the selected box</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>simulationRunnerParams</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a>) – <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters" title="AdaptivePELE.simulation.simulationrunner.SimulationParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulationParameters</span></code></a> Simulation parameters object</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Returns list, list:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">– list of the filtered clusters, list of bools flagging wether the cluster is selected or not</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.MSMClustering.getClusterListForSpawning">
+<code class="descname">getClusterListForSpawning</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#MSMClustering.getClusterListForSpawning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.MSMClustering.getClusterListForSpawning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the clusters object to be used in the spawning</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a> – Container object for the clusters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.MSMClustering.setProcessors">
+<code class="descname">setProcessors</code><span class="sig-paren">(</span><em>processors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#MSMClustering.setProcessors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.MSMClustering.setProcessors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.MSMClustering.writeOutput">
+<code class="descname">writeOutput</code><span class="sig-paren">(</span><em>outputPath</em>, <em>degeneracy</em>, <em>outputObject</em>, <em>writeAll</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#MSMClustering.writeOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.MSMClustering.writeOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes all the clustering information in outputPath</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>outputPath</strong> (<em>str</em>) – Folder that will contain all the clustering information</li>
+<li><strong>degeneracy</strong> (<em>list</em>) – Degeneracy of each cluster. It must be in the same order
+as in the self.clusters list</li>
+<li><strong>outputObject</strong> (<em>str</em>) – Output name for the pickle object</li>
+<li><strong>writeAll</strong> (<em>bool</em>) – Wether to write pdb files for all cluster in addition
+of the summary</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AdaptivePELE.clustering.clustering.NullClustering">
+<em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clustering.</code><code class="descname">NullClustering</code><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#NullClustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.NullClustering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.clustering.clustering.Clustering</span></code></a></p>
+<p>Don’t generate any clustering, works essentially as a placeholder
+for simulation when no clustering is desired</p>
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.NullClustering.cluster">
+<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em>, <em>topology=None</em>, <em>epoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#NullClustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.NullClustering.cluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster the snaptshots contained in the paths folder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paths</strong> (<em>list</em>) – List of folders with the snapshots</li>
+<li><strong>topology</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>epoch</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -1194,7 +1319,7 @@ Only useful for PELE sequential runs</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.cluster">
-<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em>, <em>topology=None</em>, <em>epoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#SequentialLastSnapshotClustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.cluster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cluster</code><span class="sig-paren">(</span><em>paths</em>, <em>topology=None</em>, <em>epoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#SequentialLastSnapshotClustering.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.SequentialLastSnapshotClustering.cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the snaptshots contained in the paths folder</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1204,6 +1329,7 @@ Only useful for PELE sequential runs</p>
 <li><strong>paths</strong> (<em>list</em>) – List of folders with the snapshots</li>
 <li><strong>topology</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
 <li><strong>epoch</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -1296,6 +1422,11 @@ steps</p>
 <dt id="AdaptivePELE.clustering.clusteringTypes.CLUSTERING_TYPES">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.clustering.clusteringTypes.</code><code class="descname">CLUSTERING_TYPES</code><a class="reference internal" href="_modules/AdaptivePELE/clustering/clusteringTypes.html#CLUSTERING_TYPES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clusteringTypes.CLUSTERING_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
+<dt id="AdaptivePELE.clustering.clusteringTypes.CLUSTERING_TYPES.MSMClustering">
+<code class="descname">MSMClustering</code><em class="property"> = 4</em><a class="headerlink" href="#AdaptivePELE.clustering.clusteringTypes.CLUSTERING_TYPES.MSMClustering" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="AdaptivePELE.clustering.clusteringTypes.CLUSTERING_TYPES.contactMap">
 <code class="descname">contactMap</code><em class="property"> = 1</em><a class="headerlink" href="#AdaptivePELE.clustering.clusteringTypes.CLUSTERING_TYPES.contactMap" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
