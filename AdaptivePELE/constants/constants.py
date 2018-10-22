@@ -46,7 +46,7 @@ trajectoryBasename = "*traj*"
 
 
 class AmberTemplates:
-    forcefields = {"ff99SB": "oldff/leaprc.ff99SB", "ff14SB": "leaprc.protein.ff14sb"}
+    forcefields = {"ff99SB": "oldff/leaprc.ff99SB", "ff14SB": "leaprc.protein.ff14SB"}
     antechamberTemplate = "antechamber -i $LIGAND -fi pdb -o $OUTPUT -fo mol2 -c bcc -pf y -nc $CHARGE"
     parmchk2Template = "parmchk2 -i $MOL2 -f mol2 -o $OUTPUT"
     tleapTemplate = "source oldff/leaprc.ff99SB\n" \
