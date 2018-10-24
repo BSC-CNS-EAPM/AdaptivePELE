@@ -437,7 +437,7 @@ def get_epoch_traj_num(filename):
     # assumes trajectories come from an Adaptive simulation
     path, traj_name = os.path.split(filename)
     try:
-        epoch = int(os.path.split(path))
+        epoch = int(os.path.split(path)[-1])
     except ValueError:
         # if for some reason epoch number can't be inferred, assume first
         # epoch
