@@ -415,7 +415,6 @@ class PeleSimulation(SimulationRunner):
             toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
         else:
             toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
-            toRun = map(str, toRun)
         utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
