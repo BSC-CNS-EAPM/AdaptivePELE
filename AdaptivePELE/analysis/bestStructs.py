@@ -88,6 +88,7 @@ def main(criteria, path=DIR, n_structs=10, sort_order="min", out_freq=FREQ, outp
         reports[0]
     except IndexError:
         raise IndexError("Not report file found. Check you are in adaptive's or Pele root folder")
+
     #Get metrics of reports
     if criteria.isdigit():
         steps, criteria = get_column_names(reports, STEPS, criteria)
@@ -111,37 +112,47 @@ def main(criteria, path=DIR, n_structs=10, sort_order="min", out_freq=FREQ, outp
 
     #Read traj and output sanpshot  
     for f_id, f_out, step, path in zip(file_ids, files_out, step_indexes, paths):
-
-        # Read Trajetory from PELE's output
         if not topology:
-            f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.pdb".format(f_id)))
-            if len(f_in) == 0:
-                sys.exit("Trajectory {} not found. Be aware that PELE trajectories must contain the label \'trajectory\' in their file name to be detected".format("*trajectory*_{}".format(f_id)))
-            f_in = f_in[0]
-            with open(f_in, 'r') as input_file:
-                file_content = input_file.read()
-            trajectory_selected = re.search('MODEL\s+%d(.*?)ENDMDL' % int((step) / out_freq+1), file_content,re.DOTALL)
-
-            # Output Snapshot
-            try:
-                mkdir_p(output)
-            except OSError:
-                pass
-
-            traj = []
-            with open(os.path.join(output, f_out), 'w') as f:
-                traj.append("MODEL     %d" % int((step)/out_freq+1))
-                try:
-                    traj.append(trajectory_selected.group(1))
-                except AttributeError:
-                    raise AttributeError("Model not found. Check the -f option.")
-                traj.append("ENDMDL\n")
-                f.write("\n".join(traj))
-            print("MODEL {} has been selected".format(f_out))
+            extract_snapshot_from_pdb(path, f_id, output, topology, step, out_freq, f_out)
         else:
-            f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.xtc".format(f_id)))
-            splitTrajectory.main(output, [f_in[0], ], topology, [(step)/out_freq+1, ], template= f_out)
+            extract_snapshot_from_xtc(path, f_id, output, topology, step, out_freq, f_out)
+
+    #Return data
     return files_out, epochs, file_ids, step_indexes
+
+
+def extract_snapshot_from_pdb(path, f_id, output, topology, step, out_freq, f_out):
+    f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.pdb".format(f_id)))
+    if len(f_in) == 0:
+        sys.exit("Trajectory {} not found. Be aware that PELE trajectories must contain the label \'trajectory\' in their file name to be detected".format("*trajectory*_{}".format(f_id)))
+    f_in = f_in[0]
+    with open(f_in, 'r') as input_file:
+        file_content = input_file.read()
+    trajectory_selected = re.search('MODEL\s+%d(.*?)ENDMDL' % int((step) / out_freq+1), file_content,re.DOTALL)
+
+    # Output Snapshot
+    try:
+        mkdir_p(output)
+    except OSError:
+        pass
+
+    traj = []
+    with open(os.path.join(output, f_out), 'w') as f:
+        traj.append("MODEL     %d" % int((step)/out_freq+1))
+        try:
+            traj.append(trajectory_selected.group(1))
+        except AttributeError:
+            raise AttributeError("Model not found. Check the -f option.")
+        traj.append("ENDMDL\n")
+        f.write("\n".join(traj))
+
+
+def extract_snapshot_from_xtc(path, f_id, output, topology, step, out_freq, f_out):
+    f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.xtc".format(f_id)))
+    if len(f_in) == 0: 
+        sys.exit("Trajectory {} not found. Be aware that PELE trajectories must contain the label \'trajectory\' in their file name to be detected".format("*trajectory*_{}".format(f_id)))
+    splitTrajectory.main(output, [f_in[0], ], topology, [(step)/out_freq+1, ], template= f_out)
+ 
 
 
 def parse_values(reports, n_structs, criteria, sort_order, steps):
