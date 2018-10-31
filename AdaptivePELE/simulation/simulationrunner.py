@@ -83,6 +83,7 @@ class SimulationParameters:
         self.constraintsNVT = 5
         self.constraintsNPT = 0.5
         self.forcefields = "ff99SB"
+        self.maxDevicesPerReplica = None
         self.customparamspath = None
 
 
@@ -1322,6 +1323,7 @@ class RunnerBuilder:
             params.devicesPerTrajectory = paramsBlock.get(blockNames.SimulationParams.devicesPerTrajectory, 1)
             params.trajsPerReplica = int(params.processors/params.numReplicas)
             assert params.trajsPerReplica*params.numReplicas == params.processors, "Number of trajectories requested does not match the number of replicas"
+            params.maxDevicesPerReplica = paramsBlock.get(blockNames.SimulationParams.maxDevicesPerReplica)
             params.runEquilibration = True
             params.equilibrationLengthNVT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNVT, 200000)
             params.equilibrationLengthNPT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNPT, 500000)
