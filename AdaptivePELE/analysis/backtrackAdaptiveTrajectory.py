@@ -32,11 +32,12 @@ def parseArguments():
     parser.add_argument("-o", type=str, default=None, help="Output path where to write the files")
     parser.add_argument("--name", type=str, default="pathway.pdb", help="Name of the pdb to write the files")
     parser.add_argument("--top", type=str, default=None, help="Name of the pdb topology for loading non-pdb trajectories")
+    parser.add_argument("--use_pdb", action="store_true", help="Force to use extraction for pdb. Only useful in case of having a pdb with .xtc extension")
     args = parser.parse_args()
-    return args.trajectory, args.snapshot, args.epoch, args.o, args.name, args.top
+    return args.trajectory, args.snapshot, args.epoch, args.o, args.name, args.top, args.use_pdb
 
 
-def main(trajectory, snapshot, epoch, outputPath, out_filename, topology):
+def main(trajectory, snapshot, epoch, outputPath, out_filename, topology, use_pdb=False):
     if outputPath is not None:
         outputPath = os.path.join(outputPath, "")
         if not os.path.exists(outputPath):
@@ -61,7 +62,7 @@ def main(trajectory, snapshot, epoch, outputPath, out_filename, topology):
     sys.stderr.write("Creating pathway...\n")
     while True:
         filename = glob.glob(os.path.join(pathPrefix, epoch, "*traj*_%d.*" % trajectory))
-        snapshots = utilities.getSnapshots(filename[0], topology=topology)
+        snapshots = utilities.getSnapshots(filename[0], topology=topology, use_pdb=use_pdb)
         if not isinstance(snapshots[0], basestring):
             new_snapshots = []
             for i in range(snapshot+1):
@@ -85,5 +86,5 @@ def main(trajectory, snapshot, epoch, outputPath, out_filename, topology):
 
 
 if __name__ == "__main__":
-    traj, num_snapshot, num_epoch, output_path, output_filename, top = parseArguments()
-    main(traj, num_snapshot, num_epoch, output_path, output_filename, top)
+    traj, num_snapshot, num_epoch, output_path, output_filename, top, use_pdb = parseArguments()
+    main(traj, num_snapshot, num_epoch, output_path, output_filename, top, use_pdb)

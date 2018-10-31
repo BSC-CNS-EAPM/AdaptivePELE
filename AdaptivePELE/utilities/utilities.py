@@ -43,7 +43,7 @@ def makeFolder(outputDir):
         os.makedirs(outputDir)
 
 
-def getSnapshots(trajectoryFile, verbose=False, topology=None):
+def getSnapshots(trajectoryFile, verbose=False, topology=None, use_pdb=False):
     """
         Gets the snapshots
 
@@ -56,7 +56,7 @@ def getSnapshots(trajectoryFile, verbose=False, topology=None):
     """
     # topology parameter is ignored, just here for compatibility purposes
     ext = os.path.splitext(trajectoryFile)[1]
-    if ext == ".pdb":
+    if ext == ".pdb" or use_pdb:
         with open(trajectoryFile, "r") as inputFile:
             inputFileContent = inputFile.read()
 
