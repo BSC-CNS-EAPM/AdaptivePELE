@@ -157,6 +157,7 @@ class SimulationParams:
         "numberEquilibrationStructures": "numbers.Real",
         "useSrun": "bool",
         "srunParameters": "basestring",
+        "mpiParameters": "basestring",
         "exitCondition": "dict",
         "trajectoryName": "basestring",
         "ligandCharge": "numbers.Real",

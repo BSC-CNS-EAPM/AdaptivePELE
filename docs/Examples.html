@@ -345,6 +345,9 @@ configurations or SLURM installations.</li>
 <li><strong>srunParameters</strong> (<em>string</em>, default=None): String with parameters to pass
 to srun, if not specified it will just run without any parameters, it is
 important to avoid whitspaces both at the beginning and end of the string.</li>
+<li><strong>mpiParameters</strong> (<em>string</em>, default=None): String with parameters to pass
+to mpirun, if not specified it will just run without any parameters, it is
+important to avoid whitspaces both at the beginning and end of the string.</li>
 </ul>
 </div>
 <div class="section" id="md-parameters">
@@ -386,6 +389,7 @@ run the energy minimization</li>
 trajectory, this parameter only applies if using the <em>CUDA</em> platformn. Note
 that <strong>devicesPerTrajectory*numReplicas</strong> should correspond to the number of
 gpus per node that you have available</li>
+<li><strong>maxDevicesPerReplica</strong> (<em>int</em>, default=None): Number of maximum gpus available per replica, this parameter is necessary if one wants to oversubscribe the gpus, i.e. run more than one trajectory in the same device</li>
 <li><strong>constraintsMinimization</strong> (<em>float</em>, default=5.0): Value of the constraints
 for the minimization (in kcal/(mol*A<sup>2</sup>)), see <a class="reference internal" href="#equilibration-procedure-in-md">Equilibration procedure in MD</a> section
 for more details on the equilibration procedure</li>
