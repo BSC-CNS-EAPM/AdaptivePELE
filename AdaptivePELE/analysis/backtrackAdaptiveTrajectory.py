@@ -65,10 +65,9 @@ def main(trajectory, snapshot, epoch, outputPath, out_filename, topology):
         if not isinstance(snapshots[0], basestring):
             new_snapshots = []
             for i in range(snapshot+1):
-                snapshot = snapshots.slice(i, copy=False)
                 PDB = atomset.PDB()
-                PDB.initialise(snapshot, topology=topology_contents)
-                new_snapshots.append(PDB.get_pdb_string())
+                PDB.initialise(snapshots[i], topology=topology_contents)
+                new_snapshots.append(PDB.pdb)
             snapshots = new_snapshots
         else:
             snapshots = snapshots[:snapshot+1]
