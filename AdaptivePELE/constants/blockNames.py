@@ -151,6 +151,7 @@ class SimulationParams:
     trajectoryName = "trajectoryName"
     srun = "useSrun"
     srunParameters = "srunParameters"
+    mpiParameters = "mpiParameters"
     # params for MD
     ligandCharge = "ligandCharge"
     nonBondedCutoff = "nonBondedCutoff"
