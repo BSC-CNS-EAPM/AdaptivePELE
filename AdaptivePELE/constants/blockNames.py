@@ -170,6 +170,7 @@ class SimulationParams:
     constraintsNPT = "constraintsNPT"
     devicesPerTrajectory = "devicesPerTrajectory"
     forcefield = "forcefield"
+    customparamspath = "customparamspath"
 
 
 class ExitConditionType:

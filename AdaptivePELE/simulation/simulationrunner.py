@@ -83,6 +83,7 @@ class SimulationParameters:
         self.constraintsNVT = 5
         self.constraintsNPT = 0.5
         self.forcefields = "ff99SB"
+        self.customparamspath = None
 
 
 class SimulationRunner:
@@ -868,8 +869,17 @@ class MDSimulation(SimulationRunner):
         Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.waterBoxSize, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
         antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
         parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
-        if processManager.isMaster():
+        if processManager.isMaster() and not self.parameters.customparamspath:
             self.prepareLigand(antechamberDict, parmchkDict)
+        # Change the Mol2 and Frcmod path to the new user defined path
+        if self.parameters.customparamspath:
+            if not os.path.exists(self.parameters.customparamspath):
+                # As the working directory has changed, eval if the given path is a global or relative one.
+                self.parameters.customparamspath = os.path.join(workingdirectory, self.parameters.customparamspath)
+                if not os.path.exists(self.parameters.customparamspath):
+                    raise FileNotFoundError("No custom parameters found in the given path")
+            Tleapdict["MOL2"] = os.path.join(self.parameters.customparamspath, Tleapdict["MOL2"])
+            Tleapdict["FRCMOD"] = os.path.join(self.parameters.customparamspath, Tleapdict["FRCMOD"])
 
         processManager.barrier()
 
@@ -1328,6 +1338,7 @@ class RunnerBuilder:
             params.constraintsMin = paramsBlock.get(blockNames.SimulationParams.constraintsMin, 5)
             params.constraintsNVT = paramsBlock.get(blockNames.SimulationParams.constraintsNVT, 5)
             params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
+            params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
