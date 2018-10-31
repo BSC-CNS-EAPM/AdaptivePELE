@@ -176,6 +176,7 @@ class SimulationParams:
         "constraintsMinimization": "numbers.Real",
         "constraintsNVT": "numbers.Real",
         "constraintsNPT": "numbers.Real",
+        "customparamspath": "basestring",
         "numReplicas": "numbers.Real"
     }
     exitCondition = {
