@@ -60,6 +60,7 @@ class SimulationParameters:
         self.trajectoryName = None
         self.srun = False
         self.srunParameters = None
+        self.mpiParameters = None
         self.numberEquilibrationStructures = 10
         self.reportName = ""
         # parameters needed for MD simulations and their defaults
@@ -82,7 +83,9 @@ class SimulationParameters:
         self.constraintsMin = 5
         self.constraintsNVT = 5
         self.constraintsNPT = 0.5
-        self.forcefields = "ff99SB"
+        self.maxDevicesPerReplica = None
+        self.forcefield = "ff99SB"
+        self.customparamspath = None
 
 
 class SimulationRunner:
@@ -371,8 +374,7 @@ class PeleSimulation(SimulationRunner):
         if self.parameters.srun:
             toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
         else:
-            toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
-            toRun = map(str, toRun)
+            toRun = ["mpirun", "-np", str(self.parameters.processors)] + self.parameters.mpiParameters + [self.parameters.executable, runningControlFile]
         utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
@@ -868,8 +870,17 @@ class MDSimulation(SimulationRunner):
         Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.waterBoxSize, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
         antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
         parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
-        if processManager.isMaster():
+        if processManager.isMaster() and not self.parameters.customparamspath:
             self.prepareLigand(antechamberDict, parmchkDict)
+        # Change the Mol2 and Frcmod path to the new user defined path
+        if self.parameters.customparamspath:
+            if not os.path.exists(self.parameters.customparamspath):
+                # As the working directory has changed, eval if the given path is a global or relative one.
+                self.parameters.customparamspath = os.path.join(workingdirectory, self.parameters.customparamspath)
+                if not os.path.exists(self.parameters.customparamspath):
+                    raise FileNotFoundError("No custom parameters found in the given path")
+            Tleapdict["MOL2"] = os.path.join(self.parameters.customparamspath, Tleapdict["MOL2"])
+            Tleapdict["FRCMOD"] = os.path.join(self.parameters.customparamspath, Tleapdict["FRCMOD"])
 
         processManager.barrier()
 
@@ -1296,6 +1307,11 @@ class RunnerBuilder:
                 params.srunParameters = params.srunParameters.strip().split()
             else:
                 params.srunParameters = []
+            params.mpiParameters = paramsBlock.get(blockNames.SimulationParams.mpiParameters, None)
+            if params.mpiParameters is not None:
+                params.mpiParameters = params.mpiParameters.strip().split()
+            else:
+                params.mpiParameters = []
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()
@@ -1312,6 +1328,7 @@ class RunnerBuilder:
             params.devicesPerTrajectory = paramsBlock.get(blockNames.SimulationParams.devicesPerTrajectory, 1)
             params.trajsPerReplica = int(params.processors/params.numReplicas)
             assert params.trajsPerReplica*params.numReplicas == params.processors, "Number of trajectories requested does not match the number of replicas"
+            params.maxDevicesPerReplica = paramsBlock.get(blockNames.SimulationParams.maxDevicesPerReplica)
             params.runEquilibration = True
             params.equilibrationLengthNVT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNVT, 200000)
             params.equilibrationLengthNPT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNPT, 500000)
@@ -1328,6 +1345,7 @@ class RunnerBuilder:
             params.constraintsMin = paramsBlock.get(blockNames.SimulationParams.constraintsMin, 5)
             params.constraintsNVT = paramsBlock.get(blockNames.SimulationParams.constraintsNVT, 5)
             params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
+            params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]

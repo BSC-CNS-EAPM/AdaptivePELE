@@ -919,6 +919,6 @@ def readPDB(pdbfile):
         :returns: basestring -- A string with PDB content
     """
     try:
-        return open(pdbfile, "rt").read()
+        return open(str(pdbfile), "rt").read()
     except IOError:
         return pdbfile

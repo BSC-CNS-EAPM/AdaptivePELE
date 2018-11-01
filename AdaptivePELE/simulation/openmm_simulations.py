@@ -139,7 +139,7 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     inpcrd = app.AmberInpcrdFile(inpcrd)
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
     if parameters.runningPlatform == "CUDA":
-        platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(worker, parameters.devicesPerTrajectory), "UseCpuPme": "false"}
+        platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(worker, parameters.devicesPerTrajectory, devicesPerReplica=parameters.maxDevicesPerReplica), "UseCpuPme": "false"}
     else:
         platformProperties = {}
     if worker == 0:
@@ -365,8 +365,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     pdb = app.PDBFile(str(pdb))
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
     if parameters.runningPlatform == "CUDA":
-        platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(deviceIndex, parameters.devicesPerTrajectory), "UseCpuPme": "false"}
-
+        platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(deviceIndex, parameters.devicesPerTrajectory, devicesPerReplica=parameters.maxDevicesPerReplica), "UseCpuPme": "false"} 
     else:
         platformProperties = {}
     system = prmtop.createSystem(nonbondedMethod=app.PME,
@@ -429,16 +428,21 @@ def getLastStep(reportfile):
     return int(last_step)
 
 
-def getDeviceIndexStr(deviceIndex, devicesPerReplica):
+def getDeviceIndexStr(deviceIndex, devicesPerTraj, devicesPerReplica=None):
     """
         Create a string to pass to OpenMM platform to select the resources to use
 
         :param deviceIndex: Index of the trajectory in the replica
         :type deviceIndex: int
-        :param devicesPerReplica: Number of devices to use per trajectory
+        :param devicesPerTraj: Number of devices to use per trajectory
+        :type devicesPerTraj: int
+        :param devicesPerReplica: Number of maximum devices to use per replica
         :type devicesPerReplica: int
 
         :returns: str -- String that tells OpenMM how to use the resources
     """
-    devices = map(str, list(range(deviceIndex, deviceIndex+devicesPerReplica)))
-    return ",".join(devices)
+    if devicesPerReplica is not None:
+        devices = [d % devicesPerReplica for d in range(deviceIndex, deviceIndex+devicesPerTraj)]
+    else:
+        devices = range(deviceIndex, deviceIndex+devicesPerTraj)
+    return ",".join(str(x) for x in devices)

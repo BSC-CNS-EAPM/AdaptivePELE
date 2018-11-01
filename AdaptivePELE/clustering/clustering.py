@@ -16,7 +16,6 @@ from AdaptivePELE.atomset import atomset
 from AdaptivePELE.clustering import clusteringTypes
 from AdaptivePELE.clustering import thresholdcalculator
 from AdaptivePELE.freeEnergies import extractCoords as coord
-from AdaptivePELE.freeEnergies import estimateDG as estimate
 from AdaptivePELE.freeEnergies import getRepresentativeStructures as getRepr
 try:
     import networkx as nx
@@ -32,6 +31,7 @@ except ImportError:
 
 try:
     from AdaptivePELE.freeEnergies import cluster as pyemma_cluster
+    from AdaptivePELE.freeEnergies.estimateDG import getCentersInfo
     import pyemma.coordinates as coor
     PYEMMA = True
 except ImportError:
@@ -1680,7 +1680,7 @@ class MSMClustering(Clustering):
         trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, base_traj_names))
         trajectories = [np.loadtxt(f)[:, 1:] for f in trajectory_files]
 
-        centersInfo = estimate.getCentersInfo(self.pyemma_clustering, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)
+        centersInfo = getCentersInfo(self.pyemma_clustering, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)
         centersInfo_processed = []
         for cluster in centersInfo:
             epoch_num, traj_num, snapshot_num = centersInfo[cluster]["structure"]

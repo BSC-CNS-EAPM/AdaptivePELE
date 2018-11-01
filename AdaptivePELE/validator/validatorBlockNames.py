@@ -157,6 +157,7 @@ class SimulationParams:
         "numberEquilibrationStructures": "numbers.Real",
         "useSrun": "bool",
         "srunParameters": "basestring",
+        "mpiParameters": "basestring",
         "exitCondition": "dict",
         "trajectoryName": "basestring",
         "ligandCharge": "numbers.Real",
@@ -176,7 +177,9 @@ class SimulationParams:
         "constraintsMinimization": "numbers.Real",
         "constraintsNVT": "numbers.Real",
         "constraintsNPT": "numbers.Real",
-        "numReplicas": "numbers.Real"
+        "customparamspath": "basestring",
+        "numReplicas": "numbers.Real",
+        "maxDevicesPerReplica": "numbers.Real"
     }
     exitCondition = {
         "types": {

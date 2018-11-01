@@ -231,7 +231,11 @@ def writeFilenamesExtractedCoordinates(pathFolder, lig_resname, atom_Ids, writeL
     originalPDBfiles = glob.glob(os.path.join(pathFolder, '*traj*.*'))
     ext = os.path.splitext(originalPDBfiles[0])[1]
     if ext in MDTRAJ_FORMATS:
-        indexes = extractIndexesTopology(topology, lig_resname, atom_Ids, writeCA, sidechains)
+        if topology is None:
+            raise ValueError("Necessary topology not provided!")
+        # get topology for the first trajectory
+        top_file = topology.getTopologyFile(0, 1)
+        indexes = extractIndexesTopology(top_file, lig_resname, atom_Ids, writeCA, sidechains)
     else:
         indexes = None
     workers = []
@@ -433,7 +437,7 @@ def get_epoch_traj_num(filename):
     # assumes trajectories come from an Adaptive simulation
     path, traj_name = os.path.split(filename)
     try:
-        epoch = int(os.path.split(path))
+        epoch = int(os.path.split(path)[-1])
     except ValueError:
         # if for some reason epoch number can't be inferred, assume first
         # epoch
