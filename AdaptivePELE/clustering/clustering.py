@@ -1692,7 +1692,7 @@ class MSMClustering(Clustering):
         # order
         for _ in range(self.n_clusters):
             self.clusters.addCluster(Cluster(""))
-        structureFolder = os.path.join(outputPathConstants.epochOutputPathTempletized, "*traj*_%d*")
+        structureFolder = os.path.join(outputPathConstants.epochOutputPathTempletized, "*traj*_%d.*")
         for trajFile, extraInfo in extractInfo.items():
             try:
                 pdbFile = glob.glob(structureFolder % trajFile)[0]
