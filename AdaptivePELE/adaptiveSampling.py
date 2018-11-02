@@ -531,7 +531,7 @@ def buildNewClusteringAndWriteInitialStructuresInRestart(firstRun, outputPathCon
     processorManagerFilename = "procMapping.txt"
     clusteringMethod = getWorkingClusteringObjectAndReclusterIfNecessary(firstRun, outputPathConstants, clusteringBlock, spawningParams, simulationRunner, topologies, processManager)
     if processManager.isMaster():
-        degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.clusters.clusters, simulationRunner.getWorkingProcessors(), firstRun)
+        degeneracyOfRepresentatives = spawningCalculator.calculate(clusteringMethod.getClusterListForSpawning(), simulationRunner.getWorkingProcessors(), firstRun)
         spawningCalculator.log()
         _, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clusteringMethod, firstRun, topologies=topologies)
         utilities.writeProcessorMappingToDisk(outputPathConstants.tmpFolder, processorManagerFilename, procMapping)
