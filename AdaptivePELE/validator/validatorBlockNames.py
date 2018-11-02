@@ -91,7 +91,11 @@ class SpawningParams:
         },
         "ProbabilityMSM": {
             "lagtime": "numbers.Real"
+        },
+        "MetastabilityMSM": {
+            "lagtime": "numbers.Real"
         }
+
     }
     density = {
         "types": {

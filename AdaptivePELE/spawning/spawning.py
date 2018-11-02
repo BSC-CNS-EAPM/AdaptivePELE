@@ -146,6 +146,8 @@ class SpawningBuilder:
             spawningCalculator = NullSpawningCalculator(spawningParams)
         elif spawningTypeString == blockNames.StringSpawningTypes.ProbabilityMSMCalculator:
             spawningCalculator = ProbabilityMSMCalculator(spawningParams)
+        elif spawningTypeString == blockNames.StringSpawningTypes.MetastabilityMSMCalculator:
+            spawningCalculator = MetastabilityMSMCalculator(spawningParams)
         else:
             sys.exit("Unknown spawning type! Choices are: " + str(spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
         return spawningCalculator
@@ -186,7 +188,7 @@ class SpawningParams:
         spawningParamsBlock = spawningBlock[blockNames.SpawningParams.params]
         spawningType = spawningBlock[blockNames.StringSpawningTypes.type]
 
-        if spawningType != blockNames.StringSpawningTypes.ProbabilityMSMCalculator:
+        if spawningType not in spawningTypes.MSMSpawning:
             # reportFilename is now mandatory for all spawning not related to
             # MSM
             self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
@@ -232,7 +234,7 @@ class SpawningParams:
             self.reportCol = spawningParamsBlock[blockNames.SpawningParams.report_col]-1
             self.condition = spawningParamsBlock.get(blockNames.SpawningParams.condition,
                                                      blockNames.SpawningParams.minValue)
-        if spawningType == blockNames.StringSpawningTypes.ProbabilityMSMCalculator:
+        if spawningType in spawningTypes.MSMSpawning:
             self.lagtime = spawningParamsBlock[blockNames.SpawningParams.lagtime]
             self.condition = spawningParamsBlock.get(blockNames.SpawningParams.condition,
                                                      blockNames.SpawningParams.minValue)
@@ -1148,16 +1150,52 @@ class ProbabilityMSMCalculator(MSMCalculator):
             probabilities[index] = msm_object.stationary_distribution[i]
         if self.parameters.condition == blockNames.SpawningParams.minValue:
             sortedProbs = np.argsort(probabilities)
-            # set the value of the clusters to avoid considering them when
-            # distributing, when taking the min set them to 1, when taking the
-            # max to 0
-            neutral = 1.0
+            probabilities = 1 - probabilities
         else:
             sortedProbs = np.argsort(probabilities)[::-1]
-            neutral = 0.0
+        neutral = 0.0
         probabilities[sortedProbs[trajToDistribute:]] = neutral
         if abs(probabilities.sum()) < 1e-8:
             probabilities = np.ones(nclusters)/nclusters
         else:
             probabilities /= sum(probabilities)
         return self.divideTrajAccordingToWeights(probabilities, trajToDistribute)
+
+
+class MetastabilityMSMCalculator(MSMCalculator):
+    def __init__(self, parameters):
+        MSMCalculator.__init__(self, parameters)
+        self.type = spawningTypes.SPAWNING_TYPES.MetastabilityMSMCalculator
+        self.parameters = parameters
+
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+        """
+            Calculate the degeneracy of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
+        # estimate MSM from clustering object
+        msm_object = self.estimateMSM(clusters.dtrajs)
+        nclusters = msm_object.nstates_full
+        # distribute seeds using the MSM
+        counts = msm_object.count_matrix_full
+        metastability = counts.diagonal()/counts.sum()
+
+        if self.parameters.condition == blockNames.SpawningParams.minValue:
+            sortedProbs = np.argsort(metastability)
+            metastability = 1 - metastability
+        else:
+            sortedProbs = np.argsort(metastability)[::-1]
+        metastability[sortedProbs[trajToDistribute:]] = 0.0
+        if abs(metastability.sum()) < 1e-8:
+            metastability = np.ones(nclusters)/nclusters
+        else:
+            metastability /= sum(metastability)
+        return self.divideTrajAccordingToWeights(metastability, trajToDistribute)

@@ -2,7 +2,7 @@ from AdaptivePELE.constants import blockNames
 
 
 class SPAWNING_TYPES:
-    sameWeight, inverselyProportional, epsilon, simulatedAnnealing, FAST, variableEpsilon, UCB, independent, REAP, null, independentMetric, ProbabilityMSMCalculator = list(range(12))
+    sameWeight, inverselyProportional, epsilon, simulatedAnnealing, FAST, variableEpsilon, UCB, independent, REAP, null, independentMetric, ProbabilityMSMCalculator, MetastabilityMSMCalculator = list(range(13))
 
 SPAWNING_TYPE_TO_STRING_DICTIONARY = {
     SPAWNING_TYPES.independent: blockNames.StringSpawningTypes.independent,
@@ -16,8 +16,12 @@ SPAWNING_TYPE_TO_STRING_DICTIONARY = {
     SPAWNING_TYPES.REAP: blockNames.StringSpawningTypes.REAP,
     SPAWNING_TYPES.null: blockNames.StringSpawningTypes.null,
     SPAWNING_TYPES.independentMetric: blockNames.StringSpawningTypes.independentMetric,
-    SPAWNING_TYPES.ProbabilityMSMCalculator: blockNames.StringSpawningTypes.ProbabilityMSMCalculator
+    SPAWNING_TYPES.ProbabilityMSMCalculator: blockNames.StringSpawningTypes.ProbabilityMSMCalculator,
+    SPAWNING_TYPES.MetastabilityMSMCalculator: blockNames.StringSpawningTypes.MetastabilityMSMCalculator
+
 }
+
+MSMSpawning = set([blockNames.StringSpawningTypes.ProbabilityMSMCalculator, blockNames.StringSpawningTypes.MetastabilityMSMCalculator])
 
 
 class EPSILON_VARIATION_TYPES:

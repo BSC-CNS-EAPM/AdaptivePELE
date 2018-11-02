@@ -71,6 +71,7 @@ class StringSpawningTypes:
     REAP = "REAP"
     null = "null"
     ProbabilityMSMCalculator = "ProbabilityMSM"
+    MetastabilityMSMCalculator = "MetastabilityMSM"
 
 
 class SpawningParams:
