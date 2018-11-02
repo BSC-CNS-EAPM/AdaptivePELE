@@ -151,6 +151,7 @@ class SimulationParams:
     trajectoryName = "trajectoryName"
     srun = "useSrun"
     srunParameters = "srunParameters"
+    mpiParameters = "mpiParameters"
     # params for MD
     ligandCharge = "ligandCharge"
     nonBondedCutoff = "nonBondedCutoff"
@@ -171,6 +172,7 @@ class SimulationParams:
     devicesPerTrajectory = "devicesPerTrajectory"
     forcefield = "forcefield"
     customparamspath = "customparamspath"
+    maxDevicesPerReplica = "maxDevicesPerReplica"
 
 
 class ExitConditionType:

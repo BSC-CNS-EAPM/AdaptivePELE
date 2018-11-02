@@ -683,7 +683,8 @@ def main(jsonParams, clusteringHook=None):
 
         clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningCalculator.parameters, initialStructures, simulationRunner, processManager)
 
-    clusteringMethod.setProcessors(simulationRunner.getWorkingProcessors())
+    if processManager.isMaster():
+        clusteringMethod.setProcessors(simulationRunner.getWorkingProcessors())
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
     for i in range(firstRun, simulationRunner.parameters.iterations):

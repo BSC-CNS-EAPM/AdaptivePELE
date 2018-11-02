@@ -192,6 +192,9 @@ Optionally, you can also use the following parameters:
 * **srunParameters** (*string*, default=None): String with parameters to pass
   to srun, if not specified it will just run without any parameters, it is
   important to avoid whitspaces both at the beginning and end of the string.
+* **mpiParameters** (*string*, default=None): String with parameters to pass
+  to mpirun, if not specified it will just run without any parameters, it is
+  important to avoid whitspaces both at the beginning and end of the string.
 
 MD Parameters
 .............
@@ -233,6 +236,7 @@ Optionally, you can also use the following parameters:
   trajectory, this parameter only applies if using the *CUDA* platformn. Note
   that **devicesPerTrajectory*numReplicas** should correspond to the number of
   gpus per node that you have available
+* **maxDevicesPerReplica** (*int*, default=None): Number of maximum gpus available per replica, this parameter is necessary if one wants to oversubscribe the gpus, i.e. run more than one trajectory in the same device
 * **constraintsMinimization** (*float*, default=5.0): Value of the constraints
   for the minimization (in kcal/(mol*A\ :sup:`2`)), see `Equilibration procedure in MD`_ section 
   for more details on the equilibration procedure

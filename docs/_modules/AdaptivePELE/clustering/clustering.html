@@ -156,7 +156,6 @@
 <span class="kn">from</span> <span class="nn">AdaptivePELE.clustering</span> <span class="k">import</span> <span class="n">clusteringTypes</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.clustering</span> <span class="k">import</span> <span class="n">thresholdcalculator</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">extractCoords</span> <span class="k">as</span> <span class="n">coord</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">estimateDG</span> <span class="k">as</span> <span class="n">estimate</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">getRepresentativeStructures</span> <span class="k">as</span> <span class="n">getRepr</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
@@ -172,6 +171,7 @@
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">cluster</span> <span class="k">as</span> <span class="n">pyemma_cluster</span>
+    <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies.estimateDG</span> <span class="k">import</span> <span class="n">getCentersInfo</span>
     <span class="kn">import</span> <span class="nn">pyemma.coordinates</span> <span class="k">as</span> <span class="nn">coor</span>
     <span class="n">PYEMMA</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -1820,7 +1820,7 @@
         <span class="n">trajectory_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">allTrajsPath</span><span class="p">,</span> <span class="n">base_traj_names</span><span class="p">))</span>
         <span class="n">trajectories</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">f</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">trajectory_files</span><span class="p">]</span>
 
-        <span class="n">centersInfo</span> <span class="o">=</span> <span class="n">estimate</span><span class="o">.</span><span class="n">getCentersInfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pyemma_clustering</span><span class="p">,</span> <span class="n">trajectories</span><span class="p">,</span> <span class="n">trajectory_files</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pyemma_clustering</span><span class="o">.</span><span class="n">dtrajs</span><span class="p">)</span>
+        <span class="n">centersInfo</span> <span class="o">=</span> <span class="n">getCentersInfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pyemma_clustering</span><span class="p">,</span> <span class="n">trajectories</span><span class="p">,</span> <span class="n">trajectory_files</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pyemma_clustering</span><span class="o">.</span><span class="n">dtrajs</span><span class="p">)</span>
         <span class="n">centersInfo_processed</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">centersInfo</span><span class="p">:</span>
             <span class="n">epoch_num</span><span class="p">,</span> <span class="n">traj_num</span><span class="p">,</span> <span class="n">snapshot_num</span> <span class="o">=</span> <span class="n">centersInfo</span><span class="p">[</span><span class="n">cluster</span><span class="p">][</span><span class="s2">&quot;structure&quot;</span><span class="p">]</span>

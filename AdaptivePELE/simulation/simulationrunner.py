@@ -60,6 +60,7 @@ class SimulationParameters:
         self.trajectoryName = None
         self.srun = False
         self.srunParameters = None
+        self.mpiParameters = None
         self.numberEquilibrationStructures = 10
         self.reportName = ""
         # parameters needed for MD simulations and their defaults
@@ -82,7 +83,8 @@ class SimulationParameters:
         self.constraintsMin = 5
         self.constraintsNVT = 5
         self.constraintsNPT = 0.5
-        self.forcefields = "ff99SB"
+        self.maxDevicesPerReplica = None
+        self.forcefield = "ff99SB"
         self.customparamspath = None
 
 
@@ -372,8 +374,7 @@ class PeleSimulation(SimulationRunner):
         if self.parameters.srun:
             toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
         else:
-            toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
-            toRun = map(str, toRun)
+            toRun = ["mpirun", "-np", str(self.parameters.processors)] + self.parameters.mpiParameters + [self.parameters.executable, runningControlFile]
         utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
@@ -416,7 +417,6 @@ class PeleSimulation(SimulationRunner):
             toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
         else:
             toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
-            toRun = map(str, toRun)
         utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
@@ -1309,6 +1309,11 @@ class RunnerBuilder:
                 params.srunParameters = params.srunParameters.strip().split()
             else:
                 params.srunParameters = []
+            params.mpiParameters = paramsBlock.get(blockNames.SimulationParams.mpiParameters, None)
+            if params.mpiParameters is not None:
+                params.mpiParameters = params.mpiParameters.strip().split()
+            else:
+                params.mpiParameters = []
             exitConditionBlock = paramsBlock.get(blockNames.SimulationParams.exitCondition, None)
             if exitConditionBlock:
                 exitConditionBuilder = ExitConditionBuilder()
@@ -1325,6 +1330,7 @@ class RunnerBuilder:
             params.devicesPerTrajectory = paramsBlock.get(blockNames.SimulationParams.devicesPerTrajectory, 1)
             params.trajsPerReplica = int(params.processors/params.numReplicas)
             assert params.trajsPerReplica*params.numReplicas == params.processors, "Number of trajectories requested does not match the number of replicas"
+            params.maxDevicesPerReplica = paramsBlock.get(blockNames.SimulationParams.maxDevicesPerReplica)
             params.runEquilibration = True
             params.equilibrationLengthNVT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNVT, 200000)
             params.equilibrationLengthNPT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNPT, 500000)
