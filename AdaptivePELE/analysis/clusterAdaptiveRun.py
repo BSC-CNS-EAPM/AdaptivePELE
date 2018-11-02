@@ -60,7 +60,6 @@ def writeInitialStructures(field1, field2, crit1, crit2, centers_info, filename_
     for cluster_num, field1, field2 in zip(centers_info, field1, field2):
         epoch_num, traj_num, snap_num = map(int, centers_info[cluster_num]['structure'])
         trajectory = "{}/{}{}.xtc".format(epoch_num, traj, traj_num) if topology else "{}/{}{}.pdb".format(epoch_num, traj, traj_num)
-        print(use_pdb)
         snapshots = utilities.getSnapshots(trajectory, topology=topology, use_pdb=use_pdb)
         filename = filename_template.format(cluster_num, crit1, field1, crit2, field2)
         if not topology:
