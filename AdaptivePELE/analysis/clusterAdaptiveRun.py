@@ -19,13 +19,14 @@ def parseArgs():
     parser.add_argument('crit2', type=int, help="Metric2 to calculate from clusters")
     parser.add_argument("ligand_resname", type=str, help="Name of the ligand in the PDB")
     parser.add_argument("-atomId", nargs="*", default="", help="Atoms to use for the coordinates of the conformation, if not specified use the center of mass")
-    parser.add_argument('-o', type=str, help="Output folder", default="Cluster_analisis")
-    parser.add_argument('-top', type=str, help="Topology file", default=None)
-    parser.add_argument('-cpus', type=int, help="Cpus to use", default=1)
-    parser.add_argument('-report', type=str, help="Report filenames i.e. run_report_", default="report_")
-    parser.add_argument('-traj', type=str, help="Trajectory filenames i.e. run_trajectory_", default="trajectory_")
+    parser.add_argument('--o', type=str, help="Output folder", default="Cluster_analisis")
+    parser.add_argument('--top', type=str, help="Topology file", default=None)
+    parser.add_argument('--cpus', type=int, help="Cpus to use", default=1)
+    parser.add_argument('--report', type=str, help="Report filenames i.e. run_report_", default="report_")
+    parser.add_argument('--traj', type=str, help="Trajectory filenames i.e. run_trajectory_", default="trajectory_")
+    parser.add_argument('--use_pdb', action="store_true", help="To use when having pdb files with .xtc extension")
     args = parser.parse_args()
-    return args.nClusters, args.crit1, args.crit2, args.ligand_resname, args.atomId, args.o, args.top, args.cpus, args.report, args.traj
+    return args.nClusters, args.crit1, args.crit2, args.ligand_resname, args.atomId, args.o, args.top, args.cpus, args.report, args.traj, args.use_pdb
 
 
 def plotClusters(fields1, fields2, crit1, crit2, output):
@@ -55,11 +56,12 @@ def writePDB(pmf_xyzg, title="clusters.pdb"):
         f.write(content)
 
 
-def writeInitialStructures(field1, field2, crit1, crit2, centers_info, filename_template, traj, topology=None):
+def writeInitialStructures(field1, field2, crit1, crit2, centers_info, filename_template, traj, topology=None, use_pdb=False):
     for cluster_num, field1, field2 in zip(centers_info, field1, field2):
         epoch_num, traj_num, snap_num = map(int, centers_info[cluster_num]['structure'])
         trajectory = "{}/{}{}.xtc".format(epoch_num, traj, traj_num) if topology else "{}/{}{}.pdb".format(epoch_num, traj, traj_num)
-        snapshots = utilities.getSnapshots(trajectory, topology=topology)
+        print(use_pdb)
+        snapshots = utilities.getSnapshots(trajectory, topology=topology, use_pdb=use_pdb)
         filename = filename_template.format(cluster_num, crit1, field1, crit2, field2)
         if not topology:
             with open(filename, "w") as fw:
@@ -97,9 +99,9 @@ def get_metric(criteria, epoch_num, traj_num, snap_num, report):
     return value, header
 
 
-def main(num_clusters, criteria1, criteria2, output_folder, ligand_resname, atom_ids, cpus=2, topology=None, report="report_", traj="trajectory_"):
+def main(num_clusters, criteria1, criteria2, output_folder, ligand_resname, atom_ids, cpus=2, topology=None, report="report_", traj="trajectory_", use_pdb=False):
     if not glob.glob("*/extractedCoordinates/coord_*"):
-    	extractCoords.main(lig_resname=ligand_resname, non_Repeat=True, atom_Ids=atom_ids, nProcessors=cpus, parallelize=False, topology=topology)
+    	extractCoords.main(lig_resname=ligand_resname, non_Repeat=True, atom_Ids=atom_ids, nProcessors=cpus, parallelize=False, topology=topology, use_pdb=use_pdb)
     trajectoryFolder = "allTrajs"
     trajectoryBasename = "*traj*"
     stride = 1
@@ -132,9 +134,9 @@ def main(num_clusters, criteria1, criteria2, output_folder, ligand_resname, atom
     else:
         outputFolder = ""
     writePDB(COMArray, outputFolder+"clusters_%d_KMeans_allSnapshots.pdb" % num_clusters)
-    writeInitialStructures(fields1, fields2, crit1_name, crit2_name, centersInfo, outputFolder+"cluster_{}_{}_{}_{}_{}.pdb", traj, topology=topology) 
+    writeInitialStructures(fields1, fields2, crit1_name, crit2_name, centersInfo, outputFolder+"cluster_{}_{}_{}_{}_{}.pdb", traj, topology=topology, use_pdb=use_pdb) 
     plotClusters(fields1, fields2, crit1_name, crit2_name, outputFolder)
 
 if __name__ == "__main__":
-    n_clusters, criteria1, criteria2, lig_name, atom_id, output, top, cpus, report, traj = parseArgs()
-    main(n_clusters, criteria1, criteria2, output, lig_name, atom_id, cpus, top, report, traj)
+    n_clusters, criteria1, criteria2, lig_name, atom_id, output, top, cpus, report, traj, use_pdb = parseArgs()
+    main(n_clusters, criteria1, criteria2, output, lig_name, atom_id, cpus, top, report, traj, use_pdb)
