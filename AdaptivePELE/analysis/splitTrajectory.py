@@ -20,7 +20,7 @@ def parseArguments():
     return args.files, args.o, args.top, args.structs
 
 
-def main(outputDir, files, topology, structs, template=None):
+def main(outputDir, files, topology, structs, template=None, use_pdb=False):
     found=False
     if outputDir:
         utilities.makeFolder(outputDir)
@@ -33,7 +33,7 @@ def main(outputDir, files, topology, structs, template=None):
     for f in files:
         name = os.path.split(f)[-1]
         templateName = os.path.join(outputDir,template) if template else os.path.join(outputDir, name[:-4] + "_%d.pdb")
-        snapshots = utilities.getSnapshots(f, topology=topology)
+        snapshots = utilities.getSnapshots(f, topology=topology, use_pdb=use_pdb)
         for i, snapshot in enumerate(snapshots):
             if structs is not None and i+1 not in structs:
                 continue
