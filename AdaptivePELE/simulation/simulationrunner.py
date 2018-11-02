@@ -1049,7 +1049,7 @@ class MDSimulation(SimulationRunner):
         for i, startingFiles in enumerate(startingFilesPairs):
             checkpoint = None
             if self.restart:
-                checkpoint = checkpoints[utilities.getTrajNum(startingFiles[1])]
+                checkpoint = checkpoints[i + processManager.id * self.parameters.trajsPerReplica]
             workerNumber = i
             workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.ligandName, processManager.id, self.parameters.trajsPerReplica, self.restart)))
         for worker in workers:
