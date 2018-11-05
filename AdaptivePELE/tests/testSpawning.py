@@ -6,6 +6,11 @@ from AdaptivePELE.clustering import clustering
 from AdaptivePELE.spawning import densitycalculator
 
 
+class ClMock(object):
+    def __init__(self, dtrajs):
+        self.dtrajs = dtrajs
+
+
 class TestSpawningCalculator(unittest.TestCase):
     def testDivideTrajAccordingToWeights(self):
         spawningCalculator = spawning.SpawningCalculator()
@@ -286,6 +291,28 @@ class TestSpawningCalculator(unittest.TestCase):
         trajs = 20
         degeneracy = UCB.calculate(clusters.clusters, trajs)
         golden = np.array([3, 5, 3, 9])
+        np.testing.assert_array_equal(degeneracy, golden)
+
+    def testMSMProbability(self):
+        params = spawning.SpawningParams()
+        params.lagtime = 1
+        dtrajs = [np.array([1, 1, 2, 2, 2, 0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1])]
+        cl = ClMock(dtrajs)
+        MSMP = spawning.ProbabilityMSMCalculator(params)
+        ntrajs = 30
+        degeneracy = MSMP.calculate(cl, ntrajs)
+        golden = np.array([10, 10, 10])
+        np.testing.assert_array_equal(degeneracy, golden)
+
+    def testMSMMetastabiligy(self):
+        params = spawning.SpawningParams()
+        params.lagtime = 1
+        dtrajs = [np.array([1, 1, 2, 2, 2, 0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1])]
+        cl = ClMock(dtrajs)
+        MSMP = spawning.MetastabilityMSMCalculator(params)
+        ntrajs = 30
+        degeneracy = MSMP.calculate(cl, ntrajs)
+        golden = np.array([10, 10, 10])
         np.testing.assert_array_equal(degeneracy, golden)
 
 
