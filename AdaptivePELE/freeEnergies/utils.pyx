@@ -94,3 +94,50 @@ def isSidechain(basestring string, bint writeSide, list sidechains):
 def is_model(basestring line):
     cdef basestring check = "ENDMDL"
     return check in line[:7]
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
+cpdef calculateAutoCorrelation(list lagtimes, list dtrajs, int nclusters, int nLags):
+    cdef double[:, :] C = np.zeros((nclusters, nLags))
+    cdef double[:, :] Ci = np.zeros((nclusters, nLags))
+    cdef double[:, :] Cf = np.zeros((nclusters, nLags))
+    cdef double[:, :] autoCorr = np.zeros((nclusters, nLags))
+    cdef int N = 0
+    cdef double[:] M = np.zeros(nLags)
+    cdef basestring trajectory
+    cdef long[:] traj
+    cdef int Nt, lagtime
+    cdef Py_ssize_t il, i, j
+    cdef double[:, :] mean = np.zeros((nclusters, nLags))
+    cdef double[:, :] var = np.zeros((nclusters, nLags))
+    cdef double N_f, var_tmp
+    for trajectory in dtrajs:
+        traj = np.loadtxt(trajectory, dtype=int)
+        Nt = traj.size
+        N += Nt
+        for il in range(nLags):
+            lagtime = lagtimes[il]
+            M[il] += Nt-lagtime
+            for i in range(Nt-lagtime):
+                if traj[i] == traj[i+lagtime]:
+                    autoCorr[traj[i], il] += 1
+                C[traj[i], il] += 1
+                Ci[traj[i], il] += 1
+                if i > lagtime:
+                    Cf[traj[i], il] += 1
+            for j in range(Nt-lagtime, Nt):
+                C[traj[j], il] += 1
+                Cf[traj[j], il] += 1
+    N_f = <double>(N)
+    var_tmp = N_f*(N_f-1)
+    for i in range(nclusters):
+        for j in range(nLags):
+            mean[i, j] = C[i, j]/N_f
+            var[i, j] = (N*C[i, j]-(C[i, j]**2))/var_tmp
+    for i in range(nclusters):
+        for j in range(nLags):
+            autoCorr[i, j] += M[j]*mean[i, j]**2-(Ci[i, j]+Cf[i, j])*mean[i, j]
+            autoCorr[i, j] /= N_f
+            autoCorr[i, j] /= var[i, j]
+    return np.array(autoCorr)

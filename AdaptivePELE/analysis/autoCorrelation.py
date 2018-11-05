@@ -5,6 +5,7 @@ import glob
 import argparse
 import numpy as np
 from AdaptivePELE.freeEnergies import cluster
+from AdaptivePELE.freeEnergies import utils
 from AdaptivePELE.utilities import utilities
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
@@ -51,14 +52,13 @@ def __cleanupFiles(trajWildcard, cleanupClusterCenters=True):
         __rmFiles("discretized/clusterCenter*")
 
 
-def calculateAutoCorrelation(lagtimes, discretized_trajs, nclusters, nLags):
+def calculateAutoCorrelation(lagtimes, dtrajs, nclusters, nLags):
     C = np.zeros((nclusters, nLags))
     Ci = np.zeros((nclusters, nLags))
     Cf = np.zeros((nclusters, nLags))
     autoCorr = np.zeros((nclusters, nLags))
     N = 0
     M = np.zeros(nLags)
-    dtrajs = glob.glob(os.path.join(discretized_trajs, "traj*"))
     for trajectory in dtrajs:
         traj = np.loadtxt(trajectory, dtype=int)
         Nt = traj.size
@@ -80,7 +80,6 @@ def calculateAutoCorrelation(lagtimes, discretized_trajs, nclusters, nLags):
     autoCorr += M*mean**2-(Ci+Cf)*mean
     autoCorr /= N
     autoCorr /= var
-    np.save("autoCorr.npy", autoCorr)
     return autoCorr
 
 
@@ -121,7 +120,9 @@ def main(lagtime, clusters_file, disctraj, trajs, n_clusters, plots_path, save_p
     else:
         clusterCenters = np.loadtxt(clusters_file)
     print("Calculating autocorrelation...")
-    autoCorr = calculateAutoCorrelation(lagtimes, disctraj, n_clusters, n_lags)
+    dtrajs = glob.glob(os.path.join(disctraj, "traj*"))
+    autoCorr = utils.calculateAutoCorrelation(lagtimes, dtrajs, n_clusters, n_lags)
+    np.save("autoCorr.npy", autoCorr)
     # __cleanupFiles(parameters.trajWildcard, False)
 
     utilities.write_PDB_clusters(np.vstack((clusterCenters.T, np.abs(autoCorr[:, -1]))).T, use_beta=True, title="cluster_autoCorr.pdb")
@@ -138,7 +139,7 @@ def main(lagtime, clusters_file, disctraj, trajs, n_clusters, plots_path, save_p
     if len(states1):
         print(" ".join(map(str, states1)))
     print("Number of clusters:", size1, ", %.2f%% of the total" % (100*size1 / float(n_clusters)))
-    if len(size2) > 0:
+    if size2 > 0:
         print("Correlation time not achieved at lagtime %d" % lagtime)
     else:
         for i in range(len(lagtimes)):
