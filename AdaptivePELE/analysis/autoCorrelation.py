@@ -119,8 +119,11 @@ def main(lagtime, clusters_file, disctraj, trajs, n_clusters, plots_path, save_p
         clusterCenters = clusteringObject.clusterCenters
     else:
         clusterCenters = np.loadtxt(clusters_file)
+    if len(clusterCenters) != n_clusters:
+        raise ValueError("Number of clusters specified in the -n parameter does not match the provided clusters")
     print("Calculating autocorrelation...")
     dtrajs = glob.glob(os.path.join(disctraj, "traj*"))
+
     autoCorr = utils.calculateAutoCorrelation(lagtimes, dtrajs, n_clusters, n_lags)
     np.save("autoCorr.npy", autoCorr)
     # __cleanupFiles(parameters.trajWildcard, False)

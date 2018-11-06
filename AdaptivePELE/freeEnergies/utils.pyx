@@ -112,9 +112,12 @@ cpdef calculateAutoCorrelation(list lagtimes, list dtrajs, int nclusters, int nL
     cdef double[:, :] mean = np.zeros((nclusters, nLags))
     cdef double[:, :] var = np.zeros((nclusters, nLags))
     cdef double N_f, var_tmp
+    cdef int maxLag = max(lagtimes)
     for trajectory in dtrajs:
         traj = np.loadtxt(trajectory, dtype=int)
         Nt = traj.size
+        if Nt < maxLag:
+            raise ValueError("Lagtime specified are too big for the trajectories!")
         N += Nt
         for il in range(nLags):
             lagtime = lagtimes[il]
