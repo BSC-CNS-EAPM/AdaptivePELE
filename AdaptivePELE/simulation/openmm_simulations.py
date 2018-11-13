@@ -14,6 +14,8 @@ import simtk.openmm.app as app
 import simtk.unit as unit
 from AdaptivePELE.constants import constants
 from AdaptivePELE.utilities import utilities
+from mdtraj.reporters.basereporter import _BaseReporter
+from mdtraj.formats import XTCTrajectoryFile
 try:
     FileNotFoundError
 except NameError:
@@ -41,6 +43,31 @@ def get_traceback(f):
             raise ex
 
     return wrapper
+
+
+class XTCReporter(_BaseReporter):
+    """
+        XTCReporter stores a molecular dynamics trajectory in the GROMACS xtc
+        format
+
+        :param file: Either an open XTCTrajectoryFile object to write to, or a string
+            specifying the filename of a new XTC file to save the trajectory to.
+        :type file: str, or :py:class:`XTCTrajectoryFile`
+        :param reportInterval: The interval (in time steps) at which to write frames.
+        :type reportInterval: int
+        :param atomSubset: Only write a subset of the atoms, with these (zero based) indices
+        to the file. If None, *all* of the atoms will be written to disk.
+        :type atomSubset: arrray_like
+    """
+    @property
+    def backend(self):
+        return XTCTrajectoryFile
+
+    def __init__(self, file, reportInterval, atomSubset=None):
+        super(XTCReporter, self).__init__(file, reportInterval, coordinates=True,
+                                          time=False, cell=False, potentialEnergy=False,
+                                          kineticEnergy=False, temperature=False,
+                                          velocities=False, atomSubset=atomSubset)
 
 
 class CustomStateDataReporter(app.StateDataReporter):
