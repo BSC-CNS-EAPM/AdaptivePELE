@@ -58,16 +58,82 @@ class XTCReporter(_BaseReporter):
         :param atomSubset: Only write a subset of the atoms, with these (zero based) indices
         to the file. If None, *all* of the atoms will be written to disk.
         :type atomSubset: arrray_like
+        :param append: Whether to append the trajectory to a prevously existing one
+        :type append: bool
     """
     @property
     def backend(self):
         return XTCTrajectoryFile
 
-    def __init__(self, file, reportInterval, atomSubset=None):
-        super(XTCReporter, self).__init__(file, reportInterval, coordinates=True,
-                                          time=False, cell=False, potentialEnergy=False,
-                                          kineticEnergy=False, temperature=False,
-                                          velocities=False, atomSubset=atomSubset)
+    def __init__(self, file, reportInterval, atomSubset=None, append=False):
+        if append:
+            if isinstance(file, basestring):
+                with self.backend(file, 'r') as f:
+                    contents = f.read()
+                self._traj_file = self.backend(file, 'w')
+                self._traj_file.write(contents)
+            elif isinstance(file, self.backend):
+                raise ValueError("Currently passing an XTCTrajectoryFile in append mode is not supported, please pass a string with the filename")
+            else:
+                raise TypeError("I don't know how to handle %s" % file)
+        else:
+            if isinstance(file, basestring):
+                self._traj_file = self.backend(file, 'w')
+            elif isinstance(file, self.backend):
+                self._traj_file = file
+                if not file.mode in ['w', 'a']:
+                    raise ValueError('file must be open in "w" or "a" mode')
+                else:
+                    raise TypeError("I don't know how to handle %s" % file)
+
+        self._reportInterval = int(reportInterval)
+        self._is_intialized = False
+        self._n_particles = None
+        self._coordinates = True
+        self._time = True
+        self._box = True
+        self._potentialEnergy = False
+        self._kineticEnergy = False
+        self._temperature = False
+        self._velocities = False
+        self._needEnergy = False  # all potentialEnergy, kineticEnergy and temperature are set to False
+        self._atomSubset = atomSubset
+        self._atomSlice = None
+
+    def report(self, simulation, state):
+        """
+            Generate a report
+
+            :param simulation: simulation to generate the report for
+            :type simulation: :py:class:`simtk.openmm.app.Simulation`
+            :param state: current state of the simulation
+            :type state: :py:class:`simtk.openmm.State`
+        """
+        if not self._is_intialized:
+            self._initialize(simulation)
+            self._is_intialized = True
+
+        self._checkForErrors(simulation, state)
+        args = ()
+        kwargs = {}
+        if self._coordinates:
+            coordinates = state.getPositions(asNumpy=True)[self._atomSlice]
+            coordinates = coordinates.value_in_unit(getattr(unit, self._traj_file.distance_unit))
+            args = (coordinates,)
+
+        if self._time:
+            time = state.getTime()
+            kwargs['time'] = time.value_in_unit(time.unit)
+        if self._box:
+            kwargs['box'] = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(getattr(unit, self._traj_file.distance_unit))
+        self._traj_file.write(*args, **kwargs)
+        # flush the file to disk. it might not be necessary to do this every
+        # report, but this is the most proactive solution. We don't want to
+        # accumulate a lot of data in memory only to find out, at the very
+        # end of the run, that there wasn't enough space on disk to hold the
+        # data.
+        if hasattr(self._traj_file, 'flush'):
+            self._traj_file.flush()
 
 
 class CustomStateDataReporter(app.StateDataReporter):
