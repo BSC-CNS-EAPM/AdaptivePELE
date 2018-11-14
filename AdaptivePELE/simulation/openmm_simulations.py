@@ -70,35 +70,14 @@ class XTCReporter(_BaseReporter):
             if isinstance(file, basestring):
                 with self.backend(file, 'r') as f:
                     contents = f.read()
-                self._traj_file = self.backend(file, 'w')
-                self._traj_file.write(contents)
             elif isinstance(file, self.backend):
                 raise ValueError("Currently passing an XTCTrajectoryFile in append mode is not supported, please pass a string with the filename")
             else:
                 raise TypeError("I don't know how to handle %s" % file)
-        else:
-            if isinstance(file, basestring):
-                self._traj_file = self.backend(file, 'w')
-            elif isinstance(file, self.backend):
-                self._traj_file = file
-                if not file.mode in ['w', 'a']:
-                    raise ValueError('file must be open in "w" or "a" mode')
-                else:
-                    raise TypeError("I don't know how to handle %s" % file)
-
-        self._reportInterval = int(reportInterval)
-        self._is_intialized = False
-        self._n_particles = None
-        self._coordinates = True
-        self._time = True
-        self._box = True
-        self._potentialEnergy = False
-        self._kineticEnergy = False
-        self._temperature = False
-        self._velocities = False
-        self._needEnergy = False  # all potentialEnergy, kineticEnergy and temperature are set to False
-        self._atomSubset = atomSubset
-        self._atomSlice = None
+        super(XTCReporter, self).__init__(file, reportInterval, coordinates=True, time=True, cell=True, potentialEnergy=False,
+                                          kineticEnergy=False, temperature=False, velocities=False, atomSubset=atomSubset)
+        if append:
+            self._traj_file.write(*contents)
 
     def report(self, simulation, state):
         """
@@ -122,9 +101,10 @@ class XTCReporter(_BaseReporter):
             args = (coordinates,)
 
         if self._time:
-            time = state.getTime()
-            kwargs['time'] = time.value_in_unit(time.unit)
-        if self._box:
+            time_step = state.getTime()
+            kwargs['time'] = time_step.value_in_unit(time_step.unit)
+            kwargs['step'] = simulation.currentStep
+        if self._cell:
             kwargs['box'] = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(getattr(unit, self._traj_file.distance_unit))
         self._traj_file.write(*args, **kwargs)
         # flush the file to disk. it might not be necessary to do this every
