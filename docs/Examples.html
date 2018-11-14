@@ -397,6 +397,8 @@ for more details on the equilibration procedure</li>
 for the NVT equilibration (in kcal/(mol*A<sup>2</sup>))</li>
 <li><strong>constraintsNPT</strong> (<em>float</em>, default=0.5): Value of the constraints
 for the NPT equilibration (in kcal/(mol*A<sup>2</sup>))</li>
+<li><strong>format</strong> (<em>str</em>, default=xtc): Format of the trajectory file, currently we
+support <em>dcd</em> and <em>xtc</em></li>
 </ul>
 </div>
 <div class="section" id="exit-condition">
@@ -622,6 +624,8 @@ There are several implemented strategies:</p>
 <li><strong>FAST</strong>: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).</li>
 <li><strong>ProbabilityMSM</strong>: Distributes the processors with a weight that is
 proportional to the stationary probability of each cluster in an MSM (see <a class="reference internal" href="#msm" id="id5">[MSM]</a> for more details, needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</li>
+<li><strong>MetastabilityMSM</strong> Distributes the processors with a weight that is
+proportional to the metastability of each cluster in an MSM calulated as q <sub>ii</sub>/<em>N</em>, where q <sub>ii</sub> is the number of self-transitions of state i and N is the total number of counts for the simulation (needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</li>
 </ul>
 <p>According to our experience, the best strategies are <strong>inverselyProportional</strong> and <strong>epsilon</strong>, guided with either PELE binding energy or the RMSD to the bound pose if available.</p>
 </div>

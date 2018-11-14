@@ -244,6 +244,8 @@ Optionally, you can also use the following parameters:
   for the NVT equilibration (in kcal/(mol*A\ :sup:`2`))
 * **constraintsNPT** (*float*, default=0.5): Value of the constraints
   for the NPT equilibration (in kcal/(mol*A\ :sup:`2`))
+* **format** (*str*, default=xtc): Format of the trajectory file, currently we
+  support *dcd* and *xtc*
 
 
 Exit condition
@@ -491,6 +493,9 @@ There are several implemented strategies:
 
 * **ProbabilityMSM**: Distributes the processors with a weight that is
   proportional to the stationary probability of each cluster in an MSM (see [MSM]_ for more details, needs to be used with `MSM Clustering`_)
+
+* **MetastabilityMSM** Distributes the processors with a weight that is
+  proportional to the metastability of each cluster in an MSM calulated as q :sub:`ii`/*N*, where q :sub:`ii` is the number of self-transitions of state i and N is the total number of counts for the simulation (needs to be used with `MSM Clustering`_)
 
 According to our experience, the best strategies are **inverselyProportional** and **epsilon**, guided with either PELE binding energy or the RMSD to the bound pose if available.
 

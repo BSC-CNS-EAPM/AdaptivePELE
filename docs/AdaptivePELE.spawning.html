@@ -579,6 +579,34 @@ snapshot from which the trajectories will start in the next iteration</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="AdaptivePELE.spawning.spawning.MetastabilityMSMCalculator">
+<em class="property">class </em><code class="descclassname">AdaptivePELE.spawning.spawning.</code><code class="descname">MetastabilityMSMCalculator</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MetastabilityMSMCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MetastabilityMSMCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.MSMCalculator" title="AdaptivePELE.spawning.spawning.MSMCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.MSMCalculator</span></code></a></p>
+<dl class="method">
+<dt id="AdaptivePELE.spawning.spawning.MetastabilityMSMCalculator.calculate">
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MetastabilityMSMCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MetastabilityMSMCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the degeneracy of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List containing the degeneracy of the clusters</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="AdaptivePELE.spawning.spawning.NullSpawningCalculator">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.spawning.spawning.</code><code class="descname">NullSpawningCalculator</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#NullSpawningCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.NullSpawningCalculator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.SpawningCalculator</span></code></a></p>
@@ -1163,6 +1191,11 @@ parameters</td>
 <dd><dl class="attribute">
 <dt id="AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.FAST">
 <code class="descname">FAST</code><em class="property"> = 4</em><a class="headerlink" href="#AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.FAST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.MetastabilityMSMCalculator">
+<code class="descname">MetastabilityMSMCalculator</code><em class="property"> = 12</em><a class="headerlink" href="#AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.MetastabilityMSMCalculator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

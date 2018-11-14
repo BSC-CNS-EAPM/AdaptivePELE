@@ -58,7 +58,7 @@ class XTCReporter(_BaseReporter):
         :param atomSubset: Only write a subset of the atoms, with these (zero based) indices
         to the file. If None, *all* of the atoms will be written to disk.
         :type atomSubset: arrray_like
-        :param append: Whether to append the trajectory to a prevously existing one
+        :param append: Whether to append the trajectory to a previously existing one
         :type append: bool
     """
     @property
@@ -449,7 +449,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     system.addForce(mm.MonteCarloBarostat(1 * unit.bar, parameters.Temperature * unit.kelvin))
     if parameters.boxCenter:
         # Harmonic flat-bottom restrain for the ligand
-        force = mm.CustomExternalForce('step(r-r0) * (k/2) * (r-r0)^2; r=sqrt((x-b0)^2+(y-b1)^2+(z-b2)^2)')
+        force = mm.CustomExternalForce('step(r-r0) * (k/2) * (r-r0)^2; r=periodicdistance(x, y, z, b0, b1, b2)')
         force.addGlobalParameter("k", 5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2)
         force.addGlobalParameter("r0", parameters.boxRadius * unit.angstroms)
         force.addGlobalParameter("b0", parameters.boxCenter[0] * unit.angstroms)
