@@ -174,6 +174,7 @@ class SimulationParams:
     forcefield = "forcefield"
     customparamspath = "customparamspath"
     maxDevicesPerReplica = "maxDevicesPerReplica"
+    format = "format"
 
 
 class ExitConditionType:

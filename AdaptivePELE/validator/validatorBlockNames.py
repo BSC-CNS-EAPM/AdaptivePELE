@@ -183,7 +183,8 @@ class SimulationParams:
         "constraintsNPT": "numbers.Real",
         "customparamspath": "basestring",
         "numReplicas": "numbers.Real",
-        "maxDevicesPerReplica": "numbers.Real"
+        "maxDevicesPerReplica": "numbers.Real",
+        "format": "basestring"
     }
     exitCondition = {
         "types": {

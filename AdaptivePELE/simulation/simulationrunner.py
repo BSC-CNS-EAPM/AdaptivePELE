@@ -86,6 +86,7 @@ class SimulationParameters:
         self.maxDevicesPerReplica = None
         self.forcefield = "ff99SB"
         self.customparamspath = None
+        self.format = None
 
 
 class SimulationRunner:
@@ -1334,6 +1335,9 @@ class RunnerBuilder:
             params.runEquilibration = True
             params.equilibrationLengthNVT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNVT, 200000)
             params.equilibrationLengthNPT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNPT, 500000)
+            params.format = paramsBlock.get(blockNames.SimulationParams.format, "xtc")
+            if params.format not in constants.md_supported_formats:
+                raise ImproperParameterValueException("Not supported %s format specified, supported formats are %s" % (params.format, constants.formats_md_string))
             params.timeStep = paramsBlock.get(blockNames.SimulationParams.timeStep, 2)
             params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)

@@ -62,7 +62,7 @@ class AmberTemplates:
                     "saveamberparm COMPLX $PRMTOP $INPCRD\n" \
                     "savepdb COMPLX $SOLVATED_PDB\n" \
                     "quit"
-    trajectoryTemplate = "trajectory_%d.dcd"
+    trajectoryTemplate = "trajectory_%d.%s"
     CheckPointReporterTemplate = "checkpoint_%d.chk"
 
 
@@ -105,3 +105,6 @@ class OutputPathConstants():
         self.tmpInitialStructuresEquilibrationTemplate = tmpFolder+"/initial_equilibration_%d.pdb"
         self.tmpControlFilename = tmpFolder+"/controlFile%d.conf"
         self.tmpControlFilenameEqulibration = tmpFolder+"/controlFile_equilibration_%d.conf"
+
+md_supported_formats = set(["xtc", "dcd"])
+formats_md_string = ", ".join(md_supported_formats)
