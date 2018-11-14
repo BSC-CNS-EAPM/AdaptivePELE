@@ -30,7 +30,7 @@ def retrieve_metrics(control_file):
     return metrics
 
 
-def write_report(metrics, initial_column=4):
+def write_report(metrics, resname, initial_column=4):
 
     OUTPUT = 'adaptive_report.pdf'
 
@@ -68,9 +68,24 @@ def write_report(metrics, initial_column=4):
         if user_metric in metrics:
             pdf,doc_position= write_metric(pdf, user_metric, "bindingEnergy", metrics, doc_position)
 
+    #Plot kmean clustering with BE and SASA
+    plot_clusters("bindingEnergy", "sasa", metrics, resname)
+    pdf.cell(0)
+    pdf.cell(doc_position[0], doc_position[1])
+    pdf.image("Cluster_analisis/ClusterMap.png", 100, 110, 83)
+
     #Output report    
     pdf.output(OUTPUT, 'F')
 
+
+def plot_clusters(metric1, metric2, metrics, resname):
+    print(resname)
+    command = command = "python -m AdaptivePELE.analysis.clusterAdaptiveRun 200 {} {} {} --png".format(get_column(metric1, metrics), get_column(metric2, metrics), resname)
+    print(command)
+    os.system(command)
+
+def get_column(metric, metrics, initial_pos=4):
+    return 1+metrics.index(metric)+initial_pos
 
 def write_metric(pdf, metric1, metric2, metrics, doc_position, initial_pos=4):
     image_name = "{}.png".format(metric1)
@@ -90,18 +105,23 @@ def create_contact_plot(path, filenames=CONTACTS):
     command = "python -m AdaptivePELE.analysis.numberOfClusters -f contacts"
     os.system(command)
    
-def retrieve_pele_confile(control_file):
+def retrieve_fields(control_file):
     with open(control_file, "r") as f:
-        control_file_line = [line for line in f if line.strip().startswith('"controlFile"')][0]
-    return control_file_line.split(":")[1].strip().strip('"')
+        content = f.readlines()
+        control_file_line = [line for line in content if line.strip().startswith('"controlFile"')][0]
+        ligand_res_line = [line for line in content if line.strip().startswith('"ligandResname"')][0]
+    return control_file_line.split(":")[1].strip().strip(",").strip('"'), ligand_res_line.split(":")[1].strip().strip(",").strip('"')
+
+
 
 def main(control_file):
     print("Search pele control file")
-    pele_conf = retrieve_pele_confile(control_file)
+    pele_conf, resname = retrieve_fields(control_file)
     print("Retrieve metrics")
     metrics = retrieve_metrics(pele_conf)
     print("Build report")
-    write_report(metrics)
+    write_report(metrics, resname)
+    print("Analysis finished succesfully")
  
 
 if __name__ == "__main__":

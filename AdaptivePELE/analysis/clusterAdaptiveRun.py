@@ -25,11 +25,12 @@ def parseArgs():
     parser.add_argument('--report', type=str, help="Report filenames i.e. run_report_", default="report_")
     parser.add_argument('--traj', type=str, help="Trajectory filenames i.e. run_trajectory_", default="trajectory_")
     parser.add_argument('--use_pdb', action="store_true", help="To use when having pdb files with .xtc extension")
+    parser.add_argument('--png', action="store_true", help="Save plot in png format")
     args = parser.parse_args()
-    return args.nClusters, args.crit1, args.crit2, args.ligand_resname, args.atomId, args.o, args.top, args.cpus, args.report, args.traj, args.use_pdb
+    return args.nClusters, args.crit1, args.crit2, args.ligand_resname, args.atomId, args.o, args.top, args.cpus, args.report, args.traj, args.use_pdb, args.png
 
 
-def plotClusters(fields1, fields2, crit1, crit2, output):
+def plotClusters(fields1, fields2, crit1, crit2, output, png=False):
     labels = ["cluster_{}".format(i) for i in np.arange(len(fields1))]
     fig, ax = plt.subplots()
     ax.scatter(fields1, fields2, label=labels)
@@ -37,7 +38,10 @@ def plotClusters(fields1, fields2, crit1, crit2, output):
     ax.set_xlabel(crit1)
     ax.set_ylabel(crit2)
     print("Plotting")
-    fig.savefig(os.path.join(output, "ClusterMap.pdf"), format='pdf', dpi=1200)
+    if png:
+        fig.savefig(os.path.join(output, "ClusterMap.png"))
+    else:
+        fig.savefig(os.path.join(output, "ClusterMap.pdf"), format='pdf', dpi=1200)
 
 def writePDB(pmf_xyzg, title="clusters.pdb"):
     templateLine = "HETATM%s  H%sCLT L 502    %s%s%s  0.75%s           H\n"
@@ -70,7 +74,7 @@ def writeInitialStructures(field1, field2, crit1, crit2, centers_info, filename_
 
 
 def get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, clusterCenters):
-    centersInfo = {x: {"structure": None, "minDist": 1e6, "center": None} for x in xrange(num_clusters)}
+    centersInfo = {x: {"structure": None, "minDist": 1e6, "center": None} for x in range(num_clusters)}
 
     trajFiles = glob.glob(os.path.join(trajectoryFolder, trajectoryBasename))
     for traj in trajFiles:
@@ -82,7 +86,7 @@ def get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, cluster
             nSnap = snapshot[0]
             snapshotCoords = snapshot[1:]
             dist = np.sqrt(np.sum((clusterCenters-snapshotCoords)**2, axis=1))
-            for clusterInd in xrange(num_clusters):
+            for clusterInd in range(num_clusters):
                 if dist[clusterInd] < centersInfo[clusterInd]['minDist']:
                     centersInfo[clusterInd]['minDist'] = dist[clusterInd]
                     centersInfo[clusterInd]['structure'] = (epoch, int(iTraj), nSnap)
@@ -98,7 +102,7 @@ def get_metric(criteria, epoch_num, traj_num, snap_num, report):
     return value, header
 
 
-def main(num_clusters, criteria1, criteria2, output_folder, ligand_resname, atom_ids, cpus=2, topology=None, report="report_", traj="trajectory_", use_pdb=False):
+def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "Cluster_analysis", atom_ids="", cpus=2, topology=None, report="report_", traj="trajectory_", use_pdb=False, png=False):
     if not glob.glob("*/extractedCoordinates/coord_*"):
     	extractCoords.main(lig_resname=ligand_resname, non_Repeat=True, atom_Ids=atom_ids, nProcessors=cpus, parallelize=False, topology=topology, use_pdb=use_pdb)
     trajectoryFolder = "allTrajs"
@@ -115,7 +119,7 @@ def main(num_clusters, criteria1, criteria2, output_folder, ligand_resname, atom
     clusteringObject.eliminateLowPopulatedClusters(clusterCountsThreshold)
     clusterCenters = clusteringObject.clusterCenters
     centersInfo = get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, clusterCenters)
-    COMArray = [centersInfo[i]['center'] for i in xrange(num_clusters)]
+    COMArray = [centersInfo[i]['center'] for i in range(num_clusters)]
 
     fields1 = []
     fields2 = []
@@ -123,8 +127,8 @@ def main(num_clusters, criteria1, criteria2, output_folder, ligand_resname, atom
         epoch_num, traj_num, snap_num = map(int, centersInfo[cluster_num]['structure'])
         field1, crit1_name = get_metric(criteria1, epoch_num, traj_num, snap_num, report)
         field2, crit2_name = get_metric(criteria2, epoch_num, traj_num, snap_num, report)
-	fields1.append(field1)	
-	fields2.append(field2)	
+        fields1.append(field1)	
+        fields2.append(field2)	
 
     if output_folder is not None:
         outputFolder = os.path.join(output_folder, "")
@@ -134,8 +138,9 @@ def main(num_clusters, criteria1, criteria2, output_folder, ligand_resname, atom
         outputFolder = ""
     writePDB(COMArray, outputFolder+"clusters_%d_KMeans_allSnapshots.pdb" % num_clusters)
     writeInitialStructures(fields1, fields2, crit1_name, crit2_name, centersInfo, outputFolder+"cluster_{}_{}_{}_{}_{}.pdb", traj, topology=topology, use_pdb=use_pdb) 
-    plotClusters(fields1, fields2, crit1_name, crit2_name, outputFolder)
+    plotClusters(fields1, fields2, crit1_name, crit2_name, outputFolder, png=png)
+    return 
 
 if __name__ == "__main__":
-    n_clusters, criteria1, criteria2, lig_name, atom_id, output, top, cpus, report, traj, use_pdb = parseArgs()
-    main(n_clusters, criteria1, criteria2, output, lig_name, atom_id, cpus, top, report, traj, use_pdb)
+    n_clusters, criteria1, criteria2, lig_name, atom_id, output, top, cpus, report, traj, use_pdb, png = parseArgs()
+    main(n_clusters, criteria1, criteria2, lig_name, output, atom_id, cpus, top, report, traj, use_pdb, png)
