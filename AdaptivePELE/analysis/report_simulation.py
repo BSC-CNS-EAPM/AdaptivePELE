@@ -3,7 +3,7 @@ import re
 import sys
 import os
 import subprocess
-import AdaptivePELE.analysis.plotAdaptive
+from AdaptivePELE.analysis import plotAdaptive
 import argparse
 
 ADAPTIVE_PATH = "/run/media/ywest/BAD432E1D432A015/3s3i_out_in_waters/"
@@ -40,7 +40,7 @@ def write_report(metrics, initial_column=4):
     # Title
     pdf.set_font('Arial', 'B', 15)
     pdf.cell(80)
-    pdf.cell(30, 10, 'Adaptive Report', align='C')
+    pdf.cell(30, 10, 'Simulation Report', align='C')
 
     # Plot Binding SASA
     plot(1+metrics.index("bindingEnergy")+initial_column, 1+metrics.index("sasa")+initial_column, ".", "BE.png")
@@ -92,14 +92,15 @@ def create_contact_plot(path, filenames=CONTACTS):
    
 def retrieve_pele_confile(control_file):
     with open(control_file, "r") as f:
-        control_file_line = [line for line in f if line.strip().startswith("")][0]
-        print(control_file_line.split()[1].strip())
-        sys.exit()
-    return control_file_line
+        control_file_line = [line for line in f if line.strip().startswith('"controlFile"')][0]
+    return control_file_line.split(":")[1].strip().strip('"')
 
 def main(control_file):
+    print("Search pele control file")
     pele_conf = retrieve_pele_confile(control_file)
+    print("Retrieve metrics")
     metrics = retrieve_metrics(pele_conf)
+    print("Build report")
     write_report(metrics)
  
 
