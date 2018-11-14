@@ -427,7 +427,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     workerNumber += replica_id*trajsPerReplica + 1
     prmtop, pdb = equilibrationFiles
     prmtop = app.AmberPrmtopFile(prmtop)
-    DCDrepoter = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % workerNumber)
+    trajName = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % (workerNumber, parameters.format))
     stateReporter = os.path.join(outputDir, "%s_%s" % (reportFileName, workerNumber))
     checkpointReporter = os.path.join(outputDir, constants.AmberTemplates.CheckPointReporterTemplate % workerNumber)
     lastStep = getLastStep(stateReporter)
@@ -438,7 +438,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     pdb = app.PDBFile(str(pdb))
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
     if parameters.runningPlatform == "CUDA":
-        platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(deviceIndex, parameters.devicesPerTrajectory, devicesPerReplica=parameters.maxDevicesPerReplica), "UseCpuPme": "false"} 
+        platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(deviceIndex, parameters.devicesPerTrajectory, devicesPerReplica=parameters.maxDevicesPerReplica), "UseCpuPme": "false"}
     else:
         platformProperties = {}
     system = prmtop.createSystem(nonbondedMethod=app.PME,
@@ -470,7 +470,11 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, seed)
         stateData = open(str(stateReporter), "w")
 
-    simulation.reporters.append(app.DCDReporter(str(DCDrepoter), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
+    if parameters.format == "xtc":
+        simulation.reporters.append(XTCReporter(str(trajName), parameters.reporterFreq, append=restart))
+    elif parameters.format == "dcd":
+        simulation.reporters.append(app.DCDReporter(str(trajName), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
+
     simulation.reporters.append(app.CheckpointReporter(str(checkpointReporter), parameters.reporterFreq))
     simulation.reporters.append(CustomStateDataReporter(stateData, parameters.reporterFreq, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
