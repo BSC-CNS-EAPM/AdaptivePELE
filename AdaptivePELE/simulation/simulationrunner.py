@@ -798,7 +798,6 @@ class MDSimulation(SimulationRunner):
         self.parmchkTemplate = constants.AmberTemplates.parmchk2Template
         self.tleapTemplate = constants.AmberTemplates.tleapTemplate
         self.prmtopFiles = []
-        self.ligandName = ""
         self.restart = False
 
         if not OPENMM:
@@ -855,7 +854,6 @@ class MDSimulation(SimulationRunner):
         initialStructures = processManager.getStructureListPerReplica(initialStructures, self.parameters.trajsPerReplica)
         # the new initialStructures list contains tuples in the form (i,
         # structure) where i is the index of structure in the original list
-        self.parameters.ligandName = resname
         newInitialStructures = []
         solvatedStrcutures = []
         equilibrationFiles = []
@@ -1052,7 +1050,7 @@ class MDSimulation(SimulationRunner):
             if self.restart:
                 checkpoint = checkpoints[i + processManager.id * self.parameters.trajsPerReplica]
             workerNumber = i
-            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.ligandName, processManager.id, self.parameters.trajsPerReplica, self.restart)))
+            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.parameters.ligandName, processManager.id, self.parameters.trajsPerReplica, self.restart)))
         for worker in workers:
             worker.get()
         endTime = time.time()
@@ -1352,6 +1350,7 @@ class RunnerBuilder:
             params.constraintsNVT = paramsBlock.get(blockNames.SimulationParams.constraintsNVT, 5)
             params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
+            params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]

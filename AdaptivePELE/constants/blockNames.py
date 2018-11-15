@@ -175,6 +175,7 @@ class SimulationParams:
     customparamspath = "customparamspath"
     maxDevicesPerReplica = "maxDevicesPerReplica"
     format = "format"
+    ligandName = "ligandName"
 
 
 class ExitConditionType:

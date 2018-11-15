@@ -165,6 +165,7 @@ class SimulationParams:
         "exitCondition": "dict",
         "trajectoryName": "basestring",
         "ligandCharge": "numbers.Real",
+        "ligandName": "basestring",
         "nonBondedCutoff": "numbers.Real",
         "timeStep": "numbers.Real",
         "Temperature": "numbers.Real",
