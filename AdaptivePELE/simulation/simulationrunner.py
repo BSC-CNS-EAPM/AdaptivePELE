@@ -798,7 +798,6 @@ class MDSimulation(SimulationRunner):
         self.parmchkTemplate = constants.AmberTemplates.parmchk2Template
         self.tleapTemplate = constants.AmberTemplates.tleapTemplate
         self.prmtopFiles = []
-        self.ligandName = ""
         self.restart = False
 
         if not OPENMM:
@@ -855,7 +854,6 @@ class MDSimulation(SimulationRunner):
         initialStructures = processManager.getStructureListPerReplica(initialStructures, self.parameters.trajsPerReplica)
         # the new initialStructures list contains tuples in the form (i,
         # structure) where i is the index of structure in the original list
-        self.parameters.ligandName = resname
         newInitialStructures = []
         solvatedStrcutures = []
         equilibrationFiles = []
@@ -1030,8 +1028,6 @@ class MDSimulation(SimulationRunner):
                 structures_to_run = sorted(equilibrated_structures, key=utilities.getTrajNum)
             checkpoints = glob.glob(os.path.join(outputDir, "checkpoint*.chk"))
             checkpoints = sorted(checkpoints, key=utilities.getTrajNum)
-            # To follow the same order as PELE (important for processor mapping)
-            checkpoints = checkpoints[1:] + [checkpoints[0]]
         # always read the prmtop files from disk to serve as communication
         # between diffrent processses
         prmtops = glob.glob(os.path.join(outputPathConstants.topologies, "*prmtop"))
@@ -1052,7 +1048,7 @@ class MDSimulation(SimulationRunner):
             if self.restart:
                 checkpoint = checkpoints[i + processManager.id * self.parameters.trajsPerReplica]
             workerNumber = i
-            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.ligandName, processManager.id, self.parameters.trajsPerReplica, self.restart)))
+            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.parameters.ligandName, processManager.id, self.parameters.trajsPerReplica, self.restart)))
         for worker in workers:
             worker.get()
         endTime = time.time()
@@ -1339,8 +1335,7 @@ class RunnerBuilder:
             if params.format not in constants.md_supported_formats:
                 raise ImproperParameterValueException("Not supported %s format specified, supported formats are %s" % (params.format, constants.formats_md_string))
             params.timeStep = paramsBlock.get(blockNames.SimulationParams.timeStep, 2)
-            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
-            params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, None)
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
             params.forcefield = paramsBlock.get(blockNames.SimulationParams.forcefield, "ff99SB")
@@ -1352,6 +1347,7 @@ class RunnerBuilder:
             params.constraintsNVT = paramsBlock.get(blockNames.SimulationParams.constraintsNVT, 5)
             params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
+            params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]

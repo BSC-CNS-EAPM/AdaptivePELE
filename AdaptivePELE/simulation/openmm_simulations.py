@@ -12,6 +12,7 @@ import traceback
 import simtk.openmm as mm
 import simtk.openmm.app as app
 import simtk.unit as unit
+import numpy as np
 from AdaptivePELE.constants import constants
 from AdaptivePELE.utilities import utilities
 from mdtraj.reporters.basereporter import _BaseReporter
@@ -397,7 +398,8 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, replica_id, trajsPerReplica, restart=False):
     """
     Functions that runs the production run at NVT conditions.
-    If a boxcenter is defined in the parameters section, Flat-bottom harmonic restrains will be applied to the ligand
+    If a boxRadius is defined in the parameters section, a Flat-bottom harmonic restrains will be applied between
+    the protein and the ligand
 
     :param equilibrationFiles: Tuple with the paths for the Amber topology file (prmtop) and the pdb for the system
     :type equilibrationFiles: Tuple
@@ -447,17 +449,23 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     system.addForce(mm.MonteCarloBarostat(1 * unit.bar, parameters.Temperature * unit.kelvin))
-    if parameters.boxCenter:
-        # Harmonic flat-bottom restrain for the ligand
-        force = mm.CustomExternalForce('step(r-r0) * (k/2) * (r-r0)^2; r=periodicdistance(x, y, z, b0, b1, b2)')
-        force.addGlobalParameter("k", 5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2)
-        force.addGlobalParameter("r0", parameters.boxRadius * unit.angstroms)
-        force.addGlobalParameter("b0", parameters.boxCenter[0] * unit.angstroms)
-        force.addGlobalParameter("b1", parameters.boxCenter[1] * unit.angstroms)
-        force.addGlobalParameter("b2", parameters.boxCenter[2] * unit.angstroms)
-        for j, atom in enumerate(prmtop.topology.atoms()):
+    if parameters.boxRadius:
+        group_ligand = []
+        group_protein = []
+        for atom in prmtop.topology.atoms():
             if atom.residue.name == ligandName:
-                force.addParticle(j, [])
+                group_ligand.append(atom.index)
+            elif atom.residue.name not in ("HOH", "Cl-", "Na+"):
+                group_protein.append(atom.index)
+        # Harmonic flat-bottom restrain for the ligand
+        group_ligand = np.array(group_ligand)
+        group_protein = np.array(group_protein)
+        force = mm.CustomCentroidBondForce(2, 'step(distance(g1,g2)-r) * (k/2) * (distance(g1,g2)-r)^2')
+        force.addGlobalParameter("k", 5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2)
+        force.addGlobalParameter("r", parameters.boxRadius * unit.angstroms)
+        force.addGroup(group_protein)
+        force.addGroup(group_ligand)
+        force.addBond([0, 1], []) # the first parameter is the list of indexes of the groups, the second is the list of perbondparameters
         system.addForce(force)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(pdb.positions)
