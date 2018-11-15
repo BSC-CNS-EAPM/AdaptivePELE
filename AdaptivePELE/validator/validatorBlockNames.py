@@ -94,6 +94,9 @@ class SpawningParams:
         },
         "MetastabilityMSM": {
             "lagtime": "numbers.Real"
+        },
+        "UncertaintyMSM": {
+            "lagtime": "numbers.Real"
         }
 
     }

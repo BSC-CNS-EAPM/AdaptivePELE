@@ -72,6 +72,7 @@ class StringSpawningTypes:
     null = "null"
     ProbabilityMSMCalculator = "ProbabilityMSM"
     MetastabilityMSMCalculator = "MetastabilityMSM"
+    UncertaintyMSMCalculator = "UncertaintyMSM"
 
 
 class SpawningParams:

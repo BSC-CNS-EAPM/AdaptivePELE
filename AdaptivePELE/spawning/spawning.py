@@ -7,12 +7,13 @@ import random
 import scipy.optimize as optim
 import os
 import glob
+from abc import abstractmethod
+from scipy.linalg import lu, solve
 from AdaptivePELE.constants import blockNames
 from AdaptivePELE.constants import constants
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.spawning import spawningTypes
 from AdaptivePELE.spawning import densitycalculator
-from abc import abstractmethod
 PYEMMA = True
 try:
     import pyemma.msm as msm
@@ -148,6 +149,8 @@ class SpawningBuilder:
             spawningCalculator = ProbabilityMSMCalculator(spawningParams)
         elif spawningTypeString == blockNames.StringSpawningTypes.MetastabilityMSMCalculator:
             spawningCalculator = MetastabilityMSMCalculator(spawningParams)
+        elif spawningTypeString == blockNames.StringSpawningTypes.UncertaintyMSMCalculator:
+            spawningCalculator = UncertaintyMSMCalculator(spawningParams)
         else:
             sys.exit("Unknown spawning type! Choices are: " + str(spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
         return spawningCalculator
@@ -1199,3 +1202,58 @@ class MetastabilityMSMCalculator(MSMCalculator):
         else:
             metastability /= sum(metastability)
         return self.divideTrajAccordingToWeights(metastability, trajToDistribute)
+
+
+class UncertaintyMSMCalculator(MSMCalculator):
+    def __init__(self, parameters):
+        MSMCalculator.__init__(self, parameters)
+        self.type = spawningTypes.SPAWNING_TYPES.UncertaintyMSMCalculator
+        self.parameters = parameters
+
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+        """
+            Calculate the degeneracy of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
+        # estimate MSM from clustering object
+        msm_object = self.estimateMSM(clusters.dtrajs)
+        nclusters = msm_object.nstates_full
+        # distribute seeds using the MSM
+        counts = msm_object.count_matrix_full
+        alpha = 1/float(nclusters)
+        U_counts = counts + alpha
+        w = U_counts.sum(axis=1)
+        P = U_counts / w[:, np.newaxis]
+        eigvalues, _ = np.linalg.eig(P)
+        eigvalues.sort()
+        eigvalues = eigvalues[::-1]
+        ek = np.zeros(nclusters)
+        ek[nclusters-1] = 1.0
+        A = P - eigvalues[1]*np.eye(nclusters)
+        perm, L, U = lu(A.T)
+        x = solve(L.T, ek)
+        xa = solve(U[:-1, :-1], -U[:-1, -1])
+        xa = np.array(xa.tolist()+[1.0])
+        norm_factor = xa.dot(xa, x)
+        si = np.outer(xa, perm.dot(x))/norm_factor
+        q = []
+        for i in range(nclusters):
+            q.append(si[i].dot((np.diag(P[i])-np.outer(P[i], P[i])).dot(si[i])))
+        q = np.array(q)
+        score = (q/(w+1))-(q/(w+1+trajToDistribute))
+        score /= score.sum()
+        sortedProbs = np.argsort(score)[::-1]
+        score[sortedProbs[trajToDistribute:]] = 0.0
+        if abs(score.sum()) < 1e-8:
+            score = np.ones(nclusters)/nclusters
+        else:
+            score /= sum(score)
+        return self.divideTrajAccordingToWeights(score, trajToDistribute)
