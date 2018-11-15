@@ -218,10 +218,9 @@ Optionally, you can also use the following parameters:
   equilibration run (default corresponds to 1 ns)
 * **timeStep** (*float*, default=2): Value of the time step for the integration
   (in femtoseconds)
-* **boxRadius** (*float*, default=8): Radius  of the center of the spherical 
-  flat-bottomed potential for the ligand (if specified, in angstroms)
-* **boxCenter** (*list*, default=None): Coordinates of the center of the spherical 
-  flat-bottomed potential for the ligand (if specified, in angstroms)
+* **boxRadius** (*float*, default=None): Distance from the protein mass center in which the ligand is allowed to move. If specified, a restrain will be applied between both mass centers when the distance between them surpasses the **boxRadius**. (in angstroms)
+  (**Note**: When defining this parameter is important to take into account the distance between the binding site and the mass center of the protein.) 
+
 * **ligandCharge** (*integer*, default=0): Charge of the ligand
 * **waterBoxSize** (*float*, default=8): Distance of the edge of the solvation
   box from the closest atom (in angstroms)

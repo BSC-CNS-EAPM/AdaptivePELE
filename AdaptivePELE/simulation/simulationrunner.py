@@ -1335,8 +1335,7 @@ class RunnerBuilder:
             if params.format not in constants.md_supported_formats:
                 raise ImproperParameterValueException("Not supported %s format specified, supported formats are %s" % (params.format, constants.formats_md_string))
             params.timeStep = paramsBlock.get(blockNames.SimulationParams.timeStep, 2)
-            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
-            params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, None)
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
             params.forcefield = paramsBlock.get(blockNames.SimulationParams.forcefield, "ff99SB")

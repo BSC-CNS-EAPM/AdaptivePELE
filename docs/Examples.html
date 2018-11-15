@@ -371,10 +371,8 @@ equilibration run (default corresponds to 400 ps)</li>
 equilibration run (default corresponds to 1 ns)</li>
 <li><strong>timeStep</strong> (<em>float</em>, default=2): Value of the time step for the integration
 (in femtoseconds)</li>
-<li><strong>boxRadius</strong> (<em>float</em>, default=8): Radius  of the center of the spherical
-flat-bottomed potential for the ligand (if specified, in angstroms)</li>
-<li><strong>boxCenter</strong> (<em>list</em>, default=None): Coordinates of the center of the spherical
-flat-bottomed potential for the ligand (if specified, in angstroms)</li>
+<li><strong>boxRadius</strong> (<em>float</em>, default=None): Distance from the protein mass center in which the ligand is allowed to move. If specified, a restrain will be applied between both mass centers when the distance between them surpasses the <strong>boxRadius</strong>. (in angstroms)
+(<strong>Note</strong>: When defining this parameter is important to take into account the distance between the binding site and the mass center of the protein.)</li>
 <li><strong>ligandCharge</strong> (<em>integer</em>, default=0): Charge of the ligand</li>
 <li><strong>waterBoxSize</strong> (<em>float</em>, default=8): Distance of the edge of the solvation
 box from the closest atom (in angstroms)</li>

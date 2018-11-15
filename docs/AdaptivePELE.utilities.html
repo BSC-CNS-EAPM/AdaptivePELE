@@ -218,6 +218,27 @@ by the checker</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.Topology.getTopologyFile">
+<code class="descname">getTopologyFile</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopologyFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopologyFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the topology file for a particular epoch and trajectory number</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epoch</strong> (<em>int</em>) &#8211; Epoch of the trajectory of interest</li>
+<li><strong>trajectory_number</strong> (<em>int</em>) &#8211; Number of the trajectory to select</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; Path to the topology file</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.getTopologyFromIndex">
 <code class="descname">getTopologyFromIndex</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopologyFromIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopologyFromIndex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the topology for a particular index</p>
@@ -319,6 +340,12 @@ mapping</td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.Topology.writeTopologyObject">
+<code class="descname">writeTopologyObject</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.writeTopologyObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.writeTopologyObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump the contents of the topology object using pickle</p>
 </dd></dl>
 
 </dd></dl>
@@ -430,6 +457,22 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <dt id="AdaptivePELE.utilities.utilities.getCpuCount">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getCpuCount</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getCpuCount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getCpuCount" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.getFileExtension">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getFileExtension</code><span class="sig-paren">(</span><em>trajectoryFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getFileExtension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getFileExtension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the extension of a trajectory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajectoryFile</strong> (<em>str</em>) &#8211; Name of the trajectory file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str &#8211; Extension of the trajectory</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.getMetricsFromReportsInEpoch">

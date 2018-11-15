@@ -143,7 +143,6 @@ class SimulationParams:
     equilibrationSelect = "equilibrationSelect"
     equilibrationCluster = "equilibrationCluster"
     numberEquilibrationStructures = "numberEquilibrationStructures"
-    boxCenter = "boxCenter"
     boxRadius = "boxRadius"
     runEquilibration = "runEquilibration"
     condition = "condition"

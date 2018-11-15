@@ -398,7 +398,8 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, replica_id, trajsPerReplica, restart=False):
     """
     Functions that runs the production run at NVT conditions.
-    If a boxcenter is defined in the parameters section, Flat-bottom harmonic restrains will be applied to the ligand
+    If a boxRadius is defined in the parameters section, a Flat-bottom harmonic restrains will be applied between
+    the protein and the ligand
 
     :param equilibrationFiles: Tuple with the paths for the Amber topology file (prmtop) and the pdb for the system
     :type equilibrationFiles: Tuple
