@@ -89,9 +89,9 @@
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#adaptivesampling-module"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#automateroundsadaptive-module"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.analysis.html">analysis Package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">atomset Package</a><ul>
@@ -142,13 +142,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-        <li><a href="AdaptivePELE.html">AdaptivePELE – Package Description</a> &raquo;</li>
+        <li><a href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a> &raquo;</li>
       
     <li>atomset Package</li>
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/AdaptivePELE.atomset.rst.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/AdaptivePELE.atomset.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -171,7 +171,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomContent</strong> (<em>basestring</em>) – Line of the pdb from which the atom will be created</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomContent</strong> (<em>basestring</em>) &#8211; Line of the pdb from which the atom will be created</td>
 </tr>
 </tbody>
 </table>
@@ -193,7 +193,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy.Array – Array with the coordinate of the atom</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">numpy.Array &#8211; Array with the coordinate of the atom</td>
 </tr>
 </tbody>
 </table>
@@ -212,7 +212,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool – True if Atom is heavy atom, false otherwise</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if Atom is heavy atom, false otherwise</td>
 </tr>
 </tbody>
 </table>
@@ -226,7 +226,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool – True if Atom is an hetero atom, false otherwise</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if Atom is an hetero atom, false otherwise</td>
 </tr>
 </tbody>
 </table>
@@ -240,7 +240,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool – True if Atom is a protein atom, false otherwise</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if Atom is a protein atom, false otherwise</td>
 </tr>
 </tbody>
 </table>
@@ -295,9 +295,9 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atom2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.Atom" title="AdaptivePELE.atomset.atomset.Atom"><em>Atom</em></a>) – Second Atom to whom the distance will be calculated</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atom2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.Atom" title="AdaptivePELE.atomset.atomset.Atom"><em>Atom</em></a>) &#8211; Second Atom to whom the distance will be calculated</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float – The distance between the atoms</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; The distance between the atoms</td>
 </tr>
 </tbody>
 </table>
@@ -377,12 +377,12 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
-<li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) &#8211; Residue name of the ligand in the PDB</li>
+<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – The number of alpha carbons in contact with the ligand</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
 </td>
 </tr>
 </tbody>
@@ -392,12 +392,12 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 <dl class="method">
 <dt id="AdaptivePELE.atomset.atomset.PDB.extractCOM">
 <code class="descname">extractCOM</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.extractCOM" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the PDB’s center of mass</p>
+<dd><p>Calculate the PDB&#8217;s center of mass</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list – List with the center of mass coordinates</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List with the center of mass coordinates</td>
 </tr>
 </tbody>
 </table>
@@ -411,7 +411,7 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List – List with the centroid coordinates</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List &#8211; List with the centroid coordinates</td>
 </tr>
 </tbody>
 </table>
@@ -425,9 +425,9 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomId</strong> (<em>basestring</em>) – Id of the Atom (in the format “atomserial:atomName:resname”)</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomId</strong> (<em>basestring</em>) &#8211; Id of the Atom (in the format &#8220;atomserial:atomName:resname&#8221;)</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – Number of atoms in the PDB</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Number of atoms in the PDB</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">KeyError if the id is not in the PDB</td>
 </tr>
@@ -438,12 +438,12 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 <dl class="method">
 <dt id="AdaptivePELE.atomset.atomset.PDB.getCOM">
 <code class="descname">getCOM</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.getCOM" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the PDB’s center of mass</p>
+<dd><p>Get the PDB&#8217;s center of mass</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list – List with the center of mass coordinates</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List with the center of mass coordinates</td>
 </tr>
 </tbody>
 </table>
@@ -452,12 +452,12 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 <dl class="method">
 <dt id="AdaptivePELE.atomset.atomset.PDB.getCentroid">
 <code class="descname">getCentroid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.getCentroid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the PDB’s centroid</p>
+<dd><p>Get the PDB&#8217;s centroid</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list – List with the centroid coordinates</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List with the centroid coordinates</td>
 </tr>
 </tbody>
 </table>
@@ -471,7 +471,7 @@ protein (i.e. less than contactThresholdDistance Amstrogms away)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int – Number of atoms in the PDB</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Number of atoms in the PDB</td>
 </tr>
 </tbody>
 </table>
@@ -533,7 +533,7 @@ created</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>basestring</em>) – Path of the file where to write the pdb</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>basestring</em>) &#8211; Path of the file where to write the pdb</td>
 </tr>
 </tbody>
 </table>
@@ -550,12 +550,12 @@ created</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>PDB1</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – First PDB with which the RMSD will be calculated</li>
-<li><strong>PDB2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB1</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float – The distance between the centers of mass between two PDB</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The distance between the centers of mass between two PDB</p>
 </td>
 </tr>
 </tbody>
@@ -571,12 +571,12 @@ created</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>PDB1</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – First PDB with which the RMSD will be calculated</li>
-<li><strong>PDB2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB1</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float – The squared distance between the centers of mass between two PDB</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The squared distance between the centers of mass between two PDB</p>
 </td>
 </tr>
 </tbody>
@@ -592,12 +592,12 @@ created</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>PDB1</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – First PDB</li>
-<li><strong>PDB2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – Second PDB</li>
+<li><strong>PDB1</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; Second PDB</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float – The squared centroid distance between two PDB</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The squared centroid distance between two PDB</p>
 </td>
 </tr>
 </tbody>
@@ -612,9 +612,9 @@ created</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pdbfile</strong> (<em>basestring</em>) – A string with PDB content or the path of a pdb file</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pdbfile</strong> (<em>basestring</em>) &#8211; A string with PDB content or the path of a pdb file</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">basestring – A string with PDB content</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">basestring &#8211; A string with PDB content</td>
 </tr>
 </tbody>
 </table>
@@ -628,7 +628,7 @@ created</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>symmetries</strong> (<em>list</em>) – List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>symmetries</strong> (<em>list</em>) &#8211; List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms</td>
 </tr>
 </tbody>
 </table>
@@ -646,12 +646,12 @@ created</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>PDB1</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – First PDB with which the RMSD will be calculated</li>
-<li><strong>PDB2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB1</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float – The squared RMSD between two PDB</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The squared RMSD between two PDB</p>
 </td>
 </tr>
 </tbody>
@@ -667,12 +667,12 @@ created</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>PDB1</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – First PDB with which the RMSD will be calculated</li>
-<li><strong>PDB2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB1</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
+<li><strong>PDB2</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; First PDB with which the RMSD will be calculated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float – The squared RMSD between two PDB</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">float &#8211; The squared RMSD between two PDB</p>
 </td>
 </tr>
 </tbody>
@@ -699,7 +699,7 @@ created</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>symmetries</strong> (<em>list</em>) – List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>symmetries</strong> (<em>list</em>) &#8211; List of dictionaries with gropus of symmetric atoms atomId:symmetricalAtomId corresponding with the symmetrical atoms</td>
 </tr>
 </tbody>
 </table>
@@ -716,18 +716,18 @@ contactThresholdDistance Amstrongs away</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>PDBobj</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – PDB object that contains the conformation’s info</li>
-<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
-<li><strong>ligandResnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>ligandResChain</strong> (<em>basestring</em>) – String containing the chain name of the ligand in the pdb</li>
-<li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
+<li><strong>PDBobj</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; PDB object that contains the conformation&#8217;s info</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) &#8211; Residue name of the ligand in the PDB</li>
+<li><strong>ligandResnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>ligandResChain</strong> (<em>basestring</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
+<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array – The contact map of the ligand and the protein</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array &#8211; The contact map of the ligand and the protein</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – The number of alpha carbons in contact with the ligand</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
 </td>
 </tr>
 </tbody>
@@ -749,18 +749,18 @@ away</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>PDBobj</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) – PDB object that contains the conformation’s info</li>
-<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
-<li><strong>ligandResnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>ligandResChain</strong> (<em>basestring</em>) – String containing the chain name of the ligand in the pdb</li>
-<li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
+<li><strong>PDBobj</strong> (<a class="reference internal" href="#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><em>PDB</em></a>) &#8211; PDB object that contains the conformation&#8217;s info</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) &#8211; Residue name of the ligand in the PDB</li>
+<li><strong>ligandResnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>ligandResChain</strong> (<em>basestring</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
+<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array – The contact map of the ligand and the protein</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array &#8211; The contact map of the ligand and the protein</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – The number of alpha carbons in contact with the ligand</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
 </td>
 </tr>
 </tbody>
@@ -776,7 +776,7 @@ similarity between the two contactMaps
 :type contactMap: numpy.Array
 :param clusterContactMap: cluster contactMap to which we are comparing
 :type cluster: numpy.Array
-:returns: numpy.Array – The permutated contact map</p>
+:returns: numpy.Array &#8211; The permutated contact map</p>
 </dd></dl>
 
 <dl class="method">
@@ -792,17 +792,17 @@ contactThresholdDistance Amstrongs away</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ligandResname</strong> (<em>basestring</em>) – Residue name of the ligand in the PDB</li>
-<li><strong>ligandResnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</li>
-<li><strong>ligandResChain</strong> (<em>basestring</em>) – String containing the chain name of the ligand in the pdb</li>
-<li><strong>contactThresholdDistance</strong> (<em>int</em>) – Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
+<li><strong>ligandResname</strong> (<em>basestring</em>) &#8211; Residue name of the ligand in the PDB</li>
+<li><strong>ligandResnum</strong> (<em>int</em>) &#8211; Integer containing the residue number of the ligand in the pdb</li>
+<li><strong>ligandResChain</strong> (<em>basestring</em>) &#8211; String containing the chain name of the ligand in the pdb</li>
+<li><strong>contactThresholdDistance</strong> (<em>int</em>) &#8211; Maximum distance at which two atoms are considered in contanct (in Angstroms)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array – The contact map of the ligand and the protein</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.Array &#8211; The contact map of the ligand and the protein</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – The number of alpha carbons in contact with the ligand</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; The number of alpha carbons in contact with the ligand</p>
 </td>
 </tr>
 </tbody>

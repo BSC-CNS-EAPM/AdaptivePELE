@@ -119,9 +119,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#control-file-examples">Control File Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#example-1-pele-with-default-parameters">Example 1 – PELE with default parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#example-2-pele-with-more-specific-parameters">Example 2 – PELE with more specific parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#example-3-md-using-openmm-with-default-parameters">Example 3 – MD using OpenMM with default parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-1-pele-with-default-parameters">Example 1 &#8211; PELE with default parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-2-pele-with-more-specific-parameters">Example 2 &#8211; PELE with more specific parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-3-md-using-openmm-with-default-parameters">Example 3 &#8211; MD using OpenMM with default parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#output">Output</a></li>
@@ -134,7 +134,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 </ul>
 
@@ -174,7 +174,7 @@
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/Examples.rst.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/Examples.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -228,7 +228,7 @@ parameters such as the output path, initial structures, or whether to restart (r
 The other three blocks configure the three iterative steps of an adaptive run, and have a
 <code class="docutils literal"><span class="pre">{&quot;type&quot;:str,</span> <span class="pre">&quot;params&quot;:{},</span> <span class="pre">&quot;optionalClasses&quot;:{}}</span></code> structure. Namely, the <strong>simulation</strong> block
 chooses and tunes the propagation algorithm, typically PELE, the <strong>clustering</strong> block tunes the clustering method,
-cluster sizes… and the <strong>spawning</strong> block selects the strategy to choose the most interesting
+cluster sizes... and the <strong>spawning</strong> block selects the strategy to choose the most interesting
 structures.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{},</span>
@@ -253,7 +253,7 @@ using debug=true may be a great option.</p>
 <p>The general parameters block has five possible fields:</p>
 <ul class="simple">
 <li><strong>restart</strong> (<em>boolean</em>, default=True): This parameter specifies whether you want to
-continue a previous simulation or not. It requires the last epoch’s clustering object,
+continue a previous simulation or not. It requires the last epoch&#8217;s clustering object,
 which is stored as a binary file to optimize disk usage.</li>
 <li><strong>debug</strong> (<em>boolean</em>, default=False): Run adaptive in debug mode, without calling
 any propagation algorithm. Typically used to tinker with the clustering/spawning.</li>
@@ -292,7 +292,7 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <h3>Templetized PELE control file<a class="headerlink" href="#templetized-pele-control-file" title="Permalink to this headline">¶</a></h3>
 <p>In order to run adaptivePELE, PELE control file needs to be templetized. In particular:</p>
 <ul class="simple">
-<li><strong>MultipleComplexes”</strong>: AdaptivePELE requieres the use of multiple complexes: <code class="docutils literal"><span class="pre">&quot;MultipleComplex&quot;:</span> <span class="pre">[</span> <span class="pre">$COMPLEXES</span> <span class="pre">]</span></code></li>
+<li><strong>MultipleComplexes&#8221;</strong>: AdaptivePELE requieres the use of multiple complexes: <code class="docutils literal"><span class="pre">&quot;MultipleComplex&quot;:</span> <span class="pre">[</span> <span class="pre">$COMPLEXES</span> <span class="pre">]</span></code></li>
 <li><strong>seed</strong>: The seed needs to be templetized: <code class="docutils literal"><span class="pre">&quot;seed&quot;:</span> <span class="pre">$SEED</span></code></li>
 <li><strong>outputPath</strong>: The output path needs to be changed for: <code class="docutils literal"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/report&quot;</span></code></li>
 <li><strong>numberOfPeleSteps</strong>: The number of pele steps needs to be templetized as <code class="docutils literal"><span class="pre">&quot;numberOfPeleSteps&quot;:</span> <span class="pre">$PELE_STEPS</span></code></li>
@@ -329,7 +329,7 @@ substitute in the PELE control file</li>
 equilibration or burn-in simulation for each initial structure</li>
 <li><strong>equilibrationLength</strong> (<em>int</em>, default=50): Number of steps for the
 equilibration run</li>
-<li><strong>equilibrationMode</strong> (<em>string</em>, default=”equilibrationSelect”): Choose the
+<li><strong>equilibrationMode</strong> (<em>string</em>, default=&#8221;equilibrationSelect&#8221;): Choose the
 mode of the equilbration run, <em>equilibrationSelect</em> selects one of the
 structures as a representative as a function of distance and energy, while
 <em>equilibrationLastSnapshot</em> selects the last snapshot of each trajectory as
@@ -361,6 +361,7 @@ important to avoid whitspaces both at the beginning and end of the string.</li>
 <li><strong>reporterFrequency</strong> (<em>integer</em>, mandatory): Frequency to write the report
 and trajectories (in time steps, see <strong>timeStep</strong> property)</li>
 <li><strong>numReplicas</strong> (<em>integer</em>, mandatory): Number of replicas to run (see <a class="reference internal" href="#running-adaptivepele-with-gpus">Running AdaptivePELE with GPUs</a> section), each replica will run the same number of trajectories, calculated as <strong>t = p/n</strong>, where <em>t</em> is the number of the trajectories per replica, <em>p</em> is the number of processors and <em>n</em> is the number of replicas</li>
+<li><strong>ligandName</strong> (<em>str</em>, mandatory): Ligand residue name in the PDB</li>
 </ul>
 <p>Optionally, you can also use the following parameters:</p>
 <ul class="simple">
@@ -412,7 +413,7 @@ Currently two types are implemented: <em>metric</em> and
 <li><p class="first"><strong>metric</strong> :
 this type accepts a <em>metricCol</em> which represents a column in the report file, an <em>exitValue</em>
 which represents a value for the metric and a <em>condition</em> parameter which can
-be either “&lt;” or “&gt;”, default value is “&lt;”. The simulation will terminate after the metric
+be either &#8220;&lt;&#8221; or &#8220;&gt;&#8221;, default value is &#8220;&lt;&#8221;. The simulation will terminate after the metric
 written in the <em>metricCol</em> reaches a value smaller or greater than <em>exitValue</em>, depending on the condition specified.
 An example of the exit condition block that would terminate the program after a trajectory reaches a value of less
 than 2 for the fifth column (4th starting to count from 0) of the report file would look like:</p>
@@ -430,7 +431,7 @@ than 2 for the fifth column (4th starting to count from 0) of the report file wo
 <li><p class="first"><strong>metricMultipleTrajectories</strong> :
 this type accepts a <em>metricCol</em> which represents a column in the report file, an <em>exitValue</em>
 which represents a value for the metric, a <em>condition</em> parameter which can
-be either “&lt;” or “&gt;”, default value is “&lt;” and a <em>numberTrajectories</em> parameter which determines how many independent trajectories
+be either &#8220;&lt;&#8221; or &#8220;&gt;&#8221;, default value is &#8220;&lt;&#8221; and a <em>numberTrajectories</em> parameter which determines how many independent trajectories
 have to meet the condition for the simulation to stop. The simulation will terminate after the metric
 written in the <em>metricCol</em> reaches a value smaller or greater than <em>exitValue</em>, depending on the condition specified for a
 number of trajectories greater or equal than <em>numberTrajectories</em>. An example of the exit condition block that would terminate the
@@ -540,8 +541,8 @@ the possibility of preprocessing the trajectories with the TICA method <a class=
 <div class="section" id="id4">
 <h3>Parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><strong>ligandResname</strong> (<em>string</em>, default=”“): Ligand residue name in the PDB (if necessary)</li>
-<li><strong>ligandChain</strong> (<em>string</em>, default=”“): Ligand chain (if necessary)</li>
+<li><strong>ligandResname</strong> (<em>string</em>, default=&#8221;&#8221;): Ligand residue name in the PDB (if necessary)</li>
+<li><strong>ligandChain</strong> (<em>string</em>, default=&#8221;&#8221;): Ligand chain (if necessary)</li>
 <li><strong>ligandResnum</strong> (<em>int</em>, default=0): Ligand residue number (if necessary). If 0 or not specified, it is ignored. The ligand ought to be univoquely identified with any combination of this and the two former parameters</li>
 <li><strong>contactThresholdDistance</strong> (<em>float</em>, default=8): Maximum distance at which two atoms have to
 be separated to be considered in contact</li>
@@ -644,7 +645,7 @@ There are two types of density calculators:</p>
 <div class="section" id="id6">
 <h3>Parameters<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. “report”.</li>
+<li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. &#8220;report&#8221;.</li>
 <li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (one indexed)</li>
 <li><strong>epsilon</strong> (<em>float</em>, mandatory in <strong>epsilon</strong> spawning): The fraction of the processors that will be assigned according to the selected metric</li>
 <li><strong>metricWeights</strong> (<em>string</em>, default=linear): Selects how to distribute the weights of the cluster according to its metric, two options: linear (proportional to metric) or Boltzmann weigths (proportional to exp(-metric/T). Needs to define the temperature <strong>T</strong>.</li>
@@ -689,7 +690,7 @@ There are two types of density calculators:</p>
 <div class="section" id="control-file-examples">
 <h2>Control File Examples<a class="headerlink" href="#control-file-examples" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="example-1-pele-with-default-parameters">
-<h3>Example 1 – PELE with default parameters<a class="headerlink" href="#example-1-pele-with-default-parameters" title="Permalink to this headline">¶</a></h3>
+<h3>Example 1 &#8211; PELE with default parameters<a class="headerlink" href="#example-1-pele-with-default-parameters" title="Permalink to this headline">¶</a></h3>
 <p>The first example makes use of default parameters, using PELE as propagator (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id7">[APELE]</a>).</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
@@ -729,7 +730,7 @@ There are two types of density calculators:</p>
 </div>
 </div>
 <div class="section" id="example-2-pele-with-more-specific-parameters">
-<h3>Example 2 – PELE with more specific parameters<a class="headerlink" href="#example-2-pele-with-more-specific-parameters" title="Permalink to this headline">¶</a></h3>
+<h3>Example 2 &#8211; PELE with more specific parameters<a class="headerlink" href="#example-2-pele-with-more-specific-parameters" title="Permalink to this headline">¶</a></h3>
 <p>A more complete (although not so comprehensible) example:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
@@ -789,7 +790,7 @@ There are two types of density calculators:</p>
 </div>
 </div>
 <div class="section" id="example-3-md-using-openmm-with-default-parameters">
-<h3>Example 3 – MD using OpenMM with default parameters<a class="headerlink" href="#example-3-md-using-openmm-with-default-parameters" title="Permalink to this headline">¶</a></h3>
+<h3>Example 3 &#8211; MD using OpenMM with default parameters<a class="headerlink" href="#example-3-md-using-openmm-with-default-parameters" title="Permalink to this headline">¶</a></h3>
 <p>A simple example of running an MD simulation with OpenMM:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
@@ -822,6 +823,7 @@ There are two types of density calculators:</p>
             <span class="s2">&quot;productionLength&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
             <span class="s2">&quot;numReplicas&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
             <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">67890</span><span class="p">,</span>
+            <span class="s2">&quot;ligandName&quot;</span><span class="p">:</span> <span class="s2">&quot;BEN&quot;</span><span class="p">,</span>
             <span class="s2">&quot;ligandCharge&quot;</span><span class="p">:</span> <span class="mi">1</span>
         <span class="p">}</span>
     <span class="p">},</span>
@@ -989,6 +991,7 @@ and 4 trajectories per replica (8 trajectories total):</p>
             <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">67891</span><span class="p">,</span>
             <span class="s2">&quot;runningPlatform&quot;</span><span class="p">:</span> <span class="s2">&quot;CUDA&quot;</span><span class="p">,</span>
             <span class="s2">&quot;devicesPerTrajectory&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;ligandName&quot;</span> <span class="p">:</span> <span class="s2">&quot;BEN&quot;</span><span class="p">,</span>
             <span class="s2">&quot;ligandCharge&quot;</span><span class="p">:</span> <span class="mi">1</span>
         <span class="p">}</span>
     <span class="p">},</span>

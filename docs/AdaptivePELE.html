@@ -88,7 +88,7 @@
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">AdaptivePELE – Package Description</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">AdaptivePELE &#8211; Package Description</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
@@ -138,11 +138,11 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>AdaptivePELE – Package Description</li>
+    <li>AdaptivePELE &#8211; Package Description</li>
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/AdaptivePELE.rst.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/AdaptivePELE.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -153,7 +153,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-AdaptivePELE.__init__">
-<span id="adaptivepele-package-description"></span><h1>AdaptivePELE – Package Description<a class="headerlink" href="#module-AdaptivePELE.__init__" title="Permalink to this headline">¶</a></h1>
+<span id="adaptivepele-package-description"></span><h1>AdaptivePELE &#8211; Package Description<a class="headerlink" href="#module-AdaptivePELE.__init__" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-AdaptivePELE.adaptiveSampling">
 <span id="adaptivesampling-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">adaptiveSampling</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.adaptiveSampling" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
@@ -166,18 +166,18 @@ Returns the clustering object to use and the initial structures filenames as str
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>debug</strong> (<em>bool</em>) – In debug, it will not remove the simulations</li>
-<li><strong>controlFile</strong> (<em>str</em>) – Adaptive sampling control file</li>
-<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
-<li><strong>clusteringBlock</strong> (<em>json</em>) – Contains the new clustering block</li>
-<li><strong>spawningParams</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) – Spawning params</li>
-<li><strong>initialStructures</strong> (<em>list</em>) – Control file initial structures</li>
-<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a> Simulation runner object</li>
-<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
+<li><strong>debug</strong> (<em>bool</em>) &#8211; In debug, it will not remove the simulations</li>
+<li><strong>controlFile</strong> (<em>str</em>) &#8211; Adaptive sampling control file</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Contains outputPath-related constants</li>
+<li><strong>clusteringBlock</strong> (<em>json</em>) &#8211; Contains the new clustering block</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Spawning params</li>
+<li><strong>initialStructures</strong> (<em>list</em>) &#8211; Control file initial structures</li>
+<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) &#8211; <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a> Simulation runner object</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) &#8211; Object to synchronize the possibly multiple processes</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>, str – The clustering method to use in the adaptive sampling simulation and the initial structures filenames</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>, str &#8211; The clustering method to use in the adaptive sampling simulation and the initial structures filenames</p>
 </td>
 </tr>
 </tbody>
@@ -195,18 +195,18 @@ and the initial structure filenames as strings</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>firstRun</strong> (<em>int</em>) – New epoch to run</li>
-<li><strong>outputPathConstants</strong> (<em>str</em>) – Contains outputPath-related constants</li>
-<li><strong>clusteringBlock</strong> (<em>json</em>) – Contains the new clustering block</li>
-<li><strong>spawningParams</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) – Spawning params</li>
-<li><strong>spawningCalculator</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">SpawningCalculator</span></code></a>) – Spawning calculator object</li>
-<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a> Simulation runner object</li>
-<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
-<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
+<li><strong>firstRun</strong> (<em>int</em>) &#8211; New epoch to run</li>
+<li><strong>outputPathConstants</strong> (<em>str</em>) &#8211; Contains outputPath-related constants</li>
+<li><strong>clusteringBlock</strong> (<em>json</em>) &#8211; Contains the new clustering block</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Spawning params</li>
+<li><strong>spawningCalculator</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">SpawningCalculator</span></code></a>) &#8211; Spawning calculator object</li>
+<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) &#8211; <a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a> Simulation runner object</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) &#8211; Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) &#8211; Object to synchronize the possibly multiple processes</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>, str – The clustering method to use in the adaptive sampling simulation and the initial structures filenames</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>, str &#8211; The clustering method to use in the adaptive sampling simulation and the initial structures filenames</p>
 </td>
 </tr>
 </tbody>
@@ -221,9 +221,9 @@ and the initial structure filenames as strings</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>objectPath</strong> (<em>str</em>) – Clustering object path</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>objectPath</strong> (<em>str</em>) &#8211; Clustering object path</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool – True if the found clustering object is valid</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if the found clustering object is valid</td>
 </tr>
 </tbody>
 </table>
@@ -239,9 +239,9 @@ multiple trajectory metric exit condition</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>firstRun</strong> (<em>int</em>) – First epoch to be run in restart simulation</li>
-<li><strong>outputFolder</strong> (<em>str</em>) – Folder of the previous simulation data</li>
-<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – Simulation runner object</li>
+<li><strong>firstRun</strong> (<em>int</em>) &#8211; First epoch to be run in restart simulation</li>
+<li><strong>outputFolder</strong> (<em>str</em>) &#8211; Folder of the previous simulation data</li>
+<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) &#8211; Simulation runner object</li>
 </ul>
 </td>
 </tr>
@@ -258,13 +258,13 @@ multiple trajectory metric exit condition</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>clusteringBlock</strong> (<em>json</em>) – JSON block with the clustering-related parameters</li>
-<li><strong>initialStructures</strong> (<em>list</em>) – List with initial structures</li>
-<li><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the system pdb</li>
+<li><strong>clusteringBlock</strong> (<em>json</em>) &#8211; JSON block with the clustering-related parameters</li>
+<li><strong>initialStructures</strong> (<em>list</em>) &#8211; List with initial structures</li>
+<li><strong>resname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the system pdb</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>AssertionError</strong> – If atoms are not found in the structure</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>AssertionError</strong> &#8211; If atoms are not found in the structure</p>
 </td>
 </tr>
 </tbody>
@@ -279,7 +279,7 @@ multiple trajectory metric exit condition</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_path</strong> (<em>str</em>) – Path where the data is stored</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_path</strong> (<em>str</em>) &#8211; Path where the data is stored</td>
 </tr>
 </tbody>
 </table>
@@ -302,11 +302,11 @@ multiple trajectory metric exit condition</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>clusteringMethod</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
-<li><strong>epoch</strong> (<em>int</em>) – Number of the epoch to cluster</li>
-<li><strong>epochOutputPathTempletized</strong> (<em>str</em>) – Path where to find the trajectories</li>
-<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
-<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>clusteringMethod</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object</li>
+<li><strong>epoch</strong> (<em>int</em>) &#8211; Number of the epoch to cluster</li>
+<li><strong>epochOutputPathTempletized</strong> (<em>str</em>) &#8211; Path where to find the trajectories</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) &#8211; Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -323,12 +323,12 @@ multiple trajectory metric exit condition</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>clusteringMethod</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
-<li><strong>finalEpoch</strong> (<em>int</em>) – Last epoch to cluster (not included)</li>
-<li><strong>epochOutputPathTempletized</strong> (<em>str</em>) – Path where to find the trajectories</li>
-<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – Simulation runner object</li>
-<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulatioies</li>
-<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>clusteringMethod</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object</li>
+<li><strong>finalEpoch</strong> (<em>int</em>) &#8211; Last epoch to cluster (not included)</li>
+<li><strong>epochOutputPathTempletized</strong> (<em>str</em>) &#8211; Path where to find the trajectories</li>
+<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) &#8211; Simulation runner object</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) &#8211; Topology object containing the set of topologies needed for the simulatioies</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -345,9 +345,9 @@ multiple trajectory metric exit condition</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>initialStructures</strong> (<em>list of str</em>) – Name of the initial structures to copy</li>
-<li><strong>tmpInitialStructuresTemplate</strong> (<em>str</em>) – Template with the name of the initial strutctures</li>
-<li><strong>iteration</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>initialStructures</strong> (<em>list of str</em>) &#8211; Name of the initial structures to copy</li>
+<li><strong>tmpInitialStructuresTemplate</strong> (<em>str</em>) &#8211; Template with the name of the initial strutctures</li>
+<li><strong>iteration</strong> (<em>int</em>) &#8211; Epoch number</li>
 </ul>
 </td>
 </tr>
@@ -364,9 +364,9 @@ multiple trajectory metric exit condition</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>initialStructures</strong> (<em>list</em>) – List of the initial structures for the first iteration</li>
-<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
-<li><strong>processors</strong> (<em>int</em>) – Number of trajectories</li>
+<li><strong>initialStructures</strong> (<em>list</em>) &#8211; List of the initial structures for the first iteration</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) &#8211; Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>processors</strong> (<em>int</em>) &#8211; Number of trajectories</li>
 </ul>
 </td>
 </tr>
@@ -382,9 +382,9 @@ multiple trajectory metric exit condition</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>initialStructureWildcard</strong> (<em>str</em>) – Wildcard that matches the initial structures</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>initialStructureWildcard</strong> (<em>str</em>) &#8211; Wildcard that matches the initial structures</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of str – The expanded initial structures</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of str &#8211; The expanded initial structures</td>
 </tr>
 </tbody>
 </table>
@@ -400,13 +400,13 @@ and return the first epoch to run in case of restart</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>outputPath</strong> (<em>str</em>) – Simulation output path</li>
-<li><strong>clusteringOutputObject</strong> (<em>str</em>) – Templetized name of the clustering object</li>
-<li><strong>simulationRunner</strong> (:py:class:<a href="#id1"><span class="problematic" id="id2">`</span></a>.SimulationRunner) – Simulation runner object</li>
+<li><strong>outputPath</strong> (<em>str</em>) &#8211; Simulation output path</li>
+<li><strong>clusteringOutputObject</strong> (<em>str</em>) &#8211; Templetized name of the clustering object</li>
+<li><strong>simulationRunner</strong> (:py:class:<a href="#id1"><span class="problematic" id="id2">`</span></a>.SimulationRunner) &#8211; Simulation runner object</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Current epoch</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; Current epoch</p>
 </td>
 </tr>
 </tbody>
@@ -423,15 +423,15 @@ New reports are stored in the fixedReport_i where i is the number of the report<
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>outputPath</strong> (<em>str</em>) – Path where trajectories are found</li>
-<li><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the pdb</li>
-<li><strong>nativeStructure</strong> (<em>str</em>) – Path to the native structure pdb</li>
-<li><strong>symmetries</strong> (<em>dict</em>) – Dictionary containg the symmetries of the ligand</li>
-<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>outputPath</strong> (<em>str</em>) &#8211; Path where trajectories are found</li>
+<li><strong>resname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the pdb</li>
+<li><strong>nativeStructure</strong> (<em>str</em>) &#8211; Path to the native structure pdb</li>
+<li><strong>symmetries</strong> (<em>dict</em>) &#8211; Dictionary containg the symmetries of the ligand</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) &#8211; Topology object containing the set of topologies needed for the simulation</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>IndexError</strong> – If original report file not found in output folder</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>IndexError</strong> &#8211; If original report file not found in output folder</p>
 </td>
 </tr>
 </tbody>
@@ -447,12 +447,12 @@ New reports are stored in the fixedReport_i where i is the number of the report<
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch</strong> (<em>int</em>) – Epoch number</li>
-<li><strong>epochOutputPathTempletized</strong> (<em>str</em>) – Templetized path where the trajectories of any epoch are stored</li>
+<li><strong>epoch</strong> (<em>int</em>) &#8211; Epoch number</li>
+<li><strong>epochOutputPathTempletized</strong> (<em>str</em>) &#8211; Templetized path where the trajectories of any epoch are stored</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – Template for the name of the trajectories in a given
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; Template for the name of the trajectories in a given
 epoch</p>
 </td>
 </tr>
@@ -470,16 +470,16 @@ it reclusters the previous trajectories. Returns the clustering object to use</p
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>firstRun</strong> (<em>int</em>) – New epoch to run</li>
-<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
-<li><strong>clusteringBlock</strong> (<em>json</em>) – Contains the new clustering block</li>
-<li><strong>spawningParams</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) – Spawning params, to know what reportFile and column to read</li>
-<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
-<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
+<li><strong>firstRun</strong> (<em>int</em>) &#8211; New epoch to run</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Contains outputPath-related constants</li>
+<li><strong>clusteringBlock</strong> (<em>json</em>) &#8211; Contains the new clustering block</li>
+<li><strong>spawningParams</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams" title="AdaptivePELE.spawning.spawning.SpawningParams"><code class="xref py py-class docutils literal"><span class="pre">SpawningParams</span></code></a>) &#8211; Spawning params, to know what reportFile and column to read</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) &#8211; Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) &#8211; Object to synchronize the possibly multiple processes</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a> – The clustering method to use in the
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a> &#8211; The clustering method to use in the
 adaptive sampling simulation</p>
 </td>
 </tr>
@@ -496,7 +496,7 @@ general parameters, clustering and spawning</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jsonParams</strong> (<em>json str</em>) – Control file in JSON format from where the parameters will be read</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jsonParams</strong> (<em>json str</em>) &#8211; Control file in JSON format from where the parameters will be read</td>
 </tr>
 </tbody>
 </table>
@@ -510,7 +510,7 @@ general parameters, clustering and spawning</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jsonParams</strong> (<em>str</em>) – A string with the name of the control file to use</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jsonParams</strong> (<em>str</em>) &#8211; A string with the name of the control file to use</td>
 </tr>
 </tbody>
 </table>
@@ -529,7 +529,7 @@ the partial list comes from the clusters excluded by the moving box
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns list:</th><td class="field-body">– complete list of cluster degeneracies</td>
+<tr class="field-odd field"><th class="field-name">Returns list:</th><td class="field-body">&#8211; complete list of cluster degeneracies</td>
 </tr>
 </tbody>
 </table>
@@ -546,12 +546,12 @@ or distance</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>oldClusteringMethod</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering in a previous simulation before the restart</li>
-<li><strong>newClusteringMethod</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering in the restarted simulation</li>
+<li><strong>oldClusteringMethod</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering in a previous simulation before the restart</li>
+<li><strong>newClusteringMethod</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering in the restarted simulation</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool – If clustering needs to be redone</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool &#8211; If clustering needs to be redone</p>
 </td>
 </tr>
 </tbody>
@@ -572,11 +572,11 @@ or distance</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>restart</strong> (<em>bool</em>) – Flag on whether to continue a previous simulation</li>
-<li><strong>debug</strong> (<em>bool</em>) – Flag to mark whether simulation is run in debug mode</li>
-<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – Simulation runner object</li>
-<li><strong>spawningCalculator</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">SpawningCalculator</span></code></a>) – Spawning calculator object</li>
-<li><strong>clusteringBlock</strong> – Block of the control file with clustering</li>
+<li><strong>restart</strong> (<em>bool</em>) &#8211; Flag on whether to continue a previous simulation</li>
+<li><strong>debug</strong> (<em>bool</em>) &#8211; Flag to mark whether simulation is run in debug mode</li>
+<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) &#8211; Simulation runner object</li>
+<li><strong>spawningCalculator</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">SpawningCalculator</span></code></a>) &#8211; Spawning calculator object</li>
+<li><strong>clusteringBlock</strong> &#8211; Block of the control file with clustering</li>
 </ul>
 </td>
 </tr>
@@ -600,8 +600,8 @@ initial structures
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>jsonParams</strong> (<em>str</em>) – Input control file in JSON format</li>
-<li><strong>originalControlFile</strong> (<em>str</em>) – Path where to save the control file</li>
+<li><strong>jsonParams</strong> (<em>str</em>) &#8211; Input control file in JSON format</li>
+<li><strong>originalControlFile</strong> (<em>str</em>) &#8211; Path where to save the control file</li>
 </ul>
 </td>
 </tr>
@@ -618,8 +618,8 @@ initial structures
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>topologies</strong> (<em>list</em>) – List of topology files</li>
-<li><strong>destination</strong> (<em>str</em>) – Path where to copy the toplogy files</li>
+<li><strong>topologies</strong> (<em>list</em>) &#8211; List of topology files</li>
+<li><strong>destination</strong> (<em>str</em>) &#8211; Path where to copy the toplogy files</li>
 </ul>
 </td>
 </tr>
@@ -639,7 +639,7 @@ only the seed</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>object</em>) – Object containing the command line arguments</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>object</em>) &#8211; Object containing the command line arguments</td>
 </tr>
 </tbody>
 </table>

@@ -208,6 +208,7 @@ When using MD as a progagator, the following parameters are mandatory:
 * **reporterFrequency** (*integer*, mandatory): Frequency to write the report
   and trajectories (in time steps, see **timeStep** property)
 * **numReplicas** (*integer*, mandatory): Number of replicas to run (see `Running AdaptivePELE with GPUs`_ section), each replica will run the same number of trajectories, calculated as **t = p/n**, where *t* is the number of the trajectories per replica, *p* is the number of processors and *n* is the number of replicas
+* **ligandName** (*str*, mandatory): Ligand residue name in the PDB
 
 Optionally, you can also use the following parameters:
 
@@ -712,6 +713,7 @@ A simple example of running an MD simulation with OpenMM::
                 "productionLength": 500,
                 "numReplicas": 5,
                 "seed": 67890,
+                "ligandName": "BEN",
                 "ligandCharge": 1
             }
         },
@@ -898,6 +900,7 @@ and 4 trajectories per replica (8 trajectories total)::
                 "seed": 67891,
                 "runningPlatform": "CUDA",
                 "devicesPerTrajectory": 1,
+                "ligandName" : "BEN",
                 "ligandCharge": 1
             }
         },

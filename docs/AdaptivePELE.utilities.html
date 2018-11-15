@@ -89,7 +89,7 @@
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
@@ -143,13 +143,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-        <li><a href="AdaptivePELE.html">AdaptivePELE – Package Description</a> &raquo;</li>
+        <li><a href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a> &raquo;</li>
       
     <li>utilities Package</li>
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/AdaptivePELE.utilities.rst.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/AdaptivePELE.utilities.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -173,9 +173,9 @@ by the checker</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object with clusters to print</li>
-<li><strong>checker</strong> (<em>function</em>) – Lambda function with the checker that should evaluate to True for intersted structures</li>
-<li><strong>outputPath</strong> (<em>str</em>) – Output cluster pdb filename</li>
+<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object with clusters to print</li>
+<li><strong>checker</strong> (<em>function</em>) &#8211; Lambda function with the checker that should evaluate to True for intersted structures</li>
+<li><strong>outputPath</strong> (<em>str</em>) &#8211; Output cluster pdb filename</li>
 </ul>
 </td>
 </tr>
@@ -205,33 +205,12 @@ by the checker</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
-<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
+<li><strong>epoch</strong> (<em>int</em>) &#8211; Epoch of the trajectory of interest</li>
+<li><strong>trajectory_number</strong> (<em>int</em>) &#8211; Number of the trajectory to select</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with topology information</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="AdaptivePELE.utilities.utilities.Topology.getTopologyFile">
-<code class="descname">getTopologyFile</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopologyFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopologyFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the topology file for a particular epoch and trajectory number</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
-<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – Path to the topology file</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with topology information</p>
 </td>
 </tr>
 </tbody>
@@ -246,9 +225,9 @@ by the checker</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>int</em>) – Index of the trajectory of interest</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>int</em>) &#8211; Index of the trajectory of interest</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list – List with topology information</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List with topology information</td>
 </tr>
 </tbody>
 </table>
@@ -263,12 +242,12 @@ by the checker</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
-<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
+<li><strong>epoch</strong> (<em>int</em>) &#8211; Epoch of the trajectory of interest</li>
+<li><strong>trajectory_number</strong> (<em>int</em>) &#8211; Number of the trajectory to select</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Index of the corresponding topology</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; Index of the corresponding topology</p>
 </td>
 </tr>
 </tbody>
@@ -284,8 +263,8 @@ by the checker</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory selected</li>
-<li><strong>trajectoryMapping</strong> (<em>list</em>) – Mapping of the trajectories and the corresponding topologies</li>
+<li><strong>epoch</strong> (<em>int</em>) &#8211; Epoch of the trajectory selected</li>
+<li><strong>trajectoryMapping</strong> (<em>list</em>) &#8211; Mapping of the trajectories and the corresponding topologies</li>
 </ul>
 </td>
 </tr>
@@ -301,7 +280,7 @@ by the checker</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) – Name of the folder where to write the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) &#8211; Name of the folder where to write the
 processorsToClusterMapping</td>
 </tr>
 </tbody>
@@ -318,8 +297,8 @@ before they are deleted and set again</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>topologyFiles</strong> (<em>list</em>) – List of topology files</li>
-<li><strong>cleanFiles</strong> (<em>bool</em>) – Flag wether to remove previous files</li>
+<li><strong>topologyFiles</strong> (<em>list</em>) &#8211; List of topology files</li>
+<li><strong>cleanFiles</strong> (<em>bool</em>) &#8211; Flag wether to remove previous files</li>
 </ul>
 </td>
 </tr>
@@ -335,17 +314,11 @@ before they are deleted and set again</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) – Name of the folder where to write the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) &#8211; Name of the folder where to write the
 mapping</td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="AdaptivePELE.utilities.utilities.Topology.writeTopologyObject">
-<code class="descname">writeTopologyObject</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.writeTopologyObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.writeTopologyObject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dump the contents of the topology object using pickle</p>
 </dd></dl>
 
 </dd></dl>
@@ -359,12 +332,12 @@ mapping</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>symmetries</strong> (<em>list of str</em>) – List of symmetry groups</li>
-<li><strong>PDB</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) – PDB object to check symmetry list against</li>
+<li><strong>symmetries</strong> (<em>list of str</em>) &#8211; List of symmetry groups</li>
+<li><strong>PDB</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) &#8211; PDB object to check symmetry list against</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>AssertionError</strong> – If an atom is not found in the structure</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>AssertionError</strong> &#8211; If an atom is not found in the structure</p>
 </td>
 </tr>
 </tbody>
@@ -379,9 +352,9 @@ mapping</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contactMap</strong> (<em>np.array</em>) – Contact map</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contactMap</strong> (<em>np.array</em>) &#8211; Contact map</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(numpy.ndarray, numpy.ndarray) – eigenvalues, eigenvectors</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(numpy.ndarray, numpy.ndarray) &#8211; eigenvalues, eigenvectors</td>
 </tr>
 </tbody>
 </table>
@@ -395,7 +368,7 @@ mapping</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tmpFolder</strong> (<em>str</em>) – Folder to remove</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tmpFolder</strong> (<em>str</em>) &#8211; Folder to remove</td>
 </tr>
 </tbody>
 </table>
@@ -410,10 +383,10 @@ mapping</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>trajectory</strong> (<em>str</em>) – Trajectory to convert</li>
-<li><strong>topology</strong> (<em>str</em>) – Topology file</li>
-<li><strong>output</strong> (<em>str</em>) – Filename of the ouput file</li>
-<li><strong>output_folder</strong> (<em>str</em>) – Folder where to store the output trajectory</li>
+<li><strong>trajectory</strong> (<em>str</em>) &#8211; Trajectory to convert</li>
+<li><strong>topology</strong> (<em>str</em>) &#8211; Topology file</li>
+<li><strong>output</strong> (<em>str</em>) &#8211; Filename of the ouput file</li>
+<li><strong>output_folder</strong> (<em>str</em>) &#8211; Folder where to store the output trajectory</li>
 </ul>
 </td>
 </tr>
@@ -445,9 +418,9 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>values</strong> (<em>iterable</em>) – Collection of numbers to assing an atom name for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>values</strong> (<em>iterable</em>) &#8211; Collection of numbers to assing an atom name for</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list – List of atom names</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List of atom names</td>
 </tr>
 </tbody>
 </table>
@@ -457,22 +430,6 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <dt id="AdaptivePELE.utilities.utilities.getCpuCount">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getCpuCount</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getCpuCount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getCpuCount" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="function">
-<dt id="AdaptivePELE.utilities.utilities.getFileExtension">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getFileExtension</code><span class="sig-paren">(</span><em>trajectoryFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getFileExtension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getFileExtension" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract the extension of a trajectory</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajectoryFile</strong> (<em>str</em>) – Name of the trajectory file</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str – Extension of the trajectory</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.getMetricsFromReportsInEpoch">
@@ -494,9 +451,9 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajFilename</strong> (<em>str</em>) – prmtop filename</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajFilename</strong> (<em>str</em>) &#8211; prmtop filename</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – prmtop number</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; prmtop number</td>
 </tr>
 </tbody>
 </table>
@@ -511,15 +468,15 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>traj</strong> (<em>str</em>) – Trajecotry filename</li>
-<li><strong>nativePDB</strong> – Native PDB object</li>
-<li><strong>resname</strong> (<em>str</em>) – Resname to compute its RMSD</li>
-<li><strong>symmetries</strong> (<em>list of dict</em>) – Symmetries dictionary list with independent symmetry groups</li>
-<li><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</li>
+<li><strong>traj</strong> (<em>str</em>) &#8211; Trajecotry filename</li>
+<li><strong>nativePDB</strong> &#8211; Native PDB object</li>
+<li><strong>resname</strong> (<em>str</em>) &#8211; Resname to compute its RMSD</li>
+<li><strong>symmetries</strong> (<em>list of dict</em>) &#8211; Symmetries dictionary list with independent symmetry groups</li>
+<li><strong>topology</strong> (<em>list</em>) &#8211; Topology for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.array – Array with the rmsd values of the trajectory</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.array &#8211; Array with the rmsd values of the trajectory</p>
 </td>
 </tr>
 </tbody>
@@ -534,9 +491,9 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>JSONdict</strong> (<em>dict</em>) – Dictionary containing a parsed PELE control file</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>JSONdict</strong> (<em>dict</em>) &#8211; Dictionary containing a parsed PELE control file</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str, str – Report and trajectory wildcards</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str, str &#8211; Report and trajectory wildcards</td>
 </tr>
 </tbody>
 </table>
@@ -556,12 +513,12 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>trajectoryFile</strong> (<em>str</em>) – Trajectory filename</li>
-<li><strong>verbose</strong> (<em>bool</em>) – Add verbose to snapshots</li>
+<li><strong>trajectoryFile</strong> (<em>str</em>) &#8211; Trajectory filename</li>
+<li><strong>verbose</strong> (<em>bool</em>) &#8211; Add verbose to snapshots</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">iterable – Snapshots with information</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">iterable &#8211; Snapshots with information</p>
 </td>
 </tr>
 </tbody>
@@ -586,9 +543,9 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>structure</strong> (<em>str</em>) – Pdb file with the topology information</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>structure</strong> (<em>str</em>) &#8211; Pdb file with the topology information</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of str – The lines of the topology file</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of str &#8211; The lines of the topology file</td>
 </tr>
 </tbody>
 </table>
@@ -602,9 +559,9 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajFilename</strong> (<em>str</em>) – Trajectory filename</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajFilename</strong> (<em>str</em>) &#8211; Trajectory filename</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – Trajectory number</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Trajectory number</td>
 </tr>
 </tbody>
 </table>
@@ -619,9 +576,9 @@ trajectories and reports</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – Path where to check for the folders</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) &#8211; Path where to check for the folders</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list – List of folders belonging to the simulation, sorted</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; List of folders belonging to the simulation, sorted</td>
 </tr>
 </tbody>
 </table>
@@ -636,12 +593,12 @@ trajectories and reports</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>conformation</strong> – Mdtraj trajectory object to write</li>
-<li><strong>topology</strong> (<em>list</em>) – Topoloy-like object</li>
+<li><strong>conformation</strong> &#8211; Mdtraj trajectory object to write</li>
+<li><strong>topology</strong> (<em>list</em>) &#8211; Topoloy-like object</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – The pdb representation of a snapshot from a xtc</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; The pdb representation of a snapshot from a xtc</p>
 </td>
 </tr>
 </tbody>
@@ -656,7 +613,7 @@ trajectories and reports</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>outputDir</strong> (<em>str</em>) – Folder filename</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>outputDir</strong> (<em>str</em>) &#8211; Folder filename</td>
 </tr>
 </tbody>
 </table>
@@ -676,11 +633,11 @@ trajectories and reports</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusteringObjectPath</strong> (<em>str</em>) – Clustering object path</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusteringObjectPath</strong> (<em>str</em>) &#8211; Clustering object path</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>EOFError</strong> – If the object is empty</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>EOFError</strong> &#8211; If the object is empty</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a> – clusteringObject</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a> &#8211; clusteringObject</td>
 </tr>
 </tbody>
 </table>
@@ -695,13 +652,13 @@ trajectories and reports</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
+<li><strong>folder</strong> (<em>str</em>) &#8211; Name of the folder where to write the
 processorsToClusterMapping</li>
-<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the processorMapping</li>
+<li><strong>filename</strong> (<em>str</em>) &#8211; Name of the file where to write the processorMapping</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the mapping of the trajectories to processors</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with the mapping of the trajectories to processors</p>
 </td>
 </tr>
 </tbody>
@@ -717,12 +674,12 @@ processorsToClusterMapping</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>numpy.array</em>) – Array of number to evaluate the sign</li>
-<li><strong>tol</strong> (<em>float</em>) – Tolerance to define the zero</li>
+<li><strong>x</strong> (<em>numpy.array</em>) &#8211; Array of number to evaluate the sign</li>
+<li><strong>tol</strong> (<em>float</em>) &#8211; Tolerance to define the zero</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Sign of the number</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; Sign of the number</p>
 </td>
 </tr>
 </tbody>
@@ -743,10 +700,10 @@ processorsToClusterMapping</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
+<li><strong>folder</strong> (<em>str</em>) &#8211; Name of the folder where to write the
 processorsToClusterMapping</li>
-<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the processorMapping</li>
-<li><strong>processorMapping</strong> (<em>list</em>) – Mapping of the trajectories to processors</li>
+<li><strong>filename</strong> (<em>str</em>) &#8211; Name of the file where to write the processorMapping</li>
+<li><strong>processorMapping</strong> (<em>list</em>) &#8211; Mapping of the trajectories to processors</li>
 </ul>
 </td>
 </tr>
@@ -768,9 +725,9 @@ processorsToClusterMapping</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>conformation</strong> – Mdtraj trajectory object to write</li>
-<li><strong>output</strong> (<em>str</em>) – Output where to write the object</li>
-<li><strong>topology</strong> (<em>list</em>) – Topoloy-like object</li>
+<li><strong>conformation</strong> &#8211; Mdtraj trajectory object to write</li>
+<li><strong>output</strong> (<em>str</em>) &#8211; Output where to write the object</li>
+<li><strong>topology</strong> (<em>list</em>) &#8211; Topoloy-like object</li>
 </ul>
 </td>
 </tr>
@@ -787,13 +744,13 @@ processorsToClusterMapping</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>filename</strong> (<em>str</em>) – Path to the xtc trajectory</li>
-<li><strong>output_file</strong> (<em>str</em>) – Output where to write the object</li>
-<li><strong>topology</strong> (<em>str</em>) – Topology file object</li>
+<li><strong>filename</strong> (<em>str</em>) &#8211; Path to the xtc trajectory</li>
+<li><strong>output_file</strong> (<em>str</em>) &#8211; Output where to write the object</li>
+<li><strong>topology</strong> (<em>str</em>) &#8211; Topology file object</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – The pdb representation of a snapshot from a xtc</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; The pdb representation of a snapshot from a xtc</p>
 </td>
 </tr>
 </tbody>
