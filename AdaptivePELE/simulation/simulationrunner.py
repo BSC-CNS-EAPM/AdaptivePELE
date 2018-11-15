@@ -1028,8 +1028,6 @@ class MDSimulation(SimulationRunner):
                 structures_to_run = sorted(equilibrated_structures, key=utilities.getTrajNum)
             checkpoints = glob.glob(os.path.join(outputDir, "checkpoint*.chk"))
             checkpoints = sorted(checkpoints, key=utilities.getTrajNum)
-            # To follow the same order as PELE (important for processor mapping)
-            checkpoints = checkpoints[1:] + [checkpoints[0]]
         # always read the prmtop files from disk to serve as communication
         # between diffrent processses
         prmtops = glob.glob(os.path.join(outputPathConstants.topologies, "*prmtop"))
