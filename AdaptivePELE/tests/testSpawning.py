@@ -6,6 +6,44 @@ from AdaptivePELE.clustering import clustering
 from AdaptivePELE.spawning import densitycalculator
 
 
+def calculateTransitions(counts):
+    # add 1e-10 to avoid nans when the whole row is zeros
+    return counts/(counts.sum(axis=1)[:, np.newaxis]+1e-10)
+
+
+def findFirstValidState(transitions):
+    for i, row in enumerate(transitions):
+        if row.sum() > 1e-6:
+            return i
+    return None
+
+
+def generateDTrajs(counts):
+    count = counts.copy()
+    dtrajs = []
+    transitions = calculateTransitions(count)
+    nstate = count.shape[0]
+    states = list(range(nstate))
+    state = 0
+    traj = [state]
+    while True:
+        dest = np.random.choice(states, p=transitions[state])
+        if count[state, dest] > 0:
+            traj.append(dest)
+            count[state, dest] -= 1
+            state = dest
+        else:
+            transitions = calculateTransitions(count)
+        if transitions[state].sum() < 1e-6:
+            # the current state has no more transitions
+            state = findFirstValidState(transitions)
+            dtrajs.append(np.array(traj))
+            traj = [state]
+            if state is None:
+                break
+    return dtrajs
+
+
 class ClMock(object):
     def __init__(self, dtrajs):
         self.dtrajs = dtrajs
@@ -304,7 +342,7 @@ class TestSpawningCalculator(unittest.TestCase):
         golden = np.array([10, 10, 10])
         np.testing.assert_array_equal(degeneracy, golden)
 
-    def testMSMMetastabiligy(self):
+    def testMSMMetastability(self):
         params = spawning.SpawningParams()
         params.lagtime = 1
         dtrajs = [np.array([1, 1, 2, 2, 2, 0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1])]
@@ -313,6 +351,25 @@ class TestSpawningCalculator(unittest.TestCase):
         ntrajs = 30
         degeneracy = MSMP.calculate(cl, ntrajs)
         golden = np.array([10, 10, 10])
+        np.testing.assert_array_equal(degeneracy, golden)
+
+    def testMSMUncertainty(self):
+        golden_q = np.array([1.855343631686e-05, 1.087041734182e-05,
+                             1.219694386094e-07, 9.760782392578e-07,
+                             5.936453161858e-04, 9.940065039403e-05])
+        counts = np.array([[4380, 153, 15, 2, 0, 0], [211, 4788, 1, 0, 0, 0],
+                           [169, 1, 4604, 226, 0, 0], [3, 13, 158, 4823, 3, 0],
+                           [0, 0, 0, 4, 4978, 18], [7, 5, 0, 0, 62, 4926]])
+        params = spawning.SpawningParams()
+        params.lagtime = 1
+        dtrajs = generateDTrajs(counts)
+        cl = ClMock(dtrajs)
+        MSMP = spawning.UncertaintyMSMCalculator(params)
+        calc_q, _ = MSMP.calculate_q(counts, 6)
+        ntrajs = 100
+        degeneracy = MSMP.calculate(cl, ntrajs)
+        golden = np.array([3, 1, 0, 0, 82, 14])
+        np.testing.assert_almost_equal(calc_q, golden_q)
         np.testing.assert_array_equal(degeneracy, golden)
 
 
