@@ -156,6 +156,7 @@ class SimulationParams:
         "peleSteps": "numbers.Real",
         "iterations": "numbers.Real",
         "modeMovingBox": "basestring",
+        "boxCenter": "list",
         "boxRadius": "numbers.Real",
         "runEquilibration": "bool",
         "equilibrationMode": "basestring",
