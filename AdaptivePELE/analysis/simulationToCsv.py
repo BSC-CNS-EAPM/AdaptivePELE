@@ -1,10 +1,16 @@
 import pandas as pd
+import argparse
 import os
 import glob
 
 EPOCH = 'Epoch'
 TRAJ = 'Traj'
 
+
+def arg_parse():
+    parser = argparse.ArgumentParser(description='Create a csv file with the summary of the simulation. Must be run under Adaptive folder')
+    args = parser.parse_args()
+    return args
 
 def retrieve_fields(report):
     data = pd.read_csv(report, sep='    ', engine='python')
@@ -46,12 +52,21 @@ def fill_data(reports, df):
     return df
        
 
+def init_df(fields):
+    df = pd.DataFrame({EPOCH : [], TRAJ : [] })
+    for field in fields:
+        df[field] = []
+    return df
+
+
+def main():
+    epochs = [folder for folder in glob.glob("./*/") if folder.isdigit()]
+    reports = gather_reports()
+    fields = retrieve_fields(reports[0])
+    df = init_df(fields)
+    df = fill_data(reports, df)
+    df.to_csv("report_summary.csv", index=False, decimal=".", float_format='%.2f')
+
 if __name__ == "__main__":
-   epochs = [folder for folder in glob.glob("./*/") if folder.isdigit()]
-   reports = gather_reports()
-   fields = retrieve_fields(reports[0])
-   df = pd.DataFrame({EPOCH : [], TRAJ : [] })
-   for field in fields:
-       df[field] = []
-   df = fill_data(reports, df)
-   df.to_csv("report_summary.csv", index=False, decimal=".", float_format='%.2f')
+    arg_parse()
+    main()
