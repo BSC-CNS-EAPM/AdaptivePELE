@@ -1210,6 +1210,28 @@ class UncertaintyMSMCalculator(MSMCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.UncertaintyMSMCalculator
         self.parameters = parameters
 
+    def calculate_q(self, counts, nclusters):
+        alpha = 1/float(nclusters)
+        U_counts = counts + alpha
+        w = U_counts.sum(axis=1)
+        P = U_counts / w[:, np.newaxis]
+        eigvalues, _ = np.linalg.eig(P)
+        eigvalues.sort()
+        eigvalues = eigvalues[::-1]
+        ek = np.zeros(nclusters)
+        ek[nclusters-1] = 1.0
+        A = P - eigvalues[1]*np.eye(nclusters)
+        perm, L, U = lu(A.T)
+        x = solve(L.T, ek)
+        xa = solve(U[:-1, :-1], -U[:-1, -1])
+        xa = np.array(xa.tolist()+[1.0])
+        norm_factor = xa.dot(perm.dot(x))
+        si = np.outer(xa, perm.dot(x))/norm_factor
+        q = []
+        for i in range(nclusters):
+            q.append(si[i].dot((np.diag(P[i])-np.outer(P[i], P[i])).dot(si[i])))
+        return np.array(q), w
+
     def calculate(self, clusters, trajToDistribute, currentEpoch=None):
         """
             Calculate the degeneracy of the clusters
@@ -1228,26 +1250,7 @@ class UncertaintyMSMCalculator(MSMCalculator):
         nclusters = msm_object.nstates_full
         # distribute seeds using the MSM
         counts = msm_object.count_matrix_full
-        alpha = 1/float(nclusters)
-        U_counts = counts + alpha
-        w = U_counts.sum(axis=1)
-        P = U_counts / w[:, np.newaxis]
-        eigvalues, _ = np.linalg.eig(P)
-        eigvalues.sort()
-        eigvalues = eigvalues[::-1]
-        ek = np.zeros(nclusters)
-        ek[nclusters-1] = 1.0
-        A = P - eigvalues[1]*np.eye(nclusters)
-        perm, L, U = lu(A.T)
-        x = solve(L.T, ek)
-        xa = solve(U[:-1, :-1], -U[:-1, -1])
-        xa = np.array(xa.tolist()+[1.0])
-        norm_factor = xa.dot(xa, x)
-        si = np.outer(xa, perm.dot(x))/norm_factor
-        q = []
-        for i in range(nclusters):
-            q.append(si[i].dot((np.diag(P[i])-np.outer(P[i], P[i])).dot(si[i])))
-        q = np.array(q)
+        q, w = self.calculate_q(counts, nclusters)
         score = (q/(w+1))-(q/(w+1+trajToDistribute))
         score /= score.sum()
         sortedProbs = np.argsort(score)[::-1]
