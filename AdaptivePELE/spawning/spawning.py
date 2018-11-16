@@ -14,6 +14,11 @@ from AdaptivePELE.constants import constants
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.spawning import spawningTypes
 from AdaptivePELE.spawning import densitycalculator
+try:
+    # Check if the basestring type if available, this will fail in python3
+    basestring
+except NameError:
+    basestring = str
 PYEMMA = True
 try:
     import pyemma.msm as msm
