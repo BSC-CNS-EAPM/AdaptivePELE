@@ -126,7 +126,11 @@ def retrieve_fields(control_file):
         content = f.readlines()
         control_file_line = [line for line in content if line.strip().startswith('"controlFile"')][0]
         ligand_res_line = [line for line in content if line.strip().startswith('"ligandResname"')][0]
-    return control_file_line.split(":")[1].strip().strip(",").strip('"'), ligand_res_line.split(":")[1].strip().strip(",").strip('"')
+    pele, resname = control_file_line.split(":")[1].strip().strip(",").strip('"'), ligand_res_line.split(":")[1].strip().strip(",").strip('"')
+    if not os.path.isfile(pele):
+        path = os.path.dirname(os.path.abspath(control_file))
+        pele = os.path.join(path, pele)
+    return pele, resname
 
 
 
