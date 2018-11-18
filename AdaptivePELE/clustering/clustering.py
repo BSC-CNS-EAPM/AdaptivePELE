@@ -1616,32 +1616,31 @@ class MSMClustering(Clustering):
         self.constantsExtract.gatherNonRepeatedTrajsFilename = os.path.join(outputPathConstants.allTrajsPath, "traj_%s_%s.dat")
         utilities.makeFolder(extractedFolder)
         trajectories = getAllTrajectories(paths)
-        if self.indexes is None and utilities.getFileExtension(trajectories[0]) in coord.MDTRAJ_FORMATS:
-            self.indexes = []
-            # select indexes for all topologies
-            for top in topology:
-                self.indexes.append(coord.extractIndexesTopology(top, self.resname, self.atom_Ids, self.writeCA, self.sidechains))
-            self.indexes = list(set(self.indexes))
-        # extract coordinates
-        if PARALELLIZATION and self.nprocessors is not None:
-            pool = mp.Pool(self.nprocessors)
-        else:
-            pool = None
         if self.sidechains:
             new_sidechains = coord.extractSidechainIndexes(trajectories, self.ligand, topology, pool=pool)
             self.sidechains = list(set(self.sidechains).intersection(set(new_sidechains)))
         else:
             self.sidechains = []
+        self.indexes = []
+        if self.indexes is None and utilities.getFileExtension(trajectories[0]) in coord.MDTRAJ_FORMATS:
+            # select indexes for all topologies
+            for top in topology.topologyFilesIterator():
+                self.indexes.append(coord.extractIndexesTopology(top, self.resname, self.atom_Ids, self.writeCA, self.sidechains))
+        # extract coordinates
+        if PARALELLIZATION and self.nprocessors is not None:
+            pool = mp.Pool(self.nprocessors)
+        else:
+            pool = None
 
         workers = []
         for filename in trajectories:
             trajNum = utilities.getTrajNum(filename)
-            if self.indexes is not None:
+            if self.indexes:
                 indexes_traj = self.indexes[topology.getTopologyIndex(self.epoch, trajNum)]
             else:
                 indexes_traj = self.indexes
             if topology is not None:
-                topology_traj = topology.getTopology(self.epoch, trajNum)
+                topology_traj = topology.getTopologyFile(self.epoch, trajNum)
             else:
                 topology_traj = None
 
@@ -1661,7 +1660,7 @@ class MSMClustering(Clustering):
             for trajectory in trajs:
                 if "tica" in trajectory:
                     continue
-                trajectories.append(np.loadtxt(trajectory))
+                trajectories.append(utilities.loadtxtfile(trajectory))
             tica = coor.tica(data=trajectories, lag=self.tica_lagtime, kinetic_map=self.tica_kinetic_map, commute_map=self.tica_commute_map)
             projected = tica.get_output(dimensions=range(self.tica_nICs))
             for traj_name, projected_traj in zip(trajs, projected):
@@ -1678,7 +1677,7 @@ class MSMClustering(Clustering):
 
         # create Adaptive clusters from the kmeans result
         trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, base_traj_names))
-        trajectories = [np.loadtxt(f)[:, 1:] for f in trajectory_files]
+        trajectories = [utilities.loadtxtfile(f)[:, 1:] for f in trajectory_files]
 
         centersInfo = getCentersInfo(self.pyemma_clustering, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)
         centersInfo_processed = []
