@@ -90,6 +90,10 @@ class Topology:
             self.topologies.append(getTopologyFile(top))
             self.topologyFiles.append(top)
 
+    def topologyFilesIterator(self):
+        for top_file in self.topologyFiles:
+            yield top_file
+
     def mapEpochTopologies(self, epoch, trajectoryMapping):
         """
             Map the trajectories for the next epoch and the used topologies
@@ -717,3 +721,18 @@ def getFileExtension(trajectoryFile):
         :returns: str -- Extension of the trajectory
     """
     return os.path.splitext(trajectoryFile)[1]
+
+def loadtxtfile(filename):
+    """
+        Load a table file from a text file
+
+        :param filename: Name of the file to load
+        :type filename: str
+
+        :returns: np.ndarray -- Contents of the text file
+    """
+    data = np.loadtxt(filename)
+    if len(data.shape) < 2:
+        data = data[np.newaxis, :]
+    return data
+

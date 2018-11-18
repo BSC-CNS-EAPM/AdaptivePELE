@@ -615,9 +615,7 @@ class PeleSimulation(SimulationRunner):
         nTrajs = len(glob.glob(trajWildcard.rsplit("_", 1)[0]+"*"))+1
         data = []
         for i in range(1, nTrajs):
-            report = np.loadtxt(reportWildcard % i)
-            if len(report.shape) < 2:
-                report = report[np.newaxis, :]
+            report = utilities.loadtxtfile(reportWildcard % i)
             snapshots = utilities.getSnapshots(trajWildcard % i)
             for nSnap, (line, snapshot) in enumerate(zip(report, snapshots)):
                 conformation = atomset.PDB()
@@ -705,9 +703,7 @@ class PeleSimulation(SimulationRunner):
 
         for i in range(1, nTrajs):
             indices.append(rowIndex)
-            report = np.loadtxt(reportWildcard % i)
-            if len(report.shape) < 2:
-                report = report[np.newaxis, :]
+            report = utilities.loadtxtfile(reportWildcard % i)
             if similarityColumn is None:
                 snapshots = utilities.getSnapshots(trajWildcard % i)
                 report_values = []
@@ -1243,10 +1239,7 @@ class MetricMultipleTrajsExitCondition:
             :returns: bool -- Returns True if the exit condition has been met
         """
         for j in range(1, self.nProcessors):
-            report = np.loadtxt(os.path.join(outputFolder, self.report % j))
-            if len(report.shape) < 2:
-                # If a report has only one line, add another axis
-                report = report[None]
+            report = utilities.loadtxtfile(reportWildcard % i)
             if self.condition(report[:, self.metricCol], self.metricValue):
                 self.trajsFound += 1
         return self.trajsFound >= self.numTrajs
