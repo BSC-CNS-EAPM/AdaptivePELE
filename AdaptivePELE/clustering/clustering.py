@@ -1621,11 +1621,13 @@ class MSMClustering(Clustering):
             self.sidechains = list(set(self.sidechains).intersection(set(new_sidechains)))
         else:
             self.sidechains = []
-        self.indexes = []
         if self.indexes is None and utilities.getFileExtension(trajectories[0]) in coord.MDTRAJ_FORMATS:
+            self.indexes = []
             # select indexes for all topologies
             for top in topology.topologyFilesIterator():
                 self.indexes.append(coord.extractIndexesTopology(top, self.resname, self.atom_Ids, self.writeCA, self.sidechains))
+        else:
+            self.indexes = []
         # extract coordinates
         if PARALELLIZATION and self.nprocessors is not None:
             pool = mp.Pool(self.nprocessors)
@@ -1643,7 +1645,6 @@ class MSMClustering(Clustering):
                 topology_traj = topology.getTopologyFile(self.epoch, trajNum)
             else:
                 topology_traj = None
-
             if pool is None:
                 # serial version
                 coord.writeFilenameExtractedCoordinates(filename, self.resname, self.atom_Ids, outputPathConstants.epochOutputPathTempletized % self.epoch, False, self.constantsExtract, self.writeCA, self.sidechains, topology=topology_traj, indexes=indexes_traj)
