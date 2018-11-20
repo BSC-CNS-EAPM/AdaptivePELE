@@ -245,7 +245,10 @@ Optionally, you can also use the following parameters:
 * **constraintsNPT** (*float*, default=0.5): Value of the constraints
   for the NPT equilibration (in kcal/(mol*A\ :sup:`2`))
 * **format** (*str*, default=xtc): Format of the trajectory file, currently we
-  support *dcd* and *xtc*
+  support *dcd* and *xtc*, note however that due to issues with the xtc library
+  in mdtraj writing *xtc* files might not be problematic unless you are
+  currently using the latest mdtraj code (this means version > 1.9.2 at the
+  moment this was written)
 
 
 Exit condition
