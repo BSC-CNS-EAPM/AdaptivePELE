@@ -1225,7 +1225,7 @@ class UncertaintyMSMCalculator(MSMCalculator):
         eigvalues = eigvalues[::-1]
         ek = np.zeros(nclusters)
         ek[nclusters-1] = 1.0
-        A = P - eigvalues[1]*np.eye(nclusters)
+        A = P - np.real(eigvalues[1])*np.eye(nclusters)
         perm, L, U = lu(A.T)
         x = solve(L.T, ek)
         xa = solve(U[:-1, :-1], -U[:-1, -1])
