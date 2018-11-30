@@ -28,8 +28,10 @@ def parseArgs():
     parser.add_argument('--traj', type=str, help="Trajectory filenames i.e. run_trajectory_", default="trajectory_")
     parser.add_argument('--use_pdb', action="store_true", help="To use when having pdb files with .xtc extension")
     parser.add_argument('--png', action="store_true", help="Save plot in png format")
+    parser.add_argument('--CA', action="store_true", help="Cluster by CA")
+    parser.add_argument('--sidechains', action="store_true", help="Cluster by sidechain RMSD")
     args = parser.parse_args()
-    return args.nClusters, args.crit1, args.crit2, args.ligand_resname, args.atomId, args.o, args.top, args.cpus, args.report, args.traj, args.use_pdb, args.png
+    return args.nClusters, args.crit1, args.crit2, args.ligand_resname, args.atomId, args.o, args.top, args.cpus, args.report, args.traj, args.use_pdb, args.png, args.CA, args.sidechains
 
 
 class cd:
@@ -154,15 +156,15 @@ def save_to_df(input):
         #df.update(df_tmp)
     return dfs_tmp
 
-def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "ClusterCentroids", atom_ids="", cpus=2, topology=None, report="report_", traj="trajectory_", use_pdb=False, png=False, nProc=4):
+def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "ClusterCentroids", atom_ids="", cpus=2, topology=None, report="report_", traj="trajectory_", use_pdb=False, png=False, CA=0, sidechains=0):
     #Create multiprocess pool
-    if nProc>1:
-        pool = mp.Pool(nProc)
+    if cpus>1:
+        pool = mp.Pool(cpus)
     else:
-        pool=None
+        pool=mp.Pool(1)
     #Extract COM ligand for each snapshot
-    if not glob.glob("*/extractedCoordinates/coord_*"):
-    	extractCoords.main(lig_resname=ligand_resname, non_Repeat=True, atom_Ids=atom_ids, nProcessors=cpus, parallelize=False, topology=topology, use_pdb=use_pdb)
+    if not glob.glob("allTrajs/traj*"):
+    	extractCoords.main(lig_resname=ligand_resname, non_Repeat=True, atom_Ids=atom_ids, nProcessors=cpus, parallelize=True, topology=topology, use_pdb=use_pdb, protein_CA=CA, sidechains=sidechains)
 
     print("Clusterize trajectories by RMSD of COM")
     trajectoryFolder = "allTrajs"
@@ -191,7 +193,7 @@ def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "Cl
     print("Update data with metrics and clusters")
     df.index = range(df.shape[0])
     df["Cluster"] = [None]*df.shape[0]
-    input_list = [ [df, traj, d] for d, traj in zip(dtrajs, clusteringObject.trajFilenames) ]
+    input_list = [ [df, Traj, d] for d, Traj in zip(dtrajs, clusteringObject.trajFilenames) ]
     results = pool.map(save_to_df, input_list)
     for data in results:
         for df_tmp in data:
@@ -225,5 +227,5 @@ def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "Cl
     return 
 
 if __name__ == "__main__":
-    n_clusters, criteria1, criteria2, lig_name, atom_id, output, top, cpus, report, traj, use_pdb, png = parseArgs()
-    main(n_clusters, criteria1, criteria2, lig_name, output, atom_id, cpus, top, report, traj, use_pdb, png)
+    n_clusters, criteria1, criteria2, lig_name, atom_id, output, top, cpus, report, traj, use_pdb, png, CA, sidechains = parseArgs()
+    main(n_clusters, criteria1, criteria2, lig_name, output, atom_id, cpus, top, report, traj, use_pdb, png, CA, sidechains)
