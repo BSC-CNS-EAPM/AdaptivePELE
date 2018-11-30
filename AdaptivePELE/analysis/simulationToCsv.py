@@ -5,6 +5,7 @@ import glob
 
 EPOCH = 'Epoch'
 TRAJ = 'Traj'
+STEPS = 'numberOfAcceptedPeleSteps' 
 
 
 def arg_parse():
@@ -14,7 +15,7 @@ def arg_parse():
 
 def retrieve_fields(report):
     data = pd.read_csv(report, sep='    ', engine='python')
-    return (list(data)[1:2] + list(data)[3:])
+    return list(data)[2:]
 
 def gather_reports():
     reports = glob.glob(os.path.join("*/*report*"))
@@ -38,20 +39,31 @@ def filter_non_numerical_folders(reports, numfolders=True):
         return reports
 
 
-def fill_data(reports, df):
+def fill_data(reports, df, pool):
 
-    for report in reports:
-       print(report)
+    workers = []
+    if pool is None:
+        for report in reports:        
+            # serial version
+            data = extract_data(report)
+            df = pd.concat([df, data], axis=0)
+    else:
+        results = pool.map(extract_data, reports)
+        for data in results:
+            df = pd.concat([df, data], axis=0)
+    return df
+
+
+def extract_data(report):
        data = pd.read_csv(report, sep='    ', engine='python')
        data = data.drop(data.columns[0], axis=1)
-       data = data.drop(data.columns[1], axis=1)
+       data = data.drop(data.columns[0], axis=1)
        size = data.shape[0]
-       data.insert(0, EPOCH, [os.path.dirname(report)]*size)
-       data.insert(1, TRAJ, [os.path.basename(report).split("_")[-1]]*size)
-       df = pd.concat([df, data], axis=0)
-    return df
-       
+       data.insert(0, EPOCH, [int(os.path.dirname(report))]*size)
+       data.insert(1, TRAJ, [int(os.path.basename(report).split("_")[-1])]*size)
+       return data
 
+       
 def init_df(fields):
     df = pd.DataFrame({EPOCH : [], TRAJ : [] })
     for field in fields:
@@ -60,11 +72,12 @@ def init_df(fields):
 
 
 def main():
+    pool = None
     epochs = [folder for folder in glob.glob("./*/") if folder.isdigit()]
     reports = gather_reports()
     fields = retrieve_fields(reports[0])
     df = init_df(fields)
-    df = fill_data(reports, df)
+    df = fill_data(reports, df, pool)
     df.to_csv("report_summary.csv", index=False, decimal=".", float_format='%.2f')
 
 if __name__ == "__main__":
