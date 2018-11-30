@@ -68,7 +68,9 @@ def write_report(metrics, resname, initial_column=4):
     #Plot other metrics agains binding
     images_per_page = 1
     images_per_row = 0
-    for user_metric in ["rmsd", "com_distance", "distanceToPoint", "clusters"]:
+    #metrics = ["rmsd", "com_distance", "distanceToPoint", "clusters"]
+    metrics_names = ["rmsd", "com_distance", "distanceToPoint"]
+    for user_metric in metrics_names:
         if images_per_page > 4:
             pdf.add_page()
             images_per_page = 1
