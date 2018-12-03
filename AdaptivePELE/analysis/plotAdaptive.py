@@ -120,7 +120,7 @@ def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint, palett
         stringPalette = ""
         colorMetric = ""
 
-    gnuplotString = "".join(["plot for [i=%(startTraj)d:%(runsPerEpoch)d] for [j=0:%(numberOfEpochs)d-1] \'\'.j.\'/%(reportName)s\'.i u %(col1)s:%(col2)d", colorMetric, " ", stringPalette, "notitle %(withLines)s"])
+    gnuplotString = "".join(["set cbrange[0:%(numberOfEpochs)d-1]; plot for [i=%(startTraj)d:%(runsPerEpoch)d] for [j=0:%(numberOfEpochs)d-1] \'\'.j.\'/%(reportName)s\'.i u %(col1)s:%(col2)d", colorMetric, " ", stringPalette, "notitle %(withLines)s"])
     return generateNestedString(gnuplotString, reportName, xcol, ycol, stepsPerRun, printWithLines, totalNumberOfSteps, False, paletteModifier, trajs_range)
 
 

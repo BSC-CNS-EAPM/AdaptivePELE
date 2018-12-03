@@ -89,7 +89,7 @@
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
@@ -143,13 +143,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-        <li><a href="AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a> &raquo;</li>
+        <li><a href="AdaptivePELE.html">AdaptivePELE – Package Description</a> &raquo;</li>
       
     <li>simulation Package</li>
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="_sources/AdaptivePELE.simulation.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/AdaptivePELE.simulation.rst.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -218,9 +218,9 @@ is met</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; Returns True if the exit condition has been met</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool – Returns True if the exit condition has been met</td>
 </tr>
 </tbody>
 </table>
@@ -239,10 +239,10 @@ is met</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>exitConditionBlock</strong> (<em>dict</em>) &#8211; Block of the control file
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>exitConditionBlock</strong> (<em>dict</em>) – Block of the control file
 corresponding to the exit condition</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.simulation.simulationrunner.MetricExitCondition" title="AdaptivePELE.simulation.simulationrunner.MetricExitCondition"><code class="xref py py-class docutils literal"><span class="pre">MetricExitCondition</span></code></a> &#8211; MetricExitCondition object
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.simulation.simulationrunner.MetricExitCondition" title="AdaptivePELE.simulation.simulationrunner.MetricExitCondition"><code class="xref py py-class docutils literal"><span class="pre">MetricExitCondition</span></code></a> – MetricExitCondition object
 selected</td>
 </tr>
 </tbody>
@@ -268,9 +268,9 @@ selected</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch</strong> (<em>int</em>) &#8211; Epoch number</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch</strong> (<em>int</em>) – Epoch number</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if the simulations where interrupted</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool – True if the simulations where interrupted</td>
 </tr>
 </tbody>
 </table>
@@ -285,7 +285,7 @@ before finishing</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>checkpointDir</strong> (<em>str</em>) &#8211; Directory with the checkpoints</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>checkpointDir</strong> (<em>str</em>) – Directory with the checkpoints</td>
 </tr>
 </tbody>
 </table>
@@ -300,10 +300,10 @@ before finishing</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>numberOfSnapshots</strong> (<em>int</em>) &#8211; Number of complexes to write</li>
-<li><strong>tmpInitialStructuresTemplate</strong> (<em>str</em>) &#8211; Template with the name of the initial strutctures</li>
-<li><strong>iteration</strong> (<em>int</em>) &#8211; Epoch number</li>
-<li><strong>equilibration</strong> (<em>bool</em>) &#8211; Flag to mark wether the complexes are part of an
+<li><strong>numberOfSnapshots</strong> (<em>int</em>) – Number of complexes to write</li>
+<li><strong>tmpInitialStructuresTemplate</strong> (<em>str</em>) – Template with the name of the initial strutctures</li>
+<li><strong>iteration</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>equilibration</strong> (<em>bool</em>) – Flag to mark wether the complexes are part of an
 equilibration run</li>
 </ul>
 </td>
@@ -327,17 +327,17 @@ to follow the same structure has the Super class definition)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>initialStructures</strong> (<em>list of str</em>) &#8211; Name of the initial structures to copy</li>
-<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Contains outputPath-related constants</li>
-<li><strong>reportBaseFilename</strong> (<em>str</em>) &#8211; Name of the file that contains the metrics of the snapshots to cluster</li>
-<li><strong>outputPath</strong> (<em>str</em>) &#8211; Path where trajectories are found</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the system pdb</li>
-<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) &#8211; Object to synchronize the possibly multiple processes</li>
-<li><strong>topology</strong> (<em>:py:class:</em>) &#8211; Topology object</li>
+<li><strong>initialStructures</strong> (<em>list of str</em>) – Name of the initial structures to copy</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>reportBaseFilename</strong> (<em>str</em>) – Name of the file that contains the metrics of the snapshots to cluster</li>
+<li><strong>outputPath</strong> (<em>str</em>) – Path where trajectories are found</li>
+<li><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the system pdb</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
+<li><strong>topology</strong> (<em>:py:class:</em>) – Topology object</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with initial structures</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with initial structures</p>
 </td>
 </tr>
 </tbody>
@@ -353,14 +353,14 @@ to follow the same structure has the Super class definition)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>PDBtoOpen</strong> (<em>str</em>) &#8211; string with the pdb to prepare</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; string with the code of the ligand</li>
-<li><strong>outputPath</strong> (<em>str</em>) &#8211; Path where the pdb is written</li>
-<li><strong>id_replica</strong> (<em>int</em>) &#8211; Id of the current replica</li>
+<li><strong>PDBtoOpen</strong> (<em>str</em>) – string with the pdb to prepare</li>
+<li><strong>resname</strong> (<em>str</em>) – string with the code of the ligand</li>
+<li><strong>outputPath</strong> (<em>str</em>) – Path where the pdb is written</li>
+<li><strong>id_replica</strong> (<em>int</em>) – Id of the current replica</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; string with the ligand pdb</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – string with the ligand pdb</p>
 </td>
 </tr>
 </tbody>
@@ -382,8 +382,8 @@ to follow the same structure has the Super class definition)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>antechamberDict</strong> (<em>dict</em>) &#8211; Dictonary containing the parameters to substitute in the antechamber command</li>
-<li><strong>parmchkDict</strong> (<em>dict</em>) &#8211; Dictonary containing the parameters to substitute in the parmchk2 command</li>
+<li><strong>antechamberDict</strong> (<em>dict</em>) – Dictonary containing the parameters to substitute in the antechamber command</li>
+<li><strong>parmchkDict</strong> (<em>dict</em>) – Dictonary containing the parameters to substitute in the parmchk2 command</li>
 </ul>
 </td>
 </tr>
@@ -400,12 +400,12 @@ to follow the same structure has the Super class definition)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>epoch</strong> (<em>int</em>) &#8211; number of the epoch</li>
-<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Contains outputPath-related constants</li>
-<li><strong>initialStructures</strong> (<em>str</em>) &#8211; Name of the initial structures to copy</li>
-<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) &#8211; Topology object containing the set of topologies needed for the simulation</li>
-<li><strong>reportFileName</strong> (<em>str</em>) &#8211; Name of the report file</li>
-<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) &#8211; Object to synchronize the possibly multiple processes</li>
+<li><strong>epoch</strong> (<em>int</em>) – number of the epoch</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>initialStructures</strong> (<em>str</em>) – Name of the initial structures to copy</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>reportFileName</strong> (<em>str</em>) – Name of the report file</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
 </ul>
 </td>
 </tr>
@@ -421,7 +421,7 @@ to follow the same structure has the Super class definition)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>TleapControlFile</strong> (<em>str</em>) &#8211; Path to the Tleap.in file</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>TleapControlFile</strong> (<em>str</em>) – Path to the Tleap.in file</td>
 </tr>
 </tbody>
 </table>
@@ -436,7 +436,7 @@ as the one provided in the spawning parameters</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>spawningReportName</strong> (<em>str</em>) &#8211; Name of the report file provided in the spawning parameters</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>spawningReportName</strong> (<em>str</em>) – Name of the report file provided in the spawning parameters</td>
 </tr>
 </tbody>
 </table>
@@ -456,9 +456,9 @@ is met</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; Returns True if the exit condition has been met</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool – Returns True if the exit condition has been met</td>
 </tr>
 </tbody>
 </table>
@@ -478,9 +478,9 @@ is met</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; Returns True if the exit condition has been met</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool – Returns True if the exit condition has been met</td>
 </tr>
 </tbody>
 </table>
@@ -508,14 +508,14 @@ to the available processors</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>resname</strong> (<em>str</em>) &#8211; Name of the ligand in the pdb</li>
-<li><strong>trajWildcard</strong> (<em>str</em>) &#8211; Templetized path to trajectory files&#8221;</li>
-<li><strong>reportWildcard</strong> (<em>str</em>) &#8211; Templetized path to report files&#8221;</li>
-<li><strong>topology</strong> (<em>list</em>) &#8211; Topology for non-pdb trajectories</li>
+<li><strong>resname</strong> (<em>str</em>) – Name of the ligand in the pdb</li>
+<li><strong>trajWildcard</strong> (<em>str</em>) – Templetized path to trajectory files”</li>
+<li><strong>reportWildcard</strong> (<em>str</em>) – Templetized path to report files”</li>
+<li><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with the pdb snapshots of the representatives structures</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the pdb snapshots of the representatives structures</p>
 </td>
 </tr>
 </tbody>
@@ -531,15 +531,15 @@ to the available processors</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>numberOfSnapshots</strong> (<em>int</em>) &#8211; Number of complexes to write</li>
-<li><strong>tmpInitialStructuresTemplate</strong> (<em>str</em>) &#8211; Template with the name of the initial strutctures</li>
-<li><strong>iteration</strong> (<em>int</em>) &#8211; Epoch number</li>
-<li><strong>equilibration</strong> (<em>bool</em>) &#8211; Flag to mark whether the complexes are part of an
+<li><strong>numberOfSnapshots</strong> (<em>int</em>) – Number of complexes to write</li>
+<li><strong>tmpInitialStructuresTemplate</strong> (<em>str</em>) – Template with the name of the initial strutctures</li>
+<li><strong>iteration</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>equilibration</strong> (<em>bool</em>) – Flag to mark whether the complexes are part of an
 equilibration run</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; jsonString to be substituted in PELE control file</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – jsonString to be substituted in PELE control file</p>
 </td>
 </tr>
 </tbody>
@@ -549,7 +549,7 @@ equilibration run</li>
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.createSymbolicLinks">
 <code class="descname">createSymbolicLinks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.createSymbolicLinks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.createSymbolicLinks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create symbolic links to Data and Documents folder if they don&#8217;t exist</p>
+<dd><p>Create symbolic links to Data and Documents folder if they don’t exist</p>
 </dd></dl>
 
 <dl class="method">
@@ -563,17 +563,17 @@ structures to start the simulation</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>initialStructures</strong> (<em>list of str</em>) &#8211; Name of the initial structures to copy</li>
-<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Contains outputPath-related constants</li>
-<li><strong>reportBaseFilename</strong> (<em>str</em>) &#8211; Name of the file that contains the metrics of the snapshots to cluster</li>
-<li><strong>outputPath</strong> (<em>str</em>) &#8211; Path where trajectories are found</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the system pdb</li>
-<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) &#8211; Object to synchronize the possibly multiple processes</li>
-<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) &#8211; Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>initialStructures</strong> (<em>list of str</em>) – Name of the initial structures to copy</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>reportBaseFilename</strong> (<em>str</em>) – Name of the file that contains the metrics of the snapshots to cluster</li>
+<li><strong>outputPath</strong> (<em>str</em>) – Path where trajectories are found</li>
+<li><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the system pdb</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211;  List with initial structures</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list –  List with initial structures</p>
 </td>
 </tr>
 </tbody>
@@ -589,9 +589,9 @@ file for equilibration runs</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>peleControlFileDict</strong> (<em>dict</em>) &#8211; Dictionary with pele control file options</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>peleControlFileDict</strong> (<em>dict</em>) – Dictionary with pele control file options</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict &#8211; Dictionary with pele control file options</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict – Dictionary with pele control file options</td>
 </tr>
 </tbody>
 </table>
@@ -605,9 +605,9 @@ file for equilibration runs</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>JSONdict</strong> (<em>dict</em>) &#8211; Dictionary containing a parsed PELE control file</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>JSONdict</strong> (<em>dict</em>) – Dictionary containing a parsed PELE control file</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; Column index of the similarity metric</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – Column index of the similarity metric</td>
 </tr>
 </tbody>
 </table>
@@ -623,14 +623,14 @@ the cluster with max SASA</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>outputFolder</strong> (<em>str</em>) &#8211; Folder to the trajectories</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; Name of the ligand in the pdb</li>
-<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) &#8211; Topology object containing the set of topologies needed for the simulation</li>
-<li><strong>epoch</strong> (<em>int</em>) &#8211; Epoch of the trajectories to analyse</li>
+<li><strong>outputFolder</strong> (<em>str</em>) – Folder to the trajectories</li>
+<li><strong>resname</strong> (<em>str</em>) – Name of the ligand in the pdb</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectories to analyse</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns str:</th><td class="field-body"><p class="first last">&#8211; string to be substitued in PELE control file</p>
+<tr class="field-even field"><th class="field-name">Returns str:</th><td class="field-body"><p class="first last">– string to be substitued in PELE control file</p>
 </td>
 </tr>
 </tbody>
@@ -651,7 +651,7 @@ the cluster with max SASA</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>runningControlFile</strong> (<em>str</em>) &#8211; Path of the control file to run</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>runningControlFile</strong> (<em>str</em>) – Path of the control file to run</td>
 </tr>
 </tbody>
 </table>
@@ -666,12 +666,12 @@ the cluster with max SASA</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>epoch</strong> (<em>int</em>) &#8211; number of the epoch</li>
-<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Contains outputPath-related constants</li>
-<li><strong>initialStructures</strong> (<em>str</em>) &#8211; Name of the initial structures to copy</li>
-<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) &#8211; Topology object containing the set of topologies needed for the simulation</li>
-<li><strong>reportFileName</strong> (<em>str</em>) &#8211; Name of the report file</li>
-<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) &#8211; Object to synchronize the possibly multiple processes</li>
+<li><strong>epoch</strong> (<em>int</em>) – number of the epoch</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>initialStructures</strong> (<em>str</em>) – Name of the initial structures to copy</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>reportFileName</strong> (<em>str</em>) – Name of the report file</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
 </ul>
 </td>
 </tr>
@@ -689,17 +689,17 @@ run</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>nTrajs</strong> (<em>int</em>) &#8211; Number of trajectories</li>
-<li><strong>similarityColumn</strong> (<em>int</em>) &#8211; Column number of the similarity metric
+<li><strong>nTrajs</strong> (<em>int</em>) – Number of trajectories</li>
+<li><strong>similarityColumn</strong> (<em>int</em>) – Column number of the similarity metric
 (RMSD or distance)</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; Name of the ligand in the pdb</li>
-<li><strong>trajWildcard</strong> (<em>str</em>) &#8211; Templetized path to trajectory files&#8221;</li>
-<li><strong>reportWildcard</strong> (<em>str</em>) &#8211; Templetized path to report files&#8221;</li>
-<li><strong>topology</strong> (<em>list</em>) &#8211; Topology for non-pdb trajectories</li>
+<li><strong>resname</strong> (<em>str</em>) – Name of the ligand in the pdb</li>
+<li><strong>trajWildcard</strong> (<em>str</em>) – Templetized path to trajectory files”</li>
+<li><strong>reportWildcard</strong> (<em>str</em>) – Templetized path to report files”</li>
+<li><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with the pdb snapshots of the representatives structures</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the pdb snapshots of the representatives structures</p>
 </td>
 </tr>
 </tbody>
@@ -716,13 +716,13 @@ initial structure from the equilibration run</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>nTrajs</strong> (<em>int</em>) &#8211; Number of trajectories</li>
-<li><strong>trajWildcard</strong> (<em>str</em>) &#8211; Templetized path to trajectory files&#8221;</li>
-<li><strong>topology</strong> (<em>list</em>) &#8211; Topology for non-pdb trajectories</li>
+<li><strong>nTrajs</strong> (<em>int</em>) – Number of trajectories</li>
+<li><strong>trajWildcard</strong> (<em>str</em>) – Templetized path to trajectory files”</li>
+<li><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; List with the pdb snapshots of the representatives structures</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the pdb snapshots of the representatives structures</p>
 </td>
 </tr>
 </tbody>
@@ -739,12 +739,12 @@ mass of the first initial structure provided</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>initialStructuresAsString</strong> (<em>str</em>) &#8211; String containing the files of the initial structures</li>
-<li><strong>resname</strong> (<em>str</em>) &#8211; Residue name of the ligand in the system pdb</li>
+<li><strong>initialStructuresAsString</strong> (<em>str</em>) – String containing the files of the initial structures</li>
+<li><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the system pdb</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns str:</th><td class="field-body"><p class="first last">&#8211; string to be substitued in PELE control file</p>
+<tr class="field-even field"><th class="field-name">Returns str:</th><td class="field-body"><p class="first last">– string to be substitued in PELE control file</p>
 </td>
 </tr>
 </tbody>
@@ -764,10 +764,10 @@ mass of the first initial structure provided</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>simulationRunnerBlock</strong> (<em>dict</em>) &#8211; Block of the control file
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>simulationRunnerBlock</strong> (<em>dict</em>) – Block of the control file
 corresponding to the simulation step</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a> &#8211; SimulationRunner object
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a> – SimulationRunner object
 selected</td>
 </tr>
 </tbody>
@@ -792,9 +792,9 @@ selected</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) &#8211; Clustering object</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if the exit condition is met</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool – True if the exit condition is met</td>
 </tr>
 </tbody>
 </table>
@@ -808,9 +808,9 @@ selected</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch</strong> (<em>int</em>) &#8211; Epoch number</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch</strong> (<em>int</em>) – Epoch number</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if the simulations where interrupted</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool – True if the simulations where interrupted</td>
 </tr>
 </tbody>
 </table>
@@ -825,7 +825,7 @@ before finishing</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch</strong> (<em>int</em>) &#8211; Epoch number</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch</strong> (<em>int</em>) – Epoch number</td>
 </tr>
 </tbody>
 </table>
@@ -840,15 +840,15 @@ before finishing</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>numberOfSnapshots</strong> (<em>int</em>) &#8211; Number of complexes to write</li>
-<li><strong>tmpInitialStructuresTemplate</strong> (<em>str</em>) &#8211; Template with the name of the initial strutctures</li>
-<li><strong>iteration</strong> (<em>int</em>) &#8211; Epoch number</li>
-<li><strong>equilibration</strong> (<em>bool</em>) &#8211; Flag to mark wether the complexes are part of an
+<li><strong>numberOfSnapshots</strong> (<em>int</em>) – Number of complexes to write</li>
+<li><strong>tmpInitialStructuresTemplate</strong> (<em>str</em>) – Template with the name of the initial strutctures</li>
+<li><strong>iteration</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>equilibration</strong> (<em>bool</em>) – Flag to mark wether the complexes are part of an
 equilibration run</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str &#8211; jsonString to be substituted in PELE control file</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – jsonString to be substituted in PELE control file</p>
 </td>
 </tr>
 </tbody>
@@ -875,7 +875,7 @@ equilibration run</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if an exit condition is set</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool – True if an exit condition is set</td>
 </tr>
 </tbody>
 </table>
@@ -890,10 +890,10 @@ equilibration run</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>workingControlFilename</strong> (<em>str</em>) &#8211; Name of the template control file</li>
-<li><strong>dictionary</strong> (<em>dict</em>) &#8211; Dictonary containing the parameters to substitute
+<li><strong>workingControlFilename</strong> (<em>str</em>) – Name of the template control file</li>
+<li><strong>dictionary</strong> (<em>dict</em>) – Dictonary containing the parameters to substitute
 in the control file</li>
-<li><strong>inputFileTemplate</strong> (<em>str</em>) &#8211; Template control file</li>
+<li><strong>inputFileTemplate</strong> (<em>str</em>) – Template control file</li>
 </ul>
 </td>
 </tr>
@@ -911,9 +911,9 @@ provided in the control file</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>epoch</strong> (<em>int</em>) &#8211; Epoch number</li>
-<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Object that has as attributes constant related to the outputPath that will be used to create the working control file</li>
-<li><strong>peleControlFileDictionary</strong> (<em>dict</em>) &#8211; Dictonary containing the values of the parameters to substitute in the control file</li>
+<li><strong>epoch</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Object that has as attributes constant related to the outputPath that will be used to create the working control file</li>
+<li><strong>peleControlFileDictionary</strong> (<em>dict</em>) – Dictonary containing the values of the parameters to substitute in the control file</li>
 </ul>
 </td>
 </tr>
@@ -929,7 +929,7 @@ provided in the control file</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) &#8211; Name of the folder where to write the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) – Name of the folder where to write the
 processorsToClusterMapping</td>
 </tr>
 </tbody>
@@ -956,7 +956,7 @@ as the one provided in the spawning parameters</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>spawningReportName</strong> (<em>str</em>) &#8211; Name of the report file provided in the spawning parameters</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>spawningReportName</strong> (<em>str</em>) – Name of the report file provided in the spawning parameters</td>
 </tr>
 </tbody>
 </table>
@@ -971,7 +971,7 @@ snapshot from which the trajectories will start in the next iteration</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mapping</strong> (<em>list</em>) &#8211; List with the snapshot from which the trajectories
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mapping</strong> (<em>list</em>) – List with the snapshot from which the trajectories
 will start in the next iteration</td>
 </tr>
 </tbody>
@@ -986,7 +986,7 @@ will start in the next iteration</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) &#8211; Name of the folder where to write the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) – Name of the folder where to write the
 processorsToClusterMapping</td>
 </tr>
 </tbody>
@@ -1020,12 +1020,12 @@ processorsToClusterMapping</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>epoch</strong> (<em>int</em>) &#8211; number of the epoch</li>
-<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) &#8211; Contains outputPath-related constants</li>
-<li><strong>initialStructures</strong> (<em>str</em>) &#8211; Name of the initial structures to copy</li>
-<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) &#8211; Topology object containing the set of topologies needed for the simulation</li>
-<li><strong>reportFileName</strong> (<em>str</em>) &#8211; Name of the report file</li>
-<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) &#8211; Object to synchronize the possibly multiple processes</li>
+<li><strong>epoch</strong> (<em>int</em>) – number of the epoch</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>initialStructures</strong> (<em>str</em>) – Name of the initial structures to copy</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+<li><strong>reportFileName</strong> (<em>str</em>) – Name of the report file</li>
+<li><strong>processManager</strong> (<code class="xref py py-class docutils literal"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
 </ul>
 </td>
 </tr>

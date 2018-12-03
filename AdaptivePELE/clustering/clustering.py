@@ -1680,7 +1680,7 @@ class MSMClustering(Clustering):
         trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, base_traj_names))
         trajectories = [utilities.loadtxtfile(f)[:, 1:] for f in trajectory_files]
 
-        centersInfo = getCentersInfo(self.pyemma_clustering, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)
+        centersInfo = getCentersInfo(self.pyemma_clustering.clusterCenters, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)
         centersInfo_processed = []
         for cluster in centersInfo:
             epoch_num, traj_num, snapshot_num = centersInfo[cluster]["structure"]

@@ -87,7 +87,7 @@
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../Problems.html">Frequently Asked Questions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE &#8211; Package Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
 </ul>
 
@@ -147,12 +147,18 @@
 <span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="k">as</span> <span class="nn">optim</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="k">import</span> <span class="n">lu</span><span class="p">,</span> <span class="n">solve</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">constants</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.spawning</span> <span class="k">import</span> <span class="n">spawningTypes</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.spawning</span> <span class="k">import</span> <span class="n">densitycalculator</span>
-<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># Check if the basestring type if available, this will fail in python3</span>
+    <span class="n">basestring</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">basestring</span> <span class="o">=</span> <span class="nb">str</span>
 <span class="n">PYEMMA</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pyemma.msm</span> <span class="k">as</span> <span class="nn">msm</span>
@@ -288,6 +294,8 @@
             <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">ProbabilityMSMCalculator</span><span class="p">(</span><span class="n">spawningParams</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">spawningTypeString</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">MetastabilityMSMCalculator</span><span class="p">:</span>
             <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">MetastabilityMSMCalculator</span><span class="p">(</span><span class="n">spawningParams</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">spawningTypeString</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">StringSpawningTypes</span><span class="o">.</span><span class="n">UncertaintyMSMCalculator</span><span class="p">:</span>
+            <span class="n">spawningCalculator</span> <span class="o">=</span> <span class="n">UncertaintyMSMCalculator</span><span class="p">(</span><span class="n">spawningParams</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Unknown spawning type! Choices are: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPE_TO_STRING_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
         <span class="k">return</span> <span class="n">spawningCalculator</span></div></div>
@@ -389,12 +397,12 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;BaseClass&quot;</span>  <span class="c1"># change for abstract attribute</span>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="SpawningCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDivide</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SpawningCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.calculate">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDivide</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="SpawningCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SpawningCalculator.log"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.log">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Log spawning information</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1339,6 +1347,64 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">metastability</span> <span class="o">/=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">metastability</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">divideTrajAccordingToWeights</span><span class="p">(</span><span class="n">metastability</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="UncertaintyMSMCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.UncertaintyMSMCalculator">[docs]</a><span class="k">class</span> <span class="nc">UncertaintyMSMCalculator</span><span class="p">(</span><span class="n">MSMCalculator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="n">MSMCalculator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">UncertaintyMSMCalculator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
+
+<div class="viewcode-block" id="UncertaintyMSMCalculator.calculate_q"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.UncertaintyMSMCalculator.calculate_q">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_q</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">nclusters</span><span class="p">):</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">nclusters</span><span class="p">)</span>
+        <span class="n">U_counts</span> <span class="o">=</span> <span class="n">counts</span> <span class="o">+</span> <span class="n">alpha</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">U_counts</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">U_counts</span> <span class="o">/</span> <span class="n">w</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">eigvalues</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+        <span class="n">eigvalues</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">eigvalues</span> <span class="o">=</span> <span class="n">eigvalues</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ek</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nclusters</span><span class="p">)</span>
+        <span class="n">ek</span><span class="p">[</span><span class="n">nclusters</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">P</span> <span class="o">-</span> <span class="n">eigvalues</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nclusters</span><span class="p">)</span>
+        <span class="n">perm</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">lu</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">ek</span><span class="p">)</span>
+        <span class="n">xa</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">U</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="n">U</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">xa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">xa</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">+</span><span class="p">[</span><span class="mf">1.0</span><span class="p">])</span>
+        <span class="n">norm_factor</span> <span class="o">=</span> <span class="n">xa</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">perm</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">si</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">xa</span><span class="p">,</span> <span class="n">perm</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">/</span><span class="n">norm_factor</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nclusters</span><span class="p">):</span>
+            <span class="n">q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">si</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">si</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">w</span></div>
+
+<div class="viewcode-block" id="UncertaintyMSMCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.UncertaintyMSMCalculator.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">,</span> <span class="n">currentEpoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the degeneracy of the clusters</span>
+
+<span class="sd">            :param clusters: Existing clusters</span>
+<span class="sd">            :type clusters: :py:class:`.Clusters`</span>
+<span class="sd">            :param trajToDistribute: Number of processors to distribute</span>
+<span class="sd">            :type trajToDistribute: int</span>
+<span class="sd">            :param currentEpoch: Current iteration number</span>
+<span class="sd">            :type currentEpoch: int</span>
+
+<span class="sd">            :returns: list -- List containing the degeneracy of the clusters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># estimate MSM from clustering object</span>
+        <span class="n">msm_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimateMSM</span><span class="p">(</span><span class="n">clusters</span><span class="o">.</span><span class="n">dtrajs</span><span class="p">)</span>
+        <span class="n">nclusters</span> <span class="o">=</span> <span class="n">msm_object</span><span class="o">.</span><span class="n">nstates_full</span>
+        <span class="c1"># distribute seeds using the MSM</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">msm_object</span><span class="o">.</span><span class="n">count_matrix_full</span>
+        <span class="n">q</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_q</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">nclusters</span><span class="p">)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span><span class="o">/</span><span class="p">(</span><span class="n">w</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">-</span><span class="p">(</span><span class="n">q</span><span class="o">/</span><span class="p">(</span><span class="n">w</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="n">trajToDistribute</span><span class="p">))</span>
+        <span class="n">score</span> <span class="o">/=</span> <span class="n">score</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">sortedProbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">score</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">score</span><span class="p">[</span><span class="n">sortedProbs</span><span class="p">[</span><span class="n">trajToDistribute</span><span class="p">:]]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">score</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">8</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nclusters</span><span class="p">)</span><span class="o">/</span><span class="n">nclusters</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">/=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">divideTrajAccordingToWeights</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">trajToDistribute</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
