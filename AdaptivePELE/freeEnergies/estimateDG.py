@@ -6,10 +6,11 @@ import shutil
 import glob
 import sys
 import matplotlib.pyplot as plt
-from AdaptivePELE.freeEnergies import checkDetailedBalance
+from AdaptivePELE.utilities import utilities
+from AdaptivePELE.freeEnergies import cluster
 from AdaptivePELE.freeEnergies import ownBuildMSM
 from AdaptivePELE.freeEnergies import computeDeltaG
-from AdaptivePELE.freeEnergies import cluster
+from AdaptivePELE.freeEnergies import checkDetailedBalance
 
 
 class Parameters:
@@ -118,7 +119,7 @@ def copyWorkingTrajectories(fileWildcard, length=None, ntrajs=None, bootstrap=Tr
     for i, trajFile in enumerate(trajFiles):
         dst = __getDstName(bootstrap, i, trajFile)
         writenFiles.append(dst)
-        traj = np.loadtxt(trajFile)
+        traj = utilities.loadtxtfile(trajFile)
         if length is None:
             traj_len = len(traj)  # so that later eveything is copied
         else:
@@ -205,9 +206,9 @@ def getCentersInfo(cl, trajs, files, dtrajs):
 
 def getRepresentativePDBs(filesWildcard, run):
     files = glob.glob(filesWildcard)
-    trajs = [np.loadtxt(f)[:, 1:] for f in files]
+    trajs = [utilities.loadtxtfile(f)[:, 1:] for f in files]
     cl = cluster.Cluster(0, "", "")
-    cl.clusterCenters = np.loadtxt(cl.clusterCentersFile)
+    cl.clusterCenters = utilities.loadtxtfile(cl.clusterCentersFile)
     dtrajs = cl.assignNewTrajectories(trajs)
     numClusters = cl.clusterCenters.shape[0]
     centersInfo = getCentersInfo(cl, trajs, files, dtrajs)

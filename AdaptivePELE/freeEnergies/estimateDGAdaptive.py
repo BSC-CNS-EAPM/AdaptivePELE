@@ -1,8 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-import glob
 import os
-from AdaptivePELE.freeEnergies import estimateDG
+import glob
 import numpy as np
+from six import reraise as raise_
+from AdaptivePELE.freeEnergies import estimateDG
 
 
 def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1, nruns=10, lagtimes=[1, 10, 25, 50, 100, 250, 400, 500, 600, 1000]):
