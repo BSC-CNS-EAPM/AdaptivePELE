@@ -118,30 +118,29 @@ def buildRevTransitionMatrix(C):
     return T
 
 
-def runSimulation(P, steps, startingPosition):
-    n = P.shape[0]
+def runSimulation(P, steps, startingPosition, states):
     position = startingPosition
-
     traj = np.zeros(steps)
     traj[0] = position
-    for step in range(steps):
-        prob = P[position]
-        position = np.random.choice(range(n), p=prob)
+    for step in range(1, steps):
+        position = np.random.choice(states, p=P[position])
         traj[step] = position
-
     return traj
 
 
 def runSetOfSimulations(numberOfSimulations, P, steps):
     trajs = []
+    states = np.array(range(P.shape[0]))
+    cumul = P.cumsum(axis=1)
     for sim in range(numberOfSimulations):
-        if sim % 50 == 0:
+        if sim % 100 == 0:
             print("Simulation", sim)
 
         startingPosition = sim % P.shape[0]
-        traj = runSimulation(P, steps, startingPosition)
+        traj = runSimulation(P, steps, startingPosition, states)
+        # traj = utils.runSimulation(cumul, steps, startingPosition, states)
         trajs.append(traj)
-    return trajs
+    return np.array(trajs)
 
 # def estimateCountMatrix(trajectories, n, tau):
 #     counts = np.zeros((n, n))
@@ -198,8 +197,8 @@ def getSortedEigen(T):
     return eigenvals[sortedIndices], eigenvectors[:, sortedIndices]
 
 
-def getSortedEigenFromDtrajs(tau, trajs, n):
-    estimatedT = estimateTransitionMatrix(trajs, n, tau)
+def getSortedEigenFromDtrajs(tau, trajs, n, symm=True):
+    estimatedT = estimateTransitionMatrix(trajs, n, tau, symm=symm)
     # T.T*pi = pi; or pi*T = pi, where pi is col and row array respectively
     return getSortedEigen(estimatedT)
 
@@ -228,11 +227,14 @@ def getGoldenTForGivenTau(T, tau):
 
 def plotEigenvalEvolutionInTau(trajs, taus, n):
     allEigenvals = []
+    probabilities = []
     for i, tau in enumerate(taus):
-        eigenvals, _ = getSortedEigenFromDtrajs(tau, trajs, n)
+        eigenvals, eigenvectors = getSortedEigenFromDtrajs(tau, trajs, n, symm=True)
         allEigenvals.append(eigenvals)
+        probabilities.append(getStationaryDistr(eigenvectors[:, 0]))
 
-    allEigenvals = np.array(allEigenvals)  # rework
+    allEigenvals = np.array(allEigenvals).real  # rework
+    probabilities = np.array(probabilities)
 
     fig = plt.figure(1)
     ax = fig.add_subplot(1, 1, 1)
@@ -240,9 +242,19 @@ def plotEigenvalEvolutionInTau(trajs, taus, n):
     valuesToPlot = n-1
     for i in range(1, valuesToPlot):
         ax.plot(taus, allEigenvals[:, i])
+    plt.ylabel("Eigenvalues")
+    plt.xlabel("Lagtime")
     plt.figure(2)
     for i in range(1, valuesToPlot):
         plt.plot(taus, -taus/np.log(allEigenvals[:, i]))
+    plt.ylabel("Implied timescales")
+    plt.xlabel("Lagtime")
+    plt.figure(3)
+    for i in range(n):
+        plt.plot(taus, probabilities[:, i])
+    print(probabilities[-1])
+    plt.xlabel("Lagtime")
+    plt.ylabel("Probability")
 
 
 def main():

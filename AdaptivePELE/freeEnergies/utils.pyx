@@ -1,10 +1,10 @@
 import numpy as np
 from io import open
 cimport cython
-from cpython cimport array
-import array
 cimport numpy as np
 from libc.math cimport sqrt
+from libc.stdlib cimport rand, RAND_MAX
+
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -144,3 +144,40 @@ cpdef calculateAutoCorrelation(list lagtimes, list dtrajs, int nclusters, int nL
             autoCorr[i, j] /= N_f
             autoCorr[i, j] /= var[i, j]
     return np.array(autoCorr)
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef double[:] runSimulation(double[:, :] P, int steps, int startingPosition, long[:] states):
+    cdef Py_ssize_t n = P.shape[0]
+    cdef int position = startingPosition
+    cdef Py_ssize_t step
+
+    cdef double[:] traj = np.zeros(steps)
+    traj[0] = position
+    for step in range(1, steps):
+        position = sample(states, P[position])
+        traj[step] = position
+
+    return traj
+
+cpdef int sample(long[:] states, double[:] prob):
+    """ Method obtained from http://keithschwarz.com/darts-dice-coins/ named roulette wheel selection"""
+    cdef double rnd = rand() / (RAND_MAX + 1.0)
+    return binary_search(rnd, prob)
+
+cdef int binary_search(double rnd, double[:] prob):
+    cdef Py_ssize_t l = 0
+    cdef Py_ssize_t r = prob.shape[0]-1
+    cdef int mid
+    while l < r:
+        mid =  (l+r) / 2
+        if prob[mid] < rnd:
+            l = mid + 1
+        else:
+            r = mid - 1
+    if prob[l] < rnd:
+        # return the first element that is larger than the random number
+        return l + 1
+    else:
+        return l
