@@ -1330,6 +1330,8 @@ class RunnerBuilder:
             params.timeStep = paramsBlock.get(blockNames.SimulationParams.timeStep, 2)
             params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
+            if params.boxCenter is not None and params.format != "xtc":
+                raise utilities.ImproperParameterValueException("When using a spherical box for the ligand only xtc format is supported")
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
             params.forcefield = paramsBlock.get(blockNames.SimulationParams.forcefield, "ff99SB")
