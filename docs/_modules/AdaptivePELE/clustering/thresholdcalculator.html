@@ -200,12 +200,12 @@
         <span class="k">pass</span>
 
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ThresholdCalculatorConstant"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculatorConstant">[docs]</a><span class="k">class</span> <span class="nc">ThresholdCalculatorConstant</span><span class="p">(</span><span class="n">ThresholdCalculator</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-        <span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">ThresholdCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">thresholdcalculatortypes</span><span class="o">.</span><span class="n">THRESHOLD_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">constant</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 
@@ -235,7 +235,7 @@
 
 <div class="viewcode-block" id="ThresholdCalculatorHeaviside"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.thresholdcalculator.ThresholdCalculatorHeaviside">[docs]</a><span class="k">class</span> <span class="nc">ThresholdCalculatorHeaviside</span><span class="p">(</span><span class="n">ThresholdCalculator</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conditions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">ThresholdCalculator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">ThresholdCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">thresholdcalculatortypes</span><span class="o">.</span><span class="n">THRESHOLD_CALCULATOR_TYPES</span><span class="o">.</span><span class="n">heaviside</span>
         <span class="k">if</span> <span class="n">conditions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">conditions</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>

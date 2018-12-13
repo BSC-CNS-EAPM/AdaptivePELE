@@ -171,7 +171,8 @@ Optionally, you can also use the following parameters:
   substitute in the PELE control file
 * **modeMovingBox** (*string*, default=None, possible values={*unbinding*, *binding*}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation
 * **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center
-* **boxRadius** (*int*, default=20): Value of the simulation box radius
+* **boxRadius** (*int*, default=20): Value of the simulation box radius (in
+  angstroms)
 * **runEquilibration** (*bool*, default=False): Whether to run a short
   equilibration or burn-in simulation for each initial structure  
 * **equilibrationLength** (*int*, default=50): Number of steps for the
@@ -218,9 +219,8 @@ Optionally, you can also use the following parameters:
   equilibration run (default corresponds to 1 ns)
 * **timeStep** (*float*, default=2): Value of the time step for the integration
   (in femtoseconds)
-* **boxRadius** (*float*, default=None): Distance from the protein mass center in which the ligand is allowed to move. If specified, a restrain will be applied between both mass centers when the distance between them surpasses the **boxRadius**. (in angstroms)
-  (**Note**: When defining this parameter is important to take into account the distance between the binding site and the mass center of the protein.) 
-
+* **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center
+* **boxRadius** (*float*, default=20): Radius of the spherical box the ligand will be restrained to (in angstroms). Note that when using the spherical box restraint only xtc trajectories are supported.
 * **ligandCharge** (*integer*, default=0): Charge of the ligand
 * **waterBoxSize** (*float*, default=8): Distance of the edge of the solvation
   box from the closest atom (in angstroms)

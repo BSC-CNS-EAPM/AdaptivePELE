@@ -173,7 +173,7 @@
 
 
 <span class="k">class</span> <span class="nc">InitialStructuresError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="n">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="n">__module__</span>
+    <span class="vm">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="vm">__module__</span>
 
 
 <div class="viewcode-block" id="cleanProcessesFiles"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.cleanProcessesFiles">[docs]</a><span class="k">def</span> <span class="nf">cleanProcessesFiles</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
@@ -539,7 +539,7 @@
     <span class="k">if</span> <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">rmsd</span> <span class="ow">or</span>\
        <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMap</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">thresholdCalculator</span> <span class="o">!=</span> <span class="n">newClusteringMethod</span><span class="o">.</span><span class="n">thresholdCalculator</span> <span class="ow">or</span>\
-                <span class="nb">abs</span><span class="p">(</span><span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span> <span class="o">-</span> <span class="n">newClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span>
+                <span class="nb">abs</span><span class="p">(</span><span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span> <span class="o">-</span> <span class="n">newClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-7</span>
 
     <span class="c1"># Check 3: Change of similarity Evaluator in contactMap clustering</span>
     <span class="k">if</span> <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMap</span><span class="p">:</span>
@@ -925,7 +925,7 @@
                     <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Simulation exit condition not met at iteration </span><span class="si">%d</span><span class="s2">, continuing...&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
         <span class="n">processManager</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span></div>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parseArgs</span><span class="p">()</span>
     <span class="n">main</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">controlFile</span><span class="p">)</span>
 </pre></div>
