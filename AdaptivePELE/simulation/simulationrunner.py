@@ -1328,7 +1328,8 @@ class RunnerBuilder:
             if params.format not in constants.md_supported_formats:
                 raise utilities.ImproperParameterValueException("Not supported %s format specified, supported formats are %s" % (params.format, constants.formats_md_string))
             params.timeStep = paramsBlock.get(blockNames.SimulationParams.timeStep, 2)
-            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, None)
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
+            params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
             params.forcefield = paramsBlock.get(blockNames.SimulationParams.forcefield, "ff99SB")
@@ -1341,6 +1342,8 @@ class RunnerBuilder:
             params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
             params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
+            if params.ligandName is None and params.boxCenter is not None:
+                raise utilities.ImproperParameterValueException("Ligand name is necessary to establish the box")
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
