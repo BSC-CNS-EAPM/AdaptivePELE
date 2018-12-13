@@ -425,7 +425,10 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     :type restart: bool
 
     """
+    # this number gives the number of the subprocess in the given node
     deviceIndex = workerNumber
+    # this one gives the number of the subprocess in the overall simulation (i.e
+    # the trajectory file number)
     workerNumber += replica_id*trajsPerReplica + 1
     prmtop, pdb = equilibrationFiles
     prmtop = app.AmberPrmtopFile(prmtop)
@@ -443,32 +446,25 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(deviceIndex, parameters.devicesPerTrajectory, devicesPerReplica=parameters.maxDevicesPerReplica), "UseCpuPme": "false"}
     else:
         platformProperties = {}
+    if parameters.boxCenter:
+        dummy = addDummyAtomToTopology(prmtop)
     system = prmtop.createSystem(nonbondedMethod=app.PME,
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                  constraints=app.HBonds, removeCMMotion=True)
+    if parameters.boxCenter:
+        addDummyAtomToSystem(system, prmtop.topology, pdb.positions, parameters.ligandName, dummy, parameters.boxCenter, deviceIndex)
+
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     system.addForce(mm.MonteCarloBarostat(1 * unit.bar, parameters.Temperature * unit.kelvin))
-    if parameters.boxRadius:
-        group_ligand = []
-        group_protein = []
-        for atom in prmtop.topology.atoms():
-            if atom.residue.name == ligandName:
-                group_ligand.append(atom.index)
-            elif atom.residue.name not in ("HOH", "Cl-", "Na+"):
-                group_protein.append(atom.index)
-        # Harmonic flat-bottom restrain for the ligand
-        group_ligand = np.array(group_ligand)
-        group_protein = np.array(group_protein)
-        force = mm.CustomCentroidBondForce(2, 'step(distance(g1,g2)-r) * (k/2) * (distance(g1,g2)-r)^2')
-        force.addGlobalParameter("k", 5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2)
-        force.addGlobalParameter("r", parameters.boxRadius * unit.angstroms)
-        force.addGroup(group_protein)
-        force.addGroup(group_ligand)
-        force.addBond([0, 1], []) # the first parameter is the list of indexes of the groups, the second is the list of perbondparameters
-        system.addForce(force)
+
+    if parameters.boxCenter:
+        addLigandBox(prmtop.topology, system, parameters.ligandName, dummy, parameters.boxRadius, deviceIndex)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
-    simulation.context.setPositions(pdb.positions)
+    if parameters.boxCenter:
+        simulation.context.setPositions(addDummyPositions(pdb.positions, parameters.boxCenter))
+    else:
+        simulation.context.setPositions(pdb.positions)
 
     if restart:
         with open(str(checkpoint), 'rb') as check:
@@ -531,3 +527,52 @@ def getDeviceIndexStr(deviceIndex, devicesPerTraj, devicesPerReplica=None):
     else:
         devices = range(deviceIndex, deviceIndex+devicesPerTraj)
     return ",".join(str(x) for x in devices)
+
+
+def addDummyAtomToTopology(model, name="EP", resname="DUM", element="H"):
+    chain_dummy = model.topology.addChain()
+    res_dummy = model.topology.addResidue(resname, chain_dummy)
+    atom_dummy = model.topology.addAtom(name, app.element.Element.getBySymbol(element), res_dummy)
+    dummy = atom_dummy.index
+    return dummy
+
+
+def addDummyAtomToSystem(system, topology, positions, resname, dummy, center, worker):
+    protein_CAs = []
+    for atom in topology.atoms():
+        if atom.residue.name not in ("HOH", "Cl-", "Na+", resname) and atom.name == "CA":
+            if worker == 0:
+                utilities.print_unbuffered("Added bond between dummy atom and protein atom", atom.residue.name, atom.residue.index+1, atom.name, atom.index)
+            protein_CAs.append(atom.index)
+            break
+    for protein_particle in protein_CAs:
+        distance_constraint = np.linalg.norm(np.array(center)-positions[protein_particle].value_in_unit(unit.angstroms))
+        force_dummy = mm.HarmonicBondForce()
+        force_dummy.addBond(dummy, protein_particle, distance_constraint/10.0, 0.2*unit.kilocalories_per_mole/unit.angstroms**2)
+        system.addForce(force_dummy)
+    dummy_system = system.addParticle(0)
+    assert dummy_system == dummy
+    for forces in system.getForces():
+        if isinstance(forces, mm.NonbondedForce):
+            forces.addParticle(0 * unit.elementary_charge, 1 * unit.nanometer, 0 * unit.kilojoule_per_mole)
+
+
+def addLigandBox(topology, system, resname, dummy, radius, worker):
+    for atom in topology.atoms():
+        if atom.residue.name == resname and atom.element.symbol != "H":
+            if worker == 0:
+                utilities.print_unbuffered("Ligand atom selected to check distance to the box", atom.residue.name, atom.name, atom.index)
+            ligand_atom = atom.index
+            break
+    forceFB = mm.CustomBondForce('step(r-r0)*(k/2) * (r-r0)^2')
+    forceFB.addPerBondParameter("k")
+    forceFB.addPerBondParameter("r0")
+    forceFB.addBond(dummy, ligand_atom, [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, radius*unit.angstroms])
+    system.addForce(forceFB)
+
+
+def addDummyPositions(pos, center):
+    pos2 = pos.in_units_of(unit.nanometers)
+    quant = unit.quantity.Quantity(value=tuple(center), unit=unit.angstrom)
+    pos2.append(quant.in_units_of(unit.nanometers))
+    return pos2
