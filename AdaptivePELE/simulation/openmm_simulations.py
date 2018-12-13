@@ -463,9 +463,10 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     if parameters.boxCenter:
         simulation.context.setPositions(addDummyPositions(pdb.positions, parameters.boxCenter))
+        atomSubset = [i for i in range(system.getNumParticles()) if i != dummy]
     else:
         simulation.context.setPositions(pdb.positions)
-
+        atomSubset = None
     if restart:
         with open(str(checkpoint), 'rb') as check:
             simulation.context.loadCheckpoint(check.read())
@@ -475,7 +476,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         stateData = open(str(stateReporter), "w")
 
     if parameters.format == "xtc":
-        simulation.reporters.append(XTCReporter(str(trajName), parameters.reporterFreq, append=restart))
+        simulation.reporters.append(XTCReporter(str(trajName), parameters.reporterFreq, append=restart, atomSubset=atomSubset))
     elif parameters.format == "dcd":
         simulation.reporters.append(app.DCDReporter(str(trajName), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
 
