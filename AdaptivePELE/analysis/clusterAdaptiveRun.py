@@ -30,8 +30,9 @@ def parseArgs():
     parser.add_argument('--png', action="store_true", help="Save plot in png format")
     parser.add_argument('--CA', action="store_true", help="Cluster by CA")
     parser.add_argument('--sidechains', action="store_true", help="Cluster by sidechain RMSD")
+    parser.add_argument('--restart', action="store_true", help="Restart analysis from previous clusters")
     args = parser.parse_args()
-    return args.nClusters, args.crit1, args.crit2, args.ligand_resname, args.atomId, args.o, args.top, args.cpus, args.report, args.traj, args.use_pdb, args.png, args.CA, args.sidechains
+    return args.nClusters, args.crit1, args.crit2, args.ligand_resname, args.atomId, args.o, args.top, args.cpus, args.report, args.traj, args.use_pdb, args.png, args.CA, args.sidechains, args.restart
 
 
 class cd:
@@ -125,7 +126,11 @@ def get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, cluster
 def get_metric(criteria, epoch_num, traj_num, snap_num, report):
     report = os.path.join(str(epoch_num), "{}{}".format(report, traj_num))
     report_data = pd.read_csv(report, sep='    ', engine='python')
-    value = report_data.iloc[snap_num, criteria-1]
+    print(snap_num, type(snap_num))
+    print(type(report_data["Step"].tolist()[0]))
+    print(report_data)
+    print(report_data["numberOfAcceptedPeleSteps"] == (snap_num-1))
+    value = report_data[(report_data["numberOfAcceptedPeleSteps"] == (snap_num-1))].values[0][criteria-1]
     header = list(report_data)[criteria-1]
     return value, header
 
@@ -156,7 +161,7 @@ def save_to_df(input):
         #df.update(df_tmp)
     return dfs_tmp
 
-def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "ClusterCentroids", atom_ids="", cpus=2, topology=None, report="report_", traj="trajectory_", use_pdb=False, png=False, CA=0, sidechains=0):
+def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "ClusterCentroids", atom_ids="", cpus=2, topology=None, report="report_", traj="trajectory_", use_pdb=False, png=False, CA=0, sidechains=0, restart="all"):
     #Create multiprocess pool
     if cpus>1:
         pool = mp.Pool(cpus)
@@ -173,39 +178,45 @@ def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "Cl
     clusterCountsThreshold = 0
     folders = utilities.get_epoch_folders(".")
     folders.sort(key=int)
+    if not restart:
 
-    clusteringObject = cluster.Cluster(num_clusters, trajectoryFolder,
-                                       trajectoryBasename, alwaysCluster=True,
-                                       stride=stride)
-    clusteringObject.clusterTrajectories()
-    clusteringObject.eliminateLowPopulatedClusters(clusterCountsThreshold)
-    clusterCenters = clusteringObject.clusterCenters
-    dtrajs = clusteringObject.dtrajs
+        clusteringObject = cluster.Cluster(num_clusters, trajectoryFolder,
+                                           trajectoryBasename, alwaysCluster=True,
+                                           stride=stride)
+        clusteringObject.clusterTrajectories()
+        clusteringObject.eliminateLowPopulatedClusters(clusterCountsThreshold)
+        clusterCenters = clusteringObject.clusterCenters
+        np.savetxt("clustercenters.dat", clusterCenters)
+        dtrajs = clusteringObject.dtrajs
 
-    print("Extract metrics for each snapshot")
-    min_metric_trajs = {}
-    epochs = [folder for folder in glob.glob("./*/") if folder.isdigit()]
-    reports = simulationToCsv.gather_reports()
-    fields = simulationToCsv.retrieve_fields(reports[0])
-    df = simulationToCsv.init_df(fields)
-    df = simulationToCsv.fill_data(reports, df, pool)
+        print("Extract metrics for each snapshot")
+        min_metric_trajs = {}
+        epochs = [folder for folder in glob.glob("./*/") if folder.isdigit()]
+        reports = simulationToCsv.gather_reports()
+        fields = simulationToCsv.retrieve_fields(reports[0])
+        df = simulationToCsv.init_df(fields)
+        df = simulationToCsv.fill_data(reports, df, pool)
 
-    print("Update data with metrics and clusters")
-    df.index = range(df.shape[0])
-    df["Cluster"] = [None]*df.shape[0]
-    input_list = [ [df, Traj, d] for d, Traj in zip(dtrajs, clusteringObject.trajFilenames) ]
-    results = pool.map(save_to_df, input_list)
-    for data in results:
-        for df_tmp in data:
-            df.update(df_tmp)
-    df.to_csv("Simulation.csv") 
-    #df = pd.read_csv("trial.csv")    
+        print("Update data with metrics and clusters")
+        df.index = range(df.shape[0])
+        df["Cluster"] = [None]*df.shape[0]
+        input_list = [ [df, Traj, d] for d, Traj in zip(dtrajs, clusteringObject.trajFilenames) ]
+        results = pool.map(save_to_df, input_list)
+        for data in results:
+            for df_tmp in data:
+                df.update(df_tmp)
+        df.to_csv("Simulation.csv", index=False) 
+    if restart:
+        df = pd.read_csv("Simulation.csv")    
+        clusterCenters = np.loadtxt("clustercenters.dat")
+        print(clusterCenters)
     centersInfo = get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, clusterCenters)
     COMArray = [centersInfo[i]['center'] for i in range(num_clusters)]
 
     print("Retrieve clusters and metric")
     fields1 = []
     fields2 = []
+    print(centersInfo)
     for cluster_num in centersInfo:
         epoch_num, traj_num, snap_num = map(int, centersInfo[cluster_num]['structure'])
         field1, crit1_name = get_metric(criteria1, epoch_num, traj_num, snap_num, report)
@@ -227,5 +238,5 @@ def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "Cl
     return 
 
 if __name__ == "__main__":
-    n_clusters, criteria1, criteria2, lig_name, atom_id, output, top, cpus, report, traj, use_pdb, png, CA, sidechains = parseArgs()
-    main(n_clusters, criteria1, criteria2, lig_name, output, atom_id, cpus, top, report, traj, use_pdb, png, CA, sidechains)
+    n_clusters, criteria1, criteria2, lig_name, atom_id, output, top, cpus, report, traj, use_pdb, png, CA, sidechains, restart = parseArgs()
+    main(n_clusters, criteria1, criteria2, lig_name, output, atom_id, cpus, top, report, traj, use_pdb, png, CA, sidechains, restart)
