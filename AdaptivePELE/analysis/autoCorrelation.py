@@ -83,7 +83,7 @@ def calculateAutoCorrelation(lagtimes, dtrajs, nclusters, nLags):
     return autoCorr
 
 
-def create_plots(autoCorr, plots_path, save_plot, show_plot, nclusters, lagtimes, threshold=2):
+def create_plots(autoCorr, plots_path, save_plot, show_plot, nclusters, lagtimes, threshold=2, title=""):
     if threshold < 1:
         fig_filename = "autoCorr_thres_%s.png" % str(threshold).replace(".", "_")
         filtered = np.where(autoCorr[:, -1] > threshold)[0]
@@ -92,9 +92,10 @@ def create_plots(autoCorr, plots_path, save_plot, show_plot, nclusters, lagtimes
     else:
         fig_filename = "autoCorr_no_thres.png"
         filtered = list(range(nclusters))
+    plt.figure()
     axes = plt.plot(lagtimes, autoCorr.T[:, filtered])
     plt.xlabel("Lagtime")
-    plt.title("Autocorrelation of membership function")
+    plt.title("Autocorrelation of membership function %s" % title)
     if len(filtered) < 20:
         for i, ax in zip(filtered, axes):
             ax.set_label("Cluster %d" % i)
