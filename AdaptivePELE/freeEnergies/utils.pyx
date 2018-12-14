@@ -99,7 +99,6 @@ def is_model(basestring line):
 @cython.wraparound(False)
 @cython.cdivision(True)
 cpdef calculateAutoCorrelation(list lagtimes, list dtrajs, int nclusters, int nLags):
-    cdef double[:, :] C = np.zeros((nclusters, nLags))
     cdef double[:, :] Ci = np.zeros((nclusters, nLags))
     cdef double[:, :] Cf = np.zeros((nclusters, nLags))
     cdef double[:, :] autoCorr = np.zeros((nclusters, nLags))
@@ -108,8 +107,9 @@ cpdef calculateAutoCorrelation(list lagtimes, list dtrajs, int nclusters, int nL
     cdef long[:] traj
     cdef int lagtime
     cdef Py_ssize_t il, i, j, Nt
-    cdef double[:, :] mean = np.zeros((nclusters, nLags))
-    cdef double[:, :] var = np.zeros((nclusters, nLags))
+    cdef double[:] C = np.zeros(nclusters)
+    cdef double[:] mean = np.zeros(nclusters)
+    cdef double[:] var = np.zeros(nclusters)
     cdef double N_f, var_tmp
     cdef int maxLag = max(lagtimes)
     for traj in dtrajs:
@@ -123,24 +123,26 @@ cpdef calculateAutoCorrelation(list lagtimes, list dtrajs, int nclusters, int nL
             for i in range(Nt-lagtime):
                 if traj[i] == traj[i+lagtime]:
                     autoCorr[traj[i], il] += 1
-                C[traj[i], il] += 1
+                if il == 0:
+                    # only count on the first lagtime, to avoid overcounting
+                    C[traj[i]] += 1
                 Ci[traj[i], il] += 1
                 if i > lagtime:
                     Cf[traj[i], il] += 1
             for j in range(Nt-lagtime, Nt):
-                C[traj[j], il] += 1
+                if il == 0:
+                    C[traj[j]] += 1
                 Cf[traj[j], il] += 1
     N_f = <double>(N)
     var_tmp = N_f*(N_f-1)
     for i in range(nclusters):
-        for j in range(nLags):
-            mean[i, j] = C[i, j]/N_f
-            var[i, j] = (N*C[i, j]-(C[i, j]**2))/var_tmp
+        mean[i] = C[i]/N_f
+        var[i] = (N*C[i]-(C[i]**2))/var_tmp
     for i in range(nclusters):
         for j in range(nLags):
-            autoCorr[i, j] += M[j]*mean[i, j]**2-(Ci[i, j]+Cf[i, j])*mean[i, j]
+            autoCorr[i, j] += M[j]*mean[i]**2-(Ci[i, j]+Cf[i, j])*mean[i]
             autoCorr[i, j] /= N_f
-            autoCorr[i, j] /= var[i, j]
+            autoCorr[i, j] /= var[i]
     return np.array(autoCorr)
 
 
