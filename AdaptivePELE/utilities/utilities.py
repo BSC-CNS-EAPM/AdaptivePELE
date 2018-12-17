@@ -630,10 +630,9 @@ def convert_trajectory_to_pdb(trajectory, topology, output, output_folder):
     """
     output = os.path.join(output_folder, output)
     topology_contents = getTopologyFile(topology)
-    traj = md.load(trajectory, top=topology)
+    snapshots = getSnapshots(trajectory)
     with open(output, "w") as fw:
-        for i in range(traj.n_frames):
-            conf = traj.slice(i, copy=False)
+        for i, conf in enumerate(snapshots):
             PDB = atomset.PDB()
             PDB.initialise(conf, topology=topology_contents)
             fw.write("MODEL     %4d\n" % (i+1))
