@@ -45,7 +45,8 @@ class SpawningParams:
         "metricsInd": "list",
         "condition": "basestring",
         "n": "numbers.Real",
-        "lagtime": "numbers.Real"
+        "lagtime": "numbers.Real",
+        "minPos": "list"
     }
     types = {
         "sameWeight": {
@@ -97,8 +98,10 @@ class SpawningParams:
         },
         "UncertaintyMSM": {
             "lagtime": "numbers.Real"
+        },
+        "IndependentMSM": {
+            "lagtime": "numbers.Real"
         }
-
     }
     density = {
         "types": {

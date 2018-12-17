@@ -82,6 +82,7 @@ class OutputPathConstants():
         self.tmpControlFilenameEqulibration = ""
         self.topologies = ""
         self.allTrajsPath = ""
+        self.MSMObjectEpoch = ""
         self.buildConstants(outputPath)
 
     def buildConstants(self, outputPath):
@@ -96,6 +97,7 @@ class OutputPathConstants():
         self.epochOutputPathTempletized = os.path.join(outputPath, "%d")
         self.clusteringOutputDir = os.path.join(self.epochOutputPathTempletized, "clustering")
         self.clusteringOutputObject = os.path.join(self.clusteringOutputDir, "object.pkl")
+        self.MSMObjectEpoch = os.path.join(self.epochOutputPathTempletized, "MSM_object.pkl")
         self.topologies = os.path.join(outputPath, "topologies")
         self.equilibrationDir = os.path.join(outputPath, "equilibration")
         self.allTrajsPath = os.path.join(outputPath, "allTrajs")

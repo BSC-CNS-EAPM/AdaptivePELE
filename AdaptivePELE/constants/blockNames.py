@@ -65,7 +65,6 @@ class StringSpawningTypes:
     epsilon = "epsilon"
     fast = "FAST"
     simulatedAnnealing = "simulatedAnnealing"
-    # New parameters for variable epsilon(experimental)
     variableEpsilon = "variableEpsilon"
     UCB = "UCB"
     REAP = "REAP"
@@ -73,6 +72,7 @@ class StringSpawningTypes:
     ProbabilityMSMCalculator = "ProbabilityMSM"
     MetastabilityMSMCalculator = "MetastabilityMSM"
     UncertaintyMSMCalculator = "UncertaintyMSM"
+    IndependentMSMCalculator = "IndependentMSM"
 
 
 class SpawningParams:
@@ -101,6 +101,7 @@ class SpawningParams:
     nclusters = "n"
     metricsInd = "metricsInd"
     lagtime = "lagtime"
+    minPos = "minPos"
 
 
 class SpawningDensity:

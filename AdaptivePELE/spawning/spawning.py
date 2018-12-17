@@ -22,8 +22,15 @@ except NameError:
 PYEMMA = True
 try:
     import pyemma.msm as msm
+    from AdaptivePELE.freeEnergies import computeDeltaG as computedG
 except ImportError:
     PYEMMA = False
+MATPLOTLIB = True
+try:
+    import matplotlib.pyplot as plt
+    plt.style.use("ggplot")
+except ImportError:
+    MATPLOTLIB = False
 
 
 def reward(x, rews):
@@ -156,6 +163,8 @@ class SpawningBuilder:
             spawningCalculator = MetastabilityMSMCalculator(spawningParams)
         elif spawningTypeString == blockNames.StringSpawningTypes.UncertaintyMSMCalculator:
             spawningCalculator = UncertaintyMSMCalculator(spawningParams)
+        elif spawningTypeString == blockNames.StringSpawningTypes.IndependentMSMCalculator:
+            spawningCalculator = IndependentMSMCalculator(spawningParams)
         else:
             sys.exit("Unknown spawning type! Choices are: " + str(spawningTypes.SPAWNING_TYPE_TO_STRING_DICTIONARY.values()))
         return spawningCalculator
@@ -182,6 +191,7 @@ class SpawningParams:
         self.metricInd = None
         self.condition = blockNames.SpawningParams.minValue  # wether to consider min or max values in epsilon
         self.lagtime = None
+        self.minPos = None
 
     def buildSpawningParameters(self, spawningBlock):
         """
@@ -246,6 +256,7 @@ class SpawningParams:
             self.lagtime = spawningParamsBlock[blockNames.SpawningParams.lagtime]
             self.condition = spawningParamsBlock.get(blockNames.SpawningParams.condition,
                                                      blockNames.SpawningParams.minValue)
+            self.minPos = spawningParamsBlock.get(blockNames.SpawningParams.minPos)
 
 
 class SpawningCalculator:
@@ -258,13 +269,27 @@ class SpawningCalculator:
         self.type = "BaseClass"  # change for abstract attribute
 
     @abstractmethod
-    def calculate(self, clusters, trajToDivide, currentEpoch=None):
+    def calculate(self, clusters, trajToDivide, currentEpoch=None, outputPathConstants=None):
         pass
 
     @abstractmethod
     def log(self):
         """
             Log spawning information
+        """
+        pass
+
+    @abstractmethod
+    def createPlots(self, outputPathConstants, currentEpoch, clusters):
+        """
+            Create the plots to do a quick analysis of the MSM and dG calculation
+
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
         """
         pass
 
@@ -537,7 +562,7 @@ class SameWeightDegeneracyCalculator(SpawningCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.sameWeight
         self.parameters = parameters
 
-    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -547,6 +572,8 @@ class SameWeightDegeneracyCalculator(SpawningCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: list -- List containing the degeneracy of the clusters
         """
@@ -578,7 +605,7 @@ class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
         """
         pass
 
-    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -588,6 +615,8 @@ class InverselyProportionalToPopulationCalculator(DensitySpawningCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: list -- List containing the degeneracy of the clusters
         """
@@ -631,7 +660,7 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
         if self.degeneracyMetricProportional is not None:
             print("[SpawningLog] Metric prop:    %s" % str(self.degeneracyMetricProportional))
 
-    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -641,6 +670,8 @@ class EpsilonDegeneracyCalculator(DensitySpawningCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: list -- List containing the degeneracy of the clusters
         """
@@ -792,7 +823,7 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
         with open("epsilon_values.txt", "a") as epsilon_file:
             epsilon_file.write("%d\t%f\n" % (epoch, epsilon))
 
-    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -802,6 +833,8 @@ class VariableEpsilonDegeneracyCalculator(DensitySpawningCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: list -- List containing the degeneracy of the clusters
         """
@@ -830,7 +863,7 @@ class SimulatedAnnealingCalculator(SpawningCalculator):
         else:
             return T
 
-    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -840,6 +873,8 @@ class SimulatedAnnealingCalculator(SpawningCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: list -- List containing the degeneracy of the clusters
         """
@@ -888,7 +923,7 @@ class FASTDegeneracyCalculator(DensitySpawningCalculator):
         metrics = self.getMetrics(clusters)
         return self.normaliseArray(metrics)
 
-    def calculate(self, clusters, trajToDivide, currentEpoch=None):
+    def calculate(self, clusters, trajToDivide, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -898,6 +933,8 @@ class FASTDegeneracyCalculator(DensitySpawningCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: list -- List containing the degeneracy of the clusters
         """
@@ -933,7 +970,7 @@ class UCBCalculator(DensitySpawningCalculator):
         """
         pass
 
-    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -943,6 +980,8 @@ class UCBCalculator(DensitySpawningCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: list -- List containing the degeneracy of the clusters
         """
@@ -1020,7 +1059,7 @@ class REAPCalculator(DensitySpawningCalculator):
         self.bounds = None
         self.parameters = parameters
 
-    def calculate(self, clusters, trajToDivide, currentEpoch=None):
+    def calculate(self, clusters, trajToDivide, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -1030,6 +1069,8 @@ class REAPCalculator(DensitySpawningCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: list -- List containing the degeneracy of the clusters
         """
@@ -1091,7 +1132,7 @@ class NullSpawningCalculator(SpawningCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.null
         self.parameters = parameters
 
-    def calculate(self, clusters, trajToDivide, currentEpoch=None):
+    def calculate(self, clusters, trajToDivide, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters. In this particular class
             no spawning is performed, so this function just returns None
@@ -1102,6 +1143,8 @@ class NullSpawningCalculator(SpawningCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: None
         """
@@ -1114,20 +1157,87 @@ class NullSpawningCalculator(SpawningCalculator):
 class MSMCalculator(SpawningCalculator):
 
     def __init__(self, parameters):
+        if not PYEMMA:
+            raise utilities.UnsatisfiedDependencyException("Pyemma module is necessary ot use MSM based spawning")
         SpawningCalculator.__init__(self)
         self.type = "BaseClass"  # change for abstract attribute
         self.parameters = parameters
+        self.MSM = None
 
-    def estimateMSM(self, dtrajs):
+    def estimateMSM(self, dtrajs, outputPathConstants, currentEpoch):
         """
             Estimate and MSM using PyEMMA
 
             :param dtrajs: Discretized trajectories to estimate the Markov model
             :type dtrajs: np.ndarray
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
 
             :return: object -- Object containing the estimated MSM
         """
-        return msm.estimate_markov_model(dtrajs, self.parameters.lagtime)
+        self.MSM = msm.estimate_markov_model(dtrajs, self.parameters.lagtime)
+        if outputPathConstants is not None and currentEpoch is not None:
+            utilities.writeObject(outputPathConstants.MSMObjectEpoch % currentEpoch, self.MSM)
+
+    def calculatedG(self, clusters, outputPathConstants, currentEpoch):
+        """
+            Calculate the ligand-binding dG from the estimated MSM
+
+            :param clusters: Cluster centers
+            :type clusters: np.ndarray
+            :param trajPath: Path to the trajectories to analyse
+            :type trajPath: str
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+
+        """
+        # need clusters for this step
+        pi, clusters = computedG.ensure_connectivity(self.MSM, clusters)
+        d = 0.75
+        originalFilenames = glob.glob(os.path.join(outputPathConstants.allTrajsPath, "*traj*.dat"))
+        originalCoordinates = computedG.gather_coordinates(originalFilenames)
+        bins = computedG.create_box(clusters, originalCoordinates, d)
+        microstateVolume = computedG.calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d)
+        gpmf, string = computedG.calculate_pmf(microstateVolume, pi)
+        print("bound    Delta G     Delta W     Binding Volume:     Binding Volume contribution")
+        print(string)
+
+        pmf_xyzg = np.hstack((clusters, np.expand_dims(gpmf, axis=1)))
+        np.savetxt(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "pmf_xyzg.dat"), pmf_xyzg)
+        distance = np.linalg.norm(clusters-self.parameters.minPos, axis=1)
+        return pi, gpmf, distance
+
+    def createPlots(self, outputPathConstants, currentEpoch, clusters):
+        """
+            Create the plots to do a quick analysis of the MSM and dG calculation
+
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+        """
+        if not MATPLOTLIB:
+            raise utilities.UnsatisfiedDependencyException("Matplotlib installation not found!!")
+        if self.parameters.minPos is None:
+            print("Plots can't be created since a reference minimum position has not been provided!!!")
+        clusters = clusters.clusterCenters
+        prob, G, distance = self.calculatedG(clusters, outputPathConstants, currentEpoch)
+        plt.figure()
+        plt.scatter(distance, prob)
+        plt.xlabel("Distance to minimum")
+        plt.ylabel("Stationary distribution")
+        plt.savefig(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "eigenvector.png"))
+        plt.figure()
+        plt.scatter(distance, G)
+        plt.xlabel("Distance to minimum")
+        plt.ylabel("PMF")
+        plt.savefig(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "PMF.png"))
 
 
 class ProbabilityMSMCalculator(MSMCalculator):
@@ -1136,7 +1246,7 @@ class ProbabilityMSMCalculator(MSMCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.ProbabilityMSMCalculator
         self.parameters = parameters
 
-    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -1146,16 +1256,18 @@ class ProbabilityMSMCalculator(MSMCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: list -- List containing the degeneracy of the clusters
         """
         # estimate MSM from clustering object
-        msm_object = self.estimateMSM(clusters.dtrajs)
-        nclusters = msm_object.nstates_full
+        self.estimateMSM(clusters.dtrajs, outputPathConstants, currentEpoch)
+        nclusters = self.MSM.nstates_full
         # distribute seeds using the MSM
         probabilities = np.zeros(nclusters)
-        for i, index in enumerate(msm_object.active_set):
-            probabilities[index] = msm_object.stationary_distribution[i]
+        for i, index in enumerate(self.MSM.active_set):
+            probabilities[index] = self.MSM.stationary_distribution[i]
         if self.parameters.condition == blockNames.SpawningParams.minValue:
             sortedProbs = np.argsort(probabilities)
             probabilities = 1 - probabilities
@@ -1176,7 +1288,7 @@ class MetastabilityMSMCalculator(MSMCalculator):
         self.type = spawningTypes.SPAWNING_TYPES.MetastabilityMSMCalculator
         self.parameters = parameters
 
-    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -1186,14 +1298,16 @@ class MetastabilityMSMCalculator(MSMCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: list -- List containing the degeneracy of the clusters
         """
         # estimate MSM from clustering object
-        msm_object = self.estimateMSM(clusters.dtrajs)
-        nclusters = msm_object.nstates_full
+        self.estimateMSM(clusters.dtrajs, outputPathConstants, currentEpoch)
+        nclusters = self.MSM.nstates_full
         # distribute seeds using the MSM
-        counts = msm_object.count_matrix_full
+        counts = self.MSM.count_matrix_full
         metastability = counts.diagonal()/counts.sum()
 
         if self.parameters.condition == blockNames.SpawningParams.minValue:
@@ -1214,6 +1328,7 @@ class UncertaintyMSMCalculator(MSMCalculator):
         MSMCalculator.__init__(self, parameters)
         self.type = spawningTypes.SPAWNING_TYPES.UncertaintyMSMCalculator
         self.parameters = parameters
+        self.MSM = None
 
     def calculate_q(self, counts, nclusters):
         alpha = 1/float(nclusters)
@@ -1237,7 +1352,7 @@ class UncertaintyMSMCalculator(MSMCalculator):
             q.append(si[i].dot((np.diag(P[i])-np.outer(P[i], P[i])).dot(si[i])))
         return np.array(q), w
 
-    def calculate(self, clusters, trajToDistribute, currentEpoch=None):
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None, outputPathConstants=None):
         """
             Calculate the degeneracy of the clusters
 
@@ -1247,14 +1362,16 @@ class UncertaintyMSMCalculator(MSMCalculator):
             :type trajToDistribute: int
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
 
             :returns: list -- List containing the degeneracy of the clusters
         """
         # estimate MSM from clustering object
-        msm_object = self.estimateMSM(clusters.dtrajs)
-        nclusters = msm_object.nstates_full
+        self.estimateMSM(clusters.dtrajs, outputPathConstants, currentEpoch)
+        nclusters = self.MSM.nstates_full
         # distribute seeds using the MSM
-        counts = msm_object.count_matrix_full
+        counts = self.MSM.count_matrix_full
         q, w = self.calculate_q(counts, nclusters)
         score = (q/(w+1))-(q/(w+1+trajToDistribute))
         score /= score.sum()
@@ -1265,3 +1382,52 @@ class UncertaintyMSMCalculator(MSMCalculator):
         else:
             score /= sum(score)
         return self.divideTrajAccordingToWeights(score, trajToDistribute)
+
+
+class IndependentMSMCalculator(MSMCalculator):
+    def __init__(self, parameters):
+        MSMCalculator.__init__(self, parameters)
+        self.type = spawningTypes.SPAWNING_TYPES.IndependentMSMCalculator
+        self.parameters = parameters
+        self.IndependentCalculator = IndependentRunsCalculator(parameters)
+
+    def calculate(self, clusters, trajToDistribute, currentEpoch=None, outputPathConstants=None):
+        """
+            Calculate the degeneracy of the clusters
+
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+            :param trajToDistribute: Number of processors to distribute
+            :type trajToDistribute: int
+            :param currentEpoch: Current iteration number
+            :type currentEpoch: int
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+
+            :returns: list -- List containing the degeneracy of the clusters
+        """
+        # estimate MSM from clustering object
+        self.estimateMSM(clusters.dtrajs, outputPathConstants, currentEpoch)
+
+    def writeSpawningInitialStructures(self, outputPathConstants, degeneracyOfRepresentatives, clustering, iteration, topologies=None):
+        """
+            Write last trajectory structure as initial one for the next iteration
+
+            :param outputPathConstants: Output constants that depend on the path
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param degeneracyOfRepresentatives: List with the degeneracy of
+                each cluster (number of processors that will start from that state)
+            :type degeneracyOfRepresentatives: list
+            :param clustering: Clustering object
+            :type clustering: :py:class:`.Clustering`
+            :param iteration: Number of epoch
+            :type iteration: int
+            :param topology_file: Topology file for non-pdb trajectories
+            :type topology_file: str
+            :param topologies: Topology object containing the set of topologies needed for the simulation
+            :type topologies: :py:class:`.Topology`
+
+            :returns: int, list -- number of processors, list with the
+                snapshot from which the trajectories will start in the next iteration
+        """
+        return self.IndependentCalculator.writeSpawningInitialStructures(outputPathConstants, degeneracyOfRepresentatives, clustering, iteration, topologies)

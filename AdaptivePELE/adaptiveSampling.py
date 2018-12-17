@@ -722,6 +722,10 @@ def main(jsonParams, clusteringHook=None):
         if processManager.isMaster():
             degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), i)
             spawningCalculator.log()
+            # this method only does works with MSM-based spwaning methods,
+            # creating a plot of the stationary distribution and the PMF, for
+            # the rest of methods it does nothing
+            spawningCalculator.createPlots(outputPathConstants, i, clustersList)
 
             if degeneracyOfRepresentatives is not None:
                 if simulationRunner.parameters.modeMovingBox is not None:
