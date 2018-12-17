@@ -167,15 +167,15 @@
 
 
 <span class="k">class</span> <span class="nc">UnsatisfiedDependencyException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="n">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="n">__module__</span>
+    <span class="vm">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="vm">__module__</span>
 
 
 <span class="k">class</span> <span class="nc">RequiredParameterMissingException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="n">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="n">__module__</span>
+    <span class="vm">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="vm">__module__</span>
 
 
 <span class="k">class</span> <span class="nc">ImproperParameterValueException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="n">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="n">__module__</span>
+    <span class="vm">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="vm">__module__</span>
 
 
 <div class="viewcode-block" id="Topology"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology">[docs]</a><span class="k">class</span> <span class="nc">Topology</span><span class="p">:</span>
@@ -229,6 +229,10 @@
         <span class="k">for</span> <span class="n">top</span> <span class="ow">in</span> <span class="n">topologyFiles</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">topologies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">top</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">topologyFiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">top</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Topology.topologyFilesIterator"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology.topologyFilesIterator">[docs]</a>    <span class="k">def</span> <span class="nf">topologyFilesIterator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">top_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topologyFiles</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">top_file</span></div>
 
 <div class="viewcode-block" id="Topology.mapEpochTopologies"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology.mapEpochTopologies">[docs]</a>    <span class="k">def</span> <span class="nf">mapEpochTopologies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">trajectoryMapping</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -594,7 +598,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">coords1</span><span class="o">-</span><span class="n">coords2</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="sign"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.sign">[docs]</a><span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span><span class="p">):</span>
+<div class="viewcode-block" id="sign"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.sign">[docs]</a><span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the sign of a number</span>
 
@@ -766,10 +770,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
     <span class="n">topology_contents</span> <span class="o">=</span> <span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
-    <span class="n">traj</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+    <span class="n">snapshots</span> <span class="o">=</span> <span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">n_frames</span><span class="p">):</span>
-            <span class="n">conf</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snapshots</span><span class="p">):</span>
             <span class="n">PDB</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
             <span class="n">PDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology_contents</span><span class="p">)</span>
             <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;MODEL     </span><span class="si">%4d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
@@ -857,6 +860,21 @@
 <span class="sd">        :returns: str -- Extension of the trajectory</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="loadtxtfile"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.loadtxtfile">[docs]</a><span class="k">def</span> <span class="nf">loadtxtfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load a table file from a text file</span>
+
+<span class="sd">        :param filename: Name of the file to load</span>
+<span class="sd">        :type filename: str</span>
+
+<span class="sd">        :returns: np.ndarray -- Contents of the text file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
 </pre></div>
 
            </div>

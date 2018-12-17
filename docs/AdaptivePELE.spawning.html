@@ -356,7 +356,7 @@ case is always one</p>
 We only consider the nclusters with best metric</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#EpsilonDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#EpsilonDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.EpsilonDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -366,6 +366,7 @@ We only consider the nclusters with best metric</p>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -414,7 +415,7 @@ each cluster</p>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.DensitySpawningCalculator" title="AdaptivePELE.spawning.spawning.DensitySpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.DensitySpawningCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDivide</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#FASTDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDivide</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#FASTDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -424,6 +425,7 @@ each cluster</p>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -454,6 +456,62 @@ each cluster</p>
 <dt id="AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.normaliseArray">
 <code class="descname">normaliseArray</code><span class="sig-paren">(</span><em>array</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#FASTDegeneracyCalculator.normaliseArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator.normaliseArray" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AdaptivePELE.spawning.spawning.IndependentMSMCalculator">
+<em class="property">class </em><code class="descclassname">AdaptivePELE.spawning.spawning.</code><code class="descname">IndependentMSMCalculator</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#IndependentMSMCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.IndependentMSMCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.MSMCalculator" title="AdaptivePELE.spawning.spawning.MSMCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.MSMCalculator</span></code></a></p>
+<dl class="method">
+<dt id="AdaptivePELE.spawning.spawning.IndependentMSMCalculator.calculate">
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#IndependentMSMCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.IndependentMSMCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the degeneracy of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
+<li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List containing the degeneracy of the clusters</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.spawning.spawning.IndependentMSMCalculator.writeSpawningInitialStructures">
+<code class="descname">writeSpawningInitialStructures</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>degeneracyOfRepresentatives</em>, <em>clustering</em>, <em>iteration</em>, <em>topologies=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#IndependentMSMCalculator.writeSpawningInitialStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.IndependentMSMCalculator.writeSpawningInitialStructures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write last trajectory structure as initial one for the next iteration</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Output constants that depend on the path</li>
+<li><strong>degeneracyOfRepresentatives</strong> (<em>list</em>) – List with the degeneracy of
+each cluster (number of processors that will start from that state)</li>
+<li><strong>clustering</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object</li>
+<li><strong>iteration</strong> (<em>int</em>) – Number of epoch</li>
+<li><strong>topology_file</strong> (<em>str</em>) – Topology file for non-pdb trajectories</li>
+<li><strong>topologies</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object containing the set of topologies needed for the simulation</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int, list – number of processors, list with the
+snapshot from which the trajectories will start in the next iteration</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -528,7 +586,7 @@ snapshot from which the trajectories will start in the next iteration</p>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.DensitySpawningCalculator" title="AdaptivePELE.spawning.spawning.DensitySpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.DensitySpawningCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#InverselyProportionalToPopulationCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#InverselyProportionalToPopulationCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -538,6 +596,7 @@ snapshot from which the trajectories will start in the next iteration</p>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -561,16 +620,61 @@ snapshot from which the trajectories will start in the next iteration</p>
 <em class="property">class </em><code class="descclassname">AdaptivePELE.spawning.spawning.</code><code class="descname">MSMCalculator</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MSMCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MSMCalculator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.SpawningCalculator</span></code></a></p>
 <dl class="method">
+<dt id="AdaptivePELE.spawning.spawning.MSMCalculator.calculatedG">
+<code class="descname">calculatedG</code><span class="sig-paren">(</span><em>clusters</em>, <em>outputPathConstants</em>, <em>currentEpoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MSMCalculator.calculatedG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MSMCalculator.calculatedG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the ligand-binding dG from the estimated MSM</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>clusters</strong> (<em>np.ndarray</em>) – Cluster centers</li>
+<li><strong>trajPath</strong> (<em>str</em>) – Path to the trajectories to analyse</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.spawning.spawning.MSMCalculator.createPlots">
+<code class="descname">createPlots</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>currentEpoch</em>, <em>clusters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MSMCalculator.createPlots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MSMCalculator.createPlots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the plots to do a quick analysis of the MSM and dG calculation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.MSMCalculator.estimateMSM">
-<code class="descname">estimateMSM</code><span class="sig-paren">(</span><em>dtrajs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MSMCalculator.estimateMSM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MSMCalculator.estimateMSM" title="Permalink to this definition">¶</a></dt>
+<code class="descname">estimateMSM</code><span class="sig-paren">(</span><em>dtrajs</em>, <em>outputPathConstants</em>, <em>currentEpoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MSMCalculator.estimateMSM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MSMCalculator.estimateMSM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate and MSM using PyEMMA</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dtrajs</strong> (<em>np.ndarray</em>) – Discretized trajectories to estimate the Markov model</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dtrajs</strong> (<em>np.ndarray</em>) – Discretized trajectories to estimate the Markov model</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">object – Object containing the estimated MSM</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">object – Object containing the estimated MSM</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -584,7 +688,7 @@ snapshot from which the trajectories will start in the next iteration</p>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.MSMCalculator" title="AdaptivePELE.spawning.spawning.MSMCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.MSMCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.MetastabilityMSMCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MetastabilityMSMCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MetastabilityMSMCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MetastabilityMSMCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MetastabilityMSMCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -594,6 +698,7 @@ snapshot from which the trajectories will start in the next iteration</p>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -612,7 +717,7 @@ snapshot from which the trajectories will start in the next iteration</p>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.SpawningCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.NullSpawningCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDivide</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#NullSpawningCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.NullSpawningCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDivide</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#NullSpawningCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.NullSpawningCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters. In this particular class
 no spawning is performed, so this function just returns None</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -623,6 +728,7 @@ no spawning is performed, so this function just returns None</p>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -646,7 +752,7 @@ no spawning is performed, so this function just returns None</p>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.MSMCalculator" title="AdaptivePELE.spawning.spawning.MSMCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.MSMCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.ProbabilityMSMCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#ProbabilityMSMCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.ProbabilityMSMCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#ProbabilityMSMCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.ProbabilityMSMCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -656,6 +762,7 @@ no spawning is performed, so this function just returns None</p>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -678,7 +785,7 @@ given by the exploration on several reaction coordinates
 is maximized</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.REAPCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDivide</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#REAPCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.REAPCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDivide</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#REAPCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.REAPCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -688,6 +795,7 @@ is maximized</p>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -712,7 +820,7 @@ is maximized</p>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.SpawningCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SameWeightDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SameWeightDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -722,6 +830,7 @@ is maximized</p>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -746,7 +855,7 @@ is maximized</p>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.SpawningCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SimulatedAnnealingCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SimulatedAnnealingCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -756,6 +865,7 @@ is maximized</p>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -838,8 +948,27 @@ object</p>
 Spawning is the way in which we split the different explorers at the begining of each epoch.</p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDivide</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDivide</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.createPlots">
+<code class="descname">createPlots</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>currentEpoch</em>, <em>clusters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#SpawningCalculator.createPlots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.SpawningCalculator.createPlots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the plots to do a quick analysis of the MSM and dG calculation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.SpawningCalculator.divideInverselyProportionalToArray">
@@ -994,7 +1123,7 @@ parameters</td>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.DensitySpawningCalculator" title="AdaptivePELE.spawning.spawning.DensitySpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.DensitySpawningCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.UCBCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#UCBCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.UCBCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#UCBCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.UCBCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1004,6 +1133,7 @@ parameters</td>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -1028,7 +1158,7 @@ parameters</td>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.MSMCalculator" title="AdaptivePELE.spawning.spawning.MSMCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.MSMCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.UncertaintyMSMCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#UncertaintyMSMCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.UncertaintyMSMCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#UncertaintyMSMCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.UncertaintyMSMCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1038,6 +1168,7 @@ parameters</td>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -1061,7 +1192,7 @@ parameters</td>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.spawning.spawning.DensitySpawningCalculator" title="AdaptivePELE.spawning.spawning.DensitySpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">AdaptivePELE.spawning.spawning.DensitySpawningCalculator</span></code></a></p>
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculate">
-<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#VariableEpsilonDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>clusters</em>, <em>trajToDistribute</em>, <em>currentEpoch=None</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#VariableEpsilonDegeneracyCalculator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator.calculate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the degeneracy of the clusters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1071,6 +1202,7 @@ parameters</td>
 <li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
 <li><strong>trajToDistribute</strong> (<em>int</em>) – Number of processors to distribute</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 </ul>
 </td>
 </tr>
@@ -1224,6 +1356,11 @@ parameters</td>
 <dd><dl class="attribute">
 <dt id="AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.FAST">
 <code class="descname">FAST</code><em class="property"> = 4</em><a class="headerlink" href="#AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.FAST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.IndependentMSMCalculator">
+<code class="descname">IndependentMSMCalculator</code><em class="property"> = 14</em><a class="headerlink" href="#AdaptivePELE.spawning.spawningTypes.SPAWNING_TYPES.IndependentMSMCalculator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

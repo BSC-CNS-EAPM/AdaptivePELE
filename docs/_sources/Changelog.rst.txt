@@ -18,6 +18,7 @@ New features:
     - Add support for formats trr, dcd and dtr, mdcrd, nc
     - Add the null clustering method
     - Add independentMetric spawning
+    - Add MSM-based spawning methods
     - Add reportName template for PELE control file
 
 Bug fixes:

@@ -500,6 +500,11 @@ There are several implemented strategies:
 * **MetastabilityMSM** Distributes the processors with a weight that is
   proportional to the metastability of each cluster in an MSM calulated as q :sub:`ii`/*N*, where q :sub:`ii` is the number of self-transitions of state i and N is the total number of counts for the simulation (needs to be used with `MSM Clustering`_)
 
+* **IndependentMSM** Trajectories are run independently, as in the
+  **independent** method, but an MSM is calculated at the end of each iteration
+  and the results are reported in the form of two plots, one of the stationary
+  distribution and one of the probability of binding (PMF)
+
 According to our experience, the best strategies are **inverselyProportional** and **epsilon**, guided with either PELE binding energy or the RMSD to the bound pose if available.
 
 
@@ -540,7 +545,17 @@ The following parameters are mandatory for **variableEpsilon**:
 * **minEpsilon** (*float*): Minimum value for epsilon
 * **variationWindow** (*integer*): Last iteration over which to change the epsilon value
 * **maxEpsilonWindow** (*integer*): Number of iteration with epsilon=maxEpsilon
-* **period** (*integer*) Variation period (in number of iterations)
+* **period** (*integer*): Variation period (in number of iterations)
+
+The following parameter are mandatory for all *MSM*-based methods:
+
+* **lagtime** (*int*): Lagtime to use when estimating the MSM
+
+Additionally, these methods can also accept the following parameters:
+
+* **minPos** (*list*): Coordinates of the reference minimum. This value is used
+  to calculate the distance to each cluster and create the probability and PMF
+  plots for the MSM-based spawnings
 
 
 Examples
@@ -567,6 +582,47 @@ Examples
         },
         "density" : {
             "type" : "continuous"
+        }
+    }
+
+
+::
+
+    "spawning" : {
+        "type" : "independent",
+        "params" : {
+            "reportFilename" : "report"
+        }
+    }
+
+::
+
+    "spawning" : {
+        "type" : "IndependentMSM",
+        "params" : {
+            "lagtime" : 100,
+            "minPos": [20.34, 32.56, 8.93]
+        }
+    }
+
+::
+
+    "spawning" : {
+        "type" : "variableEpsilon",
+        "params" : {
+            "reportFilename" : "report",
+            "varEpsilonType": "linearVariation",
+            "metricColumnInReport" : 5,
+            "maxEpsilon": 0.5,
+            "minEpsilon": 0.1,
+            "variationWindow": 10,
+            "period": 3,
+            "epsilon": 0.1,
+            "maxEpsilonWindow": 10,
+            "T":1000
+        },
+        "density" : {
+            "type" : "null"
         }
     }
 
@@ -768,7 +824,7 @@ It also prints a histogram with the ratio of counts *r* (see above). When ``-fil
 Dynamical hooks
 ---------------
 
-Starting from version 4.2, the option of dynamically changing the cluster sizes
+Starting from version 1.4.2, the option of dynamically changing the cluster sizes
 is implemented using a hook. This hook is a function that is passed to the
 adaptive main function which accepts two arguments: *clustering* and *outputPath*
 and returns two arguments: *clustering* and *hasChanged*. *clustering* refers to  the clustering object, while *hasChanged* is a boolean that marks whether any change has been done to the clustering object in the hook function. If so, the data is reclustered before starting the new iteration. One example of such function would look like::

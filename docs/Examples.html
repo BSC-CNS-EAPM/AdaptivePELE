@@ -628,6 +628,10 @@ There are several implemented strategies:</p>
 proportional to the stationary probability of each cluster in an MSM (see <a class="reference internal" href="#msm" id="id5">[MSM]</a> for more details, needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</li>
 <li><strong>MetastabilityMSM</strong> Distributes the processors with a weight that is
 proportional to the metastability of each cluster in an MSM calulated as q <sub>ii</sub>/<em>N</em>, where q <sub>ii</sub> is the number of self-transitions of state i and N is the total number of counts for the simulation (needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</li>
+<li><strong>IndependentMSM</strong> Trajectories are run independently, as in the
+<strong>independent</strong> method, but an MSM is calculated at the end of each iteration
+and the results are reported in the form of two plots, one of the stationary
+distribution and one of the probability of binding (PMF)</li>
 </ul>
 <p>According to our experience, the best strategies are <strong>inverselyProportional</strong> and <strong>epsilon</strong>, guided with either PELE binding energy or the RMSD to the bound pose if available.</p>
 </div>
@@ -660,7 +664,17 @@ There are two types of density calculators:</p>
 <li><strong>minEpsilon</strong> (<em>float</em>): Minimum value for epsilon</li>
 <li><strong>variationWindow</strong> (<em>integer</em>): Last iteration over which to change the epsilon value</li>
 <li><strong>maxEpsilonWindow</strong> (<em>integer</em>): Number of iteration with epsilon=maxEpsilon</li>
-<li><strong>period</strong> (<em>integer</em>) Variation period (in number of iterations)</li>
+<li><strong>period</strong> (<em>integer</em>): Variation period (in number of iterations)</li>
+</ul>
+<p>The following parameter are mandatory for all <em>MSM</em>-based methods:</p>
+<ul class="simple">
+<li><strong>lagtime</strong> (<em>int</em>): Lagtime to use when estimating the MSM</li>
+</ul>
+<p>Additionally, these methods can also accept the following parameters:</p>
+<ul class="simple">
+<li><strong>minPos</strong> (<em>list</em>): Coordinates of the reference minimum. This value is used
+to calculate the distance to each cluster and create the probability and PMF
+plots for the MSM-based spawnings</li>
 </ul>
 </div>
 <div class="section" id="examples">
@@ -682,6 +696,43 @@ There are two types of density calculators:</p>
     <span class="p">},</span>
     <span class="s2">&quot;density&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;continuous&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;independent&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;IndependentMSM&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;lagtime&quot;</span> <span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s2">&quot;minPos&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">20.34</span><span class="p">,</span> <span class="mf">32.56</span><span class="p">,</span> <span class="mf">8.93</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;variableEpsilon&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;varEpsilonType&quot;</span><span class="p">:</span> <span class="s2">&quot;linearVariation&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;metricColumnInReport&quot;</span> <span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="s2">&quot;maxEpsilon&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="s2">&quot;minEpsilon&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;variationWindow&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s2">&quot;epsilon&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;maxEpsilonWindow&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;T&quot;</span><span class="p">:</span><span class="mi">1000</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;density&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;null&quot;</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -871,7 +922,7 @@ It also prints a histogram with the ratio of counts <em>r</em> (see above). When
 </div>
 <div class="section" id="dynamical-hooks">
 <h2>Dynamical hooks<a class="headerlink" href="#dynamical-hooks" title="Permalink to this headline">¶</a></h2>
-<p>Starting from version 4.2, the option of dynamically changing the cluster sizes
+<p>Starting from version 1.4.2, the option of dynamically changing the cluster sizes
 is implemented using a hook. This hook is a function that is passed to the
 adaptive main function which accepts two arguments: <em>clustering</em> and <em>outputPath</em>
 and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clustering</em> refers to  the clustering object, while <em>hasChanged</em> is a boolean that marks whether any change has been done to the clustering object in the hook function. If so, the data is reclustered before starting the new iteration. One example of such function would look like:</p>

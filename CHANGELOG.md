@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Add support for formats trr, dcd and dtr, mdcrd, nc
     - Add the null clustering method
     - Add independentMetric spawning
+    - Add MSM-based spawning methods
     - Add reportName template for PELE control file
 
 ### Bug fixes:
