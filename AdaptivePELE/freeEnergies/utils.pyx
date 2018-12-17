@@ -95,14 +95,14 @@ def is_model(basestring line):
     cdef basestring check = "ENDMDL"
     return check in line[:7]
 
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.cdivision(True)
 cpdef calculateAutoCorrelation(list lagtimes, list dtrajs, int nclusters, int nLags):
-    cdef double[:, :] Ci = np.zeros((nclusters, nLags))
-    cdef double[:, :] Cf = np.zeros((nclusters, nLags))
     cdef double[:, :] autoCorr = np.zeros((nclusters, nLags))
     cdef int N = 0
+    cdef int v1, v2
     cdef double[:] M = np.zeros(nLags)
     cdef long[:] traj
     cdef int lagtime
@@ -117,37 +117,39 @@ cpdef calculateAutoCorrelation(list lagtimes, list dtrajs, int nclusters, int nL
         if Nt < maxLag:
             raise ValueError("Lagtime specified are too big for the trajectories!")
         N += Nt
-        for il in range(nLags):
-            lagtime = lagtimes[il]
-            M[il] += Nt-lagtime
-            for i in range(Nt-lagtime):
-                if traj[i] == traj[i+lagtime]:
-                    autoCorr[traj[i], il] += 1
-                if il == 0:
-                    # only count on the first lagtime, to avoid overcounting
-                    C[traj[i]] += 1
-                Ci[traj[i], il] += 1
-                if i > lagtime:
-                    Cf[traj[i], il] += 1
-            for j in range(Nt-lagtime, Nt):
-                if il == 0:
-                    C[traj[j]] += 1
-                Cf[traj[j], il] += 1
+        for i in range(Nt):
+            C[traj[i]] += 1
     N_f = <double>(N)
     var_tmp = N_f*(N_f-1)
     for i in range(nclusters):
         mean[i] = C[i]/N_f
         var[i] = (N*C[i]-(C[i]**2))/var_tmp
+
+    for traj in dtrajs:
+        Nt = traj.size
+        for il in range(nLags):
+            lagtime = lagtimes[il]
+            M[il] += Nt-lagtime
+            for i in range(Nt-lagtime):
+                for c in range(nclusters):
+                    v1 = 0
+                    v2 = 0
+                    if c == traj[i]:
+                        v1 = 1
+                    if c == traj[i+lagtime]:
+                        v2 = 1
+                    autoCorr[c, il] += (v1-mean[c])*(v2-mean[c])
+
     for i in range(nclusters):
         for j in range(nLags):
-            autoCorr[i, j] += M[j]*mean[i]**2-(Ci[i, j]+Cf[i, j])*mean[i]
-            autoCorr[i, j] /= N_f
+            autoCorr[i, j] /= M[j]
             autoCorr[i, j] /= var[i]
     return np.array(autoCorr)
 
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
+@cython.cdivision(True)
 cpdef double[:] runSimulation(double[:, :] P, int steps, int startingPosition, long[:] states):
     cdef Py_ssize_t n = P.shape[0]
     cdef int position = startingPosition
