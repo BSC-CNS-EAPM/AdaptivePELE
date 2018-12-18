@@ -1239,7 +1239,7 @@ class MetricMultipleTrajsExitCondition:
             :returns: bool -- Returns True if the exit condition has been met
         """
         for j in range(1, self.nProcessors):
-            report = utilities.loadtxtfile(reportWildcard % i)
+            report = utilities.loadtxtfile(os.path.join(outputFolder, self.report % j))
             if self.condition(report[:, self.metricCol], self.metricValue):
                 self.trajsFound += 1
         return self.trajsFound >= self.numTrajs
@@ -1326,7 +1326,7 @@ class RunnerBuilder:
             params.equilibrationLengthNPT = paramsBlock.get(blockNames.SimulationParams.equilibrationLengthNPT, 500000)
             params.format = paramsBlock.get(blockNames.SimulationParams.format, "xtc")
             if params.format not in constants.md_supported_formats:
-                raise ImproperParameterValueException("Not supported %s format specified, supported formats are %s" % (params.format, constants.formats_md_string))
+                raise utilities.ImproperParameterValueException("Not supported %s format specified, supported formats are %s" % (params.format, constants.formats_md_string))
             params.timeStep = paramsBlock.get(blockNames.SimulationParams.timeStep, 2)
             params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, None)
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
