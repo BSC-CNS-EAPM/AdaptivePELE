@@ -191,7 +191,7 @@ class PDBManager:
             for residue in chain:
                 residue.checkHISProtonationState()
 
-    def renumber(self, starting_number=1):
+    def renumber(self, starting_number=1, constraint_dict=None):
         """
         Renumbers the each one of the chains starting from the starting_number
 
@@ -201,8 +201,27 @@ class PDBManager:
         resnumber = starting_number
         for chain in self.Protein:
             for residue in chain:
+                res_id = (residue.id, residue.num)
+                if constraint_dict is not None and res_id in constraint_dict:
+                    constraint_dict[res_id] = resnumber
                 residue.renumber(resnumber)
                 resnumber += 1
+        for chain in self.Ligand:
+            for residue in chain:
+                res_id = (residue.id, residue.num)
+                if constraint_dict is not None and res_id in constraint_dict:
+                    constraint_dict[res_id] = resnumber
+                residue.renumber(resnumber)
+                resnumber += 1
+        for chain in self.Other:
+            for residue in chain:
+                res_id = (residue.id, residue.num)
+                if constraint_dict is not None and res_id in constraint_dict:
+                    constraint_dict[res_id] = resnumber
+                residue.renumber(resnumber)
+                resnumber += 1
+
+        return constraint_dict
 
     def joinChains(self):
         """
@@ -335,10 +354,12 @@ class PDBManager:
                         atom.id = "Cl%s" % oldname[2:]
                         print("Atom %s of %s rename to %s" % (oldname, self.resname, atom.id))
 
-    def preparePDBforMD(self):
+    def preparePDBforMD(self, constraints=None):
         """
-        Method that prepares the pdb to be used in adaptivePELE MD simulation
+            Method that prepares the pdb to be used in adaptivePELE MD simulation
 
+            :param constraints: List of the atoms to constraint
+            :type constraints: list
         """
         # Check if the structure has posible gaps
         self.checkgaps()
@@ -353,10 +374,27 @@ class PDBManager:
         # Make a unique chain for the protein to avoid problems with Tleap
         # Because Tleap doesn't support chain ids
         self.joinChains()
+        constraint_dict = None
+        if constraints is not None:
+            constraint_dict = {}
+            for atom1, atom2, _ in constraints:
+                res1 = atom1.split(":")[1:]
+                res1[1] = int(res1[1])
+                res2 = atom2.split(":")[1:]
+                res2[1] = int(res2[1])
+                res1 = tuple(res1)
+                res2 = tuple(res2)
+                if res1 not in constraint_dict:
+                    constraint_dict[res1] = None
+                if res2 not in constraint_dict:
+                    constraint_dict[res2] = None
         # Renumber the pdb and remove insertion codes
-        self.renumber()
+        new_constraints = self.renumber(constraint_dict=constraint_dict)
         # Check for missing atoms
         self.checkMissingAtoms()
+        # change PELE water names
+        self.changeWaterNames()
+        return new_constraints
 
 
 class PDBase:
