@@ -33,6 +33,9 @@ class PDBManager:
                  "Nd", "PB", "PD", "PR", "PT", "Pu", "RB", "Ra", "SM", "SR", "Sm", "Sn", "TB", "TL", "Th",
                  "Tl", "Tm", "U4+", "V2+", "Y", "YB2", "ZN", "Zr"}
 
+    WATERS = ["WAT", "HOH"]
+    WATER_ATOMS = {"1HW": "H1", "2HW": "H2", "OW": "O"}
+
     # Modified residues for which there is a template in AdaptivePELE/constants/MDtemplates/
     TEMPLATE_PATH = os.path.join("".join(AdaptivePELE.constants.__path__), "MDtemplates/amber_*.lib")
 
@@ -99,7 +102,6 @@ class PDBManager:
                             if len(columns[self.POSITIONS["RESNAME"]]) > 3:
                                 columns[self.POSITIONS["RESNAME"]] = columns[self.POSITIONS["RESNAME"]][1:]
 
-
                     if columns[self.POSITIONS["RESNAME"]] in self.VALID_RESNAMES:
                         if currentStructure != self.Protein:
                             currentStructure = self.Protein
@@ -115,9 +117,9 @@ class PDBManager:
 
                     elif columns[self.POSITIONS["RESNAME"]] == self.resname:
                         if currentStructure != self.Ligand:
-                                currentStructure = self.Ligand
-                                currentChainName = columns[self.POSITIONS["CHAINID"]]
-                                currentChain = Chain(currentStructure, currentChainName)
+                            currentStructure = self.Ligand
+                            currentChainName = columns[self.POSITIONS["CHAINID"]]
+                            currentChain = Chain(currentStructure, currentChainName)
 
                     elif columns[self.POSITIONS["RESNAME"]] in self.VALID_ION or columns[self.POSITIONS["RESNAME"]]\
                             in ["WAT", "HOH"] or columns[self.POSITIONS["RESNAME"]] in self.VALID_NUCLEIC:
@@ -128,7 +130,7 @@ class PDBManager:
 
                     else:
                         raise PDBLoadException("Residue %s of Chain %s is not in templates" % (columns[self.POSITIONS["RESNAME"]],
-                                                                              columns[self.POSITIONS["CHAINID"]]))
+                                                                                               columns[self.POSITIONS["CHAINID"]]))
 
                     if currentChainName != columns[self.POSITIONS["CHAINID"]]:
                         currentChainName = columns[self.POSITIONS["CHAINID"]]
@@ -138,11 +140,10 @@ class PDBManager:
                         currentResidueNumber = columns[self.POSITIONS["RESNUMBER"]]
                         currentResidue = Residue(currentChain, columns[self.POSITIONS["RESNAME"]], currentResidueNumber)
 
-                    Atom(currentResidue, columns[self.POSITIONS["ATOMNAME"]],[columns[self.POSITIONS["COORDX"]],
-                                                                              columns[self.POSITIONS["COORDY"]],
-                                                                              columns[self.POSITIONS["COORDZ"]]],
-                         columns[self.POSITIONS["OCUPANCY"]],
-                         columns[self.POSITIONS["BFACTOR"]])
+                    Atom(currentResidue, columns[self.POSITIONS["ATOMNAME"]], [columns[self.POSITIONS["COORDX"]],
+                                                                               columns[self.POSITIONS["COORDY"]],
+                                                                               columns[self.POSITIONS["COORDZ"]]],
+                         columns[self.POSITIONS["OCUPANCY"]], columns[self.POSITIONS["BFACTOR"]])
 
     def writePDB(self, finalpdb, *args):
         """
@@ -258,6 +259,22 @@ class PDBManager:
                 print("Cysteine number %s renamed to CYX" % cys.num)
                 cys.rename("CYX")
 
+    def changeWaterNames(self, waterName=None):
+        """
+            Rename water atoms coming from PELE
+
+            :param waterName: Name of the water residue
+            :type waterName: str
+        """
+        if waterName is not None and waterName not in self.WATERS:
+            self.WATERS.append(waterName)
+        for chain in self.Other:
+            for residue in chain:
+                if residue.id in self.WATERS:
+                    for atom in residue:
+                        atom.id = self.WATER_ATOMS[atom.id]
+                    residue.id = "WAT"
+
     def checkMissingAtoms(self):
         # Method that check that all the heavy atoms are in the templates and also checks that all residues have all the heavy atoms
         for chain in self.Protein:
@@ -278,7 +295,7 @@ class PDBManager:
                             else:
                                 raise PDBLoadException("ERROR: Atom %s of Residue %s in chain %s not in Templates" % (atom, residue.id, chain.id))
                     for atom in missing_atoms:
-                        print("Warning: Residue %s of chain %s doesn't have the Atom %s" %(residue.id, chain.id, atom))
+                        print("Warning: Residue %s of chain %s doesn't have the Atom %s" % (residue.id, chain.id, atom))
 
     def getModifiedResiduesTleapTemplate(self):
         """
@@ -415,7 +432,6 @@ class Residue(PDBase):
             insertion = number[-1]
         return num, insertion
 
-
     def checkHISProtonationState(self):
         """
         Method that renames the histidines according to their protonation states
@@ -476,4 +492,3 @@ class Atom(PDBase):
         if self.ocupancy:
             self.ocupancy = float(self.ocupancy)
         self.Bfactor = Bfactor
-
