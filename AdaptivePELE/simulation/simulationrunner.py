@@ -881,6 +881,7 @@ class MDSimulation(SimulationRunner):
         processManager.barrier()
         if self.parameters.constraints is not None:
             prev_constraints = None
+        new_constraints = None
         for i, structure in initialStructures:
             TleapControlFile = "tleap_equilibration_%d.in" % i
             pdb = PDBLoader.PDBManager(structure, resname)

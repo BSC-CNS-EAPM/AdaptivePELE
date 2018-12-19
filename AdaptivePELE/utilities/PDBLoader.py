@@ -33,6 +33,7 @@ class PDBManager:
                  "Nd", "PB", "PD", "PR", "PT", "Pu", "RB", "Ra", "SM", "SR", "Sm", "Sn", "TB", "TL", "Th",
                  "Tl", "Tm", "U4+", "V2+", "Y", "YB2", "ZN", "Zr"}
 
+    VALID_WATER_ATOMS = set(["H1", "H2", "O"])
     WATERS = ["WAT", "HOH"]
     WATER_ATOMS = {"1HW": "H1", "2HW": "H2", "OW": "O"}
 
@@ -291,7 +292,8 @@ class PDBManager:
             for residue in chain:
                 if residue.id in self.WATERS:
                     for atom in residue:
-                        atom.id = self.WATER_ATOMS[atom.id]
+                        if atom.id not in self.VALID_WATER_ATOMS:
+                            atom.id = self.WATER_ATOMS[atom.id]
                     residue.id = "WAT"
 
     def checkMissingAtoms(self):
