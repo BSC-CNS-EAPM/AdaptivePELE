@@ -178,6 +178,7 @@ class SimulationParams:
     maxDevicesPerReplica = "maxDevicesPerReplica"
     format = "format"
     ligandName = "ligandName"
+    constraints = "constraints"
 
 
 class ExitConditionType:

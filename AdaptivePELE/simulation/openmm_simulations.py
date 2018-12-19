@@ -264,6 +264,9 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters, platformProp
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms, constraints=app.HBonds)
     # system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
+    if parameters.constraints is not None:
+        # Add the specified constraints to the system
+        addConstraints(system, prmtop.topology, parameters.constraints)
     if constraints:
         # Add positional restraints to protein backbone
         force = mm.CustomExternalForce(str("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)"))
@@ -314,6 +317,9 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
                                    constraints=app.HBonds)
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
+    if parameters.constraints is not None:
+        # Add the specified constraints to the system
+        addConstraints(system, topology.topology, parameters.constraints)
     if constraints:
         force = mm.CustomExternalForce(str("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)"))
         force.addGlobalParameter(str("k"), constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
@@ -369,6 +375,9 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     system.addForce(mm.MonteCarloBarostat(1 * unit.bar, parameters.Temperature * unit.kelvin))
+    if parameters.constraints is not None:
+        # Add the specified constraints to the system
+        addConstraints(system, topology.topology, parameters.constraints)
     if constraints:
         force = mm.CustomExternalForce(str("k*((x-x0)^2+(y-y0)^2+(z-z0)^2)"))
         force.addGlobalParameter(str("k"), constraints * unit.kilocalories_per_mole / unit.angstroms ** 2)
@@ -449,6 +458,9 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     system.addForce(mm.MonteCarloBarostat(1 * unit.bar, parameters.Temperature * unit.kelvin))
+    if parameters.constraints is not None:
+        # Add the specified constraints to the system
+        addConstraints(system, prmtop.topology, parameters.constraints)
     if parameters.boxRadius:
         group_ligand = []
         group_protein = []
@@ -465,7 +477,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         force.addGlobalParameter("r", parameters.boxRadius * unit.angstroms)
         force.addGroup(group_protein)
         force.addGroup(group_ligand)
-        force.addBond([0, 1], []) # the first parameter is the list of indexes of the groups, the second is the list of perbondparameters
+        force.addBond([0, 1], [])  # the first parameter is the list of indexes of the groups, the second is the list of perbondparameters
         system.addForce(force)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(pdb.positions)
@@ -531,3 +543,34 @@ def getDeviceIndexStr(deviceIndex, devicesPerTraj, devicesPerReplica=None):
     else:
         devices = range(deviceIndex, deviceIndex+devicesPerTraj)
     return ",".join(str(x) for x in devices)
+
+
+def addConstraints(system, topology, constraints):
+    """
+        Add constraints to the specified atoms
+
+        :param system: System object of the openMM simulation
+        :type system: OpenMM system object
+        :param topology: Topologty object of the openMM simulation
+        :type topology: OpenMM topology object
+        :param constraints: Group of constraints to establish
+        :type constraints: list
+    """
+    atomIndices = {}
+    for constraint in constraints:
+        if constraint[0] not in atomIndices:
+            atomIndices[constraint[0]] = None
+        if constraint[1] not in atomIndices:
+            atomIndices[constraint[1]] = None
+
+    for atom in topology.atoms():
+        atom_str = "%s:%s:%d" % (atom.name, atom.residue.name, atom.residue.index+1)
+        if atom_str in atomIndices:
+            atomIndices[atom_str] = atom.index
+
+    for constraint in constraints:
+        assert atomIndices[constraint[0]] != atomIndices[constraint[1]]
+        assert atomIndices[constraint[0]] is not None
+        assert atomIndices[constraint[1]] is not None
+        # pass distance constraint in nm
+        system.addConstraint(atomIndices[constraint[0]], atomIndices[constraint[1]], float(constraint[2])/10.0)

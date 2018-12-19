@@ -191,7 +191,8 @@ class SimulationParams:
         "customparamspath": "basestring",
         "numReplicas": "numbers.Real",
         "maxDevicesPerReplica": "numbers.Real",
-        "format": "basestring"
+        "format": "basestring",
+        "constraints": "list"
     }
     exitCondition = {
         "types": {

@@ -87,6 +87,7 @@ class SimulationParameters:
         self.forcefield = "ff99SB"
         self.customparamspath = None
         self.format = None
+        self.constraints = None
 
 
 class SimulationRunner:
@@ -878,11 +879,18 @@ class MDSimulation(SimulationRunner):
             Tleapdict["FRCMOD"] = os.path.join(self.parameters.customparamspath, Tleapdict["FRCMOD"])
 
         processManager.barrier()
-
+        if self.parameters.constraints is not None:
+            prev_constraints = None
         for i, structure in initialStructures:
             TleapControlFile = "tleap_equilibration_%d.in" % i
             pdb = PDBLoader.PDBManager(structure, resname)
-            pdb.preparePDBforMD()
+            constraints_map = pdb.preparePDBforMD(constraints=self.parameters.constraints)
+            if constraints_map is not None:
+                new_constraints = updateConstraints(self.parameters.constraints, constraints_map)
+                if prev_constraints is None:
+                    prev_constraints = new_constraints
+                assert new_constraints == prev_constraints
+                prev_constraints = new_constraints
             structure = pdb.writeAll(outputpath=temporalFolder, outputname="initial_%d.pdb" % i)
             prmtop = os.path.join(workingdirectory, outputPathConstants.topologies, "system_%d.prmtop" % i)
             inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % i)
@@ -903,6 +911,8 @@ class MDSimulation(SimulationRunner):
                                         (os.path.join(workingdirectory, equilibrationOutput), i))
             self.prmtopFiles.append(prmtop)
             equilibrationFiles.append((prmtop, inpcrd))
+        if new_constraints is not None:
+            self.parameters.constraints = new_constraints
         assert len(equilibrationFiles) == len(initialStructures), "Equilibration files and initial structures don't match"
         assert len(equilibrationFiles) <= self.parameters.trajsPerReplica, "Too many equilibration structures per replica"
         os.chdir(workingdirectory)
@@ -1341,6 +1351,7 @@ class RunnerBuilder:
             params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
             params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
+            params.constraints = paramsBlock.get(blockNames.SimulationParams.constraints)
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]
@@ -1394,3 +1405,17 @@ class ExitConditionBuilder:
             return ClusteringExitCondition(ntrajs)
         else:
             sys.exit("Unknown exit condition type! Choices are: " + str(simulationTypes.EXITCONDITION_TYPE_TO_STRING_DICTIONARY.values()))
+
+
+def updateConstraints(constraints_orig, constraints_map):
+    new_const = []
+    for constr in constraints_orig:
+        atom1, atom2, dist = constr
+        atom1 = atom1.split(":")
+        atom2 = atom2.split(":")
+        atom1[2] = int(atom1[2])
+        atom2[2] = int(atom2[2])
+        atom1[2] = constraints_map[tuple(atom1[1:])]
+        atom2[2] = constraints_map[tuple(atom2[1:])]
+        new_const.append([":".join([str(i) for i in atom1]), ":".join([str(i) for i in atom2]), str(dist)])
+    return new_const
