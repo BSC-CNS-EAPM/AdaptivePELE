@@ -122,6 +122,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#example-1-pele-with-default-parameters">Example 1 – PELE with default parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example-2-pele-with-more-specific-parameters">Example 2 – PELE with more specific parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example-3-md-using-openmm-with-default-parameters">Example 3 – MD using OpenMM with default parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-4-md-using-openmm-with-constraints-and-other-parameters">Example 4 – MD using OpenMM with constraints and other parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#output">Output</a></li>
@@ -401,6 +402,11 @@ support <em>dcd</em> and <em>xtc</em>, note however that due to issues with the 
 in mdtraj writing <em>xtc</em> files might not be problematic unless you are
 currently using the latest mdtraj code (this means version &gt; 1.9.2 at the
 moment this was written)</li>
+<li><strong>constraints</strong> (<em>list</em>, default=None): List of constraints between atoms to
+establish in a simulation. The constraints must be specified as a list in the
+following format [“atom1:res1:resnum1”, “atom2:res2:resnum2”, distance] see
+<a class="reference internal" href="#control-file-examples">Control File Examples</a> section for an example on how to set constraints.
+<strong>Note</strong>: the distance of the constrints <strong>must</strong> be specified in angstroms</li>
 </ul>
 </div>
 <div class="section" id="exit-condition">
@@ -607,6 +613,39 @@ treshold of 2, those with contacts ratio between 1 and 0.75 have a treshold of
 5. This means that for greater contacts ratio, typically closer to the binding site,
 the cluster size will be smaller and therefore those regions will be more
 finely discretized.</p>
+<p>Example of contactMap clustering:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">clustering</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;contactMap&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ligandResname&quot;</span><span class="p">:</span> <span class="s2">&quot;AIN&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;contactThresholdDistance&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s2">&quot;similarityEvaluator&quot;</span><span class="p">:</span> <span class="s2">&quot;correlation&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;thresholdCalculator&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.15</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>Example of MSM clustering:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">clustering</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;MSM&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ligandResname&quot;</span><span class="p">:</span> <span class="s2">&quot;BEN&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;nclusters&quot;</span><span class="p">:</span> <span class="mi">100</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Example of null clustering:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">clustering</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;null&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="spawning-block">
@@ -679,6 +718,7 @@ plots for the MSM-based spawnings</li>
 </div>
 <div class="section" id="examples">
 <h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p>Running inverselyProportional:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;inverselyProportional&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
@@ -687,6 +727,7 @@ plots for the MSM-based spawnings</li>
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>Running epsilon:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;epsilon&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
@@ -700,6 +741,7 @@ plots for the MSM-based spawnings</li>
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>Running independent spawning:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;independent&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
@@ -708,6 +750,7 @@ plots for the MSM-based spawnings</li>
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>Running independentMSM spawning (needs to be coupled with MSM clustering):</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;IndependentMSM&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
@@ -717,6 +760,7 @@ plots for the MSM-based spawnings</li>
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>Running variableEpsilon:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;variableEpsilon&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
@@ -884,6 +928,67 @@ plots for the MSM-based spawnings</li>
         <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">,</span>
         <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;ligandResname&quot;</span> <span class="p">:</span> <span class="s2">&quot;BEN&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-4-md-using-openmm-with-constraints-and-other-parameters">
+<h3>Example 4 – MD using OpenMM with constraints and other parameters<a class="headerlink" href="#example-4-md-using-openmm-with-constraints-and-other-parameters" title="Permalink to this headline">¶</a></h3>
+<p>An sligthly more complex example of running an MD simulation with OpenMM:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+        <span class="s2">&quot;debug&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+        <span class="s2">&quot;outputPath&quot;</span><span class="p">:</span><span class="s2">&quot;simulation_prova_constraints/&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;writeAllClusteringStructures&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+        <span class="s2">&quot;initialStructures&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;EPBH_L01.pdb&quot;</span><span class="p">,</span> <span class="s2">&quot;cluster_*.pdb&quot;</span><span class="p">]</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;epsilon&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;metricColumnInReport&quot;</span> <span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;epsilon&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;T&quot;</span><span class="p">:</span><span class="mi">1000</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;density&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;continuous&quot;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;md&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;iterations&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;processors&quot;</span> <span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+            <span class="s2">&quot;numReplicas&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;WaterBoxSize&quot;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">&quot;equilibrationLengthNVT&quot;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">&quot;equilibrationLengthNPT&quot;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">&quot;productionLength&quot;</span> <span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="s2">&quot;reporterFrequency&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">&quot;nonBondedCutoff&quot;</span> <span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+            <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;xtc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">15687</span><span class="p">,</span>
+            <span class="s2">&quot;runningPlatform&quot;</span><span class="p">:</span> <span class="s2">&quot;CPU&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;boxRadius&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+            <span class="s2">&quot;boxCenter&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">34.324</span><span class="p">,</span> <span class="mf">15.612</span><span class="p">,</span> <span class="mf">7.829</span><span class="p">],</span>
+            <span class="s2">&quot;ligandName&quot;</span><span class="p">:</span> <span class="s2">&quot;L01&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ligandCharge&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;constraints&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;MG:MG:1890&quot;</span><span class="p">,</span> <span class="s2">&quot;OD1:ASP:758&quot;</span><span class="p">,</span> <span class="mf">1.98</span><span class="p">],</span>
+                            <span class="p">[</span><span class="s2">&quot;MG:MG:1891&quot;</span><span class="p">,</span> <span class="s2">&quot;OD2:ASP:740&quot;</span><span class="p">,</span> <span class="mf">4.12</span><span class="p">],</span>
+                            <span class="p">[</span><span class="s2">&quot;MG:MG:1890&quot;</span><span class="p">,</span> <span class="s2">&quot;MG:MG:1891&quot;</span><span class="p">,</span> <span class="mf">3.47</span><span class="p">]]</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="s2">&quot;clustering&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;alternativeStructure&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s2">&quot;ligandResname&quot;</span> <span class="p">:</span> <span class="s2">&quot;L01&quot;</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>

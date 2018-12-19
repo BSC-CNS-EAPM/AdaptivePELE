@@ -249,6 +249,11 @@ Optionally, you can also use the following parameters:
   in mdtraj writing *xtc* files might not be problematic unless you are
   currently using the latest mdtraj code (this means version > 1.9.2 at the
   moment this was written)
+* **constraints** (*list*, default=None): List of constraints between atoms to
+  establish in a simulation. The constraints must be specified as a list in the
+  following format ["atom1:res1:resnum1", "atom2:res2:resnum2", distance] see
+  `Control File Examples`_ section for an example on how to set constraints.
+  **Note**: the distance of the constrints **must** be specified in angstroms
 
 
 Exit condition
@@ -468,6 +473,40 @@ treshold of 2, those with contacts ratio between 1 and 0.75 have a treshold of
 the cluster size will be smaller and therefore those regions will be more
 finely discretized.
 
+Example of contactMap clustering::
+
+    clustering: {
+        "type": "contactMap",
+        "params": {
+            "ligandResname": "AIN",
+            "contactThresholdDistance": 8,
+            "similarityEvaluator": "correlation"
+        },
+        "thresholdCalculator": {
+            "type": "constant",
+            "params": {
+                "value": 0.15
+            }
+        }
+
+Example of MSM clustering::
+
+    clustering: {
+        "type": "MSM",
+        "params": {
+            "ligandResname": "BEN",
+            "nclusters": 100
+        }
+    }
+
+Example of null clustering::
+
+    clustering: {
+        "type": "null",
+        "params": {}
+    }
+
+    
 
 Spawning block
 ---------------
@@ -561,7 +600,7 @@ Additionally, these methods can also accept the following parameters:
 Examples
 ..........
 
-::
+Running inverselyProportional::
 
     "spawning" : {
         "type" : "inverselyProportional",
@@ -571,7 +610,7 @@ Examples
     }
 
 
-::
+Running epsilon::
 
     "spawning" : {
         "type" : "epsilon",
@@ -586,7 +625,7 @@ Examples
     }
 
 
-::
+Running independent spawning::
 
     "spawning" : {
         "type" : "independent",
@@ -595,7 +634,7 @@ Examples
         }
     }
 
-::
+Running independentMSM spawning (needs to be coupled with MSM clustering)::
 
     "spawning" : {
         "type" : "IndependentMSM",
@@ -605,7 +644,7 @@ Examples
         }
     }
 
-::
+Running variableEpsilon::
 
     "spawning" : {
         "type" : "variableEpsilon",
@@ -783,6 +822,70 @@ A simple example of running an MD simulation with OpenMM::
             }
         }
     }
+
+
+Example 4 -- MD using OpenMM with constraints and other parameters
+..................................................................
+
+
+An sligthly more complex example of running an MD simulation with OpenMM::
+
+    {
+        "generalParams" : {
+            "restart": false,
+            "debug" : false,
+            "outputPath":"simulation_prova_constraints/",
+            "writeAllClusteringStructures" : false,
+            "initialStructures" : ["EPBH_L01.pdb", "cluster_*.pdb"]
+        },
+
+        "spawning" : {
+            "type" : "epsilon",
+            "params" : {
+                "reportFilename" : "report",
+                "metricColumnInReport" : 5,
+                "epsilon": 0.0,
+                "T":1000
+            },
+            "density" : {
+                "type" : "continuous"
+            }
+        },
+
+        "simulation": {
+            "type" : "md",
+            "params" : {
+                "iterations" : 1,
+                "processors" : 6,
+                "numReplicas": 1,
+                "WaterBoxSize" : 10,
+                "equilibrationLengthNVT" : 10,
+                "equilibrationLengthNPT" : 10,
+                "productionLength" : 100,
+                "reporterFrequency": 10,
+                "nonBondedCutoff" : 9,
+                "format": "xtc",
+                "seed": 15687,
+                "runningPlatform": "CPU",
+                "boxRadius": 30,
+                "boxCenter": [34.324, 15.612, 7.829],
+                "ligandName": "L01",
+                "ligandCharge": 0,
+                "constraints": [["MG:MG:1890", "OD1:ASP:758", 1.98], 
+                                ["MG:MG:1891", "OD2:ASP:740", 4.12], 
+                                ["MG:MG:1890", "MG:MG:1891", 3.47]]
+            }
+        },
+
+        "clustering" : {
+            "type" : "rmsd",
+            "params" : {
+                "alternativeStructure": true,
+                "ligandResname" : "L01"
+            }
+        }
+    }
+
 
 
 Output
