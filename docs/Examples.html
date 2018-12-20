@@ -365,48 +365,67 @@ and trajectories (in time steps, see <strong>timeStep</strong> property)</li>
 <li><strong>ligandName</strong> (<em>str</em>, mandatory): Ligand residue name in the PDB</li>
 </ul>
 <p>Optionally, you can also use the following parameters:</p>
-<ul class="simple">
-<li><strong>equilibrationLengthNVT</strong> (<em>int</em>, default=200000): Number of steps for the constant volume
-equilibration run (default corresponds to 400 ps)</li>
-<li><strong>equilibrationLengthNPT</strong> (<em>int</em>, default=500000): Number of steps for the constant pressure
-equilibration run (default corresponds to 1 ns)</li>
-<li><strong>timeStep</strong> (<em>float</em>, default=2): Value of the time step for the integration
-(in femtoseconds)</li>
-<li><strong>boxRadius</strong> (<em>float</em>, default=None): Distance from the protein mass center in which the ligand is allowed to move. If specified, a restrain will be applied between both mass centers when the distance between them surpasses the <strong>boxRadius</strong>. (in angstroms)
-(<strong>Note</strong>: When defining this parameter is important to take into account the distance between the binding site and the mass center of the protein.)</li>
-<li><strong>ligandCharge</strong> (<em>integer</em>, default=0): Charge of the ligand</li>
-<li><strong>waterBoxSize</strong> (<em>float</em>, default=8): Distance of the edge of the solvation
-box from the closest atom (in angstroms)</li>
-<li><strong>nonBondedCutoff</strong> (<em>float</em>, default=8): Radius for the nonBonded cutoff of
-the long-range interactions (in angstroms)</li>
-<li><strong>temperature</strong> (<em>float</em>, default=300): Temperature of the simulation (in
-Kelvin)</li>
-<li><strong>runningPlatform</strong> (<em>str</em>, default=CPU): Platform on which to run the
-simulation, options are {<em>CPU</em>, <em>CUDA</em>, <em>OpenCL</em>, <em>Reference</em>}, see  <a class="reference external" href="http://docs.openmm.org/7.1.0/userguide/library.html#platform-specific-properties">openmm documentation</a> for more details</li>
-<li><strong>minimizationIterations</strong> (<em>float</em>, default=2000): Number of time steps to
-run the energy minimization</li>
-<li><strong>devicesPerTrajectory</strong> (<em>int</em>, default=1): Number of gpus to use for each
+<ul>
+<li><p class="first"><strong>equilibrationLengthNVT</strong> (<em>int</em>, default=200000): Number of steps for the constant volume
+equilibration run (default corresponds to 400 ps)</p>
+</li>
+<li><p class="first"><strong>equilibrationLengthNPT</strong> (<em>int</em>, default=500000): Number of steps for the constant pressure
+equilibration run (default corresponds to 1 ns)</p>
+</li>
+<li><p class="first"><strong>timeStep</strong> (<em>float</em>, default=2): Value of the time step for the integration
+(in femtoseconds)</p>
+</li>
+<li><p class="first"><strong>boxRadius</strong> (<em>float</em>, default=None): Distance from the protein mass center in which the ligand is allowed to move. If specified, a restrain will be applied between both mass centers when the distance between them surpasses the <strong>boxRadius</strong>. (in angstroms)
+(<strong>Note</strong>: When defining this parameter is important to take into account the distance between the binding site and the mass center of the protein.)</p>
+</li>
+<li><p class="first"><strong>ligandCharge</strong> (<em>integer</em>, default=0): Charge of the ligand</p>
+</li>
+<li><p class="first"><strong>waterBoxSize</strong> (<em>float</em>, default=8): Distance of the edge of the solvation
+box from the closest atom (in angstroms)</p>
+</li>
+<li><p class="first"><strong>nonBondedCutoff</strong> (<em>float</em>, default=8): Radius for the nonBonded cutoff of
+the long-range interactions (in angstroms)</p>
+</li>
+<li><p class="first"><strong>temperature</strong> (<em>float</em>, default=300): Temperature of the simulation (in
+Kelvin)</p>
+</li>
+<li><p class="first"><strong>runningPlatform</strong> (<em>str</em>, default=CPU): Platform on which to run the
+simulation, options are {<em>CPU</em>, <em>CUDA</em>, <em>OpenCL</em>, <em>Reference</em>}, see  <a class="reference external" href="http://docs.openmm.org/7.1.0/userguide/library.html#platform-specific-properties">openmm documentation</a> for more details</p>
+</li>
+<li><p class="first"><strong>minimizationIterations</strong> (<em>float</em>, default=2000): Number of time steps to
+run the energy minimization</p>
+</li>
+<li><p class="first"><strong>devicesPerTrajectory</strong> (<em>int</em>, default=1): Number of gpus to use for each
 trajectory, this parameter only applies if using the <em>CUDA</em> platformn. Note
 that <strong>devicesPerTrajectory*numReplicas</strong> should correspond to the number of
-gpus per node that you have available</li>
-<li><strong>maxDevicesPerReplica</strong> (<em>int</em>, default=None): Number of maximum gpus available per replica, this parameter is necessary if one wants to oversubscribe the gpus, i.e. run more than one trajectory in the same device</li>
-<li><strong>constraintsMinimization</strong> (<em>float</em>, default=5.0): Value of the constraints
+gpus per node that you have available</p>
+</li>
+<li><p class="first"><strong>maxDevicesPerReplica</strong> (<em>int</em>, default=None): Number of maximum gpus available per replica, this parameter is necessary if one wants to oversubscribe the gpus, i.e. run more than one trajectory in the same device</p>
+</li>
+<li><p class="first"><strong>constraintsMinimization</strong> (<em>float</em>, default=5.0): Value of the constraints
 for the minimization (in kcal/(mol*A<sup>2</sup>)), see <a class="reference internal" href="#equilibration-procedure-in-md">Equilibration procedure in MD</a> section
-for more details on the equilibration procedure</li>
-<li><strong>constraintsNVT</strong> (<em>float</em>, default=5.0): Value of the constraints
-for the NVT equilibration (in kcal/(mol*A<sup>2</sup>))</li>
-<li><strong>constraintsNPT</strong> (<em>float</em>, default=0.5): Value of the constraints
-for the NPT equilibration (in kcal/(mol*A<sup>2</sup>))</li>
-<li><strong>format</strong> (<em>str</em>, default=xtc): Format of the trajectory file, currently we
+for more details on the equilibration procedure</p>
+</li>
+<li><p class="first"><strong>constraintsNVT</strong> (<em>float</em>, default=5.0): Value of the constraints
+for the NVT equilibration (in kcal/(mol*A<sup>2</sup>))</p>
+</li>
+<li><p class="first"><strong>constraintsNPT</strong> (<em>float</em>, default=0.5): Value of the constraints
+for the NPT equilibration (in kcal/(mol*A<sup>2</sup>))</p>
+</li>
+<li><p class="first"><strong>format</strong> (<em>str</em>, default=xtc): Format of the trajectory file, currently we
 support <em>dcd</em> and <em>xtc</em>, note however that due to issues with the xtc library
 in mdtraj writing <em>xtc</em> files might not be problematic unless you are
 currently using the latest mdtraj code (this means version &gt; 1.9.2 at the
-moment this was written)</li>
-<li><strong>constraints</strong> (<em>list</em>, default=None): List of constraints between atoms to
+moment this was written)</p>
+</li>
+<li><p class="first"><strong>constraints</strong> (<em>list</em>, default=None): List of constraints between atoms to
 establish in a simulation. The constraints must be specified as a list in the
-following format [“atom1:res1:resnum1”, “atom2:res2:resnum2”, distance] see
-<a class="reference internal" href="#control-file-examples">Control File Examples</a> section for an example on how to set constraints.
-<strong>Note</strong>: the distance of the constrints <strong>must</strong> be specified in angstroms</li>
+following format (see <a class="reference internal" href="#control-file-examples">Control File Examples</a> section for an example on how
+to set constraints.  <strong>Note</strong>: the distance of the constrints <strong>must</strong> be specified in angstroms):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;atom1:res1:resnum1&quot;</span><span class="p">,</span> <span class="s2">&quot;atom2:res2:resnum2&quot;</span><span class="p">,</span> <span class="n">distance</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
 </ul>
 </div>
 <div class="section" id="exit-condition">

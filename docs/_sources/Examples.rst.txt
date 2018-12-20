@@ -251,9 +251,10 @@ Optionally, you can also use the following parameters:
   moment this was written)
 * **constraints** (*list*, default=None): List of constraints between atoms to
   establish in a simulation. The constraints must be specified as a list in the
-  following format ["atom1:res1:resnum1", "atom2:res2:resnum2", distance] see
-  `Control File Examples`_ section for an example on how to set constraints.
-  **Note**: the distance of the constrints **must** be specified in angstroms
+  following format (see `Control File Examples`_ section for an example on how 
+  to set constraints.  **Note**: the distance of the constrints **must** be specified in angstroms)::
+
+  ["atom1:res1:resnum1", "atom2:res2:resnum2", distance]
 
 
 Exit condition
