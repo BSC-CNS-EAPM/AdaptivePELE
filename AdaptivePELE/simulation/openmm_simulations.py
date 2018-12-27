@@ -46,6 +46,25 @@ def get_traceback(f):
     return wrapper
 
 
+class ForceReporter(object):
+    def __init__(self, file, reportInterval):
+        self._out = open(file, 'w')
+        self._reportInterval = reportInterval
+
+    def __del__(self):
+        self._out.close()
+
+    def describeNextReport(self, simulation):
+        steps = self._reportInterval - simulation.currentStep % self._reportInterval
+        return (steps, False, False, True, False, None)
+
+    def report(self, simulation, state):
+        self._out.write("Step %d\n" % simulation.currentStep)
+        forces = state.getForces().value_in_unit(unit.kilojoules/unit.mole/unit.nanometer)
+        for i, f in enumerate(forces):
+            self._out.write('%d %g %g %g\n' % (i, f[0], f[1], f[2]))
+
+
 class XTCReporter(_BaseReporter):
     """
         XTCReporter stores a molecular dynamics trajectory in the GROMACS xtc
