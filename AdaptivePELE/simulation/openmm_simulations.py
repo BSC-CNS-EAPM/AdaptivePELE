@@ -233,7 +233,7 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     state = simulation.context.getState(getPositions=True, getVelocities=True, enforcePeriodicBox=True)
     positions = state.getPositions()
     velocities = state.getVelocities()
-    #TODO remove for production
+    # TODO remove for production
     root, _ = os.path.splitext(reportName)
     trajName = "%s_NVT.pdb" % root
     with open(trajName, "w") as fw:
@@ -284,8 +284,8 @@ def minimization(prmtop, inpcrd, pdb_coords, PLATFORM, constraints, parameters, 
 
     if parameters.boxCenter:
         # the last parameter is only used to print a message, by passing a
-        # value different than 0 we avoid having too many prints 
-        addDummyAtomToSystem(system, prmtop.topology, pdb_coords.positions, parameters.ligandName, dummy, parameters.boxCenter, 3)
+        # value different than 0 we avoid having too many prints
+        addDummyAtomToSystem(system, prmtop.topology, pdb_coords.positions, parameters.ligandName, dummy, parameters.boxCenter, 0)
     if constraints:
         # Add positional restraints to protein backbone
         force = mm.CustomExternalForce(str("k*periodicdistance(x, y, z, x0, y0, z0)^2"))
@@ -346,8 +346,8 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         # OpenMM quantity to a list
         pos_dumm = list(ast.literal_eval(str(positions[dummy].value_in_unit(unit.angstrom))))
         # the last parameter is only used to print a message, by passing a
-        # value different than 0 we avoid having too many prints 
-        addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, pos_dumm, 3)
+        # value different than 0 we avoid having too many prints
+        addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, pos_dumm, 0)
 
     if constraints:
         force = mm.CustomExternalForce(str("k*periodicdistance(x, y, z, x0, y0, z0)^2"))
@@ -372,7 +372,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
                                                         potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=parameters.equilibrationLengthNVT, separator="\t"))
-    #TODO remove for production
+    # TODO remove for production
     # trajName = "%s_pre_NVT.pdb" % root
     # with open(trajName, "w") as fw:
     #     app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions().in_units_of(unit.angstroms), fw)
@@ -423,8 +423,8 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         # OpenMM quantity to a list
         pos_dumm = list(ast.literal_eval(str(positions[dummy].value_in_unit(unit.angstrom))))
         # the last parameter is only used to print a message, by passing a
-        # value different than 0 we avoid having too many prints 
-        addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, pos_dumm, 3)
+        # value different than 0 we avoid having too many prints
+        addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, pos_dumm, 0)
 
     if constraints:
         force = mm.CustomExternalForce(str("k*periodicdistance(x, y, z, x0, y0, z0)^2"))
@@ -438,7 +438,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         system.addForce(force)
     simulation = app.Simulation(topology.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(positions)
-    #TODO: remove for production
+    # TODO: remove for production
     if velocities:
         simulation.context.setVelocities(velocities)
     else:
@@ -517,17 +517,16 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         pos_dumm = list(ast.literal_eval(str(pdb.positions[dummy].value_in_unit(unit.angstrom))))
         addDummyAtomToSystem(system, prmtop.topology, pdb.positions, parameters.ligandName, dummy, pos_dumm, deviceIndex)
 
-
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     system.addForce(mm.MonteCarloBarostat(1 * unit.bar, parameters.Temperature * unit.kelvin))
 
-    if False and parameters.boxCenter:
+    if parameters.boxCenter:
         print("Adding spherical ligand box")
         addLigandBox(prmtop.topology, system, parameters.ligandName, dummy, parameters.boxRadius, deviceIndex)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(pdb.positions)
-    #TODO: remove for production
+    # TODO: remove for production
     if restart:
         with open(str(checkpoint), 'rb') as check:
             simulation.context.loadCheckpoint(check.read())
@@ -536,7 +535,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, seed)
         stateData = open(str(stateReporter), "w")
     pdb_trajName = os.path.join(outputDir, "trajectory_initial_%d.pdb" % (workerNumber))
-    #TODO remove for production
+    # TODO remove for production
     with open(pdb_trajName, "w") as fw:
         app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True, enforcePeriodicBox=True).getPositions().in_units_of(unit.angstroms), fw)
     if parameters.format == "xtc":
@@ -546,7 +545,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         simulation.reporters.append(app.DCDReporter(str(trajName), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
 
     simulation.reporters.append(app.CheckpointReporter(str(checkpointReporter), parameters.reporterFreq))
-    #TODO remove for production
+    # TODO remove for production
     # simulation.reporters.append(CustomStateDataReporter(stateData, parameters.reporterFreq, step=True,
     simulation.reporters.append(CustomStateDataReporter(stateData, 1, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
@@ -554,8 +553,6 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
                                                         totalSteps=parameters.productionLength, separator="\t",
                                                         append=restart, initialStep=lastStep))
     if workerNumber == 1:
-        #TODO remove for production
-        simulation.reporters.append(app.StateDataReporter(sys.stdout, 1, step=True, temperature=True, potentialEnergy=True, kineticEnergy=True))
         frequency = min(10 * parameters.reporterFreq, parameters.productionLength)
         simulation.reporters.append(app.StateDataReporter(sys.stdout, frequency, step=True))
     simulation.step(simulation_length)
