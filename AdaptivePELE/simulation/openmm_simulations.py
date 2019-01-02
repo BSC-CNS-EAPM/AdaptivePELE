@@ -139,8 +139,7 @@ class CustomStateDataReporter(app.StateDataReporter):
             # problems between different versions of python
             file_name = str(file_name)
 
-        app.StateDataReporter.__init__(self, file_name, reportInterval, step, time_sim, potentialEnergy, kineticEnergy, totalEnergy, temperature, volume, density,
-                                       progress, remainingTime, speed, elapsedTime, separator, systemMass, totalSteps)
+        app.StateDataReporter.__init__(self, file_name, reportInterval, step, time_sim, potentialEnergy, kineticEnergy, totalEnergy, temperature, volume, density, progress, remainingTime, speed, elapsedTime, separator, systemMass, totalSteps)
         self._append = append
         self.initialStep = initialStep
         self._initialClockTime = None
@@ -367,7 +366,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
     root, _ = os.path.splitext(reportName)
     reportFile = "%s_report_NVT" % root
-    report_freq = min(parameters.reporterFreq, simulation_steps/4)
+    report_freq = int(min(parameters.reporterFreq, simulation_steps/4))
     simulation.reporters.append(CustomStateDataReporter(reportFile, report_freq, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
@@ -445,7 +444,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
     root, _ = os.path.splitext(reportName)
     reportFile = "%s_report_NPT" % root
-    report_freq = min(parameters.reporterFreq, simulation_steps/4)
+    report_freq = int(min(parameters.reporterFreq, simulation_steps/4))
     simulation.reporters.append(CustomStateDataReporter(reportFile, report_freq, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
@@ -522,12 +521,11 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     system.addForce(mm.MonteCarloBarostat(1 * unit.bar, parameters.Temperature * unit.kelvin))
 
-    if False and parameters.boxCenter:
+    if parameters.boxCenter:
         print("Adding spherical ligand box")
         addLigandBox(prmtop.topology, system, parameters.ligandName, dummy, parameters.boxRadius, deviceIndex)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(pdb.positions)
-    #TODO: remove for production
     if restart:
         with open(str(checkpoint), 'rb') as check:
             simulation.context.loadCheckpoint(check.read())
@@ -535,8 +533,8 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     else:
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, seed)
         stateData = open(str(stateReporter), "w")
-    pdb_trajName = os.path.join(outputDir, "trajectory_initial_%d.pdb" % (workerNumber))
     #TODO remove for production
+    pdb_trajName = os.path.join(outputDir, "trajectory_initial_%d.pdb" % (workerNumber))
     with open(pdb_trajName, "w") as fw:
         app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True, enforcePeriodicBox=True).getPositions().in_units_of(unit.angstroms), fw)
     if parameters.format == "xtc":
