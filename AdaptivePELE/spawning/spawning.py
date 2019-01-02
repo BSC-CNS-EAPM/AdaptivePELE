@@ -28,9 +28,14 @@ except ImportError:
 MATPLOTLIB = True
 try:
     import matplotlib.pyplot as plt
-    plt.style.use("ggplot")
 except ImportError:
     MATPLOTLIB = False
+if MATPLOTLIB:
+    try:
+        # Minotauro version is too old
+        plt.style.use("ggplot")
+    except AttributeError:
+        pass
 
 
 def reward(x, rews):
