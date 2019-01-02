@@ -9,10 +9,10 @@ import sys
 import time
 import functools
 import traceback
+import numpy as np
 import simtk.openmm as mm
 import simtk.openmm.app as app
 import simtk.unit as unit
-import numpy as np
 from AdaptivePELE.constants import constants
 from AdaptivePELE.utilities import utilities
 from mdtraj.reporters.basereporter import _BaseReporter
@@ -355,8 +355,10 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         simulation.context.setVelocities(velocities)
     else:
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
-    reportFile = "%s_report_NVT" % reportName
-    simulation.reporters.append(CustomStateDataReporter(reportFile, parameters.reporterFreq, step=True,
+    root, _ = os.path.splitext(reportName)
+    reportFile = "%s_report_NVT" % root
+    report_freq = min(parameters.reporterFreq, simulation_steps/4)
+    simulation.reporters.append(CustomStateDataReporter(reportFile, report_freq, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=parameters.equilibrationLengthNVT, separator="\t"))
@@ -413,8 +415,10 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         simulation.context.setVelocities(velocities)
     else:
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
-    reportFile = "%s_report_NPT" % reportName
-    simulation.reporters.append(CustomStateDataReporter(reportFile, parameters.reporterFreq, step=True,
+    root, _ = os.path.splitext(reportName)
+    reportFile = "%s_report_NPT" % root
+    report_freq = min(parameters.reporterFreq, simulation_steps/4)
+    simulation.reporters.append(CustomStateDataReporter(reportFile, report_freq, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=parameters.equilibrationLengthNPT, separator="\t"))
@@ -453,7 +457,10 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     :type restart: bool
 
     """
+    # this number gives the number of the subprocess in the given node
     deviceIndex = workerNumber
+    # this one gives the number of the subprocess in the overall simulation (i.e
+    # the trajectory file number)
     workerNumber += replica_id*trajsPerReplica + 1
     prmtop, pdb = equilibrationFiles
     prmtop = app.AmberPrmtopFile(prmtop)
