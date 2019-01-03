@@ -862,11 +862,12 @@ class MDSimulation(SimulationRunner):
         ligandPDB = self.extractLigand(initialStructures[0][1], resname, "", processManager.id)
         ligandmol2 = "%s.mol2" % resname
         ligandfrcmod = "%s.frcmod" % resname
-        Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.waterBoxSize, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
+        Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.waterBoxSize, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod, "DUM": ""}
         antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
         parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
         if processManager.isMaster() and not self.parameters.customparamspath:
             self.prepareLigand(antechamberDict, parmchkDict)
+        amber_file_path = ""
         # Change the Mol2 and Frcmod path to the new user defined path
         if self.parameters.customparamspath:
             if not os.path.exists(self.parameters.customparamspath):
@@ -876,13 +877,19 @@ class MDSimulation(SimulationRunner):
                     raise FileNotFoundError("No custom parameters found in the given path")
             Tleapdict["MOL2"] = os.path.join(self.parameters.customparamspath, Tleapdict["MOL2"])
             Tleapdict["FRCMOD"] = os.path.join(self.parameters.customparamspath, Tleapdict["FRCMOD"])
+            amber_file_path = self.parameters.customparamspath
+        if self.parameters.boxCenter:
+            with open(os.path.join(amber_file_path, "DUM.prep"), "w") as fw:
+                fw.write(constants.AmberTemplates.DUM_prep)
+            with open(os.path.join(amber_file_path, "DUM.frcmod"), "w") as fw:
+                fw.write(constants.AmberTemplates.DUM_frcmod)
 
         processManager.barrier()
 
         for i, structure in initialStructures:
             TleapControlFile = "tleap_equilibration_%d.in" % i
             pdb = PDBLoader.PDBManager(structure, resname)
-            pdb.preparePDBforMD()
+            pdb.preparePDBforMD(boxCenter=self.parameters.boxCenter)
             structure = pdb.writeAll(outputpath=temporalFolder, outputname="initial_%d.pdb" % i)
             prmtop = os.path.join(workingdirectory, outputPathConstants.topologies, "system_%d.prmtop" % i)
             inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % i)
@@ -894,6 +901,9 @@ class MDSimulation(SimulationRunner):
             Tleapdict["SOLVATED_PDB"] = finalPDB
             Tleapdict["BONDS"] = pdb.getDisulphideBondsforTleapTemplate()
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
+            if self.parameters.boxCenter:
+                Tleapdict["DUM"] = "loadamberprep DUM.prep\nloadamberparams DUM.frcmod\n"
+
             self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
             self.runTleap(TleapControlFile)
             shutil.copy("leap.log", os.path.join(workingdirectory, equilibrationOutput, "leap_%d.log" % i))
