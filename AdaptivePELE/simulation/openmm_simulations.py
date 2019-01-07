@@ -22,10 +22,10 @@ try:
     FileNotFoundError
 except NameError:
     FileNotFoundError = IOError
-try:
-    basestring
-except NameError:
-    basestring = str
+    try:
+        basestring
+    except NameError:
+        basestring = str
 
 
 def get_traceback(f):
@@ -49,11 +49,11 @@ def get_traceback(f):
 
 class XTCReporter(_BaseReporter):
     """
-        XTCReporter stores a molecular dynamics trajectory in the GROMACS xtc
-        format
+    XTCReporter stores a molecular dynamics trajectory in the GROMACS xtc
+    format
 
         :param file: Either an open XTCTrajectoryFile object to write to, or a string
-            specifying the filename of a new XTC file to save the trajectory to.
+        specifying the filename of a new XTC file to save the trajectory to.
         :type file: str, or :py:class:`XTCTrajectoryFile`
         :param reportInterval: The interval (in time steps) at which to write frames.
         :type reportInterval: int
@@ -62,10 +62,10 @@ class XTCReporter(_BaseReporter):
         :type atomSubset: arrray_like
         :param append: Whether to append the trajectory to a previously existing one
         :type append: bool
-    """
-    @property
-    def backend(self):
-        return XTCTrajectoryFile
+        """
+        @property
+        def backend(self):
+            return XTCTrajectoryFile
 
     def __init__(self, file, reportInterval, atomSubset=None, append=False):
         if append:
@@ -83,16 +83,16 @@ class XTCReporter(_BaseReporter):
 
     def report(self, simulation, state):
         """
-            Generate a report
+        Generate a report
 
             :param simulation: simulation to generate the report for
             :type simulation: :py:class:`simtk.openmm.app.Simulation`
             :param state: current state of the simulation
             :type state: :py:class:`simtk.openmm.State`
-        """
-        if not self._is_intialized:
-            self._initialize(simulation)
-            self._is_intialized = True
+            """
+            if not self._is_intialized:
+                self._initialize(simulation)
+                self._is_intialized = True
 
         self._checkForErrors(simulation, state)
         args = ()
@@ -106,16 +106,16 @@ class XTCReporter(_BaseReporter):
             time_step = state.getTime()
             kwargs['time'] = time_step.value_in_unit(time_step.unit)
             kwargs['step'] = simulation.currentStep
-        if self._cell:
-            kwargs['box'] = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(getattr(unit, self._traj_file.distance_unit))
-        self._traj_file.write(*args, **kwargs)
-        # flush the file to disk. it might not be necessary to do this every
-        # report, but this is the most proactive solution. We don't want to
-        # accumulate a lot of data in memory only to find out, at the very
-        # end of the run, that there wasn't enough space on disk to hold the
-        # data.
-        if hasattr(self._traj_file, 'flush'):
-            self._traj_file.flush()
+            if self._cell:
+                kwargs['box'] = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(getattr(unit, self._traj_file.distance_unit))
+                self._traj_file.write(*args, **kwargs)
+                # flush the file to disk. it might not be necessary to do this every
+                # report, but this is the most proactive solution. We don't want to
+                # accumulate a lot of data in memory only to find out, at the very
+                # end of the run, that there wasn't enough space on disk to hold the
+                # data.
+                if hasattr(self._traj_file, 'flush'):
+                    self._traj_file.flush()
 
 
 class CustomStateDataReporter(app.StateDataReporter):
@@ -139,8 +139,7 @@ class CustomStateDataReporter(app.StateDataReporter):
             # problems between different versions of python
             file_name = str(file_name)
 
-        app.StateDataReporter.__init__(self, file_name, reportInterval, step, time_sim, potentialEnergy, kineticEnergy, totalEnergy, temperature, volume, density,
-                                       progress, remainingTime, speed, elapsedTime, separator, systemMass, totalSteps)
+        app.StateDataReporter.__init__(self, file_name, reportInterval, step, time_sim, potentialEnergy, kineticEnergy, totalEnergy, temperature, volume, density, progress, remainingTime, speed, elapsedTime, separator, systemMass, totalSteps)
         self._append = append
         self.initialStep = initialStep
         self._initialClockTime = None
@@ -153,9 +152,9 @@ class CustomStateDataReporter(app.StateDataReporter):
         Parameters
         ----------
         simulation : Simulation
-            The Simulation to generate a report for
+        The Simulation to generate a report for
         state : State
-            The current state of the simulation
+        The current state of the simulation
         """
         if not self._hasInitialized:
             self._initializeConstants(simulation)
@@ -163,10 +162,10 @@ class CustomStateDataReporter(app.StateDataReporter):
             # Extra line added to avoid printing the header again when the simulation is restarted
             if not self._append:
                 print('#"%s"' % ('"' + self._separator + '"').join(headers), file=self._out)
-            try:
-                self._out.flush()
-            except AttributeError:
-                pass
+                try:
+                    self._out.flush()
+                except AttributeError:
+                    pass
             self._initialClockTime = time.time()
             self._initialSimulationTime = state.getTime()
             self._initialSteps = simulation.currentStep
@@ -195,7 +194,7 @@ class CustomStateDataReporter(app.StateDataReporter):
 @get_traceback
 def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     """
-        Function that runs the whole equilibration process and returns the final pdb
+    Function that runs the whole equilibration process and returns the final pdb
 
         :param equilibrationFiles: tuple with the topology (prmtop) in the first position and the coordinates
         in the second (inpcrd)
@@ -208,46 +207,39 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
         :type worker: int
 
         :returns: str -- a string with the outputPDB
-    """
-    prmtop, inpcrd, solvatedPDB = equilibrationFiles
-    prmtop = app.AmberPrmtopFile(prmtop)
-    inpcrd = app.AmberInpcrdFile(inpcrd)
-    pdb_coords = app.PDBFile(str(solvatedPDB))
-    PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
-    if parameters.runningPlatform == "CUDA":
-        platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(worker, parameters.devicesPerTrajectory, devicesPerReplica=parameters.maxDevicesPerReplica), "UseCpuPme": "false"}
-    else:
-        platformProperties = {}
-    if worker == 0:
-        utilities.print_unbuffered("Running %d steps of minimization" % parameters.minimizationIterations)
+        """
+        prmtop, inpcrd, solvatedPDB = equilibrationFiles
+        prmtop = app.AmberPrmtopFile(prmtop)
+        inpcrd = app.AmberInpcrdFile(inpcrd)
+        PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
+        if parameters.runningPlatform == "CUDA":
+            platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(worker, parameters.devicesPerTrajectory, devicesPerReplica=parameters.maxDevicesPerReplica), "UseCpuPme": "false"}
+        else:
+            platformProperties = {}
+            if worker == 0:
+                utilities.print_unbuffered("Running %d steps of minimization" % parameters.minimizationIterations)
 
     if parameters.boxCenter:
-        # this is not really needed until the production run, but we introduced
-        # it here to let the dummy particle scale with the box
-        dummy = addDummyAtomToTopology(prmtop)
+        dummy = findDummyAtom(prmtop)
+        assert dummy is not None
     else:
         dummy = None
-    simulation = minimization(prmtop, inpcrd, pdb_coords, PLATFORM, parameters.constraintsMin, parameters, platformProperties, dummy)
-    # Retrieving the state is expensive (especially when running on GPUs) so we
-    # only called it once and then separate positions and velocities
-    state = simulation.context.getState(getPositions=True, getVelocities=True, enforcePeriodicBox=True)
-    positions = state.getPositions()
-    velocities = state.getVelocities()
-    # TODO remove for production
-    root, _ = os.path.splitext(reportName)
-    trajName = "%s_NVT.pdb" % root
-    with open(trajName, "w") as fw:
-        app.PDBFile.writeFile(simulation.topology, positions, fw)
+        simulation = minimization(prmtop, inpcrd,  PLATFORM, parameters.constraintsMin, parameters, platformProperties, dummy)
+        # Retrieving the state is expensive (especially when running on GPUs) so we
+        # only called it once and then separate positions and velocities
+        state = simulation.context.getState(getPositions=True, getVelocities=True)
+        positions = state.getPositions()
+        velocities = state.getVelocities()
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of NVT equilibration" % parameters.equilibrationLengthNVT)
     simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNVT, parameters.constraintsNVT, parameters, reportName, platformProperties, velocities=velocities, dummy=dummy)
-    state = simulation.context.getState(getPositions=True, getVelocities=True, enforcePeriodicBox=True)
+    state = simulation.context.getState(getPositions=True, getVelocities=True)
     positions = state.getPositions()
     velocities = state.getVelocities()
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of NPT equilibration" % parameters.equilibrationLengthNPT)
     simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNPT, parameters.constraintsNPT, parameters, reportName, platformProperties, velocities=velocities, dummy=dummy)
-    state = simulation.context.getState(getPositions=True, enforcePeriodicBox=True)
+    state = simulation.context.getState(getPositions=True)
     root, _ = os.path.splitext(reportName)
     outputPDB = "%s_NPT.pdb" % root
     with open(outputPDB, 'w') as fw:
@@ -256,7 +248,7 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
 
 
 @get_traceback
-def minimization(prmtop, inpcrd, pdb_coords, PLATFORM, constraints, parameters, platformProperties, dummy=None):
+def minimization(prmtop, inpcrd,  PLATFORM, constraints, parameters, platformProperties, dummy=None):
     """
     Function that runs a minimization of the system
     it uses the VerletIntegrator and applys to the heavy atoms of the
@@ -264,7 +256,6 @@ def minimization(prmtop, inpcrd, pdb_coords, PLATFORM, constraints, parameters, 
 
     :param prmtop: OpenMM Topology object
     :param inpcrd: OpenMM Positions object
-    :param pdb_coords: OpenMM pdb object
     :param PLATFORM: platform in which the minimization will run
     :type PLATFORM: str
     :param constraints: strength of the constrain (units: Kcal/mol)
@@ -285,7 +276,7 @@ def minimization(prmtop, inpcrd, pdb_coords, PLATFORM, constraints, parameters, 
     if parameters.boxCenter:
         # the last parameter is only used to print a message, by passing a
         # value different than 0 we avoid having too many prints
-        addDummyAtomToSystem(system, prmtop.topology, pdb_coords.positions, parameters.ligandName, dummy, parameters.boxCenter, 0)
+        addDummyAtomToSystem(system, prmtop.topology, inpcrd.positions, parameters.ligandName, dummy, parameters.boxCenter, 3)
     if constraints:
         # Add positional restraints to protein backbone
         force = mm.CustomExternalForce(str("k*periodicdistance(x, y, z, x0, y0, z0)^2"))
@@ -296,16 +287,13 @@ def minimization(prmtop, inpcrd, pdb_coords, PLATFORM, constraints, parameters, 
         for j, atom in enumerate(prmtop.topology.atoms()):
             if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (
                     atom.residue.name == parameters.ligandName and atom.element.symbol != "H"):
-                force.addParticle(j, pdb_coords.positions[j].value_in_unit(unit.nanometers))
+                assert j != dummy, (j, dummy)
+                force.addParticle(j, inpcrd.positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
-
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     if inpcrd.boxVectors is not None:
         simulation.context.setPeriodicBoxVectors(*inpcrd.boxVectors)
-    if parameters.boxCenter:
-        simulation.context.setPositions(addDummyPositions(pdb_coords.positions, parameters.boxCenter))
-    else:
-        simulation.context.setPositions(pdb_coords.positions)
+    simulation.context.setPositions(inpcrd.positions)
     simulation.minimizeEnergy(maxIterations=parameters.minimizationIterations)
     return simulation
 
@@ -342,12 +330,9 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     if parameters.boxCenter:
-        # this is a little hacky but I don't know a better way to go from the
-        # OpenMM quantity to a list
-        pos_dumm = list(ast.literal_eval(str(positions[dummy].value_in_unit(unit.angstrom))))
         # the last parameter is only used to print a message, by passing a
         # value different than 0 we avoid having too many prints
-        addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, pos_dumm, 0)
+        addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, 3)
 
     if constraints:
         force = mm.CustomExternalForce(str("k*periodicdistance(x, y, z, x0, y0, z0)^2"))
@@ -367,21 +352,11 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
     root, _ = os.path.splitext(reportName)
     reportFile = "%s_report_NVT" % root
-    report_freq = min(parameters.reporterFreq, simulation_steps/4)
+    report_freq = int(min(parameters.reporterFreq, simulation_steps/4))
     simulation.reporters.append(CustomStateDataReporter(reportFile, report_freq, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=parameters.equilibrationLengthNVT, separator="\t"))
-    # TODO remove for production
-    # trajName = "%s_pre_NVT.pdb" % root
-    # with open(trajName, "w") as fw:
-    #     app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True).getPositions().in_units_of(unit.angstroms), fw)
-    # simulation.reporters.append(CustomStateDataReporter(reportFile, 1, step=True,
-    #                                                     potentialEnergy=True, temperature=True, time_sim=True,
-    #                                                     volume=True, remainingTime=True, speed=True,
-    #                                                     totalSteps=parameters.equilibrationLengthNVT, separator="\t"))
-    # trajName = "%s_NVT.pdb" % root
-    # simulation.reporters.append(app.PDBReporter(str(trajName), 1, enforcePeriodicBox=True))
     simulation.step(simulation_steps)
     return simulation
 
@@ -419,12 +394,9 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
     system.addForce(mm.MonteCarloBarostat(1 * unit.bar, parameters.Temperature * unit.kelvin))
     if parameters.boxCenter:
-        # this is a little hacky but I don't know a better way to go from the
-        # OpenMM quantity to a list
-        pos_dumm = list(ast.literal_eval(str(positions[dummy].value_in_unit(unit.angstrom))))
         # the last parameter is only used to print a message, by passing a
         # value different than 0 we avoid having too many prints
-        addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, pos_dumm, 0)
+        addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, 3)
 
     if constraints:
         force = mm.CustomExternalForce(str("k*periodicdistance(x, y, z, x0, y0, z0)^2"))
@@ -438,14 +410,13 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         system.addForce(force)
     simulation = app.Simulation(topology.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(positions)
-    # TODO: remove for production
     if velocities:
         simulation.context.setVelocities(velocities)
     else:
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, 1)
     root, _ = os.path.splitext(reportName)
     reportFile = "%s_report_NPT" % root
-    report_freq = min(parameters.reporterFreq, simulation_steps/4)
+    report_freq = int(min(parameters.reporterFreq, simulation_steps/4))
     simulation.reporters.append(CustomStateDataReporter(reportFile, report_freq, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
@@ -507,15 +478,12 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     else:
         platformProperties = {}
     if parameters.boxCenter:
-        dummy = addDummyAtomToTopology(prmtop)
+        dummy = findDummyAtom(prmtop)
     system = prmtop.createSystem(nonbondedMethod=app.PME,
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                  constraints=app.HBonds, removeCMMotion=True)
     if parameters.boxCenter:
-        # this is a little hacky but I don't know a better way to go from the
-        # OpenMM quantity to a list
-        pos_dumm = list(ast.literal_eval(str(pdb.positions[dummy].value_in_unit(unit.angstrom))))
-        addDummyAtomToSystem(system, prmtop.topology, pdb.positions, parameters.ligandName, dummy, pos_dumm, deviceIndex)
+        addDummyAtomToSystem(system, prmtop.topology, pdb.positions, parameters.ligandName, dummy, deviceIndex)
 
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
@@ -526,7 +494,6 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         addLigandBox(prmtop.topology, system, parameters.ligandName, dummy, parameters.boxRadius, deviceIndex)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(pdb.positions)
-    # TODO: remove for production
     if restart:
         with open(str(checkpoint), 'rb') as check:
             simulation.context.loadCheckpoint(check.read())
@@ -534,20 +501,13 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     else:
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, seed)
         stateData = open(str(stateReporter), "w")
-    pdb_trajName = os.path.join(outputDir, "trajectory_initial_%d.pdb" % (workerNumber))
-    # TODO remove for production
-    with open(pdb_trajName, "w") as fw:
-        app.PDBFile.writeFile(simulation.topology, simulation.context.getState(getPositions=True, enforcePeriodicBox=True).getPositions().in_units_of(unit.angstroms), fw)
     if parameters.format == "xtc":
-        # simulation.reporters.append(XTCReporter(str(trajName), parameters.reporterFreq, append=restart))
-        simulation.reporters.append(XTCReporter(str(trajName), 1, append=restart))
+        simulation.reporters.append(XTCReporter(str(trajName), parameters.reporterFreq, append=restart))
     elif parameters.format == "dcd":
         simulation.reporters.append(app.DCDReporter(str(trajName), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
 
     simulation.reporters.append(app.CheckpointReporter(str(checkpointReporter), parameters.reporterFreq))
-    # TODO remove for production
-    # simulation.reporters.append(CustomStateDataReporter(stateData, parameters.reporterFreq, step=True,
-    simulation.reporters.append(CustomStateDataReporter(stateData, 1, step=True,
+    simulation.reporters.append(CustomStateDataReporter(stateData, parameters.reporterFreq, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=parameters.productionLength, separator="\t",
@@ -596,7 +556,7 @@ def getDeviceIndexStr(deviceIndex, devicesPerTraj, devicesPerReplica=None):
     return ",".join(str(x) for x in devices)
 
 
-def addDummyAtomToTopology(model, name="EP", resname="DUM", element="H"):
+def addDummyAtomToTopology(model, name=constants.AmberTemplates.DUM_atom, resname=constants.AmberTemplates.DUM_res, element="C"):
     chain_dummy = model.topology.addChain()
     res_dummy = model.topology.addResidue(resname, chain_dummy)
     atom_dummy = model.topology.addAtom(name, app.element.Element.getBySymbol(element), res_dummy)
@@ -604,7 +564,13 @@ def addDummyAtomToTopology(model, name="EP", resname="DUM", element="H"):
     return dummy
 
 
-def addDummyAtomToSystem(system, topology, positions, resname, dummy, center, worker):
+def findDummyAtom(model, name=constants.AmberTemplates.DUM_atom, resname=constants.AmberTemplates.DUM_res, element="C"):
+    for atom in model.topology.atoms():
+        if atom.residue.name == resname and atom.name == name:
+            return atom.index
+
+
+def addDummyAtomToSystem(system, topology, positions, resname, dummy, worker):
     protein_CAs = []
     for atom in topology.atoms():
         if atom.residue.name not in ("HOH", "Cl-", "Na+", resname) and atom.name == "CA":
@@ -612,17 +578,16 @@ def addDummyAtomToSystem(system, topology, positions, resname, dummy, center, wo
                 utilities.print_unbuffered("Added bond between dummy atom and protein atom", atom.residue.name, atom.residue.index+1, atom.name, atom.index)
             protein_CAs.append(atom.index)
             break
-    dummy_system = system.addParticle(0)
-    assert dummy_system == dummy
+    system.setParticleMass(dummy, 0.0)
     for protein_particle in protein_CAs:
-        distance_constraint = np.linalg.norm(np.array(center)-positions[protein_particle].value_in_unit(unit.angstroms))
+        distance_constraint = np.linalg.norm(positions[dummy].value_in_unit(unit.nanometers)-positions[protein_particle].value_in_unit(unit.nanometers))
         force_dummy = mm.HarmonicBondForce()
         constraint_force = 10*4.184*2  # express the contraint_force in kJ/mol/nm^2
-        force_dummy.addBond(dummy, protein_particle, distance_constraint/10.0, constraint_force)
+        force_dummy.addBond(dummy, protein_particle, distance_constraint, constraint_force)
         system.addForce(force_dummy)
     for forces in system.getForces():
         if isinstance(forces, mm.NonbondedForce):
-            forces.addParticle(0 * unit.elementary_charge, 1 * unit.nanometer, 0 * unit.kilojoule_per_mole)
+            forces.setParticleParameters(dummy, 0.0, 1.0, 0.0)
 
 
 def addLigandBox(topology, system, resname, dummy, radius, worker):
