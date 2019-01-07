@@ -276,7 +276,7 @@ def minimization(prmtop, inpcrd,  PLATFORM, constraints, parameters, platformPro
     if parameters.boxCenter:
         # the last parameter is only used to print a message, by passing a
         # value different than 0 we avoid having too many prints
-        addDummyAtomToSystem(system, prmtop.topology, inpcrd.positions, parameters.ligandName, dummy, parameters.boxCenter, 3)
+        addDummyAtomToSystem(system, prmtop.topology, inpcrd.positions, parameters.ligandName, dummy, 3)
     if constraints:
         # Add positional restraints to protein backbone
         force = mm.CustomExternalForce(str("k*periodicdistance(x, y, z, x0, y0, z0)^2"))
