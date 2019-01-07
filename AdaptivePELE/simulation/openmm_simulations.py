@@ -234,20 +234,20 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
         platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(worker, parameters.devicesPerTrajectory, devicesPerReplica=parameters.maxDevicesPerReplica), "UseCpuPme": "false"}
     else:
         platformProperties = {}
-        if worker == 0:
-            utilities.print_unbuffered("Running %d steps of minimization" % parameters.minimizationIterations)
+    if worker == 0:
+        utilities.print_unbuffered("Running %d steps of minimization" % parameters.minimizationIterations)
 
     if parameters.boxCenter:
         dummy = findDummyAtom(prmtop)
         assert dummy is not None
     else:
         dummy = None
-        simulation = minimization(prmtop, inpcrd, PLATFORM, parameters.constraintsMin, parameters, platformProperties, dummy)
-        # Retrieving the state is expensive (especially when running on GPUs) so we
-        # only called it once and then separate positions and velocities
-        state = simulation.context.getState(getPositions=True, getVelocities=True)
-        positions = state.getPositions()
-        velocities = state.getVelocities()
+    simulation = minimization(prmtop, inpcrd, PLATFORM, parameters.constraintsMin, parameters, platformProperties, dummy)
+    # Retrieving the state is expensive (especially when running on GPUs) so we
+    # only called it once and then separate positions and velocities
+    state = simulation.context.getState(getPositions=True, getVelocities=True)
+    positions = state.getPositions()
+    velocities = state.getVelocities()
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of NVT equilibration" % parameters.equilibrationLengthNVT)
     simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNVT, parameters.constraintsNVT, parameters, reportName, platformProperties, velocities=velocities, dummy=dummy)
@@ -527,7 +527,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     if restart:
         with open(str(checkpoint), 'rb') as check:
             simulation.context.loadCheckpoint(check.read())
-            stateData = open(str(stateReporter), "a")
+        stateData = open(str(stateReporter), "a")
     else:
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, seed)
         stateData = open(str(stateReporter), "w")

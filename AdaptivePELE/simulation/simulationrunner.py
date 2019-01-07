@@ -880,9 +880,9 @@ class MDSimulation(SimulationRunner):
             Tleapdict["FRCMOD"] = os.path.join(self.parameters.customparamspath, Tleapdict["FRCMOD"])
             amber_file_path = self.parameters.customparamspath
         if self.parameters.boxCenter:
-            with open(os.path.join(amber_file_path, "DUM.prep"), "w") as fw:
+            with open(os.path.join(amber_file_path, "%s.prep" % constants.AmberTemplates.DUM_res), "w") as fw:
                 fw.write(constants.AmberTemplates.DUM_prep)
-            with open(os.path.join(amber_file_path, "DUM.frcmod"), "w") as fw:
+            with open(os.path.join(amber_file_path, "%s.frcmod" % constants.AmberTemplates.DUM_res), "w") as fw:
                 fw.write(constants.AmberTemplates.DUM_frcmod)
 
         processManager.barrier()
@@ -911,7 +911,7 @@ class MDSimulation(SimulationRunner):
             Tleapdict["BONDS"] = pdb.getDisulphideBondsforTleapTemplate()
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
             if self.parameters.boxCenter:
-                Tleapdict["DUM"] = "loadamberprep DUM.prep\nloadamberparams DUM.frcmod\n"
+                Tleapdict["DUM"] = "loadamberprep %s.prep\nloadamberparams %s.frcmod\n" % (constants.AmberTemplates.DUM_res, constants.AmberTemplates.DUM_res)
 
             self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
             self.runTleap(TleapControlFile)
