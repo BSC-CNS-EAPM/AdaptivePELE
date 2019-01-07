@@ -356,7 +356,27 @@ class PDBManager:
                         atom.id = "Cl%s" % oldname[2:]
                         print("Atom %s of %s rename to %s" % (oldname, self.resname, atom.id))
 
-    def preparePDBforMD(self, constraints=None):
+    def addBoxAtom(self, boxCenter):
+        """
+            Add a dummy atom to represent the center of the ligand box
+        """
+        chain = None
+        for chain in self.Other:
+            # iterate until getting the last chain
+            pass
+        if chain is None:
+            chain = Chain(self.Other, "D")
+        residue = None
+        for residue in chain:
+            # iterate until getting the last residue in the chain
+            pass
+        if residue is None:
+            dum_residue = Residue(chain, AdaptivePELE.constants.constants.AmberTemplates.DUM_res, 1)
+        else:
+            dum_residue = Residue(chain, AdaptivePELE.constants.constants.AmberTemplates.DUM_res, residue.num+1)
+        Atom(dum_residue, AdaptivePELE.constants.constants.AmberTemplates.DUM_atom, boxCenter, 1.00, 0.00)
+
+    def preparePDBforMD(self, constraints=None, boxCenter=None):
         """
             Method that prepares the pdb to be used in adaptivePELE MD simulation
 
@@ -396,6 +416,9 @@ class PDBManager:
         self.checkMissingAtoms()
         # change PELE water names
         self.changeWaterNames()
+        if boxCenter is not None:
+            # add extra dummy atom
+            self.addBoxAtom(boxCenter)
         return new_constraints
 
 

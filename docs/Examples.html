@@ -325,7 +325,8 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 substitute in the PELE control file</li>
 <li><strong>modeMovingBox</strong> (<em>string</em>, default=None, possible values={<em>unbinding</em>, <em>binding</em>}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation</li>
 <li><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</li>
-<li><strong>boxRadius</strong> (<em>int</em>, default=20): Value of the simulation box radius</li>
+<li><strong>boxRadius</strong> (<em>int</em>, default=20): Value of the simulation box radius (in
+angstroms)</li>
 <li><strong>runEquilibration</strong> (<em>bool</em>, default=False): Whether to run a short
 equilibration or burn-in simulation for each initial structure</li>
 <li><strong>equilibrationLength</strong> (<em>int</em>, default=50): Number of steps for the
@@ -375,8 +376,9 @@ equilibration run (default corresponds to 1 ns)</p>
 <li><p class="first"><strong>timeStep</strong> (<em>float</em>, default=2): Value of the time step for the integration
 (in femtoseconds)</p>
 </li>
-<li><p class="first"><strong>boxRadius</strong> (<em>float</em>, default=None): Distance from the protein mass center in which the ligand is allowed to move. If specified, a restrain will be applied between both mass centers when the distance between them surpasses the <strong>boxRadius</strong>. (in angstroms)
-(<strong>Note</strong>: When defining this parameter is important to take into account the distance between the binding site and the mass center of the protein.)</p>
+<li><p class="first"><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</p>
+</li>
+<li><p class="first"><strong>boxRadius</strong> (<em>float</em>, default=20): Radius of the spherical box the ligand will be restrained to (in angstroms). Note that when using the spherical box restraint only xtc trajectories are supported.</p>
 </li>
 <li><p class="first"><strong>ligandCharge</strong> (<em>integer</em>, default=0): Charge of the ligand</p>
 </li>

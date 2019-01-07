@@ -863,11 +863,12 @@ class MDSimulation(SimulationRunner):
         ligandPDB = self.extractLigand(initialStructures[0][1], resname, "", processManager.id)
         ligandmol2 = "%s.mol2" % resname
         ligandfrcmod = "%s.frcmod" % resname
-        Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.waterBoxSize, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod}
+        Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.waterBoxSize, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod, "DUM": ""}
         antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
         parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
         if processManager.isMaster() and not self.parameters.customparamspath:
             self.prepareLigand(antechamberDict, parmchkDict)
+        amber_file_path = ""
         # Change the Mol2 and Frcmod path to the new user defined path
         if self.parameters.customparamspath:
             if not os.path.exists(self.parameters.customparamspath):
@@ -877,6 +878,12 @@ class MDSimulation(SimulationRunner):
                     raise FileNotFoundError("No custom parameters found in the given path")
             Tleapdict["MOL2"] = os.path.join(self.parameters.customparamspath, Tleapdict["MOL2"])
             Tleapdict["FRCMOD"] = os.path.join(self.parameters.customparamspath, Tleapdict["FRCMOD"])
+            amber_file_path = self.parameters.customparamspath
+        if self.parameters.boxCenter:
+            with open(os.path.join(amber_file_path, "DUM.prep"), "w") as fw:
+                fw.write(constants.AmberTemplates.DUM_prep)
+            with open(os.path.join(amber_file_path, "DUM.frcmod"), "w") as fw:
+                fw.write(constants.AmberTemplates.DUM_frcmod)
 
         processManager.barrier()
         if self.parameters.constraints is not None:
@@ -885,7 +892,7 @@ class MDSimulation(SimulationRunner):
         for i, structure in initialStructures:
             TleapControlFile = "tleap_equilibration_%d.in" % i
             pdb = PDBLoader.PDBManager(structure, resname)
-            constraints_map = pdb.preparePDBforMD(constraints=self.parameters.constraints)
+            constraints_map = pdb.preparePDBforMD(constraints=self.parameters.constraints, boxCenter=self.parameters.boxCenter)
             if constraints_map is not None:
                 new_constraints = updateConstraints(self.parameters.constraints, constraints_map)
                 if prev_constraints is None:
@@ -903,6 +910,9 @@ class MDSimulation(SimulationRunner):
             Tleapdict["SOLVATED_PDB"] = finalPDB
             Tleapdict["BONDS"] = pdb.getDisulphideBondsforTleapTemplate()
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
+            if self.parameters.boxCenter:
+                Tleapdict["DUM"] = "loadamberprep DUM.prep\nloadamberparams DUM.frcmod\n"
+
             self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
             self.runTleap(TleapControlFile)
             shutil.copy("leap.log", os.path.join(workingdirectory, equilibrationOutput, "leap_%d.log" % i))
@@ -1339,7 +1349,8 @@ class RunnerBuilder:
             if params.format not in constants.md_supported_formats:
                 raise utilities.ImproperParameterValueException("Not supported %s format specified, supported formats are %s" % (params.format, constants.formats_md_string))
             params.timeStep = paramsBlock.get(blockNames.SimulationParams.timeStep, 2)
-            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, None)
+            params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
+            params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
             params.forcefield = paramsBlock.get(blockNames.SimulationParams.forcefield, "ff99SB")
@@ -1353,6 +1364,8 @@ class RunnerBuilder:
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
             params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
             params.constraints = paramsBlock.get(blockNames.SimulationParams.constraints)
+            if params.ligandName is None and params.boxCenter is not None:
+                raise utilities.ImproperParameterValueException("Ligand name is necessary to establish the box")
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]

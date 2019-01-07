@@ -53,3 +53,9 @@ AdaptivePELE simulation.
       particular feature that you are using cannot be found. To solve it ensure
       that the package in question is installed and accessible to the python
       interpreter (e.g check the PYTHONPATH value)
+
+    - There is a weird atom named *DUM* in my trajectories! When using MD with
+      an spherical box for the ligand, a dummy atom is introduced to act as the
+      center of the box and is listed in the trajectories as *DUM* atom in
+      a residue also named *DUM*. This atom is massless so it will not be moved
+      during the simulation.
