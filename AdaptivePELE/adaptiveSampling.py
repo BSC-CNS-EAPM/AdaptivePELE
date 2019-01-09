@@ -292,7 +292,7 @@ def generateTrajectorySelectionString(epoch, epochOutputPathTempletized):
     return "[\"" + os.path.join(epochOutputPathTempletized % epoch, constants.trajectoryBasename) + "\"]"
 
 
-def findFirstRun(outputPath, clusteringOutputObject, simulationRunner):
+def findFirstRun(outputPath, clusteringOutputObject, simulationRunner, restart):
     """
         Find the last epoch that was properly simulated and clusterized and
         and return the first epoch to run in case of restart
@@ -303,6 +303,8 @@ def findFirstRun(outputPath, clusteringOutputObject, simulationRunner):
         :type clusteringOutputObject: str
         :param simulationRunner: Simulation runner object
         :type simulationRunner: :py:class:`.SimulationRunner
+        :param restart: Whether to restart a previous simulation
+        :type restart: bool
 
         :return: int -- Current epoch
     """
@@ -314,7 +316,7 @@ def findFirstRun(outputPath, clusteringOutputObject, simulationRunner):
 
     objectsFound = []
     for epoch in epochFolders:
-        if simulationRunner.checkSimulationInterrupted(epoch, outputPath):
+        if simulationRunner.checkSimulationInterrupted(epoch, outputPath, restart):
             # this should only happen in MD simulations, where checkpoints are
             # periodically written in case the adaptive run dies at
             # mid-simulation, be able to use the already computed trajectories
@@ -637,7 +639,7 @@ def main(jsonParams, clusteringHook=None):
     utilities.makeFolder(outputPathConstants.tmpFolder)
     utilities.makeFolder(outputPathConstants.topologies)
     processManager = ProcessesManager(outputPath, simulationRunner.getNumReplicas())
-    firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject, simulationRunner)
+    firstRun = findFirstRun(outputPath, outputPathConstants.clusteringOutputObject, simulationRunner, restart)
     if processManager.isMaster():
         printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusteringBlock, outputPath, initialStructuresWildcard)
         saveInitialControlFile(jsonParams, outputPathConstants.originalControlFile)
