@@ -21,10 +21,10 @@ try:
     FileNotFoundError
 except NameError:
     FileNotFoundError = IOError
-    try:
-        basestring
-    except NameError:
-        basestring = str
+try:
+    basestring
+except NameError:
+    basestring = str
 
 
 def get_traceback(f):
@@ -124,16 +124,16 @@ class XTCReporter(_BaseReporter):
             time_step = state.getTime()
             kwargs['time'] = time_step.value_in_unit(time_step.unit)
             kwargs['step'] = simulation.currentStep
-            if self._cell:
-                kwargs['box'] = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(getattr(unit, self._traj_file.distance_unit))
-                self._traj_file.write(*args, **kwargs)
-                # flush the file to disk. it might not be necessary to do this every
-                # report, but this is the most proactive solution. We don't want to
-                # accumulate a lot of data in memory only to find out, at the very
-                # end of the run, that there wasn't enough space on disk to hold the
-                # data.
-                if hasattr(self._traj_file, 'flush'):
-                    self._traj_file.flush()
+        if self._cell:
+            kwargs['box'] = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(getattr(unit, self._traj_file.distance_unit))
+            self._traj_file.write(*args, **kwargs)
+            # flush the file to disk. it might not be necessary to do this every
+            # report, but this is the most proactive solution. We don't want to
+            # accumulate a lot of data in memory only to find out, at the very
+            # end of the run, that there wasn't enough space on disk to hold the
+            # data.
+            if hasattr(self._traj_file, 'flush'):
+                self._traj_file.flush()
 
 
 class CustomStateDataReporter(app.StateDataReporter):
@@ -145,9 +145,7 @@ class CustomStateDataReporter(app.StateDataReporter):
     # Added two new parameters append and intialsteps to properly handle the report file when the simulation is restarted
     # changed the name of the file and time parameters to avoid overriding
     # reserved names
-    def __init__(self, file_name, reportInterval, step=False, time_sim=False, potentialEnergy=False, kineticEnergy=False, totalEnergy=False, temperature=False, volume=False, density=False,
-                 progress=False, remainingTime=False, speed=False, elapsedTime=False, separator=',', systemMass=None, totalSteps=None, append=False, initialStep=0):
-
+    def __init__(self, file_name, reportInterval, step=False, time_sim=False, potentialEnergy=False, kineticEnergy=False, totalEnergy=False, temperature=False, volume=False, density=False, progress=False, remainingTime=False, speed=False, elapsedTime=False, separator=',', systemMass=None, totalSteps=None, append=False, initialStep=0):
         # This new class doesn't properly support progress information. Because to do the restart it assumes that
         # the first column has the step information, which is True as long as the progress value is False.
 
