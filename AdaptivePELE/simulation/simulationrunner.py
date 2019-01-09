@@ -118,12 +118,16 @@ class SimulationRunner:
         """
         return self.parameters.exitCondition is not None
 
-    def checkSimulationInterrupted(self, epoch, outputpath):
+    def checkSimulationInterrupted(self, epoch, outputpath, restart):
         """
             Check wether the simulation was interrupted before finishing
 
             :param epoch: Epoch number
             :type epoch: int
+            :param outputpath: Simulation output path
+            :type outputpath: str
+            :param restart: Whether to restart a previous simulation
+            :type restart: bool
 
             :returns: bool -- True if the simulations where interrupted
         """
@@ -1104,19 +1108,25 @@ class MDSimulation(SimulationRunner):
         initialStructures.append((tmpInitialStructuresTemplate % (iteration, numberOfSnapshots-1)))
         return "".join(initialStructures)
 
-    def checkSimulationInterrupted(self, epoch, outputpath):
+    def checkSimulationInterrupted(self, epoch, outputpath, restart):
         """
             Check wether the simulation was interrupted before finishing
 
             :param epoch: Epoch number
             :type epoch: int
+            :param outputpath: Simulation output path
+            :type outputpath: str
+            :param restart: Whether to restart a previous simulation
+            :type restart: bool
 
             :returns: bool -- True if the simulations where interrupted
         """
         # to be implemented depending on implementation details
         simulationpath = os.path.join(outputpath, str(epoch), "checkpoint*")
         if glob.glob(simulationpath):
-            self.restart = True
+            # if the simulation does not have the restart option set we don't
+            # want to restart
+            self.restart = True and restart
             return True
         else:
             return False
