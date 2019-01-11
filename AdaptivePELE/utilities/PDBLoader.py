@@ -3,6 +3,8 @@ import os.path
 import numpy as np
 import glob
 import AdaptivePELE.constants
+import mdtraj as md
+import math
 
 
 class PDBLoadException(Exception):
@@ -375,6 +377,40 @@ class PDBManager:
         else:
             dum_residue = Residue(chain, AdaptivePELE.constants.constants.AmberTemplates.DUM_res, residue.num+1)
         Atom(dum_residue, AdaptivePELE.constants.constants.AmberTemplates.DUM_atom, boxCenter, 1.00, 0.00)
+
+    def get_borders(self):
+        """
+        Gets the maximum and minimal value for each of the 3D axis
+        :return: array with tuples containing the maximum and minimum values of each axis
+        [(X_max,X_min),(Y_max,Y_min),(Z_max,Z_min)]
+        """
+        traj = md.load(self.PDBtoLoad)
+        bondaries = []
+        for i in range(3):  # X,Y,Z
+            upper_bound = round(max(traj.xyz[0][:, [i]])[0]*10, 3)
+            lower_bound = round(min(traj.xyz[0][:, [i]])[0]*10, 3)
+            bondaries.append((upper_bound, lower_bound))
+        return bondaries
+
+    def compute_water_box(self, waterBoxSize=None, boxCenter=None, boxRadius=None):
+        """
+        Function that computes the water box needed for the simulation.
+        if a boxcenter is provided. the amount of water buffer required will be calculated for each axis to ensure that
+        there is enough water, with at least 2 A of extra buffer. If the value of the axis is smallets than the waterbox defined ,
+        the water box will be the one used
+        :return: string needed for Tleap to build the water box
+        """
+        water_box_axis = []
+        water_string = "{%s,%s,%s}"
+        if boxCenter:
+            bondaries = self.get_borders()
+            for i in range(3):  # X,Y,Z
+                up_buf = 2 + int(math.ceil(boxRadius - np.linalg.norm(max(bondaries[i][0], boxCenter[i]) - boxCenter[i])))
+                down_buf = 2 + int(math.ceil(boxRadius - np.linalg.norm(min(bondaries[i][1], boxCenter[i]) - boxCenter[i])))
+                water_box_axis.append(max(up_buf, down_buf, waterBoxSize))
+        else:
+            water_box_axis = [waterBoxSize, waterBoxSize, waterBoxSize]
+        return water_string % (water_box_axis[0], water_box_axis[1], water_box_axis[2])
 
     def preparePDBforMD(self, constraints=None, boxCenter=None):
         """
