@@ -263,30 +263,40 @@ def calculate_pmf(microstateVolume, pi):
     kb = 0.0019872041
     T = 300
     beta = 1 / (kb * T)
-    newDist = pi/microstateVolume
-    newDist /= newDist[newDist != np.inf].sum()
+    newDist = pi  # /microstateVolume
+    # newDist /= newDist[newDist != np.inf].sum()
     gpmf = -kb*T*np.log(newDist)
     print(gpmf[gpmf == -np.inf])
     print(gpmf[gpmf == np.inf])
     gpmf[gpmf == -np.inf] = np.inf  # to avoid contribution later
     gpmf -= gpmf.min()
 
-    deltaW = -gpmf[gpmf != np.inf].max()
+    # deltaW = gpmf[gpmf != np.inf].max()
+    n_states = int(gpmf.size*0.10)
+    # use the 10% clusters with highest pmf to establish the depth of the pmf
+    # this should give a more reliable estimate of the bulk pmf value than just
+    # the max
+    deltaW = np.mean(gpmf[np.argsort(gpmf[gpmf != np.inf])[-n_states:]])
     print("bound    Delta G     Delta W     Binding Volume:     Binding Volume contribution")
 
-    upperGpmfValues = np.arange(0, -deltaW, 0.5)
+    upperGpmfValues = np.arange(0, deltaW, 0.25)
 
     # Initialize string variable in case loop is not accessed
     string = ""
 
+    bound_vols = []
     for upperGpmfValue in upperGpmfValues:
         bindingVolume = 0
         for g, volume in zip(gpmf, microstateVolume):
             if g <= upperGpmfValue:
                 bindingVolume += np.exp(-beta * g) * volume
-        deltaG = deltaW - kb*T*np.log(bindingVolume/1661)
+        bound_vols.append(bindingVolume)
+        deltaG = -deltaW - kb*T*np.log(bindingVolume/1661)
         string = "%.1f\t%.3f\t%.3f\t%.3f\t%.3f" % (upperGpmfValue, deltaG, deltaW, bindingVolume, -kb*T*np.log(bindingVolume/1661))
         print(string)
+    differences = np.diff(bound_vols)
+    if np.mean(np.abs(differences[-3:])) > 1:
+        print("WARNING!: There are differences in the estimated binding volume for large values of the pmf")
     return gpmf, string
 
 
