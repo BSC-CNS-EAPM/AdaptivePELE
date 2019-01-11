@@ -863,7 +863,7 @@ class MDSimulation(SimulationRunner):
         ligandPDB = self.extractLigand(initialStructures[0][1], resname, "", processManager.id)
         ligandmol2 = "%s.mol2" % resname
         ligandfrcmod = "%s.frcmod" % resname
-        Tleapdict = {"RESNAME": resname, "BOXSIZE": self.parameters.waterBoxSize, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod, "DUM": ""}
+        Tleapdict = {"RESNAME": resname, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod, "DUM": ""}
         antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
         parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
         if processManager.isMaster() and not self.parameters.customparamspath:
@@ -904,6 +904,10 @@ class MDSimulation(SimulationRunner):
             inpcrd = os.path.join(workingdirectory, equilibrationOutput, "system_%d.inpcrd" % i)
             finalPDB = os.path.join(workingdirectory, equilibrationOutput, "system_%d.pdb" % i)
             Tleapdict["FORCEFIELD"] = constants.AmberTemplates.forcefields[self.parameters.forcefield]
+
+            Tleapdict["BOXSIZE"] = pdb.compute_water_box(waterBoxSize=self.parameters.waterBoxSize,
+                                                         boxCenter=self.parameters.boxCenter,
+                                                         boxRadius=self.parameters.boxRadius)
             Tleapdict["COMPLEX"] = structure
             Tleapdict["PRMTOP"] = prmtop
             Tleapdict["INPCRD"] = inpcrd

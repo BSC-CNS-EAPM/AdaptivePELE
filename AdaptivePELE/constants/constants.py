@@ -59,6 +59,7 @@ class AmberTemplates:
                     "COMPLX = loadpdb $COMPLEX\n" \
                     "$BONDS " \
                     "addions COMPLX Cl- 0\n" \
+                    "addions COMPLX Na+ 0\n" \
                     "solvatebox COMPLX TIP3PBOX $BOXSIZE\n" \
                     "saveamberparm COMPLX $PRMTOP $INPCRD\n" \
                     "savepdb COMPLX $SOLVATED_PDB\n" \
