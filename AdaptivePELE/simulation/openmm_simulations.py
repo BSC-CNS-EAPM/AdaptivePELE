@@ -453,7 +453,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 @get_traceback
 def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, replica_id, trajsPerReplica, restart=False):
     """
-    Functions that runs the production run at NVT conditions.
+    Functions that runs the production run at NPT conditions.
     If a boxRadius is defined in the parameters section, a Flat-bottom harmonic restrains will be applied between
     the protein and the ligand
 
@@ -538,7 +538,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     simulation.reporters.append(CustomStateDataReporter(stateData, parameters.reporterFreq, step=True,
                                                         potentialEnergy=True, temperature=True, time_sim=True,
                                                         volume=True, remainingTime=True, speed=True,
-                                                        totalSteps=parameters.productionLength, separator="\t",
+                                                        totalSteps=simulation_length, separator="\t",
                                                         append=restart, initialStep=lastStep))
     if workerNumber == 1:
         frequency = min(10 * parameters.reporterFreq, parameters.productionLength)
