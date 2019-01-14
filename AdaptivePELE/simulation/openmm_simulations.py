@@ -519,7 +519,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
 
     if parameters.boxCenter:
         print("Adding spherical ligand box")
-        addLigandBox(prmtop.topology, system, parameters.ligandName, dummy, parameters.boxRadius, deviceIndex)
+        addLigandBox(prmtop.topology, pdb.positions, system, parameters.ligandName, dummy, parameters.boxRadius, deviceIndex)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(pdb.positions)
     if restart:
