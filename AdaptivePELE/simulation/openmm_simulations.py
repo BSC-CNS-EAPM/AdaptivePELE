@@ -649,13 +649,22 @@ def addDummyAtomToSystem(system, topology, positions, resname, dummy, worker):
             forces.setParticleParameters(dummy, 0.0, 1.0, 0.0)
 
 
-def addLigandBox(topology, system, resname, dummy, radius, worker):
+def addLigandBox(topology, positions, system, resname, dummy, radius, worker):
+    masses = []
+    coords = np.ndarray(shape=(0, 3))
+    ligand_atoms = []
     for atom in topology.atoms():
         if atom.residue.name == resname and atom.element.symbol != "H":
-            if worker == 0:
-                utilities.print_unbuffered("Ligand atom selected to check distance to the box", atom.residue.name, atom.name, atom.index)
-            ligand_atom = atom.index
-            break
+            masses.append(atom.element.mass.value_in_unit(unit=unit.dalton))
+            coords = np.vstack((coords, positions[atom.index.value_in_unit(unit=unit.nanometer)]))
+            ligand_atoms.append(atom)
+    masses = np.array(masses)
+    masses /= masses.sum()
+    mass_center = coords.astype('float64').T.dot(masses)
+    atomClosestToMassCenter = min(ligand_atoms, key=lambda x: np.linalg.norm(mass_center - positions[x.index].value_in_unit(unit=unit.nanometer)))
+    if worker == 0:
+        utilities.print_unbuffered("Ligand atom selected to check distance to the box", atomClosestToMassCenter.residue.name, atomClosestToMassCenter.name, atomClosestToMassCenter.index)
+    ligand_atom = atomClosestToMassCenter.index
     forceFB = mm.CustomBondForce('step(r-r0)*(k/2) * (r-r0)^2')
     forceFB.addPerBondParameter("k")
     forceFB.addPerBondParameter("r0")
