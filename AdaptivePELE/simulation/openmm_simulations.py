@@ -636,7 +636,9 @@ def addDummyAtomToSystem(system, topology, positions, resname, dummy, worker):
             if worker == 0:
                 utilities.print_unbuffered("Added bond between dummy atom and protein atom", atom.residue.name, atom.residue.index+1, atom.name, atom.index)
             protein_CAs.append(atom.index)
-            break
+            if len(protein_CAs) >= 20:
+                break
+
     system.setParticleMass(dummy, 0.0)
     for protein_particle in protein_CAs:
         distance_constraint = np.linalg.norm(positions[dummy].value_in_unit(unit.nanometers)-positions[protein_particle].value_in_unit(unit.nanometers))
@@ -656,7 +658,7 @@ def addLigandBox(topology, positions, system, resname, dummy, radius, worker):
     for atom in topology.atoms():
         if atom.residue.name == resname and atom.element.symbol != "H":
             masses.append(atom.element.mass.value_in_unit(unit=unit.dalton))
-            coords = np.vstack((coords, positions[atom.index.value_in_unit(unit=unit.nanometer)]))
+            coords = np.vstack((coords, positions[atom.index].value_in_unit(unit=unit.nanometer)))
             ligand_atoms.append(atom)
     masses = np.array(masses)
     masses /= masses.sum()
