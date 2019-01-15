@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 import numpy as np
 import re
-import mdtraj as md
 from io import StringIO, open
 cimport cython
 cimport numpy as np
