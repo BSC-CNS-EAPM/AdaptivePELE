@@ -3,7 +3,6 @@ import os.path
 import numpy as np
 import glob
 import AdaptivePELE.constants
-import mdtraj as md
 import math
 
 
@@ -64,6 +63,8 @@ class PDBManager:
         self.bondedCYS = []
         # Set with the modified residues
         self.modified_res = set()
+        # ndarray with all the coords of the system
+        self.ndarray_xyz_coords = np.ndarray(shape=(0, 3))
         # Dictionary with the valid Atom names for each of the heavy atoms of each residue
         self.AtomTemplates = self.loadTemplates()
         self.loadPDB()
@@ -147,6 +148,10 @@ class PDBManager:
                                                                                columns[self.POSITIONS["COORDY"]],
                                                                                columns[self.POSITIONS["COORDZ"]]],
                          columns[self.POSITIONS["OCUPANCY"]], columns[self.POSITIONS["BFACTOR"]])
+                    xyzcoords = np.array([float(columns[self.POSITIONS["COORDX"]]),
+                                          float(columns[self.POSITIONS["COORDY"]]),
+                                          float(columns[self.POSITIONS["COORDZ"]])])
+                    self.ndarray_xyz_coords = np.vstack((self.ndarray_xyz_coords, xyzcoords))
 
     def writePDB(self, finalpdb, *args):
         """
@@ -384,11 +389,10 @@ class PDBManager:
         :return: array with tuples containing the maximum and minimum values of each axis
         [(X_max,X_min),(Y_max,Y_min),(Z_max,Z_min)]
         """
-        traj = md.load(self.PDBtoLoad)
         bondaries = []
         for i in range(3):  # X,Y,Z
-            upper_bound = round(max(traj.xyz[0][:, [i]])[0]*10, 3)
-            lower_bound = round(min(traj.xyz[0][:, [i]])[0]*10, 3)
+            upper_bound = round(max(self.ndarray_xyz_coords[:, [i]])[0], 3)
+            lower_bound = round(min(self.ndarray_xyz_coords[:, [i]])[0], 3)
             bondaries.append((upper_bound, lower_bound))
         return bondaries
 
