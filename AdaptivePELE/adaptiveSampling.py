@@ -676,7 +676,13 @@ def main(jsonParams, clusteringHook=None):
             initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningCalculator.parameters.reportFilename, outputPath, resname, processManager, topologies)
             # write the equilibration structures for each replica
             processManager.writeEquilibrationStructures(outputPathConstants.tmpFolder, initialStructures)
+            if processManager.isMaster() and simulationRunner.parameters.constraints:
+                # write the new constraints for synchronization
+                utilities.writeNewConstraints(outputPathConstants.tmpFolder, "new_constraints.txt", simulationRunner.parameters.constraints)
+
             processManager.barrier()
+            if not processManager.isMaster() and simulationRunner.parameters.constraints:
+                simulationRunner.parameters.constraints = utilities.readConstraints(outputPathConstants.tmpFolder, "new_constraints.txt")
             # read all the equilibration structures
             initialStructures = processManager.readEquilibrationStructures(outputPathConstants.tmpFolder)
             topologies.setTopologies(initialStructures, cleanFiles=processManager.isMaster())

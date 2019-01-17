@@ -721,6 +721,7 @@ def getFileExtension(trajectoryFile):
     """
     return os.path.splitext(trajectoryFile)[1]
 
+
 def loadtxtfile(filename):
     """
         Load a table file from a text file
@@ -735,3 +736,39 @@ def loadtxtfile(filename):
         data = data[np.newaxis, :]
     return data
 
+
+def writeNewConstraints(folder, filename, constraints):
+    """
+        Write the constraints to disk
+
+        :param folder: Name of the folder where to write the
+            constraints
+        :type folder: str
+        :param filename: Name of the file where to write the constraints
+        :type filename: str
+        :param constraints: List of the constraints
+        :type constraints: list
+    """
+    with open(os.path.join(folder, filename), "w") as f:
+        for constraint in constraints:
+            f.write("{x[0]} {x[1]} {x[2]}\n".format(x=constraint))
+
+
+def readConstraints(folder, filename):
+    """
+        Read the new constraints from disk
+
+        :param folder: Name of the folder where to write the
+            processorsToClusterMapping
+        :type folder: str
+        :param filename: Name of the file where to write the constraints
+        :type filename: str
+        :returns: list -- List with the new constraints
+    """
+    new_constraints = []
+    with open(os.path.join(folder, filename)) as f:
+        for line in f:
+            line_split = line.rstrip().split()
+            line_split[2] = float(line_split[2])
+            new_constraints.append(line_split)
+    return new_constraints
