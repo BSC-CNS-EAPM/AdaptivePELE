@@ -44,8 +44,8 @@ class Constants(object):
 
 class TopologyCompat(object):
     def __init__(self, pdb_file):
-        self.path = os.path.split(os.path.abspath(pdb_file))[0]
-        self.topologyFiles = pdb_file
+        self.topologyFiles = os.path.abspath(pdb_file)
+        self.path = os.path.split(self.topologyFiles)[0]
 
     def getTopologyFile(self, epoch, trajectory_number):
         return self.topologyFiles
