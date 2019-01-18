@@ -861,6 +861,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
 
+
 <div class="viewcode-block" id="loadtxtfile"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.loadtxtfile">[docs]</a><span class="k">def</span> <span class="nf">loadtxtfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load a table file from a text file</span>
@@ -875,6 +876,42 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
+
+<div class="viewcode-block" id="writeNewConstraints"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.writeNewConstraints">[docs]</a><span class="k">def</span> <span class="nf">writeNewConstraints</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the constraints to disk</span>
+
+<span class="sd">        :param folder: Name of the folder where to write the</span>
+<span class="sd">            constraints</span>
+<span class="sd">        :type folder: str</span>
+<span class="sd">        :param filename: Name of the file where to write the constraints</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param constraints: List of the constraints</span>
+<span class="sd">        :type constraints: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="n">constraints</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{x[0]}</span><span class="s2"> </span><span class="si">{x[1]}</span><span class="s2"> </span><span class="si">{x[2]}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">constraint</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="readConstraints"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.readConstraints">[docs]</a><span class="k">def</span> <span class="nf">readConstraints</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the new constraints from disk</span>
+
+<span class="sd">        :param folder: Name of the folder where to write the</span>
+<span class="sd">            processorsToClusterMapping</span>
+<span class="sd">        :type folder: str</span>
+<span class="sd">        :param filename: Name of the file where to write the constraints</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :returns: list -- List with the new constraints</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_constraints</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">line_split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">line_split</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">new_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_split</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_constraints</span></div>
 </pre></div>
 
            </div>

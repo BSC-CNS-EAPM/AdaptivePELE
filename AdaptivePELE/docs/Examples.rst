@@ -596,6 +596,10 @@ Additionally, these methods can also accept the following parameters:
 * **minPos** (*list*): Coordinates of the reference minimum. This value is used
   to calculate the distance to each cluster and create the probability and PMF
   plots for the MSM-based spawnings
+* **SASA_column** (*int*): Column corresponding to SASA in the report files. This value is used
+  to calculate the SASA of each cluster and create the probability and PMF
+  plots for the MSM-based spawnings
+
 
 
 Examples
@@ -641,7 +645,8 @@ Running independentMSM spawning (needs to be coupled with MSM clustering)::
         "type" : "IndependentMSM",
         "params" : {
             "lagtime" : 100,
-            "minPos": [20.34, 32.56, 8.93]
+            "minPos": [20.34, 32.56, 8.93],
+            "SASA_column": 7
         }
     }
 

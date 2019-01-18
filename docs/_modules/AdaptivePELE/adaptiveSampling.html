@@ -228,12 +228,14 @@
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="cleanPreviousSimulation"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.cleanPreviousSimulation">[docs]</a><span class="k">def</span> <span class="nf">cleanPreviousSimulation</span><span class="p">(</span><span class="n">output_path</span><span class="p">):</span>
+<div class="viewcode-block" id="cleanPreviousSimulation"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.cleanPreviousSimulation">[docs]</a><span class="k">def</span> <span class="nf">cleanPreviousSimulation</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">allTrajs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clean the uneeded data from a previous simulation</span>
 
 <span class="sd">        :param output_path: Path where the data is stored</span>
 <span class="sd">        :type output_path: str</span>
+<span class="sd">        :param allTrajs: Path where the discretized trajectories for MSM are stored</span>
+<span class="sd">        :type allTrajs: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">equilibration_folders</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;equilibration*&quot;</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">equilibration_folders</span><span class="p">:</span>
@@ -250,7 +252,12 @@
             <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">epoch</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">:</span>
-                <span class="k">raise</span></div>
+                <span class="k">raise</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">allTrajs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="c1"># this folder may not exist, in which case we just carry on</span>
+        <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="createMappingForFirstEpoch"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.createMappingForFirstEpoch">[docs]</a><span class="k">def</span> <span class="nf">createMappingForFirstEpoch</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">,</span> <span class="n">topologies</span><span class="p">,</span> <span class="n">processors</span><span class="p">):</span>
@@ -432,7 +439,7 @@
     <span class="k">return</span> <span class="s2">&quot;[</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">trajectoryBasename</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">]&quot;</span></div>
 
 
-<div class="viewcode-block" id="findFirstRun"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.findFirstRun">[docs]</a><span class="k">def</span> <span class="nf">findFirstRun</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">clusteringOutputObject</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">):</span>
+<div class="viewcode-block" id="findFirstRun"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.findFirstRun">[docs]</a><span class="k">def</span> <span class="nf">findFirstRun</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">clusteringOutputObject</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">,</span> <span class="n">restart</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find the last epoch that was properly simulated and clusterized and</span>
 <span class="sd">        and return the first epoch to run in case of restart</span>
@@ -443,6 +450,8 @@
 <span class="sd">        :type clusteringOutputObject: str</span>
 <span class="sd">        :param simulationRunner: Simulation runner object</span>
 <span class="sd">        :type simulationRunner: :py:class:`.SimulationRunner</span>
+<span class="sd">        :param restart: Whether to restart a previous simulation</span>
+<span class="sd">        :type restart: bool</span>
 
 <span class="sd">        :return: int -- Current epoch</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -454,7 +463,7 @@
 
     <span class="n">objectsFound</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">epochFolders</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">checkSimulationInterrupted</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">checkSimulationInterrupted</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">restart</span><span class="p">):</span>
             <span class="c1"># this should only happen in MD simulations, where checkpoints are</span>
             <span class="c1"># periodically written in case the adaptive run dies at</span>
             <span class="c1"># mid-simulation, be able to use the already computed trajectories</span>
@@ -777,7 +786,7 @@
     <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">)</span>
     <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">topologies</span><span class="p">)</span>
     <span class="n">processManager</span> <span class="o">=</span> <span class="n">ProcessesManager</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">getNumReplicas</span><span class="p">())</span>
-    <span class="n">firstRun</span> <span class="o">=</span> <span class="n">findFirstRun</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">clusteringOutputObject</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">)</span>
+    <span class="n">firstRun</span> <span class="o">=</span> <span class="n">findFirstRun</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">clusteringOutputObject</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">,</span> <span class="n">restart</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
         <span class="n">printRunInfo</span><span class="p">(</span><span class="n">restart</span><span class="p">,</span> <span class="n">debug</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">,</span> <span class="n">spawningCalculator</span><span class="p">,</span> <span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">initialStructuresWildcard</span><span class="p">)</span>
         <span class="n">saveInitialControlFile</span><span class="p">(</span><span class="n">jsonParams</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">originalControlFile</span><span class="p">)</span>
@@ -803,7 +812,7 @@
         <span class="n">topologies</span><span class="o">.</span><span class="n">setTopologies</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
-                <span class="n">cleanPreviousSimulation</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
+                <span class="n">cleanPreviousSimulation</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">allTrajsPath</span><span class="p">)</span>
             <span class="n">writeTopologyFiles</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">topologies</span><span class="p">)</span>
         <span class="n">processManager</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
         <span class="n">firstRun</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># if restart false, but there were previous simulations</span>
@@ -814,7 +823,13 @@
             <span class="n">initialStructures</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">equilibrate</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">reportFilename</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">processManager</span><span class="p">,</span> <span class="n">topologies</span><span class="p">)</span>
             <span class="c1"># write the equilibration structures for each replica</span>
             <span class="n">processManager</span><span class="o">.</span><span class="n">writeEquilibrationStructures</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">()</span> <span class="ow">and</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span>
+                <span class="c1"># write the new constraints for synchronization</span>
+                <span class="n">utilities</span><span class="o">.</span><span class="n">writeNewConstraints</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">,</span> <span class="s2">&quot;new_constraints.txt&quot;</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
+
             <span class="n">processManager</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">()</span> <span class="ow">and</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span>
+                <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">readConstraints</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">,</span> <span class="s2">&quot;new_constraints.txt&quot;</span><span class="p">)</span>
             <span class="c1"># read all the equilibration structures</span>
             <span class="n">initialStructures</span> <span class="o">=</span> <span class="n">processManager</span><span class="o">.</span><span class="n">readEquilibrationStructures</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">)</span>
             <span class="n">topologies</span><span class="o">.</span><span class="n">setTopologies</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">,</span> <span class="n">cleanFiles</span><span class="o">=</span><span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">())</span>
@@ -865,7 +880,7 @@
             <span class="c1"># this method only does works with MSM-based spwaning methods,</span>
             <span class="c1"># creating a plot of the stationary distribution and the PMF, for</span>
             <span class="c1"># the rest of methods it does nothing</span>
-            <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">createPlots</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">clustersList</span><span class="p">)</span>
+            <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">createPlots</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">clusteringMethod</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">degeneracyOfRepresentatives</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">modeMovingBox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

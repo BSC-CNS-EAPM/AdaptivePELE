@@ -262,15 +262,21 @@ selected</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.checkSimulationInterrupted">
-<code class="descname">checkSimulationInterrupted</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.checkSimulationInterrupted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.checkSimulationInterrupted" title="Permalink to this definition">¶</a></dt>
+<code class="descname">checkSimulationInterrupted</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputpath</em>, <em>restart</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.checkSimulationInterrupted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.checkSimulationInterrupted" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check wether the simulation was interrupted before finishing</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch</strong> (<em>int</em>) – Epoch number</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epoch</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>outputpath</strong> (<em>str</em>) – Simulation output path</li>
+<li><strong>restart</strong> (<em>bool</em>) – Whether to restart a previous simulation</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool – True if the simulations where interrupted</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool – True if the simulations where interrupted</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -802,15 +808,21 @@ selected</td>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.checkSimulationInterrupted">
-<code class="descname">checkSimulationInterrupted</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.checkSimulationInterrupted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.checkSimulationInterrupted" title="Permalink to this definition">¶</a></dt>
+<code class="descname">checkSimulationInterrupted</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputpath</em>, <em>restart</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.checkSimulationInterrupted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.checkSimulationInterrupted" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check wether the simulation was interrupted before finishing</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch</strong> (<em>int</em>) – Epoch number</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epoch</strong> (<em>int</em>) – Epoch number</li>
+<li><strong>outputpath</strong> (<em>str</em>) – Simulation output path</li>
+<li><strong>restart</strong> (<em>bool</em>) – Whether to restart a previous simulation</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool – True if the simulations where interrupted</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool – True if the simulations where interrupted</p>
+</td>
 </tr>
 </tbody>
 </table>

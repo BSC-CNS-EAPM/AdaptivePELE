@@ -641,7 +641,7 @@ snapshot from which the trajectories will start in the next iteration</p>
 
 <dl class="method">
 <dt id="AdaptivePELE.spawning.spawning.MSMCalculator.createPlots">
-<code class="descname">createPlots</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>currentEpoch</em>, <em>clusters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MSMCalculator.createPlots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MSMCalculator.createPlots" title="Permalink to this definition">¶</a></dt>
+<code class="descname">createPlots</code><span class="sig-paren">(</span><em>outputPathConstants</em>, <em>currentEpoch</em>, <em>clustering</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MSMCalculator.createPlots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MSMCalculator.createPlots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the plots to do a quick analysis of the MSM and dG calculation</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -650,7 +650,7 @@ snapshot from which the trajectories will start in the next iteration</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
 <li><strong>currentEpoch</strong> (<em>int</em>) – Current iteration number</li>
-<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
+<li><strong>clustering</strong> – Existing clusters</li>
 </ul>
 </td>
 </tr>
@@ -674,6 +674,24 @@ snapshot from which the trajectories will start in the next iteration</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">object – Object containing the estimated MSM</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.spawning.spawning.MSMCalculator.getSASAvalues">
+<code class="descname">getSASAvalues</code><span class="sig-paren">(</span><em>clusters</em>, <em>outputPathConstants</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/spawning/spawning.html#MSMCalculator.getSASAvalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.spawning.spawning.MSMCalculator.getSASAvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the SASA value for each cluster from the report file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Contains outputPath-related constants</li>
+<li><strong>clusters</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a>) – Existing clusters</li>
+</ul>
 </td>
 </tr>
 </tbody>

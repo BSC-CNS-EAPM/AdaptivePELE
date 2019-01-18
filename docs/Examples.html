@@ -735,6 +735,9 @@ There are two types of density calculators:</p>
 <li><strong>minPos</strong> (<em>list</em>): Coordinates of the reference minimum. This value is used
 to calculate the distance to each cluster and create the probability and PMF
 plots for the MSM-based spawnings</li>
+<li><strong>SASA_column</strong> (<em>int</em>): Column corresponding to SASA in the report files. This value is used
+to calculate the SASA of each cluster and create the probability and PMF
+plots for the MSM-based spawnings</li>
 </ul>
 </div>
 <div class="section" id="examples">
@@ -776,7 +779,8 @@ plots for the MSM-based spawnings</li>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;IndependentMSM&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;lagtime&quot;</span> <span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
-        <span class="s2">&quot;minPos&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">20.34</span><span class="p">,</span> <span class="mf">32.56</span><span class="p">,</span> <span class="mf">8.93</span><span class="p">]</span>
+        <span class="s2">&quot;minPos&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">20.34</span><span class="p">,</span> <span class="mf">32.56</span><span class="p">,</span> <span class="mf">8.93</span><span class="p">],</span>
+        <span class="s2">&quot;SASA_column&quot;</span><span class="p">:</span> <span class="mi">7</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
