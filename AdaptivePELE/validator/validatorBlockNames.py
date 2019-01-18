@@ -46,7 +46,8 @@ class SpawningParams:
         "condition": "basestring",
         "n": "numbers.Real",
         "lagtime": "numbers.Real",
-        "minPos": "list"
+        "minPos": "list",
+        "SASA_column": "int"
     }
     types = {
         "sameWeight": {

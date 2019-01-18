@@ -197,6 +197,7 @@ class SpawningParams:
         self.condition = blockNames.SpawningParams.minValue  # wether to consider min or max values in epsilon
         self.lagtime = None
         self.minPos = None
+        self.sasaColumn = None
 
     def buildSpawningParameters(self, spawningBlock):
         """
@@ -262,6 +263,10 @@ class SpawningParams:
             self.condition = spawningParamsBlock.get(blockNames.SpawningParams.condition,
                                                      blockNames.SpawningParams.minValue)
             self.minPos = spawningParamsBlock.get(blockNames.SpawningParams.minPos)
+            self.sasaColumn = spawningParamsBlock.get(blockNames.SpawningParams.SASA_column)
+            if self.sasaColumn is not None:
+                # start counting from one in the report file
+                self.sasaColumn -= 1
 
 
 class SpawningCalculator:
@@ -1213,10 +1218,29 @@ class MSMCalculator(SpawningCalculator):
 
         pmf_xyzg = np.hstack((clusters, np.expand_dims(gpmf, axis=1)))
         np.savetxt(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "pmf_xyzg.dat"), pmf_xyzg)
-        distance = np.linalg.norm(clusters-self.parameters.minPos, axis=1)
+        distance = None
+        if self.parameters.minPos is not None:
+            distance = np.linalg.norm(clusters-self.parameters.minPos, axis=1)
         return pi, gpmf, distance
 
-    def createPlots(self, outputPathConstants, currentEpoch, clusters):
+    def getSASAvalues(self, clusters, outputPathConstants):
+        """
+            Get the SASA value for each cluster from the report file
+
+            :param outputPathConstants: Contains outputPath-related constants
+            :type outputPathConstants: :py:class:`.OutputPathConstants`
+            :param clusters: Existing clusters
+            :type clusters: :py:class:`.Clusters`
+        """
+        sasa = []
+        for cl in clusters:
+            epoch, traj, snapshot = cl.trajPosition
+            report_filename = glob.glob(os.path.join(outputPathConstants.epochOutputPathTempletized % epoch, "*report*_%d" % traj))[0]
+            report_values = utilities.loadtxtfile(report_filename)
+            sasa.append(report_values[snapshot, self.parameters.sasaColumn])
+        return sasa
+
+    def createPlots(self, outputPathConstants, currentEpoch, clustering):
         """
             Create the plots to do a quick analysis of the MSM and dG calculation
 
@@ -1224,25 +1248,56 @@ class MSMCalculator(SpawningCalculator):
             :type outputPathConstants: :py:class:`.OutputPathConstants`
             :param currentEpoch: Current iteration number
             :type currentEpoch: int
-            :param clusters: Existing clusters
-            :type clusters: :py:class:`.Clusters`
+            :param clustering: Existing clusters
+            :type clusters: :py:class:`.Clustering`
         """
         if not MATPLOTLIB:
             raise utilities.UnsatisfiedDependencyException("Matplotlib installation not found!!")
-        if self.parameters.minPos is None:
-            print("Plots can't be created since a reference minimum position has not been provided!!!")
-        clusters = clusters.clusterCenters
+        if self.parameters.minPos is None and self.parameters.sasaColumn is None:
+            print("Plots can't be created since neither a reference minimum position nor SASA have been provided!!!")
+            return
+        clusters = clustering.pyemma_clustering.clusterCenters
         prob, G, distance = self.calculatedG(clusters, outputPathConstants, currentEpoch)
-        plt.figure()
-        plt.scatter(distance, prob)
-        plt.xlabel("Distance to minimum")
-        plt.ylabel("Stationary distribution")
-        plt.savefig(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "eigenvector.png"))
-        plt.figure()
-        plt.scatter(distance, G)
-        plt.xlabel("Distance to minimum")
-        plt.ylabel("PMF")
-        plt.savefig(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "PMF.png"))
+        sasa_values = None
+        if self.parameters.sasaColumn is not None:
+            sasa_values = self.getSASAvalues(clustering.clusters, outputPathConstants)
+        if sasa_values is not None and distance is not None:
+            f, axarr = plt.subplots(1, 2)
+            axarr[0].scatter(distance, prob)
+            axarr[0].set_xlabel("Distance to minimum")
+            axarr[0].set_ylabel("Stationary distribution")
+            axarr[1].scatter(sasa_values, prob)
+            axarr[1].set_xlabel("SASA")
+            f.savefig(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "eigenvector.png"))
+            f, axarr = plt.subplots(1, 2)
+            axarr[0].scatter(distance, G)
+            axarr[0].set_xlabel("Distance to minimum")
+            axarr[0].set_ylabel("PMF")
+            axarr[1].scatter(sasa_values, G)
+            axarr[1].set_xlabel("SASA")
+            f.savefig(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "PMF.png"))
+        elif distance is not None:
+            plt.figure()
+            plt.scatter(distance, prob)
+            plt.xlabel("Distance to minimum")
+            plt.ylabel("Stationary distribution")
+            plt.savefig(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "eigenvector.png"))
+            plt.figure()
+            plt.scatter(distance, G)
+            plt.xlabel("Distance to minimum")
+            plt.ylabel("PMF")
+            plt.savefig(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "PMF.png"))
+        elif sasa_values is not None:
+            plt.figure()
+            plt.scatter(sasa_values, prob)
+            plt.xlabel("SASA")
+            plt.ylabel("Stationary distribution")
+            plt.savefig(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "eigenvector.png"))
+            plt.figure()
+            plt.scatter(sasa_values, G)
+            plt.xlabel("SASA")
+            plt.ylabel("PMF")
+            plt.savefig(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "PMF.png"))
 
 
 class ProbabilityMSMCalculator(MSMCalculator):

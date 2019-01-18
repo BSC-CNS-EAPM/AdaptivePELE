@@ -102,6 +102,7 @@ class SpawningParams:
     metricsInd = "metricsInd"
     lagtime = "lagtime"
     minPos = "minPos"
+    SASA_column = "SASA_column"
 
 
 class SpawningDensity:
