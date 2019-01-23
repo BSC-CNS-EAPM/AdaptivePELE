@@ -987,6 +987,8 @@ class MDSimulation(SimulationRunner):
             :returns: str -- string with the ligand pdb
         """
         ligandpdb = os.path.join(outputpath, "raw_ligand.pdb")
+        if resname is None:
+            return ""
         if id_replica:
             return ligandpdb
         with open(ligandpdb, "w") as out:
