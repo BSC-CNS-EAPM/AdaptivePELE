@@ -88,12 +88,14 @@ def printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusterin
     sys.stdout.flush()
 
 
-def cleanPreviousSimulation(output_path):
+def cleanPreviousSimulation(output_path, allTrajs):
     """
         Clean the uneeded data from a previous simulation
 
         :param output_path: Path where the data is stored
         :type output_path: str
+        :param allTrajs: Path where the discretized trajectories for MSM are stored
+        :type allTrajs: str
     """
     equilibration_folders = glob.glob(os.path.join(output_path, "equilibration*"))
     for folder in equilibration_folders:
@@ -111,6 +113,11 @@ def cleanPreviousSimulation(output_path):
         except OSError as exc:
             if exc.errno != errno.ENOENT:
                 raise
+    try:
+        shutil.rmtree(allTrajs)
+    except OSError as exc:
+        # this folder may not exist, in which case we just carry on
+        pass
 
 
 def createMappingForFirstEpoch(initialStructures, topologies, processors):
@@ -665,18 +672,22 @@ def main(jsonParams, clusteringHook=None):
         topologies.setTopologies(initialStructures)
         if processManager.isMaster():
             if not debug:
-                cleanPreviousSimulation(outputPath)
+                cleanPreviousSimulation(outputPath, outputPathConstants.allTrajsPath)
             writeTopologyFiles(initialStructures, outputPathConstants.topologies)
         processManager.barrier()
         firstRun = 0  # if restart false, but there were previous simulations
 
         if simulationRunner.parameters.runEquilibration:
-            if resname is None:
-                raise utilities.RequiredParameterMissingException("Resname not specified in clustering block!!!")
             initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningCalculator.parameters.reportFilename, outputPath, resname, processManager, topologies)
             # write the equilibration structures for each replica
             processManager.writeEquilibrationStructures(outputPathConstants.tmpFolder, initialStructures)
+            if processManager.isMaster() and simulationRunner.parameters.constraints:
+                # write the new constraints for synchronization
+                utilities.writeNewConstraints(outputPathConstants.tmpFolder, "new_constraints.txt", simulationRunner.parameters.constraints)
             processManager.barrier()
+
+            if not processManager.isMaster() and simulationRunner.parameters.constraints:
+                simulationRunner.parameters.constraints = utilities.readConstraints(outputPathConstants.tmpFolder, "new_constraints.txt")
             # read all the equilibration structures
             initialStructures = processManager.readEquilibrationStructures(outputPathConstants.tmpFolder)
             topologies.setTopologies(initialStructures, cleanFiles=processManager.isMaster())
@@ -727,7 +738,7 @@ def main(jsonParams, clusteringHook=None):
             # this method only does works with MSM-based spwaning methods,
             # creating a plot of the stationary distribution and the PMF, for
             # the rest of methods it does nothing
-            spawningCalculator.createPlots(outputPathConstants, i, clustersList)
+            spawningCalculator.createPlots(outputPathConstants, i, clusteringMethod)
 
             if degeneracyOfRepresentatives is not None:
                 if simulationRunner.parameters.modeMovingBox is not None:

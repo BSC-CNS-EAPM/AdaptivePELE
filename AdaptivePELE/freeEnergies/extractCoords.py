@@ -44,8 +44,8 @@ class Constants(object):
 
 class TopologyCompat(object):
     def __init__(self, pdb_file):
-        self.path = os.path.split(os.path.abspath(pdb_file))[0]
-        self.topologyFiles = pdb_file
+        self.topologyFiles = os.path.abspath(pdb_file)
+        self.path = os.path.split(self.topologyFiles)[0]
 
     def getTopologyFile(self, epoch, trajectory_number):
         return self.topologyFiles
@@ -375,12 +375,17 @@ def copyTrajectories(traj_names, destFolderTempletized, folderName, setNumber=0,
 
 
 def gatherTrajs(constants, folder_name, setNumber, non_Repeat, epochNum=None):
+    nonRepeatedTrajs = glob.glob(os.path.join(constants.extractedTrajectoryFolder % folder_name, constants.baseExtractedTrajectoryName + "*"))
+    copyTrajectories(nonRepeatedTrajs, constants.gatherNonRepeatedTrajsFilename, folder_name, setNumber, epochNum=epochNum)
     if not non_Repeat:
+        # copy the repeated coordinates to the allTrajs folder
         trajectoriesFilenames = os.path.join(constants.outputTrajectoryFolder % folder_name, constants.baseExtractedTrajectoryName + "*")
         trajectories = glob.glob(trajectoriesFilenames)
         copyTrajectories(trajectories, constants.gatherTrajsFilename, folder_name, setNumber)
-    nonRepeatedTrajs = glob.glob(os.path.join(constants.extractedTrajectoryFolder % folder_name, constants.baseExtractedTrajectoryName + "*"))
-    copyTrajectories(nonRepeatedTrajs, constants.gatherNonRepeatedTrajsFilename, folder_name, setNumber, epochNum=epochNum)
+    else:
+        # if we ask to not repeat trajectories, copy the non-repeated to the
+        # allTrajs folder
+        copyTrajectories(nonRepeatedTrajs, constants.gatherTrajsFilename, folder_name, setNumber, epochNum=epochNum)
 
 
 def extractSidechainIndexes_prody(traj, ligand_resname, topology=None):

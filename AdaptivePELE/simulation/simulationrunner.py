@@ -540,6 +540,8 @@ class PeleSimulation(SimulationRunner):
 
             :returns: list --  List with initial structures
         """
+        if resname is None:
+            raise utilities.RequiredParameterMissingException("Resname not specified in clustering block!!!")
         newInitialStructures = []
         newStructure = []
         if self.parameters.equilibrationLength is None:

@@ -255,7 +255,7 @@ def calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d):
     return microstateVolume
 
 
-def calculate_pmf(microstateVolume, pi):
+def calculate_pmf(microstateVolume, pi, divide_volume=False):
     """
         Compute a potential of mean force given a stationary distribution
         (probabilities) and cluster volumes
@@ -263,8 +263,12 @@ def calculate_pmf(microstateVolume, pi):
     kb = 0.0019872041
     T = 300
     beta = 1 / (kb * T)
-    newDist = pi  # /microstateVolume
-    # newDist /= newDist[newDist != np.inf].sum()
+    if not divide_volume:
+        newDist = pi  # /microstateVolume
+    else:
+        print("Dividing probability distribution by the volume of each cluster")
+        newDist = pi/microstateVolume
+        newDist /= newDist[newDist != np.inf].sum()
     gpmf = -kb*T*np.log(newDist)
     print(gpmf[gpmf == -np.inf])
     print(gpmf[gpmf == np.inf])
@@ -300,7 +304,7 @@ def calculate_pmf(microstateVolume, pi):
     return gpmf, string
 
 
-def main(trajWildcard, reweightingT=1000):
+def main(trajWildcard, reweightingT=1000, volume_method="new"):
     allClusters = np.loadtxt("discretized/clusterCenters.dat")
     MSMObject = loadMSM('MSM_object.pkl')
 
@@ -313,8 +317,7 @@ def main(trajWildcard, reweightingT=1000):
     originalCoordinates = gather_coordinates(originalFilenames)
 
     bins = create_box(clusters, originalCoordinates, d)
-    method = "new"
-    if method == "new":
+    if volume_method == "new":
         print("Using new volume estimation with radius %.2f" % d)
         microstateVolume = calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d)
     else:

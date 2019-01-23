@@ -708,6 +708,28 @@ trajectories and reports</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.readConstraints">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">readConstraints</code><span class="sig-paren">(</span><em>folder</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readConstraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readConstraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the new constraints from disk</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
+processorsToClusterMapping</li>
+<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the constraints</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the new constraints</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.readProcessorMappingFromDisk">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">readProcessorMappingFromDisk</code><span class="sig-paren">(</span><em>folder</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readProcessorMappingFromDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readProcessorMappingFromDisk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the processorsToClusterMapping from disk</p>
@@ -744,6 +766,26 @@ processorsToClusterMapping</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Sign of the number</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.writeNewConstraints">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">writeNewConstraints</code><span class="sig-paren">(</span><em>folder</em>, <em>filename</em>, <em>constraints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeNewConstraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeNewConstraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the constraints to disk</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
+constraints</li>
+<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the constraints</li>
+<li><strong>constraints</strong> (<em>list</em>) – List of the constraints</li>
+</ul>
 </td>
 </tr>
 </tbody>
