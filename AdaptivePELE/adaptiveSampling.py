@@ -684,8 +684,8 @@ def main(jsonParams, clusteringHook=None):
             if processManager.isMaster() and simulationRunner.parameters.constraints:
                 # write the new constraints for synchronization
                 utilities.writeNewConstraints(outputPathConstants.tmpFolder, "new_constraints.txt", simulationRunner.parameters.constraints)
-
             processManager.barrier()
+
             if not processManager.isMaster() and simulationRunner.parameters.constraints:
                 simulationRunner.parameters.constraints = utilities.readConstraints(outputPathConstants.tmpFolder, "new_constraints.txt")
             # read all the equilibration structures
