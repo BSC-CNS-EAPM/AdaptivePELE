@@ -304,7 +304,7 @@ def calculate_pmf(microstateVolume, pi, divide_volume=False):
     return gpmf, string
 
 
-def main(trajWildcard, reweightingT=1000):
+def main(trajWildcard, reweightingT=1000, volume_method="new"):
     allClusters = np.loadtxt("discretized/clusterCenters.dat")
     MSMObject = loadMSM('MSM_object.pkl')
 
@@ -317,8 +317,7 @@ def main(trajWildcard, reweightingT=1000):
     originalCoordinates = gather_coordinates(originalFilenames)
 
     bins = create_box(clusters, originalCoordinates, d)
-    method = "new"
-    if method == "new":
+    if volume_method == "new":
         print("Using new volume estimation with radius %.2f" % d)
         microstateVolume = calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d)
     else:
