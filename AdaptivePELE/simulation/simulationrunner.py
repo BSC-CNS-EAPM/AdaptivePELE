@@ -870,11 +870,13 @@ class MDSimulation(SimulationRunner):
         Tleapdict = {"RESNAME": resname, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod, "DUM": ""}
         antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
         parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
-        if processManager.isMaster() and not self.parameters.customparamspath:
+        if processManager.isMaster() and not self.parameters.customparamspath and resname is not None:
             self.prepareLigand(antechamberDict, parmchkDict)
         amber_file_path = ""
         # Change the Mol2 and Frcmod path to the new user defined path
-        if self.parameters.customparamspath:
+        if resname is None:
+            self.tleapTemplate = constants.AmberTemplates.tleapTemplatenoLigand
+        if self.parameters.customparamspath and resname is not None:
             if not os.path.exists(self.parameters.customparamspath):
                 # As the working directory has changed, eval if the given path is a global or relative one.
                 self.parameters.customparamspath = os.path.join(workingdirectory, self.parameters.customparamspath)

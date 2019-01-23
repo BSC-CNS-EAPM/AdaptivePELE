@@ -633,12 +633,16 @@ def addDummyAtomToSystem(system, topology, positions, resname, dummy, worker):
     protein_CAs = []
     for atom in topology.atoms():
         if atom.residue.name not in ("HOH", "Cl-", "Na+", resname) and atom.name == "CA":
-            if worker == 0:
-                utilities.print_unbuffered("Added bond between dummy atom and protein atom", atom.residue.name, atom.residue.index+1, atom.name, atom.index)
             protein_CAs.append(atom.index)
-            if len(protein_CAs) >= 20:
-                break
-
+    modul = len(protein_CAs) % 20
+    step_to_use = (len(protein_CAs)-modul)/20
+    if modul == 0:
+        modul = None
+    else:
+        modul = modul * -1
+    protein_CAs = protein_CAs[:modul:step_to_use]
+    if worker == 0:
+        utilities.print_unbuffered("Added bond between dummy atom and protein atoms", protein_CAs)
     system.setParticleMass(dummy, 0.0)
     for protein_particle in protein_CAs:
         distance_constraint = np.linalg.norm(positions[dummy].value_in_unit(unit.nanometers)-positions[protein_particle].value_in_unit(unit.nanometers))

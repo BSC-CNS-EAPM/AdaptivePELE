@@ -49,12 +49,25 @@ class AmberTemplates:
     forcefields = {"ff99SB": "oldff/leaprc.ff99SB", "ff14SB": "leaprc.protein.ff14SB"}
     antechamberTemplate = "antechamber -i $LIGAND -fi pdb -o $OUTPUT -fo mol2 -c bcc -pf y -nc $CHARGE"
     parmchk2Template = "parmchk2 -i $MOL2 -f mol2 -o $OUTPUT"
-    tleapTemplate = "source oldff/leaprc.ff99SB\n" \
+    tleapTemplate = "source $FORCEFIELD\n" \
                     "source leaprc.gaff\n" \
                     "source leaprc.water.tip3p\n" \
                     "$MODIFIED_RES " \
                     "$RESNAME = loadmol2 $MOL2\n" \
                     "loadamberparams $FRCMOD\n" \
+                    "$DUM " \
+                    "COMPLX = loadpdb $COMPLEX\n" \
+                    "$BONDS " \
+                    "addions COMPLX Cl- 0\n" \
+                    "addions COMPLX Na+ 0\n" \
+                    "solvatebox COMPLX TIP3PBOX $BOXSIZE\n" \
+                    "saveamberparm COMPLX $PRMTOP $INPCRD\n" \
+                    "savepdb COMPLX $SOLVATED_PDB\n" \
+                    "quit"
+    tleapTemplatenoLigand = "source $FORCEFIELD\n" \
+                    "source leaprc.gaff\n" \
+                    "source leaprc.water.tip3p\n" \
+                    "$MODIFIED_RES " \
                     "$DUM " \
                     "COMPLX = loadpdb $COMPLEX\n" \
                     "$BONDS " \
