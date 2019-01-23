@@ -678,8 +678,6 @@ def main(jsonParams, clusteringHook=None):
         firstRun = 0  # if restart false, but there were previous simulations
 
         if simulationRunner.parameters.runEquilibration:
-            if resname is None:
-                raise utilities.RequiredParameterMissingException("Resname not specified in clustering block!!!")
             initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningCalculator.parameters.reportFilename, outputPath, resname, processManager, topologies)
             # write the equilibration structures for each replica
             processManager.writeEquilibrationStructures(outputPathConstants.tmpFolder, initialStructures)
