@@ -126,7 +126,7 @@ def get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, cluster
 def get_metric(criteria, epoch_num, traj_num, snap_num, report):
     report = os.path.join(str(epoch_num), "{}{}".format(report, traj_num))
     report_data = pd.read_csv(report, sep='    ', engine='python')
-    value = report_data[(report_data["numberOfAcceptedPeleSteps"] == (snap_num-1))].values[0][criteria-1]
+    value = report_data[(report_data["numberOfAcceptedPeleSteps"] == (snap_num))].values[0][criteria-1]
     header = list(report_data)[criteria-1]
     return value, header
 
