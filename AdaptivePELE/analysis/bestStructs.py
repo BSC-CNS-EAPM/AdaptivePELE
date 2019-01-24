@@ -124,6 +124,8 @@ def main(criteria, path=DIR, n_structs=10, sort_order="min", out_freq=FREQ, outp
 
 def extract_snapshot_from_pdb(path, f_id, output, topology, step, out_freq, f_out):
     f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.pdb".format(f_id)))
+    if not f_in:
+        glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.*".format(f_id)))
     if len(f_in) == 0:
         sys.exit("Trajectory {} not found. Be aware that PELE trajectories must contain the label \'trajectory\' in their file name to be detected".format("*trajectory*_{}".format(f_id)))
     f_in = f_in[0]
@@ -150,6 +152,8 @@ def extract_snapshot_from_pdb(path, f_id, output, topology, step, out_freq, f_ou
 
 def extract_snapshot_from_xtc(path, f_id, output, topology, step, out_freq, f_out):
     f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.xtc".format(f_id)))
+    if not f_in:
+        f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.*".format(f_id)))
     if len(f_in) == 0: 
         sys.exit("Trajectory {} not found. Be aware that PELE trajectories must contain the label \'trajectory\' in their file name to be detected".format("*trajectory*_{}".format(f_id)))
     splitTrajectory.main(output, [f_in[0], ], topology, [(step)/out_freq+1, ], template= f_out)
