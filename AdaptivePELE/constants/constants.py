@@ -29,12 +29,6 @@ elif machine == "bscls309":
     DOCUMENTS_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Documents"
 
 
-else:
-    PELE_EXECUTABLE  = "/opt/apps/NBD_PELE/PELErev12536/bin/Pele_mpi"
-    DATA_FOLDER  = "/opt/apps/NBD_PELE/PELErev12536/Data"
-    DOCUMENTS_FOLDER  = "/opt/apps/NBD_PELE/PELErev12536/Documents"
-
-
 inputFileTemplate = "{ \"files\" : [ { \"path\" : \"%s\" } ] }"
 trajectoryBasename = "*traj*"
 
