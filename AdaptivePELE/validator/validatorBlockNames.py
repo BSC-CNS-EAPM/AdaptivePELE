@@ -220,9 +220,7 @@ class clusteringTypes:
         "lastSnapshot": {
             "ligandResname": "basestring"
         },
-        "null": {
-            "ligandResname": "basestring"
-        },
+        "null": {},
         "MSM": {
             "ligandResname": "basestring",
             "nclusters": "numbers.Real"
