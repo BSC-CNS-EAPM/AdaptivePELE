@@ -6,7 +6,6 @@ import subprocess
 from AdaptivePELE.analysis import plotAdaptive
 import argparse
 
-<<<<<<< HEAD
 CONTACTS = "contacts"
 BE = "bindingEnergy" 
 SASA = "sasa"
@@ -18,14 +17,6 @@ def arg_parse():
     parser.add_argument('control_file', type=str, help='adaptive control file')
     parser.add_argument('--traj', type=str, help='Trajectory file name i.e. run_traj_', default='trajectory_')
     parser.add_argument('--report', type=str, help='Report file name i.e run_report_', default='report_')
-=======
-ADAPTIVE_PATH = "/run/media/ywest/BAD432E1D432A015/3s3i_out_in_waters/"
-IMAGE = "plot_1.png"
-CONTACTS = "contacts"
-CONTROL_FILE = "originalControlFile_1.conf"
-steps_Run, Xcol, Ycol, filename, kind_Print, colModifier, traj_range = 8, 6, 5, "report_", "PRINT_BE_RMSD", 4, None
-
-
     args = parser.parse_args()
 
     return args
@@ -99,6 +90,8 @@ def write_report(metrics, resname, initial_column=4, traj="trajectory_", report=
 def plot_clusters(metric1, metric2, metrics, resname, traj, report):
     command = "python -m AdaptivePELE.analysis.clusterAdaptiveRun 200 {} {} {} --report {} --traj {} --png".format(
        get_column(metric1, metrics), get_column(metric2, metrics), resname, report, traj)
+    os.system(command)
+
 def get_column(metric, metrics, initial_pos=4):
     return 1+metrics.index(metric)+initial_pos
 

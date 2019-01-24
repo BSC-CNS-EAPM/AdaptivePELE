@@ -3,10 +3,7 @@ matplotlib.use('Agg')
 import sys
 from functools import partial
 import os
-<<<<<<< HEAD
 import shutil
-=======
->>>>>>> 979598d7c0cce04fb6699123c43f0fb4dd20b7ea
 import multiprocessing as mp
 import glob
 from pylab import rcParams
@@ -30,20 +27,12 @@ def parseArgs():
     parser.add_argument('--cpus', type=int, help="Cpus to use", default=1)
     parser.add_argument('--report', type=str, help="Report filenames i.e. run_report_", default="report_")
     parser.add_argument('--traj', type=str, help="Trajectory filenames i.e. run_trajectory_", default="trajectory_")
-<<<<<<< HEAD
-=======
-    parser.add_argument('--use_pdb', action="store_true", help="To use when having pdb files with .xtc extension")
->>>>>>> 979598d7c0cce04fb6699123c43f0fb4dd20b7ea
     parser.add_argument('--png', action="store_true", help="Save plot in png format")
     parser.add_argument('--CA', action="store_true", help="Cluster by CA")
     parser.add_argument('--sidechains', action="store_true", help="Cluster by sidechain RMSD")
     parser.add_argument('--restart', action="store_true", help="Restart analysis from previous clusters")
     args = parser.parse_args()
-<<<<<<< HEAD
     return args.nClusters, args.crit1, args.crit2, args.ligand_resname, args.atomId, args.o, args.top, args.cpus, args.report, args.traj, args.png, args.CA, args.sidechains, args.restart
-=======
-    return args.nClusters, args.crit1, args.crit2, args.ligand_resname, args.atomId, args.o, args.top, args.cpus, args.report, args.traj, args.use_pdb, args.png, args.CA, args.sidechains, args.restart
->>>>>>> 979598d7c0cce04fb6699123c43f0fb4dd20b7ea
 
 
 class cd:
@@ -59,7 +48,6 @@ class cd:
         os.chdir(self.savedPath)
 
 
-<<<<<<< HEAD
 def write_snapshot(snap_num, trajectory, filename, topology=None):
     if not topology:
         snapshots = utilities.getSnapshots(trajectory, topology=topology)
@@ -67,15 +55,6 @@ def write_snapshot(snap_num, trajectory, filename, topology=None):
             fw.write(snapshots[snap_num])
     else:
         splitTrajectory.main("", [trajectory, ], topology, [snap_num+1,],template=filename)
-=======
-def write_snapshot(snap_num, trajectory, filename, topology=None, use_pdb=False):
-    if not topology:
-        snapshots = utilities.getSnapshots(trajectory, topology=topology, use_pdb=use_pdb)
-        with open(filename, "w") as fw:
-            fw.write(snapshots[snap_num])
-    else:
-        splitTrajectory.main("", [trajectory, ], topology, [snap_num+1,],template=filename, use_pdb=use_pdb)
->>>>>>> 979598d7c0cce04fb6699123c43f0fb4dd20b7ea
 
 
 
@@ -147,15 +126,7 @@ def get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, cluster
 def get_metric(criteria, epoch_num, traj_num, snap_num, report):
     report = os.path.join(str(epoch_num), "{}{}".format(report, traj_num))
     report_data = pd.read_csv(report, sep='    ', engine='python')
-<<<<<<< HEAD
-    value = report_data[(report_data["numberOfAcceptedPeleSteps"] == (snap_num))].values[0][criteria-1]
-=======
-    print(snap_num, type(snap_num))
-    print(type(report_data["Step"].tolist()[0]))
-    print(report_data)
-    print(report_data["numberOfAcceptedPeleSteps"] == (snap_num-1))
     value = report_data[(report_data["numberOfAcceptedPeleSteps"] == (snap_num-1))].values[0][criteria-1]
->>>>>>> 979598d7c0cce04fb6699123c43f0fb4dd20b7ea
     header = list(report_data)[criteria-1]
     return value, header
 
@@ -187,17 +158,12 @@ def save_to_df(input):
         #df.update(df_tmp)
     return dfs_tmp
 
-<<<<<<< HEAD
 def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "ClusterCentroids", atom_ids="", cpus=2, topology=None, report="report_", traj="trajectory_", png=False, CA=0, sidechains=0, restart=False):
-=======
-def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "ClusterCentroids", atom_ids="", cpus=2, topology=None, report="report_", traj="trajectory_", use_pdb=False, png=False, CA=0, sidechains=0, restart="all"):
->>>>>>> 979598d7c0cce04fb6699123c43f0fb4dd20b7ea
     #Create multiprocess pool
     if cpus>1:
         pool = mp.Pool(cpus)
     else:
         pool=mp.Pool(1)
-<<<<<<< HEAD
 
     # Clean files
     for file_path in glob.glob("*/extractedCoordinates"):
@@ -208,11 +174,6 @@ def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "Cl
     	extractCoords.main(lig_resname=ligand_resname, non_Repeat=True, atom_Ids=atom_ids, nProcessors=cpus, parallelize=True, topology=topology, protein_CA=CA, sidechains=sidechains)
     except ValueError:
 	raise ValueError("Check residue name")
-=======
-    #Extract COM ligand for each snapshot
-    if not glob.glob("allTrajs/traj*"):
-    	extractCoords.main(lig_resname=ligand_resname, non_Repeat=True, atom_Ids=atom_ids, nProcessors=cpus, parallelize=True, topology=topology, use_pdb=use_pdb, protein_CA=CA, sidechains=sidechains)
->>>>>>> 979598d7c0cce04fb6699123c43f0fb4dd20b7ea
 
     print("Clusterize trajectories by RMSD of COM")
     trajectoryFolder = "allTrajs"
@@ -275,20 +236,11 @@ def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "Cl
         outputFolder = ""
     print("Output structures")
     writePDB(COMArray, outputFolder+"clusters_%d_KMeans_allSnapshots.pdb" % num_clusters)
-<<<<<<< HEAD
     writeInitialStructures(fields1, fields2, crit1_name, crit2_name, centersInfo, outputFolder+"cluster_{}_{}_{}_{}_{}.pdb", traj, topology=topology) 
-=======
-    writeInitialStructures(fields1, fields2, crit1_name, crit2_name, centersInfo, outputFolder+"cluster_{}_{}_{}_{}_{}.pdb", traj, topology=topology, use_pdb=use_pdb) 
->>>>>>> 979598d7c0cce04fb6699123c43f0fb4dd20b7ea
     plotClusters(fields1, fields2, crit1_name, crit2_name, outputFolder, png=png)
     assesClusterConvergence(df, num_clusters, traj, topology)
     return 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     n_clusters, criteria1, criteria2, lig_name, atom_id, output, top, cpus, report, traj, png, CA, sidechains, restart = parseArgs()
     main(n_clusters, criteria1, criteria2, lig_name, output, atom_id, cpus, top, report, traj, png, CA, sidechains, restart)
-=======
-    n_clusters, criteria1, criteria2, lig_name, atom_id, output, top, cpus, report, traj, use_pdb, png, CA, sidechains, restart = parseArgs()
-    main(n_clusters, criteria1, criteria2, lig_name, output, atom_id, cpus, top, report, traj, use_pdb, png, CA, sidechains, restart)
->>>>>>> 979598d7c0cce04fb6699123c43f0fb4dd20b7ea
