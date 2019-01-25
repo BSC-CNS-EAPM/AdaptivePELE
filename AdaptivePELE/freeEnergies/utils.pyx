@@ -9,7 +9,7 @@ from libc.stdlib cimport rand, RAND_MAX
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef double[:] sum_rows(double[:,:] C):
-    cdef Py_ssize_t sx, sy
+    cdef Py_ssize_t sx, sy, i, j
     cdef double tmp_sum
     sx = C.shape[0]
     sy = C.shape[1]
@@ -19,7 +19,6 @@ cdef double[:] sum_rows(double[:,:] C):
         for j in range(sx):
             tmp_sum += C[i, j]
         x[i] = tmp_sum
-
     return x
 
 
@@ -31,7 +30,7 @@ def buildRevTransitionMatrix(double[:,:] C):
         #Implemented as Prinz paper
     """
     cdef double[:,:] X, T
-    cdef Py_ssize_t sx, sy
+    cdef Py_ssize_t sx, sy, k, ky
     sx = C.shape[0]
     sy = C.shape[1]
     X = np.empty((sx, sy))
@@ -78,6 +77,16 @@ def isAlphaCarbon(basestring string, bint writeCA):
 
     return writeCA and string[12:16].strip() == CA and string[76:80].strip() == C
 
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def extraAtomCheck(basestring line, dict extraAtoms):
+    cdef bint result
+    cdef basestring resname = line[17:20].strip()
+    cdef basestring atomname = line[12:16].strip()
+    cdef basestring extra_atom = extraAtoms[resname]
+    result = atomname == extra_atom
+    return result
 
 
 @cython.boundscheck(False)
@@ -183,3 +192,24 @@ cdef int binary_search(double rnd, double[:] prob):
         return l + 1
     else:
         return l
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def contactMap(double[:,:] coords, Py_ssize_t n):
+    cdef Py_ssize_t n_rows, size , row_ind, i, j, el
+    cdef double tmp = 0.5*n*(n-1)
+    size = <Py_ssize_t>tmp
+    n_rows = coords.shape[0]
+    cdef double tmp_sum, dist_x, dist_y, dist_z
+    cdef double[:, :] cm = np.zeros((n_rows, size))
+    for row_ind in range(n_rows):
+        # row_ind corresponds to a frame
+        el = 0
+        for i in range(n):
+            for j in range(i+1, n):
+                dist_x = coords[row_ind][i*3]-coords[row_ind][j*3]
+                dist_y = coords[row_ind][i*3+1]-coords[row_ind][j*3+1]
+                dist_z = coords[row_ind][i*3+2]-coords[row_ind][j*3+2]
+                cm[row_ind][el] = sqrt(dist_x**2+dist_y**2+dist_z**2)
+                el += 1
+    return np.asarray(cm)
