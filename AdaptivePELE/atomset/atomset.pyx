@@ -479,7 +479,7 @@ cdef class PDB:
     def isfromPDBFile(self):
         return self.ispdb
 
-    def _initialisePDB(self, basestring PDBstr, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=""):
+    def _initialisePDB(self, basestring PDBstr, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element="", dict extra_atoms={}):
         """
             Load the information from a PDB file or a string with the PDB
             contents
@@ -513,6 +513,9 @@ cdef class PDB:
         # creates a buffer that can handle a pdb file or a string containing
         # the PDB
         self.pdb = PDBContent.read()  # in case one wants to write it
+        if extra_atoms != {}:
+            self.CMAtoms = extra_atoms
+
 
         stringWithPDBContent = self.pdb.split(u'\n')
         for atomLine in stringWithPDBContent:
@@ -551,7 +554,7 @@ cdef class PDB:
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
-    def _initialiseXTC(self, np.ndarray[float, ndim=2] frame, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None):
+    def _initialiseXTC(self, np.ndarray[float, ndim=2] frame, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None, dict extra_atoms={}):
         """
             Load the information from a loaded XTC file into a  mdtraj Trajectory
 
@@ -582,6 +585,8 @@ cdef class PDB:
         else:
             resnumStr = u"%d" % (resnum)
         self.pdb = self.join_PDB_lines(topology, frame)  # in case one wants to write it
+        if extra_atoms != {}:
+            self.CMAtoms = extra_atoms
         for iatom in range(len(topology)):
             atomLine = topology[iatom]
             if not atomLine.startswith(u"ATOM") and not atomLine.startswith(u"HETATM"):
@@ -627,16 +632,16 @@ cdef class PDB:
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
-    def initialise(self, object coordinates, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None):
+    def initialise(self, object coordinates, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None, dict extra_atoms={}):
         """
             Wrapper function
         """
         if isinstance(coordinates, basestring):
             self.ispdb = True
-            self._initialisePDB(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element)
+            self._initialisePDB(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element, extra_atoms=extra_atoms)
         else:
             self.ispdb = False
-            self._initialiseXTC(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element, topology=topology)
+            self._initialiseXTC(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element, topology=topology, extra_atoms=extra_atoms)
 
     def computeTotalMass(self):
         """

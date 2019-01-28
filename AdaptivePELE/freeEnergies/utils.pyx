@@ -107,6 +107,12 @@ def is_model(basestring line):
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
+def is_end(basestring line):
+    cdef basestring check = "END"
+    return check in line[:3]
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
 @cython.cdivision(True)
 cpdef calculateAutoCorrelation(list lagtimes, list dtrajs, int nclusters, int nLags):
     cdef double[:, :] autoCorr = np.zeros((nclusters, nLags))

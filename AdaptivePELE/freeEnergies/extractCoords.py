@@ -2,13 +2,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from builtins import range
 import os
-import argparse
-import glob
 import re
-import shutil
 import sys
-import mdtraj as md
+import glob
+import shutil
+import argparse
+import itertools
 import numpy as np
+import mdtraj as md
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.freeEnergies import utils
 from AdaptivePELE.utilities import utilities
@@ -125,16 +126,18 @@ def parseArguments():
     return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors, args.top, args.sidechains, args.sidechains_folder, args.serial, args.contact_map, args.extra_atoms, args.cm_mode
 
 
-def loadAllResnameAtomsInPdb(filename, lig_resname, writeCA, sidechains):
+def loadAllResnameAtomsInPdb(filename, params):
     prunedFileContent = []
-    sidechains_bool = bool(sidechains)
+    sidechains_bool = bool(params.sidechains)
     with open(filename) as f:
         prunedSnapshot = []
         for line in f:
             if utils.is_model(line):
                 prunedFileContent.append("".join(prunedSnapshot))
                 prunedSnapshot = []
-            elif line[17:20] == lig_resname or utils.isAlphaCarbon(line, writeCA) or utils.isSidechain(line, sidechains_bool, sidechains):
+            elif utils.is_end(line):
+                continue
+            elif line[17:20] == params.lig_resname or utils.isAlphaCarbon(line, params.protein_CA or params.contact_map) or utils.isSidechain(line, sidechains_bool, params.sidechains) or (params.contact_map and params.extra_atoms and utils.extraAtomCheck(line, params.EXTRA_ATOMS)):
                 prunedSnapshot.append(line)
         if prunedSnapshot:
             prunedFileContent.append("".join(prunedSnapshot))
@@ -151,6 +154,25 @@ def extractFilenumber(filename):
 def getOutputFilename(directory, filename, baseOutputFilename):
     filenumber = extractFilenumber(filename)
     return os.path.join(directory, baseOutputFilename+filenumber+".dat")
+
+
+def extractContactMapCoordinatesPDB(allCoordinates, params):
+    trajCoords = []
+    for coordinates in allCoordinates:
+        if params.cm_mode == "p-lig":
+            PDB = atomset.PDB()
+            PDB.initialise(coordinates, resname=lig_resname)
+            snapshotCoords = [coord for at in PDB.atomList for coord in PDB.atoms[at].getAtomCoords()]
+        else:
+            snapshotCoords = []
+        PDBCA = atomset.PDB()
+        if params.extra_atoms:
+            PDBCA.initialise(coordinates, type=u"PROTEIN", extra_atoms=EXTRA_ATOMS)
+        else:
+            PDBCA.initialise(coordinates, type=u"PROTEIN")
+        snapshotCoords.extend([coord for at in PDBCA.atomList for coord in PDBCA.atoms[at].getAtomCoords()])
+        trajCoords.append(snapshotCoords)
+    return trajCoords
 
 
 def getLigandAlphaCarbonsCoords(allCoordinates, lig_resname, sidechains=False):
@@ -244,6 +266,12 @@ def extractIndexesTopology(topology, lig_resname, atoms, writeCA, sidechains):
     return selection
 
 
+def contactMapNonPDB(file_name, params, topology, selected_indices):
+    trajectory = md.load(file_name, top=topology)
+    atom_pairs = list(itertools.combinations(selected_indices, 2))
+    return 10*md.compute_distances(trajectory, atom_pairs, periodic=True)
+
+
 def extractCoordinatesXTCFile(file_name, params, topology, selected_indices):
     trajectory = md.load(file_name, top=topology)
     if params.com:
@@ -262,24 +290,28 @@ def writeFilenameExtractedCoordinates(filename, params, pathFolder, constants, t
     """
     ext = utilities.getFileExtension(filename)
     if ext == ".pdb":
-        allCoordinates = loadAllResnameAtomsInPdb(filename, params.lig_resname, params.writeCA, params.sidechains)
+        allCoordinates = loadAllResnameAtomsInPdb(filename, params)
         if params.writeLigandTrajectory:
             outputFilename = os.path.join(pathFolder, constants.ligandTrajectoryBasename % extractFilenumber(filename))
             with open(outputFilename, 'w') as f:
                 f.write("\nENDMDL\n".join(allCoordinates))
-        if params.writeCA:
+        if params.protein_CA:
             coords = getLigandAlphaCarbonsCoords(allCoordinates, params.lig_resname)
         elif params.sidechains:
             coords = getLigandAlphaCarbonsCoords(allCoordinates, params.lig_resname, sidechains=params.sidechains)
         else:
             if params.com:
                 coords = getPDBCOM(allCoordinates, params.lig_resname)
+            elif params.contact_map:
+                coords = np.array(extractContactMapCoordinatesPDB(allCoordinates, params))
+                coords = utils.contactMap(coords, int(coords.shape[1]/3))
             else:
-                coords = getAtomCoord(allCoordinates, params.lig_resname, params.atom_Ids)
+                coords = getAtomCoord(allCoordinates, params.lig_resname, params.atomIds)
     elif ext in MDTRAJ_FORMATS:
-        coords = extractCoordinatesXTCFile(filename, params, topology, indexes)
         if params.contact_map:
-            coords = utils.contactMap(coords.astype(np.float), len(indexes))
+            coords = contactMapNonPDB(filename, params, topology, indexes)
+        else:
+            coords = extractCoordinatesXTCFile(filename, params, topology, indexes)
     else:
         raise ValueError("Unrecongnized file extension for %s" % filename)
 
@@ -302,7 +334,7 @@ def writeFilenamesExtractedCoordinates(pathFolder, params, constants, pool=None)
         if params.contact_map:
             indexes = extractIndexesTopology_CM(top_file, params.lig_resname, params.cm_mode, params.extra_atoms)
         else:
-            indexes = extractIndexesTopology(top_file, params.lig_resname, params.atom_Ids, params.writeCA, params.sidechains)
+            indexes = extractIndexesTopology(top_file, params.lig_resname, params.atomIds, params.protein_CA, params.sidechains)
     else:
         indexes = None
     workers = []
