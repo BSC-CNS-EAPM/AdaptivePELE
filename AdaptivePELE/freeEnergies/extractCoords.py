@@ -68,7 +68,7 @@ class TopologyCompat(object):
 
 
 class ParamsHandler(object):
-    def __init__(self, folderWithTrajs, atom_id, lig_name, total_steps, sequential, writeLigandTrajectory, set_number, protein_CA, noRepeat, numProcessors, parallelize, topol, sidechains, sidechains_folder, CM, use_extra_atoms, CM_mode):
+    def __init__(self, folderWithTrajs, atom_id, lig_name, total_steps, sequential, writeLigandTrajectory, set_number, protein_CA, noRepeat, numProcessors, parallelize, topol, sidechains, sidechains_folder, CM, use_extra_atoms, CM_mode, dihedrals):
         self.folder_name = folderWithTrajs
         self.atomIds = atom_id
         self.lig_resname = lig_name
@@ -86,11 +86,12 @@ class ParamsHandler(object):
         self.contact_map = CM
         self.extra_atoms = use_extra_atoms
         self.cm_mode = CM_mode
-        if self.cm_mode == "p-lig" and self.lig_resname == "":
+        self.dihedrals = dihedrals
+        if self.contact_map and self.cm_mode == "p-lig" and self.lig_resname == "":
             raise ValueError("Ligand resname needed for protein-ligand contact map")
-        if self.cm_mode not in VALID_CM_MODES:
+        if self.contact_map and self.cm_mode not in VALID_CM_MODES:
             raise ValueError("Unrecognized type of contact map, valids are: %s" " ".join(VALID_CM_MODES))
-        self.com = not self.protein_CA and (self.atomIds is None or len(atomIds) == 0) and not self.sidechains and not self.contact_map
+        self.com = not self.protein_CA and (self.atomIds is None or len(atomIds) == 0) and not self.sidechains and not self.contact_map and not self.dihedrals
 
 
 def parseArguments():
@@ -119,11 +120,11 @@ def parseArguments():
     parser.add_argument("--serial", action="store_true", help="Flag to deactivate parallelization")
     parser.add_argument("--contact_map", action="store_true", help="Flag to activate contact map creation")
     parser.add_argument("--extra_atoms", action="store_true", help="Flag to use extra atoms in contact map creation (in addition to alpha carbons)")
+    parser.add_argument("--dihedrals", action="store_true", help="Flag to activate dihedral angles calculations")
     parser.add_argument("--cm_mode", default="p-lig", help="Type of contact map to create (p-lig for protein-ligand or p-p protein-protein)")
-    # parser.add_argument("-f", nargs='+', help="Files to get coordinates")
     args = parser.parse_args()
 
-    return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors, args.top, args.sidechains, args.sidechains_folder, args.serial, args.contact_map, args.extra_atoms, args.cm_mode
+    return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors, args.top, args.sidechains, args.sidechains_folder, args.serial, args.contact_map, args.extra_atoms, args.cm_mode, args.dihedrals
 
 
 def loadAllResnameAtomsInPdb(filename, params):
@@ -135,9 +136,9 @@ def loadAllResnameAtomsInPdb(filename, params):
             if utils.is_model(line):
                 prunedFileContent.append("".join(prunedSnapshot))
                 prunedSnapshot = []
-            elif utils.is_end(line):
+            elif utils.is_end(line) or utils.is_remark(line) or utils.is_cryst(line):
                 continue
-            elif line[17:20] == params.lig_resname or utils.isAlphaCarbon(line, params.protein_CA or params.contact_map) or utils.isSidechain(line, sidechains_bool, params.sidechains) or (params.contact_map and params.extra_atoms and utils.extraAtomCheck(line, params.EXTRA_ATOMS)):
+            elif line[17:20] == params.lig_resname or utils.isAlphaCarbon(line, params.protein_CA or params.contact_map) or utils.isSidechain(line, sidechains_bool, params.sidechains) or (params.contact_map and params.extra_atoms and utils.extraAtomCheck(line, EXTRA_ATOMS)):
                 prunedSnapshot.append(line)
         if prunedSnapshot:
             prunedFileContent.append("".join(prunedSnapshot))
@@ -161,7 +162,7 @@ def extractContactMapCoordinatesPDB(allCoordinates, params):
     for coordinates in allCoordinates:
         if params.cm_mode == "p-lig":
             PDB = atomset.PDB()
-            PDB.initialise(coordinates, resname=lig_resname)
+            PDB.initialise(coordinates, resname=params.lig_resname)
             snapshotCoords = [coord for at in PDB.atomList for coord in PDB.atoms[at].getAtomCoords()]
         else:
             snapshotCoords = []
@@ -272,6 +273,13 @@ def contactMapNonPDB(file_name, params, topology, selected_indices):
     return 10*md.compute_distances(trajectory, atom_pairs, periodic=True)
 
 
+def calculateDihedrals(file_name, params, topology):
+    trajectory = md.load(file_name, top=topology)
+    _, psi_angles = md.compute_psi(trajectory, periodic=True)
+    _, phi_angles = md.compute_phi(trajectory, periodic=True)
+    return np.hstack((psi_angles, phi_angles))
+
+
 def extractCoordinatesXTCFile(file_name, params, topology, selected_indices):
     trajectory = md.load(file_name, top=topology)
     if params.com:
@@ -288,6 +296,12 @@ def writeFilenameExtractedCoordinates(filename, params, pathFolder, constants, t
         Process the coordinates of a trajectory
 
     """
+    if params.dihedrals:
+        coords = calculateDihedrals(filename, params, topology)
+        outputFilename = getOutputFilename(constants.extractedTrajectoryFolder, filename,
+                                           constants.baseExtractedTrajectoryName)
+        writeToFile(coords, outputFilename % pathFolder)
+        return
     ext = utilities.getFileExtension(filename)
     if ext == ".pdb":
         allCoordinates = loadAllResnameAtomsInPdb(filename, params)
@@ -354,7 +368,9 @@ def writeFilenamesExtractedCoordinates(pathFolder, params, constants, pool=None)
         w.get()
 
 
-def parseResname(atom_Ids, lig_resname, CM, CM_mode):
+def parseResname(atom_Ids, lig_resname, CM, CM_mode, dihedrals):
+    if dihedrals:
+        return ""
     if atom_Ids is not None and len(atom_Ids) > 0:
         differentResnames = {atomId.split(":")[-1] for atomId in atom_Ids}
         if len(differentResnames) > 1:
@@ -574,14 +590,14 @@ def getTopologyObject(topology_file):
         raise ValueError("The topology parameter needs to be the path to a pickled Topology object or a pdb!")
 
 
-def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, parallelize=True, topology=None, sidechains=False, sidechain_folder=".", cm=False, use_extra_atoms=False, CM_mode="p-lig"):
-    params = ParamsHandler(folder_name, atom_Ids, lig_resname, numtotalSteps, enforceSequential_run, writeLigandTrajectory, setNumber, protein_CA, non_Repeat, nProcessors, parallelize, topology, sidechains, sidechain_folder, cm, use_extra_atoms, CM_mode)
+def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, parallelize=True, topology=None, sidechains=False, sidechain_folder=".", cm=False, use_extra_atoms=False, CM_mode="p-lig", calc_dihedrals=False):
+    params = ParamsHandler(folder_name, atom_Ids, lig_resname, numtotalSteps, enforceSequential_run, writeLigandTrajectory, setNumber, protein_CA, non_Repeat, nProcessors, parallelize, topology, sidechains, sidechain_folder, cm, use_extra_atoms, CM_mode, calc_dihedrals)
     constants = Constants()
 
     if params.topology is not None:
         params.topology = getTopologyObject(params.topology)
 
-    params.lig_resname = parseResname(params.atomIds, params.lig_resname, params.contact_map, params.cm_mode)
+    params.lig_resname = parseResname(params.atomIds, params.lig_resname, params.contact_map, params.cm_mode, params.dihedrals)
 
     folderWithTrajs = params.folder_name
 
@@ -625,5 +641,5 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
 
 if __name__ == "__main__":
-    folder, atomIds, resname, proteinCA, enforceSequential, writeLigandTraj, totalSteps, setNum, nonRepeat, n_processors, top, side_chains, sideChain_folder, serial, contact_map, extra_atoms, cm_mode = parseArguments()
-    main(folder, atomIds, resname, totalSteps, enforceSequential, writeLigandTraj, setNum, proteinCA, nonRepeat, n_processors, topology=top, sidechains=side_chains, sidechain_folder=sideChain_folder, parallelize=(not serial), cm=contact_map, use_extra_atoms=extra_atoms, CM_mode=cm_mode)
+    folder, atomIds, resname, proteinCA, enforceSequential, writeLigandTraj, totalSteps, setNum, nonRepeat, n_processors, top, side_chains, sideChain_folder, serial, contact_map, extra_atoms, cm_mode, dihedral_angles = parseArguments()
+    main(folder, atomIds, resname, totalSteps, enforceSequential, writeLigandTraj, setNum, proteinCA, nonRepeat, n_processors, topology=top, sidechains=side_chains, sidechain_folder=sideChain_folder, parallelize=(not serial), cm=contact_map, use_extra_atoms=extra_atoms, CM_mode=cm_mode, calc_dihedrals=dihedral_angles)

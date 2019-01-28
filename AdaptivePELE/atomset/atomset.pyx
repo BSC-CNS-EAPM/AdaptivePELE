@@ -514,7 +514,9 @@ cdef class PDB:
         # the PDB
         self.pdb = PDBContent.read()  # in case one wants to write it
         if extra_atoms != {}:
-            self.CMAtoms = extra_atoms
+            CMAtoms = extra_atoms
+        else:
+            CMAtoms = self.CMAtoms
 
 
         stringWithPDBContent = self.pdb.split(u'\n')
@@ -524,9 +526,9 @@ cdef class PDB:
             if type == self._typeCM:
                 atomName = atomLine[12:16].strip()
                 resName = atomLine[17:20].strip()
-                if resName not in self.CMAtoms:
+                if resName not in CMAtoms:
                     continue
-                if atomName != u"CA" and atomName != self.CMAtoms[resName]:
+                if atomName != u"CA" and atomName != CMAtoms[resName]:
                     continue
             else:
                 # HUGE optimisation (not to create an atom each time ~ 2e-5 s/atom)
@@ -586,7 +588,9 @@ cdef class PDB:
             resnumStr = u"%d" % (resnum)
         self.pdb = self.join_PDB_lines(topology, frame)  # in case one wants to write it
         if extra_atoms != {}:
-            self.CMAtoms = extra_atoms
+            CMAtoms = extra_atoms
+        else:
+            CMAtoms = self.CMAtoms
         for iatom in range(len(topology)):
             atomLine = topology[iatom]
             if not atomLine.startswith(u"ATOM") and not atomLine.startswith(u"HETATM"):
@@ -594,9 +598,9 @@ cdef class PDB:
             if type == self._typeCM:
                 atomName = atomLine[12:16].strip()
                 resName = atomLine[17:20].strip()
-                if resName not in self.CMAtoms:
+                if resName not in CMAtoms:
                     continue
-                if atomName != u"CA" and atomName != self.CMAtoms[resName]:
+                if atomName != u"CA" and atomName != CMAtoms[resName]:
                     continue
             else:
                 # HUGE optimisation (not to create an atom each time ~ 2e-5 s/atom)

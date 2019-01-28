@@ -84,6 +84,8 @@ def extraAtomCheck(basestring line, dict extraAtoms):
     cdef bint result
     cdef basestring resname = line[17:20].strip()
     cdef basestring atomname = line[12:16].strip()
+    if resname not in extraAtoms:
+        return False
     cdef basestring extra_atom = extraAtoms[resname]
     result = atomname == extra_atom
     return result
@@ -109,7 +111,22 @@ def is_model(basestring line):
 @cython.wraparound(False)
 def is_end(basestring line):
     cdef basestring check = "END"
-    return check in line[:3]
+    return check == line[:3]
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def is_remark(basestring line):
+    cdef basestring check = "REMARK"
+    return check == line[:6]
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def is_cryst(basestring line):
+    cdef basestring check = "CRYST"
+    return check == line[:5]
+
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
