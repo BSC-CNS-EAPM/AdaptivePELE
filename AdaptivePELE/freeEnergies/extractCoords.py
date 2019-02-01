@@ -68,7 +68,7 @@ class TopologyCompat(object):
 
 
 class ParamsHandler(object):
-    def __init__(self, folderWithTrajs, atom_id, lig_name, total_steps, sequential, writeLigandTrajectory, set_number, protein_CA, noRepeat, numProcessors, parallelize, topol, sidechains, sidechains_folder, CM, use_extra_atoms, CM_mode, dihedrals):
+    def __init__(self, folderWithTrajs, atom_id, lig_name, total_steps, sequential, writeLigandTrajectory, set_number, protein_CA, noRepeat, numProcessors, parallelize, topol, sidechains, sidechains_folder, CM, use_extra_atoms, CM_mode, dihedrals, dihedrals_projection):
         self.folder_name = folderWithTrajs
         self.atomIds = atom_id
         self.lig_resname = lig_name
@@ -87,6 +87,7 @@ class ParamsHandler(object):
         self.extra_atoms = use_extra_atoms
         self.cm_mode = CM_mode
         self.dihedrals = dihedrals
+        self.dihedrals_projection = dihedrals_projection
         if self.contact_map and self.cm_mode == "p-lig" and self.lig_resname == "":
             raise ValueError("Ligand resname needed for protein-ligand contact map")
         if self.contact_map and self.cm_mode not in VALID_CM_MODES:
@@ -121,10 +122,11 @@ def parseArguments():
     parser.add_argument("--contact_map", action="store_true", help="Flag to activate contact map creation")
     parser.add_argument("--extra_atoms", action="store_true", help="Flag to use extra atoms in contact map creation (in addition to alpha carbons)")
     parser.add_argument("--dihedrals", action="store_true", help="Flag to activate dihedral angles calculations")
+    parser.add_argument("--dihedrals_projection", action="store_true", help="Flag to project dihedral angles calculations into their cos and sin")
     parser.add_argument("--cm_mode", default="p-lig", help="Type of contact map to create (p-lig for protein-ligand or p-p protein-protein)")
     args = parser.parse_args()
 
-    return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors, args.top, args.sidechains, args.sidechains_folder, args.serial, args.contact_map, args.extra_atoms, args.cm_mode, args.dihedrals
+    return args.folderWithTrajs, args.atomIds, args.resname, args.proteinCA, args.enforceSequential, args.writeLigandTrajectory, args.totalSteps, args.setNum, args.noRepeat, args.numProcessors, args.top, args.sidechains, args.sidechains_folder, args.serial, args.contact_map, args.extra_atoms, args.cm_mode, args.dihedrals, args.dihedrals_projection
 
 
 def loadAllResnameAtomsInPdb(filename, params):
@@ -280,6 +282,12 @@ def calculateDihedrals(file_name, params, topology):
     return np.hstack((psi_angles, phi_angles))
 
 
+def projectDihedrals(dihedrals):
+    cos_proj = np.cos(dihedrals)
+    sin_proj = np.sin(dihedrals)
+    return np.hstack((cos_proj, sin_proj))
+
+
 def extractCoordinatesXTCFile(file_name, params, topology, selected_indices):
     trajectory = md.load(file_name, top=topology)
     if params.com:
@@ -298,6 +306,8 @@ def writeFilenameExtractedCoordinates(filename, params, pathFolder, constants, t
     """
     if params.dihedrals:
         coords = calculateDihedrals(filename, params, topology)
+        if params.dihedrals_projection:
+            coords = projectDihedrals(coords)
         outputFilename = getOutputFilename(constants.extractedTrajectoryFolder, filename,
                                            constants.baseExtractedTrajectoryName)
         writeToFile(coords, outputFilename % pathFolder)
@@ -590,8 +600,8 @@ def getTopologyObject(topology_file):
         raise ValueError("The topology parameter needs to be the path to a pickled Topology object or a pdb!")
 
 
-def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, parallelize=True, topology=None, sidechains=False, sidechain_folder=".", cm=False, use_extra_atoms=False, CM_mode="p-lig", calc_dihedrals=False):
-    params = ParamsHandler(folder_name, atom_Ids, lig_resname, numtotalSteps, enforceSequential_run, writeLigandTrajectory, setNumber, protein_CA, non_Repeat, nProcessors, parallelize, topology, sidechains, sidechain_folder, cm, use_extra_atoms, CM_mode, calc_dihedrals)
+def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, parallelize=True, topology=None, sidechains=False, sidechain_folder=".", cm=False, use_extra_atoms=False, CM_mode="p-lig", calc_dihedrals=False, dihedrals_projection=False):
+    params = ParamsHandler(folder_name, atom_Ids, lig_resname, numtotalSteps, enforceSequential_run, writeLigandTrajectory, setNumber, protein_CA, non_Repeat, nProcessors, parallelize, topology, sidechains, sidechain_folder, cm, use_extra_atoms, CM_mode, calc_dihedrals, dihedrals_projection)
     constants = Constants()
 
     if params.topology is not None:
@@ -641,5 +651,5 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
 
 
 if __name__ == "__main__":
-    folder, atomIds, resname, proteinCA, enforceSequential, writeLigandTraj, totalSteps, setNum, nonRepeat, n_processors, top, side_chains, sideChain_folder, serial, contact_map, extra_atoms, cm_mode, dihedral_angles = parseArguments()
-    main(folder, atomIds, resname, totalSteps, enforceSequential, writeLigandTraj, setNum, proteinCA, nonRepeat, n_processors, topology=top, sidechains=side_chains, sidechain_folder=sideChain_folder, parallelize=(not serial), cm=contact_map, use_extra_atoms=extra_atoms, CM_mode=cm_mode, calc_dihedrals=dihedral_angles)
+    folder, atomIds, resname, proteinCA, enforceSequential, writeLigandTraj, totalSteps, setNum, nonRepeat, n_processors, top, side_chains, sideChain_folder, serial, contact_map, extra_atoms, cm_mode, dihedral_angles, dihedrals_proj = parseArguments()
+    main(folder, atomIds, resname, totalSteps, enforceSequential, writeLigandTraj, setNum, proteinCA, nonRepeat, n_processors, topology=top, sidechains=side_chains, sidechain_folder=sideChain_folder, parallelize=(not serial), cm=contact_map, use_extra_atoms=extra_atoms, CM_mode=cm_mode, calc_dihedrals=dihedral_angles, dihedrals_projection=dihedrals_proj)
