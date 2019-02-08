@@ -415,7 +415,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         return oldClusteringMethod.similarityEvaluator.typeEvaluator != newClusteringMethod.similarityEvaluator.typeEvaluator
 
 
-def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topologies, outputPathConstants):
+def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topologies, outputPathConstants=None):
     """
         Cluster the trajecotories of a given epoch
 
@@ -438,7 +438,7 @@ def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topol
     clusteringMethod.cluster(paths, topology=topologies, epoch=epoch, outputPathConstants=outputPathConstants)
 
 
-def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner, topologies, outputPathConstants):
+def clusterPreviousEpochs(clusteringMethod, finalEpoch, epochOutputPathTempletized, simulationRunner, topologies, outputPathConstants=None):
     """
         Cluster all previous epochs using the clusteringMethod object
 
