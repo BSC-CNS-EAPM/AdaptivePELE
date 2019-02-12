@@ -635,7 +635,7 @@ def addDummyAtomToSystem(system, topology, positions, resname, dummy, worker):
         if atom.residue.name not in ("HOH", "Cl-", "Na+", resname) and atom.name == "CA":
             protein_CAs.append(atom.index)
     modul = len(protein_CAs) % 20
-    step_to_use = (len(protein_CAs)-modul)/20
+    step_to_use = int((len(protein_CAs)-modul)/20)
     if modul == 0:
         modul = None
     else:
