@@ -1533,6 +1533,7 @@ class MSMClustering(Clustering):
         self.tica_kinetic_map = tica_kinetic_map
         self.tica_commute_map = tica_commute_map
         self.pyemma_clustering = None
+        self.extract_params = coord.ParamsHandler("", self.atom_Ids, self.resname, 0, False, False, 0, self.writeCA, True, self.nprocessors, False, "", self.sidechains, "", False, False, "", False, False)
 
     def __getstate__(self):
         # Defining pickling interface to avoid problems when working with old
@@ -1612,12 +1613,23 @@ class MSMClustering(Clustering):
         self.epoch = epoch
 
         utilities.makeFolder(outputPathConstants.allTrajsPath)
+        utilities.makeFolder(os.path.join(outputPathConstants.allTrajsPath, "extractedCoordinates"))
         extractedFolder = self.constantsExtract.extractedTrajectoryFolder % outputPathConstants.epochOutputPathTempletized % self.epoch
-        self.constantsExtract.gatherNonRepeatedTrajsFilename = os.path.join(outputPathConstants.allTrajsPath, "traj_%s_%s.dat")
+        self.constantsExtract.gatherTrajsFilename = os.path.join(outputPathConstants.allTrajsPath, "traj_%s_%s.dat")
+        self.constantsExtract.gatherNonRepeatedTrajsFilename = os.path.join(outputPathConstants.allTrajsPath, "extractedCoordinates", "traj_%s_%s.dat")
         utilities.makeFolder(extractedFolder)
         trajectories = getAllTrajectories(paths)
+        self.extract_params.sidechain_folder = paths[0]
+        self.extract_params.topology = topology
+        # extract coordinates
+        if PARALELLIZATION and self.nprocessors is not None:
+            pool = mp.Pool(self.nprocessors)
+            self.extract_params.parallelize = True
+        else:
+            self.extract_params.parallelize = False
+            pool = None
         if self.sidechains:
-            new_sidechains = coord.extractSidechainIndexes(trajectories, self.ligand, topology, pool=pool)
+            new_sidechains = coord.extractSidechainIndexes(self.extract_params, pool=pool)
             self.sidechains = list(set(self.sidechains).intersection(set(new_sidechains)))
         else:
             self.sidechains = []
@@ -1628,11 +1640,6 @@ class MSMClustering(Clustering):
                 self.indexes.append(coord.extractIndexesTopology(top, self.resname, self.atom_Ids, self.writeCA, self.sidechains))
         else:
             self.indexes = []
-        # extract coordinates
-        if PARALELLIZATION and self.nprocessors is not None:
-            pool = mp.Pool(self.nprocessors)
-        else:
-            pool = None
 
         workers = []
         for filename in trajectories:
@@ -1647,13 +1654,13 @@ class MSMClustering(Clustering):
                 topology_traj = None
             if pool is None:
                 # serial version
-                coord.writeFilenameExtractedCoordinates(filename, self.resname, self.atom_Ids, outputPathConstants.epochOutputPathTempletized % self.epoch, False, self.constantsExtract, self.writeCA, self.sidechains, topology=topology_traj, indexes=indexes_traj)
+                coord.writeFilenameExtractedCoordinates(filename, self.extract_params, outputPathConstants.epochOutputPathTempletized % self.epoch, self.constantsExtract, topology=topology_traj, indexes=indexes_traj)
             else:
                 # multiprocessor version
-                workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, self.resname, self.atom_Ids, outputPathConstants.epochOutputPathTempletized % self.epoch, False, self.constantsExtract, self.writeCA, self.sidechains, topology_traj, indexes_traj)))
+                workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, self.extract_params, outputPathConstants.epochOutputPathTempletized % self.epoch, self.constantsExtract, topology_traj, indexes_traj)))
         for w in workers:
             w.get()
-        coord.gatherTrajs(self.constantsExtract, outputPathConstants.epochOutputPathTempletized % self.epoch, self.epoch, True, self.epoch)
+        coord.gatherTrajs(self.constantsExtract, outputPathConstants.epochOutputPathTempletized % self.epoch, self.epoch, self.extract_params.non_Repeat, self.epoch)
         # apply tica
         if self.tica:
             trajectories = []
