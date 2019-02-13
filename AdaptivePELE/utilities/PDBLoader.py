@@ -171,6 +171,8 @@ class PDBManager:
                     Atomtype = "HETATM"
                 for chain in structure:
                     for residue in chain:
+                        if residue.isNTerminalResidue():
+                            out_pdb.write("TER\n")
                         for atom in residue:
                             atomNumber += 1
                             out_pdb.write("%-6s%5s %4s %3s %s%4s    %8s%8s%8s\n" % (Atomtype, atomNumber, atom.id, residue.id, chain.id, residue.num, atom.coords[0], atom.coords[1], atom.coords[2]))
@@ -239,6 +241,7 @@ class PDBManager:
         """
         mainChain = self.Protein[0]
         for chain in self.Protein[1:]:
+            chain[0].setNTerminal()
             mainChain.append(chain)
             self.Protein.remove(chain)
 
@@ -524,7 +527,14 @@ class Residue(PDBase):
     def __init__(self, parent, ID, number):
         PDBase.__init__(self, parent, ID)
         self.num, self.insertionCode = self.set_number(number)
+        self.isNTerminal = False
         self.setHirearchy()
+
+    def setNTerminal(self):
+        self.isNTerminal = True
+
+    def isNTerminalResidue(self):
+        return self.isNTerminal
 
     def set_number(self, number):
         insertion = None
