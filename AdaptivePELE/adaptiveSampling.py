@@ -62,14 +62,13 @@ def printRunInfo(restart, debug, simulationRunner, spawningCalculator, clusterin
         :type simulationRunner: :py:class:`.SimulationRunner`
         :param spawningCalculator: Spawning calculator object
         :type spawningCalculator: :py:class:`.SpawningCalculator`
-        :param clusteringBlock: Block of the control file with clustering
-        options
+        :param clusteringBlock: Block of the control file with clustering options
         :type clusteringBlock: dict
         :param outputPath: Path where to write the simulation output
         :type outputPath: str
-        :param initialStructuresWildcard: Wildcard expression to find the
-        initial structures
+        :param initialStructuresWildcard: Wildcard expression to find the initial structures
         :type initialStructuresWildcard: str
+
     """
     print("================================")
     print("            PARAMS              ")
@@ -309,7 +308,7 @@ def findFirstRun(outputPath, clusteringOutputObject, simulationRunner, restart):
         :param clusteringOutputObject: Templetized name of the clustering object
         :type clusteringOutputObject: str
         :param simulationRunner: Simulation runner object
-        :type simulationRunner: :py:class:`.SimulationRunner
+        :type simulationRunner: :py:class:`.SimulationRunner`
         :param restart: Whether to restart a previous simulation
         :type restart: bool
 

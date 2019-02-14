@@ -614,6 +614,31 @@ structures will fit into the selected box</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.Clustering.filterClustersAccordingToMetric">
+<code class="descname">filterClustersAccordingToMetric</code><span class="sig-paren">(</span><em>clustersFiltered</em>, <em>filter_value</em>, <em>condition</em>, <em>col_filter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.filterClustersAccordingToMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.filterClustersAccordingToMetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the clusters to select only the ones whose metric fits an
+specific criterion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clustersFiltered</strong> (<em>list</em>) – List of clusters to be processed</li>
+<li><strong>filter_value</strong> (<em>float</em>) – Value to use in the filtering</li>
+<li><strong>condition</strong> (<em>str</em>) – Whether to use &gt; or &lt; condition in the filtering</li>
+<li><strong>col_filter</strong> (<em>int</em>) – Column of the report to use</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Returns list, list:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first last">– list of the filtered clusters, list of bools flagging whether the cluster is selected or not</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.Clustering.getCluster">
 <code class="descname">getCluster</code><span class="sig-paren">(</span><em>clusterNum</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.getCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.getCluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the cluster at index clusterNum</p>
@@ -636,6 +661,22 @@ structures will fit into the selected box</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clusters" title="AdaptivePELE.clustering.clustering.Clusters"><code class="xref py py-class docutils literal"><span class="pre">Clusters</span></code></a> – Container object for the clusters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.Clustering.getMetricsFromColumn">
+<code class="descname">getMetricsFromColumn</code><span class="sig-paren">(</span><em>col</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.getMetricsFromColumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.getMetricsFromColumn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the metric of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>col</strong> (<em>int</em>) – Column to select the metric</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.array – Array containing the metric of the clusters</td>
 </tr>
 </tbody>
 </table>
@@ -1189,6 +1230,31 @@ structures will fit into the selected box</p>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">Returns list, list:</th></tr>
 <tr class="field-even field"><td>&#160;</td><td class="field-body">– list of the filtered clusters, list of bools flagging wether the cluster is selected or not</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.MSMClustering.filterClustersAccordingToMetric">
+<code class="descname">filterClustersAccordingToMetric</code><span class="sig-paren">(</span><em>clustersFiltered</em>, <em>filter_value</em>, <em>condition</em>, <em>col_filter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#MSMClustering.filterClustersAccordingToMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.MSMClustering.filterClustersAccordingToMetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the clusters to select only the ones whose metric fits an
+specific criterion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clustersFiltered</strong> (<em>list</em>) – List of clusters to be processed</li>
+<li><strong>filter_value</strong> (<em>float</em>) – Value to use in the filtering</li>
+<li><strong>condition</strong> (<em>str</em>) – Whether to use &gt; or &lt; condition in the filtering</li>
+<li><strong>col_filter</strong> (<em>int</em>) – Column of the report to use</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Returns list, list:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first last">– list of the filtered clusters, list of bools flagging whether the cluster is selected or not</p>
+</td>
 </tr>
 </tbody>
 </table>

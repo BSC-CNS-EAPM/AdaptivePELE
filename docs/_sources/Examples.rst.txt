@@ -576,7 +576,7 @@ Parameters
 
 * **T** (*float*, default=1000): Temperature, only used for Boltzmann weights
 
-* **condition** (*string*, optional): Selects wether to take into account maximum or minimum values in epsilon related spawning, values are *min* or *max*
+* **condition** (*string*, default=min): Selects wether to take into account maximum or minimum values in epsilon related spawning, values are *min* or *max*
 
 The following parameters are mandatory for **variableEpsilon**:
 
@@ -586,6 +586,10 @@ The following parameters are mandatory for **variableEpsilon**:
 * **variationWindow** (*integer*): Last iteration over which to change the epsilon value
 * **maxEpsilonWindow** (*integer*): Number of iteration with epsilon=maxEpsilon
 * **period** (*integer*): Variation period (in number of iterations)
+* **filterByMetric** (*bool*, default=False): Whether to filter clusters for the spawning
+  according to some metric
+* **filter_value** (*float*): Value to establish the filter
+* **filter_col** (*int*): Column of the report file to use for the filtering
 
 The following parameter are mandatory for all *MSM*-based methods:
 
@@ -988,11 +992,37 @@ call shown above will convert the file 0/trajectory_3.xtc into the file output_p
 described with the file topology.pdb
 
 
-Ligand preparation for MD
--------------------------
+Input preparation for MD
+------------------------
 
 Currently for running MD with protein-ligand systems we use AmberTools and the
 gaff forcefield for the ligand, and the Amber99 forcefield for the protein.
+
+Several tasks are applied to the input pdb to ensure compatibility with
+AmberTools:
+
+* Check for gaps in the structure, this only produces a warning, it's still the
+  users' responsibility to provide a correct input structure.
+
+* Correct alternative positions. If the input pdb has alternative positions we
+  select the ones with higher occupancy.
+
+* Identify disulphide bonds
+
+* Check the protonation states of the histidine residues.
+
+* Check atom names so that they match the expected names for the amber
+  forcefield
+
+Despite all this, there are still several points that the user has to keep in
+mind when providing input for the MD runs:
+
+* When working whith multiple proteins, each protein **must** be in a separate
+  chain so that the processing can identify them and the resulting amber
+  topology has several molecules as desired.
+
+* The ligand in the input file can't have a name starting with a digit, since
+  AmberTools does not accept residues starting with digits
 
 
 Equilibration procedure in MD

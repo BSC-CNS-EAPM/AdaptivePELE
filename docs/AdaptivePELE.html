@@ -299,7 +299,7 @@ multiple trajectory metric exit condition</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.clusterEpochTrajs">
-<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">clusterEpochTrajs</code><span class="sig-paren">(</span><em>clusteringMethod</em>, <em>epoch</em>, <em>epochOutputPathTempletized</em>, <em>topologies</em>, <em>outputPathConstants</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#clusterEpochTrajs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.clusterEpochTrajs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">clusterEpochTrajs</code><span class="sig-paren">(</span><em>clusteringMethod</em>, <em>epoch</em>, <em>epochOutputPathTempletized</em>, <em>topologies</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#clusterEpochTrajs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.clusterEpochTrajs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the trajecotories of a given epoch</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -320,7 +320,7 @@ multiple trajectory metric exit condition</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.adaptiveSampling.clusterPreviousEpochs">
-<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">clusterPreviousEpochs</code><span class="sig-paren">(</span><em>clusteringMethod</em>, <em>finalEpoch</em>, <em>epochOutputPathTempletized</em>, <em>simulationRunner</em>, <em>topologies</em>, <em>outputPathConstants</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#clusterPreviousEpochs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.clusterPreviousEpochs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.adaptiveSampling.</code><code class="descname">clusterPreviousEpochs</code><span class="sig-paren">(</span><em>clusteringMethod</em>, <em>finalEpoch</em>, <em>epochOutputPathTempletized</em>, <em>simulationRunner</em>, <em>topologies</em>, <em>outputPathConstants=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/adaptiveSampling.html#clusterPreviousEpochs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.adaptiveSampling.clusterPreviousEpochs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster all previous epochs using the clusteringMethod object</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -406,7 +406,7 @@ and return the first epoch to run in case of restart</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>outputPath</strong> (<em>str</em>) – Simulation output path</li>
 <li><strong>clusteringOutputObject</strong> (<em>str</em>) – Templetized name of the clustering object</li>
-<li><strong>simulationRunner</strong> (:py:class:<a href="#id1"><span class="problematic" id="id2">`</span></a>.SimulationRunner) – Simulation runner object</li>
+<li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – Simulation runner object</li>
 <li><strong>restart</strong> (<em>bool</em>) – Whether to restart a previous simulation</li>
 </ul>
 </td>
@@ -581,19 +581,14 @@ or distance</p>
 <li><strong>debug</strong> (<em>bool</em>) – Flag to mark whether simulation is run in debug mode</li>
 <li><strong>simulationRunner</strong> (<a class="reference internal" href="AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner" title="AdaptivePELE.simulation.simulationrunner.SimulationRunner"><code class="xref py py-class docutils literal"><span class="pre">SimulationRunner</span></code></a>) – Simulation runner object</li>
 <li><strong>spawningCalculator</strong> (<a class="reference internal" href="AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator" title="AdaptivePELE.spawning.spawning.SpawningCalculator"><code class="xref py py-class docutils literal"><span class="pre">SpawningCalculator</span></code></a>) – Spawning calculator object</li>
-<li><strong>clusteringBlock</strong> – Block of the control file with clustering</li>
+<li><strong>clusteringBlock</strong> (<em>dict</em>) – Block of the control file with clustering options</li>
+<li><strong>outputPath</strong> (<em>str</em>) – Path where to write the simulation output</li>
+<li><strong>initialStructuresWildcard</strong> (<em>str</em>) – Wildcard expression to find the initial structures</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<p>options
-:type clusteringBlock: dict
-:param outputPath: Path where to write the simulation output
-:type outputPath: str
-:param initialStructuresWildcard: Wildcard expression to find the
-initial structures
-:type initialStructuresWildcard: str</p>
 </dd></dl>
 
 <dl class="function">
