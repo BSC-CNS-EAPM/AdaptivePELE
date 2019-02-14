@@ -43,3 +43,19 @@ AdaptivePELE simulation.
       adaptivePELE has not been able to find trajectories to cluster. This is
       tipically because the simulation died before it could produce any
       trajectories, in such case check for PELE errors.
+
+    - If you get an error like::
+
+        UnsatisfiedDependencyException: Missing package....
+
+      it means that an optional dependence is missing. That is a package that
+      is not absolutely required to run AdaptivePELE but it is needed for some
+      particular feature that you are using cannot be found. To solve it ensure
+      that the package in question is installed and accessible to the python
+      interpreter (e.g check the PYTHONPATH value)
+
+    - There is a weird atom named *DUM* in my trajectories! When using MD with
+      an spherical box for the ligand, a dummy atom is introduced to act as the
+      center of the box and is listed in the trajectories as *DUM* atom in
+      a residue also named *DUM*. This atom is massless so it will not be moved
+      during the simulation.

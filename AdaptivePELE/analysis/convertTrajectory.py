@@ -17,7 +17,7 @@ def parseArguments():
 
 def main(trajectory, output_file, output_path, topology):
     if output_path:
-        os.makedirs(output_path)
+        utilities.makeFolder(output_path)
     if not output_file:
         output_file = "%s.pdb" % os.path.splitext(os.path.split(trajectory)[1])[0]
     utilities.convert_trajectory_to_pdb(trajectory, topology, output_file, output_path)

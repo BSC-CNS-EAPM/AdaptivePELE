@@ -1,6 +1,7 @@
 """
     Write specified cluster representative structures to pdb
 """
+from __future__ import print_function, unicode_literals
 from AdaptivePELE.utilities import clusteringUtilities
 import argparse
 
@@ -21,14 +22,12 @@ def parseArgs():
                         help="Structures to write")
     parser.add_argument("--threshold", type=float, default=None,
                         help="Only print those structures with matching threshold")
-    parser.add_argument('--top', type=str,
-                        help="Path to the topology file for non-pdb trajectories")
     args = parser.parse_args()
     return args
 
 
-def main(clObject, structures, cond, outputPath, topology):
-    clusteringUtilities.writeStructures(clObject, structures, cond, outputPath, topology=topology)
+def main(clObject, structures, cond, outputPath):
+    clusteringUtilities.writeStructures(clObject, structures, cond, outputPath)
 
 
 if __name__ == "__main__":
@@ -37,4 +36,4 @@ if __name__ == "__main__":
         condition = lambda x: abs(x.threshold-arguments.threshold) < 0.01
     else:
         condition = None
-    main(arguments.clObject, arguments.structures, condition, arguments.outputPath, arguments.top)
+    main(arguments.clObject, arguments.structures, condition, arguments.outputPath)

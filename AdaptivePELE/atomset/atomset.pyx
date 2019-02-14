@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 import numpy as np
 import re
-import mdtraj as md
 from io import StringIO, open
 cimport cython
 cimport numpy as np
@@ -467,7 +466,6 @@ cdef class PDB:
                  u"ispdb": self.ispdb}
         return state
 
-
     def __setstate__(self, state):
         # Restore instance attributes
         self.atoms = state[u'atoms']
@@ -481,7 +479,7 @@ cdef class PDB:
     def isfromPDBFile(self):
         return self.ispdb
 
-    def _initialisePDB(self, basestring PDBstr, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=""):
+    def _initialisePDB(self, basestring PDBstr, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element="", dict extra_atoms={}):
         """
             Load the information from a PDB file or a string with the PDB
             contents
@@ -515,6 +513,11 @@ cdef class PDB:
         # creates a buffer that can handle a pdb file or a string containing
         # the PDB
         self.pdb = PDBContent.read()  # in case one wants to write it
+        if extra_atoms != {}:
+            CMAtoms = extra_atoms
+        else:
+            CMAtoms = self.CMAtoms
+
 
         stringWithPDBContent = self.pdb.split(u'\n')
         for atomLine in stringWithPDBContent:
@@ -523,9 +526,9 @@ cdef class PDB:
             if type == self._typeCM:
                 atomName = atomLine[12:16].strip()
                 resName = atomLine[17:20].strip()
-                if resName not in self.CMAtoms:
+                if resName not in CMAtoms:
                     continue
-                if atomName != u"CA" and atomName != self.CMAtoms[resName]:
+                if atomName != u"CA" and atomName != CMAtoms[resName]:
                     continue
             else:
                 # HUGE optimisation (not to create an atom each time ~ 2e-5 s/atom)
@@ -553,7 +556,7 @@ cdef class PDB:
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
-    def _initialiseXTC(self, np.ndarray[float, ndim=2] frame, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None):
+    def _initialiseXTC(self, np.ndarray[float, ndim=2] frame, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None, dict extra_atoms={}):
         """
             Load the information from a loaded XTC file into a  mdtraj Trajectory
 
@@ -584,6 +587,10 @@ cdef class PDB:
         else:
             resnumStr = u"%d" % (resnum)
         self.pdb = self.join_PDB_lines(topology, frame)  # in case one wants to write it
+        if extra_atoms != {}:
+            CMAtoms = extra_atoms
+        else:
+            CMAtoms = self.CMAtoms
         for iatom in range(len(topology)):
             atomLine = topology[iatom]
             if not atomLine.startswith(u"ATOM") and not atomLine.startswith(u"HETATM"):
@@ -591,9 +598,9 @@ cdef class PDB:
             if type == self._typeCM:
                 atomName = atomLine[12:16].strip()
                 resName = atomLine[17:20].strip()
-                if resName not in self.CMAtoms:
+                if resName not in CMAtoms:
                     continue
-                if atomName != u"CA" and atomName != self.CMAtoms[resName]:
+                if atomName != u"CA" and atomName != CMAtoms[resName]:
                     continue
             else:
                 # HUGE optimisation (not to create an atom each time ~ 2e-5 s/atom)
@@ -629,16 +636,16 @@ cdef class PDB:
         if self.atoms == {}:
             raise ValueError('The input pdb file/string was empty, no atoms loaded!')
 
-    def initialise(self, object coordinates, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None):
+    def initialise(self, object coordinates, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None, dict extra_atoms={}):
         """
             Wrapper function
         """
         if isinstance(coordinates, basestring):
             self.ispdb = True
-            self._initialisePDB(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element)
+            self._initialisePDB(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element, extra_atoms=extra_atoms)
         else:
             self.ispdb = False
-            self._initialiseXTC(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element, topology=topology)
+            self._initialiseXTC(coordinates, heavyAtoms, resname, atomname, type, chain, resnum, element, topology=topology, extra_atoms=extra_atoms)
 
     def computeTotalMass(self):
         """
@@ -795,7 +802,7 @@ cdef class PDB:
         if self.ispdb:
             return self.pdb
         else:
-            return "".join([u"MODEL %d\n" % model_num, self.pdb, u"ENDMDL\n", u"END\n"])
+            return "".join([u"MODEL    %4d\n" % model_num, self.pdb, u"ENDMDL\n", u"END\n"])
 
     def writePDB(self, basestring path, int model_num=1):
         """
@@ -808,10 +815,11 @@ cdef class PDB:
         cdef object fileHandle, atom
         if self.ispdb:
             with open(path, 'w', encoding="utf-8") as fileHandle:
-                fileHandle.write(self.pdb)
+                # in old simulations it will fail without the unicode
+                fileHandle.write(unicode(self.pdb))
         else:
             with open(path, 'w', encoding="utf-8") as fileHandle:
-                fileHandle.write(u"MODEL %d\n" % model_num)
+                fileHandle.write(u"MODEL    %4d\n" % model_num)
                 fileHandle.write(self.pdb)
                 fileHandle.write(u"ENDMDL\n")
                 fileHandle.write(u"END\n")
@@ -919,6 +927,6 @@ def readPDB(pdbfile):
         :returns: basestring -- A string with PDB content
     """
     try:
-        return open(pdbfile, "rt").read()
+        return open(str(pdbfile), "rt").read()
     except IOError:
         return pdbfile

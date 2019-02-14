@@ -6,7 +6,6 @@ import os
 import AdaptivePELE.adaptiveSampling as adaptiveSampling
 import AdaptivePELE.atomset.atomset as atomset
 from AdaptivePELE.clustering import clustering
-import socket
 
 
 class TestadaptiveSampling(unittest.TestCase):
@@ -145,11 +144,17 @@ class TestadaptiveSampling(unittest.TestCase):
             cluster.elements = elements[i]
             cluster.contacts = 0
             goldenClusters.append(cluster)
-        name = socket.gethostname()
+        # name = socket.gethostname()
         # if "bsccv" not in name and "login" not in name:
         #     print("Some integration can't be run due to not having PELE  installed")
         #     return True
-        self.integrationTest(controlFile, goldenPath, outputPath, goldenClusters)
+        # self.integrationTest(controlFile, goldenPath, outputPath, goldenClusters)
+        tmpFolder = "tmp_" + outputPath.replace("/", "_")
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(outputPath, 3)
+        # cleanup
+        shutil.rmtree(outputPath)
+        shutil.rmtree(tmpFolder)
 
     def testRestartEmptyClustering(self):
         controlFile = "tests/data/3ptb_data/restartTest.conf"
@@ -158,7 +163,7 @@ class TestadaptiveSampling(unittest.TestCase):
         clusteringObjectPath = os.path.join(outputPath, "2", "clustering", "object.pkl")
         if not os.path.exists(os.path.join(outputPath, "1", "clustering")):
             os.makedirs(os.path.join(outputPath, "1", "clustering"))
-        name = socket.gethostname()
+        # name = socket.gethostname()
         # if "bsccv" not in name and "login" not in name:
         #     print("Some integration can't be run due to not having PELE  installed")
         #     return True
@@ -215,6 +220,30 @@ class TestadaptiveSampling(unittest.TestCase):
     def testRMSDVarEpsilon_xtc(self):
         output_path = "tests/data/1f5k_adaptive_rmsd_vareps_xtc"
         controlFile = "tests/data/templetized_controlFile_1f5k_rmsd_vareps_xtc.conf"
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2)
+        # cleanup
+        shutil.rmtree(output_path)
+
+    def testNullIndependent_xtc(self):
+        output_path = "tests/data/1f5k_adaptive_null_cl_xtc/"
+        controlFile = "tests/data/templetized_controlFile_1f5k_null_cl_xtc.conf"
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2)
+        # cleanup
+        shutil.rmtree(output_path)
+
+    def testNullIndependentMetric_xtc(self):
+        output_path = "tests/data/1f5k_adaptive_null_independent_metric_xtc/"
+        controlFile = "tests/data/templetized_controlFile_1f5k_null_independent_metric.conf"
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2)
+        # cleanup
+        shutil.rmtree(output_path)
+
+    def testReport_xtc(self):
+        output_path = "tests/data/1f5k_adaptive_rmsd_inv_report_xtc"
+        controlFile = "tests/data/templetized_controlFile_1f5k_rmsd_inv_report_xtc.conf"
         adaptiveSampling.main(controlFile)
         self.check_succesful_simulation(output_path, 2)
         # cleanup

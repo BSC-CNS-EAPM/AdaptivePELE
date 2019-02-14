@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.5.2
+                v1.6
               </div>
             
           
@@ -260,11 +260,11 @@
         <span class="n">stringPalette</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">colorMetric</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="n">gnuplotString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;plot for [i=</span><span class="si">%(startTraj)d</span><span class="s2">:</span><span class="si">%(runsPerEpoch)d</span><span class="s2">] for [j=0:</span><span class="si">%(numberOfEpochs)d</span><span class="s2">-1] </span><span class="se">\&#39;\&#39;</span><span class="s2">.j.</span><span class="se">\&#39;</span><span class="s2">/</span><span class="si">%(reportName)s</span><span class="se">\&#39;</span><span class="s2">.i u </span><span class="si">%(col1)s</span><span class="s2">:</span><span class="si">%(col2)d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">colorMetric</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">stringPalette</span><span class="p">,</span> <span class="s2">&quot;notitle </span><span class="si">%(withLines)s</span><span class="s2">&quot;</span><span class="p">])</span>
+    <span class="n">gnuplotString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;set cbrange[0:</span><span class="si">%(numberOfEpochs)d</span><span class="s2">]; plot for [i=</span><span class="si">%(startTraj)d</span><span class="s2">:</span><span class="si">%(runsPerEpoch)d</span><span class="s2">] for [j=0:</span><span class="si">%(numberOfEpochs)d</span><span class="s2">-1] </span><span class="se">\&#39;\&#39;</span><span class="s2">.j.</span><span class="se">\&#39;</span><span class="s2">/</span><span class="si">%(reportName)s</span><span class="se">\&#39;</span><span class="s2">.i u </span><span class="si">%(col1)s</span><span class="s2">:</span><span class="si">%(col2)d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">colorMetric</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">stringPalette</span><span class="p">,</span> <span class="s2">&quot;notitle </span><span class="si">%(withLines)s</span><span class="s2">&quot;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">generateNestedString</span><span class="p">(</span><span class="n">gnuplotString</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="p">,</span> <span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">printWithLines</span><span class="p">,</span> <span class="n">totalNumberOfSteps</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">paletteModifier</span><span class="p">,</span> <span class="n">trajs_range</span><span class="p">)</span></div>
 
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">steps_Run</span><span class="p">,</span> <span class="n">Xcol</span><span class="p">,</span> <span class="n">Ycol</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">be</span><span class="p">,</span> <span class="n">rmsd</span><span class="p">,</span> <span class="n">colModifier</span><span class="p">,</span> <span class="n">traj_range</span><span class="p">,</span> <span class="n">color_traj</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
     <span class="c1"># VARIABLES TO SET WHEN PRINTING</span>
     <span class="k">if</span> <span class="n">be</span><span class="p">:</span>
