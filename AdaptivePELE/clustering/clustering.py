@@ -935,6 +935,48 @@ class Clustering(object):
                 clustersSelected.append(False)
         return clustersFiltered, clustersSelected
 
+    def filterClustersAccordingToMetric(self, clustersFiltered, filter_value, condition, col_filter):
+        """
+            Filter the clusters to select only the ones whose metric fits an
+            specific criterion
+
+            :param clustersFiltered: List of clusters to be processed
+            :type clustersFiltered: list
+            :param filter_value: Value to use in the filtering
+            :type filter_value: float
+            :param condition: Whether to use > or < condition in the filtering
+            :type condition: str
+            :param col_filter: Column of the report to use
+            :type col_filter: int
+
+            :returns list, list: -- list of the filtered clusters, list of bools flagging whether the cluster is selected or not
+
+        """
+        metrics = self.getMetricsFromColumn(col_filter)
+        if None in metrics:
+            raise utilities.RequiredParameterMissingException("Metrics not found in clusters and required for filtering!!")
+        if condition == blockNames.SpawningParams.minValue:
+            tmp_selection = metrics < filter_value
+        elif condition == blockNames.SpawningParams.maxValue:
+            tmp_selection = metrics > filter_value
+        selection = np.array(clustersFiltered) & tmp_selection
+        if not selection.any():
+            # if no clusters match the given filtering criteria, bussiness as
+            # usual
+            selection = clustersFiltered
+        return [cl for i, cl in enumerate(self.clusters) if selection[i]], selection
+
+    def getMetricsFromColumn(self, col):
+        """
+            Get the metric of the clusters
+
+            :param col: Column to select the metric
+            :type col: int
+
+            :returns: np.array -- Array containing the metric of the clusters
+        """
+        return np.array([cl.getMetricFromColumn(col) for cl in self.clusters])
+
     def cluster(self, paths, ignoreFirstRow=False, topology=None, epoch=None, outputPathConstants=None):
         """
             Cluster the snaptshots contained in the paths folder
@@ -964,7 +1006,6 @@ class Clustering(object):
                 top = topology.getTopology(epoch, trajNum)
             else:
                 top = None
-
             if self.reportBaseFilename:
                 reportFilename = os.path.join(os.path.split(trajectory)[0],
                                               self.reportBaseFilename % trajNum)
@@ -1759,6 +1800,25 @@ class MSMClustering(Clustering):
             :type simulationRunnerParams: :py:class:`.SimulationParameters`
 
             :returns list, list: -- list of the filtered clusters, list of bools flagging wether the cluster is selected or not
+
+        """
+        pass
+
+    def filterClustersAccordingToMetric(self, clustersFiltered, filter_value, condition, col_filter):
+        """
+            Filter the clusters to select only the ones whose metric fits an
+            specific criterion
+
+            :param clustersFiltered: List of clusters to be processed
+            :type clustersFiltered: list
+            :param filter_value: Value to use in the filtering
+            :type filter_value: float
+            :param condition: Whether to use > or < condition in the filtering
+            :type condition: str
+            :param col_filter: Column of the report to use
+            :type col_filter: int
+
+            :returns list, list: -- list of the filtered clusters, list of bools flagging whether the cluster is selected or not
 
         """
         pass

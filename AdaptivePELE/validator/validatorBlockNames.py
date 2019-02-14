@@ -47,7 +47,10 @@ class SpawningParams:
         "n": "numbers.Real",
         "lagtime": "numbers.Real",
         "minPos": "list",
-        "SASA_column": "int"
+        "SASA_column": "int",
+        "filterByMetric": "bool",
+        "filter_value": "numbers.Real",
+        "filter_col": "int"
     }
     types = {
         "sameWeight": {

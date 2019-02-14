@@ -198,6 +198,9 @@ class SpawningParams:
         self.lagtime = None
         self.minPos = None
         self.sasaColumn = None
+        self.filter_value = None
+        self.filter_col = None
+        self.filterByMetric = None
 
     def buildSpawningParameters(self, spawningBlock):
         """
@@ -216,6 +219,25 @@ class SpawningParams:
             # reportFilename is now mandatory for all spawning not related to
             # MSM
             self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
+            # this paramaters are optional for many methods, some of the
+            # assignments are redundant and might be later overriden, but since
+            # there are many spawning methods we trade in a bit of efficient for
+            # sanity
+            self.condition = spawningParamsBlock.get(blockNames.SpawningParams.condition,
+                                                     blockNames.SpawningParams.minValue)
+            self.filterByMetric = spawningParamsBlock.get(blockNames.SpawningParams.filterByMetric, False)
+            self.filter_col = spawningParamsBlock.get(blockNames.SpawningParams.filter_col)
+            if self.filter_col is None and self.filterByMetric:
+                raise utilities.RequiredParameterMissingException("Column not specified for cluster filtering")
+            else:
+                self.filter_col -= 1
+            self.filter_value = spawningParamsBlock.get(blockNames.SpawningParams.filter_value)
+            if self.filter_value is None and self.filterByMetric:
+                raise utilities.RequiredParameterMissingException("Filtering value not specified for cluster filtering")
+            self.reportCol = spawningParamsBlock.get(blockNames.SpawningParams.report_col)
+            if self.reportCol is not None:
+                self.reportCol -= 1
+
         # Params specific to epsilon related spawning
         if spawningType == blockNames.StringSpawningTypes.epsilon or \
                 spawningType == blockNames.StringSpawningTypes.variableEpsilon:

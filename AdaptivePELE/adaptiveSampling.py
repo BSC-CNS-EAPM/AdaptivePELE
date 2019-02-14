@@ -726,6 +726,7 @@ def main(jsonParams, clusteringHook=None):
             if clusteringHook is not None:
                 clusteringHook(clusteringMethod, outputPathConstants, simulationRunner, i+1)
             clustersList = clusteringMethod.getClusterListForSpawning()
+            clustersFiltered = [True for _ in clusteringMethod]
 
         if simulationRunner.parameters.modeMovingBox is not None:
             simulationRunner.getNextIterationBox(outputPathConstants.epochOutputPathTempletized % i, resname, topologies, i)
@@ -733,6 +734,9 @@ def main(jsonParams, clusteringHook=None):
                 clustersList, clustersFiltered = clusteringMethod.filterClustersAccordingToBox(simulationRunner.parameters)
 
         if processManager.isMaster():
+            if spawningCalculator.parameters.filterByMetric:
+                clustersList, clustersFiltered = clusteringMethod.filterClustersAccordingToMetric(clustersFiltered, spawningCalculator.parameters.filter_value, spawningCalculator.parameters.condition, spawningCalculator.parameters.filter_col)
+
             degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), i)
             spawningCalculator.log()
             # this method only does works with MSM-based spwaning methods,
@@ -741,7 +745,7 @@ def main(jsonParams, clusteringHook=None):
             spawningCalculator.createPlots(outputPathConstants, i, clusteringMethod)
 
             if degeneracyOfRepresentatives is not None:
-                if simulationRunner.parameters.modeMovingBox is not None:
+                if simulationRunner.parameters.modeMovingBox is not None or spawningCalculator.parameters.filterByMetric:
                     degeneracyOfRepresentatives = mergeFilteredClustersAccordingToBox(degeneracyOfRepresentatives, clustersFiltered)
                 utilities.print_unbuffered("Degeneracy", degeneracyOfRepresentatives)
                 assert len(degeneracyOfRepresentatives) == len(clusteringMethod)
