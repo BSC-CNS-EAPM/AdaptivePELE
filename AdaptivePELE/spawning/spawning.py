@@ -229,7 +229,7 @@ class SpawningParams:
             self.filter_col = spawningParamsBlock.get(blockNames.SpawningParams.filter_col)
             if self.filter_col is None and self.filterByMetric:
                 raise utilities.RequiredParameterMissingException("Column not specified for cluster filtering")
-            else:
+            if self.filter_col is not None:
                 self.filter_col -= 1
             self.filter_value = spawningParamsBlock.get(blockNames.SpawningParams.filter_value)
             if self.filter_value is None and self.filterByMetric:
