@@ -352,7 +352,7 @@
             <span class="k">raise</span></div>
 
 
-<div class="viewcode-block" id="getSnapshots"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getSnapshots">[docs]</a><span class="k">def</span> <span class="nf">getSnapshots</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="getSnapshots"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getSnapshots">[docs]</a><span class="k">def</span> <span class="nf">getSnapshots</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_pdb</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the snapshots</span>
 
@@ -365,7 +365,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># topology parameter is ignored, just here for compatibility purposes</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">getFileExtension</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.pdb&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.pdb&quot;</span> <span class="ow">or</span> <span class="n">use_pdb</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inputFile</span><span class="p">:</span>
             <span class="n">inputFileContent</span> <span class="o">=</span> <span class="n">inputFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 

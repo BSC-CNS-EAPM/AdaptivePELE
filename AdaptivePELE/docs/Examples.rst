@@ -196,6 +196,9 @@ Optionally, you can also use the following parameters:
 * **mpiParameters** (*string*, default=None): String with parameters to pass
   to mpirun, if not specified it will just run without any parameters, it is
   important to avoid whitspaces both at the beginning and end of the string.
+* **time** (*float*, default=None): Time limit for the simulation (in seconds),
+  if no value is specified simulation is run until the number of steps in
+  **peleSteps** is finished
 
 MD Parameters
 .............
