@@ -92,7 +92,7 @@ class ParamsHandler(object):
             raise ValueError("Ligand resname needed for protein-ligand contact map")
         if self.contact_map and self.cm_mode not in VALID_CM_MODES:
             raise ValueError("Unrecognized type of contact map, valids are: %s" " ".join(VALID_CM_MODES))
-        self.com = not self.protein_CA and (self.atomIds is None or len(atomIds) == 0) and not self.sidechains and not self.contact_map and not self.dihedrals
+        self.com = not self.protein_CA and (self.atomIds is None or len(self.atomIds) == 0) and not self.sidechains and not self.contact_map and not self.dihedrals
 
 
 def parseArguments():
