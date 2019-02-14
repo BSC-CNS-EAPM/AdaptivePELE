@@ -387,6 +387,7 @@ class PeleSimulation(SimulationRunner):
             toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
         else:
             toRun = ["mpirun", "-np", str(self.parameters.processors)] + self.parameters.mpiParameters + [self.parameters.executable, runningControlFile]
+
         utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
@@ -428,22 +429,24 @@ class PeleSimulation(SimulationRunner):
         if self.parameters.srun:
             toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
         else:
-            toRun = ["mpirun", "-np", str(self.parameters.processors), self.parameters.executable, runningControlFile]
+            toRun = ["mpirun", "-np", str(self.parameters.processors)] + self.parameters.mpiParameters + [self.parameters.executable, runningControlFile]
         utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         if self.parameters.time:
             try:
-                proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+                proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
                 (out, err) = proc.communicate(timeout=self.parameters.time)
             except subprocess.TimeoutExpired:
-                print("killing")
+                utilities.print_unbuffered("Simulation has reached the established time limit, exiting now!!")
+                out = err = None
                 proc.kill()
         else:
-            proc = subprocess.Popen(toRun, stdout=subprocess.PIPE, shell=True, universal_newlines=True)
+            proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
             (out, err) = proc.communicate()
+        if out:
             print(out)
-            if err:
-                print(err)
+        if err:
+            print(err)
 
         endTime = time.time()
         utilities.print_unbuffered("PELE took %.2f sec" % (endTime - startTime))
