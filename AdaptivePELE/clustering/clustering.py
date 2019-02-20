@@ -1674,13 +1674,14 @@ class MSMClustering(Clustering):
             self.sidechains = list(set(self.sidechains).intersection(set(new_sidechains)))
         else:
             self.sidechains = []
-        if self.indexes is None and utilities.getFileExtension(trajectories[0]) in coord.MDTRAJ_FORMATS:
-            self.indexes = []
-            # select indexes for all topologies
-            for top in topology.topologyFilesIterator():
-                self.indexes.append(coord.extractIndexesTopology(top, self.resname, self.atom_Ids, self.writeCA, self.sidechains))
-        else:
-            self.indexes = []
+        if self.indexes is None:
+            if utilities.getFileExtension(trajectories[0]) in coord.MDTRAJ_FORMATS:
+                self.indexes = []
+                # select indexes for all topologies
+                for top in topology.topologyFilesIterator():
+                    self.indexes.append(coord.extractIndexesTopology(top, self.resname, self.atom_Ids, self.writeCA, self.sidechains))
+            else:
+                self.indexes = []
 
         workers = []
         for filename in trajectories:
