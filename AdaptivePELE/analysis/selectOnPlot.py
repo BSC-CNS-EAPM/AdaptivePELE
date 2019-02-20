@@ -278,6 +278,7 @@ def main(adaptive_results_folder,  column_to_x="epoch", column_to_y="Binding Ene
     fig, ax = plt.subplots()
     if column_to_z:
         pts = ax.scatter(dataframe[column_to_x], dataframe[column_to_y], c=dataframe[column_to_z], s=20)
+        plt.colorbar(pts)
     else:
         pts = ax.scatter(dataframe[column_to_x], dataframe[column_to_y], s=20)
     selector = SelectFromCollection(ax, pts)
@@ -287,13 +288,16 @@ def main(adaptive_results_folder,  column_to_x="epoch", column_to_y="Binding Ene
             print("Selected points:")
             df_select = dataframe.loc[selector.ind]
             print(df_select)
+            counter = 0
             if not output_selection_folder:
                 output_selection_folder = os.path.join(adaptive_results_folder, "selected_from_plot")
-            if not os.path.exists(output_selection_folder):
-                os.mkdir(output_selection_folder)
-            else:
-                shutil.rmtree(output_selection_folder)
-                os.mkdir(output_selection_folder)
+            while True:
+                try:
+                    os.mkdir(output_selection_folder+"_"+str(counter))
+                    break
+                except FileExistsError:
+                    counter += 1
+            output_selection_folder = output_selection_folder+"_"+str(counter)
             df_select.to_csv(os.path.join(output_selection_folder, "selection_report.csv"), sep=separator, index=False)
             get_pdbs_from_df_in_xtc(df_select, output_selection_folder, processors=processors, column_file=column_file)
             selector.disconnect()
