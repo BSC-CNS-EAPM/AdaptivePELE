@@ -772,3 +772,13 @@ def readConstraints(folder, filename):
             line_split[2] = float(line_split[2])
             new_constraints.append(line_split)
     return new_constraints
+
+
+def generateRotationMatrixAroundAxis(axis, angle):
+    # extracted from https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+    c = np.cos(angle)
+    s = np.sin(angle)
+    x, y, z = axis
+    return np.array([[c+(1-c)*x**2, x*y*(1-c)-z*s, x*z*(1-c)+y*s],
+                     [x*y*(1-c)+z*s, c+(1-c)*y**2, y*z*(1-c)-x*s],
+                     [x*z*(1-c)-y*s, y*z*(1-c)+x*s, c+(1-c)*z**2]])
