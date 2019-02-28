@@ -259,6 +259,13 @@ Optionally, you can also use the following parameters:
 
   ["atom1:res1:resnum1", "atom2:res2:resnum2", distance]
 
+* **boxType** (*str*, default=sphere): Type of box to use, it can be *sphere* or
+  *cylinder*
+* **cylinderBases** (*list*, default=None): List with the coordinates of the
+  bases of the cylinder (in angstroms), this should look like::
+
+  [[xb, yb, zb], [xt, yt, zt]]
+
 
 Exit condition
 ..............

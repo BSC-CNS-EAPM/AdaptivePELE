@@ -3,6 +3,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [1.x] - Unreleased
+
+### New features:
+
+    - Add cylindrical box for MD
+    - Add script to generate cylindrical box for visualization
+
+### Bug fixes:
+
+    - Fix bug selecting topolgies for odd number of initial conditions
+    - Fix bug extracting indexes from topology in MSMClustering
+
+### Behaviour changes from previous version:
+
+
 ## [1.6] - 2019-02-19
 
 ### New features:
