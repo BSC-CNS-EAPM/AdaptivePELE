@@ -197,7 +197,9 @@ class SimulationParams:
         "numReplicas": "numbers.Real",
         "maxDevicesPerReplica": "numbers.Real",
         "format": "basestring",
-        "constraints": "list"
+        "constraints": "list",
+        "boxType": "basestring",
+        "cylinderBases": "list"
     }
     exitCondition = {
         "types": {

@@ -94,6 +94,8 @@ class SimulationParameters:
         self.customparamspath = None
         self.format = None
         self.constraints = None
+        self.boxType = None
+        self.cylinderBases = None
 
 
 class SimulationRunner:
@@ -903,7 +905,7 @@ class MDSimulation(SimulationRunner):
             Tleapdict["MOL2"] = os.path.join(self.parameters.customparamspath, Tleapdict["MOL2"])
             Tleapdict["FRCMOD"] = os.path.join(self.parameters.customparamspath, Tleapdict["FRCMOD"])
             amber_file_path = self.parameters.customparamspath
-        if self.parameters.boxCenter:
+        if self.parameters.boxCenter or self.parameters.cylinderBases:
             with open(os.path.join(amber_file_path, "%s.prep" % constants.AmberTemplates.DUM_res), "w") as fw:
                 fw.write(constants.AmberTemplates.DUM_prep)
             with open(os.path.join(amber_file_path, "%s.frcmod" % constants.AmberTemplates.DUM_res), "w") as fw:
@@ -916,7 +918,7 @@ class MDSimulation(SimulationRunner):
         for i, structure in initialStructures:
             TleapControlFile = "tleap_equilibration_%d.in" % i
             pdb = PDBLoader.PDBManager(structure, resname)
-            constraints_map = pdb.preparePDBforMD(constraints=self.parameters.constraints, boxCenter=self.parameters.boxCenter)
+            constraints_map = pdb.preparePDBforMD(constraints=self.parameters.constraints, boxCenter=self.parameters.boxCenter, cylinderBases=self.parameters.cylinderBases)
             if constraints_map is not None:
                 new_constraints = updateConstraints(self.parameters.constraints, constraints_map)
                 if prev_constraints is None:
@@ -938,9 +940,8 @@ class MDSimulation(SimulationRunner):
             Tleapdict["SOLVATED_PDB"] = finalPDB
             Tleapdict["BONDS"] = pdb.getDisulphideBondsforTleapTemplate()
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
-            if self.parameters.boxCenter:
+            if self.parameters.boxCenter or self.parameters.cylinderBases:
                 Tleapdict["DUM"] = "loadamberprep %s.prep\nloadamberparams %s.frcmod\n" % (constants.AmberTemplates.DUM_res, constants.AmberTemplates.DUM_res)
-
             self.makeWorkingControlFile(TleapControlFile, Tleapdict, self.tleapTemplate)
             self.runTleap(TleapControlFile)
             shutil.copy("leap.log", os.path.join(workingdirectory, equilibrationOutput, "leap_%d.log" % i))
@@ -1388,6 +1389,16 @@ class RunnerBuilder:
             params.timeStep = paramsBlock.get(blockNames.SimulationParams.timeStep, 2)
             params.boxRadius = paramsBlock.get(blockNames.SimulationParams.boxRadius, 20)
             params.boxCenter = paramsBlock.get(blockNames.SimulationParams.boxCenter)
+            params.boxType = paramsBlock.get(blockNames.SimulationParams.boxType, blockNames.SimulationParams.sphere)
+            params.cylinderBases = paramsBlock.get(blockNames.SimulationParams.cylinderBases)
+            if params.boxType == blockNames.SimulationParams.cylinder and params.cylinderBases is None:
+                raise utilities.RequiredParameterMissingException("To use a cylinder box you need to specify the basis points for the cylinder")
+            if params.cylinderBases is not None:
+                # round all coordinates to 3 decimals to fit into pdb format and
+                # also ensure that they are numpy arrays
+                params.cylinderBases = [np.round(el, decimals=3) for el in params.cylinderBases]
+            if params.boxType is not None and params.boxType not in (blockNames.SimulationParams.sphere, blockNames.SimulationParams.cylinder):
+                raise utilities.ImproperParameterValueException("Unknown %s box type, supported formats are %s" % (params.boxType, " ".join([blockNames.SimulationParams.sphere, blockNames.SimulationParams.cylinder])))
             params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
             params.forcefield = paramsBlock.get(blockNames.SimulationParams.forcefield, "ff99SB")

@@ -13,7 +13,7 @@ import numpy as np
 import simtk.openmm as mm
 import simtk.openmm.app as app
 import simtk.unit as unit
-from AdaptivePELE.constants import constants
+from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.utilities import utilities
 from mdtraj.reporters.basereporter import _BaseReporter
 from mdtraj.formats import XTCTrajectoryFile
@@ -235,12 +235,12 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of minimization" % parameters.minimizationIterations)
 
-    if parameters.boxCenter:
-        dummy = findDummyAtom(prmtop)
-        assert dummy is not None
+    if parameters.boxCenter or parameters.cylinderBases:
+        dummies = findDummyAtom(prmtop)
+        assert dummies is not None
     else:
-        dummy = None
-    simulation = minimization(prmtop, inpcrd, PLATFORM, parameters.constraintsMin, parameters, platformProperties, dummy)
+        dummies = None
+    simulation = minimization(prmtop, inpcrd, PLATFORM, parameters.constraintsMin, parameters, platformProperties, dummies)
     # Retrieving the state is expensive (especially when running on GPUs) so we
     # only called it once and then separate positions and velocities
     state = simulation.context.getState(getPositions=True, getVelocities=True)
@@ -248,13 +248,13 @@ def runEquilibration(equilibrationFiles, reportName, parameters, worker):
     velocities = state.getVelocities()
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of NVT equilibration" % parameters.equilibrationLengthNVT)
-    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNVT, parameters.constraintsNVT, parameters, reportName, platformProperties, velocities=velocities, dummy=dummy)
+    simulation = NVTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNVT, parameters.constraintsNVT, parameters, reportName, platformProperties, velocities=velocities, dummy=dummies)
     state = simulation.context.getState(getPositions=True, getVelocities=True)
     positions = state.getPositions()
     velocities = state.getVelocities()
     if worker == 0:
         utilities.print_unbuffered("Running %d steps of NPT equilibration" % parameters.equilibrationLengthNPT)
-    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNPT, parameters.constraintsNPT, parameters, reportName, platformProperties, velocities=velocities, dummy=dummy)
+    simulation = NPTequilibration(prmtop, positions, PLATFORM, parameters.equilibrationLengthNPT, parameters.constraintsNPT, parameters, reportName, platformProperties, velocities=velocities, dummy=dummies)
     state = simulation.context.getState(getPositions=True)
     root, _ = os.path.splitext(reportName)
     outputPDB = "%s_NPT.pdb" % root
@@ -292,7 +292,7 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters, platformProp
         # Add the specified constraints to the system
         addConstraints(system, prmtop.topology, parameters.constraints)
 
-    if parameters.boxCenter:
+    if parameters.boxCenter or parameters.cylinderBases:
         # the last parameter is only used to print a message, by passing a
         # value different than 0 we avoid having too many prints
         addDummyAtomToSystem(system, prmtop.topology, inpcrd.positions, parameters.ligandName, dummy, 3)
@@ -303,10 +303,9 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters, platformProp
         force.addPerParticleParameter(str("x0"))
         force.addPerParticleParameter(str("y0"))
         force.addPerParticleParameter(str("z0"))
+        atomNames = ('CA', 'C', 'N', 'O')
         for j, atom in enumerate(prmtop.topology.atoms()):
-            if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (
-                    atom.residue.name == parameters.ligandName and atom.element.symbol != "H"):
-                assert j != dummy, (j, dummy)
+            if (atom.name in atomNames and atom.residue.name != "HOH") or (atom.residue.name == parameters.ligandName and atom.element.symbol != "H"):
                 force.addParticle(j, inpcrd.positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
@@ -338,8 +337,8 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     :type platformProperties: dict
     :param velocities: OpenMM object with the velocities of the system. Optional, if velocities are not given,
     random velocities acording to the temperature will be used.
-    :param dummy: Index of the dummy atom introduced as center of the box
-    :type dummy: int
+    :param dummy: List of indices of dummy atoms introduced for the box
+    :type dummy: list
 
     :return: The equilibrated OpenMM simulation object
     """
@@ -351,7 +350,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     if parameters.constraints is not None:
         # Add the specified constraints to the system
         addConstraints(system, topology.topology, parameters.constraints)
-    if parameters.boxCenter:
+    if parameters.boxCenter or parameters.cylinderBases:
         # the last parameter is only used to print a message, by passing a
         # value different than 0 we avoid having too many prints
         addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, 3)
@@ -404,8 +403,8 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     :type platformProperties: dict
     :param velocities: OpenMM object with the velocities of the system. Optional, if velocities are not given,
     random velocities acording to the temperature will be used.
-    :param dummy: Index of the dummy atom introduced as center of the box
-    :type dummy: int
+    :param dummy: List of indices of dummy atoms introduced for the box
+    :type dummy: list
 
     :return: The equilibrated OpenMM simulation object
     """
@@ -418,7 +417,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     if parameters.constraints is not None:
         # Add the specified constraints to the system
         addConstraints(system, topology.topology, parameters.constraints)
-    if parameters.boxCenter:
+    if parameters.boxCenter or parameters.cylinderBases:
         # the last parameter is only used to print a message, by passing a
         # value different than 0 we avoid having too many prints
         addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, 3)
@@ -502,13 +501,13 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(deviceIndex, parameters.devicesPerTrajectory, devicesPerReplica=parameters.maxDevicesPerReplica), "UseCpuPme": "false"}
     else:
         platformProperties = {}
-    if parameters.boxCenter:
-        dummy = findDummyAtom(prmtop)
+    if parameters.boxCenter or parameters.cylinderBases:
+        dummies = findDummyAtom(prmtop)
     system = prmtop.createSystem(nonbondedMethod=app.PME,
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                  constraints=app.HBonds, removeCMMotion=True)
-    if parameters.boxCenter:
-        addDummyAtomToSystem(system, prmtop.topology, pdb.positions, parameters.ligandName, dummy, deviceIndex)
+    if parameters.boxCenter or parameters.cylinderBases:
+        addDummyAtomToSystem(system, prmtop.topology, pdb.positions, parameters.ligandName, dummies, deviceIndex)
 
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
@@ -517,9 +516,16 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         # Add the specified constraints to the system
         addConstraints(system, prmtop.topology, parameters.constraints)
 
-    if parameters.boxCenter:
-        print("Adding spherical ligand box")
-        addLigandBox(prmtop.topology, pdb.positions, system, parameters.ligandName, dummy, parameters.boxRadius, deviceIndex)
+    if parameters.boxCenter or parameters.cylinderBases:
+        if parameters.boxType == blockNames.SimulationParams.sphere:
+            if deviceIndex == 0:
+                utilities.print_unbuffered("Adding spherical ligand box")
+            assert len(dummies) == 1
+            addLigandBox(prmtop.topology, pdb.positions, system, parameters.ligandName, dummies[0], parameters.boxRadius, deviceIndex)
+        elif parameters.boxType == blockNames.SimulationParams.cylinder:
+            if deviceIndex == 0:
+                utilities.print_unbuffered("Adding cylinder ligand box")
+            addLigandCylinderBox(prmtop.topology, pdb.positions, system, parameters.ligandName, dummies, parameters.boxRadius, deviceIndex)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(pdb.positions)
     if restart:
@@ -624,12 +630,18 @@ def addDummyAtomToTopology(model, name=constants.AmberTemplates.DUM_atom, resnam
 
 
 def findDummyAtom(model, name=constants.AmberTemplates.DUM_atom, resname=constants.AmberTemplates.DUM_res, element="C"):
+    dummies = []
+    valid_names = [name, name+"B", name+"T"]
     for atom in model.topology.atoms():
-        if atom.residue.name == resname and atom.name == name:
-            return atom.index
+        if atom.residue.name == resname and atom.name in valid_names:
+            dummies.append(atom.index)
+    if dummies:
+        return dummies
+    else:
+        return None
 
 
-def addDummyAtomToSystem(system, topology, positions, resname, dummy, worker):
+def addDummyAtomToSystem(system, topology, positions, resname, dummies, worker):
     protein_CAs = []
     for atom in topology.atoms():
         if atom.residue.name not in ("HOH", "Cl-", "Na+", resname) and atom.name == "CA":
@@ -643,16 +655,17 @@ def addDummyAtomToSystem(system, topology, positions, resname, dummy, worker):
     protein_CAs = protein_CAs[:modul:step_to_use]
     if worker == 0:
         utilities.print_unbuffered("Added bond between dummy atom and protein atoms", protein_CAs)
-    system.setParticleMass(dummy, 0.0)
-    for protein_particle in protein_CAs:
-        distance_constraint = np.linalg.norm(positions[dummy].value_in_unit(unit.nanometers)-positions[protein_particle].value_in_unit(unit.nanometers))
-        force_dummy = mm.HarmonicBondForce()
-        constraint_force = 10*4.184*2  # express the contraint_force in kJ/mol/nm^2
-        force_dummy.addBond(dummy, protein_particle, distance_constraint, constraint_force)
-        system.addForce(force_dummy)
-    for forces in system.getForces():
-        if isinstance(forces, mm.NonbondedForce):
-            forces.setParticleParameters(dummy, 0.0, 1.0, 0.0)
+    for dummy in dummies:
+        system.setParticleMass(dummy, 0.0)
+        for protein_particle in protein_CAs:
+            distance_constraint = np.linalg.norm(positions[dummy].value_in_unit(unit.nanometers)-positions[protein_particle].value_in_unit(unit.nanometers))
+            force_dummy = mm.HarmonicBondForce()
+            constraint_force = 10*4.184*2  # express the contraint_force in kJ/mol/nm^2
+            force_dummy.addBond(dummy, protein_particle, distance_constraint, constraint_force)
+            system.addForce(force_dummy)
+        for forces in system.getForces():
+            if isinstance(forces, mm.NonbondedForce):
+                forces.setParticleParameters(dummy, 0.0, 1.0, 0.0)
 
 
 def addLigandBox(topology, positions, system, resname, dummy, radius, worker):
@@ -671,12 +684,48 @@ def addLigandBox(topology, positions, system, resname, dummy, radius, worker):
     if worker == 0:
         utilities.print_unbuffered("Ligand atom selected to check distance to the box", atomClosestToMassCenter.residue.name, atomClosestToMassCenter.name, atomClosestToMassCenter.index)
     ligand_atom = atomClosestToMassCenter.index
-    forceFB = mm.CustomBondForce('step(r-r0)*(k/2) * (r-r0)^2')
-    forceFB.addPerBondParameter("k")
+    forceFB = mm.CustomBondForce('step(r-r0)*(k_box/2) * (r-r0)^2')
+    forceFB.addPerBondParameter("k_box")
     forceFB.addPerBondParameter("r0")
     forceFB.addBond(dummy, ligand_atom, [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, radius*unit.angstroms])
     forceFB.setUsesPeriodicBoundaryConditions(True)
     system.addForce(forceFB)
+
+
+def addLigandCylinderBox(topology, positions, system, resname, dummies, radius, worker):
+    center, base, top_base = dummies
+    masses = []
+    coords = np.ndarray(shape=(0, 3))
+    ligand_atoms = []
+    for atom in topology.atoms():
+        if atom.residue.name == resname and atom.element.symbol != "H":
+            masses.append(atom.element.mass.value_in_unit(unit=unit.dalton))
+            coords = np.vstack((coords, positions[atom.index].value_in_unit(unit=unit.nanometer)))
+            ligand_atoms.append(atom)
+    masses = np.array(masses)
+    masses /= masses.sum()
+    mass_center = coords.astype('float64').T.dot(masses)
+    atomClosestToMassCenter = min(ligand_atoms, key=lambda x: np.linalg.norm(mass_center - positions[x.index].value_in_unit(unit=unit.nanometer)))
+    length = np.linalg.norm(positions[center].value_in_unit(unit.nanometers)-positions[base].value_in_unit(unit.nanometers))
+    if worker == 0:
+        utilities.print_unbuffered("Ligand atom selected to check distance to the box", atomClosestToMassCenter.residue.name, atomClosestToMassCenter.name, atomClosestToMassCenter.index)
+    ligand_atom = atomClosestToMassCenter.index
+    # forceFB = mm.CustomBondForce('step(r-r_l)*(k_box/2) * (r-r_l)^2')
+    forceFB = mm.CustomCompoundBondForce(3, '(step(r_par-2*r_l)+step(-r_par))*(k_box/2) * (r_par-r_l)^2; r_par=ax*dx+ay*dy+az*dz; ax=(x1-x2)/l; ay=(y1-y2)/l; az=(z1-z2)/l; dx=x3-x2; dy=y3-y2; dz=z3-z2; l=distance(p1, p2)')
+    forceFB.addPerBondParameter("k_box")
+    forceFB.addPerBondParameter("r_l")
+    #forceFB.addBond(center, ligand_atom, [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, length*unit.nanometers])
+    forceFB.addBond([center, base, ligand_atom], [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, length*unit.nanometers])
+    forceFB.setUsesPeriodicBoundaryConditions(True)
+    system.addForce(forceFB)
+    force_side = mm.CustomCompoundBondForce(3, 'step(r_normal-r0)*(k_box/2) * (r_normal-r0)^2; r_normal=sqrt((ay*dz-az*dy)^2+(az*dx-ax*dz)^2+(ax*dy-ay*dx)^2); ax=(x1-x2)/l; ay=(y1-y2)/l; az=(z1-z2)/l; dx=x3-x2; dy=y3-y2; dz=z3-z2; l=distance(p1, p2)')
+    force_side.addPerBondParameter("k_box")
+    force_side.addPerBondParameter("r0")
+    # the order of the particles involved are center of the cilinder, base and
+    # atom to constrain (ligand)
+    force_side.addBond([center, base, ligand_atom], [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, radius*unit.angstroms])
+    force_side.setUsesPeriodicBoundaryConditions(True)
+    system.addForce(force_side)
 
 
 def addDummyPositions(pos, center):
