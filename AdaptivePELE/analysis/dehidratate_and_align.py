@@ -8,7 +8,7 @@ import AdaptivePELE.analysis.trajectory_processing as tp
 def parseArguments():
     desc = "Program that extracts residue coordinates for a posterior MSM analysis."
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("--dont-image", action="store_false", help="Flag to set whether trajectories should be imaged before the alignment (if not specfied performs the imaging)")
+    parser.add_argument("--dont_image", action="store_false", help="Flag to set whether trajectories should be imaged before the alignment (if not specfied performs the imaging)")
     parser.add_argument("--offset", type=int, default=0, help="Offset to add to trajectory number")
     parser.add_argument("--processors", type=int, default=4, help="Number of cpus to use")
     parser.add_argument("resname", help="Ligand resname")
@@ -16,7 +16,7 @@ def parseArguments():
     parser.add_argument("topology", help="Glob string for the topology")
     parser.add_argument("trajectories", help="Glob string for the trajectories")
     args = parser.parse_args()
-    return args.trajectories, args.resname, args.topology, args.reference, args.processors, args.offset, args.image
+    return args.trajectories, args.resname, args.topology, args.reference, args.processors, args.offset, args.dont_image
 
 
 def process_traj(traj, top, ligand_name, reference, num, image=True):
