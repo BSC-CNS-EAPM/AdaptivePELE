@@ -366,7 +366,7 @@ class PDBManager:
                         atom.id = "Cl%s" % oldname[2:]
                         print("Atom %s of %s rename to %s" % (oldname, self.resname, atom.id))
 
-    def addBoxAtom(self, boxCenter):
+    def addBoxAtom(self, boxCenter, cylinderBases):
         """
             Add a dummy atom to represent the center of the ligand box
         """
@@ -385,6 +385,11 @@ class PDBManager:
         else:
             dum_residue = Residue(chain, AdaptivePELE.constants.constants.AmberTemplates.DUM_res, residue.num+1)
         Atom(dum_residue, AdaptivePELE.constants.constants.AmberTemplates.DUM_atom, boxCenter, 1.00, 0.00)
+        if cylinderBases is not None:
+            # round to 3 decimals the positions so that it fits the PDB format,
+            # otherwise AmberTools crashes
+            Atom(dum_residue, AdaptivePELE.constants.constants.AmberTemplates.DUM_atom+"B", np.round(cylinderBases[0], decimals=3), 1.00, 0.00)
+            Atom(dum_residue, AdaptivePELE.constants.constants.AmberTemplates.DUM_atom+"T", np.round(cylinderBases[1], decimals=3), 1.00, 0.00)
 
     def get_borders(self):
         """
@@ -419,12 +424,16 @@ class PDBManager:
             water_box_axis = [waterBoxSize, waterBoxSize, waterBoxSize]
         return water_string % (water_box_axis[0], water_box_axis[1], water_box_axis[2])
 
-    def preparePDBforMD(self, constraints=None, boxCenter=None):
+    def preparePDBforMD(self, constraints=None, boxCenter=None, cylinderBases=None):
         """
             Method that prepares the pdb to be used in adaptivePELE MD simulation
 
             :param constraints: List of the atoms to constraint
             :type constraints: list
+            :param boxCenter: Coordinates to locate the center of the box
+            :type boxCenter: list
+            :param cylinderBases: Coordinates to locate the basis of the box
+            :type cylinderBases: list
         """
         # Check if the structure has posible gaps
         self.checkgaps()
@@ -459,9 +468,13 @@ class PDBManager:
         self.checkMissingAtoms()
         # change PELE water names
         self.changeWaterNames()
+        if cylinderBases is not None:
+            A = cylinderBases[0]
+            B = cylinderBases[1]
+            boxCenter = np.round(A+(B-A)/2.0, decimals=3)  # round to 3 decimal to properly fit into PDB format
         if boxCenter is not None:
             # add extra dummy atom
-            self.addBoxAtom(boxCenter)
+            self.addBoxAtom(boxCenter, cylinderBases)
         return new_constraints
 
 

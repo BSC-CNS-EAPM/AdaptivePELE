@@ -90,17 +90,24 @@ class AmberTemplates:
                "   2 DUMM  DU  M  1   0  -1  1.0000    0.0000    0.0000   0.000\n" \
                "   3 DUMM  DU  M  2   1   0  1.0000   90.0000    0.0000   0.000\n" \
                "   4 %s    C  E  0.00 0.00 0.00  0.00\n" \
+               "   5 %s    C  E  0.00 0.00 0.00  0.00\n" \
+               "   6 %s    C  E  0.00 0.00 0.00  0.00\n" \
                "\n" \
                "\n" \
                "DONE\n" \
                "STOP\n" \
-               "\n" % (DUM_res, DUM_res, DUM_res, DUM_atom)
+               "\n" % (DUM_res, DUM_res, DUM_res, DUM_atom, DUM_atom+"B", DUM_atom+"T")
     DUM_frcmod = "invented MM atom\n" \
                  "MASS\n" \
                  "%s     0.00     0.00\n" \
+                 "%s     0.00     0.00\n" \
+                 "%s     0.00     0.00\n" \
                  "\n" \
                  "NONB\n" \
-                 "  %s        0.00     0.00\n" % (DUM_atom, DUM_atom)
+                 "  %s        0.00     0.00\n" \
+                 "  %s        0.00     0.00\n" \
+                 "  %s        0.00     0.00\n" % (DUM_atom, DUM_atom+"B", DUM_atom+"T", DUM_atom, DUM_atom+"B", DUM_atom+"T")
+
     trajectoryTemplate = "trajectory_%d.%s"
     CheckPointReporterTemplate = "checkpoint_%d.chk"
 

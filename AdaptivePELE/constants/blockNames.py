@@ -184,6 +184,10 @@ class SimulationParams:
     format = "format"
     ligandName = "ligandName"
     constraints = "constraints"
+    boxType = "boxType"
+    cylinder = "cylinder"
+    cylinderBases = "cylinderBases"
+    sphere = "sphere"
 
 
 class ExitConditionType:
