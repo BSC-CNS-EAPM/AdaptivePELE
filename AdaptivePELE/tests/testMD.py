@@ -30,6 +30,15 @@ class TestMD(unittest.TestCase):
         # cleanup
         shutil.rmtree(output_path)
 
+    def testOpenMM3ptb(self):
+        output_path = "tests/data/openmm_3ptb_cyl"
+        controlFile = "tests/data/templetized_controlFile_3ptb_cyl_md.conf"
+
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2, 4)
+        # cleanup
+        shutil.rmtree(output_path)
+
     def testOpenMM1ab1(self):
         output_path = "tests/data/openmm_1ab1"
         controlFile = "tests/data/templetized_controlFile_1ab1_md.conf"
