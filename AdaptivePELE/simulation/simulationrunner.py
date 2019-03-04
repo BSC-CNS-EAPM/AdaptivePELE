@@ -291,6 +291,12 @@ class PeleSimulation(SimulationRunner):
         SimulationRunner.__init__(self, parameters)
         self.type = simulationTypes.SIMULATION_TYPE.PELE
 
+    def getClusteringInfo(self):
+        """
+            Return information relevant for MSMClustering
+        """
+        return False, self.parameters.peleSteps
+
     def createSymbolicLinks(self):
         """
             Create symbolic links to Data and Documents folder if they don't exist
@@ -826,6 +832,12 @@ class MDSimulation(SimulationRunner):
         if not self.checkAmbertools():
             raise utilities.UnsatisfiedDependencyException("No installation of AmberTools found. Please, install AmberTools to run MD simulations.")
 
+    def getClusteringInfo(self):
+        """
+            Return information relevant for MSMClustering
+        """
+        return True, self.parameters.peleSteps
+
     def checkAmbertools(self):
         try:
             subprocess.Popen(['antechamber'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
@@ -1187,6 +1199,12 @@ class TestSimulation(SimulationRunner):
         self.type = simulationTypes.SIMULATION_TYPE.TEST
         self.copied = False
         self.parameters = parameters
+
+    def getClusteringInfo(self):
+        """
+            Return information relevant for MSMClustering
+        """
+        return True, self.parameters.peleSteps
 
     def getWorkingProcessors(self):
         """

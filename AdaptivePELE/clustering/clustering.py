@@ -860,6 +860,17 @@ class Clustering(object):
         for cluster in self.clusters.clusters:
             cluster.metricCol = col
 
+    def updateInfo(self, repeat, steps):
+        """
+            Update parameters that should be extracted from the simulation object
+
+            :param repeat: Whether to avoid repeating steps (False for PELE, True for md)
+            :type repeat: bool
+            :param steps: steps per epoch
+            :type steps: int
+        """
+        pass
+
     def getClusterListForSpawning(self):
         """
             Return the clusters object to be used in the spawning
@@ -1622,6 +1633,18 @@ class MSMClustering(Clustering):
         self.tica_commute_map = state.get('tica_commute_map', False)
         self.pyemma_clustering = state.get('pyemma_clustering')
 
+    def updateInfo(self, repeat, steps):
+        """
+            Update parameters that should be extracted from the simulation object
+
+            :param repeat: Whether to avoid repeating steps (False for PELE, True for md)
+            :type repeat: bool
+            :param steps: steps per epoch
+            :type steps: int
+        """
+        self.extract_params.non_Repeat = repeat
+        self.extract_params.numtotalSteps = steps
+
     def getClusterListForSpawning(self):
         """
             Return the clusters object to be used in the spawning
@@ -1702,6 +1725,8 @@ class MSMClustering(Clustering):
                 workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, self.extract_params, outputPathConstants.epochOutputPathTempletized % self.epoch, self.constantsExtract, topology_traj, indexes_traj)))
         for w in workers:
             w.get()
+        if not self.extract_params.non_Repeat:
+            coord.repeatExtractedSnapshotsInFolder(outputPathConstants.epochOutputPathTempletized % self.epoch, self.constantsExtract, self.extract_params.numtotalSteps)
         coord.gatherTrajs(self.constantsExtract, outputPathConstants.epochOutputPathTempletized % self.epoch, self.epoch, self.extract_params.non_Repeat, self.epoch)
         # apply tica
         if self.tica:
