@@ -58,45 +58,6 @@ class Constants(object):
         self.gatherNonRepeatedTrajsFilename = os.path.join(self.gatherNonRepeatedFolder, "traj_%s_%s.dat")
 
 
-class TopologyCompat(object):
-    def __init__(self, pdb_file):
-        self.topologyFiles = os.path.abspath(pdb_file)
-        self.path = os.path.split(self.topologyFiles)[0]
-        self.topologies = [utilities.getTopologyFile(self.topologyFiles)]
-
-    def getTopologyFile(self, epoch, trajectory_number):
-        return self.topologyFiles
-
-    def topologyFilesIterator(self):
-        yield self.topologyFiles
-
-    def getTopologyIndex(self, epoch, trajectory_number):
-        """
-            Get the topology index for a particular epoch and trajectory number
-
-            :param epoch: Epoch of the trajectory of interest
-            :type epoch: int
-            :param trajectory_number: Number of the trajectory to select
-            :type trajectory_number: int
-
-            :returns: int -- Index of the corresponding topology
-        """
-        return 0
-
-    def getTopology(self, epoch, trajectory_number):
-        """
-            Get the topology for a particular epoch and trajectory number
-
-            :param epoch: Epoch of the trajectory of interest
-            :type epoch: int
-            :param trajectory_number: Number of the trajectory to select
-            :type trajectory_number: int
-
-            :returns: list -- List with topology information
-        """
-        return self.topologies[0]
-
-
 class ParamsHandler(object):
     def __init__(self, folderWithTrajs, atom_id, lig_name, total_steps, sequential, writeLigandTrajectory, set_number, protein_CA, noRepeat, numProcessors, parallelize, topol, sidechains, sidechains_folder, CM, use_extra_atoms, CM_mode, dihedrals, dihedrals_projection):
         self.folder_name = folderWithTrajs
@@ -620,22 +581,12 @@ def get_epoch_traj_num(filename):
     return epoch, traj_num
 
 
-def getTopologyObject(topology_file):
-    ext = utilities.getFileExtension(topology_file)
-    if ext == ".pdb":
-        return TopologyCompat(topology_file)
-    elif ext == ".pkl":
-        return utilities.readClusteringObject(topology_file)
-    else:
-        raise ValueError("The topology parameter needs to be the path to a pickled Topology object or a pdb!")
-
-
 def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceSequential_run=0, writeLigandTrajectory=True, setNumber=0, protein_CA=0, non_Repeat=False, nProcessors=None, parallelize=True, topology=None, sidechains=False, sidechain_folder=".", cm=False, use_extra_atoms=False, CM_mode="p-lig", calc_dihedrals=False, dihedrals_projection=False):
     params = ParamsHandler(folder_name, atom_Ids, lig_resname, numtotalSteps, enforceSequential_run, writeLigandTrajectory, setNumber, protein_CA, non_Repeat, nProcessors, parallelize, topology, sidechains, sidechain_folder, cm, use_extra_atoms, CM_mode, calc_dihedrals, dihedrals_projection)
     constants = Constants()
 
     if params.topology is not None:
-        params.topology = getTopologyObject(params.topology)
+        params.topology = utilities.getTopologyObject(params.topology)
 
     params.lig_resname = parseResname(params.atomIds, params.lig_resname, params.contact_map, params.cm_mode, params.dihedrals)
 

@@ -182,6 +182,45 @@ class Topology:
             sys.stderr.write("WARNING: topologyMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
 
 
+class TopologyCompat(object):
+    def __init__(self, pdb_file):
+        self.topologyFiles = os.path.abspath(pdb_file)
+        self.path = os.path.split(self.topologyFiles)[0]
+        self.topologies = [getTopologyFile(self.topologyFiles)]
+
+    def getTopologyFile(self, epoch, trajectory_number):
+        return self.topologyFiles
+
+    def topologyFilesIterator(self):
+        yield self.topologyFiles
+
+    def getTopologyIndex(self, epoch, trajectory_number):
+        """
+            Get the topology index for a particular epoch and trajectory number
+
+            :param epoch: Epoch of the trajectory of interest
+            :type epoch: int
+            :param trajectory_number: Number of the trajectory to select
+            :type trajectory_number: int
+
+            :returns: int -- Index of the corresponding topology
+        """
+        return 0
+
+    def getTopology(self, epoch, trajectory_number):
+        """
+            Get the topology for a particular epoch and trajectory number
+
+            :param epoch: Epoch of the trajectory of interest
+            :type epoch: int
+            :param trajectory_number: Number of the trajectory to select
+            :type trajectory_number: int
+
+            :returns: list -- List with topology information
+        """
+        return self.topologies[0]
+
+
 def cleanup(tmpFolder):
     """
         Remove folder if exists
@@ -782,3 +821,13 @@ def generateRotationMatrixAroundAxis(axis, angle):
     return np.array([[c+(1-c)*x**2, x*y*(1-c)-z*s, x*z*(1-c)+y*s],
                      [x*y*(1-c)+z*s, c+(1-c)*y**2, y*z*(1-c)-x*s],
                      [x*z*(1-c)-y*s, y*z*(1-c)+x*s, c+(1-c)*z**2]])
+
+
+def getTopologyObject(topology_file):
+    ext = getFileExtension(topology_file)
+    if ext == ".pdb":
+        return TopologyCompat(topology_file)
+    elif ext == ".pkl":
+        return readClusteringObject(topology_file)
+    else:
+        raise ValueError("The topology parameter needs to be the path to a pickled Topology object or a pdb!")
