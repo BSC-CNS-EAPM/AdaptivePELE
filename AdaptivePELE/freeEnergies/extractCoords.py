@@ -505,7 +505,7 @@ def gatherTrajs(constants, folder_name, setNumber, non_Repeat, epochNum=None):
         # copy the repeated coordinates to the allTrajs folder
         trajectoriesFilenames = os.path.join(constants.outputTrajectoryFolder % folder_name, constants.baseExtractedTrajectoryName + "*")
         trajectories = glob.glob(trajectoriesFilenames)
-        copyTrajectories(trajectories, constants.gatherTrajsFilename, folder_name, setNumber)
+        copyTrajectories(trajectories, constants.gatherTrajsFilename, folder_name, setNumber, epochNum=epochNum)
     else:
         # if we ask to not repeat trajectories, copy the non-repeated to the
         # allTrajs folder

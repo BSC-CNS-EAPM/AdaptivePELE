@@ -1679,9 +1679,12 @@ class MSMClustering(Clustering):
         utilities.makeFolder(outputPathConstants.allTrajsPath)
         utilities.makeFolder(os.path.join(outputPathConstants.allTrajsPath, "extractedCoordinates"))
         extractedFolder = self.constantsExtract.extractedTrajectoryFolder % outputPathConstants.epochOutputPathTempletized % self.epoch
+        repeatedFolder = self.constantsExtract.outputTrajectoryFolder % outputPathConstants.epochOutputPathTempletized % self.epoch
         self.constantsExtract.gatherTrajsFilename = os.path.join(outputPathConstants.allTrajsPath, "traj_%s_%s.dat")
         self.constantsExtract.gatherNonRepeatedTrajsFilename = os.path.join(outputPathConstants.allTrajsPath, "extractedCoordinates", "traj_%s_%s.dat")
         utilities.makeFolder(extractedFolder)
+        if not self.extract_params.non_Repeat:
+            utilities.makeFolder(repeatedFolder)
         trajectories = getAllTrajectories(paths)
         self.extract_params.sidechain_folder = paths[0]
         self.extract_params.topology = topology
@@ -1751,7 +1754,7 @@ class MSMClustering(Clustering):
         self.pyemma_clustering.clusterTrajectories()
 
         # create Adaptive clusters from the kmeans result
-        trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, base_traj_names))
+        trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, "extractedCoordinates", base_traj_names))
         trajectories = [utilities.loadtxtfile(f)[:, 1:] for f in trajectory_files]
 
         centersInfo = getCentersInfo(self.pyemma_clustering.clusterCenters, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)
