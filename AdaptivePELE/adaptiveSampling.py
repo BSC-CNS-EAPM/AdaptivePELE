@@ -689,7 +689,13 @@ def main(jsonParams, clusteringHook=None):
             # read all the equilibration structures
             initialStructures = processManager.readEquilibrationStructures(outputPathConstants.tmpFolder)
             topologies.setTopologies(initialStructures, cleanFiles=processManager.isMaster())
-            writeTopologyFiles(initialStructures, outputPathConstants.topologies)
+            if processManager.isMaster():
+                writeTopologyFiles(initialStructures, outputPathConstants.topologies)
+            # ensure that topologies are written
+            processManager.barrier()
+            topology_files = glob.glob(os.path.join(outputPathConstants.topologies, "topology*.pdb"))
+            topology_files.sort(key=utilities.getTrajNum)
+            topologies.setTopologies(topology_files, cleanFiles=False)
         createMappingForFirstEpoch(initialStructures, topologies, simulationRunner.getWorkingProcessors())
 
         clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningCalculator.parameters, initialStructures, simulationRunner, processManager)
