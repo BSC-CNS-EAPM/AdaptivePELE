@@ -860,7 +860,7 @@ class Clustering(object):
         for cluster in self.clusters.clusters:
             cluster.metricCol = col
 
-    def updateInfo(self, repeat, steps):
+    def updateRepeatParameters(self, repeat, steps):
         """
             Update parameters that should be extracted from the simulation object
 
