@@ -1633,7 +1633,7 @@ class MSMClustering(Clustering):
         self.tica_commute_map = state.get('tica_commute_map', False)
         self.pyemma_clustering = state.get('pyemma_clustering')
 
-    def updateInfo(self, repeat, steps):
+    def updateRepeatParameters(self, repeat, steps):
         """
             Update parameters that should be extracted from the simulation object
 
