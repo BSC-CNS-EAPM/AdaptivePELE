@@ -654,7 +654,7 @@ def getCpuCount():
     if "bsccv" in machine:
         # life cluster
         cores = os.getenv("SLURM_NTASKS", None)
-    elif "mn.bsc" in machine:
+    elif "mn.bsc" in machine or "power" in machine:
         # nord3
         cores = os.getenv("LSB_DJOB_NUMPROC", None)
     elif "bsc.mn" in machine:
