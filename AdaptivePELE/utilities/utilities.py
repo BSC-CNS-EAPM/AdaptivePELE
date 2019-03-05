@@ -43,7 +43,7 @@ class Topology:
         Container object that points to the topology used in each trajectory
     """
     def __init__(self, path):
-        self.path = path
+        self.path = os.path.abspath(path)
         self.topologies = []
         # the topologyMap maps each trajectory to its corresponding topology
         # {0: [t1, t2.. tM], 1: [t2, t3, t4, t4...]}
@@ -88,7 +88,7 @@ class Topology:
                 self.cleanTopologies()
         for top in topologyFiles:
             self.topologies.append(getTopologyFile(top))
-            self.topologyFiles.append(top)
+            self.topologyFiles.append(os.path.abspath(top))
 
     def topologyFilesIterator(self):
         for top_file in self.topologyFiles:
