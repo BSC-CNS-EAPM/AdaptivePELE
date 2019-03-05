@@ -112,6 +112,12 @@ class SimulationRunner:
         """
         return self.parameters.processors
 
+    def getClusteringInfo(self):
+        """
+            Return information relevant for MSMClustering
+        """
+        return True, self.parameters.peleSteps
+
     def getNumReplicas(self):
         """
             Return the number of replicas, only useful for MD simulations
@@ -832,12 +838,6 @@ class MDSimulation(SimulationRunner):
         if not self.checkAmbertools():
             raise utilities.UnsatisfiedDependencyException("No installation of AmberTools found. Please, install AmberTools to run MD simulations.")
 
-    def getClusteringInfo(self):
-        """
-            Return information relevant for MSMClustering
-        """
-        return True, self.parameters.peleSteps
-
     def checkAmbertools(self):
         try:
             subprocess.Popen(['antechamber'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
@@ -1199,12 +1199,6 @@ class TestSimulation(SimulationRunner):
         self.type = simulationTypes.SIMULATION_TYPE.TEST
         self.copied = False
         self.parameters = parameters
-
-    def getClusteringInfo(self):
-        """
-            Return information relevant for MSMClustering
-        """
-        return True, self.parameters.peleSteps
 
     def getWorkingProcessors(self):
         """

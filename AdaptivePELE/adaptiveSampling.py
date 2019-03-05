@@ -702,7 +702,7 @@ def main(jsonParams, clusteringHook=None):
 
     if processManager.isMaster():
         repeat, numSteps = simulationRunner.getClusteringInfo()
-        clusteringMethod.updateInfo(repeat, numSteps)
+        clusteringMethod.updateRepeatParameters(repeat, numSteps)
         clusteringMethod.setProcessors(simulationRunner.getWorkingProcessors())
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
@@ -743,7 +743,7 @@ def main(jsonParams, clusteringHook=None):
             if spawningCalculator.parameters.filterByMetric:
                 clustersList, clustersFiltered = clusteringMethod.filterClustersAccordingToMetric(clustersFiltered, spawningCalculator.parameters.filter_value, spawningCalculator.parameters.condition, spawningCalculator.parameters.filter_col)
 
-            degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), i)
+            degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), i, outputPathConstants=outputPathConstants)
             spawningCalculator.log()
             # this method only does works with MSM-based spwaning methods,
             # creating a plot of the stationary distribution and the PMF, for
