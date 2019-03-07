@@ -37,11 +37,12 @@ ACCEPTED_STEPS = 'numberOfAcceptedPeleSteps'
 OUTPUT_FOLDER = 'BestStructs'
 DIR = os.path.abspath(os.getcwd())
 STEPS=3
+HELP = "USE:\n\n- For xtc: python bestStructs.py 5 --top topology.pdb\n\n- For pdb:  python bestStructs.py 5"
 
 
 def parse_args():
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=HELP, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("crit", type=str, nargs='+', help="Criteria we want to rank and output the strutures for. Must be a column of the report. i.e: Binding Energy")
     parser.add_argument("--crit2", type=str, nargs='+', help="Second Criteria we want to rank and output the strutures for. Must be a column of the report. i.e: SasaLig, i.e.2. 3", default="")
     parser.add_argument("--path", type=str, help="Path to Pele's results root folder i.e: path=/Pele/results/", default=DIR)
