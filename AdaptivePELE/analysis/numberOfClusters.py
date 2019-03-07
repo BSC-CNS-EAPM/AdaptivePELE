@@ -10,6 +10,8 @@ if machine == "bsccv03":
     matplotlib.use('wxagg')
 elif 'login' in machine:
     matplotlib.use('TkAgg')
+else:
+    matplotlib.use("agg")
 import matplotlib.pyplot as plt
 try:
     # This might fail for older versions of matplotlib (e.g in life cluster)
