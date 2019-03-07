@@ -420,15 +420,16 @@ def buildFullTrajectory(steps, trajectory, numtotalSteps, inputTrajectory):
             return completeTrajectory
 
         if numtotalSteps == 0:
-            iterations = list(range(1))
+            iterations = range(1)
         else:
-            iterations = list(range(numtotalSteps + 1 - counter))
+            # PELE write the initial structure as step 0, so an extra step is
+            # always needed
+            iterations = range(numtotalSteps + 1 - counter)
 
+        snapshot = trajectory[-1].split()
         for i in iterations:
-            snapshot = trajectory[-1].split()
             snapshot[0] = str(counter)
-            snapshot = ' '.join(snapshot)
-            completeTrajectory.append(snapshot)
+            completeTrajectory.append(' '.join(snapshot))
             counter += 1
 
     return completeTrajectory
@@ -597,8 +598,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
     if params.enforceSequential_run:
         folders = ["."]
     else:
-        allFolders = os.listdir(folderWithTrajs)
-        folders = [epoch for epoch in allFolders if epoch.isdigit()]
+        folders = utilities.get_epoch_folders(folderWithTrajs)
         if len(folders) == 0:
             folders = ["."]
 
