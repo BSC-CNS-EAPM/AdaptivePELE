@@ -6,31 +6,36 @@ import subprocess
 from AdaptivePELE.analysis import plotAdaptive
 import argparse
 
-ADAPTIVE_PATH = "/run/media/ywest/BAD432E1D432A015/3s3i_out_in_waters/"
-IMAGE = "plot_1.png"
 CONTACTS = "contacts"
-CONTROL_FILE = "originalControlFile_1.conf"
-steps_Run, Xcol, Ycol, filename, kind_Print, colModifier, traj_range = 8, 6, 5, "report_", "PRINT_BE_RMSD", 4, None
+BE = "bindingEnergy" 
+SASA = "sasa"
+kind_Print, colModifier, traj_range = "PRINT_BE_RMSD", 4, None
 
 
 def arg_parse():
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description='Build a summary pdf file of the simulation')
     parser.add_argument('control_file', type=str, help='adaptive control file')
+    parser.add_argument('--traj', type=str, help='Trajectory file name i.e. run_traj_', default='trajectory_')
+    parser.add_argument('--report', type=str, help='Report file name i.e run_report_', default='report_')
     args = parser.parse_args()
 
     return args
 
 def retrieve_metrics(control_file):
-    with open(control_file, "r") as f:
-        discard = ["random", "constrainAtomToPosition", "sphericalBox"]
-        metrics = [line for line in f if (line.strip()).startswith('"type"') and not any(x in line for x in discard)]
+    metrics_names = ["rmsd", "com_distance", "distanceToPoint", BE, SASA]
+    discard = ["random", "constrainAtomToPosition", "sphericalBox", "toThisOtherAtom", "constrainThisAtom", "springConstant", "equilibriumDistance", ]
+    try:
+        with open(control_file, "r") as f:
+            metrics = [line for line in f if "type" in (line.strip()) and not any(x in line for x in discard)]
+    except IOError:
+        raise IOError("Pele control file {} not found. Check the path inside Adaptive control file".format(control_file))
     pattern = r'"([A-Za-z0-9_\./\\-]*)"'
     metrics = re.findall(pattern, "".join(metrics))
-    metrics = [metric for metric in metrics if metric != "type"]
+    metrics = [metric for metric in metrics if metric in metrics_names]
     return metrics
 
 
-def write_report(metrics, resname, initial_column=4):
+def write_report(metrics, resname, initial_column=4, traj="trajectory_", report="report_"):
 
     OUTPUT = 'adaptive_report.pdf'
 
@@ -43,14 +48,14 @@ def write_report(metrics, resname, initial_column=4):
     pdf.cell(30, 10, 'Simulation Report', align='C')
 
     # Plot Binding SASA
-    plot(1+metrics.index("bindingEnergy")+initial_column, 1+metrics.index("sasa")+initial_column, ".", "BE.png", "BindingE", "sasa")
+    plot(1+metrics.index(BE)+initial_column, 1+metrics.index(SASA)+initial_column, ".", "BE.png", "BindingE", "sasa", report=report)
     pdf.cell(-100)
     pdf.set_font('Arial', 'B', 11)
     pdf.cell(10, 49, 'Interaction Energy vs Sasa' +34*"\t" + "Total Energy vs Interaction Energy")
     pdf.image("BE.png", 10, 40, 83)
 
     # Plot Total Biding
-    plot(initial_column,  1+metrics.index("bindingEnergy")+initial_column, ".", "total.png", "totalE", "BindingE")
+    plot(initial_column,  1+metrics.index(BE)+initial_column, ".", "total.png", "totalE", "BindingE", report=report)
     pdf.cell(0)
     pdf.set_font('Arial', 'B', 11)
     pdf.image("total.png", 100, 40, 83)
@@ -76,28 +81,30 @@ def write_report(metrics, resname, initial_column=4):
             images_per_page = 1
         if user_metric in metrics or user_metric == "clusters":
             pdf, images_per_page, images_per_row = write_metric(
-	        pdf, user_metric, "bindingEnergy", metrics, images_per_page, images_per_row, resname)
+	        pdf, user_metric, BE, metrics, images_per_page, images_per_row, resname, traj=traj, report=report)
 
     #Output report    
     pdf.output(OUTPUT, 'F')
 
 
-def plot_clusters(metric1, metric2, metrics, resname):
-    command = command = "python -m AdaptivePELE.analysis.clusterAdaptiveRun 200 {} {} {} --png".format(get_column(metric1, metrics), get_column(metric2, metrics), resname)
+def plot_clusters(metric1, metric2, metrics, resname, traj, report):
+    command = "python -m AdaptivePELE.analysis.clusterAdaptiveRun 200 {} {} {} --report {} --traj {} --png".format(
+       get_column(metric1, metrics), get_column(metric2, metrics), resname, report, traj)
     os.system(command)
 
 def get_column(metric, metrics, initial_pos=4):
     return 1+metrics.index(metric)+initial_pos
 
-def write_metric(pdf, metric1, metric2, metrics, images_per_page, images_per_row, resname=None, initial_pos=4):
+def write_metric(pdf, metric1, metric2, metrics, images_per_page, images_per_row, resname=None, initial_pos=4, traj="trajectory_", report="report_"):
 
     #Create Image
     if metric1 == "clusters":
         image_name = "Cluster_analisis/ClusterMap.png".format(metric1)
-        plot_clusters("bindingEnergy", "sasa", metrics, resname)
+        plot_clusters("bindingEnergy", "sasa", metrics, resname, report)
     else:
         image_name = "{}.png".format(metric1)
-        plot(1+metrics.index(metric1)+initial_pos,  1+metrics.index(metric2)+initial_pos, ".", image_name, metric1, metric2, zcol=initial_pos + 1+ metrics.index("sasa"))
+        plot(1+metrics.index(metric1)+initial_pos,  1+metrics.index(metric2)+initial_pos, ".",
+          image_name, metric1, metric2, zcol=initial_pos + 1+ metrics.index("sasa"), report=report)
 
     #Move over pdf
     pdf.image(image_name, pdf.get_x(), pdf.get_y(), 83)
@@ -113,8 +120,11 @@ def write_metric(pdf, metric1, metric2, metrics, images_per_page, images_per_row
     #Update cursor
     return pdf, images_per_page, images_per_row
     
-def plot(Xcol, Ycol, path, name, xcol_name, ycol_name, zcol=5):
-    plot_line = plotAdaptive.generatePrintString(8, Xcol, Ycol, "report_", "PRINT_BE_RMSD", zcol, None).strip("\n")
+def plot(Xcol, Ycol, path, name, xcol_name, ycol_name, zcol=5, report="report_"):
+    try:
+        plot_line = plotAdaptive.generatePrintString(8, Xcol, Ycol, report, "PRINT_BE_RMSD", zcol, None).strip("\n")
+    except TypeError:
+        raise TypeError("Report not found use the flag --report. i.e --report run_report_ ") 
     command = '''gnuplot -e "set terminal png; set output '{}'; set xlabel '{}'; set ylabel '{}'; {}"'''.format(
         name, xcol_name, ycol_name, plot_line)
     os.system(command)
@@ -136,16 +146,16 @@ def retrieve_fields(control_file):
 
 
 
-def main(control_file):
+def main(control_file, traj, report):
     print("Search pele control file")
     pele_conf, resname = retrieve_fields(control_file)
     print("Retrieve metrics")
     metrics = retrieve_metrics(pele_conf)
     print("Build report")
-    write_report(metrics, resname)
+    write_report(metrics, resname, 4, traj, report)
     print("Analysis finished succesfully")
  
 
 if __name__ == "__main__":
     args = arg_parse()
-    main(args.control_file)
+    main(args.control_file, args.traj, args.report)
