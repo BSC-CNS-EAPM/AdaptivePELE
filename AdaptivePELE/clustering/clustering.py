@@ -543,11 +543,7 @@ class Cluster(object):
             return trajPosition
 
     def __eq__(self, other):
-        return self.pdb == other.pdb\
-             and self.elements == other.elements\
-             and self.threshold == other.threshold\
-             and self.contacts == other.contacts\
-             and np.allclose(self.metrics, other.metrics)
+        return (self.pdb, self.elements, self.threshold, self.contacts) == (other.pdb, other.elements, other.threshold, other.contacts) and np.allclose(self.metrics, other.metrics)
 
 
 class ClusteringEvaluator(object):
@@ -916,12 +912,7 @@ class Clustering(object):
         return self.clusters.getNumberClusters()
 
     def __eq__(self, other):
-        return self.clusters == other.clusters\
-            and self.reportBaseFilename == other.reportBaseFilename\
-            and self.resname == other.resname\
-            and self.resnum == other.resnum\
-            and self.resChain == other.resChain\
-            and self.col == other.col
+        return (self.clusters, self.reportBaseFilename, self.resname, self.resnum, self.resChain, self.col) == (other.clusters, other.reportBaseFilename, other.resname, other.resnum, other.resChain, other.col)
 
     def filterClustersAccordingToBox(self, simulationRunnerParams):
         """
