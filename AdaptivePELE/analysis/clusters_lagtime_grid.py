@@ -1,12 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from builtins import range
 import os
+import shutil
 import argparse
 import numpy as np
-import shutil
 import matplotlib.pyplot as plt
-import pyemma.coordinates as coor
 import pyemma.msm as msm
+import pyemma.coordinates as coor
 from AdaptivePELE.freeEnergies import cluster
 plt.style.use("ggplot")
 
@@ -17,8 +17,8 @@ def parse_arguments():
     """
     desc = "Plot information related to an MSM"
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("-l", "--lagtimes", type=int, nargs="*", required=True, help="Lagtimes to analyse, specifying lower and upper bound")
-    parser.add_argument("-c", "--clusters", type=int, nargs="*", required=True, help="Number of clusters to analyse, specifying lower and upper bound")
+    parser.add_argument("-l", "--lagtimes", type=int, nargs=2, required=True, help="Lagtimes to analyse, specifying lower and upper bound")
+    parser.add_argument("-c", "--clusters", type=int, nargs=2, required=True, help="Number of clusters to analyse, specifying lower and upper bound")
     parser.add_argument("--lagtime_step", type=int, default=20, help="Resolution in the lagtimes to explore, default is 20")
     parser.add_argument("--cluster_step", type=int, default=20, help="Resolution in the clusters to explore, default is 20")
     parser.add_argument("-m", type=int, default=6, help="Number of eigenvalues to sum in the GMRQ")
