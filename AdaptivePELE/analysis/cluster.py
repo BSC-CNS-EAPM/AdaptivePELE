@@ -322,7 +322,6 @@ def cluster_with_dbscan(paths, snapshots, all_coordinates, out_freq=1, topology=
         else:
             traj = []
             model = (snapshot)/out_freq+1
-            print(model)
 
             with open(f_in, 'r') as input_file:
                 file_content = input_file.read()
