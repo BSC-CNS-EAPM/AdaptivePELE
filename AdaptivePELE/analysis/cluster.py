@@ -66,11 +66,11 @@ def parse_args():
     parser.add_argument("--zcol", type=int, help="Thirs Criteria we want to rank and output the strutures for. Must be a column of the report. i.e: SASA", default=2)
     parser.add_argument("--resname", type=str, help="Resname of the ligand. Resquested for clusterization", default="LIG")
     parser.add_argument("--percentage", type=int, help="Percentage of snapshots taken based on the first criteria to clusterize", default=30)
-    parser.add_argument("--tresh", type=float, help="Treshold of the first criteria below which it will be clusterize. i.e --tresh -60 (binding energy)", default=None)
+    parser.add_argument("--thresh", type=float, help="Treshold of the first criteria below which it will be clusterize. i.e --thresh -60 (binding energy)", default=None)
     parser.add_argument("--cpus", type=int, help="Number of workers to use", default=1)
     args = parser.parse_args()
 
-    return args.crit1, args.crit2, args.zcol, args.ad_steps, os.path.abspath(args.path), args.ofreq, args.out, args.numfolders, args.top, args.first, args.resname, args.percentage, args.tresh, args.cpus
+    return args.crit1, args.crit2, args.zcol, args.ad_steps, os.path.abspath(args.path), args.ofreq, args.out, args.numfolders, args.top, args.first, args.resname, args.percentage, args.thresh, args.cpus
 
 
 def is_adaptive():
@@ -133,7 +133,7 @@ def cluster(data, resName, out_freq=1, cpus=1):
 
 
 def main(criteria1, criteria2, criteria3, ad_steps, path=DIR, out_freq=FREQ, output=OUTPUT_FOLDER, numfolders=False, topology=None, skip_first=False,
-    resname="LIG", percentage=30, treshold=None, cpus=1):
+    resname="LIG", percentage=30, threshold=None, cpus=1):
     """
 
       Description: Rank the traj found in the report files under path
@@ -170,8 +170,8 @@ def main(criteria1, criteria2, criteria3, ad_steps, path=DIR, out_freq=FREQ, out
     data = parse_values(reports, criteria1, criteria2, steps, crit1_name, crit2_name, skip_first)
 
     # Filter values
-    if treshold:
-        filter_data = Filter(data, percentage, crit1_name, tresh=treshold)
+    if threshold:
+        filter_data = Filter(data, percentage, crit1_name, thresh=threshold)
     else:
         filter_data = Filter(data, percentage, crit1_name)
         
@@ -179,9 +179,9 @@ def main(criteria1, criteria2, criteria3, ad_steps, path=DIR, out_freq=FREQ, out
     cluster(filter_data, resname, out_freq, cpus)
 
 
-def Filter(values, percentage, column_name, tresh=None):
-    if tresh:
-        condition = (values[column_name] < tresh)
+def Filter(values, percentage, column_name, thresh=None):
+    if thresh:
+        condition = (values[column_name] < thresh)
         data_filtered = values[condition]
     else:
         n_values_to_take = int(values.shape[0]*percentage/100)
@@ -341,5 +341,5 @@ def cluster_with_dbscan(paths, snapshots, all_coordinates, out_freq=1, topology=
 
 
 if __name__ == "__main__":
-    criteria1, criteria2, criteria3, ad_steps, path, out_freq, output, numfolders, topology, skip_first, resname, percentage, tresh, cpus = parse_args()
-    main(criteria1, criteria2, criteria3, ad_steps, path, out_freq, output, numfolders, topology, skip_first, resname, percentage, tresh, cpus)
+    criteria1, criteria2, criteria3, ad_steps, path, out_freq, output, numfolders, topology, skip_first, resname, percentage, thresh, cpus = parse_args()
+    main(criteria1, criteria2, criteria3, ad_steps, path, out_freq, output, numfolders, topology, skip_first, resname, percentage, thresh, cpus)
