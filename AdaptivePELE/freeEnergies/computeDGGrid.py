@@ -15,7 +15,7 @@ def parse_arguments():
     """
         Create command-line interface
     """
-    desc = "Plot information related to an MSM"
+    desc = "Compute dG, stdDG for different lengths and number of trajectories"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("-l", "--lagtime", type=int, default=100, help="Lagtimes to use, default 100")
     parser.add_argument("-c", "--cluster", type=int, default=100, help="Number of clusters to use, default 100")
@@ -26,22 +26,29 @@ def parse_arguments():
     parser.add_argument("-n", type=int, default=10, help="Number of iterations for the cross validation")
     parser.add_argument("--skip_steps", type=int, default=0, help="Number of initial steps to skip")
     parser.add_argument("--out_path", type=str, default="", help="Path to store the output")
+    parser.add_argument("--cluster_each_iteration", action="store_true", help="Whether to cluster at each iteration, slower but more accurate results")
     args = parser.parse_args()
-    return args.lagtime, args.out_path, args.cluster, args.length_step, args.trajs_step, args.n, args.skip_steps, args.lengths, args.trajs
+    return args.lagtime, args.out_path, args.cluster, args.length_step, args.trajs_step, args.n, args.skip_steps, args.lengths, args.trajs, args.cluster_each_iteration
 
 
 def select_iteration_data(data, ntraj):
     return np.random.choice(range(len(data)), ntraj)
 
 
-def estimateDG(data, nruns, cl, lag, ntraj, len_traj, skipFirstSnaphots):
+def estimateDG(data, nruns, cl, lag, ntraj, len_traj, skipFirstSnaphots, cluster_each_iteration):
     deltaG = []
+    if not cluster_each_iteration:
+        clustering = coor.cluster_kmeans(data=data, k=cl, max_iter=500, stride=1)
     for _ in range(nruns):
         data_it = select_iteration_data(data, ntraj)
         data_it = [data[j][skipFirstSnaphots:len_traj] for j in data_it]
-        clustering = coor.cluster_kmeans(data=data_it, k=cl, max_iter=500, stride=1)
+        if cluster_each_iteration:
+            clustering = coor.cluster_kmeans(data=data_it, k=cl, max_iter=500, stride=1)
+            dtrajs = clustering.dtrajs
+        else:
+            dtrajs = clustering.assign(data_it)
         try:
-            MSM = msm.estimate_markov_model(clustering.dtrajs, lag)
+            MSM = msm.estimate_markov_model(dtrajs, lag)
             print("MSM estimated on %d states" % MSM.nstates)
         except Exception:
             print("Estimation error in %d clusters, %d lagtime, %d trajectories of %d steps" % (cl, lag, ntraj, len_traj))
@@ -55,7 +62,7 @@ def estimateDG(data, nruns, cl, lag, ntraj, len_traj, skipFirstSnaphots):
     return np.mean(deltaG), np.std(deltaG)
 
 
-def lengthVsNtrajs(data, nruns, lagtime, cl_num, lengths, ntrajs, outputFilename, cache, skipFirstSnaphots):
+def lengthVsNtrajs(data, nruns, lagtime, cl_num, lengths, ntrajs, outputFilename, cache, skipFirstSnaphots, cluster_each_iteration):
     nLengths = len(lengths)
     nNtrajs = len(ntrajs)
     results = np.zeros((nLengths, nNtrajs))
@@ -69,7 +76,7 @@ def lengthVsNtrajs(data, nruns, lagtime, cl_num, lengths, ntrajs, outputFilename
                     f.write("%d %d %f %f\n" % (length, ntraj, results[i][j], stdDev[i][j]))
                 continue
             print("Computing for length:%d and ntrajs:%d" % (length, ntraj))
-            results[i][j], stdDev[i][j] = estimateDG(data, nruns, cl_num, lagtime, ntraj, length, skipFirstSnaphots)
+            results[i][j], stdDev[i][j] = estimateDG(data, nruns, cl_num, lagtime, ntraj, length, skipFirstSnaphots, cluster_each_iteration)
             with open(outputFilename, 'a') as f:
                 f.write("%d %d %f %f\n" % (length, ntraj, results[i][j], stdDev[i][j]))
     return results, stdDev
@@ -98,11 +105,11 @@ def plotIsocostLines(extent, minCost, maxCost, steps=10):
         plt.plot(x, y, color="black")
 
 
-def main(lagtime, clusters, output_path, dlengths, dtrajs, nruns, skipFirstSnaphots, lengths, trajs):
+def main(lagtime, clusters, output_path, dlengths, dtrajs, nruns, skipFirstSnaphots, lengths, trajs, cluster_each_iteration):
     ilengths, flengths = lengths
-    lengths = list(range(ilengths, flengths, dlengths))
+    lengths = list(range(ilengths, flengths+1, dlengths))
     itrajs, ftrajs = trajs
-    ntrajs = list(range(itrajs, ftrajs, dtrajs))
+    ntrajs = list(range(itrajs, ftrajs+1, dtrajs))
     if not lengths:
         raise ValueError("Length values wrongly specified, ensure that the lengths are provided in the format lower bound - upper bound")
     if not ntrajs:
@@ -128,11 +135,11 @@ def main(lagtime, clusters, output_path, dlengths, dtrajs, nruns, skipFirstSnaph
     saveResultsFileBckp(outputFilename)
 
     with open(outputFilename, 'w') as f:
-        f.write("Computing DG, stdDG, DB and stdDB for different lengths and number of trajectories\n")
+        f.write("Computing DG, stdDG for different lengths and number of trajectories\n")
         f.write("Lengths: %s\n" % lengths)
         f.write("Ntrajs: %s\n" % ntrajs)
         f.write("Skipping first: %d snapshots of each trajectory\n" % skipFirstSnaphots)
-    results, stdDev = lengthVsNtrajs(data, nruns, lagtime, clusters, lengths, ntrajs, outputFilename, cache, skipFirstSnaphots)
+    results, stdDev = lengthVsNtrajs(data, nruns, lagtime, clusters, lengths, ntrajs, outputFilename, cache, skipFirstSnaphots, cluster_each_iteration)
     np.save("results.npy", results)
     np.save("stdDev.npy", stdDev)
 
@@ -142,15 +149,19 @@ def main(lagtime, clusters, output_path, dlengths, dtrajs, nruns, skipFirstSnaph
     plt.imshow(results, interpolation="nearest", origin="lower", aspect="auto", extent=extent)
     # plt.imshow(results, interpolation="nearest", origin="lower", aspect="auto", extent=extent, vmin=-7, vmax=-5)
     plt.colorbar()
+    plt.xlabel("Number of trajectories")
+    plt.ylabel("Length of trajectories")
     plt.savefig(os.path.join(output_path, "dgGrid_%d_%d_rough.png" % (ftrajs, flengths)))
     plt.figure(2)
     plotIsocostLines(extent, (ilengths+dlengths)*(itrajs+dtrajs), (flengths-dlengths)*(ftrajs-dtrajs), 6)
     plt.imshow(results, interpolation="bilinear", origin="lower", aspect="auto", extent=extent)
     plt.colorbar()
+    plt.xlabel("Number of trajectories")
+    plt.ylabel("Length of trajectories")
     plt.savefig(os.path.join(output_path, "dgGrid_%d_%d_finer.png" % (ftrajs, flengths)))
     plt.show()
 
 
 if __name__ == "__main__":
-    lags, out_path, cl_val, lengths_step, traj_step, n, skipSteps, lengths_vals, trajs_vals = parse_arguments()
-    main(lags, cl_val, out_path, lengths_step, traj_step, n, skipSteps, lengths_vals, trajs_vals)
+    lags, out_path, cl_val, lengths_step, traj_step, n, skipSteps, lengths_vals, trajs_vals, cl_iteration = parse_arguments()
+    main(lags, cl_val, out_path, lengths_step, traj_step, n, skipSteps, lengths_vals, trajs_vals, cl_iteration)
