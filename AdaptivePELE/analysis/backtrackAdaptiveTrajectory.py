@@ -63,15 +63,20 @@ def main(trajectory, snapshot, epoch, outputPath, out_filename, topology, use_pd
     while True:
         filename = glob.glob(os.path.join(pathPrefix, epoch, "*traj*_%d.*" % trajectory))
         snapshots = utilities.getSnapshots(filename[0], topology=topology, use_pdb=use_pdb)
+        if epoch == '0':
+            initial = 0
+        else:
+            # avoid repeating the initial snapshot
+            initial = 1
         if not isinstance(snapshots[0], basestring):
             new_snapshots = []
-            for i in range(snapshot+1):
+            for i in range(initial, snapshot+1):
                 PDB = atomset.PDB()
                 PDB.initialise(snapshots[i], topology=topology_contents)
                 new_snapshots.append(PDB.pdb)
             snapshots = new_snapshots
         else:
-            snapshots = snapshots[:snapshot+1]
+            snapshots = snapshots[initial:snapshot+1]
         pathway.insert(0, snapshots)
         if epoch == '0':
             # Once we get to epoch 0, we just need to append the trajectory
@@ -82,8 +87,11 @@ def main(trajectory, snapshot, epoch, outputPath, out_filename, topology, use_pd
         epoch = str(epoch)
     sys.stderr.write("Writing pathway...\n")
     with open(outputPath+out_filename, "a") as f:
-        f.write("ENDMDL\n".join(itertools.chain.from_iterable(pathway)))
-
+        if topology:
+            #Quick fix to avoid problems when visualizing with PyMol
+            f.write("ENDMDL\nMODEL     2\n".join(itertools.chain.from_iterable(pathway)))
+        else:
+            f.write("ENDMDL\n".join(itertools.chain.from_iterable(pathway)))
 
 if __name__ == "__main__":
     traj, num_snapshot, num_epoch, output_path, output_filename, top, use_pdb = parseArguments()
