@@ -20,9 +20,8 @@ def parseArguments():
     """
         Parse the command-line options
 
-        :returns: :py:class:`.Clustering`, int, int, int, str -- Clustering
-            object, number of trajectory, number of snapshot, number of epoch,
-            output path where to write the files
+        :returns: int, int, int, str, str, str --  number of trajectory, number of snapshot, number of epoch,
+            output path where to write the files, name of the files, name of the topology
     """
     desc = "Write the information related to the conformation network to file\n"
     parser = argparse.ArgumentParser(description=desc)
@@ -62,7 +61,9 @@ def main(trajectory, snapshot, epoch, outputPath, out_filename, topology, use_pd
     sys.stderr.write("Creating pathway...\n")
     while True:
         filename = glob.glob(os.path.join(pathPrefix, epoch, "*traj*_%d.*" % trajectory))
-        snapshots = utilities.getSnapshots(filename[0], topology=topology, use_pdb=use_pdb)
+        if not filename:
+            raise ValueError("Trajectory %s not found!" % os.path.join(pathPrefix, epoch, "*traj*_%d.*" % trajectory))
+        snapshots = utilities.getSnapshots(filename[0])
         if epoch == '0':
             initial = 0
         else:

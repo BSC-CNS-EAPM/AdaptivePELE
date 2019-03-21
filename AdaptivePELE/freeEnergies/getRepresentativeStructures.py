@@ -19,6 +19,19 @@ def parseArgs():
     return args
 
 
+def getExtractInfo(clusters_info):
+    extract_info = {}
+    for row in clusters_info:
+        # write information as {[epoch, traj]: [cluster, snapshot]}
+        index = (row[1], row[2])
+        value = (row[0], row[3])
+        if index in extract_info:
+            extract_info[index].append(value)
+        else:
+            extract_info[index] = [value]
+    return extract_info
+
+
 def main(representatives_files, path_structures, output="", clusters=None, trajNames="trajectory", topology=None):
     if clusters is None:
         clusters = ['a']
@@ -31,15 +44,7 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
     if clusters != ['a']:
         clusters_info = clusters_info[map(int, clusters)]
 
-    extract_info = {}
-    for row in clusters_info:
-        # write information as {[epoch, traj]: [cluster, snapshot]}
-        index = (row[1], row[2])
-        value = (row[0], row[3])
-        if index in extract_info:
-            extract_info[index].append(value)
-        else:
-            extract_info[index] = [value]
+    extract_info = getExtractInfo(clusters_info)
 
     # Write appropiate pdbs
     destFolder = output
@@ -64,7 +69,10 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
         topology_contents = None
 
     for trajFile, extraInfo in extract_info.items():
-        pdbFile = glob.glob(structureFolder % trajFile)[0]
+        try:
+            pdbFile = glob.glob(structureFolder % trajFile)[0]
+        except IndexError:
+            raise ValueError("Structure %s not found" % (structureFolder % trajFile))
         try:
             snapshots = utilities.getSnapshots(pdbFile, topology=topology)
         except IOError:

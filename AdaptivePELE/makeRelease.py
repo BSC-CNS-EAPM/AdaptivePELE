@@ -10,6 +10,7 @@ import os
 import subprocess
 import argparse
 import AdaptivePELE as a
+from AdaptivePELE.utilities import utilities
 
 
 def parseArgs():
@@ -33,14 +34,19 @@ def main(releaseName):
             releaseFolder = "/gpfs/projects/bsc72/adaptiveSampling/bin"
         elif name == "nord3":
             releaseFolder = "/gpfs/projects/bsc72/adaptiveSampling/bin_nord"
+        elif name == "nvidia":
+            releaseFolder = "/gpfs/projects/bsc72/adaptiveSampling/bin_mt"
+        elif name == "power":
+            releaseFolder = "/gpfs/projects/bsc72/adaptiveSampling/bin_cte"
 
     if releaseName is None:
         releaseName = "v%s" % a.__version__
     toOmit = ["tests", "runAllTests.py", "os", "sys", "TODO.txt", "Data", "Documents", "DataLocal", "epsilon_values.txt", "makeRelease.py", ".git", ".gitignore"]
+    toOmit += ['runTestsCuda.sl', 'runMDTest.sl', 'runAllTests.sl', 'runAllTests_nord.sl', 'runTestsCuda_CTE.sl', 'AdaptiveTest_CUDA.err', 'AdaptiveTest_CUDA.out']
 
 
     files = glob.glob("*")
-
+    utilities.makeFolder(os.path.join(releaseFolder, releaseName))
     destFolder = os.path.join(releaseFolder, releaseName, "AdaptivePELE", "%s")
     for filename in files:
         if filename in toOmit or filename.startswith(".") or filename.endswith("pyc"):
