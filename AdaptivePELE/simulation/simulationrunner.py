@@ -1,13 +1,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-import time
 import os
+import sys
 import json
+import time
+import glob
 import shutil
 import string
-import sys
-import numpy as np
-import glob
 import itertools
+import numpy as np
+import mdtraj as md
 import multiprocessing as mp
 from builtins import range
 from AdaptivePELE.constants import constants, blockNames
@@ -34,6 +35,7 @@ try:
     from AdaptivePELE.simulation import openmm_simulations as sim
 except ImportError:
     OPENMM = False
+
 try:
     FileNotFoundError
 except NameError:
@@ -285,6 +287,18 @@ class SimulationRunner:
             baseReportName[0] = spawningReportName
             self.parameters.reportName = "_%d".join(baseReportName)
 
+    def processTrajectories(self, output_path, topology, epoch):
+        """
+            Post-process the simulation trajectories, i.e. superpose to initial frame
+
+            :param output_path: Path that contains the trajectories
+            :type output_path: str
+            :param topology: Topology object for the simulation
+            :type topology: :py:class:`.Topology`
+            :param epoch: Current epoch of the simulation
+            :type epoch: int
+        """
+        pass
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
@@ -840,6 +854,24 @@ class MDSimulation(SimulationRunner):
             Return the number of working processors, i.e. number of trajectories
         """
         return self.parameters.processors
+
+    def processTrajectories(self, output_path, topology, epoch):
+        """
+            Post-process the simulation trajectories, i.e. superpose to initial frame
+
+            :param output_path: Path that contains the trajectories
+            :type output_path: str
+            :param topology: Topology object for the simulation
+            :type topology: :py:class:`.Topology`
+            :param epoch: Current epoch of the simulation
+            :type epoch: int
+        """
+        trajectory_files = glob.glob(os.path.join(output_path, constants.AmberTemplates.trajectoryTemplate.replace("%d", "*") % self.parameters.format))
+        trajectory_files = [(traj, topology.getTopologyFile(epoch, utilities.getTrajNum(traj))) for traj in trajectory_files]
+        pool = mp.Pool(self.parameters.trajsPerReplica)
+        pool.map(processTraj, trajectory_files)
+        pool.close()
+        pool.join()
 
     def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, processManager, topologies=None):
         """
@@ -1481,3 +1513,17 @@ def updateConstraints(constraints_orig, constraints_map):
         atom2[2] = constraints_map[tuple(atom2[1:])]
         new_const.append([":".join([str(i) for i in atom1]), ":".join([str(i) for i in atom2]), str(dist)])
     return new_const
+
+def processTraj(input_files):
+    """
+        Align a single trajectory file (helper function for parallelization)
+
+        :param input_files: Tuple with (trajectory_file, topology_file)
+        :type input_files: tuple
+    """
+    traj_file, top_file = input_files
+    t = md.load(traj_file, top=top_file)
+    backbone_selection = t.top.select("backbone")
+    t.image_molecules()
+    t.superpose(t, atom_indices=backbone_selection)
+    t.save(traj_file)

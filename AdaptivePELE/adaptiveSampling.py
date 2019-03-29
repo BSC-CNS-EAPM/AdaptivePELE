@@ -716,6 +716,7 @@ def main(jsonParams, clusteringHook=None):
         processManager.barrier()
 
         if processManager.isMaster():
+            simulationRunner.processTrajectories(outputPathConstants.epochOutputPathTempletized % i, topologies, i)
             utilities.print_unbuffered("Clustering...")
             startTime = time.time()
             clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies, outputPathConstants)
