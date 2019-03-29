@@ -657,8 +657,8 @@ def getCpuCount():
     elif "mn.bsc" in machine:
         # nord3
         cores = os.getenv("LSB_DJOB_NUMPROC", None)
-    elif "bsc.mn" in machine:
-        # MNIV
+    elif "bsc.mn" in machine or "bullx" in machine or "power" in machine:
+        # MNIV, MinoTauro or CTE-Power
         cores = os.getenv("SLURM_NPROCS", None)
     try:
         cores = int(cores)
