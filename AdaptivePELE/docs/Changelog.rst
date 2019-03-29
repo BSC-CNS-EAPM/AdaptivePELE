@@ -25,6 +25,8 @@ Bug fixes:
 Behaviour changes from previous version:
 ........................................
 
+    - Now the MSMClustering with PELE simulation repeats the rejected steps
+
 
 1.6 - 2019-02-19
 ----------------

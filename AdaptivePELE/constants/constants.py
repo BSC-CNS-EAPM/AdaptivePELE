@@ -65,18 +65,18 @@ class AmberTemplates:
                     "savepdb COMPLX $SOLVATED_PDB\n" \
                     "quit"
     tleapTemplatenoLigand = "source $FORCEFIELD\n" \
-                    "source leaprc.gaff\n" \
-                    "source leaprc.water.tip3p\n" \
-                    "$MODIFIED_RES " \
-                    "$DUM " \
-                    "COMPLX = loadpdb $COMPLEX\n" \
-                    "$BONDS " \
-                    "addions COMPLX Cl- 0\n" \
-                    "addions COMPLX Na+ 0\n" \
-                    "solvatebox COMPLX TIP3PBOX $BOXSIZE\n" \
-                    "saveamberparm COMPLX $PRMTOP $INPCRD\n" \
-                    "savepdb COMPLX $SOLVATED_PDB\n" \
-                    "quit"
+                            "source leaprc.gaff\n" \
+                            "source leaprc.water.tip3p\n" \
+                            "$MODIFIED_RES " \
+                            "$DUM " \
+                            "COMPLX = loadpdb $COMPLEX\n" \
+                            "$BONDS " \
+                            "addions COMPLX Cl- 0\n" \
+                            "addions COMPLX Na+ 0\n" \
+                            "solvatebox COMPLX TIP3PBOX $BOXSIZE\n" \
+                            "saveamberparm COMPLX $PRMTOP $INPCRD\n" \
+                            "savepdb COMPLX $SOLVATED_PDB\n" \
+                            "quit"
     DUM_atom = "DUM"
     DUM_res = "DUM"
     DUM_prep = "  0  0  0\n" \
@@ -90,23 +90,45 @@ class AmberTemplates:
                "   2 DUMM  DU  M  1   0  -1  1.0000    0.0000    0.0000   0.000\n" \
                "   3 DUMM  DU  M  2   1   0  1.0000   90.0000    0.0000   0.000\n" \
                "   4 %s    C  E  0.00 0.00 0.00  0.00\n" \
-               "   5 %s    C  E  0.00 0.00 0.00  0.00\n" \
-               "   6 %s    C  E  0.00 0.00 0.00  0.00\n" \
                "\n" \
                "\n" \
                "DONE\n" \
                "STOP\n" \
-               "\n" % (DUM_res, DUM_res, DUM_res, DUM_atom, DUM_atom+"B", DUM_atom+"T")
+               "\n" % (DUM_res, DUM_res, DUM_res, DUM_atom)
+    DUM_cyl_prep = "  0  0  0\n" \
+                   "\n" \
+                   "------%s--------------\n" \
+                   "%s\n" \
+                   "%s   INT  0\n" \
+                   "CHANGE OMIT DU  BEG\n" \
+                   " 0.0\n" \
+                   "   1 DUMM  DU  M  0  -1  -2  0.000     0.000     0.000    0.000\n" \
+                   "   2 DUMM  DU  M  1   0  -1  1.0000    0.0000    0.0000   0.000\n" \
+                   "   3 DUMM  DU  M  2   1   0  1.0000   90.0000    0.0000   0.000\n" \
+                   "   4 %s    C  E  0.00 0.00 0.00  0.00\n" \
+                   "   5 %s    C  E  0.00 0.00 0.00  0.00\n" \
+                   "   6 %s    C  E  0.00 0.00 0.00  0.00\n" \
+                   "\n" \
+                   "\n" \
+                   "DONE\n" \
+                   "STOP\n" \
+                   "\n" % (DUM_res, DUM_res, DUM_res, DUM_atom, DUM_atom+"B", DUM_atom+"T")
     DUM_frcmod = "invented MM atom\n" \
                  "MASS\n" \
                  "%s     0.00     0.00\n" \
-                 "%s     0.00     0.00\n" \
-                 "%s     0.00     0.00\n" \
                  "\n" \
                  "NONB\n" \
-                 "  %s        0.00     0.00\n" \
-                 "  %s        0.00     0.00\n" \
-                 "  %s        0.00     0.00\n" % (DUM_atom, DUM_atom+"B", DUM_atom+"T", DUM_atom, DUM_atom+"B", DUM_atom+"T")
+                 "  %s        0.00     0.00\n" % (DUM_atom, DUM_atom)
+    DUM_cyl_frcmod = "invented MM atom\n" \
+                     "MASS\n" \
+                     "%s     0.00     0.00\n" \
+                     "%s     0.00     0.00\n" \
+                     "%s     0.00     0.00\n" \
+                     "\n" \
+                     "NONB\n" \
+                     "  %s        0.00     0.00\n" \
+                     "  %s        0.00     0.00\n" \
+                     "  %s        0.00     0.00\n" % (DUM_atom, DUM_atom+"B", DUM_atom+"T", DUM_atom, DUM_atom+"B", DUM_atom+"T")
 
     trajectoryTemplate = "trajectory_%d.%s"
     CheckPointReporterTemplate = "checkpoint_%d.chk"

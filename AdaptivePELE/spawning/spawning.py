@@ -1190,7 +1190,7 @@ class MSMCalculator(SpawningCalculator):
 
     def __init__(self, parameters):
         if not PYEMMA:
-            raise utilities.UnsatisfiedDependencyException("Pyemma module is necessary ot use MSM based spawning")
+            raise utilities.UnsatisfiedDependencyException("Pyemma module is necessary to use MSM based spawning")
         SpawningCalculator.__init__(self)
         self.type = "BaseClass"  # change for abstract attribute
         self.parameters = parameters

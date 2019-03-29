@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ### Behaviour changes from previous version:
 
+    - Now the MSMClustering with PELE simulation repeats the rejected steps
 
 ## [1.6] - 2019-02-19
 

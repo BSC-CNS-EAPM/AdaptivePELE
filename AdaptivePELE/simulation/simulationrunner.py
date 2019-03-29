@@ -114,6 +114,12 @@ class SimulationRunner:
         """
         return self.parameters.processors
 
+    def getClusteringInfo(self):
+        """
+            Return information relevant for MSMClustering
+        """
+        return True, self.parameters.peleSteps
+
     def getNumReplicas(self):
         """
             Return the number of replicas, only useful for MD simulations
@@ -304,6 +310,12 @@ class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
         SimulationRunner.__init__(self, parameters)
         self.type = simulationTypes.SIMULATION_TYPE.PELE
+
+    def getClusteringInfo(self):
+        """
+            Return information relevant for MSMClustering
+        """
+        return False, self.parameters.peleSteps
 
     def createSymbolicLinks(self):
         """
@@ -938,10 +950,16 @@ class MDSimulation(SimulationRunner):
             Tleapdict["FRCMOD"] = os.path.join(self.parameters.customparamspath, Tleapdict["FRCMOD"])
             amber_file_path = self.parameters.customparamspath
         if self.parameters.boxCenter or self.parameters.cylinderBases:
+            if self.parameters.boxType == blockNames.SimulationParams.sphere:
+                prep_template = constants.AmberTemplates.DUM_prep
+                frcmod_template = constants.AmberTemplates.DUM_frcmod
+            elif self.parameters.boxType == blockNames.SimulationParams.cylinder:
+                prep_template = constants.AmberTemplates.DUM_cyl_prep
+                frcmod_template = constants.AmberTemplates.DUM_cyl_frcmod
             with open(os.path.join(amber_file_path, "%s.prep" % constants.AmberTemplates.DUM_res), "w") as fw:
-                fw.write(constants.AmberTemplates.DUM_prep)
+                fw.write(prep_template)
             with open(os.path.join(amber_file_path, "%s.frcmod" % constants.AmberTemplates.DUM_res), "w") as fw:
-                fw.write(constants.AmberTemplates.DUM_frcmod)
+                fw.write(frcmod_template)
 
         processManager.barrier()
         if self.parameters.constraints is not None:

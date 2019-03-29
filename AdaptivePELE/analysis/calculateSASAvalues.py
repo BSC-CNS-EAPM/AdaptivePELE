@@ -7,7 +7,6 @@ import mdtraj as md
 import multiprocessing as mp
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.analysis import correctRMSD
-from AdaptivePELE.freeEnergies.extractCoords import getTopologyObject
 
 
 def parseArguments():
@@ -137,7 +136,7 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
     pool = mp.Pool(nProcessors)
     epochs = utilities.get_epoch_folders(folder)
     if top is not None:
-        top_obj = getTopologyObject(top)
+        top_obj = utilities.getTopologyObject(top)
     else:
         top_obj = None
     files = []

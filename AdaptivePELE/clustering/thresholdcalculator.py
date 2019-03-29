@@ -81,7 +81,7 @@ class ThresholdCalculatorConstant(ThresholdCalculator):
         return self.value
 
     def __eq__(self, other):
-        return self.type == other.type and self.value == other.value
+        return (self.type, self.value) == (other.type, other.value)
 
     def getMaxThreshold(self):
         """
