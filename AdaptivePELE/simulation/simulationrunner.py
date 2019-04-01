@@ -1016,6 +1016,7 @@ class MDSimulation(SimulationRunner):
 
         for worker in workers:
             newInitialStructures.append(worker.get())
+        pool.terminate()
         endTime = time.time()
         utilities.print_unbuffered("Equilibration took %.2f sec" % (endTime - startTime))
         return newInitialStructures
@@ -1149,6 +1150,7 @@ class MDSimulation(SimulationRunner):
             workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.parameters.ligandName, processManager.id, self.parameters.trajsPerReplica, self.restart)))
         for worker in workers:
             worker.get()
+        pool.terminate()
         endTime = time.time()
         self.restart = False
         utilities.print_unbuffered("OpenMM took %.2f sec" % (endTime - startTime))
