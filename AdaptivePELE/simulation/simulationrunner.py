@@ -8,8 +8,9 @@ import shutil
 import string
 import itertools
 import numpy as np
-import mdtraj as md
+import MDAnalysis as MDA
 import multiprocessing as mp
+from MDAnalysis.analysis import align
 from builtins import range
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
@@ -305,6 +306,7 @@ class SimulationRunner:
             :type epoch: int
         """
         pass
+
 
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
@@ -1149,6 +1151,7 @@ class MDSimulation(SimulationRunner):
             workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.parameters.ligandName, processManager.id, self.parameters.trajsPerReplica, self.restart)))
         for worker in workers:
             worker.get()
+        pool.terminate()
         endTime = time.time()
         self.restart = False
         utilities.print_unbuffered("OpenMM took %.2f sec" % (endTime - startTime))
@@ -1532,6 +1535,7 @@ def updateConstraints(constraints_orig, constraints_map):
         new_const.append([":".join([str(i) for i in atom1]), ":".join([str(i) for i in atom2]), str(dist)])
     return new_const
 
+
 def processTraj(input_files):
     """
         Align a single trajectory file (helper function for parallelization)
@@ -1540,8 +1544,9 @@ def processTraj(input_files):
         :type input_files: tuple
     """
     traj_file, top_file = input_files
-    t = md.load(traj_file, top=top_file)
-    backbone_selection = t.top.select("backbone")
-    t.image_molecules()
-    t.superpose(t, atom_indices=backbone_selection)
-    t.save(traj_file)
+    new_file = "%s_new%s" % os.path.splitext(traj_file)
+    t = MDA.Universe(top_file, traj_file)
+    t.atoms.wrap()
+    alignment = align.AlignTraj(t, t, select="backbone", filename=new_file)
+    alignment.run()
+    os.rename(new_file, traj_file)
