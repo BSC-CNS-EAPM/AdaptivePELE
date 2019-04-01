@@ -384,7 +384,7 @@ class PDBManager:
             dum_residue = Residue(chain, AdaptivePELE.constants.constants.AmberTemplates.DUM_res, 1)
         else:
             dum_residue = Residue(chain, AdaptivePELE.constants.constants.AmberTemplates.DUM_res, residue.num+1)
-        Atom(dum_residue, AdaptivePELE.constants.constants.AmberTemplates.DUM_atom, boxCenter, 1.00, 0.00)
+        Atom(dum_residue, AdaptivePELE.constants.constants.AmberTemplates.DUM_atom, np.round(boxCenter, decimals=3), 1.00, 0.00)
         if cylinderBases is not None:
             # round to 3 decimals the positions so that it fits the PDB format,
             # otherwise AmberTools crashes
