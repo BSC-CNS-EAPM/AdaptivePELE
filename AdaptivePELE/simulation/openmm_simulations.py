@@ -67,8 +67,8 @@ class ForceReporter(object):
 
 class XTCReporter(_BaseReporter):
     """
-    XTCReporter stores a molecular dynamics trajectory in the GROMACS xtc
-    format
+        XTCReporter stores a molecular dynamics trajectory in the GROMACS xtc
+        format
 
         :param file: Either an open XTCTrajectoryFile object to write to, or a string
         specifying the filename of a new XTC file to save the trajectory to.
