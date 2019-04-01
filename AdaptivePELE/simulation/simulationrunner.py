@@ -1018,6 +1018,7 @@ class MDSimulation(SimulationRunner):
 
         for worker in workers:
             newInitialStructures.append(worker.get())
+        pool.terminate()
         endTime = time.time()
         utilities.print_unbuffered("Equilibration took %.2f sec" % (endTime - startTime))
         return newInitialStructures
