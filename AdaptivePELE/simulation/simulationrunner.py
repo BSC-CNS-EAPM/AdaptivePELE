@@ -880,6 +880,7 @@ class MDSimulation(SimulationRunner):
             :param epoch: Current epoch of the simulation
             :type epoch: int
         """
+        print("Processing trajectories for epoch", epoch)
         trajectory_files = glob.glob(os.path.join(output_path, constants.AmberTemplates.trajectoryTemplate.replace("%d", "*") % self.parameters.format))
         trajectory_files = [(traj, topology.getTopologyFile(epoch, utilities.getTrajNum(traj))) for traj in trajectory_files]
         pool = mp.Pool(self.parameters.trajsPerReplica)
@@ -1466,7 +1467,7 @@ class RunnerBuilder:
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
             params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
             params.constraints = paramsBlock.get(blockNames.SimulationParams.constraints)
-            if params.ligandName is None and params.boxCenter is not None:
+            if params.ligandName is None and (params.boxCenter is not None or params.cylinderBases is not None):
                 raise utilities.ImproperParameterValueException("Ligand name is necessary to establish the box")
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
