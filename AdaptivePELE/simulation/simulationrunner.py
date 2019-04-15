@@ -889,6 +889,7 @@ class MDSimulation(SimulationRunner):
             :param epoch: Current epoch of the simulation
             :type epoch: int
         """
+        print("Processing trajectories for epoch", epoch)
         trajectory_files = glob.glob(os.path.join(output_path, constants.AmberTemplates.trajectoryTemplate.replace("%d", "*") % self.parameters.format))
         trajectory_files = [(traj, topology.getTopologyFile(epoch, utilities.getTrajNum(traj))) for traj in trajectory_files]
         pool = mp.Pool(self.parameters.trajsPerReplica)
