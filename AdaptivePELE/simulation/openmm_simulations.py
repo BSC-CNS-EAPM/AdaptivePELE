@@ -564,10 +564,14 @@ def getLastStep(reportfile):
     try:
         with open(reportfile, "r") as inp:
             report = inp.read()
-        last_step = report.split("\n")[-2].split("\t")[0]
+        lines = report.split("\n")
+        if len(lines) <= 2:
+            # filter if only a header is found
+            return 0
+        last_step = int(lines[-2].split("\t")[0])
     except FileNotFoundError:
-        last_step = 0
-    return int(last_step)
+        return 0
+    return last_step
 
 
 def getDeviceIndexStr(deviceIndex, devicesPerTraj, devicesPerReplica=None):
@@ -714,7 +718,7 @@ def addLigandCylinderBox(topology, positions, system, resname, dummies, radius, 
     forceFB = mm.CustomCompoundBondForce(3, '(step(r_par-2*r_l)+step(-r_par))*(k_box/2) * (r_par-r_l)^2; r_par=ax*dx+ay*dy+az*dz; ax=(x1-x2)/l; ay=(y1-y2)/l; az=(z1-z2)/l; dx=x3-x2; dy=y3-y2; dz=z3-z2; l=distance(p1, p2)')
     forceFB.addPerBondParameter("k_box")
     forceFB.addPerBondParameter("r_l")
-    #forceFB.addBond(center, ligand_atom, [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, length*unit.nanometers])
+    # forceFB.addBond(center, ligand_atom, [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, length*unit.nanometers])
     forceFB.addBond([center, base, ligand_atom], [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, length*unit.nanometers])
     forceFB.setUsesPeriodicBoundaryConditions(True)
     system.addForce(forceFB)
