@@ -85,7 +85,7 @@ class XTCReporter(_BaseReporter):
     def backend(self):
         return XTCTrajectoryFile
 
-    def __init__(self, file, reportInterval, atomSubset=None, append=False):
+    def __init__(self, file, reportInterval, atomSubset=None, append=False, enforcePeriodicBox=True):
         if append:
             if isinstance(file, basestring):
                 with self.backend(file, 'r') as f:
@@ -96,8 +96,30 @@ class XTCReporter(_BaseReporter):
                 raise TypeError("I don't know how to handle %s" % file)
         super(XTCReporter, self).__init__(file, reportInterval, coordinates=True, time=True, cell=True, potentialEnergy=False,
                                           kineticEnergy=False, temperature=False, velocities=False, atomSubset=atomSubset)
+        self._enforcePeriodicBox = enforcePeriodicBox
         if append:
             self._traj_file.write(*contents)
+
+    def describeNextReport(self, simulation):
+        """
+            Get information about the next report this object will generate.
+
+            Parameters
+            ----------
+            simulation : Simulation
+                The Simulation to generate a report for
+
+            Returns
+            -------
+            tuple
+                A six element tuple. The first element is the number of steps
+                until the next report. The next four elements specify whether
+                that report will require positions, velocities, forces, and
+                energies respectively.  The final element specifies whether
+                positions should be wrapped to lie in a single periodic box.
+        """
+        steps = self._reportInterval - simulation.currentStep%self._reportInterval
+        return (steps, self._coordinates, self._velocities, False, self._needEnergy, self._enforcePeriodicBox)
 
     def report(self, simulation, state):
         """
