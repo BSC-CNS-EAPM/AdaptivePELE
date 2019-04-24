@@ -4,6 +4,7 @@ import re
 from io import StringIO, open
 cimport cython
 cimport numpy as np
+from libc.math cimport abs
 # try:
 #     # Check if the basestring type if available, this will fail in python3
 #     basestring
@@ -140,6 +141,23 @@ _AMINO_ACID_CODES =  {'ACE': None, 'NME':  None, '00C': 'C', '01W':  'X', '02K':
 'XDT': 'T', 'XPL':  'O', 'XPR': 'P', 'XSN': 'N', 'XX1':  'K', 'YCM': 'C', 'YOF':
 'Y', 'YTH':  'T', 'Z01': 'A',  'ZAL': 'A', 'ZCL':  'F', 'ZFB': 'X',  'ZU0': 'T',
 'ZZJ': 'A'}
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+cdef bint check_add_TER(basestring prevLine, basestring line):
+    cdef basestring prevres = prevLine[22:26], res = line[22:26]
+    cdef int prevres_num = int(prevres), resnum = int(res)
+    cdef basestring resname, prevresname, prevAtomtype, atomtype
+    if abs(prevres_num - resnum) > 1:
+        return True
+    resname = line[17:20]
+    prevresname = prevLine[17:20]
+    prevAtomtype = prevLine[0:6]
+    atomtype = line[0:6]
+    if prevres != res and (("HOH" == resname or "HOH" == prevresname) or (atomtype != prevAtomtype) or (prevAtomtype == atomtype == "HETATM")):
+        return True
+    return False
 
 REGEX_PATTERN = re.compile("[0-9]|\+|\-")
 
@@ -789,7 +807,7 @@ cdef class PDB:
         cdef unsigned int i
         for i in range(natoms):
             line = topology[i]
-            if prevLine is not None and (prevLine[21] != line[21] or (prevLine[22:26] != line[22:26] and (u"HOH" == line[17:20] or u"HOH" == prevLine[17:20])) or (prevLine[0:4] == "ATOM" and line[0:6] == "HETATM") or (prevLine[0:6] == "HETATM" and line[0:6] == "HETATM" and (prevLine[22:26] != line[22:26]))):
+            if prevLine is not None and (prevLine[21] != line[21] or check_add_TER(prevLine, line)):
                 pdb.append(u"TER\n")
             x = (temp % frame[i, 0]).rjust(8)
             y = (temp % frame[i, 1]).rjust(8)
