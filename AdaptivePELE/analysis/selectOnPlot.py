@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-#title           :selectOnPlot.py
-#description     :Generates a scatterplot where you can draw and select specific dots.
-#author          :Carles Perez Lopez
-#date            :20190219
-#python_version  :3.6.5
-#==============================================================================
+# title           :selectOnPlot.py
+# description     :Generates a scatterplot where you can draw and select specific dots.
+# author          :Carles Perez Lopez
+# date            :20190219
+# python_version  :3.6.5
+# ==============================================================================
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import os
@@ -14,11 +14,15 @@ import multiprocessing as mp
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import shutil
 from matplotlib.widgets import LassoSelector
 from matplotlib.path import Path
-from AdaptivePELE.atomset import RMSDCalculator, atomset
+from AdaptivePELE.atomset import atomset
 import AdaptivePELE.utilities.utilities as adapt_tools
+
+try:
+    FileExistsError
+except NameError:
+    FileExistsError = OSError
 
 
 def parseArguments():
@@ -64,8 +68,7 @@ def parseArguments():
 
     args = parser.parse_args()
 
-    return args.res_path, args.xcol, args.ycol, args.zcol, args.outfol, args.done, args.cpus, args.report, args.traj, \
-           args.sep
+    return args.res_path, args.xcol, args.ycol, args.zcol, args.outfol, args.done, args.cpus, args.report, args.traj, args.sep
 
 
 class SelectFromCollection(object):
@@ -152,7 +155,7 @@ def concat_reports_in_csv(adaptive_results_path, output_file_path, report_prefix
                 pandas_df = pd.read_csv(report, sep="    ", engine="python", index_col=False, header=0)
                 pandas_df["epoch"] = adaptive_epoch
                 pandas_df["trajectory"] = glob.glob("{}/{}/*{}{}.*".format(adaptive_results_path, adaptive_epoch,
-                                                                          trajectory_prefix, n + 1))[0]
+                                                                           trajectory_prefix, n + 1))[0]
                 dataframe_lists.append(pandas_df)
         else:
             break
@@ -208,9 +211,8 @@ def get_pdb_from_xtc(row, pdbs_output_path, column_file="trajectory"):
     snapshot = row["numberOfAcceptedPeleSteps"]
     new_file_name = os.path.basename(foldername.split("/")[-1])
     new_file_name = new_file_name.split(".")[0]
-    trajectory_and_snapshot_to_pdb(filepath, snapshot, os.path.join(pdbs_output_path, "{}_epoch_{}_snap_{}.pdb".format(
-        new_file_name, epoch, snapshot)
-                                                                    ))
+    trajectory_and_snapshot_to_pdb(filepath, snapshot, os.path.join(pdbs_output_path,
+                                                                    "{}_epoch_{}_snap_{}.pdb".format(new_file_name, epoch, snapshot)))
     print(os.path.join(pdbs_output_path, "{}_epoch_{}_snap_{}.pdb".format(new_file_name, epoch, snapshot)))
 
 
@@ -229,14 +231,14 @@ def get_pdbs_from_df_in_xtc(df, pdbs_output_path, processors=4, column_file="tra
     """
     pool = mp.Pool(processes=processors)
     multiprocessing_list = []
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
         multiprocessing_list.append(pool.apply_async(get_pdb_from_xtc,
                                                      (row, pdbs_output_path, column_file)))
     for process in multiprocessing_list:
         process.get()
 
 
-def main(adaptive_results_folder,  column_to_x="epoch", column_to_y="Binding Energy", column_to_z=None,
+def main(adaptive_results_folder, column_to_x="epoch", column_to_y="Binding Energy", column_to_z=None,
          output_selection_folder=None, summary_done=False, processors=4, report_pref="report_",
          trajectory_pref="trajectory_", separator=";", column_file="trajectory"):
     """
