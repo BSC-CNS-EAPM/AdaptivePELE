@@ -19,6 +19,10 @@ from matplotlib.path import Path
 from AdaptivePELE.atomset import atomset
 import AdaptivePELE.utilities.utilities as adapt_tools
 
+avail_backend = adapt_tools.get_available_backend()
+if avail_backend is not None:
+    plt.switch_backend(avail_backend)
+
 try:
     FileExistsError
 except NameError:
