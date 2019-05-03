@@ -762,3 +762,19 @@ def addDummyPositions(pos, center):
     quant = unit.quantity.Quantity(value=tuple(center), unit=unit.angstrom)
     pos2.append(quant.in_units_of(unit.nanometers))
     return pos2
+
+
+def debugSimulation(simulation, outputDir, workerNumber, parameters):
+    """
+        Add some debugging information for MD simulations that crash
+    """
+    simulation.reporters.append(ForceReporter(str(os.path.join(outputDir, "forces_%d" % workerNumber)), parameters.reporterFreq))
+    state = simulation.context.getState(getEnergy=True, getPositions=True)
+    utilities.print_unbuffered("Trajectory", workerNumber, "kinetic energy", state.getKineticEnergy(), "potential energy", state.getPotentialEnergy())
+    with open(str(os.path.join(outputDir, "initial_%d.pdb" % workerNumber)), 'w') as fw:
+        app.PDBFile.writeFile(simulation.topology, state.getPositions(), fw)
+    simulation.minimizeEnergy(maxIterations=parameters.minimizationIterations)
+    state = simulation.context.getState(getEnergy=True, getPositions=True)
+    utilities.print_unbuffered("After minimizing Trajectory", workerNumber, "kinetic energy", state.getKineticEnergy(), "potential energy", state.getPotentialEnergy())
+    with open(str(os.path.join(outputDir, "initial_min_%d.pdb" % workerNumber)), 'w') as fw:
+        app.PDBFile.writeFile(simulation.topology, state.getPositions(), fw)
