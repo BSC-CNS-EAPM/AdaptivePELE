@@ -571,9 +571,12 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=simulation_length, separator="\t",
                                                         append=restart, initialStep=lastStep))
+
     if workerNumber == 1:
         frequency = min(10 * parameters.reporterFreq, parameters.productionLength)
         simulation.reporters.append(app.StateDataReporter(sys.stdout, frequency, step=True))
+    if epoch_number > 0:
+        simulation.minimizeEnergy(maxIterations=parameters.minimizationIterations)
     simulation.step(simulation_length)
     stateData.close()
 
