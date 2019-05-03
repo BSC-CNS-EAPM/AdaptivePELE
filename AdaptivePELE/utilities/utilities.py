@@ -831,3 +831,22 @@ def getTopologyObject(topology_file):
         return readClusteringObject(topology_file)
     else:
         raise ValueError("The topology parameter needs to be the path to a pickled Topology object or a pdb!")
+
+
+def get_available_backend():
+    machine = socket.getfqdn()
+    if "bsccv" in machine:
+        # life cluster
+        return "webagg"
+    elif "mn.bsc" in machine:
+        # nord3
+        return "tkagg"
+    elif "bsc.mn" in machine:
+        # MNIV
+        return "qt5agg"
+    elif "bullx" in machine:
+        # MinoTauro
+        return "gtkagg"
+    elif "power" in machine:
+        # CTE-Power
+        return "tkagg"

@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.1
               </div>
             
           
@@ -971,6 +971,25 @@
         <span class="k">return</span> <span class="n">readClusteringObject</span><span class="p">(</span><span class="n">topology_file</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The topology parameter needs to be the path to a pickled Topology object or a pdb!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_available_backend"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.get_available_backend">[docs]</a><span class="k">def</span> <span class="nf">get_available_backend</span><span class="p">():</span>
+    <span class="n">machine</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">getfqdn</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;bsccv&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># life cluster</span>
+        <span class="k">return</span> <span class="s2">&quot;webagg&quot;</span>
+    <span class="k">elif</span> <span class="s2">&quot;mn.bsc&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># nord3</span>
+        <span class="k">return</span> <span class="s2">&quot;tkagg&quot;</span>
+    <span class="k">elif</span> <span class="s2">&quot;bsc.mn&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># MNIV</span>
+        <span class="k">return</span> <span class="s2">&quot;qt5agg&quot;</span>
+    <span class="k">elif</span> <span class="s2">&quot;bullx&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># MinoTauro</span>
+        <span class="k">return</span> <span class="s2">&quot;gtkagg&quot;</span>
+    <span class="k">elif</span> <span class="s2">&quot;power&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># CTE-Power</span>
+        <span class="k">return</span> <span class="s2">&quot;tkagg&quot;</span></div>
 </pre></div>
 
            </div>

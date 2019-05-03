@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.1
               </div>
             
           
@@ -90,8 +90,8 @@
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#adaptivesampling-module"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#automateroundsadaptive-module"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">analysis Package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.correctRMSD"><code class="docutils literal"><span class="pre">correctRMSD</span></code> Module</a></li>
@@ -169,36 +169,28 @@
 <div class="section" id="module-AdaptivePELE.analysis.correctRMSD">
 <span id="correctrmsd-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">correctRMSD</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.correctRMSD" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="AdaptivePELE.analysis.correctRMSD.extendReportWithRmsd">
-<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">extendReportWithRmsd</code><span class="sig-paren">(</span><em>reportFile</em>, <em>rmsds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#extendReportWithRmsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.extendReportWithRmsd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extend a previous report file with corrected rmsd values</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>reportFile</strong> (<em>np.ndarray</em>) – Report file to be corrected</li>
-<li><strong>rmsds</strong> (<em>np.ndarray</em>) – Rmsd corrected values</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.ndarray – Extended report file with corrected rmsd values</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
+<dt id="AdaptivePELE.analysis.correctRMSD.calculate_rmsd_traj">
+<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">calculate_rmsd_traj</code><span class="sig-paren">(</span><em>nativePDB</em>, <em>resname</em>, <em>symmetries</em>, <em>rmsdColInReport</em>, <em>traj</em>, <em>reportName</em>, <em>top</em>, <em>epoch</em>, <em>outputFilename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#calculate_rmsd_traj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.calculate_rmsd_traj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.correctRMSD.main">
-<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">main</code><span class="sig-paren">(</span><em>controlFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">main</code><span class="sig-paren">(</span><em>controlFile</em>, <em>trajName</em>, <em>reportName</em>, <em>folder</em>, <em>top</em>, <em>outputFilename</em>, <em>nProcessors</em>, <em>output_folder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the corrected rmsd values of conformation taking into account
 molecule symmetries</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>controlFile</strong> (<em>str</em>) – Control file</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>controlFile</strong> (<em>str</em>) – Control file</li>
+<li><strong>folder</strong> (<em>str</em>) – Path the simulation</li>
+<li><strong>top</strong> (<em>str</em>) – Path to the topology</li>
+<li><strong>outputFilename</strong> (<em>str</em>) – Name of the output file</li>
+<li><strong>nProcessors</strong> (<em>int</em>) – Number of processors to use</li>
+<li><strong>output_folder</strong> (<em>str</em>) – Path where to store the new reports</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>

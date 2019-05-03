@@ -1,12 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import glob
+import time
 import argparse
 import numpy as np
 import mdtraj as md
 import multiprocessing as mp
 from AdaptivePELE.utilities import utilities
-from AdaptivePELE.analysis import correctRMSD
+from AdaptivePELE.analysis import analysis_utils
 
 
 def parseArguments():
@@ -55,6 +56,7 @@ def calculateSASA(trajectory, topology, res_name):
 
 
 def process_file(traj, top_file, resname, report, outputFilename, format_out, new_report, epoch):
+    start = time.time()
     sasa_values = calculateSASA(traj, top_file, resname)
     header = ""
     if not new_report:
@@ -71,35 +73,17 @@ def process_file(traj, top_file, resname, report, outputFilename, format_out, ne
 
         fixedReport = correctRMSD.extendReportWithRmsd(reportFile, sasa_values)
     else:
-        fixedReport = sasa_values
+        indexes = np.array(range(sasa_values.shape[0]))
+        fixedReport = np.concatenate((indexes[:, None], sasa_values[:, None]), axis=1)
 
     with open(outputFilename, "w") as fw:
         if header:
             fw.write("%s\tSASA\n" % header)
         else:
-            fw.write("# SASA\n")
+            fw.write("# Step\tSASA\n")
         np.savetxt(fw, fixedReport, fmt=format_out, delimiter="\t")
-
-
-def process_folder(epoch, folder, trajName, reportName, output_filename, top):
-    if epoch is None:
-        allTrajs = glob.glob(os.path.join(folder, trajName))
-        full_reportName = os.path.join(folder, reportName)
-    else:
-        allTrajs = glob.glob(os.path.join(folder, epoch, trajName))
-        full_reportName = os.path.join(folder, epoch, reportName)
-        epoch = int(epoch)
-
-    allFiles = []
-    for traj in allTrajs:
-        trajNum = utilities.getTrajNum(traj)
-        if top is not None:
-            top_file = top.getTopologyFile(epoch, trajNum)
-        else:
-            top_file = None
-        report_file = full_reportName % trajNum
-        allFiles.append((traj, report_file, top_file, epoch, output_filename % trajNum))
-    return allFiles
+    end = time.time()
+    print("Took %.2fs to process" % (end-start), traj)
 
 
 def main(resname, folder, top, out_report_name, format_out, nProcessors, output_folder, new_report):
@@ -143,10 +127,10 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
     if not epochs:
         # path does not contain an adaptive simulation, we'll try to retrieve
         # trajectories from the specified path
-        files = process_folder(None, folder, trajName, reportName, os.path.join(folder, outputFilename), top_obj)
+        files = analysis_utils.process_folder(None, folder, trajName, reportName, os.path.join(folder, outputFilename), top_obj)
     for epoch in epochs:
         print("Epoch", epoch)
-        files.extend(process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj))
+        files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj))
     results = []
     for info in files:
         results.append(pool.apply_async(process_file, args=(info[0], info[2], resname, info[1], info[4], format_out, new_report, info[3])))

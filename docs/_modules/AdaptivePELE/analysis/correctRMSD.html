@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.1
               </div>
             
           
@@ -141,29 +141,12 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span>
 <span class="kn">import</span> <span class="nn">AdaptivePELE.atomset.atomset</span> <span class="k">as</span> <span class="nn">atomset</span>
-
-
-<div class="viewcode-block" id="extendReportWithRmsd"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.correctRMSD.extendReportWithRmsd">[docs]</a><span class="k">def</span> <span class="nf">extendReportWithRmsd</span><span class="p">(</span><span class="n">reportFile</span><span class="p">,</span> <span class="n">rmsds</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extend a previous report file with corrected rmsd values</span>
-
-<span class="sd">        :param reportFile: Report file to be corrected</span>
-<span class="sd">        :type reportFile: np.ndarray</span>
-<span class="sd">        :param rmsds: Rmsd corrected values</span>
-<span class="sd">        :type rmsds: np.ndarray</span>
-
-<span class="sd">        :returns: np.ndarray -- Extended report file with corrected rmsd values</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">newShape</span> <span class="o">=</span> <span class="n">reportFile</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">fixedReport</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">newShape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">newShape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-    <span class="n">fixedReport</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">reportFile</span>
-    <span class="n">fixedReport</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmsds</span>
-    <span class="k">return</span> <span class="n">fixedReport</span></div>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.analysis</span> <span class="k">import</span> <span class="n">analysis_utils</span>
 
 
 <div class="viewcode-block" id="parseArguments"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.correctRMSD.parseArguments">[docs]</a><span class="k">def</span> <span class="nf">parseArguments</span><span class="p">():</span>
@@ -179,14 +162,21 @@
            <span class="s2">&quot;{&quot;</span>\
            <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">resname</span><span class="se">\&quot;</span><span class="s2"> : </span><span class="se">\&quot;</span><span class="s2">K5Y</span><span class="se">\&quot;</span><span class="s2">,&quot;</span>\
            <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">native</span><span class="se">\&quot;</span><span class="s2"> : </span><span class="se">\&quot;</span><span class="s2">native.pdb</span><span class="se">\&quot;</span><span class="s2">,&quot;</span>\
-           <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">symmetries</span><span class="se">\&quot;</span><span class="s2"> : {[</span><span class="se">\&quot;</span><span class="s2">4122:C12:K5Y</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">4123:C13:K5Y</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="s2">4120:C10:K5Y</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">4127:C17:K5Y</span><span class="se">\&quot;</span><span class="s2">]},&quot;</span>\
+           <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">symmetries</span><span class="se">\&quot;</span><span class="s2"> : [{</span><span class="se">\&quot;</span><span class="s2">4122:C12:K5Y</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">4123:C13:K5Y</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="s2">4120:C10:K5Y</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">4127:C17:K5Y</span><span class="se">\&quot;</span><span class="s2">}],&quot;</span>\
            <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">column</span><span class="se">\&quot;</span><span class="s2"> = 5&quot;</span>\
            <span class="s2">&quot;}&quot;</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;controlFile&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Control File name&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--report_name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of report files, for example if reports are named &#39;report_1&#39; use report&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--trajectory_name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of trajectory files, for example if reports are named &#39;run_trajectories_1&#39; use run_trajectories&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--path&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path where the simulation is stored&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--top&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Topology file for non-pdb trajectories or path to Adaptive topology object&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--out_name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;fixedReport&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of the modified report files (default is fixedReport)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--out_folder&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path where to store the report files (default is fixedReport)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of processors to parallelize&quot;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">controlFile</span></div>
+    <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">controlFile</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">report_name</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">trajectory_name</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">top</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">out_name</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">out_folder</span></div>
 
 
 <div class="viewcode-block" id="readControlFile"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.correctRMSD.readControlFile">[docs]</a><span class="k">def</span> <span class="nf">readControlFile</span><span class="p">(</span><span class="n">controlFile</span><span class="p">):</span>
@@ -212,58 +202,97 @@
     <span class="k">return</span> <span class="n">resname</span><span class="p">,</span> <span class="n">nativeFilename</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">rmsdColInReport</span></div>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.correctRMSD.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">controlFile</span><span class="p">):</span>
+<div class="viewcode-block" id="calculate_rmsd_traj"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.correctRMSD.calculate_rmsd_traj">[docs]</a><span class="k">def</span> <span class="nf">calculate_rmsd_traj</span><span class="p">(</span><span class="n">nativePDB</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">rmsdColInReport</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">outputFilename</span><span class="p">):</span>
+    <span class="n">top_proc</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">top</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">top_proc</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">top</span><span class="p">)</span>
+    <span class="n">rmsds</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getRMSD</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">nativePDB</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">top_proc</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">reportName</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">header</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">reportFile</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">loadtxtfile</span><span class="p">(</span><span class="n">reportName</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">rmsdColInReport</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">rmsdColInReport</span> <span class="o">&lt;</span> <span class="n">reportFile</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">reportFile</span><span class="p">[:,</span> <span class="n">rmsdColInReport</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmsds</span>
+        <span class="n">fixedReport</span> <span class="o">=</span> <span class="n">reportFile</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fixedReport</span> <span class="o">=</span> <span class="n">analysis_utils</span><span class="o">.</span><span class="n">extendReportWithRmsd</span><span class="p">(</span><span class="n">reportFile</span><span class="p">,</span> <span class="n">rmsds</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputFilename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">header</span><span class="p">:</span>
+            <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\t</span><span class="s2">RMSD</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">header</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;# Step</span><span class="se">\t</span><span class="s2">RMSD</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">fw</span><span class="p">,</span> <span class="n">fixedReport</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.correctRMSD.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">controlFile</span><span class="p">,</span> <span class="n">trajName</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">outputFilename</span><span class="p">,</span> <span class="n">nProcessors</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the corrected rmsd values of conformation taking into account</span>
 <span class="sd">        molecule symmetries</span>
 
 <span class="sd">        :param controlFile: Control file</span>
 <span class="sd">        :type controlFile: str</span>
+<span class="sd">        :param folder: Path the simulation</span>
+<span class="sd">        :type folder: str</span>
+<span class="sd">        :param top: Path to the topology</span>
+<span class="sd">        :type top: str</span>
+<span class="sd">        :param outputFilename: Name of the output file</span>
+<span class="sd">        :type outputFilename: str</span>
+<span class="sd">        :param nProcessors: Number of processors to use</span>
+<span class="sd">        :type nProcessors: int</span>
+<span class="sd">        :param output_folder: Path where to store the new reports</span>
+<span class="sd">        :type output_folder: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Constants</span>
-    <span class="n">folder</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>
-    <span class="n">outputFilename</span> <span class="o">=</span> <span class="s2">&quot;fixedReport_</span><span class="si">%d</span><span class="s2">&quot;</span>
-    <span class="n">trajName</span> <span class="o">=</span> <span class="s2">&quot;*traj*&quot;</span>
-    <span class="n">reportName</span> <span class="o">=</span> <span class="s2">&quot;*report_</span><span class="si">%d</span><span class="s2">&quot;</span>
-    <span class="c1"># end constants</span>
+    <span class="k">if</span> <span class="n">trajName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">trajName</span> <span class="o">=</span> <span class="s2">&quot;*traj*&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">trajName</span> <span class="o">+=</span> <span class="s2">&quot;_*&quot;</span>
+    <span class="k">if</span> <span class="n">reportName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">reportName</span> <span class="o">=</span> <span class="s2">&quot;*report_</span><span class="si">%d</span><span class="s2">&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">reportName</span> <span class="o">+=</span> <span class="s2">&quot;_</span><span class="si">%d</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="n">output_folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">outputFilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">outputFilename</span><span class="p">)</span>
+    <span class="n">outputFilename</span> <span class="o">+=</span> <span class="s2">&quot;_</span><span class="si">%d</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="n">nProcessors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">nProcessors</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getCpuCount</span><span class="p">()</span>
+    <span class="n">nProcessors</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nProcessors</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating RMSDs with </span><span class="si">%d</span><span class="s2"> processors&quot;</span> <span class="o">%</span> <span class="n">nProcessors</span><span class="p">)</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">nProcessors</span><span class="p">)</span>
+    <span class="n">epochs</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_epoch_folders</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">top</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">top_obj</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTopologyObject</span><span class="p">(</span><span class="n">top</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">top_obj</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">resname</span><span class="p">,</span> <span class="n">nativeFilename</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">rmsdColInReport</span> <span class="o">=</span> <span class="n">readControlFile</span><span class="p">(</span><span class="n">controlFile</span><span class="p">)</span>
 
     <span class="n">nativePDB</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
     <span class="n">nativePDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">nativeFilename</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
 
-    <span class="n">allFolders</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
-    <span class="n">epochs</span> <span class="o">=</span> <span class="p">[</span><span class="n">epoch</span> <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">allFolders</span> <span class="k">if</span> <span class="n">epoch</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
-
+    <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">epochs</span><span class="p">:</span>
+        <span class="c1"># path does not contain an adaptive simulation, we&#39;ll try to retrieve</span>
+        <span class="c1"># trajectories from the specified path</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">analysis_utils</span><span class="o">.</span><span class="n">process_folder</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">trajName</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">outputFilename</span><span class="p">),</span> <span class="n">top_obj</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">epochs</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epoch&quot;</span><span class="p">,</span> <span class="n">epoch</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
-        <span class="n">allTrajs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">trajName</span><span class="p">)</span>
+        <span class="n">files</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">analysis_utils</span><span class="o">.</span><span class="n">process_folder</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">trajName</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">outputFilename</span><span class="p">),</span> <span class="n">top_obj</span><span class="p">))</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">calculate_rmsd_traj</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">nativePDB</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">rmsdColInReport</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="mi">4</span><span class="p">])))</span>
+    <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div>
 
-        <span class="k">for</span> <span class="n">traj</span> <span class="ow">in</span> <span class="n">allTrajs</span><span class="p">:</span>
-            <span class="n">rmsds</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getRMSD</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">nativePDB</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">)</span>
-            <span class="n">trajNum</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTrajNum</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">reportFilename</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">reportName</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> not found in folder </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">reportName</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">,</span> <span class="n">epoch</span><span class="p">))</span>
-
-            <span class="n">reportFile</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">reportFilename</span><span class="p">,</span> <span class="n">ndmin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">rmsdColInReport</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">rmsdColInReport</span> <span class="o">&lt;</span> <span class="n">reportFile</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">reportFile</span><span class="p">[:,</span> <span class="n">rmsdColInReport</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmsds</span>
-                <span class="n">fixedReport</span> <span class="o">=</span> <span class="n">reportFile</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">fixedReport</span> <span class="o">=</span> <span class="n">extendReportWithRmsd</span><span class="p">(</span><span class="n">reportFile</span><span class="p">,</span> <span class="n">rmsds</span><span class="p">)</span>
-
-            <span class="c1"># print(fixedReport)</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">outputFilename</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">,</span> <span class="n">fixedReport</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span><span class="p">)</span>
-
-        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span></div>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">control_file</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
-    <span class="n">main</span><span class="p">(</span><span class="n">control_file</span><span class="p">)</span>
+    <span class="n">control_file</span><span class="p">,</span> <span class="n">name_report</span><span class="p">,</span> <span class="n">name_traj</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">topology_path</span><span class="p">,</span> <span class="n">out_name</span><span class="p">,</span> <span class="n">n_proc</span><span class="p">,</span> <span class="n">out_folder</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">control_file</span><span class="p">,</span> <span class="n">name_traj</span><span class="p">,</span> <span class="n">name_report</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">topology_path</span><span class="p">,</span> <span class="n">out_name</span><span class="p">,</span> <span class="n">n_proc</span><span class="p">,</span> <span class="n">out_folder</span><span class="p">)</span>
 </pre></div>
 
            </div>

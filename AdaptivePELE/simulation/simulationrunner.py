@@ -497,9 +497,10 @@ class PeleSimulation(SimulationRunner):
         # Remove dynamical changes in control file
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("exitConditions", None)
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("parametersChanges", None)
-        # Set box_radius to 2
-        peleControlFileDict["commands"][0]["Perturbation"]["Box"]["fixedCenter"] = "$BOX_CENTER"
-        peleControlFileDict["commands"][0]["Perturbation"]["Box"]["radius"] = 2
+        if "Box" in peleControlFileDict["commands"][0]["Perturbation"]:
+            # Set box_radius to 2
+            peleControlFileDict["commands"][0]["Perturbation"]["Box"]["fixedCenter"] = "$BOX_CENTER"
+            peleControlFileDict["commands"][0]["Perturbation"]["Box"]["radius"] = 2
         # Ensure random tags exists in metrics
         metricsBlock = peleControlFileDict["commands"][0]["PeleTasks"][0]["metrics"]
         nMetrics = len(metricsBlock)
