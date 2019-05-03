@@ -63,6 +63,7 @@ class ForceReporter(object):
         forces = state.getForces().value_in_unit(unit.kilojoules/unit.mole/unit.nanometer)
         for i, f in enumerate(forces):
             self._out.write('%d %g %g %g\n' % (i, f[0], f[1], f[2]))
+        self._out.flush()
 
 
 class XTCReporter(_BaseReporter):
@@ -98,6 +99,27 @@ class XTCReporter(_BaseReporter):
                                           kineticEnergy=False, temperature=False, velocities=False, atomSubset=atomSubset)
         if append:
             self._traj_file.write(*contents)
+
+    def describeNextReport(self, simulation):
+        """
+            Get information about the next report this object will generate.
+
+            Parameters
+            ----------
+            simulation : Simulation
+                The Simulation to generate a report for
+
+            Returns
+            -------
+            tuple
+                A six element tuple. The first element is the number of steps
+                until the next report. The next four elements specify whether
+                that report will require positions, velocities, forces, and
+                energies respectively.  The final element specifies whether
+                positions should be wrapped to lie in a single periodic box.
+        """
+        steps = self._reportInterval - simulation.currentStep % self._reportInterval
+        return (steps, self._coordinates, self._velocities, False, self._needEnergy, self._enforcePeriodicBox)
 
     def report(self, simulation, state):
         """
