@@ -225,7 +225,7 @@ Optionally, you can also use the following parameters:
 * **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center
 * **boxRadius** (*float*, default=20): Radius of the spherical box the ligand will be restrained to (in angstroms). Note that when using the spherical box restraint only xtc trajectories are supported.
 * **ligandCharge** (*integer*, default=0): Charge of the ligand
-* **waterBoxSize** (*float*, default=8): Distance of the edge of the solvation
+* **WaterBoxSize** (*float*, default=8): Distance of the edge of the solvation
   box from the closest atom (in angstroms)
 * **nonBondedCutoff** (*float*, default=8): Radius for the nonBonded cutoff of
   the long-range interactions (in angstroms)
