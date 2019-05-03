@@ -63,6 +63,7 @@ class ForceReporter(object):
         forces = state.getForces().value_in_unit(unit.kilojoules/unit.mole/unit.nanometer)
         for i, f in enumerate(forces):
             self._out.write('%d %g %g %g\n' % (i, f[0], f[1], f[2]))
+        self._out.flush()
 
 
 class XTCReporter(_BaseReporter):
@@ -118,7 +119,7 @@ class XTCReporter(_BaseReporter):
                 energies respectively.  The final element specifies whether
                 positions should be wrapped to lie in a single periodic box.
         """
-        steps = self._reportInterval - simulation.currentStep%self._reportInterval
+        steps = self._reportInterval - simulation.currentStep % self._reportInterval
         return (steps, self._coordinates, self._velocities, False, self._needEnergy, self._enforcePeriodicBox)
 
     def report(self, simulation, state):
