@@ -720,7 +720,6 @@ def addLigandBox(topology, positions, system, resname, dummy, radius, worker):
     forceFB.addPerBondParameter("k_box")
     forceFB.addPerBondParameter("r0")
     forceFB.addBond(dummy, ligand_atom, [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, radius*unit.angstroms])
-    forceFB.setUsesPeriodicBoundaryConditions(True)
     system.addForce(forceFB)
 
 
@@ -748,7 +747,6 @@ def addLigandCylinderBox(topology, positions, system, resname, dummies, radius, 
     forceFB.addPerBondParameter("r_l")
     # forceFB.addBond(center, ligand_atom, [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, length*unit.nanometers])
     forceFB.addBond([center, base, ligand_atom], [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, length*unit.nanometers])
-    forceFB.setUsesPeriodicBoundaryConditions(True)
     system.addForce(forceFB)
     force_side = mm.CustomCompoundBondForce(3, 'step(r_normal-r0)*(k_box/2) * (r_normal-r0)^2; r_normal=sqrt((ay*dz-az*dy)^2+(az*dx-ax*dz)^2+(ax*dy-ay*dx)^2); ax=(x1-x2)/l; ay=(y1-y2)/l; az=(z1-z2)/l; dx=x3-x2; dy=y3-y2; dz=z3-z2; l=distance(p1, p2)')
     force_side.addPerBondParameter("k_box")
@@ -756,7 +754,6 @@ def addLigandCylinderBox(topology, positions, system, resname, dummies, radius, 
     # the order of the particles involved are center of the cilinder, base and
     # atom to constrain (ligand)
     force_side.addBond([center, base, ligand_atom], [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, radius*unit.angstroms])
-    force_side.setUsesPeriodicBoundaryConditions(True)
     system.addForce(force_side)
 
 
