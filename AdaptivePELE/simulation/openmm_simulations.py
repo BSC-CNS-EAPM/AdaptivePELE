@@ -473,7 +473,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 
 
 @get_traceback
-def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, replica_id, trajsPerReplica, restart=False):
+def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, replica_id, trajsPerReplica, epoch_number, restart=False):
     """
     Functions that runs the production run at NPT conditions.
     If a boxRadius is defined in the parameters section, a Flat-bottom harmonic restrains will be applied between
@@ -501,6 +501,8 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     :type trajsPerReplica: int
     :param restart: Whether the simulation run has to be restarted or not
     :type restart: bool
+    :param epoch_number: Number of the epoch
+    :type epoch_number: int
 
     """
     # this number gives the number of the subprocess in the given node

@@ -1150,7 +1150,7 @@ class MDSimulation(SimulationRunner):
             if self.restart:
                 checkpoint = checkpoints[i + processManager.id * self.parameters.trajsPerReplica]
             workerNumber = i
-            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.parameters.ligandName, processManager.id, self.parameters.trajsPerReplica, self.restart)))
+            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.parameters.ligandName, processManager.id, self.parameters.trajsPerReplica, epoch, self.restart)))
         for worker in workers:
             worker.get()
         pool.terminate()
