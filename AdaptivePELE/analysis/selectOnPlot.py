@@ -179,14 +179,24 @@ def trajectory_and_snapshot_to_pdb(trajectory_path, snapshot, output_path):
     :type output_path: str
     :return: Creates a PDB file.
     """
-    topology_path_splited = trajectory_path.split("/")[0:-2]
-    topology_path = os.path.join("/".join(topology_path_splited), "topology.pdb")
-    topology_contents = adapt_tools.getTopologyFile(topology_path)
-    trajectory = adapt_tools.getSnapshots(trajectory_path, topology=topology_path)
+    # get the path where the adaptive simulation resides
+    topology_path_splited = trajectory_path.split(os.sep)
+    epoch = int(topology_path_splited[-2])
+    traj = adapt_tools.getTrajNum(topology_path_splited[-1])
+    topology_path = os.path.join(os.sep.join(topology_path_splited[0:-2]), "topologies")
+    if os.path.exists(os.path.join(topology_path, "topologies.pkl")):
+        # if there is a pkl object use it
+        topology_path = os.path.join(topology_path, "topologies.pkl")
+    else:
+        # if there is no pkl, try with one of the pdbs, if it's PELE is fine,
+        # but if it's MD we may have problems
+        topology_path = glob.glob(os.path.join(topology_path, "topology_*.pdb"))[0]
+    topology_contents = adapt_tools.getTopologyObject(topology_path)
+    trajectory = adapt_tools.getSnapshots(trajectory_path)
     try:
         single_model = trajectory[snapshot]
         PDB = atomset.PDB()
-        PDB.initialise(single_model, topology=topology_contents)
+        PDB.initialise(single_model, topology=topology_contents.getTopology(epoch, traj))
     except IndexError:
         exit("You are selecting the model {} for a trajectory that has {} models, please, reselect the model index "
              "(starting from 0).".format(snapshot, len(trajectory)))
