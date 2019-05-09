@@ -464,6 +464,21 @@ def gen_atom_name(index):
     return chr(65+ind1)+chr(65+ind2//260)+chr(65+ind3//10)+str(ind3 % 10)
 
 
+def join_coordinates_prob(coords, p):
+    """
+        Join a MxN numpy array representing some cluster center coordinates with
+        an 1XN array representing some metric of the clusters
+
+        :param coords: Coordinates of the clusters
+        :type coords: np.array
+        :param p: Metric of the clusters
+        :type p: np.array
+    """
+    if len(p.shape) < 2:
+        p = p[:, np.newaxis]
+    return np.hstack((coords, p))
+
+
 def write_PDB_clusters(pmf_xyzg, title="clusters.pdb", use_beta=False, elements=None):
     templateLine = "HETATM%s %s CLT L 502    %s%s%s  0.75%s          %s  \n"
     if elements is None:
