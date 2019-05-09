@@ -34,9 +34,10 @@ def parseArguments():
     parser.add_argument("--out_name", type=str, default="fixedReport", help="Name of the modified report files (default is fixedReport)")
     parser.add_argument("--out_folder", type=str, default=None, help="Path where to store the report files (default is fixedReport)")
     parser.add_argument("-n", type=int, default=1, help="Number of processors to parallelize")
+    parser.add_argument("--fmt_str", type=str, default="%.4f", help="Format of the output file (default is .4f which means all floats with 4 decimal points)")
     args = parser.parse_args()
 
-    return args.controlFile, args.report_name, args.trajectory_name, args.path, args.top, args.out_name, args.n, args.out_folder
+    return args.controlFile, args.report_name, args.trajectory_name, args.path, args.top, args.out_name, args.n, args.out_folder, args.fmt_str
 
 
 def readControlFile(controlFile):
@@ -62,7 +63,7 @@ def readControlFile(controlFile):
     return resname, nativeFilename, symmetries, rmsdColInReport
 
 
-def calculate_rmsd_traj(nativePDB, resname, symmetries, rmsdColInReport, traj, reportName, top, epoch, outputFilename):
+def calculate_rmsd_traj(nativePDB, resname, symmetries, rmsdColInReport, traj, reportName, top, epoch, outputFilename, fmt_str):
     top_proc = None
     if top is not None:
         top_proc = utilities.getTopologyFile(top)
@@ -73,7 +74,6 @@ def calculate_rmsd_traj(nativePDB, resname, symmetries, rmsdColInReport, traj, r
         if not header.startswith("#"):
             header = ""
         reportFile = utilities.loadtxtfile(reportName)
-
     if rmsdColInReport > 0 and rmsdColInReport < reportFile.shape[1]:
         reportFile[:, rmsdColInReport] = rmsds
         fixedReport = reportFile
@@ -85,10 +85,10 @@ def calculate_rmsd_traj(nativePDB, resname, symmetries, rmsdColInReport, traj, r
             fw.write("%s\tRMSD\n" % header)
         else:
             fw.write("# Step\tRMSD\n")
-        np.savetxt(fw, fixedReport, fmt=b'%.4f')
+        np.savetxt(fw, fixedReport, fmt=fmt_str)
 
 
-def main(controlFile, trajName, reportName, folder, top, outputFilename, nProcessors, output_folder):
+def main(controlFile, trajName, reportName, folder, top, outputFilename, nProcessors, output_folder, format_str):
     """
         Calculate the corrected rmsd values of conformation taking into account
         molecule symmetries
@@ -105,6 +105,8 @@ def main(controlFile, trajName, reportName, folder, top, outputFilename, nProces
         :type nProcessors: int
         :param output_folder: Path where to store the new reports
         :type output_folder: str
+        :param format_str: String with the format of the report
+        :type format_str: str
     """
     if trajName is None:
         trajName = "*traj*"
@@ -143,7 +145,7 @@ def main(controlFile, trajName, reportName, folder, top, outputFilename, nProces
         files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj))
     results = []
     for info in files:
-        results.append(pool.apply_async(calculate_rmsd_traj, args=(nativePDB, resname, symmetries, rmsdColInReport, info[0], info[1], info[2], info[3], info[4])))
+        results.append(pool.apply_async(calculate_rmsd_traj, args=(nativePDB, resname, symmetries, rmsdColInReport, info[0], info[1], info[2], info[3], info[4], format_str)))
     for res in results:
         res.get()
     pool.close()
@@ -151,5 +153,5 @@ def main(controlFile, trajName, reportName, folder, top, outputFilename, nProces
 
 
 if __name__ == "__main__":
-    control_file, name_report, name_traj, path, topology_path, out_name, n_proc, out_folder = parseArguments()
-    main(control_file, name_traj, name_report, path, topology_path, out_name, n_proc, out_folder)
+    control_file, name_report, name_traj, path, topology_path, out_name, n_proc, out_folder, fmt = parseArguments()
+    main(control_file, name_traj, name_report, path, topology_path, out_name, n_proc, out_folder, fmt)
