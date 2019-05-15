@@ -1547,9 +1547,10 @@ def processTraj(input_files):
         :type input_files: tuple
     """
     traj_file, top_file = input_files
+    mobile = MDA.Universe(top_file)
     new_file = "%s_new%s" % os.path.splitext(traj_file)
     t = MDA.Universe(top_file, traj_file)
     t.atoms.wrap(compound="residues")
-    alignment = align.AlignTraj(t, t, select="backbone", filename=new_file)
+    alignment = align.AlignTraj(t, mobile, select="backbone", filename=new_file)
     alignment.run()
     os.rename(new_file, traj_file)
