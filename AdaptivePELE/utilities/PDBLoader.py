@@ -441,8 +441,6 @@ class PDBManager:
         self.correctAlternativePositions()
         # Load the information of disulphidebonds
         self.loadDisulphideBonds()
-        # check the protonation states of the histidines
-        self.checkprotonation()
         # Rename atoms from the ligand to match parmchk atom names
         self.checkLigand()
         # Make a unique chain for the protein to avoid problems with Tleap
@@ -464,6 +462,8 @@ class PDBManager:
                     constraint_dict[res2] = None
         # Renumber the pdb and remove insertion codes
         new_constraints = self.renumber(constraint_dict=constraint_dict)
+        # check the protonation states of the histidines
+        self.checkprotonation()
         # Check for missing atoms
         self.checkMissingAtoms()
         # change PELE water names
