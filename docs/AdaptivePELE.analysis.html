@@ -90,8 +90,8 @@
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#adaptivesampling-module"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#automateroundsadaptive-module"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">analysis Package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.correctRMSD"><code class="docutils literal"><span class="pre">correctRMSD</span></code> Module</a></li>
@@ -170,12 +170,12 @@
 <span id="correctrmsd-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">correctRMSD</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.correctRMSD" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.analysis.correctRMSD.calculate_rmsd_traj">
-<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">calculate_rmsd_traj</code><span class="sig-paren">(</span><em>nativePDB</em>, <em>resname</em>, <em>symmetries</em>, <em>rmsdColInReport</em>, <em>traj</em>, <em>reportName</em>, <em>top</em>, <em>epoch</em>, <em>outputFilename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#calculate_rmsd_traj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.calculate_rmsd_traj" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">calculate_rmsd_traj</code><span class="sig-paren">(</span><em>nativePDB</em>, <em>resname</em>, <em>symmetries</em>, <em>rmsdColInReport</em>, <em>traj</em>, <em>reportName</em>, <em>top</em>, <em>epoch</em>, <em>outputFilename</em>, <em>fmt_str</em>, <em>new_report</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#calculate_rmsd_traj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.calculate_rmsd_traj" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.correctRMSD.main">
-<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">main</code><span class="sig-paren">(</span><em>controlFile</em>, <em>trajName</em>, <em>reportName</em>, <em>folder</em>, <em>top</em>, <em>outputFilename</em>, <em>nProcessors</em>, <em>output_folder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">main</code><span class="sig-paren">(</span><em>controlFile</em>, <em>trajName</em>, <em>reportName</em>, <em>folder</em>, <em>top</em>, <em>outputFilename</em>, <em>nProcessors</em>, <em>output_folder</em>, <em>format_str</em>, <em>new_report</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the corrected rmsd values of conformation taking into account
 molecule symmetries</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -189,6 +189,8 @@ molecule symmetries</p>
 <li><strong>outputFilename</strong> (<em>str</em>) – Name of the output file</li>
 <li><strong>nProcessors</strong> (<em>int</em>) – Number of processors to use</li>
 <li><strong>output_folder</strong> (<em>str</em>) – Path where to store the new reports</li>
+<li><strong>format_str</strong> (<em>str</em>) – String with the format of the report</li>
+<li><strong>new_report</strong> (<em>bool</em>) – Whether to write rmsd to a new report file</li>
 </ul>
 </td>
 </tr>
