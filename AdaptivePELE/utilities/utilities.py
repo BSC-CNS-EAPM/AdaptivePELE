@@ -812,8 +812,7 @@ def readConstraints(folder, filename):
     """
         Read the new constraints from disk
 
-        :param folder: Name of the folder where to write the
-            processorsToClusterMapping
+        :param folder: Name of the folder where to write the constraints
         :type folder: str
         :param filename: Name of the file where to write the constraints
         :type filename: str
