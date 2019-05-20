@@ -644,7 +644,6 @@ def addConstraints(system, topology, constraints):
         atom_str = "%s:%s:%d" % (atom.name, atom.residue.name, atom.residue.index+1)
         if atom_str in atomIndices:
             atomIndices[atom_str] = atom.index
-
     for constraint in constraints:
         assert atomIndices[constraint[0]] != atomIndices[constraint[1]], (constraint, atomIndices[constraint[0]], atomIndices[constraint[1]])
         assert atomIndices[constraint[0]] is not None
