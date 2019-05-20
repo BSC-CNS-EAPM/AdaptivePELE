@@ -98,6 +98,7 @@ class SimulationParameters:
         self.constraints = None
         self.boxType = None
         self.cylinderBases = None
+        self.postprocessing = False
 
 
 class SimulationRunner:
@@ -1123,6 +1124,9 @@ class MDSimulation(SimulationRunner):
         outputDir = outputPathConstants.epochOutputPathTempletized % epoch
         structures_to_run = initialStructuresAsString.split(":")
         if self.restart:
+            if self.parameters.constraints is not None:
+                # load fixed constraints
+                self.parameters.constraints = utilities.readConstraints(outputPathConstants.topologies, "new_constraints.txt")
             if epoch == 0:
                 # if the epoch is 0 the original equilibrated pdb files are taken as intial structures
                 equilibrated_structures = glob.glob(os.path.join(outputPathConstants.topologies, "top*pdb"))
@@ -1466,7 +1470,8 @@ class RunnerBuilder:
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
             params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
             params.constraints = paramsBlock.get(blockNames.SimulationParams.constraints)
-            if params.ligandName is None and params.boxCenter is not None:
+            params.postprocessing = paramsBlock.get(blockNames.SimulationParams.postprocessing, True)
+            if params.ligandName is None and (params.boxCenter is not None or params.cylinderBases is not None):
                 raise utilities.ImproperParameterValueException("Ligand name is necessary to establish the box")
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
