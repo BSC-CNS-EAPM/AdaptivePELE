@@ -199,6 +199,7 @@ class SimulationParams:
         "format": "basestring",
         "constraints": "list",
         "boxType": "basestring",
+        "postprocessing": "bool",
         "cylinderBases": "list"
     }
     exitCondition = {
