@@ -14,15 +14,22 @@ New features:
 .............
 
     - Add possibility to generate cylinder box from pdb
+    - Add coordinate wrapping to XTC reporter
 
 Bug fixes:
 ..........
 
+    - Fix bug restarting MD simulation with constraints
+    - Fix bug that crashed when constrianing HIS
+    - Fix colorbar range for plotAdaptive script
 
 Behaviour changes from previous version:
 ........................................
 
     - Allow PELE equilibration to run without a box
+    - Read PELE and MD reports seemingly
+    - Add postprocessing option to simulationRunner
+    - Add proper topology support to selectOnPlot and backtrackAdaptiveTrajectory 
 
 1.6.1 - 2019-04-26
 ------------------
