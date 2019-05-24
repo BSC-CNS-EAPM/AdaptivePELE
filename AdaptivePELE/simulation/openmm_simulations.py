@@ -561,9 +561,9 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, seed)
         stateData = open(str(stateReporter), "w")
     if parameters.format == "xtc":
-        simulation.reporters.append(XTCReporter(str(trajName), parameters.reporterFreq, append=restart))
+        simulation.reporters.append(XTCReporter(str(trajName), parameters.reporterFreq, append=restart, enforcePeriodicBox=parameters.postprocessing))
     elif parameters.format == "dcd":
-        simulation.reporters.append(app.DCDReporter(str(trajName), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
+        simulation.reporters.append(app.DCDReporter(str(trajName), parameters.reporterFreq, append=restart, enforcePeriodicBox=parameters.postprocessing))
 
     simulation.reporters.append(app.CheckpointReporter(str(checkpointReporter), parameters.reporterFreq))
     simulation.reporters.append(CustomStateDataReporter(stateData, parameters.reporterFreq, step=True,
