@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.1
               </div>
             
           
@@ -385,7 +385,7 @@ equilibration run (default corresponds to 1 ns)</p>
 </li>
 <li><p class="first"><strong>ligandCharge</strong> (<em>integer</em>, default=0): Charge of the ligand</p>
 </li>
-<li><p class="first"><strong>waterBoxSize</strong> (<em>float</em>, default=8): Distance of the edge of the solvation
+<li><p class="first"><strong>WaterBoxSize</strong> (<em>float</em>, default=8): Distance of the edge of the solvation
 box from the closest atom (in angstroms)</p>
 </li>
 <li><p class="first"><strong>nonBondedCutoff</strong> (<em>float</em>, default=8): Radius for the nonBonded cutoff of
@@ -428,6 +428,15 @@ establish in a simulation. The constraints must be specified as a list in the
 following format (see <a class="reference internal" href="#control-file-examples">Control File Examples</a> section for an example on how
 to set constraints.  <strong>Note</strong>: the distance of the constrints <strong>must</strong> be specified in angstroms):</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;atom1:res1:resnum1&quot;</span><span class="p">,</span> <span class="s2">&quot;atom2:res2:resnum2&quot;</span><span class="p">,</span> <span class="n">distance</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>boxType</strong> (<em>str</em>, default=sphere): Type of box to use, it can be <em>sphere</em> or
+<em>cylinder</em></p>
+</li>
+<li><p class="first"><strong>cylinderBases</strong> (<em>list</em>, default=None): List with the coordinates of the
+bases of the cylinder (in angstroms), this should look like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">,</span> <span class="n">zb</span><span class="p">],</span> <span class="p">[</span><span class="n">xt</span><span class="p">,</span> <span class="n">yt</span><span class="p">,</span> <span class="n">zt</span><span class="p">]]</span>
 </pre></div>
 </div>
 </li>

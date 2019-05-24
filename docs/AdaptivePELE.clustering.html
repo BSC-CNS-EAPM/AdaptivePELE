@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.1
               </div>
             
           
@@ -738,6 +738,24 @@ if not specified, the cluster metric is chosen</li>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.Clustering.updateRepeatParameters">
+<code class="descname">updateRepeatParameters</code><span class="sig-paren">(</span><em>repeat</em>, <em>steps</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.updateRepeatParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.updateRepeatParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update parameters that should be extracted from the simulation object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>repeat</strong> (<em>bool</em>) – Whether to avoid repeating steps (False for PELE, True for md)</li>
+<li><strong>steps</strong> (<em>int</em>) – steps per epoch</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.Clustering.writeClusterMetric">
 <code class="descname">writeClusterMetric</code><span class="sig-paren">(</span><em>path</em>, <em>metricCol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#Clustering.writeClusterMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.Clustering.writeClusterMetric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the metric of each node in the conformation network in a
@@ -1278,6 +1296,24 @@ specific criterion</p>
 <dt id="AdaptivePELE.clustering.clustering.MSMClustering.setProcessors">
 <code class="descname">setProcessors</code><span class="sig-paren">(</span><em>processors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#MSMClustering.setProcessors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.MSMClustering.setProcessors" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.clustering.clustering.MSMClustering.updateRepeatParameters">
+<code class="descname">updateRepeatParameters</code><span class="sig-paren">(</span><em>repeat</em>, <em>steps</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#MSMClustering.updateRepeatParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.MSMClustering.updateRepeatParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update parameters that should be extracted from the simulation object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>repeat</strong> (<em>bool</em>) – Whether to avoid repeating steps (False for PELE, True for md)</li>
+<li><strong>steps</strong> (<em>int</em>) – steps per epoch</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="AdaptivePELE.clustering.clustering.MSMClustering.writeOutput">

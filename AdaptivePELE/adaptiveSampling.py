@@ -639,7 +639,6 @@ def main(jsonParams, clusteringHook=None):
 
     if not debug:
         atexit.register(utilities.cleanup, outputPathConstants.tmpFolder)
-
     simulationRunner.unifyReportNames(spawningCalculator.parameters.reportFilename)
     utilities.makeFolder(outputPath)
     utilities.makeFolder(outputPathConstants.tmpFolder)
@@ -690,12 +689,20 @@ def main(jsonParams, clusteringHook=None):
             # read all the equilibration structures
             initialStructures = processManager.readEquilibrationStructures(outputPathConstants.tmpFolder)
             topologies.setTopologies(initialStructures, cleanFiles=processManager.isMaster())
-            writeTopologyFiles(initialStructures, outputPathConstants.topologies)
+            if processManager.isMaster():
+                writeTopologyFiles(initialStructures, outputPathConstants.topologies)
+            # ensure that topologies are written
+            processManager.barrier()
+            topology_files = glob.glob(os.path.join(outputPathConstants.topologies, "topology*.pdb"))
+            topology_files.sort(key=utilities.getTrajNum)
+            topologies.setTopologies(topology_files, cleanFiles=False)
         createMappingForFirstEpoch(initialStructures, topologies, simulationRunner.getWorkingProcessors())
 
         clusteringMethod, initialStructuresAsString = buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, jsonParams, outputPathConstants, clusteringBlock, spawningCalculator.parameters, initialStructures, simulationRunner, processManager)
 
     if processManager.isMaster():
+        repeat, numSteps = simulationRunner.getClusteringInfo()
+        clusteringMethod.updateRepeatParameters(repeat, numSteps)
         clusteringMethod.setProcessors(simulationRunner.getWorkingProcessors())
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
         simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
@@ -716,6 +723,7 @@ def main(jsonParams, clusteringHook=None):
         processManager.barrier()
 
         if processManager.isMaster():
+            simulationRunner.processTrajectories(outputPathConstants.epochOutputPathTempletized % i, topologies, i)
             utilities.print_unbuffered("Clustering...")
             startTime = time.time()
             clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies, outputPathConstants)
@@ -736,7 +744,7 @@ def main(jsonParams, clusteringHook=None):
             if spawningCalculator.parameters.filterByMetric:
                 clustersList, clustersFiltered = clusteringMethod.filterClustersAccordingToMetric(clustersFiltered, spawningCalculator.parameters.filter_value, spawningCalculator.parameters.condition, spawningCalculator.parameters.filter_col)
 
-            degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), i)
+            degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), i, outputPathConstants=outputPathConstants)
             spawningCalculator.log()
             # this method only does works with MSM-based spwaning methods,
             # creating a plot of the stationary distribution and the PMF, for

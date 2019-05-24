@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.1
               </div>
             
           
@@ -183,7 +183,7 @@
 <span class="sd">        Container object that points to the topology used in each trajectory</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">topologies</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># the topologyMap maps each trajectory to its corresponding topology</span>
         <span class="c1"># {0: [t1, t2.. tM], 1: [t2, t3, t4, t4...]}</span>
@@ -228,7 +228,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">cleanTopologies</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">top</span> <span class="ow">in</span> <span class="n">topologyFiles</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">topologies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">top</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">topologyFiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">top</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">topologyFiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">top</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Topology.topologyFilesIterator"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology.topologyFilesIterator">[docs]</a>    <span class="k">def</span> <span class="nf">topologyFilesIterator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">top_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topologyFiles</span><span class="p">:</span>
@@ -320,6 +320,45 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">topologyMap</span><span class="p">[</span><span class="n">epoch</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)))</span>
         <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;WARNING: topologyMapping.txt not found, you might not be able to recronstruct fine-grained pathways</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TopologyCompat"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.TopologyCompat">[docs]</a><span class="k">class</span> <span class="nc">TopologyCompat</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb_file</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topologyFiles</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topologyFiles</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topologies</span> <span class="o">=</span> <span class="p">[</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topologyFiles</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="TopologyCompat.getTopologyFile"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyFile">[docs]</a>    <span class="k">def</span> <span class="nf">getTopologyFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">trajectory_number</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">topologyFiles</span></div>
+
+<div class="viewcode-block" id="TopologyCompat.topologyFilesIterator"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.TopologyCompat.topologyFilesIterator">[docs]</a>    <span class="k">def</span> <span class="nf">topologyFilesIterator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">topologyFiles</span></div>
+
+<div class="viewcode-block" id="TopologyCompat.getTopologyIndex"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyIndex">[docs]</a>    <span class="k">def</span> <span class="nf">getTopologyIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">trajectory_number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get the topology index for a particular epoch and trajectory number</span>
+
+<span class="sd">            :param epoch: Epoch of the trajectory of interest</span>
+<span class="sd">            :type epoch: int</span>
+<span class="sd">            :param trajectory_number: Number of the trajectory to select</span>
+<span class="sd">            :type trajectory_number: int</span>
+
+<span class="sd">            :returns: int -- Index of the corresponding topology</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="TopologyCompat.getTopology"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.TopologyCompat.getTopology">[docs]</a>    <span class="k">def</span> <span class="nf">getTopology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">trajectory_number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get the topology for a particular epoch and trajectory number</span>
+
+<span class="sd">            :param epoch: Epoch of the trajectory of interest</span>
+<span class="sd">            :type epoch: int</span>
+<span class="sd">            :param trajectory_number: Number of the trajectory to select</span>
+<span class="sd">            :type trajectory_number: int</span>
+
+<span class="sd">            :returns: list -- List with topology information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">topologies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div></div>
 
 
 <div class="viewcode-block" id="cleanup"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.cleanup">[docs]</a><span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="n">tmpFolder</span><span class="p">):</span>
@@ -794,11 +833,11 @@
     <span class="k">if</span> <span class="s2">&quot;bsccv&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
         <span class="c1"># life cluster</span>
         <span class="n">cores</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SLURM_NTASKS&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="s2">&quot;mn.bsc&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="s2">&quot;mn.bsc&quot;</span> <span class="ow">in</span> <span class="n">machine</span> <span class="ow">or</span> <span class="s2">&quot;power&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
         <span class="c1"># nord3</span>
         <span class="n">cores</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LSB_DJOB_NUMPROC&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="s2">&quot;bsc.mn&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
-        <span class="c1"># MNIV</span>
+    <span class="k">elif</span> <span class="s2">&quot;bsc.mn&quot;</span> <span class="ow">in</span> <span class="n">machine</span> <span class="ow">or</span> <span class="s2">&quot;bullx&quot;</span> <span class="ow">in</span> <span class="n">machine</span> <span class="ow">or</span> <span class="s2">&quot;power&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># MNIV, MinoTauro or CTE-Power</span>
         <span class="n">cores</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SLURM_NPROCS&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">cores</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cores</span><span class="p">)</span>
@@ -912,6 +951,26 @@
             <span class="n">line_split</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
             <span class="n">new_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_split</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">new_constraints</span></div>
+
+
+<div class="viewcode-block" id="generateRotationMatrixAroundAxis"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.generateRotationMatrixAroundAxis">[docs]</a><span class="k">def</span> <span class="nf">generateRotationMatrixAroundAxis</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+    <span class="c1"># extracted from https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">axis</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">c</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">-</span><span class="n">z</span><span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="n">z</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">+</span><span class="n">y</span><span class="o">*</span><span class="n">s</span><span class="p">],</span>
+                     <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">+</span><span class="n">z</span><span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="n">c</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">*</span><span class="n">z</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="o">*</span><span class="n">s</span><span class="p">],</span>
+                     <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="n">z</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">-</span><span class="n">y</span><span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="n">y</span><span class="o">*</span><span class="n">z</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">+</span><span class="n">x</span><span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="n">c</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">*</span><span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">]])</span></div>
+
+
+<div class="viewcode-block" id="getTopologyObject"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getTopologyObject">[docs]</a><span class="k">def</span> <span class="nf">getTopologyObject</span><span class="p">(</span><span class="n">topology_file</span><span class="p">):</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">getFileExtension</span><span class="p">(</span><span class="n">topology_file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.pdb&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">TopologyCompat</span><span class="p">(</span><span class="n">topology_file</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.pkl&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">readClusteringObject</span><span class="p">(</span><span class="n">topology_file</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The topology parameter needs to be the path to a pickled Topology object or a pdb!&quot;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

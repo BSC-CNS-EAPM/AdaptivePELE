@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.1
               </div>
             
           
@@ -1330,7 +1330,7 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">PYEMMA</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">utilities</span><span class="o">.</span><span class="n">UnsatisfiedDependencyException</span><span class="p">(</span><span class="s2">&quot;Pyemma module is necessary ot use MSM based spawning&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">utilities</span><span class="o">.</span><span class="n">UnsatisfiedDependencyException</span><span class="p">(</span><span class="s2">&quot;Pyemma module is necessary to use MSM based spawning&quot;</span><span class="p">)</span>
         <span class="n">SpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;BaseClass&quot;</span>  <span class="c1"># change for abstract attribute</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>

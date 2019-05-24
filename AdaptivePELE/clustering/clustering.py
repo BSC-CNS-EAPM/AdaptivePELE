@@ -543,11 +543,7 @@ class Cluster(object):
             return trajPosition
 
     def __eq__(self, other):
-        return self.pdb == other.pdb\
-             and self.elements == other.elements\
-             and self.threshold == other.threshold\
-             and self.contacts == other.contacts\
-             and np.allclose(self.metrics, other.metrics)
+        return (self.pdb, self.elements, self.threshold, self.contacts) == (other.pdb, other.elements, other.threshold, other.contacts) and np.allclose(self.metrics, other.metrics)
 
 
 class ClusteringEvaluator(object):
@@ -860,6 +856,17 @@ class Clustering(object):
         for cluster in self.clusters.clusters:
             cluster.metricCol = col
 
+    def updateRepeatParameters(self, repeat, steps):
+        """
+            Update parameters that should be extracted from the simulation object
+
+            :param repeat: Whether to avoid repeating steps (False for PELE, True for md)
+            :type repeat: bool
+            :param steps: steps per epoch
+            :type steps: int
+        """
+        pass
+
     def getClusterListForSpawning(self):
         """
             Return the clusters object to be used in the spawning
@@ -905,12 +912,7 @@ class Clustering(object):
         return self.clusters.getNumberClusters()
 
     def __eq__(self, other):
-        return self.clusters == other.clusters\
-            and self.reportBaseFilename == other.reportBaseFilename\
-            and self.resname == other.resname\
-            and self.resnum == other.resnum\
-            and self.resChain == other.resChain\
-            and self.col == other.col
+        return (self.clusters, self.reportBaseFilename, self.resname, self.resnum, self.resChain, self.col) == (other.clusters, other.reportBaseFilename, other.resname, other.resnum, other.resChain, other.col)
 
     def filterClustersAccordingToBox(self, simulationRunnerParams):
         """
@@ -1622,6 +1624,18 @@ class MSMClustering(Clustering):
         self.tica_commute_map = state.get('tica_commute_map', False)
         self.pyemma_clustering = state.get('pyemma_clustering')
 
+    def updateRepeatParameters(self, repeat, steps):
+        """
+            Update parameters that should be extracted from the simulation object
+
+            :param repeat: Whether to avoid repeating steps (False for PELE, True for md)
+            :type repeat: bool
+            :param steps: steps per epoch
+            :type steps: int
+        """
+        self.extract_params.non_Repeat = repeat
+        self.extract_params.numtotalSteps = steps
+
     def getClusterListForSpawning(self):
         """
             Return the clusters object to be used in the spawning
@@ -1656,9 +1670,12 @@ class MSMClustering(Clustering):
         utilities.makeFolder(outputPathConstants.allTrajsPath)
         utilities.makeFolder(os.path.join(outputPathConstants.allTrajsPath, "extractedCoordinates"))
         extractedFolder = self.constantsExtract.extractedTrajectoryFolder % outputPathConstants.epochOutputPathTempletized % self.epoch
+        repeatedFolder = self.constantsExtract.outputTrajectoryFolder % outputPathConstants.epochOutputPathTempletized % self.epoch
         self.constantsExtract.gatherTrajsFilename = os.path.join(outputPathConstants.allTrajsPath, "traj_%s_%s.dat")
         self.constantsExtract.gatherNonRepeatedTrajsFilename = os.path.join(outputPathConstants.allTrajsPath, "extractedCoordinates", "traj_%s_%s.dat")
         utilities.makeFolder(extractedFolder)
+        if not self.extract_params.non_Repeat:
+            utilities.makeFolder(repeatedFolder)
         trajectories = getAllTrajectories(paths)
         self.extract_params.sidechain_folder = paths[0]
         self.extract_params.topology = topology
@@ -1702,6 +1719,8 @@ class MSMClustering(Clustering):
                 workers.append(pool.apply_async(coord.writeFilenameExtractedCoordinates, args=(filename, self.extract_params, outputPathConstants.epochOutputPathTempletized % self.epoch, self.constantsExtract, topology_traj, indexes_traj)))
         for w in workers:
             w.get()
+        if not self.extract_params.non_Repeat:
+            coord.repeatExtractedSnapshotsInFolder(outputPathConstants.epochOutputPathTempletized % self.epoch, self.constantsExtract, self.extract_params.numtotalSteps)
         coord.gatherTrajs(self.constantsExtract, outputPathConstants.epochOutputPathTempletized % self.epoch, self.epoch, self.extract_params.non_Repeat, self.epoch)
         # apply tica
         if self.tica:
@@ -1726,7 +1745,7 @@ class MSMClustering(Clustering):
         self.pyemma_clustering.clusterTrajectories()
 
         # create Adaptive clusters from the kmeans result
-        trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, base_traj_names))
+        trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, "extractedCoordinates", base_traj_names))
         trajectories = [utilities.loadtxtfile(f)[:, 1:] for f in trajectory_files]
 
         centersInfo = getCentersInfo(self.pyemma_clustering.clusterCenters, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)

@@ -1,13 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import glob
+import time
 import argparse
 import numpy as np
 import mdtraj as md
 import multiprocessing as mp
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.analysis import correctRMSD
-from AdaptivePELE.freeEnergies.extractCoords import getTopologyObject
 
 
 def parseArguments():
@@ -56,6 +56,7 @@ def calculateSASA(trajectory, topology, res_name):
 
 
 def process_file(traj, top_file, resname, report, outputFilename, format_out, new_report, epoch):
+    start = time.time()
     sasa_values = calculateSASA(traj, top_file, resname)
     header = ""
     if not new_report:
@@ -72,14 +73,17 @@ def process_file(traj, top_file, resname, report, outputFilename, format_out, ne
 
         fixedReport = correctRMSD.extendReportWithRmsd(reportFile, sasa_values)
     else:
-        fixedReport = sasa_values
+        indexes = np.array(range(sasa_values.shape[0]))
+        fixedReport = np.concatenate((indexes[:, None], sasa_values[:, None]), axis=1)
 
     with open(outputFilename, "w") as fw:
         if header:
             fw.write("%s\tSASA\n" % header)
         else:
-            fw.write("# SASA\n")
+            fw.write("# Step\tSASA\n")
         np.savetxt(fw, fixedReport, fmt=format_out, delimiter="\t")
+    end = time.time()
+    print("Took %.2fs to process" % (end-start), traj)
 
 
 def process_folder(epoch, folder, trajName, reportName, output_filename, top):
@@ -137,7 +141,7 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
     pool = mp.Pool(nProcessors)
     epochs = utilities.get_epoch_folders(folder)
     if top is not None:
-        top_obj = getTopologyObject(top)
+        top_obj = utilities.getTopologyObject(top)
     else:
         top_obj = None
     files = []

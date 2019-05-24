@@ -43,7 +43,7 @@ class Topology:
         Container object that points to the topology used in each trajectory
     """
     def __init__(self, path):
-        self.path = path
+        self.path = os.path.abspath(path)
         self.topologies = []
         # the topologyMap maps each trajectory to its corresponding topology
         # {0: [t1, t2.. tM], 1: [t2, t3, t4, t4...]}
@@ -88,7 +88,7 @@ class Topology:
                 self.cleanTopologies()
         for top in topologyFiles:
             self.topologies.append(getTopologyFile(top))
-            self.topologyFiles.append(top)
+            self.topologyFiles.append(os.path.abspath(top))
 
     def topologyFilesIterator(self):
         for top_file in self.topologyFiles:
@@ -180,6 +180,45 @@ class Topology:
                 self.topologyMap[epoch] = list(map(int, f.read().rstrip().split(':')))
         except IOError:
             sys.stderr.write("WARNING: topologyMapping.txt not found, you might not be able to recronstruct fine-grained pathways\n")
+
+
+class TopologyCompat(object):
+    def __init__(self, pdb_file):
+        self.topologyFiles = os.path.abspath(pdb_file)
+        self.path = os.path.split(self.topologyFiles)[0]
+        self.topologies = [getTopologyFile(self.topologyFiles)]
+
+    def getTopologyFile(self, epoch, trajectory_number):
+        return self.topologyFiles
+
+    def topologyFilesIterator(self):
+        yield self.topologyFiles
+
+    def getTopologyIndex(self, epoch, trajectory_number):
+        """
+            Get the topology index for a particular epoch and trajectory number
+
+            :param epoch: Epoch of the trajectory of interest
+            :type epoch: int
+            :param trajectory_number: Number of the trajectory to select
+            :type trajectory_number: int
+
+            :returns: int -- Index of the corresponding topology
+        """
+        return 0
+
+    def getTopology(self, epoch, trajectory_number):
+        """
+            Get the topology for a particular epoch and trajectory number
+
+            :param epoch: Epoch of the trajectory of interest
+            :type epoch: int
+            :param trajectory_number: Number of the trajectory to select
+            :type trajectory_number: int
+
+            :returns: list -- List with topology information
+        """
+        return self.topologies[0]
 
 
 def cleanup(tmpFolder):
@@ -654,11 +693,11 @@ def getCpuCount():
     if "bsccv" in machine:
         # life cluster
         cores = os.getenv("SLURM_NTASKS", None)
-    elif "mn.bsc" in machine:
+    elif "mn.bsc" in machine or "power" in machine:
         # nord3
         cores = os.getenv("LSB_DJOB_NUMPROC", None)
-    elif "bsc.mn" in machine:
-        # MNIV
+    elif "bsc.mn" in machine or "bullx" in machine or "power" in machine:
+        # MNIV, MinoTauro or CTE-Power
         cores = os.getenv("SLURM_NPROCS", None)
     try:
         cores = int(cores)
@@ -782,3 +821,13 @@ def generateRotationMatrixAroundAxis(axis, angle):
     return np.array([[c+(1-c)*x**2, x*y*(1-c)-z*s, x*z*(1-c)+y*s],
                      [x*y*(1-c)+z*s, c+(1-c)*y**2, y*z*(1-c)-x*s],
                      [x*z*(1-c)-y*s, y*z*(1-c)+x*s, c+(1-c)*z**2]])
+
+
+def getTopologyObject(topology_file):
+    ext = getFileExtension(topology_file)
+    if ext == ".pdb":
+        return TopologyCompat(topology_file)
+    elif ext == ".pkl":
+        return readClusteringObject(topology_file)
+    else:
+        raise ValueError("The topology parameter needs to be the path to a pickled Topology object or a pdb!")

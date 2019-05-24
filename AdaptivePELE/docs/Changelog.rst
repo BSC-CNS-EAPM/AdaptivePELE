@@ -6,6 +6,49 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_.
 
+
+XXX - Unreleased
+----------------
+
+New features:
+.............
+
+    - Add possibility to generate cylinder box from pdb
+
+Bug fixes:
+..........
+
+
+Behaviour changes from previous version:
+........................................
+
+    - Allow PELE equilibration to run without a box
+
+1.6.1 - 2019-04-26
+------------------
+
+New features:
+.............
+
+    - Add cylindrical box for MD
+    - Add script to generate cylindrical box for visualization
+    - Introduce new postprocessing function for MD
+
+Bug fixes:
+..........
+
+    - Fix bug selecting topolgies for odd number of initial conditions
+    - Fix bug extracting indexes from topology in MSMClustering
+    - Fix bug in atomset writing PDBs with gaps, now if there are residues with
+      a difference in more than one in the residue number a TER is written 
+
+
+Behaviour changes from previous version:
+........................................
+
+    - Now the MSMClustering with PELE simulation repeats the rejected steps
+
+
 1.6 - 2019-02-19
 ----------------
 

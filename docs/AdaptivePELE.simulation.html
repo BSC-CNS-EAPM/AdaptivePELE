@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.1
               </div>
             
           
@@ -398,6 +398,25 @@ to follow the same structure has the Super class definition)</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.processTrajectories">
+<code class="descname">processTrajectories</code><span class="sig-paren">(</span><em>output_path</em>, <em>topology</em>, <em>epoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.processTrajectories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.processTrajectories" title="Permalink to this definition">¶</a></dt>
+<dd><p>Post-process the simulation trajectories, i.e. superpose to initial frame</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>output_path</strong> (<em>str</em>) – Path that contains the trajectories</li>
+<li><strong>topology</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object for the simulation</li>
+<li><strong>epoch</strong> (<em>int</em>) – Current epoch of the simulation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.runSimulation">
 <code class="descname">runSimulation</code><span class="sig-paren">(</span><em>epoch</em>, <em>outputPathConstants</em>, <em>initialStructuresAsString</em>, <em>topologies</em>, <em>reportFileName</em>, <em>processManager</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.runSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.runSimulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a MD simulation using OpenMM</p>
@@ -584,6 +603,12 @@ structures to start the simulation</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.simulation.simulationrunner.PeleSimulation.getClusteringInfo">
+<code class="descname">getClusteringInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#PeleSimulation.getClusteringInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.PeleSimulation.getClusteringInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return information relevant for MSMClustering</p>
 </dd></dl>
 
 <dl class="method">
@@ -868,6 +893,12 @@ equilibration run</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.getClusteringInfo">
+<code class="descname">getClusteringInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.getClusteringInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.getClusteringInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return information relevant for MSMClustering</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.getNumReplicas">
 <code class="descname">getNumReplicas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.getNumReplicas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.getNumReplicas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the number of replicas, only useful for MD simulations</p>
@@ -926,6 +957,25 @@ provided in the control file</p>
 <li><strong>epoch</strong> (<em>int</em>) – Epoch number</li>
 <li><strong>outputPathConstants</strong> (<code class="xref py py-class docutils literal"><span class="pre">OutputPathConstants</span></code>) – Object that has as attributes constant related to the outputPath that will be used to create the working control file</li>
 <li><strong>peleControlFileDictionary</strong> (<em>dict</em>) – Dictonary containing the values of the parameters to substitute in the control file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.simulation.simulationrunner.SimulationRunner.processTrajectories">
+<code class="descname">processTrajectories</code><span class="sig-paren">(</span><em>output_path</em>, <em>topology</em>, <em>epoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#SimulationRunner.processTrajectories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.SimulationRunner.processTrajectories" title="Permalink to this definition">¶</a></dt>
+<dd><p>Post-process the simulation trajectories, i.e. superpose to initial frame</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>output_path</strong> (<em>str</em>) – Path that contains the trajectories</li>
+<li><strong>topology</strong> (<a class="reference internal" href="AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology" title="AdaptivePELE.utilities.utilities.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – Topology object for the simulation</li>
+<li><strong>epoch</strong> (<em>int</em>) – Current epoch of the simulation</li>
 </ul>
 </td>
 </tr>
@@ -1045,6 +1095,20 @@ processorsToClusterMapping</td>
 </table>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.simulation.simulationrunner.processTraj">
+<code class="descclassname">AdaptivePELE.simulation.simulationrunner.</code><code class="descname">processTraj</code><span class="sig-paren">(</span><em>input_files</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#processTraj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.processTraj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Align a single trajectory file (helper function for parallelization)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_files</strong> (<em>tuple</em>) – Tuple with (trajectory_file, topology_file)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">

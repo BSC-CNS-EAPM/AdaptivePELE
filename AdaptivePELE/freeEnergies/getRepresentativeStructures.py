@@ -42,7 +42,7 @@ def main(representatives_files, path_structures, output="", clusters=None, trajN
         raise IOError("Couldn't find a representative file in %s, please check that the path is correct" % representatives_files)
     # Organize to minimise pdb loading
     if clusters != ['a']:
-        clusters_info = clusters_info[map(int, clusters)]
+        clusters_info = clusters_info[list(map(int, clusters))]
 
     extract_info = getExtractInfo(clusters_info)
 

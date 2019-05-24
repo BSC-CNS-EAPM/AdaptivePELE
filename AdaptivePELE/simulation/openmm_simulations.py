@@ -67,8 +67,8 @@ class ForceReporter(object):
 
 class XTCReporter(_BaseReporter):
     """
-    XTCReporter stores a molecular dynamics trajectory in the GROMACS xtc
-    format
+        XTCReporter stores a molecular dynamics trajectory in the GROMACS xtc
+        format
 
         :param file: Either an open XTCTrajectoryFile object to write to, or a string
         specifying the filename of a new XTC file to save the trajectory to.
@@ -126,14 +126,14 @@ class XTCReporter(_BaseReporter):
             kwargs['step'] = simulation.currentStep
         if self._cell:
             kwargs['box'] = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(getattr(unit, self._traj_file.distance_unit))
-            self._traj_file.write(*args, **kwargs)
-            # flush the file to disk. it might not be necessary to do this every
-            # report, but this is the most proactive solution. We don't want to
-            # accumulate a lot of data in memory only to find out, at the very
-            # end of the run, that there wasn't enough space on disk to hold the
-            # data.
-            if hasattr(self._traj_file, 'flush'):
-                self._traj_file.flush()
+        self._traj_file.write(*args, **kwargs)
+        # flush the file to disk. it might not be necessary to do this every
+        # report, but this is the most proactive solution. We don't want to
+        # accumulate a lot of data in memory only to find out, at the very
+        # end of the run, that there wasn't enough space on disk to hold the
+        # data.
+        if hasattr(self._traj_file, 'flush'):
+            self._traj_file.flush()
 
 
 class CustomStateDataReporter(app.StateDataReporter):

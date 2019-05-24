@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.1
               </div>
             
           
@@ -355,6 +355,64 @@ mapping</td>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="AdaptivePELE.utilities.utilities.TopologyCompat">
+<em class="property">class </em><code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">TopologyCompat</code><span class="sig-paren">(</span><em>pdb_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.TopologyCompat.getTopology">
+<code class="descname">getTopology</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.getTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.getTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the topology for a particular epoch and trajectory number</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
+<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with topology information</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyFile">
+<code class="descname">getTopologyFile</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.getTopologyFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyIndex">
+<code class="descname">getTopologyIndex</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.getTopologyIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the topology index for a particular epoch and trajectory number</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
+<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Index of the corresponding topology</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="AdaptivePELE.utilities.utilities.TopologyCompat.topologyFilesIterator">
+<code class="descname">topologyFilesIterator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.topologyFilesIterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.topologyFilesIterator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.assertSymmetriesDict">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">assertSymmetriesDict</code><span class="sig-paren">(</span><em>symmetries</em>, <em>PDB</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#assertSymmetriesDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.assertSymmetriesDict" title="Permalink to this definition">¶</a></dt>
@@ -439,6 +497,11 @@ mapping</td>
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.gen_atom_name">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">gen_atom_name</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#gen_atom_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.gen_atom_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.generateRotationMatrixAroundAxis">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">generateRotationMatrixAroundAxis</code><span class="sig-paren">(</span><em>axis</em>, <em>angle</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#generateRotationMatrixAroundAxis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.generateRotationMatrixAroundAxis" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -598,6 +661,11 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.getTopologyObject">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getTopologyObject</code><span class="sig-paren">(</span><em>topology_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getTopologyObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getTopologyObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.getTrajNum">
