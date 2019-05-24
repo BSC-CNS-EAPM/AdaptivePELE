@@ -1,4 +1,4 @@
-# must do conda install -c NostrumBioDiscovery frag_pele 
+# must do conda install -c NostrumBioDiscovery adaptive_pele 
 package:
   name: adaptive_pele
   version: "1.6.1"
