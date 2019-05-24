@@ -57,6 +57,8 @@ def parseArguments():
                         help="If set, path to the output's folder. By default it will be created in the Adaptive's \n"
                              "results path. WARNING: Take into account that if the folder already exists it will be \n"
                              "overwritten!!!")
+    parser.add_argument("--top", type=str, default=None,
+                        help="If set, path to the topology folder. This can be a pkl object or a simple pdb file")
     parser.add_argument("-done", action="store_true",
                         help="If this is not the first time that you run this script, it is strongly recommended to \n"
                              "set this parameter on. If it is set, instead of looking all the reports and create a new\n"
@@ -72,7 +74,7 @@ def parseArguments():
 
     args = parser.parse_args()
 
-    return args.res_path, args.xcol, args.ycol, args.zcol, args.outfol, args.done, args.cpus, args.report, args.traj, args.sep
+    return args.res_path, args.xcol, args.ycol, args.zcol, args.outfol, args.done, args.cpus, args.report, args.traj, args.sep, args.top
 
 
 class SelectFromCollection(object):
@@ -167,7 +169,7 @@ def concat_reports_in_csv(adaptive_results_path, output_file_path, report_prefix
     dataframe.to_csv(output_file_path, sep=separator_out, index=False)
 
 
-def trajectory_and_snapshot_to_pdb(trajectory_path, snapshot, output_path):
+def trajectory_and_snapshot_to_pdb(trajectory_path, snapshot, output_path, topology_contents):
     """
     Given an absolute path to a trajectory of Adaptive and a snapshot (MODEL) in xtc format, the function transform it
     into a PDB format.
@@ -179,14 +181,15 @@ def trajectory_and_snapshot_to_pdb(trajectory_path, snapshot, output_path):
     :type output_path: str
     :return: Creates a PDB file.
     """
-    topology_path_splited = trajectory_path.split("/")[0:-2]
-    topology_path = os.path.join("/".join(topology_path_splited), "topology.pdb")
-    topology_contents = adapt_tools.getTopologyFile(topology_path)
-    trajectory = adapt_tools.getSnapshots(trajectory_path, topology=topology_path)
+    # get the path where the adaptive simulation resides
+    topology_path_splited = trajectory_path.split(os.sep)
+    epoch = int(topology_path_splited[-2])
+    traj = adapt_tools.getTrajNum(topology_path_splited[-1])
+    trajectory = adapt_tools.getSnapshots(trajectory_path)
     try:
         single_model = trajectory[snapshot]
         PDB = atomset.PDB()
-        PDB.initialise(single_model, topology=topology_contents)
+        PDB.initialise(single_model, topology=topology_contents.getTopology(epoch, traj))
     except IndexError:
         exit("You are selecting the model {} for a trajectory that has {} models, please, reselect the model index "
              "(starting from 0).".format(snapshot, len(trajectory)))
@@ -197,7 +200,7 @@ def trajectory_and_snapshot_to_pdb(trajectory_path, snapshot, output_path):
         fw.write("END\n")
 
 
-def get_pdb_from_xtc(row, pdbs_output_path, column_file="trajectory"):
+def get_pdb_from_xtc(row, pdbs_output_path, column_file="trajectory", topology=None):
     """
     Given a row of a dataframe (expected to come from a csv report) and a column name (that must contain the path to
     its correspondent trajectory), this function extract the file in PDB format in an output file.
@@ -215,12 +218,12 @@ def get_pdb_from_xtc(row, pdbs_output_path, column_file="trajectory"):
     snapshot = row["numberOfAcceptedPeleSteps"]
     new_file_name = os.path.basename(foldername.split("/")[-1])
     new_file_name = new_file_name.split(".")[0]
-    trajectory_and_snapshot_to_pdb(filepath, snapshot, os.path.join(pdbs_output_path,
-                                                                    "{}_epoch_{}_snap_{}.pdb".format(new_file_name, epoch, snapshot)))
-    print(os.path.join(pdbs_output_path, "{}_epoch_{}_snap_{}.pdb".format(new_file_name, epoch, snapshot)))
+    out_path = os.path.join(pdbs_output_path, "{}_epoch_{}_snap_{}.pdb".format(new_file_name, epoch, snapshot))
+    trajectory_and_snapshot_to_pdb(filepath, snapshot, out_path, topology)
+    print(out_path)
 
 
-def get_pdbs_from_df_in_xtc(df, pdbs_output_path, processors=4, column_file="trajectory"):
+def get_pdbs_from_df_in_xtc(df, pdbs_output_path, processors=4, column_file="trajectory", topology=None):
     """
     It uses the function "get_pdb_from_xtc" for a whole dataframe using multiprocessing.
     :param df: Dataframe object (Pandas)
@@ -237,14 +240,14 @@ def get_pdbs_from_df_in_xtc(df, pdbs_output_path, processors=4, column_file="tra
     multiprocessing_list = []
     for _, row in df.iterrows():
         multiprocessing_list.append(pool.apply_async(get_pdb_from_xtc,
-                                                     (row, pdbs_output_path, column_file)))
+                                                     (row, pdbs_output_path, column_file, topology)))
     for process in multiprocessing_list:
         process.get()
 
 
 def main(adaptive_results_folder, column_to_x="epoch", column_to_y="Binding Energy", column_to_z=None,
          output_selection_folder=None, summary_done=False, processors=4, report_pref="report_",
-         trajectory_pref="trajectory_", separator=";", column_file="trajectory"):
+         trajectory_pref="trajectory_", separator=";", column_file="trajectory", topology=None):
     """
     Generates a scatterplot of Adaptive's results given two or three columns (X, Y, and Z if set).
     This plot allows the selection of desired points by drawing. Structures will be selected and
@@ -274,6 +277,8 @@ def main(adaptive_results_folder, column_to_x="epoch", column_to_y="Binding Ener
     :type separator: str
     :param column_file: Column name of the dataframe that contains the path to the trajectory file.
     :type column_file: str
+    :param topology: Path to the topology for the simulation
+    :type topology: str
     :return:
     """
     summary_csv_filename = os.path.join(adaptive_results_folder, "summary.csv")
@@ -288,6 +293,11 @@ def main(adaptive_results_folder, column_to_x="epoch", column_to_y="Binding Ener
     else:
         pts = ax.scatter(dataframe[column_to_x], dataframe[column_to_y], s=20)
     selector = SelectFromCollection(ax, pts)
+
+    if topology is not None:
+        topology_contents = adapt_tools.getTopologyObject(topology)
+    else:
+        topology_contents = None
 
     def accept(event, output_selection_folder=output_selection_folder):
         if event.key == "enter":
@@ -305,7 +315,7 @@ def main(adaptive_results_folder, column_to_x="epoch", column_to_y="Binding Ener
                     counter += 1
             output_selection_folder = output_selection_folder+"_"+str(counter)
             df_select.to_csv(os.path.join(output_selection_folder, "selection_report.csv"), sep=separator, index=False)
-            get_pdbs_from_df_in_xtc(df_select, output_selection_folder, processors=processors, column_file=column_file)
+            get_pdbs_from_df_in_xtc(df_select, output_selection_folder, processors=processors, column_file=column_file, topology=topology_contents)
             selector.disconnect()
             ax.set_title("")
             fig.canvas.draw()
@@ -318,7 +328,7 @@ def main(adaptive_results_folder, column_to_x="epoch", column_to_y="Binding Ener
 
 
 if __name__ == '__main__':
-    res_path, xcol, ycol, zcol, outfol, done, cpus, report, traj, sep = parseArguments()
+    res_path, xcol, ycol, zcol, outfol, done, cpus, report_name, traj_name, sep, top = parseArguments()
     main(adaptive_results_folder=res_path, column_to_x=xcol, column_to_y=ycol, column_to_z=zcol,
-         output_selection_folder=outfol, summary_done=done, processors=cpus, report_pref=report,
-         trajectory_pref=traj, separator=sep)
+         output_selection_folder=outfol, summary_done=done, processors=cpus, report_pref=report_name,
+         trajectory_pref=traj_name, separator=sep, topology=top)
