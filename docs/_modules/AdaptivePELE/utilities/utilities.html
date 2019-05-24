@@ -604,6 +604,21 @@
     <span class="k">return</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind1</span><span class="p">)</span><span class="o">+</span><span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind2</span><span class="o">//</span><span class="mi">260</span><span class="p">)</span><span class="o">+</span><span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="n">ind3</span><span class="o">//</span><span class="mi">10</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ind3</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="join_coordinates_prob"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.join_coordinates_prob">[docs]</a><span class="k">def</span> <span class="nf">join_coordinates_prob</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Join a MxN numpy array representing some cluster center coordinates with</span>
+<span class="sd">        an 1XN array representing some metric of the clusters</span>
+
+<span class="sd">        :param coords: Coordinates of the clusters</span>
+<span class="sd">        :type coords: np.array</span>
+<span class="sd">        :param p: Metric of the clusters</span>
+<span class="sd">        :type p: np.array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">coords</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span></div>
+
+
 <div class="viewcode-block" id="write_PDB_clusters"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.write_PDB_clusters">[docs]</a><span class="k">def</span> <span class="nf">write_PDB_clusters</span><span class="p">(</span><span class="n">pmf_xyzg</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;clusters.pdb&quot;</span><span class="p">,</span> <span class="n">use_beta</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">templateLine</span> <span class="o">=</span> <span class="s2">&quot;HETATM</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> CLT L 502    </span><span class="si">%s%s%s</span><span class="s2">  0.75</span><span class="si">%s</span><span class="s2">          </span><span class="si">%s</span><span class="s2">  </span><span class="se">\n</span><span class="s2">&quot;</span>
     <span class="k">if</span> <span class="n">elements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -910,10 +925,10 @@
 
 <span class="sd">        :returns: np.ndarray -- Contents of the text file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="k">return</span> <span class="n">data</span></div>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">missing_values</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">),</span> <span class="n">filling_values</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">metrics</span></div>
 
 
 <div class="viewcode-block" id="writeNewConstraints"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.writeNewConstraints">[docs]</a><span class="k">def</span> <span class="nf">writeNewConstraints</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
@@ -937,8 +952,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the new constraints from disk</span>
 
-<span class="sd">        :param folder: Name of the folder where to write the</span>
-<span class="sd">            processorsToClusterMapping</span>
+<span class="sd">        :param folder: Name of the folder where to write the constraints</span>
 <span class="sd">        :type folder: str</span>
 <span class="sd">        :param filename: Name of the file where to write the constraints</span>
 <span class="sd">        :type filename: str</span>
@@ -971,6 +985,25 @@
         <span class="k">return</span> <span class="n">readClusteringObject</span><span class="p">(</span><span class="n">topology_file</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The topology parameter needs to be the path to a pickled Topology object or a pdb!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_available_backend"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.get_available_backend">[docs]</a><span class="k">def</span> <span class="nf">get_available_backend</span><span class="p">():</span>
+    <span class="n">machine</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">getfqdn</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;bsccv&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># life cluster</span>
+        <span class="k">return</span> <span class="s2">&quot;webagg&quot;</span>
+    <span class="k">elif</span> <span class="s2">&quot;mn.bsc&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># nord3</span>
+        <span class="k">return</span> <span class="s2">&quot;tkagg&quot;</span>
+    <span class="k">elif</span> <span class="s2">&quot;bsc.mn&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># MNIV</span>
+        <span class="k">return</span> <span class="s2">&quot;qt5agg&quot;</span>
+    <span class="k">elif</span> <span class="s2">&quot;bullx&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># MinoTauro</span>
+        <span class="k">return</span> <span class="s2">&quot;gtkagg&quot;</span>
+    <span class="k">elif</span> <span class="s2">&quot;power&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
+        <span class="c1"># CTE-Power</span>
+        <span class="k">return</span> <span class="s2">&quot;tkagg&quot;</span></div>
 </pre></div>
 
            </div>

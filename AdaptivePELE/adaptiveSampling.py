@@ -681,11 +681,11 @@ def main(jsonParams, clusteringHook=None):
             processManager.writeEquilibrationStructures(outputPathConstants.tmpFolder, initialStructures)
             if processManager.isMaster() and simulationRunner.parameters.constraints:
                 # write the new constraints for synchronization
-                utilities.writeNewConstraints(outputPathConstants.tmpFolder, "new_constraints.txt", simulationRunner.parameters.constraints)
+                utilities.writeNewConstraints(outputPathConstants.topologies, "new_constraints.txt", simulationRunner.parameters.constraints)
             processManager.barrier()
 
             if not processManager.isMaster() and simulationRunner.parameters.constraints:
-                simulationRunner.parameters.constraints = utilities.readConstraints(outputPathConstants.tmpFolder, "new_constraints.txt")
+                simulationRunner.parameters.constraints = utilities.readConstraints(outputPathConstants.topologies, "new_constraints.txt")
             # read all the equilibration structures
             initialStructures = processManager.readEquilibrationStructures(outputPathConstants.tmpFolder)
             topologies.setTopologies(initialStructures, cleanFiles=processManager.isMaster())
@@ -723,7 +723,8 @@ def main(jsonParams, clusteringHook=None):
         processManager.barrier()
 
         if processManager.isMaster():
-            simulationRunner.processTrajectories(outputPathConstants.epochOutputPathTempletized % i, topologies, i)
+            if simulationRunner.parameters.postprocessing:
+                simulationRunner.processTrajectories(outputPathConstants.epochOutputPathTempletized % i, topologies, i)
             utilities.print_unbuffered("Clustering...")
             startTime = time.time()
             clusterEpochTrajs(clusteringMethod, i, outputPathConstants.epochOutputPathTempletized, topologies, outputPathConstants)

@@ -785,10 +785,10 @@ def loadtxtfile(filename):
 
         :returns: np.ndarray -- Contents of the text file
     """
-    data = np.loadtxt(filename)
-    if len(data.shape) < 2:
-        data = data[np.newaxis, :]
-    return data
+    metrics = np.genfromtxt(filename, missing_values=str("--"), filling_values='0')
+    if len(metrics.shape) < 2:
+        metrics = metrics[np.newaxis, :]
+    return metrics
 
 
 def writeNewConstraints(folder, filename, constraints):
@@ -812,8 +812,7 @@ def readConstraints(folder, filename):
     """
         Read the new constraints from disk
 
-        :param folder: Name of the folder where to write the
-            processorsToClusterMapping
+        :param folder: Name of the folder where to write the constraints
         :type folder: str
         :param filename: Name of the file where to write the constraints
         :type filename: str

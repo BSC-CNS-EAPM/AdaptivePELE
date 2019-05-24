@@ -266,6 +266,8 @@ Optionally, you can also use the following parameters:
 
   [[xb, yb, zb], [xt, yt, zt]]
 
+* **forcefield** (*str*, default="ff99SB"): Forcefield to use in the simulation, current options are: {"ff99SB", "ff14SB"}
+* **postprocessing** (*bool*, defuault=True): "Whether to postprocess the trajectories (wrapping of the water box and alginment of the protein)"
 
 Exit condition
 ..............
