@@ -179,7 +179,7 @@ class SimulationParams:
         "ligandName": "basestring",
         "nonBondedCutoff": "numbers.Real",
         "timeStep": "numbers.Real",
-        "Temperature": "numbers.Real",
+        "temperature": "numbers.Real",
         "runningPlatform": "basestring",
         "minimizationIterations": "numbers.Real",
         "reporterFrequency": "numbers.Real",
