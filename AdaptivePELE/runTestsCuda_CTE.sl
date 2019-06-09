@@ -12,4 +12,5 @@
 #SBATCH --gres gpu:2
 
 
+python runAllTests.py --exclude MD_CUDA Ad
 srun python runAllTests.py --run MD_CUDA
