@@ -9,6 +9,7 @@ import simtk.openmm.app as app
 import simtk.unit as unit
 import mdtraj as md
 import AdaptivePELE.adaptiveSampling as adaptiveSampling
+from AdaptivePELE.utilities import utilities
 from AdaptivePELE.simulation.openmm_simulations import XTCReporter
 
 
@@ -70,4 +71,4 @@ class TestReporter(unittest.TestCase):
         adaptiveSampling.main(controlFile)
         self.check_succesful_simulation(output_path, 2, 1)
         # cleanup
-        shutil.rmtree(output_path)
+        utilities.cleanup(output_path)

@@ -8,8 +8,9 @@ import shutil
 import string
 import itertools
 import numpy as np
-import mdtraj as md
+import MDAnalysis as MDA
 import multiprocessing as mp
+from MDAnalysis.analysis import align
 from builtins import range
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
@@ -881,6 +882,7 @@ class MDSimulation(SimulationRunner):
             :param epoch: Current epoch of the simulation
             :type epoch: int
         """
+        print("Processing trajectories for epoch", epoch)
         trajectory_files = glob.glob(os.path.join(output_path, constants.AmberTemplates.trajectoryTemplate.replace("%d", "*") % self.parameters.format))
         trajectory_files = [(traj, topology.getTopologyFile(epoch, utilities.getTrajNum(traj))) for traj in trajectory_files]
         pool = mp.Pool(self.parameters.trajsPerReplica)
@@ -1541,6 +1543,7 @@ def updateConstraints(constraints_orig, constraints_map):
         new_const.append([":".join([str(i) for i in atom1]), ":".join([str(i) for i in atom2]), str(dist)])
     return new_const
 
+
 def processTraj(input_files):
     """
         Align a single trajectory file (helper function for parallelization)
@@ -1549,8 +1552,10 @@ def processTraj(input_files):
         :type input_files: tuple
     """
     traj_file, top_file = input_files
-    t = md.load(traj_file, top=top_file)
-    backbone_selection = t.top.select("backbone")
-    t.image_molecules()
-    t.superpose(t, atom_indices=backbone_selection)
-    t.save(traj_file)
+    mobile = MDA.Universe(top_file)
+    new_file = "%s_new%s" % os.path.splitext(traj_file)
+    t = MDA.Universe(top_file, traj_file)
+    t.atoms.wrap(compound="residues")
+    alignment = align.AlignTraj(t, mobile, select="backbone", filename=new_file)
+    alignment.run()
+    os.rename(new_file, traj_file)
