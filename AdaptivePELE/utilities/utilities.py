@@ -38,6 +38,10 @@ class ImproperParameterValueException(Exception):
     __module__ = Exception.__module__
 
 
+class UnspecifiedPELECrashException(Exception):
+    __module__ = Exception.__module__
+
+
 class Topology:
     """
         Container object that points to the topology used in each trajectory
