@@ -2019,7 +2019,5 @@ def loadReportFile(reportFile):
         :type reportFile: str
         :returns: np.ndarray -- Contents of the report file
     """
-    metrics = np.genfromtxt(reportFile, missing_values="--", filling_values=0)
-    if len(metrics.shape) < 2:
-        metrics = metrics[np.newaxis, :]
+    metrics = utilities.loadtxtfile(reportFile)
     return filterRepeatedReports(metrics)

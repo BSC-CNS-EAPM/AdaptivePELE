@@ -2159,9 +2159,7 @@
 <span class="sd">        :type reportFile: str</span>
 <span class="sd">        :returns: np.ndarray -- Contents of the report file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">reportFile</span><span class="p">,</span> <span class="n">missing_values</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">filling_values</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">loadtxtfile</span><span class="p">(</span><span class="n">reportFile</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">filterRepeatedReports</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span></div>
 </pre></div>
 
