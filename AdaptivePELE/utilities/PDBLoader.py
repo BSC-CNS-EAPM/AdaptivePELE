@@ -563,19 +563,19 @@ class Residue(PDBase):
         Method that renames the histidines according to their protonation states
         """
         if self.id == "HIS":
-            HD1, HE1 = False, False
+            HD1, HE2 = False, False
             for atom in self.childs:
                 if atom.id == "HD1":
                     HD1 = True
-                elif atom.id == "HE1":
-                    HE1 = True
-            if HD1 and HE1:
+                elif atom.id == "HE2":
+                    HE2 = True
+            if HD1 and HE2:
                 self.rename("HIP")
                 print("Histidine number %s renamed to HIP" % self.num)
             elif HD1:
                 self.rename("HID")
                 print("Histidine number %s renamed to HID" % self.num)
-            elif HE1:
+            elif HE2:
                 self.rename("HIE")
                 print("Histidine number %s renamed to HIE" % self.num)
 
