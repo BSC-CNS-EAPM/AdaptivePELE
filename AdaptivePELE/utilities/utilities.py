@@ -780,17 +780,21 @@ def getFileExtension(trajectoryFile):
     return os.path.splitext(trajectoryFile)[1]
 
 
-def loadtxtfile(filename):
+def loadtxtfile(filename, usecols=None, postprocess=True):
     """
         Load a table file from a text file
 
         :param filename: Name of the file to load
         :type filename: str
+        :param usecols: Which columns to read, with 0 being the first
+        :type usecols: int
+        :param postprocess: Whether to add an extra dimension if only one line present in the txt file
+        :type postprocess: bool
 
         :returns: np.ndarray -- Contents of the text file
     """
-    metrics = np.genfromtxt(filename, missing_values=str("--"), filling_values='0')
-    if len(metrics.shape) < 2:
+    metrics = np.genfromtxt(filename, missing_values=str("--"), filling_values='0', usecols=usecols)
+    if len(metrics.shape) < 2 and postprocess:
         metrics = metrics[np.newaxis, :]
     return metrics
 
