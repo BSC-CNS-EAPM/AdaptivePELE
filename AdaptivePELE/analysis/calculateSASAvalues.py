@@ -71,7 +71,7 @@ def process_file(traj, top_file, resname, report, outputFilename, format_out, ne
                 header = ""
             reportFile = utilities.loadtxtfile(f)
 
-        fixedReport = correctRMSD.extendReportWithRmsd(reportFile, sasa_values)
+        fixedReport = analysis_utils.extendReportWithRmsd(reportFile, sasa_values)
     else:
         indexes = np.array(range(sasa_values.shape[0]))
         fixedReport = np.concatenate((indexes[:, None], sasa_values[:, None]), axis=1)
