@@ -71,7 +71,7 @@ def process_file(traj, top_file, resname, report, outputFilename, format_out, ne
                 header = ""
             reportFile = utilities.loadtxtfile(f)
 
-        fixedReport = correctRMSD.extendReportWithRmsd(reportFile, sasa_values)
+        fixedReport = analysis_utils.extendReportWithRmsd(reportFile, sasa_values)
     else:
         indexes = np.array(range(sasa_values.shape[0]))
         fixedReport = np.concatenate((indexes[:, None], sasa_values[:, None]), axis=1)
@@ -136,6 +136,8 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
         results.append(pool.apply_async(process_file, args=(info[0], info[2], resname, info[1], info[4], format_out, new_report, info[3])))
     for res in results:
         res.get()
+    pool.close()
+    pool.terminate()
 
 if __name__ == "__main__":
     lig_name, path, topology_path, out_name, fmt_str, n_proc, out_folder, new_reports = parseArguments()

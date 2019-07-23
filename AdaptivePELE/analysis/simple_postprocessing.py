@@ -21,7 +21,7 @@ def parse_arguments():
 def process_traj(inputs):
     top_ind, traj_name, epoch, traj_num, imaging = inputs
     ext = os.path.splitext(traj_name)[1]
-    print("Processing trajectory", traj_name)
+    utilities.print_unbuffered("Processing trajectory", traj_name)
     top = md.load("topologies/topology_%s.pdb" % top_ind)
     atoms = top.top.select("backbone")
     t = md.load(traj_name, top="topologies/system_%s.prmtop" % top_ind)

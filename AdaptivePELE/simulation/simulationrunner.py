@@ -677,6 +677,8 @@ class PeleSimulation(SimulationRunner):
                 conformation.initialise(snapshot, resname=resname, topology=topology)
                 com = conformation.getCOM()
                 data.append([line[energyColumn], i, nSnap]+com)
+        if not data:
+            raise utilities.UnspecifiedPELECrashException("Some happened with PELE and no trajectories were written!!")
         data = np.array(data)
         data = data[data[:, 0].argsort()]
         nPoints = max(self.parameters.numberEquilibrationStructures, data.shape[0]//4)

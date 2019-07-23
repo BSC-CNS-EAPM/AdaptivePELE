@@ -656,6 +656,7 @@ def main(jsonParams, clusteringHook=None):
     topologies = utilities.Topology(outputPathConstants.topologies)
     if restart and firstRun is not None:
         topology_files = glob.glob(os.path.join(outputPathConstants.topologies, "topology*.pdb"))
+        topology_files.sort(key=utilities.getTrajNum)
         topologies.setTopologies(topology_files)
         if firstRun == 0:
             createMappingForFirstEpoch(initialStructures, topologies, simulationRunner.getWorkingProcessors())
@@ -714,7 +715,10 @@ def main(jsonParams, clusteringHook=None):
 
             simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
             topologies.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i, i)
-
+            if i == 0:
+                # write the object to file at the start of the first epoch, so
+                # the topologies can always be loaded
+                topologies.writeTopologyObject()
         processManager.barrier()
         if processManager.isMaster():
             utilities.print_unbuffered("Production run...")
