@@ -108,6 +108,8 @@ def main(col_energy, folder, out_report_name, format_out, nProcessors, output_fo
         results.append(pool.apply_async(process_file, args=(info[1], info[4], format_out, new_report, info[3], col_energy)))
     for res in results:
         res.get()
+    pool.close()
+    pool.terminate()
 
 if __name__ == "__main__":
     energy_col, path, out_name, fmt_str, n_proc, out_folder, new_reports, name_report = parseArguments()

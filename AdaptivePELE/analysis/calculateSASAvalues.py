@@ -136,6 +136,8 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
         results.append(pool.apply_async(process_file, args=(info[0], info[2], resname, info[1], info[4], format_out, new_report, info[3])))
     for res in results:
         res.get()
+    pool.close()
+    pool.terminate()
 
 if __name__ == "__main__":
     lig_name, path, topology_path, out_name, fmt_str, n_proc, out_folder, new_reports = parseArguments()
