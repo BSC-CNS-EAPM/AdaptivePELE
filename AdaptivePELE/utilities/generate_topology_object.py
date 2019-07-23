@@ -22,7 +22,9 @@ def main(top_path):
     sim_folder = os.path.abspath(os.path.join(top_path, os.path.pardir))
     epochs = utilities.get_epoch_folders(sim_folder)
     top = utilities.Topology(top_path)
-    top.setTopologies(glob.glob(os.path.join(top_path, "topology*.pdb")))
+    topology_files = glob.glob(os.path.join(top_path, "topology*.pdb"))
+    topology_files.sort(key=utilities.getTrajNum)
+    top.setTopologies(topology_files)
     for epoch in epochs:
         top.readMappingFromDisk(os.path.join(sim_folder, epoch), int(epoch))
     top.writeTopologyObject()

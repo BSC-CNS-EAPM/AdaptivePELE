@@ -656,6 +656,7 @@ def main(jsonParams, clusteringHook=None):
     topologies = utilities.Topology(outputPathConstants.topologies)
     if restart and firstRun is not None:
         topology_files = glob.glob(os.path.join(outputPathConstants.topologies, "topology*.pdb"))
+        topology_files.sort(key=utilities.getTrajNum)
         topologies.setTopologies(topology_files)
         if firstRun == 0:
             createMappingForFirstEpoch(initialStructures, topologies, simulationRunner.getWorkingProcessors())
