@@ -714,7 +714,10 @@ def main(jsonParams, clusteringHook=None):
 
             simulationRunner.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i)
             topologies.writeMappingToDisk(outputPathConstants.epochOutputPathTempletized % i, i)
-
+            if i == 0:
+                # write the object to file at the start of the first epoch, so
+                # the topologies can always be loaded
+                topologies.writeTopologyObject()
         processManager.barrier()
         if processManager.isMaster():
             utilities.print_unbuffered("Production run...")
