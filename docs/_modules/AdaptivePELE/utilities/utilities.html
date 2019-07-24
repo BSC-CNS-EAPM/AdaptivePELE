@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.6.1
+                v1.6.2
               </div>
             
           
@@ -144,15 +144,15 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">socket</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">errno</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">linalg</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">mdtraj</span> <span class="k">as</span> <span class="nn">md</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">linalg</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -175,6 +175,10 @@
 
 
 <span class="k">class</span> <span class="nc">ImproperParameterValueException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="vm">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="vm">__module__</span>
+
+
+<span class="k">class</span> <span class="nc">UnspecifiedPELECrashException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="vm">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="vm">__module__</span>
 
 
@@ -916,17 +920,21 @@
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="loadtxtfile"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.loadtxtfile">[docs]</a><span class="k">def</span> <span class="nf">loadtxtfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="loadtxtfile"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.loadtxtfile">[docs]</a><span class="k">def</span> <span class="nf">loadtxtfile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load a table file from a text file</span>
 
 <span class="sd">        :param filename: Name of the file to load</span>
 <span class="sd">        :type filename: str</span>
+<span class="sd">        :param usecols: Which columns to read, with 0 being the first</span>
+<span class="sd">        :type usecols: int</span>
+<span class="sd">        :param postprocess: Whether to add an extra dimension if only one line present in the txt file</span>
+<span class="sd">        :type postprocess: bool</span>
 
 <span class="sd">        :returns: np.ndarray -- Contents of the text file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">missing_values</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">),</span> <span class="n">filling_values</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">missing_values</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">),</span> <span class="n">filling_values</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">postprocess</span><span class="p">:</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
     <span class="k">return</span> <span class="n">metrics</span></div>
 
