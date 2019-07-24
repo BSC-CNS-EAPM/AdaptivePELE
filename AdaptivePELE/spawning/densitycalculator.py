@@ -1,8 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from AdaptivePELE.constants import blockNames
-from abc import abstractmethod
-from AdaptivePELE.spawning import densitycalculatortypes
 import sys
+from abc import abstractmethod
+from AdaptivePELE.constants import blockNames
+from AdaptivePELE.spawning import densitycalculatortypes
 
 
 def continousDensity(contacts):

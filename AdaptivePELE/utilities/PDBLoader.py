@@ -1,9 +1,9 @@
 from __future__ import print_function
+import glob
+import math
 import os.path
 import numpy as np
-import glob
 import AdaptivePELE.constants
-import math
 
 
 class PDBLoadException(Exception):

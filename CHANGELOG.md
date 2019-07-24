@@ -4,7 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 
-## [1.x] - Unreleased
+[//] : # ## [1.x] - Unreleased
+
+## [1.6.2] - 2019-07-24
 
 ### New features:
 
@@ -14,8 +16,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 ### Bug fixes:
 
     - Fix bug restarting MD simulation with constraints
-    - Fix bug that crashed when constrianing HIS
+    - Fix bug that crashed when constraining HIS
     - Fix colorbar range for plotAdaptive script
+    - Fix bug in HIS protonation
 
 ### Behaviour changes from previous version:
 
@@ -23,6 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Read PELE and MD reports seemingly
     - Add postprocessing option to simulationRunner
     - Add proper topology support to selectOnPlot and backtrackAdaptiveTrajectory 
+    - Write topologies.pkl at the start of the first epoch
 
 ## [1.6.1] - 2019-04-26
 
