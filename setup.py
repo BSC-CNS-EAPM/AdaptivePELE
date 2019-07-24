@@ -61,7 +61,7 @@ setup(
     license='',
     packages=find_packages(exclude=['docs', 'tests']),
     package_data={"AdaptivePELE/atomset": ['*.pxd']},
-    install_requires=['numpy', 'mdtraj', 'scipy'],
+    install_requires=['numpy', 'mdtraj', 'scipy', 'six', 'future'],
     cmdclass=cmdclass,
     ext_modules=ext_modules,  # accepts a glob pattern
     include_dirs=[numpy.get_include()],
