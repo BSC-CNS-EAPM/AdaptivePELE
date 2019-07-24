@@ -4,15 +4,15 @@ from six import reraise as raise_
 import os
 import ast
 import sys
-import socket
-import shutil
 import glob
-import string
 import json
 import errno
-from scipy import linalg
+import socket
+import shutil
+import string
 import numpy as np
 import mdtraj as md
+from scipy import linalg
 try:
     import cPickle as pickle
 except ImportError:
