@@ -1,18 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-import socket
-import matplotlib
 import numpy as np
 import os
 import collections
 import argparse
-machine = socket.gethostname()
-if machine == "bsccv03":
-    matplotlib.use('wxagg')
-elif 'login' in machine:
-    matplotlib.use('TkAgg')
-else:
-    matplotlib.use("agg")
 import matplotlib.pyplot as plt
+from AdaptivePELE.utilities.utilities import get_available_backend
+avail_backend = get_available_backend()
+if avail_backend is not None:
+    plt.switch_backend(avail_backend)
 try:
     # This might fail for older versions of matplotlib (e.g in life cluster)
     plt.style.use("ggplot")

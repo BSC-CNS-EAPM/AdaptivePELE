@@ -1,9 +1,13 @@
 from __future__ import print_function, unicode_literals
+import os
 import argparse
 import numpy as np
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.utilities import utilities
 import matplotlib.pyplot as plt
+back = utilities.get_available_backend()
+if back is not None:
+    plt.switch_backend(back)
 
 
 def parseArguments():
@@ -17,16 +21,18 @@ def parseArguments():
     return args.trajectory, args.ref, args.nRes, args.top
 
 
-def extractAvgPDB(trajs, topology, topology_content):
+def extractAvgPDB(trajs, topology_content):
     nSnapshots = 0
     avgStruct = {}
     snapshotsTot = []
     for traj in trajs:
-        snapshots = utilities.getSnapshots(traj, topology=topology)
+        snapshots = utilities.getSnapshots(traj)
+        traj_num = utilities.getTrajNum(traj)
+        epoch = int(os.path.abspath(traj).split(os.sep)[-2])
         for snapshot in snapshots:
             nSnapshots += 1
             PDB = atomset.PDB()
-            PDB.initialise(snapshot, type="PROTEIN", topology=topology_content)
+            PDB.initialise(snapshot, type="PROTEIN", topology=topology_content.getTopology(epoch, traj_num))
             snapshotsTot.append(PDB)
             for atomID, atom in PDB.atoms.items():
                 if atomID in avgStruct:
@@ -36,30 +42,33 @@ def extractAvgPDB(trajs, topology, topology_content):
     return avgStruct, snapshotsTot
 
 
-def mapReference(ref, trajs, topology, topology_content):
+def mapReference(ref, trajs, topology_content):
     refPDB = atomset.PDB()
     refPDB.initialise(ref, type="PROTEIN", topology=topology_content)
     avgStruct = {atomID: refPDB.atoms[atomID].getAtomCoords() for atomID in refPDB.atoms}
     snapshotsTot = []
     for traj in trajs:
-        snapshots = utilities.getSnapshots(traj, topology=topology)
+        snapshots = utilities.getSnapshots(traj)
+        traj_num = utilities.getTrajNum(traj)
+        epoch = int(os.path.abspath(traj).split(os.sep)[-2])
+        snapshots = utilities.getSnapshots(traj)
         for snapshot in snapshots:
             PDB = atomset.PDB()
-            PDB.initialise(snapshot, type="PROTEIN", topology=topology_content)
+            PDB.initialise(snapshot, type="PROTEIN", topology=topology_content.getTopology(epoch, traj_num))
             snapshotsTot.append(PDB)
 
     return avgStruct, snapshotsTot
 
-if __name__ == "__main__":
-    trajs, ref, nResidues, top = parseArguments()
+
+def main(trajs, ref, nResidues, top):
     if top is None:
         top_content = None
     else:
-        top_content = utilities.getTopologyFile(top)
+        top_content = utilities.getTopologyObject(top)
     if ref is None:
-        avgPDB, totPDBs = extractAvgPDB(trajs, top, top_content)
+        avgPDB, totPDBs = extractAvgPDB(trajs, top_content)
     else:
-        avgPDB, totPDBs = mapReference(ref, trajs, top, top_content)
+        avgPDB, totPDBs = mapReference(ref, trajs, top_content)
     RMSF = {atom: 0.0 for atom in avgPDB}
     residueMapping = {}
     # TODO: Handle multiple chains and insertion residues in PDB
@@ -86,3 +95,7 @@ if __name__ == "__main__":
     plt.ylabel("RMSF")
     plt.savefig("RMSF-residue.png")
     plt.show()
+
+if __name__ == "__main__":
+    trajectories, reference, num_Residues, topology = parseArguments()
+    main(trajectories, reference, num_Residues, topology)

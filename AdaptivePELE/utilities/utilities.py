@@ -4,15 +4,15 @@ from six import reraise as raise_
 import os
 import ast
 import sys
-import socket
-import shutil
 import glob
-import string
 import json
 import errno
-from scipy import linalg
+import socket
+import shutil
+import string
 import numpy as np
 import mdtraj as md
+from scipy import linalg
 try:
     import cPickle as pickle
 except ImportError:
@@ -35,6 +35,10 @@ class RequiredParameterMissingException(Exception):
 
 
 class ImproperParameterValueException(Exception):
+    __module__ = Exception.__module__
+
+
+class UnspecifiedPELECrashException(Exception):
     __module__ = Exception.__module__
 
 
@@ -464,6 +468,21 @@ def gen_atom_name(index):
     return chr(65+ind1)+chr(65+ind2//260)+chr(65+ind3//10)+str(ind3 % 10)
 
 
+def join_coordinates_prob(coords, p):
+    """
+        Join a MxN numpy array representing some cluster center coordinates with
+        an 1XN array representing some metric of the clusters
+
+        :param coords: Coordinates of the clusters
+        :type coords: np.array
+        :param p: Metric of the clusters
+        :type p: np.array
+    """
+    if len(p.shape) < 2:
+        p = p[:, np.newaxis]
+    return np.hstack((coords, p))
+
+
 def write_PDB_clusters(pmf_xyzg, title="clusters.pdb", use_beta=False, elements=None):
     templateLine = "HETATM%s %s CLT L 502    %s%s%s  0.75%s          %s  \n"
     if elements is None:
@@ -761,19 +780,23 @@ def getFileExtension(trajectoryFile):
     return os.path.splitext(trajectoryFile)[1]
 
 
-def loadtxtfile(filename):
+def loadtxtfile(filename, usecols=None, postprocess=True):
     """
         Load a table file from a text file
 
         :param filename: Name of the file to load
         :type filename: str
+        :param usecols: Which columns to read, with 0 being the first
+        :type usecols: int
+        :param postprocess: Whether to add an extra dimension if only one line present in the txt file
+        :type postprocess: bool
 
         :returns: np.ndarray -- Contents of the text file
     """
-    data = np.loadtxt(filename)
-    if len(data.shape) < 2:
-        data = data[np.newaxis, :]
-    return data
+    metrics = np.genfromtxt(filename, missing_values=str("--"), filling_values='0', usecols=usecols)
+    if len(metrics.shape) < 2 and postprocess:
+        metrics = metrics[np.newaxis, :]
+    return metrics
 
 
 def writeNewConstraints(folder, filename, constraints):
@@ -797,8 +820,7 @@ def readConstraints(folder, filename):
     """
         Read the new constraints from disk
 
-        :param folder: Name of the folder where to write the
-            processorsToClusterMapping
+        :param folder: Name of the folder where to write the constraints
         :type folder: str
         :param filename: Name of the file where to write the constraints
         :type filename: str
@@ -831,3 +853,22 @@ def getTopologyObject(topology_file):
         return readClusteringObject(topology_file)
     else:
         raise ValueError("The topology parameter needs to be the path to a pickled Topology object or a pdb!")
+
+
+def get_available_backend():
+    machine = socket.getfqdn()
+    if "bsccv" in machine:
+        # life cluster
+        return "webagg"
+    elif "mn.bsc" in machine:
+        # nord3
+        return "tkagg"
+    elif "bsc.mn" in machine:
+        # MNIV
+        return "qt5agg"
+    elif "bullx" in machine:
+        # MinoTauro
+        return "gtkagg"
+    elif "power" in machine:
+        # CTE-Power
+        return "tkagg"

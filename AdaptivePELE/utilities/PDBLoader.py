@@ -1,9 +1,9 @@
 from __future__ import print_function
+import glob
+import math
 import os.path
 import numpy as np
-import glob
 import AdaptivePELE.constants
-import math
 
 
 class PDBLoadException(Exception):
@@ -441,8 +441,6 @@ class PDBManager:
         self.correctAlternativePositions()
         # Load the information of disulphidebonds
         self.loadDisulphideBonds()
-        # check the protonation states of the histidines
-        self.checkprotonation()
         # Rename atoms from the ligand to match parmchk atom names
         self.checkLigand()
         # Make a unique chain for the protein to avoid problems with Tleap
@@ -464,6 +462,8 @@ class PDBManager:
                     constraint_dict[res2] = None
         # Renumber the pdb and remove insertion codes
         new_constraints = self.renumber(constraint_dict=constraint_dict)
+        # check the protonation states of the histidines
+        self.checkprotonation()
         # Check for missing atoms
         self.checkMissingAtoms()
         # change PELE water names
@@ -563,19 +563,19 @@ class Residue(PDBase):
         Method that renames the histidines according to their protonation states
         """
         if self.id == "HIS":
-            HD1, HE1 = False, False
+            HD1, HE2 = False, False
             for atom in self.childs:
                 if atom.id == "HD1":
                     HD1 = True
-                elif atom.id == "HE1":
-                    HE1 = True
-            if HD1 and HE1:
+                elif atom.id == "HE2":
+                    HE2 = True
+            if HD1 and HE2:
                 self.rename("HIP")
                 print("Histidine number %s renamed to HIP" % self.num)
             elif HD1:
                 self.rename("HID")
                 print("Histidine number %s renamed to HID" % self.num)
-            elif HE1:
+            elif HE2:
                 self.rename("HIE")
                 print("Histidine number %s renamed to HIE" % self.num)
 

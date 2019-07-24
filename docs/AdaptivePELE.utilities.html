@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.6.1
+                v1.6.2
               </div>
             
           
@@ -684,6 +684,11 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.get_available_backend">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_available_backend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_available_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_available_backend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.get_epoch_folders">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_epoch_folders</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_epoch_folders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_epoch_folders" title="Permalink to this definition">¶</a></dt>
 <dd><p>List the folders belonging to an adaptive simulation and containing
@@ -722,16 +727,41 @@ trajectories and reports</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.join_coordinates_prob">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">join_coordinates_prob</code><span class="sig-paren">(</span><em>coords</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#join_coordinates_prob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.join_coordinates_prob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join a MxN numpy array representing some cluster center coordinates with
+an 1XN array representing some metric of the clusters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>coords</strong> (<em>np.array</em>) – Coordinates of the clusters</li>
+<li><strong>p</strong> (<em>np.array</em>) – Metric of the clusters</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.loadtxtfile">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">loadtxtfile</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#loadtxtfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.loadtxtfile" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">loadtxtfile</code><span class="sig-paren">(</span><em>filename</em>, <em>usecols=None</em>, <em>postprocess=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#loadtxtfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.loadtxtfile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a table file from a text file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – Name of the file to load</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>str</em>) – Name of the file to load</li>
+<li><strong>usecols</strong> (<em>int</em>) – Which columns to read, with 0 being the first</li>
+<li><strong>postprocess</strong> (<em>bool</em>) – Whether to add an extra dimension if only one line present in the txt file</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray – Contents of the text file</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.ndarray – Contents of the text file</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -784,8 +814,7 @@ trajectories and reports</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
-processorsToClusterMapping</li>
+<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the constraints</li>
 <li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the constraints</li>
 </ul>
 </td>
