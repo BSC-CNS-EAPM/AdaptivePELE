@@ -188,6 +188,7 @@ class SimulationParams:
     cylinder = "cylinder"
     cylinderBases = "cylinderBases"
     sphere = "sphere"
+    postprocessing = "postprocessing"
 
 
 class ExitConditionType:

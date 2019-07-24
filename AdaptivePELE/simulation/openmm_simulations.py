@@ -63,6 +63,7 @@ class ForceReporter(object):
         forces = state.getForces().value_in_unit(unit.kilojoules/unit.mole/unit.nanometer)
         for i, f in enumerate(forces):
             self._out.write('%d %g %g %g\n' % (i, f[0], f[1], f[2]))
+        self._out.flush()
 
 
 class XTCReporter(_BaseReporter):
@@ -85,7 +86,7 @@ class XTCReporter(_BaseReporter):
     def backend(self):
         return XTCTrajectoryFile
 
-    def __init__(self, file, reportInterval, atomSubset=None, append=False):
+    def __init__(self, file, reportInterval, atomSubset=None, append=False, enforcePeriodicBox=True):
         if append:
             if isinstance(file, basestring):
                 with self.backend(file, 'r') as f:
@@ -96,8 +97,30 @@ class XTCReporter(_BaseReporter):
                 raise TypeError("I don't know how to handle %s" % file)
         super(XTCReporter, self).__init__(file, reportInterval, coordinates=True, time=True, cell=True, potentialEnergy=False,
                                           kineticEnergy=False, temperature=False, velocities=False, atomSubset=atomSubset)
+        self._enforcePeriodicBox = enforcePeriodicBox
         if append:
             self._traj_file.write(*contents)
+
+    def describeNextReport(self, simulation):
+        """
+            Get information about the next report this object will generate.
+
+            Parameters
+            ----------
+            simulation : Simulation
+                The Simulation to generate a report for
+
+            Returns
+            -------
+            tuple
+                A six element tuple. The first element is the number of steps
+                until the next report. The next four elements specify whether
+                that report will require positions, velocities, forces, and
+                energies respectively.  The final element specifies whether
+                positions should be wrapped to lie in a single periodic box.
+        """
+        steps = self._reportInterval - simulation.currentStep % self._reportInterval
+        return (steps, self._coordinates, self._velocities, False, self._needEnergy, self._enforcePeriodicBox)
 
     def report(self, simulation, state):
         """
@@ -450,7 +473,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 
 
 @get_traceback
-def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, replica_id, trajsPerReplica, restart=False):
+def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, parameters, reportFileName, checkpoint, ligandName, replica_id, trajsPerReplica, epoch_number, restart=False):
     """
     Functions that runs the production run at NPT conditions.
     If a boxRadius is defined in the parameters section, a Flat-bottom harmonic restrains will be applied between
@@ -478,6 +501,8 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     :type trajsPerReplica: int
     :param restart: Whether the simulation run has to be restarted or not
     :type restart: bool
+    :param epoch_number: Number of the epoch
+    :type epoch_number: int
 
     """
     # this number gives the number of the subprocess in the given node
@@ -536,9 +561,9 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         simulation.context.setVelocitiesToTemperature(parameters.Temperature * unit.kelvin, seed)
         stateData = open(str(stateReporter), "w")
     if parameters.format == "xtc":
-        simulation.reporters.append(XTCReporter(str(trajName), parameters.reporterFreq, append=restart))
+        simulation.reporters.append(XTCReporter(str(trajName), parameters.reporterFreq, append=restart, enforcePeriodicBox=parameters.postprocessing))
     elif parameters.format == "dcd":
-        simulation.reporters.append(app.DCDReporter(str(trajName), parameters.reporterFreq, append=restart, enforcePeriodicBox=True))
+        simulation.reporters.append(app.DCDReporter(str(trajName), parameters.reporterFreq, append=restart, enforcePeriodicBox=parameters.postprocessing))
 
     simulation.reporters.append(app.CheckpointReporter(str(checkpointReporter), parameters.reporterFreq))
     simulation.reporters.append(CustomStateDataReporter(stateData, parameters.reporterFreq, step=True,
@@ -546,9 +571,12 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
                                                         volume=True, remainingTime=True, speed=True,
                                                         totalSteps=simulation_length, separator="\t",
                                                         append=restart, initialStep=lastStep))
+
     if workerNumber == 1:
         frequency = min(10 * parameters.reporterFreq, parameters.productionLength)
         simulation.reporters.append(app.StateDataReporter(sys.stdout, frequency, step=True))
+    if epoch_number > 0:
+        simulation.minimizeEnergy(maxIterations=parameters.minimizationIterations)
     simulation.step(simulation_length)
     stateData.close()
 
@@ -612,7 +640,6 @@ def addConstraints(system, topology, constraints):
         atom_str = "%s:%s:%d" % (atom.name, atom.residue.name, atom.residue.index+1)
         if atom_str in atomIndices:
             atomIndices[atom_str] = atom.index
-
     for constraint in constraints:
         assert atomIndices[constraint[0]] != atomIndices[constraint[1]], (constraint, atomIndices[constraint[0]], atomIndices[constraint[1]])
         assert atomIndices[constraint[0]] is not None
@@ -688,7 +715,6 @@ def addLigandBox(topology, positions, system, resname, dummy, radius, worker):
     forceFB.addPerBondParameter("k_box")
     forceFB.addPerBondParameter("r0")
     forceFB.addBond(dummy, ligand_atom, [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, radius*unit.angstroms])
-    forceFB.setUsesPeriodicBoundaryConditions(True)
     system.addForce(forceFB)
 
 
@@ -716,7 +742,6 @@ def addLigandCylinderBox(topology, positions, system, resname, dummies, radius, 
     forceFB.addPerBondParameter("r_l")
     #forceFB.addBond(center, ligand_atom, [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, length*unit.nanometers])
     forceFB.addBond([center, base, ligand_atom], [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, length*unit.nanometers])
-    forceFB.setUsesPeriodicBoundaryConditions(True)
     system.addForce(forceFB)
     force_side = mm.CustomCompoundBondForce(3, 'step(r_normal-r0)*(k_box/2) * (r_normal-r0)^2; r_normal=sqrt((ay*dz-az*dy)^2+(az*dx-ax*dz)^2+(ax*dy-ay*dx)^2); ax=(x1-x2)/l; ay=(y1-y2)/l; az=(z1-z2)/l; dx=x3-x2; dy=y3-y2; dz=z3-z2; l=distance(p1, p2)')
     force_side.addPerBondParameter("k_box")
@@ -724,7 +749,6 @@ def addLigandCylinderBox(topology, positions, system, resname, dummies, radius, 
     # the order of the particles involved are center of the cilinder, base and
     # atom to constrain (ligand)
     force_side.addBond([center, base, ligand_atom], [5.0 * unit.kilocalories_per_mole / unit.angstroms ** 2, radius*unit.angstroms])
-    force_side.setUsesPeriodicBoundaryConditions(True)
     system.addForce(force_side)
 
 
@@ -733,3 +757,19 @@ def addDummyPositions(pos, center):
     quant = unit.quantity.Quantity(value=tuple(center), unit=unit.angstrom)
     pos2.append(quant.in_units_of(unit.nanometers))
     return pos2
+
+
+def debugSimulation(simulation, outputDir, workerNumber, parameters):
+    """
+        Add some debugging information for MD simulations that crash
+    """
+    simulation.reporters.append(ForceReporter(str(os.path.join(outputDir, "forces_%d" % workerNumber)), parameters.reporterFreq))
+    state = simulation.context.getState(getEnergy=True, getPositions=True)
+    utilities.print_unbuffered("Trajectory", workerNumber, "kinetic energy", state.getKineticEnergy(), "potential energy", state.getPotentialEnergy())
+    with open(str(os.path.join(outputDir, "initial_%d.pdb" % workerNumber)), 'w') as fw:
+        app.PDBFile.writeFile(simulation.topology, state.getPositions(), fw)
+    simulation.minimizeEnergy(maxIterations=parameters.minimizationIterations)
+    state = simulation.context.getState(getEnergy=True, getPositions=True)
+    utilities.print_unbuffered("After minimizing Trajectory", workerNumber, "kinetic energy", state.getKineticEnergy(), "potential energy", state.getPotentialEnergy())
+    with open(str(os.path.join(outputDir, "initial_min_%d.pdb" % workerNumber)), 'w') as fw:
+        app.PDBFile.writeFile(simulation.topology, state.getPositions(), fw)

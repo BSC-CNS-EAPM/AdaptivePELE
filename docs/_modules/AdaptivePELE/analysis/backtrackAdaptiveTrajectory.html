@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.2
               </div>
             
           
@@ -184,9 +184,10 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">outputPath</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">topology_contents</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTopologyObject</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">topology_contents</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">topology_contents</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outputPath</span><span class="o">+</span><span class="n">out_filename</span><span class="p">):</span>
         <span class="c1"># If the specified name exists, append a number to distinguish the files</span>
         <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">out_filename</span><span class="p">)</span>
@@ -209,6 +210,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># avoid repeating the initial snapshot</span>
             <span class="n">initial</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">topology_contents</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">getTopology</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">epoch</span><span class="p">),</span> <span class="n">trajectory</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">basestring</span><span class="p">):</span>
             <span class="n">new_snapshots</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
@@ -232,8 +235,8 @@
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">traj</span><span class="p">,</span> <span class="n">num_snapshot</span><span class="p">,</span> <span class="n">num_epoch</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">use_pdb</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
-    <span class="n">main</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">num_snapshot</span><span class="p">,</span> <span class="n">num_epoch</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">use_pdb</span><span class="p">)</span>
+    <span class="n">traj</span><span class="p">,</span> <span class="n">num_snapshot</span><span class="p">,</span> <span class="n">num_epoch</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">force_use_pdb</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">num_snapshot</span><span class="p">,</span> <span class="n">num_epoch</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">force_use_pdb</span><span class="p">)</span>
 </pre></div>
 
            </div>

@@ -60,7 +60,7 @@ cdef class RMSDCalculator:
                     atom21 = PDB2.getAtom(atom1Id)
                     atom22 = PDB2.getAtom(atom2Id)
                 except KeyError as err:
-                    raise KeyError("Atom %s not found in PDB" % err.message)
+                    raise KeyError("Atom %s not found in PDB" % str(err))
                 d2 += atom11.squaredDistance(atom21) + atom12.squaredDistance(atom22)
                 d2sm += atom12.squaredDistance(atom21) + atom11.squaredDistance(atom22)
             rmsd += min(d2, d2sm)
@@ -69,7 +69,7 @@ cdef class RMSDCalculator:
                 atom1 = PDB1.getAtom(atomId)
                 atom2 = PDB2.getAtom(atomId)
             except KeyError as err:
-                raise KeyError("Atom %s not found in PDB" % err.message)
+                raise KeyError("Atom %s not found in PDB" % str(err))
             rmsd += atom1.squaredDistance(atom2)
         n = len(PDB1.atoms.items())
         return rmsd/n

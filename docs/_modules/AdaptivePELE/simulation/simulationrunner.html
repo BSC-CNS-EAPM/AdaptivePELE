@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.2
               </div>
             
           
@@ -139,15 +139,16 @@
             
   <h1>Source code for AdaptivePELE.simulation.simulationrunner</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
-<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">string</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">mdtraj</span> <span class="k">as</span> <span class="nn">md</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">blockNames</span>
@@ -174,6 +175,7 @@
     <span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="k">import</span> <span class="n">openmm_simulations</span> <span class="k">as</span> <span class="n">sim</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">OPENMM</span> <span class="o">=</span> <span class="kc">False</span>
+
 <span class="k">try</span><span class="p">:</span>
     <span class="ne">FileNotFoundError</span>
 <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
@@ -235,7 +237,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">boxType</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cylinderBases</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cylinderBases</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">postprocessing</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="SimulationRunner"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner">[docs]</a><span class="k">class</span> <span class="nc">SimulationRunner</span><span class="p">:</span>
@@ -429,7 +432,20 @@
         <span class="n">baseReportName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">reportName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">baseReportName</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">spawningReportName</span><span class="p">:</span>
             <span class="n">baseReportName</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">spawningReportName</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">reportName</span> <span class="o">=</span> <span class="s2">&quot;_</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">baseReportName</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">reportName</span> <span class="o">=</span> <span class="s2">&quot;_</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">baseReportName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulationRunner.processTrajectories"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner.processTrajectories">[docs]</a>    <span class="k">def</span> <span class="nf">processTrajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Post-process the simulation trajectories, i.e. superpose to initial frame</span>
+
+<span class="sd">            :param output_path: Path that contains the trajectories</span>
+<span class="sd">            :type output_path: str</span>
+<span class="sd">            :param topology: Topology object for the simulation</span>
+<span class="sd">            :type topology: :py:class:`.Topology`</span>
+<span class="sd">            :param epoch: Current epoch of the simulation</span>
+<span class="sd">            :type epoch: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
 
 
 <div class="viewcode-block" id="PeleSimulation"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation">[docs]</a><span class="k">class</span> <span class="nc">PeleSimulation</span><span class="p">(</span><span class="n">SimulationRunner</span><span class="p">):</span>
@@ -621,9 +637,10 @@
         <span class="c1"># Remove dynamical changes in control file</span>
         <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PeleTasks&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exitConditions&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PeleTasks&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;parametersChanges&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="c1"># Set box_radius to 2</span>
-        <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Perturbation&quot;</span><span class="p">][</span><span class="s2">&quot;Box&quot;</span><span class="p">][</span><span class="s2">&quot;fixedCenter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;$BOX_CENTER&quot;</span>
-        <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Perturbation&quot;</span><span class="p">][</span><span class="s2">&quot;Box&quot;</span><span class="p">][</span><span class="s2">&quot;radius&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="s2">&quot;Box&quot;</span> <span class="ow">in</span> <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Perturbation&quot;</span><span class="p">]:</span>
+            <span class="c1"># Set box_radius to 2</span>
+            <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Perturbation&quot;</span><span class="p">][</span><span class="s2">&quot;Box&quot;</span><span class="p">][</span><span class="s2">&quot;fixedCenter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;$BOX_CENTER&quot;</span>
+            <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Perturbation&quot;</span><span class="p">][</span><span class="s2">&quot;Box&quot;</span><span class="p">][</span><span class="s2">&quot;radius&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="c1"># Ensure random tags exists in metrics</span>
         <span class="n">metricsBlock</span> <span class="o">=</span> <span class="n">peleControlFileDict</span><span class="p">[</span><span class="s2">&quot;commands&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;PeleTasks&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;metrics&quot;</span><span class="p">]</span>
         <span class="n">nMetrics</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">metricsBlock</span><span class="p">)</span>
@@ -799,6 +816,8 @@
                 <span class="n">conformation</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
                 <span class="n">com</span> <span class="o">=</span> <span class="n">conformation</span><span class="o">.</span><span class="n">getCOM</span><span class="p">()</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">line</span><span class="p">[</span><span class="n">energyColumn</span><span class="p">],</span> <span class="n">i</span><span class="p">,</span> <span class="n">nSnap</span><span class="p">]</span><span class="o">+</span><span class="n">com</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">utilities</span><span class="o">.</span><span class="n">UnspecifiedPELECrashException</span><span class="p">(</span><span class="s2">&quot;Some happened with PELE and no trajectories were written!!&quot;</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
         <span class="n">nPoints</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">numberEquilibrationStructures</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">4</span><span class="p">)</span>
@@ -993,6 +1012,24 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">processors</span></div>
 
+<div class="viewcode-block" id="MDSimulation.processTrajectories"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MDSimulation.processTrajectories">[docs]</a>    <span class="k">def</span> <span class="nf">processTrajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Post-process the simulation trajectories, i.e. superpose to initial frame</span>
+
+<span class="sd">            :param output_path: Path that contains the trajectories</span>
+<span class="sd">            :type output_path: str</span>
+<span class="sd">            :param topology: Topology object for the simulation</span>
+<span class="sd">            :type topology: :py:class:`.Topology`</span>
+<span class="sd">            :param epoch: Current epoch of the simulation</span>
+<span class="sd">            :type epoch: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trajectory_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">AmberTemplates</span><span class="o">.</span><span class="n">trajectoryTemplate</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">format</span><span class="p">))</span>
+        <span class="n">trajectory_files</span> <span class="o">=</span> <span class="p">[(</span><span class="n">traj</span><span class="p">,</span> <span class="n">topology</span><span class="o">.</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTrajNum</span><span class="p">(</span><span class="n">traj</span><span class="p">)))</span> <span class="k">for</span> <span class="n">traj</span> <span class="ow">in</span> <span class="n">trajectory_files</span><span class="p">]</span>
+        <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">trajsPerReplica</span><span class="p">)</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">processTraj</span><span class="p">,</span> <span class="n">trajectory_files</span><span class="p">)</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="MDSimulation.equilibrate"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MDSimulation.equilibrate">[docs]</a>    <span class="k">def</span> <span class="nf">equilibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">reportFilename</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">processManager</span><span class="p">,</span> <span class="n">topologies</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Run short simulation to equilibrate the system. It will run one</span>
@@ -1124,6 +1161,7 @@
 
         <span class="k">for</span> <span class="n">worker</span> <span class="ow">in</span> <span class="n">workers</span><span class="p">:</span>
             <span class="n">newInitialStructures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">worker</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="n">endTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Equilibration took </span><span class="si">%.2f</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">newInitialStructures</span></div>
@@ -1228,6 +1266,9 @@
         <span class="n">outputDir</span> <span class="o">=</span> <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">epoch</span>
         <span class="n">structures_to_run</span> <span class="o">=</span> <span class="n">initialStructuresAsString</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">restart</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># load fixed constraints</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">readConstraints</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">topologies</span><span class="p">,</span> <span class="s2">&quot;new_constraints.txt&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">epoch</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># if the epoch is 0 the original equilibrated pdb files are taken as intial structures</span>
                 <span class="n">equilibrated_structures</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">topologies</span><span class="p">,</span> <span class="s2">&quot;top*pdb&quot;</span><span class="p">))</span>
@@ -1254,9 +1295,10 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">restart</span><span class="p">:</span>
                 <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">checkpoints</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">processManager</span><span class="o">.</span><span class="n">id</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">trajsPerReplica</span><span class="p">]</span>
             <span class="n">workerNumber</span> <span class="o">=</span> <span class="n">i</span>
-            <span class="n">workers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">runProductionSimulation</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">startingFiles</span><span class="p">,</span> <span class="n">workerNumber</span><span class="p">,</span> <span class="n">outputDir</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span> <span class="n">reportFileName</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">ligandName</span><span class="p">,</span> <span class="n">processManager</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">trajsPerReplica</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">restart</span><span class="p">)))</span>
+            <span class="n">workers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">runProductionSimulation</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">startingFiles</span><span class="p">,</span> <span class="n">workerNumber</span><span class="p">,</span> <span class="n">outputDir</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span> <span class="n">reportFileName</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">ligandName</span><span class="p">,</span> <span class="n">processManager</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">trajsPerReplica</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">restart</span><span class="p">)))</span>
         <span class="k">for</span> <span class="n">worker</span> <span class="ow">in</span> <span class="n">workers</span><span class="p">:</span>
             <span class="n">worker</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="n">endTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;OpenMM took </span><span class="si">%.2f</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">))</span></div>
@@ -1570,7 +1612,8 @@
             <span class="n">params</span><span class="o">.</span><span class="n">customparamspath</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">customparamspath</span><span class="p">)</span>
             <span class="n">params</span><span class="o">.</span><span class="n">ligandName</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">ligandName</span><span class="p">)</span>
             <span class="n">params</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">ligandName</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">params</span><span class="o">.</span><span class="n">boxCenter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">postprocessing</span> <span class="o">=</span> <span class="n">paramsBlock</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationParams</span><span class="o">.</span><span class="n">postprocessing</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">ligandName</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">boxCenter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">params</span><span class="o">.</span><span class="n">cylinderBases</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">utilities</span><span class="o">.</span><span class="n">ImproperParameterValueException</span><span class="p">(</span><span class="s2">&quot;Ligand name is necessary to establish the box&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">MDSimulation</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">simulationType</span> <span class="o">==</span> <span class="n">blockNames</span><span class="o">.</span><span class="n">SimulationType</span><span class="o">.</span><span class="n">test</span><span class="p">:</span>
@@ -1639,6 +1682,21 @@
         <span class="n">atom2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">constraints_map</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">atom2</span><span class="p">[</span><span class="mi">1</span><span class="p">:])]</span>
         <span class="n">new_const</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">atom1</span><span class="p">]),</span> <span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">atom2</span><span class="p">]),</span> <span class="nb">str</span><span class="p">(</span><span class="n">dist</span><span class="p">)])</span>
     <span class="k">return</span> <span class="n">new_const</span></div>
+
+
+<div class="viewcode-block" id="processTraj"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.processTraj">[docs]</a><span class="k">def</span> <span class="nf">processTraj</span><span class="p">(</span><span class="n">input_files</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Align a single trajectory file (helper function for parallelization)</span>
+
+<span class="sd">        :param input_files: Tuple with (trajectory_file, topology_file)</span>
+<span class="sd">        :type input_files: tuple</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">traj_file</span><span class="p">,</span> <span class="n">top_file</span> <span class="o">=</span> <span class="n">input_files</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">traj_file</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">top_file</span><span class="p">)</span>
+    <span class="n">backbone_selection</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">top</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;backbone&quot;</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">image_molecules</span><span class="p">()</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">superpose</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">atom_indices</span><span class="o">=</span><span class="n">backbone_selection</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">traj_file</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

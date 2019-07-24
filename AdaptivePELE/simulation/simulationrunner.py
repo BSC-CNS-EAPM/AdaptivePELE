@@ -98,6 +98,7 @@ class SimulationParameters:
         self.constraints = None
         self.boxType = None
         self.cylinderBases = None
+        self.postprocessing = False
 
 
 class SimulationRunner:
@@ -306,6 +307,7 @@ class SimulationRunner:
         """
         pass
 
+
 class PeleSimulation(SimulationRunner):
     def __init__(self, parameters):
         SimulationRunner.__init__(self, parameters)
@@ -495,9 +497,10 @@ class PeleSimulation(SimulationRunner):
         # Remove dynamical changes in control file
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("exitConditions", None)
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("parametersChanges", None)
-        # Set box_radius to 2
-        peleControlFileDict["commands"][0]["Perturbation"]["Box"]["fixedCenter"] = "$BOX_CENTER"
-        peleControlFileDict["commands"][0]["Perturbation"]["Box"]["radius"] = 2
+        if "Box" in peleControlFileDict["commands"][0]["Perturbation"]:
+            # Set box_radius to 2
+            peleControlFileDict["commands"][0]["Perturbation"]["Box"]["fixedCenter"] = "$BOX_CENTER"
+            peleControlFileDict["commands"][0]["Perturbation"]["Box"]["radius"] = 2
         # Ensure random tags exists in metrics
         metricsBlock = peleControlFileDict["commands"][0]["PeleTasks"][0]["metrics"]
         nMetrics = len(metricsBlock)
@@ -673,6 +676,8 @@ class PeleSimulation(SimulationRunner):
                 conformation.initialise(snapshot, resname=resname, topology=topology)
                 com = conformation.getCOM()
                 data.append([line[energyColumn], i, nSnap]+com)
+        if not data:
+            raise utilities.UnspecifiedPELECrashException("Some happened with PELE and no trajectories were written!!")
         data = np.array(data)
         data = data[data[:, 0].argsort()]
         nPoints = max(self.parameters.numberEquilibrationStructures, data.shape[0]//4)
@@ -1121,6 +1126,9 @@ class MDSimulation(SimulationRunner):
         outputDir = outputPathConstants.epochOutputPathTempletized % epoch
         structures_to_run = initialStructuresAsString.split(":")
         if self.restart:
+            if self.parameters.constraints is not None:
+                # load fixed constraints
+                self.parameters.constraints = utilities.readConstraints(outputPathConstants.topologies, "new_constraints.txt")
             if epoch == 0:
                 # if the epoch is 0 the original equilibrated pdb files are taken as intial structures
                 equilibrated_structures = glob.glob(os.path.join(outputPathConstants.topologies, "top*pdb"))
@@ -1147,7 +1155,7 @@ class MDSimulation(SimulationRunner):
             if self.restart:
                 checkpoint = checkpoints[i + processManager.id * self.parameters.trajsPerReplica]
             workerNumber = i
-            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.parameters.ligandName, processManager.id, self.parameters.trajsPerReplica, self.restart)))
+            workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.parameters.ligandName, processManager.id, self.parameters.trajsPerReplica, epoch, self.restart)))
         for worker in workers:
             worker.get()
         pool.terminate()
@@ -1464,7 +1472,8 @@ class RunnerBuilder:
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
             params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
             params.constraints = paramsBlock.get(blockNames.SimulationParams.constraints)
-            if params.ligandName is None and params.boxCenter is not None:
+            params.postprocessing = paramsBlock.get(blockNames.SimulationParams.postprocessing, True)
+            if params.ligandName is None and (params.boxCenter is not None or params.cylinderBases is not None):
                 raise utilities.ImproperParameterValueException("Ligand name is necessary to establish the box")
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
@@ -1533,6 +1542,7 @@ def updateConstraints(constraints_orig, constraints_map):
         atom2[2] = constraints_map[tuple(atom2[1:])]
         new_const.append([":".join([str(i) for i in atom1]), ":".join([str(i) for i in atom2]), str(dist)])
     return new_const
+
 
 def processTraj(input_files):
     """

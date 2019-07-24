@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.6
+                v1.6.2
               </div>
             
           
@@ -683,11 +683,7 @@
             <span class="k">return</span> <span class="n">trajPosition</span></div>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">pdb</span>\
-             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span>\
-             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">threshold</span>\
-             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">contacts</span>\
-             <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">contacts</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ClusteringEvaluator"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ClusteringEvaluator">[docs]</a><span class="k">class</span> <span class="nc">ClusteringEvaluator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -1056,12 +1052,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">getNumberClusters</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">clusters</span>\
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">reportBaseFilename</span>\
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">resname</span>\
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">resnum</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">resnum</span>\
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">resChain</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">resChain</span>\
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">col</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resChain</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">clusters</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">reportBaseFilename</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">resChain</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Clustering.filterClustersAccordingToBox"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.filterClustersAccordingToBox">[docs]</a>    <span class="k">def</span> <span class="nf">filterClustersAccordingToBox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulationRunnerParams</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2168,9 +2159,7 @@
 <span class="sd">        :type reportFile: str</span>
 <span class="sd">        :returns: np.ndarray -- Contents of the report file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">reportFile</span><span class="p">,</span> <span class="n">missing_values</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">filling_values</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">loadtxtfile</span><span class="p">(</span><span class="n">reportFile</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">filterRepeatedReports</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span></div>
 </pre></div>
 

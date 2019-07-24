@@ -1,29 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import json
-import glob
 import argparse
 import numpy as np
+import multiprocessing as mp
 from AdaptivePELE.utilities import utilities
 import AdaptivePELE.atomset.atomset as atomset
-
-
-def extendReportWithRmsd(reportFile, rmsds):
-    """
-        Extend a previous report file with corrected rmsd values
-
-        :param reportFile: Report file to be corrected
-        :type reportFile: np.ndarray
-        :param rmsds: Rmsd corrected values
-        :type rmsds: np.ndarray
-
-        :returns: np.ndarray -- Extended report file with corrected rmsd values
-    """
-    newShape = reportFile.shape
-    fixedReport = np.zeros((newShape[0], newShape[1]+1))
-    fixedReport[:, :-1] = reportFile
-    fixedReport[:, -1] = rmsds
-    return fixedReport
+from AdaptivePELE.analysis import analysis_utils
 
 
 def parseArguments():
@@ -39,14 +22,23 @@ def parseArguments():
            "{"\
            "\"resname\" : \"K5Y\","\
            "\"native\" : \"native.pdb\","\
-           "\"symmetries\" : {[\"4122:C12:K5Y\":\"4123:C13:K5Y\", \"4120:C10:K5Y\":\"4127:C17:K5Y\"]},"\
+           "\"symmetries\" : [{\"4122:C12:K5Y\":\"4123:C13:K5Y\", \"4120:C10:K5Y\":\"4127:C17:K5Y\"}],"\
            "\"column\" = 5"\
            "}"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("controlFile", type=str, help="Control File name")
+    parser.add_argument("--report_name", type=str, default=None, help="Name of report files, for example if reports are named 'report_1' use report")
+    parser.add_argument("--trajectory_name", type=str, default=None, help="Name of trajectory files, for example if reports are named 'run_trajectories_1' use run_trajectories")
+    parser.add_argument("--path", type=str, default=".", help="Path where the simulation is stored")
+    parser.add_argument("--top", type=str, default=None, help="Topology file for non-pdb trajectories or path to Adaptive topology object")
+    parser.add_argument("--out_name", type=str, default="fixedReport", help="Name of the modified report files (default is fixedReport)")
+    parser.add_argument("--out_folder", type=str, default=None, help="Path where to store the report files (default is fixedReport)")
+    parser.add_argument("-n", type=int, default=1, help="Number of processors to parallelize")
+    parser.add_argument("--fmt_str", type=str, default="%.4f", help="Format of the output file (default is .4f which means all floats with 4 decimal points)")
+    parser.add_argument("--new_report", action="store_true", help="Whether to create new report files")
     args = parser.parse_args()
 
-    return args.controlFile
+    return args.controlFile, args.report_name, args.trajectory_name, args.path, args.top, args.out_name, args.n, args.out_folder, args.fmt_str, args.new_report
 
 
 def readControlFile(controlFile):
@@ -72,55 +64,104 @@ def readControlFile(controlFile):
     return resname, nativeFilename, symmetries, rmsdColInReport
 
 
-def main(controlFile):
+def calculate_rmsd_traj(nativePDB, resname, symmetries, rmsdColInReport, traj, reportName, top, epoch, outputFilename, fmt_str, new_report):
+    top_proc = None
+    if top is not None:
+        top_proc = utilities.getTopologyFile(top)
+    rmsds = utilities.getRMSD(traj, nativePDB, resname, symmetries, topology=top_proc)
+
+    if new_report:
+        fixedReport = np.zeros((rmsds.size, 2))
+        fixedReport[:, 0] = range(rmsds.size)
+        fixedReport[:, 1] = rmsds
+        header = ""
+    else:
+        with open(reportName) as f:
+            header = f.readline().rstrip()
+            if not header.startswith("#"):
+                header = ""
+            reportFile = utilities.loadtxtfile(reportName)
+        if rmsdColInReport > 0 and rmsdColInReport < reportFile.shape[1]:
+            reportFile[:, rmsdColInReport] = rmsds
+            fixedReport = reportFile
+        else:
+            fixedReport = analysis_utils.extendReportWithRmsd(reportFile, rmsds)
+
+    with open(outputFilename, "w") as fw:
+        if header:
+            fw.write("%s\tRMSD\n" % header)
+        else:
+            fw.write("# Step\tRMSD\n")
+        np.savetxt(fw, fixedReport, fmt=fmt_str)
+
+
+def main(controlFile, trajName, reportName, folder, top, outputFilename, nProcessors, output_folder, format_str, new_report):
     """
         Calculate the corrected rmsd values of conformation taking into account
         molecule symmetries
 
         :param controlFile: Control file
         :type controlFile: str
+        :param folder: Path the simulation
+        :type folder: str
+        :param top: Path to the topology
+        :type top: str
+        :param outputFilename: Name of the output file
+        :type outputFilename: str
+        :param nProcessors: Number of processors to use
+        :type nProcessors: int
+        :param output_folder: Path where to store the new reports
+        :type output_folder: str
+        :param format_str: String with the format of the report
+        :type format_str: str
+        :param new_report: Whether to write rmsd to a new report file
+        :type new_report: bool
+
     """
-    # Constants
-    folder = "."
-    outputFilename = "fixedReport_%d"
-    trajName = "*traj*"
-    reportName = "*report_%d"
-    # end constants
+    if trajName is None:
+        trajName = "*traj*"
+    else:
+        trajName += "_*"
+    if reportName is None:
+        reportName = "report_%d"
+    else:
+        reportName += "_%d"
+    if output_folder is not None:
+        outputFilename = os.path.join(output_folder, outputFilename)
+    outputFilename += "_%d"
+    if nProcessors is None:
+        nProcessors = utilities.getCpuCount()
+    nProcessors = max(1, nProcessors)
+    print("Calculating RMSDs with %d processors" % nProcessors)
+    pool = mp.Pool(nProcessors)
+    epochs = utilities.get_epoch_folders(folder)
+    if top is not None:
+        top_obj = utilities.getTopologyObject(top)
+    else:
+        top_obj = None
 
     resname, nativeFilename, symmetries, rmsdColInReport = readControlFile(controlFile)
 
     nativePDB = atomset.PDB()
     nativePDB.initialise(nativeFilename, resname=resname)
 
-    allFolders = os.listdir(folder)
-    epochs = [epoch for epoch in allFolders if epoch.isdigit()]
-
+    files = []
+    if not epochs:
+        # path does not contain an adaptive simulation, we'll try to retrieve
+        # trajectories from the specified path
+        files = analysis_utils.process_folder(None, folder, trajName, reportName, os.path.join(folder, outputFilename), top_obj)
     for epoch in epochs:
         print("Epoch", epoch)
-        os.chdir(epoch)
-        allTrajs = glob.glob(trajName)
+        files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj))
+    results = []
+    for info in files:
+        results.append(pool.apply_async(calculate_rmsd_traj, args=(nativePDB, resname, symmetries, rmsdColInReport, info[0], info[1], info[2], info[3], info[4], format_str, new_report)))
+    for res in results:
+        res.get()
+    pool.close()
+    pool.terminate()
 
-        for traj in allTrajs:
-            rmsds = utilities.getRMSD(traj, nativePDB, resname, symmetries)
-            trajNum = utilities.getTrajNum(traj)
-            try:
-                reportFilename = glob.glob(reportName % trajNum)[0]
-            except IndexError:
-                raise IndexError("File %s not found in folder %s" % (reportName % trajNum, epoch))
-
-            reportFile = np.loadtxt(reportFilename, ndmin=2)
-
-            if rmsdColInReport > 0 and rmsdColInReport < reportFile.shape[1]:
-                reportFile[:, rmsdColInReport] = rmsds
-                fixedReport = reportFile
-            else:
-                fixedReport = extendReportWithRmsd(reportFile, rmsds)
-
-            # print(fixedReport)
-            np.savetxt(outputFilename % trajNum, fixedReport, fmt=b'%.4f')
-
-        os.chdir("..")
 
 if __name__ == "__main__":
-    control_file = parseArguments()
-    main(control_file)
+    control_file, name_report, name_traj, path, topology_path, out_name, n_proc, out_folder, fmt, new_rep = parseArguments()
+    main(control_file, name_traj, name_report, path, topology_path, out_name, n_proc, out_folder, fmt, new_rep)
