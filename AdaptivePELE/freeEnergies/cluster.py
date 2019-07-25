@@ -6,6 +6,8 @@ import numpy as np
 from AdaptivePELE.utilities import utilities
 import pyemma.coordinates as coor
 from pyemma.coordinates.clustering import AssignCenters
+from pyemma import config 
+config.show_progress_bars = False
 
 
 class Cluster:
