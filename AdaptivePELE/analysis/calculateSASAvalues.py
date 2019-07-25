@@ -42,7 +42,9 @@ def calculateSASA(trajectory, topology, res_name):
         :param res_name: Ligand resname
         :type res_name: str
     """
+    utilities.print_unbuffered("Processing", trajectory)
     t = md.load(trajectory, top=topology)
+    t.remove_solvent(inplace=True)
     res_atoms = t.top.select("resname '%s'" % res_name)
     t2 = t.atom_slice(res_atoms)
     for atom in t2.top.atoms:
@@ -117,7 +119,6 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
         nProcessors = utilities.getCpuCount()
     nProcessors = max(1, nProcessors)
     print("Calculating SASA with %d processors" % nProcessors)
-    pool = mp.Pool(nProcessors)
     epochs = utilities.get_epoch_folders(folder)
     if top is not None:
         top_obj = utilities.getTopologyObject(top)
@@ -132,12 +133,11 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
         print("Epoch", epoch)
         files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj))
     results = []
+    pool = mp.Pool(nProcessors)
     for info in files:
         results.append(pool.apply_async(process_file, args=(info[0], info[2], resname, info[1], info[4], format_out, new_report, info[3])))
-    for res in results:
-        res.get()
     pool.close()
-    pool.terminate()
+    pool.join()
 
 if __name__ == "__main__":
     lig_name, path, topology_path, out_name, fmt_str, n_proc, out_folder, new_reports = parseArguments()
