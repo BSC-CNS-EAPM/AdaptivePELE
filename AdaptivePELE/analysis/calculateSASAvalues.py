@@ -26,9 +26,10 @@ def parseArguments():
     parser.add_argument("-n", type=int, default=1, help="Number of processors to parallelize")
     parser.add_argument("--fmt_str", type=str, default="%.4f", help="Format of the output file (default is .4f which means all floats with 4 decimal points)")
     parser.add_argument("--new_report", action="store_true", help="Whether to create new report files instead of modifying existing ones")
+    parser.add_argument("--traj_to_process", nargs="*", type=int, default=None, help="Number of the trajectories to filter, if not specified all of them will be processed")
     args = parser.parse_args()
 
-    return args.resname, args.path, args.top, args.out_name, args.fmt_str, args.n, args.out_folder, args.new_report
+    return args.resname, args.path, args.top, args.out_name, args.fmt_str, args.n, args.out_folder, args.new_report, args.traj_to_process
 
 
 def calculateSASA(trajectory, topology, res_name):
@@ -88,7 +89,7 @@ def process_file(traj, top_file, resname, report, outputFilename, format_out, ne
     print("Took %.2fs to process" % (end-start), traj)
 
 
-def main(resname, folder, top, out_report_name, format_out, nProcessors, output_folder, new_report):
+def main(resname, folder, top, out_report_name, format_out, nProcessors, output_folder, new_report, trajs_to_select):
     """
         Calculate the relative SASA values of the ligand
 
@@ -108,6 +109,8 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
         :type output_folder: str
         :param new_report: Whether to create new reports
         :type new_report: bool
+        :param trajs_to_select: Number of the reports to read, if don't want to select all
+        :type trajs_to_select: set
     """
     # Constants
     if output_folder is not None:
@@ -128,10 +131,11 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
     if not epochs:
         # path does not contain an adaptive simulation, we'll try to retrieve
         # trajectories from the specified path
-        files = analysis_utils.process_folder(None, folder, trajName, reportName, os.path.join(folder, outputFilename), top_obj)
+        files = analysis_utils.process_folder(None, folder, trajName, reportName, os.path.join(folder, outputFilename), top_obj, trajs_to_select)
     for epoch in epochs:
         print("Epoch", epoch)
-        files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj))
+        files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj, trajs_to_select))
+    print("Starting to process files!")
     results = []
     pool = mp.Pool(nProcessors)
     for info in files:
@@ -140,5 +144,5 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
     pool.join()
 
 if __name__ == "__main__":
-    lig_name, path, topology_path, out_name, fmt_str, n_proc, out_folder, new_reports = parseArguments()
-    main(lig_name, path, topology_path, out_name, fmt_str, n_proc, out_folder, new_reports)
+    lig_name, path, topology_path, out_name, fmt_str, n_proc, out_folder, new_reports, traj_filter = parseArguments()
+    main(lig_name, path, topology_path, out_name, fmt_str, n_proc, out_folder, new_reports, set(traj_filter))
