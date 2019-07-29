@@ -46,6 +46,10 @@ def process_file(report, outputFilename, format_out, new_report, epoch, energy_c
 
     if not new_report:
         if outputFilename != reportFilename:
+            with open(outputFilename) as f:
+                header = f.readline().rstrip()
+                if not header.startswith("#"):
+                    header = ""
             reportFile = utilities.loadtxtfile(outputFilename)
         fixedReport = analysis_utils.extendReportWithRmsd(reportFile, energy_values)
     else:
