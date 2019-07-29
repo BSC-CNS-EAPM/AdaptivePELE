@@ -36,9 +36,10 @@ def parseArguments():
     parser.add_argument("-n", type=int, default=1, help="Number of processors to parallelize")
     parser.add_argument("--fmt_str", type=str, default="%.4f", help="Format of the output file (default is .4f which means all floats with 4 decimal points)")
     parser.add_argument("--new_report", action="store_true", help="Whether to create new report files")
+    parser.add_argument("--traj_to_process", nargs="*", type=int, default=None, help="Number of the trajectories to filter, if not specified all of them will be processed")
     args = parser.parse_args()
 
-    return args.controlFile, args.report_name, args.trajectory_name, args.path, args.top, args.out_name, args.n, args.out_folder, args.fmt_str, args.new_report
+    return args.controlFile, args.report_name, args.trajectory_name, args.path, args.top, args.out_name, args.n, args.out_folder, args.fmt_str, args.new_report, args.traj_to_process
 
 
 def readControlFile(controlFile):
@@ -95,7 +96,7 @@ def calculate_rmsd_traj(nativePDB, resname, symmetries, rmsdColInReport, traj, r
         np.savetxt(fw, fixedReport, fmt=fmt_str)
 
 
-def main(controlFile, trajName, reportName, folder, top, outputFilename, nProcessors, output_folder, format_str, new_report):
+def main(controlFile, trajName, reportName, folder, top, outputFilename, nProcessors, output_folder, format_str, new_report, trajs_to_select):
     """
         Calculate the corrected rmsd values of conformation taking into account
         molecule symmetries
@@ -148,11 +149,11 @@ def main(controlFile, trajName, reportName, folder, top, outputFilename, nProces
     if not epochs:
         # path does not contain an adaptive simulation, we'll try to retrieve
         # trajectories from the specified path
-        files = analysis_utils.process_folder(None, folder, trajName, reportName, os.path.join(folder, outputFilename), top_obj)
+        files = analysis_utils.process_folder(None, folder, trajName, reportName, os.path.join(folder, outputFilename), top_obj, trajs_to_select)
     for epoch in epochs:
         print("Epoch", epoch)
-        files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj))
-    results = []
+        files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj, trajs_to_select))
+    pool = mp.Pool(nProcessors)
     for info in files:
         pool.apply_async(calculate_rmsd_traj, args=(nativePDB, resname, symmetries, rmsdColInReport, info[0], info[1], info[2], info[3], info[4], format_str, new_report))
     pool.close()
@@ -160,5 +161,7 @@ def main(controlFile, trajName, reportName, folder, top, outputFilename, nProces
 
 
 if __name__ == "__main__":
-    control_file, name_report, name_traj, path, topology_path, out_name, n_proc, out_folder, fmt, new_rep = parseArguments()
-    main(control_file, name_traj, name_report, path, topology_path, out_name, n_proc, out_folder, fmt, new_rep)
+    control_file, name_report, name_traj, path, topology_path, out_name, n_proc, out_folder, fmt, new_rep, traj_filter = parseArguments()
+    if traj_filter is not None:
+        traj_filter = set(traj_filter)
+    main(control_file, name_traj, name_report, path, topology_path, out_name, n_proc, out_folder, fmt, new_rep, traj_filter)

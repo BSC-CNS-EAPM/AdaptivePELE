@@ -144,4 +144,6 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
 
 if __name__ == "__main__":
     lig_name, path, topology_path, out_name, fmt_str, n_proc, out_folder, new_reports, traj_filter = parseArguments()
-    main(lig_name, path, topology_path, out_name, fmt_str, n_proc, out_folder, new_reports, set(traj_filter))
+    if traj_filter is not None:
+        traj_filter = set(traj_filter)
+    main(lig_name, path, topology_path, out_name, fmt_str, n_proc, out_folder, new_reports, traj_filter)
