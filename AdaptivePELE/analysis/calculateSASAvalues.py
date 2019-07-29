@@ -136,10 +136,9 @@ def main(resname, folder, top, out_report_name, format_out, nProcessors, output_
         print("Epoch", epoch)
         files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj, trajs_to_select))
     print("Starting to process files!")
-    results = []
     pool = mp.Pool(nProcessors)
     for info in files:
-        results.append(pool.apply_async(process_file, args=(info[0], info[2], resname, info[1], info[4], format_out, new_report, info[3])))
+        pool.apply_async(process_file, args=(info[0], info[2], resname, info[1], info[4], format_out, new_report, info[3]))
     pool.close()
     pool.join()
 

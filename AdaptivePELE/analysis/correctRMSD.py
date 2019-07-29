@@ -133,7 +133,6 @@ def main(controlFile, trajName, reportName, folder, top, outputFilename, nProces
         nProcessors = utilities.getCpuCount()
     nProcessors = max(1, nProcessors)
     print("Calculating RMSDs with %d processors" % nProcessors)
-    pool = mp.Pool(nProcessors)
     epochs = utilities.get_epoch_folders(folder)
     if top is not None:
         top_obj = utilities.getTopologyObject(top)
@@ -155,11 +154,9 @@ def main(controlFile, trajName, reportName, folder, top, outputFilename, nProces
         files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj))
     results = []
     for info in files:
-        results.append(pool.apply_async(calculate_rmsd_traj, args=(nativePDB, resname, symmetries, rmsdColInReport, info[0], info[1], info[2], info[3], info[4], format_str, new_report)))
-    for res in results:
-        res.get()
+        pool.apply_async(calculate_rmsd_traj, args=(nativePDB, resname, symmetries, rmsdColInReport, info[0], info[1], info[2], info[3], info[4], format_str, new_report))
     pool.close()
-    pool.terminate()
+    pool.join()
 
 
 if __name__ == "__main__":
