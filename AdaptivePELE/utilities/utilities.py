@@ -318,6 +318,19 @@ def getTrajNum(trajFilename):
     return int(trajFilename.split("_")[-1][:-4])
 
 
+def getReportNum(reportFilename):
+    """
+        Gets the report number
+
+        :param reportFilename: Trajectory filename
+        :type reportFilename: str
+
+        :returns: int -- Report number
+    """
+    name, _ = os.path.splitext(reportFilename)
+    return int(name.split("_")[-1])
+
+
 def getPrmtopNum(prmtopFilename):
     """
         Gets the prmtop number
