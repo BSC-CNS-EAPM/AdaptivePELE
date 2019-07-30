@@ -40,7 +40,7 @@ def parseArguments():
     return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel
 
 
-def addLine(data_plot, traj_num, epoch, steps, opt_dict):
+def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
     """
         Add a line to the plot corresponding to a report file
 
@@ -63,14 +63,14 @@ def addLine(data_plot, traj_num, epoch, steps, opt_dict):
         modifier = 'o'
     y = data_plot[:, opt_dict['col2']]
     if opt_dict['color'] is None:
-        plt.plot(x, y, modifier, c=opt_dict['cmap'].to_rgba(epoch), markersize=2.5)
+        artists.extend(plt.plot(x, y, modifier, c=opt_dict['cmap'].to_rgba(epoch), markersize=2.5))
     elif opt_dict['color'] == -1:
-        plt.plot(x, y, modifier, c=opt_dict['cmap'].to_rgba(traj_num), markersize=2.5)
+        artists.extend(plt.plot(x, y, modifier, c=opt_dict['cmap'].to_rgba(traj_num), markersize=2.5))
     else:
         colors = data_plot[:, opt_dict['color']]
         if opt_dict['withLines']:
             plt.plot(x, y, '-k', linewidth=0.2, alpha=0.2)
-        plt.scatter(x, y, c=colors, cmap=opt_dict['cmap'].cmap, s=15, zorder=2)
+        artists.append(plt.scatter(x, y, c=colors, cmap=opt_dict['cmap'].cmap, s=15, zorder=2))
 
 
 def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, paletteModifier, trajs_range=None, path_out=None, label_x=None, label_y=None, label_colorbar=None):
@@ -104,7 +104,8 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
 
     dictionary = {'reportName': reportName, 'col2': column2, 'numberOfEpochs': numberOfEpochs,
                   'col1': column1, 'withLines': printWithLines, 'color': paletteModifier}
-
+    annotations = []
+    artists = []
     trajectory_range = set()
     if trajs_range is not None:
         start, end = map(int, traj_range.split(":"))
@@ -130,6 +131,7 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
                 cmin = min(cmin, data[:, paletteModifier].min())
                 cmax = max(cmax, data[:, paletteModifier].max())
             data_dict[(ep, report_num)] = data
+    fig, ax = plt.subplots()
     ticks = None
     if paletteModifier == -1:
         cmin = min_report
@@ -143,8 +145,10 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
     dictionary['cmap'] = sm
     if paletteModifier != -1:
         cbar = plt.colorbar(sm, ticks=ticks)
+        cbar.ax.zorder = -1
     for el in data_dict:
-        addLine(data_dict[el], el[1], el[0], stepsPerRun, dictionary)
+        addLine(data_dict[el], el[1], el[0], stepsPerRun, dictionary, artists)
+        annotations.append(["Epoch: %d\nTrajectory: %d\nModel: %d" % (el[0], el[1], i+1) for i in range(len(data_dict[el]))])
     if label_x is not None:
         plt.xlabel(label_x)
     if label_y is not None:
@@ -153,6 +157,59 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
             cbar.set_label("Epoch")
         if label_colorbar is not None:
             cbar.set_label(label_colorbar)
+
+    annot = ax.annotate("", xy=(0, 0), xytext=(20, 20),
+                        textcoords="offset points",
+                        bbox=dict(boxstyle="round", fc="w"),
+                        arrowprops=dict(arrowstyle="->"))
+    annot.set_visible(False)
+
+    def update_annot(ind, color, pos, index):
+        """Update the information box of the selected point"""
+        annot.xy = pos
+        annot.set_text(annotations[index][int(ind["ind"][0])])
+        annot.get_bbox_patch().set_facecolor(color)
+        annot.get_bbox_patch().set_alpha(0.8)
+        annot.zorder = 10
+
+    def locate_event(event):
+        for j, el in enumerate(artists):
+            found, info = el.contains(event)
+            if found:
+                return j, found, info, el
+        return 0, False, None, None
+
+    def extract_data(obj_plot, ind):
+        try:
+            x, y = obj_plot.get_data()
+            x = x[ind["ind"][0]]
+            y = y[ind["ind"][0]]
+            return (x, y)
+        except AttributeError:
+            return obj_plot.get_offsets()[ind["ind"][0]]
+
+    def extract_color(obj_plot, ind):
+        try:
+            return obj_plot.get_markerfacecolor()
+        except AttributeError:
+            return obj_plot.get_facecolor()[ind["ind"][0]]
+
+
+    def hover(event):
+        """Action to perform when hovering the mouse on a point"""
+        vis = annot.get_visible()
+        if event.inaxes == ax:
+            index, cont, ind, obj = locate_event(event)
+            if cont:
+                update_annot(ind, extract_color(obj, ind), extract_data(obj, ind), index)
+                annot.set_visible(True)
+                fig.canvas.draw_idle()
+            else:
+                if vis:
+                    annot.set_visible(False)
+                    fig.canvas.draw_idle()
+    # Respond to mouse motion
+    fig.canvas.mpl_connect("motion_notify_event", hover)
 
 
 def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier, trajs_range, path_to_save, xlabel, ylabel, cblabel):
