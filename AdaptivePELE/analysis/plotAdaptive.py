@@ -5,6 +5,9 @@ import argparse
 import matplotlib.pyplot as plt
 from AdaptivePELE.utilities import utilities
 plt.style.use("ggplot")
+avail_backend = utilities.get_available_backend()
+if avail_backend is not None:
+    plt.switch_backend(avail_backend)
 
 
 def parseArguments():
