@@ -10,6 +10,21 @@ The format is based on `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_
 .. XXX - Unreleased
 .. ----------------
 
+1.6.3 - Unreleased
+------------------
+
+New features:
+.............
+
+    - Add annotations to plotAdaptive, which show the origin (epoch, trajectory and snapshot) of the plot points
+
+Bug fixes:
+..........
+
+Behaviour changes from previous version:
+........................................
+
+    - Modify plotAdaptive to generate the plots using matplotlib and not rely on gnuplot
 
 1.6.2 - 2019-07-24
 ------------------
