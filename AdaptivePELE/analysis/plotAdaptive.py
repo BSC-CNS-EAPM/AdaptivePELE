@@ -164,11 +164,18 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
                         arrowprops=dict(arrowstyle="->"))
     annot.set_visible(False)
 
+    def modify_color(color):
+        color_offset = 0.5
+        color = list(color)
+        for i in range(3):
+            color[i] = min(color[i]+color_offset, 1)
+        return tuple(color)
+
     def update_annot(ind, color, pos, index):
         """Update the information box of the selected point"""
         annot.xy = pos
         annot.set_text(annotations[index][int(ind["ind"][0])])
-        annot.get_bbox_patch().set_facecolor(color)
+        annot.get_bbox_patch().set_facecolor(modify_color(color))
         annot.get_bbox_patch().set_alpha(0.8)
         annot.zorder = 10
 
@@ -193,7 +200,6 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
             return obj_plot.get_markerfacecolor()
         except AttributeError:
             return obj_plot.get_facecolor()[ind["ind"][0]]
-
 
     def hover(event):
         """Action to perform when hovering the mouse on a point"""
