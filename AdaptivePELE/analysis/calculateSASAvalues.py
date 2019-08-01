@@ -47,6 +47,8 @@ def calculateSASA(trajectory, topology, res_name):
     t = md.load(trajectory, top=topology)
     t.remove_solvent(inplace=True)
     res_atoms = t.top.select("resname '%s'" % res_name)
+    if not len(res_atoms):
+        raise ValueError("Nothing found using resname %s" % res_name)
     t2 = t.atom_slice(res_atoms)
     for atom in t2.top.atoms:
         # mdtraj complains if the ligand residue index is not 0 when
