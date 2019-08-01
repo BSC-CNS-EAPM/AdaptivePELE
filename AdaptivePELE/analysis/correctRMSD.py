@@ -154,10 +154,11 @@ def main(controlFile, trajName, reportName, folder, top, outputFilename, nProces
         print("Epoch", epoch)
         files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), top_obj, trajs_to_select))
     pool = mp.Pool(nProcessors)
-    for info in files:
-        pool.apply_async(calculate_rmsd_traj, args=(nativePDB, resname, symmetries, rmsdColInReport, info[0], info[1], info[2], info[3], info[4], format_str, new_report))
+    results = [pool.apply_async(calculate_rmsd_traj, args=(nativePDB, resname, symmetries, rmsdColInReport, info[0], info[1], info[2], info[3], info[4], format_str, new_report)) for info in files]
     pool.close()
     pool.join()
+    for res in results:
+        res.get()
 
 
 if __name__ == "__main__":

@@ -97,7 +97,7 @@ def main(col_energy, folder, out_report_name, format_out, nProcessors, output_fo
     if nProcessors is None:
         nProcessors = utilities.getCpuCount()
     nProcessors = max(1, nProcessors)
-    print("Standirizing energy with %d processors" % nProcessors)
+    print("Standarizing energy with %d processors" % nProcessors)
     epochs = utilities.get_epoch_folders(folder)
     files = []
     if not epochs:
@@ -108,10 +108,11 @@ def main(col_energy, folder, out_report_name, format_out, nProcessors, output_fo
         print("Epoch", epoch)
         files.extend(analysis_utils.process_folder(epoch, folder, trajName, reportName, os.path.join(folder, epoch, outputFilename), None, trajs_to_select))
     pool = mp.Pool(nProcessors)
-    for info in files:
-        pool.apply_async(process_file, args=(info[1], info[4], format_out, new_report, info[3], col_energy))
+    results = [pool.apply_async(process_file, args=(info[1], info[4], format_out, new_report, info[3], col_energy)) for info in files]
     pool.close()
     pool.join()
+    for res in results:
+        res.get()
 
 if __name__ == "__main__":
     energy_col, path, out_name, fmt_str, n_proc, out_folder, new_reports, name_report, traj_filter = parseArguments()
