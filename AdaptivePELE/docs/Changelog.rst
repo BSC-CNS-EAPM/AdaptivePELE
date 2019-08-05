@@ -25,6 +25,7 @@ Behaviour changes from previous version:
 ........................................
 
     - Modify plotAdaptive to generate the plots using matplotlib and not rely on gnuplot
+    - Raise separate and more informative errors for the cases of input file not existing, resname selection incorrect, input file in text file but not pdb and topology mismatching for binary files
 
 1.6.2 - 2019-07-24
 ------------------

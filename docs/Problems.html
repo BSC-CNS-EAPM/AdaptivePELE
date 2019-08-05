@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.2
+                v1.6.3
               </div>
             
           
@@ -160,14 +160,6 @@ so find the setup.py script in the AdaptivePELE repository and run:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">inplace</span>
 </pre></div>
 </div>
-</li>
-<li><p class="first">If you get an error like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>ValueError: The input pdb file/string was empty, no atoms loaded!
-</pre></div>
-</div>
-<p>tipically one of two things happened, either the pdb file passed is not
-correctly formed or empty or the resname introduced in the control file does
-not match the one in the control file.</p>
 </li>
 <li><p class="first">Simulation dies with no error. This happen sometimes in a PELE simulation,
 almost always is related to a PELE error that was not handled properly. One
