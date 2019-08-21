@@ -1156,8 +1156,19 @@ class MDSimulation(SimulationRunner):
                 checkpoint = checkpoints[i + processManager.id * self.parameters.trajsPerReplica]
             workerNumber = i
             workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.parameters.ligandName, processManager.id, self.parameters.trajsPerReplica, epoch, self.restart)))
-        for worker in workers:
-            worker.get()
+        pool.close()
+        to_finish = list(range(len(workers)))
+        # loop over all processes of the pool, waiting for a minute and checking
+        # if they are finished, this allows to query and reraise exceptions
+        # withiout waiting for previous succesfull workers to finish
+        while to_finish:
+            i = to_finish.pop(0)
+            workers[i].wait(60)
+            if workers[i].ready():
+                workers[i].get()
+            else:
+                # if worker is not done append it again at the end of the queue
+                to_finish.append(i)
         pool.terminate()
         endTime = time.time()
         self.restart = False
