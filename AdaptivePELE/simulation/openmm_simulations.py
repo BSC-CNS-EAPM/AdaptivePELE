@@ -47,8 +47,8 @@ def get_traceback(f):
 
 
 class ForceReporter(object):
-    def __init__(self, file, reportInterval):
-        self._out = open(file, 'w')
+    def __init__(self, file_name, reportInterval):
+        self._out = open(file_name, 'w')
         self._reportInterval = reportInterval
 
     def __del__(self):
@@ -86,16 +86,16 @@ class XTCReporter(_BaseReporter):
     def backend(self):
         return XTCTrajectoryFile
 
-    def __init__(self, file, reportInterval, atomSubset=None, append=False, enforcePeriodicBox=True):
+    def __init__(self, file_name, reportInterval, atomSubset=None, append=False, enforcePeriodicBox=True):
         if append:
-            if isinstance(file, basestring):
-                with self.backend(file, 'r') as f:
+            if isinstance(file_name, basestring):
+                with self.backend(file_name, 'r') as f:
                     contents = f.read()
-            elif isinstance(file, self.backend):
+            elif isinstance(file_name, self.backend):
                 raise ValueError("Currently passing an XTCTrajectoryFile in append mode is not supported, please pass a string with the filename")
             else:
-                raise TypeError("I don't know how to handle %s" % file)
-        super(XTCReporter, self).__init__(file, reportInterval, coordinates=True, time=True, cell=True, potentialEnergy=False,
+                raise TypeError("I don't know how to handle %s" % file_name)
+        super(XTCReporter, self).__init__(file_name, reportInterval, coordinates=True, time=True, cell=True, potentialEnergy=False,
                                           kineticEnergy=False, temperature=False, velocities=False, atomSubset=atomSubset)
         self._enforcePeriodicBox = enforcePeriodicBox
         if append:
@@ -184,6 +184,7 @@ class CustomStateDataReporter(app.StateDataReporter):
         self._initialClockTime = None
         self._initialSimulationTime = None
         self._initialSteps = None
+        self._hasInitialized = None
 
     def report(self, simulation, state):
         """Generate a report.
@@ -723,7 +724,7 @@ def addLigandBox(topology, positions, system, resname, dummy, radius, worker):
 
 
 def addLigandCylinderBox(topology, positions, system, resname, dummies, radius, worker):
-    center, base, top_base = dummies
+    center, base, _ = dummies
     masses = []
     coords = np.ndarray(shape=(0, 3))
     ligand_atoms = []
