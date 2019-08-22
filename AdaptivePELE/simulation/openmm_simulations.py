@@ -333,8 +333,14 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters, platformProp
                 force.addParticle(j, inpcrd.positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
-    if inpcrd.boxVectors is not None:
-        simulation.context.setPeriodicBoxVectors(*inpcrd.boxVectors)
+    try:
+        # if the inpcrd object passed does not in fact come from a inpcrd file
+        # but from a pdb it does not have the boxVectors attribute
+        boxVectors = inpcrd.boxVectors
+    except AttributeError:
+        boxVectors = None
+    if boxVectors is not None:
+        simulation.context.setPeriodicBoxVectors(*boxVectors)
     simulation.context.setPositions(inpcrd.positions)
     simulation.minimizeEnergy(maxIterations=parameters.minimizationIterations)
     return simulation
@@ -527,13 +533,21 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(deviceIndex, parameters.devicesPerTrajectory, devicesPerReplica=parameters.maxDevicesPerReplica), "UseCpuPme": "false"}
     else:
         platformProperties = {}
+
     if parameters.boxCenter or parameters.cylinderBases:
         dummies = findDummyAtom(prmtop)
+
+    if epoch_number > 0:
+        min_sim = minimization(prmtop, pdb, PLATFORM, parameters.constraintsMin, parameters, platformProperties, dummy=dummies)
+        positions = min_sim.context.getState(getPositions=True).getPositions()
+    else:
+        positions = pdb.positions
+
     system = prmtop.createSystem(nonbondedMethod=app.PME,
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                  constraints=app.HBonds, removeCMMotion=True)
     if parameters.boxCenter or parameters.cylinderBases:
-        addDummyAtomToSystem(system, prmtop.topology, pdb.positions, parameters.ligandName, dummies, deviceIndex)
+        addDummyAtomToSystem(system, prmtop.topology, positions, parameters.ligandName, dummies, deviceIndex)
 
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
@@ -547,13 +561,13 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
             if deviceIndex == 0:
                 utilities.print_unbuffered("Adding spherical ligand box")
             assert len(dummies) == 1
-            addLigandBox(prmtop.topology, pdb.positions, system, parameters.ligandName, dummies[0], parameters.boxRadius, deviceIndex)
+            addLigandBox(prmtop.topology, positions, system, parameters.ligandName, dummies[0], parameters.boxRadius, deviceIndex)
         elif parameters.boxType == blockNames.SimulationParams.cylinder:
             if deviceIndex == 0:
                 utilities.print_unbuffered("Adding cylinder ligand box")
-            addLigandCylinderBox(prmtop.topology, pdb.positions, system, parameters.ligandName, dummies, parameters.boxRadius, deviceIndex)
+            addLigandCylinderBox(prmtop.topology, positions, system, parameters.ligandName, dummies, parameters.boxRadius, deviceIndex)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
-    simulation.context.setPositions(pdb.positions)
+    simulation.context.setPositions(positions)
     if restart:
         with open(str(checkpoint), 'rb') as check:
             simulation.context.loadCheckpoint(check.read())
@@ -576,8 +590,6 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     if workerNumber == 1:
         frequency = min(10 * parameters.reporterFreq, parameters.productionLength)
         simulation.reporters.append(app.StateDataReporter(sys.stdout, frequency, step=True))
-    if epoch_number > 0:
-        simulation.minimizeEnergy(maxIterations=parameters.minimizationIterations)
     simulation.step(simulation_length)
     stateData.close()
 
