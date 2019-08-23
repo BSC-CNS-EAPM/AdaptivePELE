@@ -763,7 +763,7 @@ an 1XN array representing some metric of the clusters</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.loadtxtfile">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">loadtxtfile</code><span class="sig-paren">(</span><em>filename</em>, <em>usecols=None</em>, <em>postprocess=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#loadtxtfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.loadtxtfile" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">loadtxtfile</code><span class="sig-paren">(</span><em>filename</em>, <em>usecols=None</em>, <em>postprocess=True</em>, <em>dtype=&lt;type 'float'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#loadtxtfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.loadtxtfile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a table file from a text file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -773,6 +773,7 @@ an 1XN array representing some metric of the clusters</p>
 <li><strong>filename</strong> (<em>str</em>) – Name of the file to load</li>
 <li><strong>usecols</strong> (<em>int</em>) – Which columns to read, with 0 being the first</li>
 <li><strong>postprocess</strong> (<em>bool</em>) – Whether to add an extra dimension if only one line present in the txt file</li>
+<li><strong>dtype</strong> (<em>data-type</em>) – Data-type of the resulting array, (default float)</li>
 </ul>
 </td>
 </tr>
