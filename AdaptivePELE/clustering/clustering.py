@@ -1005,7 +1005,7 @@ class Clustering(object):
             origCluster = None
             snapshots = utilities.getSnapshots(trajectory, True)
             if topology is not None:
-                top = topology.getTopology(epoch, trajNum)
+                top = topology.getTopology(self.epoch, trajNum)
             else:
                 top = None
             if self.reportBaseFilename:
@@ -1457,7 +1457,7 @@ class SequentialLastSnapshotClustering(Clustering):
             trajNum = utilities.getTrajNum(trajectory)
             snapshots = utilities.getSnapshots(trajectory, True)
             if topology is not None:
-                top = topology.getTopology(epoch, trajNum)
+                top = topology.getTopology(self.epoch, trajNum)
             else:
                 top = None
             if self.reportBaseFilename:

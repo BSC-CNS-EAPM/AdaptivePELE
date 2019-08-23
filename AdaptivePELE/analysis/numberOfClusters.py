@@ -289,7 +289,8 @@ def main(filename, outputPath):
     plt.xlabel("Contact ratio")
     if filename != "":
         plt.savefig("%s%s_hist.png" % (outputPath, filename))
-    plt.show()
+    else:
+    	plt.show()
 
 if __name__ == "__main__":
     file_name, outputFolder = printHelp()

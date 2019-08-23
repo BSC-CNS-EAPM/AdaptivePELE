@@ -318,6 +318,19 @@ def getTrajNum(trajFilename):
     return int(trajFilename.split("_")[-1][:-4])
 
 
+def getReportNum(reportFilename):
+    """
+        Gets the report number
+
+        :param reportFilename: Trajectory filename
+        :type reportFilename: str
+
+        :returns: int -- Report number
+    """
+    name, _ = os.path.splitext(reportFilename)
+    return int(name.split("_")[-1])
+
+
 def getPrmtopNum(prmtopFilename):
     """
         Gets the prmtop number
@@ -780,7 +793,7 @@ def getFileExtension(trajectoryFile):
     return os.path.splitext(trajectoryFile)[1]
 
 
-def loadtxtfile(filename, usecols=None, postprocess=True):
+def loadtxtfile(filename, usecols=None, postprocess=True, dtype=float):
     """
         Load a table file from a text file
 
@@ -790,10 +803,12 @@ def loadtxtfile(filename, usecols=None, postprocess=True):
         :type usecols: int
         :param postprocess: Whether to add an extra dimension if only one line present in the txt file
         :type postprocess: bool
+        :param dtype: Data-type of the resulting array, (default float)
+        :type dtype: data-type
 
         :returns: np.ndarray -- Contents of the text file
     """
-    metrics = np.genfromtxt(filename, missing_values=str("--"), filling_values='0', usecols=usecols)
+    metrics = np.genfromtxt(filename, missing_values=str("--"), filling_values='0', usecols=usecols, dtype=dtype)
     if len(metrics.shape) < 2 and postprocess:
         metrics = metrics[np.newaxis, :]
     return metrics

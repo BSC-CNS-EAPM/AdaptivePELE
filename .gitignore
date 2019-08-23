@@ -32,6 +32,3 @@ AdaptivePELE/__pycache__
 AdaptivePELE/*/__pycache__
 .idea
 AdaptivePELE/AdaptiveTest_CUDA.*
-AdaptivePELE/tests/data/3ptb_data/RestartTest/2/report_*
-AdaptivePELE/tests/data/3ptb_data/RestartTest/2/trajectory_*
-AdaptivePELE/tests/data/3ptb_data/RestartTest/synchronization/syncFile.lock

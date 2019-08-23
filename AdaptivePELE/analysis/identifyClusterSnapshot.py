@@ -2,7 +2,6 @@ from __future__ import print_function, unicode_literals
 import os
 import glob
 import argparse
-import numpy as np
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.atomset import atomset, RMSDCalculator
 
@@ -30,7 +29,7 @@ def parseArguments():
 def main(epoch_num, trajectory, snapshot_num, resname, clustering_object, topology):
     calc = RMSDCalculator.RMSDCalculator()
     clustering_object = utilities.readClusteringObject(clustering_object)
-    n_clusters = np.loadtxt(os.path.join(str(epoch_num-1), "clustering", "summary.txt")).shape[0]
+    n_clusters = utilities.loadtxtfile(os.path.join(str(max(0, epoch_num-1)), "clustering", "summary.txt")).shape[0]
     if topology is not None:
         topology_contents = utilities.getTopologyFile(topology)
     else:
@@ -43,7 +42,7 @@ def main(epoch_num, trajectory, snapshot_num, resname, clustering_object, topolo
     except IndexError:
         raise IndexError("Snapshot number %d not found in trajectory %d for epoch %d, please check that the arguments provided are correct" % (snapshot_num, trajectory, epoch_num))
     pdb = atomset.PDB()
-    pdb.initialise(snapshots, resname=resname)
+    pdb.initialise(snapshots, resname=resname, topology=topology_contents)
     for i, cluster in enumerate(clustering_object[:n_clusters]):
         dist = calc.computeRMSD(pdb, cluster.pdb)
         if dist < cluster.threshold:

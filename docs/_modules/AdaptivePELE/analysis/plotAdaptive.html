@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.6.2
+                v1.6.3
               </div>
             
           
@@ -140,22 +140,27 @@
   <h1>Source code for AdaptivePELE.analysis.plotAdaptive</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;ggplot&quot;</span><span class="p">)</span>
+<span class="n">avail_backend</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_available_backend</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">avail_backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">switch_backend</span><span class="p">(</span><span class="n">avail_backend</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="parseArguments"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.parseArguments">[docs]</a><span class="k">def</span> <span class="nf">parseArguments</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parse command line arguments</span>
 
-<span class="sd">        :returns: int, int, int, str, bool, bool -- Number of steps per epoch,</span>
+<span class="sd">        :returns: int, int, int, str, bool, bool, int, str, bool, str, str, str, str -- Number of steps per epoch,</span>
 <span class="sd">            column to plot in the X axis, column to plot in the Y axis, name of</span>
 <span class="sd">            the files containing the simulation data, whether to plot the data</span>
-<span class="sd">            as points, wether to plot the data as lines</span>
+<span class="sd">            as points, wether to plot the data as lines, column to use as color, range of trajectories to select, whether to color each trajectory differently, path where to store the plot, label of the x-axis, label of the y-axis, label for the colorbar</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">desc</span> <span class="o">=</span> <span class="s2">&quot;Generates output for gnuplot</span><span class="se">\n</span><span class="s2">&quot;</span>\
-           <span class="s2">&quot;It MUST be run from the root epoch folder (i.e., where it can find the folders 0/, 1/, 2/, ... lastEpoch/&quot;</span>\
-           <span class="s2">&quot;To be run for example like: </span><span class="se">\&quot;</span><span class="s2">&gt;python generateGnuplotFile.py | gnuplot -persist</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="s2">&quot;Plot relevant information from a simulation&#39;s report files.</span><span class="se">\n</span><span class="s2">&quot;</span>\
+           <span class="s2">&quot;It MUST be run from the root epoch folder (i.e., where it can find the folders 0/, 1/, 2/, ... lastEpoch/&quot;</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pele steps per run&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;xcol&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;xcol&quot;</span><span class="p">)</span>
@@ -166,17 +171,52 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-zcol&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Column to define color according to metric&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-traj_col&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Color differently each trajectory&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--traj_range&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Range of trajs to select, e.g to select trajs from 1 to 10, 1:10&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--output_path&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Where to save the file, including the name of the image file (for exmple path/plot.png)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--xlabel&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Label for the x axis&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--ylabel&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Label for the y axis&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--cblabel&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Label for the colorbar&quot;</span><span class="p">)</span>
 
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">steps</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">xcol</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">ycol</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">lines</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">zcol</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">traj_range</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">traj_col</span></div>
+    <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">steps</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">xcol</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">ycol</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">lines</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">zcol</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">traj_range</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">traj_col</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">cblabel</span></div>
 
 
-<div class="viewcode-block" id="generateNestedString"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.generateNestedString">[docs]</a><span class="k">def</span> <span class="nf">generateNestedString</span><span class="p">(</span><span class="n">gnuplotString</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">column1</span><span class="p">,</span> <span class="n">column2</span><span class="p">,</span> <span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">printWithLines</span><span class="p">,</span> <span class="n">totalNumberOfSteps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">replotFirst</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">paletteModifier</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trajs_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="addLine"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.addLine">[docs]</a><span class="k">def</span> <span class="nf">addLine</span><span class="p">(</span><span class="n">data_plot</span><span class="p">,</span> <span class="n">traj_num</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">opt_dict</span><span class="p">,</span> <span class="n">artists</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a line to the plot corresponding to a report file</span>
+
+<span class="sd">        :param data_plot: Data from the report file</span>
+<span class="sd">        :type data_plot: np.ndarray</span>
+<span class="sd">        :param traj_num: Number of the report</span>
+<span class="sd">        :type traj_num: int</span>
+<span class="sd">        :param epoch: Epoch of the report</span>
+<span class="sd">        :type epoch: int</span>
+<span class="sd">        :param steps: Number of steps of the simulation</span>
+<span class="sd">        :type steps: int</span>
+<span class="sd">        :param opt_dict: Dictionary with plotting options</span>
+<span class="sd">        :type opt_dict: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">opt_dict</span><span class="p">[</span><span class="s1">&#39;withLines&#39;</span><span class="p">]:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">data_plot</span><span class="p">[:,</span> <span class="n">opt_dict</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">]]</span><span class="o">+</span><span class="n">epoch</span><span class="o">*</span><span class="n">steps</span>
+        <span class="n">modifier</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">data_plot</span><span class="p">[:,</span> <span class="n">opt_dict</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">]]</span>
+        <span class="n">modifier</span> <span class="o">=</span> <span class="s1">&#39;o&#39;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">data_plot</span><span class="p">[:,</span> <span class="n">opt_dict</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]]</span>
+    <span class="k">if</span> <span class="n">opt_dict</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">artists</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">modifier</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">opt_dict</span><span class="p">[</span><span class="s1">&#39;cmap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">epoch</span><span class="p">),</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">opt_dict</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">artists</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">modifier</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">opt_dict</span><span class="p">[</span><span class="s1">&#39;cmap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">traj_num</span><span class="p">),</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">data_plot</span><span class="p">[:,</span> <span class="n">opt_dict</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">opt_dict</span><span class="p">[</span><span class="s1">&#39;withLines&#39;</span><span class="p">]:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;-k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">artists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">opt_dict</span><span class="p">[</span><span class="s1">&#39;cmap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cmap</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="createPlot"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.createPlot">[docs]</a><span class="k">def</span> <span class="nf">createPlot</span><span class="p">(</span><span class="n">reportName</span><span class="p">,</span> <span class="n">column1</span><span class="p">,</span> <span class="n">column2</span><span class="p">,</span> <span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">printWithLines</span><span class="p">,</span> <span class="n">paletteModifier</span><span class="p">,</span> <span class="n">trajs_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label_colorbar</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a string to be passed to gnuplot</span>
 
-<span class="sd">        :param gnuplotString: Template string for gnuplot</span>
-<span class="sd">        :type gnuplotString: str</span>
 <span class="sd">        :param reportName: Name of the files containing the simulation data</span>
 <span class="sd">        :type reportName: str</span>
 <span class="sd">        :param column1: Column to plot in the X axis</span>
@@ -185,45 +225,140 @@
 <span class="sd">        :type column2: int</span>
 <span class="sd">        :param stepsPerRun: Number of steps per epoch,</span>
 <span class="sd">        :type stepsPerRun: int</span>
-<span class="sd">        :param TotalNumberOfSteps: Not only considering steps in current epoch,</span>
-<span class="sd">            but steps with all previous epochs</span>
-<span class="sd">        :type TotalNumberOfSteps: bool</span>
-<span class="sd">        :param replotFirst: Deprecated parameter</span>
-<span class="sd">        :type replotFirst: bool</span>
 <span class="sd">        :param paletteModifier: Wheter to use the epoch as color or a column</span>
 <span class="sd">        :type paletteModifier: int</span>
-
-<span class="sd">        :returns: str -- String to plot using gnuplot</span>
+<span class="sd">        :param trajs_range: Range of trajectories to plot</span>
+<span class="sd">        :type trajs_range: str</span>
+<span class="sd">        :param path_out: Path where to store the plot</span>
+<span class="sd">        :type path_out: str</span>
+<span class="sd">        :param label_x: Label of the x-axis</span>
+<span class="sd">        :type label_x: str</span>
+<span class="sd">        :param label_y: Label of the y-axis</span>
+<span class="sd">        :type label_y: str</span>
+<span class="sd">        :param label_colorbar: Label of the colorbar</span>
+<span class="sd">        :type label_colorbar: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">allFolders</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
-    <span class="n">epochFolders</span> <span class="o">=</span> <span class="p">[</span><span class="n">epoch</span> <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">allFolders</span> <span class="k">if</span> <span class="n">epoch</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
-    <span class="n">numberOfEpochs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">epochFolders</span><span class="p">))</span>
+    <span class="n">epochs</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_epoch_folders</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">numberOfEpochs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">epochs</span><span class="p">))</span>
+    <span class="n">cmap_name</span> <span class="o">=</span> <span class="s2">&quot;viridis&quot;</span>
 
-    <span class="n">dictionary</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reportName&#39;</span><span class="p">:</span> <span class="n">reportName</span><span class="p">,</span> <span class="s1">&#39;col2&#39;</span><span class="p">:</span> <span class="n">column2</span><span class="p">,</span> <span class="s1">&#39;numberOfEpochs&#39;</span><span class="p">:</span> <span class="n">numberOfEpochs</span><span class="p">,</span> <span class="s1">&#39;withLines&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
-
+    <span class="n">dictionary</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reportName&#39;</span><span class="p">:</span> <span class="n">reportName</span><span class="p">,</span> <span class="s1">&#39;col2&#39;</span><span class="p">:</span> <span class="n">column2</span><span class="p">,</span> <span class="s1">&#39;numberOfEpochs&#39;</span><span class="p">:</span> <span class="n">numberOfEpochs</span><span class="p">,</span>
+                  <span class="s1">&#39;col1&#39;</span><span class="p">:</span> <span class="n">column1</span><span class="p">,</span> <span class="s1">&#39;withLines&#39;</span><span class="p">:</span> <span class="n">printWithLines</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">paletteModifier</span><span class="p">}</span>
+    <span class="n">annotations</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">artists</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">trajectory_range</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">trajs_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">traj_range</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">))</span>
-        <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;startTraj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start</span>
-        <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;runsPerEpoch&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">end</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;startTraj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="c1"># runs of epoch 0, assumed constant</span>
-        <span class="n">numberOfRunsPerEpoch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">reportName</span><span class="o">+</span><span class="s2">&quot;*&quot;</span><span class="p">)))</span>
-        <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;runsPerEpoch&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numberOfRunsPerEpoch</span>
+        <span class="n">trajectory_range</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">cmin</span> <span class="o">=</span> <span class="mf">1e10</span>
+    <span class="n">cmax</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1e10</span>
+    <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">max_report</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">min_report</span> <span class="o">=</span> <span class="mf">1e10</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">epochs</span><span class="p">:</span>
+        <span class="n">ep</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
+        <span class="n">reports</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">reportName</span><span class="o">+</span><span class="s2">&quot;*&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">reports</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not find any reports with the given name!!&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">report</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">reportName</span><span class="o">+</span><span class="s2">&quot;*&quot;</span><span class="p">)):</span>
+            <span class="n">report_num</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getReportNum</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+            <span class="n">max_report</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_report</span><span class="p">,</span> <span class="n">report_num</span><span class="p">)</span>
+            <span class="n">min_report</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_report</span><span class="p">,</span> <span class="n">report_num</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">trajs_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">report_num</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">trajectory_range</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">loadtxtfile</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">paletteModifier</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">paletteModifier</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">cmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cmin</span><span class="p">,</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">paletteModifier</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+                <span class="n">cmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cmax</span><span class="p">,</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">paletteModifier</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+            <span class="n">data_dict</span><span class="p">[(</span><span class="n">ep</span><span class="p">,</span> <span class="n">report_num</span><span class="p">)]</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">ticks</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">paletteModifier</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">cmin</span> <span class="o">=</span> <span class="n">min_report</span>
+        <span class="n">cmax</span> <span class="o">=</span> <span class="n">max_report</span>
+    <span class="k">if</span> <span class="n">paletteModifier</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cmin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">epochs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">cmax</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">epochs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">ticks</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">cmin</span><span class="p">,</span> <span class="n">cmax</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap_name</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">cmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">cmax</span><span class="p">))</span>
+    <span class="n">sm</span><span class="o">.</span><span class="n">set_array</span><span class="p">([])</span>
+    <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;cmap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sm</span>
+    <span class="k">if</span> <span class="n">paletteModifier</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="n">ticks</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">zorder</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">:</span>
+        <span class="n">addLine</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="n">el</span><span class="p">],</span> <span class="n">el</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">,</span> <span class="n">artists</span><span class="p">)</span>
+        <span class="n">annotations</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s2">&quot;Epoch: </span><span class="si">%d</span><span class="se">\n</span><span class="s2">Trajectory: </span><span class="si">%d</span><span class="se">\n</span><span class="s2">Model: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">el</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="n">el</span><span class="p">]))])</span>
+    <span class="k">if</span> <span class="n">label_x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">label_x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">label_y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">label_y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">paletteModifier</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">&quot;Epoch&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">label_colorbar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">label_colorbar</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">printWithLines</span><span class="p">:</span>
-        <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;withLines&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;w l&quot;</span>
+    <span class="n">annot</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+                        <span class="n">textcoords</span><span class="o">=</span><span class="s2">&quot;offset points&quot;</span><span class="p">,</span>
+                        <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">),</span>
+                        <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">))</span>
+    <span class="n">annot</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column1</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">totalNumberOfSteps</span><span class="p">:</span>
-            <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;($&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">column1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;+ (</span><span class="si">%d</span><span class="s2">*j))&quot;</span> <span class="o">%</span> <span class="n">stepsPerRun</span>  <span class="c1"># adds steps per runs, so that it mathes the total number of steps</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dictionary</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">column1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">modify_color</span><span class="p">(</span><span class="n">color</span><span class="p">):</span>
+        <span class="n">color_offset</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="n">color_offset</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">gnuplotString</span> <span class="o">%</span> <span class="n">dictionary</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span></div>
+    <span class="k">def</span> <span class="nf">update_annot</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the information box of the selected point&quot;&quot;&quot;</span>
+        <span class="n">annot</span><span class="o">.</span><span class="n">xy</span> <span class="o">=</span> <span class="n">pos</span>
+        <span class="n">annot</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">annotations</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="s2">&quot;ind&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])])</span>
+        <span class="n">annot</span><span class="o">.</span><span class="n">get_bbox_patch</span><span class="p">()</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">modify_color</span><span class="p">(</span><span class="n">color</span><span class="p">))</span>
+        <span class="n">annot</span><span class="o">.</span><span class="n">get_bbox_patch</span><span class="p">()</span><span class="o">.</span><span class="n">set_alpha</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
+        <span class="n">annot</span><span class="o">.</span><span class="n">zorder</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="k">def</span> <span class="nf">locate_event</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">el</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">artists</span><span class="p">):</span>
+            <span class="n">found</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">j</span><span class="p">,</span> <span class="n">found</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">el</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">extract_data</span><span class="p">(</span><span class="n">obj_plot</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">obj_plot</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="s2">&quot;ind&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="s2">&quot;ind&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">obj_plot</span><span class="o">.</span><span class="n">get_offsets</span><span class="p">()[</span><span class="n">ind</span><span class="p">[</span><span class="s2">&quot;ind&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="k">def</span> <span class="nf">extract_color</span><span class="p">(</span><span class="n">obj_plot</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">obj_plot</span><span class="o">.</span><span class="n">get_markerfacecolor</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">obj_plot</span><span class="o">.</span><span class="n">get_facecolor</span><span class="p">()[</span><span class="n">ind</span><span class="p">[</span><span class="s2">&quot;ind&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="k">def</span> <span class="nf">hover</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Action to perform when hovering the mouse on a point&quot;&quot;&quot;</span>
+        <span class="n">vis</span> <span class="o">=</span> <span class="n">annot</span><span class="o">.</span><span class="n">get_visible</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">inaxes</span> <span class="o">==</span> <span class="n">ax</span><span class="p">:</span>
+            <span class="n">index</span><span class="p">,</span> <span class="n">cont</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">locate_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cont</span><span class="p">:</span>
+                <span class="n">update_annot</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">extract_color</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ind</span><span class="p">),</span> <span class="n">extract_data</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ind</span><span class="p">),</span> <span class="n">index</span><span class="p">)</span>
+                <span class="n">annot</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw_idle</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">vis</span><span class="p">:</span>
+                    <span class="n">annot</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw_idle</span><span class="p">()</span>
+    <span class="c1"># Respond to mouse motion</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s2">&quot;motion_notify_event&quot;</span><span class="p">,</span> <span class="n">hover</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="generatePrintString"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.generatePrintString">[docs]</a><span class="k">def</span> <span class="nf">generatePrintString</span><span class="p">(</span><span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">kindOfPrint</span><span class="p">,</span> <span class="n">paletteModifier</span><span class="p">,</span> <span class="n">trajs_range</span><span class="p">):</span>
+<div class="viewcode-block" id="generatePlot"><a class="viewcode-back" href="../../../AdaptivePELE.analysis.html#AdaptivePELE.analysis.plotAdaptive.generatePlot">[docs]</a><span class="k">def</span> <span class="nf">generatePlot</span><span class="p">(</span><span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">kindOfPrint</span><span class="p">,</span> <span class="n">paletteModifier</span><span class="p">,</span> <span class="n">trajs_range</span><span class="p">,</span> <span class="n">path_to_save</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">,</span> <span class="n">cblabel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a template string to use with gnuplot</span>
 
@@ -239,45 +374,46 @@
 <span class="sd">        :type kindOfPrint: bool</span>
 <span class="sd">        :param paletteModifier: Third column to specify color</span>
 <span class="sd">        :type paletteModifier: int</span>
-<span class="sd">        :trajs_range: Range of trajectories to plot</span>
+<span class="sd">        :param trajs_range: Range of trajectories to plot</span>
 <span class="sd">        :type trajs_range: str</span>
+<span class="sd">        :param path_to_save: Path the save the plot</span>
+<span class="sd">        :type path_to_save: str</span>
+<span class="sd">        :param xlabel: Label of the x axis</span>
+<span class="sd">        :type xlabel: str</span>
+<span class="sd">        :param ylabel: Label of the y axis</span>
+<span class="sd">        :type ylabel: str</span>
+<span class="sd">        :param cblabel: Label of the colorbar</span>
+<span class="sd">        :type cblabel: str</span>
 
 <span class="sd">        :returns: str -- String to plot using gnuplot</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">kindOfPrint</span> <span class="o">==</span> <span class="s2">&quot;PRINT_RMSD_STEPS&quot;</span><span class="p">:</span>
         <span class="n">printWithLines</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">totalNumberOfSteps</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">elif</span> <span class="n">kindOfPrint</span> <span class="o">==</span> <span class="s2">&quot;PRINT_BE_RMSD&quot;</span><span class="p">:</span>
         <span class="n">printWithLines</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">totalNumberOfSteps</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">colorbar</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">paletteModifier</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">stringPalette</span> <span class="o">=</span> <span class="s2">&quot;lt 6 lc palette frac j/</span><span class="si">%(numberOfEpochs)d</span><span class="s2">. &quot;</span>
-        <span class="n">colorMetric</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="n">colorbar</span> <span class="o">=</span> <span class="s2">&quot;set cbrange[0:</span><span class="si">%(numberOfEpochs)d</span><span class="s2">]; &quot;</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">paletteModifier</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">stringPalette</span> <span class="o">=</span> <span class="s2">&quot;lt 6 lc palette &quot;</span>
-        <span class="n">colorMetric</span> <span class="o">=</span> <span class="s2">&quot;:</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">paletteModifier</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">stringPalette</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="n">colorMetric</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-
-    <span class="n">gnuplotString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">colorbar</span><span class="p">,</span> <span class="s2">&quot;plot for [i=</span><span class="si">%(startTraj)d</span><span class="s2">:</span><span class="si">%(runsPerEpoch)d</span><span class="s2">] for [j=0:</span><span class="si">%(numberOfEpochs)d</span><span class="s2">-1] </span><span class="se">\&#39;\&#39;</span><span class="s2">.j.</span><span class="se">\&#39;</span><span class="s2">/</span><span class="si">%(reportName)s</span><span class="se">\&#39;</span><span class="s2">.i u </span><span class="si">%(col1)s</span><span class="s2">:</span><span class="si">%(col2)d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">colorMetric</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">stringPalette</span><span class="p">,</span> <span class="s2">&quot;notitle </span><span class="si">%(withLines)s</span><span class="s2">&quot;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">generateNestedString</span><span class="p">(</span><span class="n">gnuplotString</span><span class="p">,</span> <span class="n">reportName</span><span class="p">,</span> <span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="p">,</span> <span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">printWithLines</span><span class="p">,</span> <span class="n">totalNumberOfSteps</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">paletteModifier</span><span class="p">,</span> <span class="n">trajs_range</span><span class="p">)</span></div>
-
+    <span class="n">createPlot</span><span class="p">(</span><span class="n">reportName</span><span class="p">,</span> <span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="p">,</span> <span class="n">stepsPerRun</span><span class="p">,</span> <span class="n">printWithLines</span><span class="p">,</span> <span class="n">paletteModifier</span><span class="p">,</span> <span class="n">trajs_range</span><span class="o">=</span><span class="n">trajs_range</span><span class="p">,</span> <span class="n">path_out</span><span class="o">=</span><span class="n">path_to_save</span><span class="p">,</span> <span class="n">label_x</span><span class="o">=</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">label_y</span><span class="o">=</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">label_colorbar</span><span class="o">=</span><span class="n">cblabel</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path_to_save</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">folder</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path_to_save</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">folder</span><span class="p">:</span>
+            <span class="n">utilities</span><span class="o">.</span><span class="n">makeFolder</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">path_to_save</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">steps_Run</span><span class="p">,</span> <span class="n">Xcol</span><span class="p">,</span> <span class="n">Ycol</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">be</span><span class="p">,</span> <span class="n">rmsd</span><span class="p">,</span> <span class="n">colModifier</span><span class="p">,</span> <span class="n">traj_range</span><span class="p">,</span> <span class="n">color_traj</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
+    <span class="n">steps_Run</span><span class="p">,</span> <span class="n">Xcol</span><span class="p">,</span> <span class="n">Ycol</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">be</span><span class="p">,</span> <span class="n">rmsd</span><span class="p">,</span> <span class="n">colModifier</span><span class="p">,</span> <span class="n">traj_range</span><span class="p">,</span> <span class="n">color_traj</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">xlab</span><span class="p">,</span> <span class="n">ylab</span><span class="p">,</span> <span class="n">cblab</span> <span class="o">=</span> <span class="n">parseArguments</span><span class="p">()</span>
+    <span class="n">Xcol</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="n">Ycol</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">colModifier</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">colModifier</span> <span class="o">-=</span> <span class="mi">1</span>
     <span class="c1"># VARIABLES TO SET WHEN PRINTING</span>
     <span class="k">if</span> <span class="n">be</span><span class="p">:</span>
         <span class="n">kind_Print</span> <span class="o">=</span> <span class="s2">&quot;PRINT_BE_RMSD&quot;</span>
     <span class="k">elif</span> <span class="n">rmsd</span><span class="p">:</span>
         <span class="n">kind_Print</span> <span class="o">=</span> <span class="s2">&quot;PRINT_RMSD_STEPS&quot;</span>
     <span class="k">if</span> <span class="n">color_traj</span><span class="p">:</span>
-        <span class="n">colModifier</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">colModifier</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
-    <span class="n">printLine</span> <span class="o">=</span> <span class="n">generatePrintString</span><span class="p">(</span><span class="n">steps_Run</span><span class="p">,</span> <span class="n">Xcol</span><span class="p">,</span> <span class="n">Ycol</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">kind_Print</span><span class="p">,</span> <span class="n">colModifier</span><span class="p">,</span> <span class="n">traj_range</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">printLine</span><span class="p">)</span>
+    <span class="n">generatePlot</span><span class="p">(</span><span class="n">steps_Run</span><span class="p">,</span> <span class="n">Xcol</span><span class="p">,</span> <span class="n">Ycol</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">kind_Print</span><span class="p">,</span> <span class="n">colModifier</span><span class="p">,</span> <span class="n">traj_range</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">xlab</span><span class="p">,</span> <span class="n">ylab</span><span class="p">,</span> <span class="n">cblab</span><span class="p">)</span>
 </pre></div>
 
            </div>
