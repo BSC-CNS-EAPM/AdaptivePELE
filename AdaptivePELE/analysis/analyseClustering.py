@@ -141,10 +141,10 @@ def parseArguments():
     parser.add_argument("-top", type=str, default=None, help="PDB file with topology information, necessary if working with xtc files")
     args = parser.parse_args()
 
-    return args.clusteringObject, args.resname, args.metrics, args.population, args.contacts, args.i
+    return args.clusteringObject, args.resname, args.metrics, args.population, args.contacts, args.i, args.top
 
 if __name__ == "__main__":
-    pklObject_filename, lig_resname, metricsFlag, population_flag, contacts_flag, input_file = parseArguments()
+    pklObject_filename, lig_resname, metricsFlag, population_flag, contacts_flag, input_file, top = parseArguments()
 
     metricPlot_filename = ""  # "results/contactClusters.png"
     populationPlot_filename = ""  # "results/contactClusterspop.png"
@@ -152,12 +152,12 @@ if __name__ == "__main__":
     title_metric = "Metrics Contacts"
     title_population = "Population Contacts"
     title_contacts = "Number of contacts Contacts"
-    topology = None
+    topology_contents = None
     if top is not None:
-        topology = utilities.getTopologyFile(top)
+        topology_contents = utilities.getTopologyFile(top)
 
     plotClusteringData(pklObject_filename, lig_resname, title_metric, title_population,
                        title_contacts, metricPlot_filename,
                        populationPlot_filename, contactsPlot_filename, metricsFlag,
-                       population_flag, contacts_flag, input_file, topology=topology)
+                       population_flag, contacts_flag, input_file, topology=topology_contents)
     plt.show()
