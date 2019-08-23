@@ -520,7 +520,7 @@ cdef class PDB:
         """
         cdef object PDBContent
         cdef list stringWithPDBContent
-        cdef int atomLineNum
+        cdef int atomLineNum, pdb_lines
         cdef basestring atomName, resName, atomLine, resnumStr
         cdef Atom atom
         if resnum == 0:
@@ -538,9 +538,15 @@ cdef class PDB:
 
 
         stringWithPDBContent = self.pdb.split(u'\n')
+        if len(stringWithPDBContent) < 2:
+            # If the string got here and only contains one line means that is a
+            # path which does not exist
+            raise ValueError("Input file not found!!")
+        pdb_lines = 0
         for atomLine in stringWithPDBContent:
             if not atomLine.startswith(u"ATOM") and not atomLine.startswith(u"HETATM"):
                 continue
+            pdb_lines += 1
             if type == self._typeCM:
                 atomName = atomLine[12:16].strip()
                 resName = atomLine[17:20].strip()
@@ -571,8 +577,10 @@ cdef class PDB:
                         self.atomList.append(atom.id)
             except:
                 pass
+        if pdb_lines == 0:
+            raise ValueError("Input pdb was malformed or empty!!")
         if self.atoms == {}:
-            raise ValueError('The input pdb file/string was empty, no atoms loaded!')
+            raise ValueError('Nothing found in the input coordinates, please check your selection!')
 
     def _initialiseXTC(self, np.ndarray[float, ndim=2] frame, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None, dict extra_atoms={}):
         """
@@ -605,6 +613,8 @@ cdef class PDB:
         else:
             resnumStr = u"%d" % (resnum)
         self.pdb = self.join_PDB_lines(topology, frame)  # in case one wants to write it
+        if len(frame) != len(topology):
+            raise ValueError("Input coordinates and topology do not match!!!")
         if extra_atoms != {}:
             CMAtoms = extra_atoms
         else:
@@ -652,7 +662,7 @@ cdef class PDB:
                 self.atoms.update({atom.id: atom})
                 self.atomList.append(atom.id)
         if self.atoms == {}:
-            raise ValueError('The input pdb file/string was empty, no atoms loaded!')
+            raise ValueError('Nothing found in the input coordinates, please check your selection!')
 
     def initialise(self, object coordinates, bint heavyAtoms=True, basestring resname=u"", basestring atomname=u"", basestring type=u"ALL", basestring chain=u"", int resnum = 0, basestring element=u"", list topology=None, dict extra_atoms={}):
         """

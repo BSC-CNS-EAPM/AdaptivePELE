@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.6.2
+                v1.6.3
               </div>
             
           
@@ -90,8 +90,8 @@
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#adaptivesampling-module"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#automateroundsadaptive-module"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">analysis Package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.correctRMSD"><code class="docutils literal"><span class="pre">correctRMSD</span></code> Module</a></li>
@@ -175,7 +175,7 @@
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.correctRMSD.main">
-<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">main</code><span class="sig-paren">(</span><em>controlFile</em>, <em>trajName</em>, <em>reportName</em>, <em>folder</em>, <em>top</em>, <em>outputFilename</em>, <em>nProcessors</em>, <em>output_folder</em>, <em>format_str</em>, <em>new_report</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.correctRMSD.</code><code class="descname">main</code><span class="sig-paren">(</span><em>controlFile</em>, <em>trajName</em>, <em>reportName</em>, <em>folder</em>, <em>top</em>, <em>outputFilename</em>, <em>nProcessors</em>, <em>output_folder</em>, <em>format_str</em>, <em>new_report</em>, <em>trajs_to_select</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/correctRMSD.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.correctRMSD.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the corrected rmsd values of conformation taking into account
 molecule symmetries</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -510,27 +510,20 @@ clustering summary file</li>
 <div class="section" id="module-AdaptivePELE.analysis.plotAdaptive">
 <span id="plotadaptive-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">plotAdaptive</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.analysis.plotAdaptive" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="AdaptivePELE.analysis.plotAdaptive.generateNestedString">
-<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generateNestedString</code><span class="sig-paren">(</span><em>gnuplotString</em>, <em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>totalNumberOfSteps=False</em>, <em>replotFirst=False</em>, <em>paletteModifier=None</em>, <em>trajs_range=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generateNestedString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generateNestedString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a string to be passed to gnuplot</p>
+<dt id="AdaptivePELE.analysis.plotAdaptive.addLine">
+<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">addLine</code><span class="sig-paren">(</span><em>data_plot</em>, <em>traj_num</em>, <em>epoch</em>, <em>steps</em>, <em>opt_dict</em>, <em>artists</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#addLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.addLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a line to the plot corresponding to a report file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>gnuplotString</strong> (<em>str</em>) – Template string for gnuplot</li>
-<li><strong>reportName</strong> (<em>str</em>) – Name of the files containing the simulation data</li>
-<li><strong>column1</strong> (<em>int</em>) – Column to plot in the X axis</li>
-<li><strong>column2</strong> (<em>int</em>) – Column to plot in the Y axis</li>
-<li><strong>stepsPerRun</strong> (<em>int</em>) – Number of steps per epoch,</li>
-<li><strong>TotalNumberOfSteps</strong> (<em>bool</em>) – Not only considering steps in current epoch,
-but steps with all previous epochs</li>
-<li><strong>replotFirst</strong> (<em>bool</em>) – Deprecated parameter</li>
-<li><strong>paletteModifier</strong> (<em>int</em>) – Wheter to use the epoch as color or a column</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_plot</strong> (<em>np.ndarray</em>) – Data from the report file</li>
+<li><strong>traj_num</strong> (<em>int</em>) – Number of the report</li>
+<li><strong>epoch</strong> (<em>int</em>) – Epoch of the report</li>
+<li><strong>steps</strong> (<em>int</em>) – Number of steps of the simulation</li>
+<li><strong>opt_dict</strong> (<em>dict</em>) – Dictionary with plotting options</li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – String to plot using gnuplot</p>
 </td>
 </tr>
 </tbody>
@@ -538,8 +531,34 @@ but steps with all previous epochs</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="AdaptivePELE.analysis.plotAdaptive.generatePrintString">
-<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generatePrintString</code><span class="sig-paren">(</span><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em>, <em>paletteModifier</em>, <em>trajs_range</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generatePrintString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generatePrintString" title="Permalink to this definition">¶</a></dt>
+<dt id="AdaptivePELE.analysis.plotAdaptive.createPlot">
+<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">createPlot</code><span class="sig-paren">(</span><em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>paletteModifier</em>, <em>trajs_range=None</em>, <em>path_out=None</em>, <em>label_x=None</em>, <em>label_y=None</em>, <em>label_colorbar=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#createPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.createPlot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a string to be passed to gnuplot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>reportName</strong> (<em>str</em>) – Name of the files containing the simulation data</li>
+<li><strong>column1</strong> (<em>int</em>) – Column to plot in the X axis</li>
+<li><strong>column2</strong> (<em>int</em>) – Column to plot in the Y axis</li>
+<li><strong>stepsPerRun</strong> (<em>int</em>) – Number of steps per epoch,</li>
+<li><strong>paletteModifier</strong> (<em>int</em>) – Wheter to use the epoch as color or a column</li>
+<li><strong>trajs_range</strong> (<em>str</em>) – Range of trajectories to plot</li>
+<li><strong>path_out</strong> (<em>str</em>) – Path where to store the plot</li>
+<li><strong>label_x</strong> (<em>str</em>) – Label of the x-axis</li>
+<li><strong>label_y</strong> (<em>str</em>) – Label of the y-axis</li>
+<li><strong>label_colorbar</strong> (<em>str</em>) – Label of the colorbar</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.analysis.plotAdaptive.generatePlot">
+<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generatePlot</code><span class="sig-paren">(</span><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em>, <em>paletteModifier</em>, <em>trajs_range</em>, <em>path_to_save</em>, <em>xlabel</em>, <em>ylabel</em>, <em>cblabel</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generatePlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generatePlot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a template string to use with gnuplot</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -552,13 +571,15 @@ but steps with all previous epochs</li>
 <li><strong>reportName</strong> (<em>str</em>) – Name of the files containing the simulation data</li>
 <li><strong>kindOfPrint</strong> (<em>bool</em>) – Kind of lines to plot (solid or points)</li>
 <li><strong>paletteModifier</strong> (<em>int</em>) – Third column to specify color</li>
+<li><strong>trajs_range</strong> (<em>str</em>) – Range of trajectories to plot</li>
+<li><strong>path_to_save</strong> (<em>str</em>) – Path the save the plot</li>
+<li><strong>xlabel</strong> (<em>str</em>) – Label of the x axis</li>
+<li><strong>ylabel</strong> (<em>str</em>) – Label of the y axis</li>
+<li><strong>cblabel</strong> (<em>str</em>) – Label of the colorbar</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Trajs_range:</th><td class="field-body"><p class="first">Range of trajectories to plot</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – String to plot using gnuplot</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – String to plot using gnuplot</p>
 </td>
 </tr>
 </tbody>
@@ -573,10 +594,10 @@ but steps with all previous epochs</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int, int, int, str, bool, bool – Number of steps per epoch,
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int, int, int, str, bool, bool, int, str, bool, str, str, str, str – Number of steps per epoch,
 column to plot in the X axis, column to plot in the Y axis, name of
 the files containing the simulation data, whether to plot the data
-as points, wether to plot the data as lines</td>
+as points, wether to plot the data as lines, column to use as color, range of trajectories to select, whether to color each trajectory differently, path where to store the plot, label of the x-axis, label of the y-axis, label for the colorbar</td>
 </tr>
 </tbody>
 </table>

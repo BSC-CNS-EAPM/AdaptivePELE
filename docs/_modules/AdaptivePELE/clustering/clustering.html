@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.6.2
+                v1.6.3
               </div>
             
           
@@ -1145,7 +1145,7 @@
             <span class="n">origCluster</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">top</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">getTopology</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">)</span>
+                <span class="n">top</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">getTopology</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">top</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span><span class="p">:</span>
@@ -1597,7 +1597,7 @@
             <span class="n">trajNum</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTrajNum</span><span class="p">(</span><span class="n">trajectory</span><span class="p">)</span>
             <span class="n">snapshots</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getSnapshots</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">top</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">getTopology</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">)</span>
+                <span class="n">top</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">getTopology</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">top</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span><span class="p">:</span>

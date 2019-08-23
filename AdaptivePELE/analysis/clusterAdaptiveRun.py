@@ -1,18 +1,17 @@
-import matplotlib
-matplotlib.use('Agg')
-import sys
-from functools import partial
+from __future__ import print_function
 import os
 import multiprocessing as mp
 import glob
-from pylab import rcParams
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 from AdaptivePELE.utilities import utilities
 from AdaptivePELE.freeEnergies import cluster, extractCoords
-from AdaptivePELE.analysis import splitTrajectory, simulationToCsv 
+from AdaptivePELE.analysis import splitTrajectory, simulationToCsv
+import matplotlib
+matplotlib.use('Agg')
+
 
 def parseArgs():
     parser = argparse.ArgumentParser(description="Script that reclusters the Adaptive clusters")
@@ -54,9 +53,7 @@ def write_snapshot(snap_num, trajectory, filename, topology=None, use_pdb=False)
         with open(filename, "w") as fw:
             fw.write(snapshots[snap_num])
     else:
-        splitTrajectory.main("", [trajectory, ], topology, [snap_num+1,],template=filename, use_pdb=use_pdb)
-
-
+        splitTrajectory.main("", [trajectory, ], topology, [snap_num+1], template=filename, use_pdb=use_pdb)
 
 
 def plotClusters(fields1, fields2, crit1, crit2, output, png=False):
@@ -71,6 +68,7 @@ def plotClusters(fields1, fields2, crit1, crit2, output, png=False):
         fig.savefig(os.path.join(output, "ClusterMap.png"))
     else:
         fig.savefig(os.path.join(output, "ClusterMap.pdf"), format='pdf', dpi=1200)
+
 
 def writePDB(pmf_xyzg, title="clusters.pdb"):
     templateLine = "HETATM%s  H%sCLT L 502    %s%s%s  0.75%s           H\n"
@@ -99,7 +97,7 @@ def writeInitialStructures(field1, field2, crit1, crit2, centers_info, filename_
             with open(filename, "w") as fw:
                 fw.write(snapshots[snap_num])
         else:
-            splitTrajectory.main("", [trajectory, ], topology, [snap_num+1,],template=filename, use_pdb=use_pdb)
+            splitTrajectory.main("", [trajectory, ], topology, [snap_num+1], template=filename, use_pdb=use_pdb)
 
 
 def get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, clusterCenters):
@@ -108,7 +106,7 @@ def get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, cluster
     trajFiles = glob.glob(os.path.join(trajectoryFolder, trajectoryBasename))
     for traj in trajFiles:
         _, epoch, iTraj = os.path.splitext(traj)[0].split("_", 3)
-        trajCoords = np.loadtxt(traj)
+        trajCoords = utilities.loadtxtfile(traj)
         if len(trajCoords.shape) < 2:
             trajCoords = [trajCoords]
         for snapshot in trajCoords:
@@ -135,7 +133,7 @@ def get_metric(criteria, epoch_num, traj_num, snap_num, report):
     return value, header
 
 
-def assesClusterConvergence(df, num_clusters, traj_name = "trajectory_", topology=None):
+def assesClusterConvergence(df, num_clusters, traj_name="trajectory_", topology=None):
     for i in range(num_clusters):
         path = "ClustersSummary/Cluster{}".format(i)
         if not os.path.exists(path):
@@ -148,7 +146,7 @@ def assesClusterConvergence(df, num_clusters, traj_name = "trajectory_", topolog
         for j, (epoch, traj, step) in enumerate(zip(epochs, trajs, steps)):
             trajectory = "{}/{}{}.xtc".format(int(epoch), traj_name, int(traj)) if topology else "{}/{}{}.pdb".format(int(epoch), traj_name, int(traj))
             write_snapshot(int(step), trajectory, os.path.join(path, "Cluster_{}_{}.pdb".format(i, j)), topology=topology)
-        
+
 
 def save_to_df(input):
     df, traject, dtraj = input
@@ -158,18 +156,19 @@ def save_to_df(input):
         df_tmp = df[(df[simulationToCsv.EPOCH] == float(epoch)) & (df[simulationToCsv.TRAJ] == float(traj)) & (df[simulationToCsv.STEPS] == float(i))]
         df_tmp["Cluster"] = d
         dfs_tmp.append(df_tmp)
-        #df.update(df_tmp)
+        # df.update(df_tmp)
     return dfs_tmp
 
-def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "ClusterCentroids", atom_ids="", cpus=2, topology=None, report="report_", traj="trajectory_", use_pdb=False, png=False, CA=0, sidechains=0, restart="all"):
-    #Create multiprocess pool
-    if cpus>1:
+
+def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder="ClusterCentroids", atom_ids="", cpus=2, topology=None, report="report_", traj="trajectory_", use_pdb=False, png=False, CA=0, sidechains=0, restart="all"):
+    # Create multiprocess pool
+    if cpus > 1:
         pool = mp.Pool(cpus)
     else:
-        pool=mp.Pool(1)
-    #Extract COM ligand for each snapshot
+        pool = mp.Pool(1)
+    # Extract COM ligand for each snapshot
     if not glob.glob("allTrajs/traj*"):
-    	extractCoords.main(lig_resname=ligand_resname, non_Repeat=True, atom_Ids=atom_ids, nProcessors=cpus, parallelize=True, topology=topology, use_pdb=use_pdb, protein_CA=CA, sidechains=sidechains)
+        extractCoords.main(lig_resname=ligand_resname, non_Repeat=True, atom_Ids=atom_ids, nProcessors=cpus, parallelize=True, topology=topology, protein_CA=CA, sidechains=sidechains)
 
     print("Clusterize trajectories by RMSD of COM")
     trajectoryFolder = "allTrajs"
@@ -200,15 +199,15 @@ def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "Cl
         print("Update data with metrics and clusters")
         df.index = range(df.shape[0])
         df["Cluster"] = [None]*df.shape[0]
-        input_list = [ [df, Traj, d] for d, Traj in zip(dtrajs, clusteringObject.trajFilenames) ]
+        input_list = [[df, Traj, d] for d, Traj in zip(dtrajs, clusteringObject.trajFilenames)]
         results = pool.map(save_to_df, input_list)
         for data in results:
             for df_tmp in data:
                 df.update(df_tmp)
-        df.to_csv("Simulation.csv", index=False) 
+        df.to_csv("Simulation.csv", index=False)
     if restart:
-        df = pd.read_csv("Simulation.csv")    
-        clusterCenters = np.loadtxt("clustercenters.dat")
+        df = pd.read_csv("Simulation.csv")
+        clusterCenters = utilities.loadtxtfile("clustercenters.dat")
         print(clusterCenters)
     centersInfo = get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, clusterCenters)
     COMArray = [centersInfo[i]['center'] for i in range(num_clusters)]
@@ -221,8 +220,8 @@ def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "Cl
         epoch_num, traj_num, snap_num = map(int, centersInfo[cluster_num]['structure'])
         field1, crit1_name = get_metric(criteria1, epoch_num, traj_num, snap_num, report)
         field2, crit2_name = get_metric(criteria2, epoch_num, traj_num, snap_num, report)
-        fields1.append(field1)	
-        fields2.append(field2)	
+        fields1.append(field1)
+        fields2.append(field2)
 
     if output_folder is not None:
         outputFolder = os.path.join(output_folder, "")
@@ -232,10 +231,10 @@ def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder = "Cl
         outputFolder = ""
     print("Output structures")
     writePDB(COMArray, outputFolder+"clusters_%d_KMeans_allSnapshots.pdb" % num_clusters)
-    writeInitialStructures(fields1, fields2, crit1_name, crit2_name, centersInfo, outputFolder+"cluster_{}_{}_{}_{}_{}.pdb", traj, topology=topology, use_pdb=use_pdb) 
+    writeInitialStructures(fields1, fields2, crit1_name, crit2_name, centersInfo, outputFolder+"cluster_{}_{}_{}_{}_{}.pdb", traj, topology=topology, use_pdb=use_pdb)
     plotClusters(fields1, fields2, crit1_name, crit2_name, outputFolder, png=png)
     assesClusterConvergence(df, num_clusters, traj, topology)
-    return 
+    return
 
 if __name__ == "__main__":
     n_clusters, criteria1, criteria2, lig_name, atom_id, output, top, cpus, report, traj, use_pdb, png, CA, sidechains, restart = parseArgs()

@@ -23,7 +23,7 @@ def extendReportWithRmsd(reportFile, rmsds):
     return fixedReport
 
 
-def process_folder(epoch, folder, trajName, reportName, output_filename, top):
+def process_folder(epoch, folder, trajName, reportName, output_filename, top, trajs_to_select=None):
     if epoch is None:
         allTrajs = glob.glob(os.path.join(folder, trajName))
         full_reportName = os.path.join(folder, reportName)
@@ -35,6 +35,8 @@ def process_folder(epoch, folder, trajName, reportName, output_filename, top):
     allFiles = []
     for traj in allTrajs:
         trajNum = utilities.getTrajNum(traj)
+        if trajs_to_select is not None and trajNum not in trajs_to_select:
+            continue
         if top is not None:
             top_file = top.getTopologyFile(epoch, trajNum)
         else:

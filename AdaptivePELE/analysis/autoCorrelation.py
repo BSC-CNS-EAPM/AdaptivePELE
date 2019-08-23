@@ -60,7 +60,7 @@ def calculateAutoCorrelation(lagtimes, dtrajs, nclusters, nLags):
     N = 0
     M = np.zeros(nLags)
     for trajectory in dtrajs:
-        traj = np.loadtxt(trajectory, dtype=int)
+        traj = utilities.loadtxtfile(trajectory, dtype=int)
         Nt = traj.size
         N += Nt
         for il, lagtime in enumerate(lagtimes):
@@ -119,12 +119,12 @@ def main(lagtime, clusters_file, disctraj, trajs, n_clusters, plots_path, save_p
         disctraj = clusteringObject.discretizedFolder
         clusterCenters = clusteringObject.clusterCenters
     else:
-        clusterCenters = np.loadtxt(clusters_file)
+        clusterCenters = utilities.loadtxtfile(clusters_file)
     if len(clusterCenters) != n_clusters:
         raise ValueError("Number of clusters specified in the -n parameter does not match the provided clusters")
     print("Calculating autocorrelation...")
     dtrajs = glob.glob(os.path.join(disctraj, "traj*"))
-    dtrajs_loaded = [np.loadtxt(dtraj, dtype=int) for dtraj in dtrajs]
+    dtrajs_loaded = [utilities.loadtxtfile(dtraj, dtype=int) for dtraj in dtrajs]
 
     autoCorr = utils.calculateAutoCorrelation(lagtimes, dtrajs_loaded, n_clusters, n_lags)
     np.save("autoCorr.npy", autoCorr)

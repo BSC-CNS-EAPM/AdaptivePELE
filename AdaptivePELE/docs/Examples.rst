@@ -1144,11 +1144,29 @@ like::
     #SBATCH --gres gpu:4
 
     module load intel/16.0.2 amber/16 python/2.7.2 2> /dev/null
-    export PYTHONPATH="/gpfs/projects/bsc72/AdaptiveSampling/bin_mt/v1.6:/gpfs/projects/bsc72/lib/site-packages_minot"
+    export PYTHONPATH="/gpfs/projects/bsc72/AdaptiveSampling/bin_mt/v1.6.2:/gpfs/projects/bsc72/lib/site-packages_minot"
     srun python -m AdaptivePELE.adaptiveSampling control_file_MD_3ptb_mt.conf
 
 Note also that this job requests 8 cpus per replica. At least a number of cpus
 per replica equal to the number of trajectories per replica are required.
+Similarly, the CTE-POWER cluster also has 4 gpus per node, so the configuration
+is very similar. An example for this machin would look like::
+
+    #!/bin/bash
+    #SBATCH --job-name="md_PK2_evoCt"
+    #SBATCH -D .
+    #SBATCH --output=md_PK2_evoCt.out
+    #SBATCH --error=md_PK2_evoCt.err
+    #SBATCH --ntasks=1
+    #SBATCH --nodes=1
+    #SBATCH --gres gpu:4
+    #SBATCH --cpus-per-task=160
+    #SBATCH --time=14:00:00
+
+    module load python/3.6.5
+    module load ambertools/18
+    export PYTHONPATH="/gpfs/projects/bsc72/adaptiveSampling/bin_cte/v1.6.2:/gpfs/projects/bsc72/lib/site-packages-cte"
+    srun python -m AdaptivePELE.adaptiveSampling templetized_PK2_evoCt_md.conf
 
 
 .. [APELE] Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, https://www.nature.com/articles/s41598-017-08445-5

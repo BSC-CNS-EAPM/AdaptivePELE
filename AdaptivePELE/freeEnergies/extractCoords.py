@@ -323,6 +323,8 @@ def writeFilenameExtractedCoordinates(filename, params, pathFolder, constants, t
             else:
                 coords = getAtomCoord(allCoordinates, params.lig_resname, params.atomIds)
     elif ext in MDTRAJ_FORMATS:
+        if not indexes:
+            raise ValueError("Empty selection!!!")
         if params.contact_map:
             coords = contactMapNonPDB(filename, params, topology, indexes)
         else:
@@ -494,7 +496,7 @@ def copyTrajectories(traj_names, destFolderTempletized, folderName, setNumber=0,
         trajectoryNumber = extractFilenumber(os.path.split(inputTrajectory)[1])
         if folderName != ".":  # if not sequential
             setNumber = folderName
-        if epochNum is not None:
+        if epochNum is not None and epochNum != ".":
             setNumber = epochNum
         shutil.copyfile(inputTrajectory, destFolderTempletized % (setNumber, trajectoryNumber))
 
@@ -616,7 +618,6 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
         pool = None
 
     params.sidechains = extractSidechainIndexes(params, pool=pool) if params.sidechains else []
-
     for folder_it in folders:
         pathFolder = os.path.join(folderWithTrajs, folder_it)
         print("Extracting coords from folder %s" % folder_it)
@@ -628,7 +629,7 @@ def main(folder_name=".", atom_Ids="", lig_resname="", numtotalSteps=0, enforceS
             print("Repeating snapshots from folder %s" % folder_it)
             repeatExtractedSnapshotsInFolder(pathFolder, constants, params.numtotalSteps, pool=None)
         print("Gathering trajs in %s" % constants.gatherTrajsFolder)
-        gatherTrajs(constants, folder_it, params.setNumber, params.non_Repeat)
+        gatherTrajs(constants, pathFolder, params.setNumber, params.non_Repeat, epochNum=folder_it)
 
 
 if __name__ == "__main__":

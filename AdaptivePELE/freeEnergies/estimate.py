@@ -56,7 +56,7 @@ class MSM:
                 raise err
         print("Using lagtime = ", self.lagtime)
         self.buildMSM()
-        np.savetxt(self.stationaryDistributionFilename, self.MSM_object.pi)
+        # np.savetxt(self.stationaryDistributionFilename, self.MSM_object.pi)
         self.saveMSM(self.MSM_object)
 
     def computePCCA(self, numberOfPCCAclusters):
@@ -84,6 +84,24 @@ class MSM:
         plt.show()
 
     def _calculateITS(self):
+        print("Calculating implied time-scales")
+        if not self.error:
+            itsErrors = None
+        elif self.error:
+            itsErrors = "bayes"
+        if self.lagtimes and self.lagtimes is not None:
+            # workaround to get new its plot at each iteration, the
+            # plot_implied_timescales function is calling plt.gca() and
+            # recovers the previous plot's axes, by creating a new figure
+            # gca gets a set of empty axes and plots are fine
+            plt.figure()
+            its_object = msm.its(self.dtrajs, lags=self.lagtimes, errors=itsErrors)
+            mplt.plot_implied_timescales(its_object, outfile=self.itsOutput, nits=self.numberOfITS)
+            plt.savefig("its.png")
+        if self.lagtime is not None:
+            return self.lagtime
+
+    def _calculateITS_old(self):
         is_converged = False
         # its
         print(("Calculating implied time-scales, when it's done will prompt "
