@@ -106,7 +106,7 @@ def get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, cluster
     trajFiles = glob.glob(os.path.join(trajectoryFolder, trajectoryBasename))
     for traj in trajFiles:
         _, epoch, iTraj = os.path.splitext(traj)[0].split("_", 3)
-        trajCoords = np.loadtxt(traj)
+        trajCoords = utilities.loadtxtfile(traj)
         if len(trajCoords.shape) < 2:
             trajCoords = [trajCoords]
         for snapshot in trajCoords:
@@ -206,8 +206,8 @@ def main(num_clusters, criteria1, criteria2, ligand_resname, output_folder="Clus
                 df.update(df_tmp)
         df.to_csv("Simulation.csv", index=False)
     if restart:
-        df = pd.read_csv("Simulation.csv")    
-        clusterCenters = np.loadtxt("clustercenters.dat")
+        df = pd.read_csv("Simulation.csv")
+        clusterCenters = utilities.loadtxtfile("clustercenters.dat")
         print(clusterCenters)
     centersInfo = get_centers_info(trajectoryFolder, trajectoryBasename, num_clusters, clusterCenters)
     COMArray = [centersInfo[i]['center'] for i in range(num_clusters)]

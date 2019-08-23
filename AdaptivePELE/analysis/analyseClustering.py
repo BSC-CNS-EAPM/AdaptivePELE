@@ -3,6 +3,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from AdaptivePELE.atomset import atomset
+from AdaptivePELE.utilities import utilities
 from mpl_toolkits.mplot3d import Axes3D
 import argparse
 
@@ -92,7 +93,7 @@ def plotClusters(cluster_matrix, metrics, title):
 
 
 def extractInfo(inputFile):
-    clusterInfo = np.loadtxt(inputFile)
+    clusterInfo = utilities.loadtxtfile(inputFile)
     return clusterInfo[:, 1]
 
 

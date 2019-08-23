@@ -1,16 +1,17 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from builtins import range
+import os
 import socket
+import argparse
 import matplotlib
 import numpy as np
-import os
-import argparse
+from builtins import range
+import matplotlib.pyplot as plt
+from AdaptivePELE.utilities import utilities
 machine = socket.gethostname()
 if machine == "bsccv03":
     matplotlib.use('wxagg')
 elif 'login' in machine:
     matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 try:
     # This might fail for older versions of matplotlib (e.g in life cluster)
     plt.style.use("ggplot")
@@ -41,12 +42,12 @@ def main(filename, output_folder):
     numberOfEpochs = len([epoch for epoch in allFolders if epoch.isdigit() and
                           os.path.isfile(templateSummary % int(epoch))])
 
-    clustering = np.loadtxt(templateSummary % (numberOfEpochs-1))
+    clustering = utilities.loadtxtfile(templateSummary % (numberOfEpochs-1))
     clustersThres = list(set(clustering[:, 4]))
     clustersThres.sort(reverse=True)
     spawningPerThres = np.zeros((numberOfEpochs, len(clustersThres)))
     for i in range(numberOfEpochs):
-        clustering = np.loadtxt(templateSummary % i)
+        clustering = utilities.loadtxtfile(templateSummary % i)
         for j, threshold in enumerate(clustersThres):
             spawningPerThres[i, j] = clustering[clustering[:, 4] == threshold, 2].sum()
     line_objects = plt.plot(spawningPerThres)
