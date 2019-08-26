@@ -534,6 +534,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     else:
         platformProperties = {}
 
+    dummies = None
     if parameters.boxCenter or parameters.cylinderBases:
         dummies = findDummyAtom(prmtop)
 
