@@ -73,7 +73,7 @@ class Topology:
         """
             Dump the contents of the topology object using pickle
         """
-        writeObject(os.path.join(self.path, "topologies.pkl"), self)
+        writeObject(os.path.join(self.path, "topologies.pkl"), self, protocol=2)
 
     def setTopologies(self, topologyFiles, cleanFiles=True):
         """
