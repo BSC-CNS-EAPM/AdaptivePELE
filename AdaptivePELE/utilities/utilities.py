@@ -887,3 +887,31 @@ def get_available_backend():
     elif "power" in machine:
         # CTE-Power
         return "tkagg"
+
+
+def get_workers_output(workers, wait_time=60):
+    """
+        Get the output of a pool of workers without serializing the program at the get.
+
+        :param workers: List of AsyncResult objects created when passing work to the pool
+        :type workers: list
+        :param wait_time: Number of second to wait before checking if next worker is finished
+        :type wait_time: int
+
+        :returns: list -- List containing the output of all workers, if the function
+        passed to the pool had no return value it will be a list of None objects
+    """
+    results = []
+    to_finish = list(range(len(workers)))
+    # loop over all processes of the pool, waiting for a minute and checking
+    # if they are finished, this allows to query and reraise exceptions
+    # withiout waiting for previous succesfull workers to finish
+    while to_finish:
+        i = to_finish.pop(0)
+        workers[i].wait(wait_time)
+        if workers[i].ready():
+            results.append(workers[i].get())
+        else:
+            # if worker is not done append it again at the end of the queue
+            to_finish.append(i)
+    return results
