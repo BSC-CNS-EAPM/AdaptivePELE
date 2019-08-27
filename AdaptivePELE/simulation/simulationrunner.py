@@ -924,9 +924,6 @@ class MDSimulation(SimulationRunner):
             processManager.barrier()
             return []
         initialStructures = processManager.getStructureListPerReplica(initialStructures, self.parameters.trajsPerReplica)
-        # the new initialStructures list contains tuples in the form (i,
-        # structure) where i is the index of structure in the original list
-        newInitialStructures = []
         solvatedStrcutures = []
         equilibrationFiles = []
         equilibrationOutput = outputPathConstants.equilibrationDir
@@ -1020,9 +1017,10 @@ class MDSimulation(SimulationRunner):
         for i, equilibrationFilePair in enumerate(equilibrationFiles):
             reportName = os.path.join(equilibrationOutput, "equilibrated_system_%d.pdb" % (i+processManager.id*self.parameters.trajsPerReplica))
             workers.append(pool.apply_async(sim.runEquilibration, args=(equilibrationFilePair, reportName, self.parameters, i)))
-
-        for worker in workers:
-            newInitialStructures.append(worker.get())
+        pool.close()
+        # the new initialStructures list contains tuples in the form (i,
+        # structure) where i is the index of structure in the original list
+        newInitialStructures = utilities.get_workers_output(workers)
         pool.terminate()
         endTime = time.time()
         utilities.print_unbuffered("Equilibration took %.2f sec" % (endTime - startTime))
@@ -1159,18 +1157,7 @@ class MDSimulation(SimulationRunner):
             workerNumber = i
             workers.append(pool.apply_async(sim.runProductionSimulation, args=(startingFiles, workerNumber, outputDir, seed, self.parameters, reportFileName, checkpoint, self.parameters.ligandName, processManager.id, self.parameters.trajsPerReplica, epoch, self.restart)))
         pool.close()
-        to_finish = list(range(len(workers)))
-        # loop over all processes of the pool, waiting for a minute and checking
-        # if they are finished, this allows to query and reraise exceptions
-        # withiout waiting for previous succesfull workers to finish
-        while to_finish:
-            i = to_finish.pop(0)
-            workers[i].wait(60)
-            if workers[i].ready():
-                workers[i].get()
-            else:
-                # if worker is not done append it again at the end of the queue
-                to_finish.append(i)
+        utilities.get_workers_output(workers)
         pool.terminate()
         endTime = time.time()
         self.restart = False
