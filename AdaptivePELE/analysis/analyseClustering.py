@@ -1,11 +1,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import pickle
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.utilities import utilities
 from mpl_toolkits.mplot3d import Axes3D
-import argparse
 
 
 def extractCOMMatrix(clusters, resname, topology=None):
