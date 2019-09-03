@@ -251,7 +251,10 @@ def makeFolder(outputDir):
     try:
         os.makedirs(outputDir)
     except OSError as exc:
-        if exc.errno != errno.EEXIST:
+        # if at this point another process has created the folder we are already
+        # happy. If not, we complain
+        if exc.errno != errno.EEXIST or not os.path.isdir(outputDir):
+            print(exc.args)
             raise
 
 
