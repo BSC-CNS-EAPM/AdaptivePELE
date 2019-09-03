@@ -42,7 +42,7 @@ class UnspecifiedPELECrashException(Exception):
     __module__ = Exception.__module__
 
 
-class Topology:
+class Topology(object):
     """
         Container object that points to the topology used in each trajectory
     """
