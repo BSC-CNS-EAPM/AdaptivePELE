@@ -17,9 +17,13 @@ def extendReportWithRmsd(reportFile, rmsds):
         :returns: np.ndarray -- Extended report file with corrected rmsd values
     """
     newShape = reportFile.shape
-    fixedReport = np.zeros((newShape[0], newShape[1]+1))
-    fixedReport[:, :-1] = reportFile
-    fixedReport[:, -1] = rmsds
+    if len(rmsds.shape) < 2:
+        add_cols = 1
+    else:
+        add_cols = rmsds.shape[1]
+    fixedReport = np.zeros((newShape[0], newShape[1]+add_cols))
+    fixedReport[:, :-add_cols] = reportFile
+    fixedReport[:, -add_cols:] = rmsds
     return fixedReport
 
 
