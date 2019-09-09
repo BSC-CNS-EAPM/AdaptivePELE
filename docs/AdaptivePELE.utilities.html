@@ -189,7 +189,8 @@ by the checker</p>
 <dl class="class">
 <dt id="AdaptivePELE.utilities.utilities.Topology">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">Topology</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Container object that points to the topology used in each trajectory</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Container object that points to the topology used in each trajectory</p>
 <dl class="method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.cleanTopologies">
 <code class="descname">cleanTopologies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.cleanTopologies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.cleanTopologies" title="Permalink to this definition">¶</a></dt>
@@ -743,6 +744,28 @@ trajectories and reports</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.get_workers_output">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_workers_output</code><span class="sig-paren">(</span><em>workers</em>, <em>wait_time=60</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_workers_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_workers_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the output of a pool of workers without serializing the program at the get.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>workers</strong> (<em>list</em>) – List of AsyncResult objects created when passing work to the pool</li>
+<li><strong>wait_time</strong> (<em>int</em>) – Number of second to wait before checking if next worker is finished</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List containing the output of all workers, if the function</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>passed to the pool had no return value it will be a list of None objects</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.join_coordinates_prob">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">join_coordinates_prob</code><span class="sig-paren">(</span><em>coords</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#join_coordinates_prob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.join_coordinates_prob" title="Permalink to this definition">¶</a></dt>
 <dd><p>Join a MxN numpy array representing some cluster center coordinates with
@@ -763,7 +786,7 @@ an 1XN array representing some metric of the clusters</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.loadtxtfile">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">loadtxtfile</code><span class="sig-paren">(</span><em>filename</em>, <em>usecols=None</em>, <em>postprocess=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#loadtxtfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.loadtxtfile" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">loadtxtfile</code><span class="sig-paren">(</span><em>filename</em>, <em>usecols=None</em>, <em>postprocess=True</em>, <em>dtype=&lt;type 'float'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#loadtxtfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.loadtxtfile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a table file from a text file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -773,6 +796,7 @@ an 1XN array representing some metric of the clusters</p>
 <li><strong>filename</strong> (<em>str</em>) – Name of the file to load</li>
 <li><strong>usecols</strong> (<em>int</em>) – Which columns to read, with 0 being the first</li>
 <li><strong>postprocess</strong> (<em>bool</em>) – Whether to add an extra dimension if only one line present in the txt file</li>
+<li><strong>dtype</strong> (<em>data-type</em>) – Data-type of the resulting array, (default float)</li>
 </ul>
 </td>
 </tr>

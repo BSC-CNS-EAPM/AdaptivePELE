@@ -182,7 +182,7 @@
     <span class="vm">__module__</span> <span class="o">=</span> <span class="ne">Exception</span><span class="o">.</span><span class="vm">__module__</span>
 
 
-<div class="viewcode-block" id="Topology"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology">[docs]</a><span class="k">class</span> <span class="nc">Topology</span><span class="p">:</span>
+<div class="viewcode-block" id="Topology"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology">[docs]</a><span class="k">class</span> <span class="nc">Topology</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Container object that points to the topology used in each trajectory</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -213,7 +213,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Dump the contents of the topology object using pickle</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">writeObject</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;topologies.pkl&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span></div>
+        <span class="n">writeObject</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;topologies.pkl&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Topology.setTopologies"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.Topology.setTopologies">[docs]</a>    <span class="k">def</span> <span class="nf">setTopologies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topologyFiles</span><span class="p">,</span> <span class="n">cleanFiles</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -391,7 +391,10 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outputDir</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span><span class="p">:</span>
+        <span class="c1"># if at this point another process has created the folder we are already</span>
+        <span class="c1"># happy. If not, we complain</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">outputDir</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
             <span class="k">raise</span></div>
 
 
@@ -933,7 +936,7 @@
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">trajectoryFile</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="loadtxtfile"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.loadtxtfile">[docs]</a><span class="k">def</span> <span class="nf">loadtxtfile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="loadtxtfile"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.loadtxtfile">[docs]</a><span class="k">def</span> <span class="nf">loadtxtfile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load a table file from a text file</span>
 
@@ -943,10 +946,12 @@
 <span class="sd">        :type usecols: int</span>
 <span class="sd">        :param postprocess: Whether to add an extra dimension if only one line present in the txt file</span>
 <span class="sd">        :type postprocess: bool</span>
+<span class="sd">        :param dtype: Data-type of the resulting array, (default float)</span>
+<span class="sd">        :type dtype: data-type</span>
 
 <span class="sd">        :returns: np.ndarray -- Contents of the text file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">missing_values</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">),</span> <span class="n">filling_values</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">)</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">missing_values</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">),</span> <span class="n">filling_values</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">postprocess</span><span class="p">:</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
     <span class="k">return</span> <span class="n">metrics</span></div>
@@ -1025,6 +1030,34 @@
     <span class="k">elif</span> <span class="s2">&quot;power&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="p">:</span>
         <span class="c1"># CTE-Power</span>
         <span class="k">return</span> <span class="s2">&quot;tkagg&quot;</span></div>
+
+
+<div class="viewcode-block" id="get_workers_output"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.get_workers_output">[docs]</a><span class="k">def</span> <span class="nf">get_workers_output</span><span class="p">(</span><span class="n">workers</span><span class="p">,</span> <span class="n">wait_time</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the output of a pool of workers without serializing the program at the get.</span>
+
+<span class="sd">        :param workers: List of AsyncResult objects created when passing work to the pool</span>
+<span class="sd">        :type workers: list</span>
+<span class="sd">        :param wait_time: Number of second to wait before checking if next worker is finished</span>
+<span class="sd">        :type wait_time: int</span>
+
+<span class="sd">        :returns: list -- List containing the output of all workers, if the function</span>
+<span class="sd">        passed to the pool had no return value it will be a list of None objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">to_finish</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">workers</span><span class="p">)))</span>
+    <span class="c1"># loop over all processes of the pool, waiting for a minute and checking</span>
+    <span class="c1"># if they are finished, this allows to query and reraise exceptions</span>
+    <span class="c1"># withiout waiting for previous succesfull workers to finish</span>
+    <span class="k">while</span> <span class="n">to_finish</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">to_finish</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">workers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">wait_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">workers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">workers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if worker is not done append it again at the end of the queue</span>
+            <span class="n">to_finish</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span></div>
 </pre></div>
 
            </div>

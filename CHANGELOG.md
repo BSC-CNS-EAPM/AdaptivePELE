@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ### Bug fixes:
 
+    - Fix bug ignoring ligandName parameter in the simulation block
+
 ### Behaviour changes from previous version:
 
     - Modify plotAdaptive to generate the plots using matplotlib and not rely on gnuplot
