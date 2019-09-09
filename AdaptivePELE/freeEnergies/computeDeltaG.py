@@ -18,8 +18,8 @@ try:
 except ImportError:
     import pickle as cPickle
 from pyemma.coordinates.clustering import AssignCenters
-from AdaptivePELE.freeEnergies import runMarkovChainModel as run
 from AdaptivePELE.freeEnergies import utils
+from AdaptivePELE.freeEnergies.runMarkovChainModel import getStationaryDistr, getSortedEigen
 
 
 def assignNewTrajectories(trajs, clusterCenters):
@@ -112,8 +112,8 @@ def ensure_connectivity(MSMObject, allClusters):
         print("Adding pseudocounts to enforce connectivity")
         counts = MSMObject.count_matrix_full
         trans = reestimate_transition_matrix(counts)
-        _, eic = run.getSortedEigen(trans)
-        pi = run.getStationaryDistr(eic[:, 0])
+        _, eic = getSortedEigen(trans)
+        pi = getStationaryDistr(eic[:, 0])
         clusters = allClusters
     return pi, clusters
 
