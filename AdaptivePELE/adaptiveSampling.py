@@ -624,6 +624,9 @@ def main(jsonParams, clusteringHook=None):
     writeAll = generalParams.get(blockNames.GeneralParams.writeAllClustering, False)
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
     resname = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.ligandResname)
+    if resname is None:
+        # check if resname is provided in the simulation block
+        resname = simulationRunner.getResname()
 
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
     if not initialStructures:

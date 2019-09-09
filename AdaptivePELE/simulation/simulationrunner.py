@@ -121,6 +121,12 @@ class SimulationRunner:
         """
         return True, self.parameters.peleSteps
 
+    def getResname(self):
+        """
+            Return the value of the ligand name
+        """
+        return None
+
     def getNumReplicas(self):
         """
             Return the number of replicas, only useful for MD simulations
@@ -889,6 +895,12 @@ class MDSimulation(SimulationRunner):
         pool.map(processTraj, trajectory_files)
         pool.close()
         pool.join()
+
+    def getResname(self):
+        """
+            Return the value of the ligand name
+        """
+        return self.parameters.ligandName
 
     def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, processManager, topologies=None):
         """
