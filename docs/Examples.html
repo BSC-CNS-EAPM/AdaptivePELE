@@ -426,10 +426,13 @@ moment this was written)</p>
 <li><p class="first"><strong>constraints</strong> (<em>list</em>, default=None): List of constraints between atoms to
 establish in a simulation. The constraints must be specified as a list in the
 following format (see <a class="reference internal" href="#control-file-examples">Control File Examples</a> section for an example on how
-to set constraints.  <strong>Note</strong>: the distance of the constrints <strong>must</strong> be specified in angstroms):</p>
+to set constraints.  <strong>Note</strong>: the distance of the constraints <strong>must</strong> be specified in angstroms):</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;atom1:res1:resnum1&quot;</span><span class="p">,</span> <span class="s2">&quot;atom2:res2:resnum2&quot;</span><span class="p">,</span> <span class="n">distance</span><span class="p">]</span>
 </pre></div>
 </div>
+<p><strong>Note 2</strong>: Histidines present in constraints should be named HIS regardless
+of their protonation state, see <a class="reference internal" href="#input-preparation-for-md">Input preparation for MD</a> section for more
+details on histidines naming.</p>
 </li>
 <li><p class="first"><strong>boxType</strong> (<em>str</em>, default=sphere): Type of box to use, it can be <em>sphere</em> or
 <em>cylinder</em></p>
@@ -1123,7 +1126,8 @@ described with the file topology.pdb</p>
 <div class="section" id="input-preparation-for-md">
 <h2>Input preparation for MD<a class="headerlink" href="#input-preparation-for-md" title="Permalink to this headline">¶</a></h2>
 <p>Currently for running MD with protein-ligand systems we use AmberTools and the
-gaff forcefield for the ligand, and the Amber99 forcefield for the protein.</p>
+gaff forcefield for the ligand, and the Amberff forcefield for the protein
+(different versions can be selected see ).</p>
 <p>Several tasks are applied to the input pdb to ensure compatibility with
 AmberTools:</p>
 <ul class="simple">
@@ -1132,7 +1136,8 @@ users’ responsibility to provide a correct input structure.</li>
 <li>Correct alternative positions. If the input pdb has alternative positions we
 select the ones with higher occupancy.</li>
 <li>Identify disulphide bonds</li>
-<li>Check the protonation states of the histidine residues.</li>
+<li>Check the protonation states of the histidine residues, the input structure
+should have the correct histidine protonation state for the model.</li>
 <li>Check atom names so that they match the expected names for the amber
 forcefield</li>
 </ul>
@@ -1144,6 +1149,11 @@ chain so that the processing can identify them and the resulting amber
 topology has several molecules as desired.</li>
 <li>The ligand in the input file can’t have a name starting with a digit, since
 AmberTools does not accept residues starting with digits</li>
+<li>Histidines should be name <em>HIS</em> regardless of the protonation state, the code
+will detect and assign the correct template without the need of using
+alternative names such as <em>HIE</em> or <em>HIP</em> (this is particularly important when
+using constraints, see <a class="reference internal" href="#md-parameters">MD Parameters</a> section for more details on the
+constraints options).</li>
 </ul>
 </div>
 <div class="section" id="equilibration-procedure-in-md">

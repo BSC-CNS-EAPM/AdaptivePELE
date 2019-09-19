@@ -255,9 +255,13 @@ Optionally, you can also use the following parameters:
 * **constraints** (*list*, default=None): List of constraints between atoms to
   establish in a simulation. The constraints must be specified as a list in the
   following format (see `Control File Examples`_ section for an example on how 
-  to set constraints.  **Note**: the distance of the constrints **must** be specified in angstroms)::
+  to set constraints.  **Note**: the distance of the constraints **must** be specified in angstroms)::
 
   ["atom1:res1:resnum1", "atom2:res2:resnum2", distance]
+
+  **Note 2**: Histidines present in constraints should be named HIS regardless
+  of their protonation state, see `Input preparation for MD`_ section for more
+  details on histidines naming.
 
 * **boxType** (*str*, default=sphere): Type of box to use, it can be *sphere* or
   *cylinder*
@@ -1008,7 +1012,8 @@ Input preparation for MD
 ------------------------
 
 Currently for running MD with protein-ligand systems we use AmberTools and the
-gaff forcefield for the ligand, and the Amber99 forcefield for the protein.
+gaff forcefield for the ligand, and the Amberff forcefield for the protein
+(different versions can be selected see ).
 
 Several tasks are applied to the input pdb to ensure compatibility with
 AmberTools:
@@ -1021,7 +1026,8 @@ AmberTools:
 
 * Identify disulphide bonds
 
-* Check the protonation states of the histidine residues.
+* Check the protonation states of the histidine residues, the input structure
+  should have the correct histidine protonation state for the model.
 
 * Check atom names so that they match the expected names for the amber
   forcefield
@@ -1036,6 +1042,11 @@ mind when providing input for the MD runs:
 * The ligand in the input file can't have a name starting with a digit, since
   AmberTools does not accept residues starting with digits
 
+* Histidines should be name *HIS* regardless of the protonation state, the code
+  will detect and assign the correct template without the need of using
+  alternative names such as *HIE* or *HIP* (this is particularly important when
+  using constraints, see `MD Parameters`_ section for more details on the
+  constraints options).
 
 Equilibration procedure in MD
 -----------------------------
