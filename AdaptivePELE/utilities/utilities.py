@@ -645,7 +645,7 @@ def write_mdtraj_object_PDB(conformation, output, topology):
         :type structure: str or Trajectory
         :param output: Output where to write the object
         :type output: str
-        :param topology: Topoloy-like object
+        :param topology: Topology-like object
         :type topology: list
     """
     PDB = atomset.PDB()
@@ -659,7 +659,7 @@ def get_mdtraj_object_PDBstring(conformation, topology):
 
         :param conformation: Mdtraj trajectory object to write
         :type structure: str or Trajectory
-        :param topology: Topoloy-like object
+        :param topology: Topology-like object
         :type topology: list
 
         :returns: str -- The pdb representation of a snapshot from a xtc
