@@ -1048,6 +1048,11 @@ mind when providing input for the MD runs:
   using constraints, see `MD Parameters`_ section for more details on the
   constraints options).
 
+* Different cysteine types can be specified by changing the residue name.
+  Disulphide bonds will be automatically detected, but can be also specified
+  manually by renaming the cysteines as *CYX*. Furthermore, cysteines bound to
+  metals should be renamed to *CYM*.
+
 Equilibration procedure in MD
 -----------------------------
 
