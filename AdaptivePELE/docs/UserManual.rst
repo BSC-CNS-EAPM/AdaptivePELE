@@ -1159,8 +1159,10 @@ like::
     #SBATCH --constraint=k80
     #SBATCH --gres gpu:4
 
-    module load intel/16.0.2 amber/16 python/2.7.2 2> /dev/null
-    export PYTHONPATH="/gpfs/projects/bsc72/AdaptiveSampling/bin_mt/v1.6.2:/gpfs/projects/bsc72/lib/site-packages_minot"
+    module purge
+    module load bullxmpi/bullxmpi-1.2.9.1 compilewrappers/yes vgl/2.5 cuda/7.5 K80/default
+    module load intel/16.0.2 amber/16 python/2.7.2
+    export PYTHONPATH="/gpfs/projects/bsc72/adaptiveSampling/bin_mt/v1.6.2:/gpfs/projects/bsc72/lib/site-packages_minot"
     srun python -m AdaptivePELE.adaptiveSampling control_file_MD_3ptb_mt.conf
 
 Note also that this job requests 8 cpus per replica. At least a number of cpus
