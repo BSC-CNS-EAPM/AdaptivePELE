@@ -19,7 +19,7 @@ except ImportError:
     import pickle as cPickle
 from pyemma.coordinates.clustering import AssignCenters
 from AdaptivePELE.freeEnergies import utils
-from AdaptivePELE.freeEnergies.runMarkovChainModel import getStationaryDistr, getSortedEigen
+from AdaptivePELE.freeEnergies.utilitiesFreeEnergies import getStationaryDistr, getSortedEigen
 
 
 def assignNewTrajectories(trajs, clusterCenters):
