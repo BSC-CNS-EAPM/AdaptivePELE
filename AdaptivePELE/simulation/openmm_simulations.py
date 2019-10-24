@@ -543,7 +543,6 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         positions = min_sim.context.getState(getPositions=True).getPositions()
     else:
         positions = pdb.positions
-
     system = prmtop.createSystem(nonbondedMethod=app.PME,
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                  constraints=app.HBonds, removeCMMotion=True)
@@ -568,6 +567,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
                 utilities.print_unbuffered("Adding cylinder ligand box")
             addLigandCylinderBox(prmtop.topology, positions, system, parameters.ligandName, dummies, parameters.boxRadius, deviceIndex)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
+    utilities.print_unbuffered(workerNumber, equilibrationFiles, dummies, len(positions), prmtop.topology.getNumAtoms(), system.getNumParticles())
     simulation.context.setPositions(positions)
     if restart:
         with open(str(checkpoint), 'rb') as check:
