@@ -904,7 +904,8 @@ def get_workers_output(workers, wait_time=60):
         :returns: list -- List containing the output of all workers, if the function
             passed to the pool had no return value it will be a list of None objects
     """
-    results = []
+    # fill the list of results with placeholder zeros
+    results = [0 for _ in range(len(workers))]
     to_finish = list(range(len(workers)))
     # loop over all processes of the pool, waiting for a minute and checking
     # if they are finished, this allows to query and reraise exceptions
@@ -913,7 +914,9 @@ def get_workers_output(workers, wait_time=60):
         i = to_finish.pop(0)
         workers[i].wait(wait_time)
         if workers[i].ready():
-            results.append(workers[i].get())
+            # mantain the order of the results in which they were submitted,
+            # this is assumed in some places where multiprocessing is used
+            results[i] = workers[i].get()
         else:
             # if worker is not done append it again at the end of the queue
             to_finish.append(i)
