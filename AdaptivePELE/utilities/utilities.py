@@ -902,7 +902,7 @@ def get_workers_output(workers, wait_time=60):
         :type wait_time: int
 
         :returns: list -- List containing the output of all workers, if the function
-        passed to the pool had no return value it will be a list of None objects
+            passed to the pool had no return value it will be a list of None objects
     """
     results = []
     to_finish = list(range(len(workers)))
