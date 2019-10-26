@@ -660,8 +660,8 @@ def addConstraints(system, topology, constraints):
             atomIndices[atom_str] = atom.index
     for constraint in constraints:
         assert atomIndices[constraint[0]] != atomIndices[constraint[1]], (constraint, atomIndices[constraint[0]], atomIndices[constraint[1]])
-        assert atomIndices[constraint[0]] is not None
-        assert atomIndices[constraint[1]] is not None
+        assert atomIndices[constraint[0]] is not None, (constraint, atomIndices[constraint[0]])
+        assert atomIndices[constraint[1]] is not None, (constraint, atomIndices[constraint[1]])
         # pass distance constraint in nm
         system.addConstraint(atomIndices[constraint[0]], atomIndices[constraint[1]], float(constraint[2])/10.0)
 

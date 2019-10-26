@@ -12,7 +12,7 @@ def parseArguments():
     parser.add_argument("--offset", type=int, default=0, help="Offset to add to trajectory number")
     parser.add_argument("--processors", type=int, default=4, help="Number of cpus to use")
     parser.add_argument("resname", help="Ligand resname")
-    parser.add_argument("reference", help="Ligand resname")
+    parser.add_argument("reference", help="Reference structure")
     parser.add_argument("topology", help="Glob string for the topology")
     parser.add_argument("trajectories", help="Glob string for the trajectories")
     args = parser.parse_args()

@@ -85,7 +85,7 @@
             
             
                 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../UserManual.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../Problems.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../AdaptivePELE.html">AdaptivePELE – Package Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
@@ -1887,7 +1887,6 @@
         <span class="c1"># create Adaptive clusters from the kmeans result</span>
         <span class="n">trajectory_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">allTrajsPath</span><span class="p">,</span> <span class="s2">&quot;extractedCoordinates&quot;</span><span class="p">,</span> <span class="n">base_traj_names</span><span class="p">))</span>
         <span class="n">trajectories</span> <span class="o">=</span> <span class="p">[</span><span class="n">utilities</span><span class="o">.</span><span class="n">loadtxtfile</span><span class="p">(</span><span class="n">f</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">trajectory_files</span><span class="p">]</span>
-
         <span class="n">centersInfo</span> <span class="o">=</span> <span class="n">getCentersInfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pyemma_clustering</span><span class="o">.</span><span class="n">clusterCenters</span><span class="p">,</span> <span class="n">trajectories</span><span class="p">,</span> <span class="n">trajectory_files</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pyemma_clustering</span><span class="o">.</span><span class="n">dtrajs</span><span class="p">)</span>
         <span class="n">centersInfo_processed</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">centersInfo</span><span class="p">:</span>
@@ -2172,7 +2171,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Daniel Lecina, Joan Francesc Gilabert.
+        &copy; Copyright 2019, Daniel Lecina, Joan Francesc Gilabert.
 
     </p>
   </div>

@@ -42,7 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'AdaptivePELE'
-copyright = u'2017, Daniel Lecina, Joan Francesc Gilabert'
+copyright = u'2019, Daniel Lecina, Joan Francesc Gilabert'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

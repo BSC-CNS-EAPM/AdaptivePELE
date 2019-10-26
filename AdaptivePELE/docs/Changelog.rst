@@ -21,6 +21,8 @@ New features:
 Bug fixes:
 ..........
 
+    - Fix bug ignoring ligandName parameter in the simulation block
+
 Behaviour changes from previous version:
 ........................................
 

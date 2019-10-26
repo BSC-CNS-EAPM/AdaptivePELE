@@ -1235,6 +1235,7 @@ class MSMCalculator(SpawningCalculator):
         bins = computedG.create_box(clusters, originalCoordinates, d)
         microstateVolume = computedG.calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d)
         gpmf, string = computedG.calculate_pmf(microstateVolume, pi)
+        print("Results for estimated dG:")
         print("bound    Delta G     Delta W     Binding Volume:     Binding Volume contribution")
         print(string)
 
