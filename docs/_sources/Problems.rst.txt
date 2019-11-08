@@ -51,3 +51,10 @@ AdaptivePELE simulation.
       center of the box and is listed in the trajectories as *DUM* atom in
       a residue also named *DUM*. This atom is massless so it will not be moved
       during the simulation.
+
+    - Ligand preparation for MD fails with a ligand containing a Cl atom. With
+      a tleap error like::
+        FATAL:  Atom .R<SCH 218>.A<Cl1 22> does not have a type.
+      check that the ligand's Cl atom in named "Cl" and not "CL", so that
+      antechamber recognizes it properly. This might happen with other atoms,
+      if so we will update this site with their examples.
