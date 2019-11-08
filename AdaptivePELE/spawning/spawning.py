@@ -1236,8 +1236,12 @@ class MSMCalculator(SpawningCalculator):
         microstateVolume = computedG.calculate_microstate_volumes_new(clusters, originalCoordinates, bins, d)
         gpmf, string = computedG.calculate_pmf(microstateVolume, pi)
         print("Results for estimated dG:")
-        print("bound    Delta G     Delta W     Binding Volume:     Binding Volume contribution")
+        print("bound    Delta G     Delta W     Binding Volume     Binding Volume contribution")
         print(string)
+        with open(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "results_summary.txt"), "w") as fw:
+            fw.write("Results for estimated dG:\n")
+            fw.write("bound    Delta G     Delta W     Binding Volume     Binding Volume contribution\n")
+            fw.write("%s\n" % string)
 
         pmf_xyzg = np.hstack((clusters, np.expand_dims(gpmf, axis=1)))
         np.savetxt(os.path.join(outputPathConstants.epochOutputPathTempletized % currentEpoch, "pmf_xyzg.dat"), pmf_xyzg)
