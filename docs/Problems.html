@@ -195,6 +195,15 @@ center of the box and is listed in the trajectories as <em>DUM</em> atom in
 a residue also named <em>DUM</em>. This atom is massless so it will not be moved
 during the simulation.</p>
 </li>
+<li><p class="first">Ligand preparation for MD fails with a ligand containing a Cl atom. With
+a tleap error like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">FATAL</span><span class="p">:</span>  <span class="n">Atom</span> <span class="o">.</span><span class="n">R</span><span class="o">&lt;</span><span class="n">SCH</span> <span class="mi">218</span><span class="o">&gt;.</span><span class="n">A</span><span class="o">&lt;</span><span class="n">Cl1</span> <span class="mi">22</span><span class="o">&gt;</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">have</span> <span class="n">a</span> <span class="nb">type</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>check that the ligand’s Cl atom in named “Cl” and not “CL”, so that
+antechamber recognizes it properly. This might happen with other atoms,
+if so we will update this site with their examples.</p>
+</li>
 </ul>
 </div></blockquote>
 </div>
