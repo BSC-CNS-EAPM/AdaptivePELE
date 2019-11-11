@@ -1747,10 +1747,17 @@ class MSMClustering(Clustering):
         # create Adaptive clusters from the kmeans result
         trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, "extractedCoordinates", base_traj_names))
         trajectories = [utilities.loadtxtfile(f)[:, 1:] for f in trajectory_files]
-        centersInfo = getCentersInfo(self.pyemma_clustering.clusterCenters, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)
+        # assign non-repeated trajectories to the clusters, in order to properly
+        # assing the corresponding structures
+        nonRepeatedDtrajs = self.pyemma_clustering.assignNewTrajectories(trajectories)
+        centersInfo = getCentersInfo(self.pyemma_clustering.clusterCenters, trajectories, trajectory_files, nonRepeatedDtrajs)
         centersInfo_processed = []
         for cluster in centersInfo:
-            epoch_num, traj_num, snapshot_num = centersInfo[cluster]["structure"]
+            try:
+                epoch_num, traj_num, snapshot_num = centersInfo[cluster]["structure"]
+            except TypeError:
+                print("Structure not found for cluster %d" % cluster)
+                raise
             centersInfo_processed.append([cluster, int(epoch_num), int(traj_num), int(snapshot_num)])
         extractInfo = getRepr.getExtractInfo(centersInfo_processed)
         # extractInfo is a dictionary organized as {[epoch, traj]: [cluster, snapshot]}
