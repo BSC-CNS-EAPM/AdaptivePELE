@@ -1,7 +1,7 @@
-# must do conda install -c NostrumBioDiscovery adaptive_pele 
+# must do conda install -c conda-forge -c NostrumBioDiscovery adaptive_pele 
 package:
   name: adaptive_pele
-  version: "1.6.1"
+  version: "1.6.2"
 
 about:
   home: https://github.com/AdaptivePELE/AdaptivePELE
@@ -26,7 +26,8 @@ requirements:
     - python
     - numpy
     - mdtraj
-    - scikit-learn
+    - six
+    - future
 
 test:
   imports:
