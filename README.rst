@@ -11,8 +11,8 @@ simulation built around the Protein Energy Landscape Exploration method (`PELE <
 Usage
 -----
 
-AdaptivePELE is called with a control file as a
-parameters. The control file is a json document that contains 4 sections:
+AdaptivePELE is called with a control file as input
+parameter. The control file is a json document that contains 4 sections:
 general parameters, simulation parameters, clustering parameters and spawning
 parameters. The first block refers to general parameters of the adaptive run,
 while the other three blocks configure the three steps of an adaptive sampling

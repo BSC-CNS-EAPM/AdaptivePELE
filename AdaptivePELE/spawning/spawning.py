@@ -1,12 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from builtins import range
-import math
-import sys
-import numpy as np
-import random
-import scipy.optimize as optim
 import os
+import sys
+import math
 import glob
+import random
+import numpy as np
+import scipy.optimize as optim
 from abc import abstractmethod
 from scipy.linalg import lu, solve
 from AdaptivePELE.constants import blockNames

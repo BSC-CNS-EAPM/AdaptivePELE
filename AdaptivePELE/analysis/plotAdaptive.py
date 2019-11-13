@@ -110,9 +110,11 @@ def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint, palett
     elif kindOfPrint == "PRINT_BE_RMSD":
         printWithLines = False
         totalNumberOfSteps = False
+    colorbar = ""
     if paletteModifier is None:
         stringPalette = "lt 6 lc palette frac j/%(numberOfEpochs)d. "
         colorMetric = ""
+        colorbar = "set cbrange[0:%(numberOfEpochs)d]; "
     elif isinstance(paletteModifier, int):
         stringPalette = "lt 6 lc palette "
         colorMetric = ":%d" % paletteModifier
@@ -120,7 +122,7 @@ def generatePrintString(stepsPerRun, xcol, ycol, reportName, kindOfPrint, palett
         stringPalette = ""
         colorMetric = ""
 
-    gnuplotString = "".join(["set cbrange[0:%(numberOfEpochs)d]; plot for [i=%(startTraj)d:%(runsPerEpoch)d] for [j=0:%(numberOfEpochs)d-1] \'\'.j.\'/%(reportName)s\'.i u %(col1)s:%(col2)d", colorMetric, " ", stringPalette, "notitle %(withLines)s"])
+    gnuplotString = "".join([colorbar, "plot for [i=%(startTraj)d:%(runsPerEpoch)d] for [j=0:%(numberOfEpochs)d-1] \'\'.j.\'/%(reportName)s\'.i u %(col1)s:%(col2)d", colorMetric, " ", stringPalette, "notitle %(withLines)s"])
     return generateNestedString(gnuplotString, reportName, xcol, ycol, stepsPerRun, printWithLines, totalNumberOfSteps, False, paletteModifier, trajs_range)
 
 
