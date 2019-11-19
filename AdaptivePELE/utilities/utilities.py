@@ -921,3 +921,21 @@ def get_workers_output(workers, wait_time=60):
             # if worker is not done append it again at the end of the queue
             to_finish.append(i)
     return results
+
+
+def glob_sorted(pattern, reverse=False, key=None):
+    """
+        Run glob and sort the output to ensure cross-platform compatibility
+
+        :param pattern: pathname to match files
+        :type pattern: str
+        :param reverse: If set to True, then the list elements are sorted as if each comparison were reversed
+        :type reverse: bool
+        :param key: Function of one argument that is used to extract a comparison key from each list element
+        :type key: function
+
+        :returns: list -- List containing the output of all workers, if the function
+            passed to the pool had no return value it will be a list of None objects
+    """
+    results = glob.glob(pattern)
+    return sorted(results, reverse=reverse, key=key)
