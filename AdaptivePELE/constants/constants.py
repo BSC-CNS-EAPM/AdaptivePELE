@@ -12,16 +12,16 @@ if "bsccv" in machine:
     PYTHON = "/data2/apps/PYTHON/2.7.5/bin/python2.7"
 
 elif "mn.bsc" in machine:
-    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/nord/rev090518/bin/PELE-1.5_mpi"
-    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Data"
-    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Documents"
+    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/nord/V1.6/build/PELE-1.6_mpi"
+    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/V1.6/Data"
+    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/V1.6/Documents"
     PYTHON = "python"
 
 
 elif "bsc.mn" in machine:
-    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/bin/PELE-1.5_mpi"
-    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/Data"
-    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/rev090518/Documents"
+    PELE_EXECUTABLE = "/gpfs/projects/bsc72/PELE++/mniv/V1.6/build/PELE-1.6_mpi"
+    DATA_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/V1.6/Data"
+    DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/mniv/V1.6/Documents"
 
 elif "bullx" in machine:
     # this values are not correct for the minoTauro hardware, just leaving it
