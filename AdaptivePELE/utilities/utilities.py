@@ -937,6 +937,8 @@ def get_string_from_array(array, sep=", ", decimals=None, remove_newlines=True):
         :param remove_newlines: Wheter to remove the newlines between dimensions
         :type remove_newlines: bool
     """
+    # ensure input is a numpy array
+    array = np.array(array)
     representation = np.array2string(array, precision=decimals, separator=sep)
     if remove_newlines:
         return representation.replace('\n', '')
