@@ -939,3 +939,23 @@ def glob_sorted(pattern, reverse=False, key=None):
     """
     results = glob.glob(pattern)
     return sorted(results, reverse=reverse, key=key)
+
+
+def get_string_from_array(array, sep=", ", decimals=None, remove_newlines=True):
+    """
+        Get a string representation of an array, specifiying separator and
+        decimal rounding
+
+        :param array: Input array
+        :type array: ndarray or list
+        :param sep: Separator
+        :type sep: str
+        :param decimals: Number of decimals to round the array
+        :type decimals: int
+        :param remove_newlines: Wheter to remove the newlines between dimensions
+        :type remove_newlines: bool
+    """
+    representation = np.array2string(array, precision=decimals, separator=sep)
+    if remove_newlines:
+        return representation.replace('\n', '')
+    return representation

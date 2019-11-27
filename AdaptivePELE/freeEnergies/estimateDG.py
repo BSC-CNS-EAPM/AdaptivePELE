@@ -78,9 +78,9 @@ def __computeDG(trajWildcard):
 
 def __getDstName(bootstrap, i, trajFile):
     # Equiv lambda
-    # getDstName = lambda bootstrap, i, trajFile: "traj_.%d.dat"%i if bootstrap else os.path.split(trajFile)[-1]
+    # getDstName = lambda bootstrap, i, trajFile: "traj_%d.dat"%i if bootstrap else os.path.split(trajFile)[-1]
     if bootstrap:
-        return "traj_.%d.dat" % i
+        return "traj_%d.dat" % i
     else:
         return os.path.split(trajFile)[-1]
 
