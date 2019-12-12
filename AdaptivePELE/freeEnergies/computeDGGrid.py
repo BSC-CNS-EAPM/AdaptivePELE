@@ -52,6 +52,7 @@ def estimateDG(data, nruns, cl, lag, ntraj, len_traj, skipFirstSnaphots, cluster
             print("MSM estimated on %d states" % MSM.nstates)
         except Exception:
             print("Estimation error in %d clusters, %d lagtime, %d trajectories of %d steps" % (cl, lag, ntraj, len_traj))
+            continue
         pi, cl_centers = compute.ensure_connectivity(MSM, clustering.clustercenters)
         d = 0.75
         bins = compute.create_box(cl_centers, data_it, d)
