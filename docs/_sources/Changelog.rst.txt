@@ -17,6 +17,7 @@ New features:
 .............
 
     - Add annotations to plotAdaptive, which show the origin (epoch, trajectory and snapshot) of the plot points
+    - Improve python2/python3 compatibility for pickling objects
 
 Bug fixes:
 ..........
@@ -28,8 +29,8 @@ Behaviour changes from previous version:
 
     - Modify plotAdaptive to generate the plots using matplotlib and not rely on gnuplot
     - Raise separate and more informative errors for the cases of input file not existing, resname selection incorrect, input file in text file but not pdb and topology mismatching for binary files
-    - Constrain the heavy atoms in the minimization run at the begging of the
-      epochs in MD simulation, to preserve similiraty with the original
+    - Constrain the heavy atoms in the minimization run at the begining of the
+      epochs in MD simulation, to preserve similarity with the original
       cluster
 
 1.6.2 - 2019-07-24

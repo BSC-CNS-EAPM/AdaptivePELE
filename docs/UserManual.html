@@ -545,8 +545,8 @@ of the diffusion of ions or tiny molecules (e.g. a oxygen molecule).</p>
 <div class="section" id="thresholdcalculator">
 <h3>ThresholdCalculator<a class="headerlink" href="#thresholdcalculator" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><strong>constant</strong>, where all clusters have the same threshold. A sound value may be 3Å.</li>
-<li><strong>heaviside</strong> (default), where thesholds (values) are assigned according to a set of step functions that
+<li><strong>constant</strong>, where all clusters have the same threshold. A sound value may be 3 Å.</li>
+<li><strong>heaviside</strong> (default), where thresholds (values) are assigned according to a set of step functions that
 vary according to a ratio of protein-ligand contacts and ligand size , <em>r</em>, (conditions, see below). The values and conditions
 of change are defined with two lists. The condition list is iterated until <em>r</em> &gt; condition[i], and the used
 threshold is values[i]. If r &lt;= conditions[i] for all i, it returns the last element in values.
@@ -648,9 +648,9 @@ distance with TICA</li>
 </pre></div>
 </div>
 <p>In this exemple, clusters having a contacts ration greater than 1 have a
-treshold of 2, those with contacts ratio between 1 and 0.75 have a treshold of
-3, between 0.75 and 0.5 a threshold of 4 and the rest have a threshold size of
-5. This means that for greater contacts ratio, typically closer to the binding site,
+treshold of 2 Å, those with contacts ratio between 1 and 0.75 have a treshold of
+3 Å, between 0.75 and 0.5 a threshold of 4 Å and the rest have a threshold size of
+5 Å. This means that for greater contacts ratio, typically closer to the binding site,
 the cluster size will be smaller and therefore those regions will be more
 finely discretized.</p>
 <p>Example of contactMap clustering:</p>

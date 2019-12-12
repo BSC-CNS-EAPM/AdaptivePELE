@@ -372,9 +372,9 @@ of the diffusion of ions or tiny molecules (e.g. a oxygen molecule).
 ThresholdCalculator
 ...................
 
-* **constant**, where all clusters have the same threshold. A sound value may be 3Å.
+* **constant**, where all clusters have the same threshold. A sound value may be 3 Å.
 
-* **heaviside** (default), where thesholds (values) are assigned according to a set of step functions that 
+* **heaviside** (default), where thresholds (values) are assigned according to a set of step functions that 
   vary according to a ratio of protein-ligand contacts and ligand size , *r*, (conditions, see below). The values and conditions 
   of change are defined with two lists. The condition list is iterated until *r* > condition[i], and the used
   threshold is values[i]. If r <= conditions[i] for all i, it returns the last element in values. 
@@ -484,9 +484,9 @@ which, given the default options, is equivalent to::
 
 
 In this exemple, clusters having a contacts ration greater than 1 have a
-treshold of 2, those with contacts ratio between 1 and 0.75 have a treshold of
-3, between 0.75 and 0.5 a threshold of 4 and the rest have a threshold size of
-5. This means that for greater contacts ratio, typically closer to the binding site,
+treshold of 2 Å, those with contacts ratio between 1 and 0.75 have a treshold of
+3 Å, between 0.75 and 0.5 a threshold of 4 Å and the rest have a threshold size of
+5 Å. This means that for greater contacts ratio, typically closer to the binding site,
 the cluster size will be smaller and therefore those regions will be more
 finely discretized.
 
