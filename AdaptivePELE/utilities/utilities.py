@@ -4,6 +4,7 @@ from six import reraise as raise_
 import os
 import ast
 import sys
+import six
 import glob
 import json
 import errno
@@ -425,7 +426,11 @@ def readClusteringObject(clusteringObjectPath):
     """
     with open(clusteringObjectPath, 'rb') as f:
         try:
-            return pickle.load(f)
+            if six.PY2:
+                return pickle.load(f)
+            elif six.PY3:
+                # make python3 able to read python2-written pickles
+                return pickle.load(f, encoding="latin")
         except EOFError:
             t, v, tb = sys.exc_info()
             raise_(t, v, tb)
