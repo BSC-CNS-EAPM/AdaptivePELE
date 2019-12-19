@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
     - Add annotations to plotAdaptive, which show the origin (epoch, trajectory and snapshot) of the plot points
     - Improve python2/python3 compatibility for pickling objects
+    - Now MD simulation can be extended in time
 
 ### Bug fixes:
 
