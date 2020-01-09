@@ -108,7 +108,6 @@ class Cluster:
 
 def loadTrajFiles(trajectoryFolder, trajectory_basename):
     trajectoryBasename = os.path.join(trajectoryFolder, trajectory_basename)
-    print(trajectoryBasename)
     # load traj
     files = glob.glob(trajectoryBasename)
     x = len(files)*[0]
