@@ -20,7 +20,7 @@ def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1, nruns=10, lagtim
         f.write("#=======================\n")
 
     resultsEpoch = []
-    initialEpoch = -1 if only_last else 0
+    initialEpoch = len(sortedFolders)-1 if only_last else 0
     for i, folder in enumerate(sortedFolders[initialEpoch:]):
         epoch = i + initialEpoch
         print(epoch, folder)
