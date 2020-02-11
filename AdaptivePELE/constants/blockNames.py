@@ -183,6 +183,7 @@ class SimulationParams:
     maxDevicesPerReplica = "maxDevicesPerReplica"
     format = "format"
     ligandName = "ligandName"
+    cofactors = "cofactors"
     constraints = "constraints"
     boxType = "boxType"
     cylinder = "cylinder"

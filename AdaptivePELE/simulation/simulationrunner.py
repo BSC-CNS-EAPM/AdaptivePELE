@@ -83,6 +83,7 @@ class SimulationParameters:
         self.energyReport = True
         self.productionLength = 0
         self.ligandName = None
+        self.cofactors = None
         self.waterBoxSize = 8
         self.trajsPerReplica = None
         self.numReplicas = 1
