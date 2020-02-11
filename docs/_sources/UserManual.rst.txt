@@ -930,15 +930,15 @@ Analysis
 
 In order to analyse simulation results, a bunch of scripts are provided in ``AdaptivePELE/analysis``. Get help to run them with: ``python <script> -h``
 
-Example to print column 5 evolution with gnuplot::
+Example to plot column 5 evolution::
 
-    python -m AdaptivePELE.analysis.plotAdaptive 4 2 5 report_ -lines | gnuplot -persist
+    python -m AdaptivePELE.analysis.plotAdaptive 4 2 5 report_ -lines
 
 It prints the evolution of column 5 (e.g. RMSD) in report_* files with lines in epochs of 4 steps.
 
-Example to print BE against RMSD with gnuplot::
+Example to print BE against RMSD::
 
-    python -m AdaptivePELE.analysis.plotAdaptive 4 5 6 report_ -points | gnuplot -persist
+    python -m AdaptivePELE.analysis.plotAdaptive 4 5 6 report_ -points
 
 It prints the column 6 against column 5 with points. Epoch length is ignored in this case
 
