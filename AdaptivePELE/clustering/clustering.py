@@ -1594,7 +1594,8 @@ class MSMClustering(Clustering):
                  "tica_lagtime": self.tica_lagtime, "tica_nICs": self.tica_nICs,
                  "tica_kinetic_map": self.tica_kinetic_map,
                  "tica_commute_map": self.tica_commute_map,
-                 "pyemma_clustering": self.pyemma_clustering}
+                 "pyemma_clustering": self.pyemma_clustering,
+                 "extract_params": self.extract_params}
         return state
 
     def __setstate__(self, state):
@@ -1623,6 +1624,7 @@ class MSMClustering(Clustering):
         self.tica_kinetic_map = state.get('tica_kinetic_map', True)
         self.tica_commute_map = state.get('tica_commute_map', False)
         self.pyemma_clustering = state.get('pyemma_clustering')
+        self.extract_params = state.get('extract_params', coord.ParamsHandler("", self.atom_Ids, self.resname, 0, False, False, 0, self.writeCA, True, self.nprocessors, False, "", self.sidechains, "", False, False, "", False, False))
 
     def updateRepeatParameters(self, repeat, steps):
         """
