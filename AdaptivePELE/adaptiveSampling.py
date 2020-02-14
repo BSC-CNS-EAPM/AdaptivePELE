@@ -771,7 +771,6 @@ def main(jsonParams, clusteringHook=None):
             clusteringMethod.writeOutput(outputPathConstants.clusteringOutputDir % i,
                                          degeneracyOfRepresentatives,
                                          outputPathConstants.clusteringOutputObject % i, writeAll)
-            simulationRunner.cleanCheckpointFiles(outputPathConstants.epochOutputPathTempletized % i)
 
             if i > 0:
                 # Remove old clustering object, since we already have a newer one
@@ -801,6 +800,8 @@ def main(jsonParams, clusteringHook=None):
                 initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(simulationRunner.getWorkingProcessors(),
                                                                                               outputPathConstants.tmpInitialStructuresTemplate,
                                                                                               i+1)
+            if processManager.isMaster():
+                simulationRunner.cleanCheckpointFiles(outputPathConstants.epochOutputPathTempletized % i)
 
         if processManager.isMaster():
             topologies.writeTopologyObject()

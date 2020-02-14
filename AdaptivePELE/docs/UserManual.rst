@@ -372,9 +372,9 @@ of the diffusion of ions or tiny molecules (e.g. a oxygen molecule).
 ThresholdCalculator
 ...................
 
-* **constant**, where all clusters have the same threshold. A sound value may be 3Å.
+* **constant**, where all clusters have the same threshold. A sound value may be 3 Å.
 
-* **heaviside** (default), where thesholds (values) are assigned according to a set of step functions that 
+* **heaviside** (default), where thresholds (values) are assigned according to a set of step functions that 
   vary according to a ratio of protein-ligand contacts and ligand size , *r*, (conditions, see below). The values and conditions 
   of change are defined with two lists. The condition list is iterated until *r* > condition[i], and the used
   threshold is values[i]. If r <= conditions[i] for all i, it returns the last element in values. 
@@ -484,9 +484,9 @@ which, given the default options, is equivalent to::
 
 
 In this exemple, clusters having a contacts ration greater than 1 have a
-treshold of 2, those with contacts ratio between 1 and 0.75 have a treshold of
-3, between 0.75 and 0.5 a threshold of 4 and the rest have a threshold size of
-5. This means that for greater contacts ratio, typically closer to the binding site,
+treshold of 2 Å, those with contacts ratio between 1 and 0.75 have a treshold of
+3 Å, between 0.75 and 0.5 a threshold of 4 Å and the rest have a threshold size of
+5 Å. This means that for greater contacts ratio, typically closer to the binding site,
 the cluster size will be smaller and therefore those regions will be more
 finely discretized.
 
@@ -930,15 +930,15 @@ Analysis
 
 In order to analyse simulation results, a bunch of scripts are provided in ``AdaptivePELE/analysis``. Get help to run them with: ``python <script> -h``
 
-Example to print column 5 evolution with gnuplot::
+Example to plot column 5 evolution::
 
-    python -m AdaptivePELE.analysis.plotAdaptive 4 2 5 report_ -lines | gnuplot -persist
+    python -m AdaptivePELE.analysis.plotAdaptive 4 2 5 report_ -lines
 
 It prints the evolution of column 5 (e.g. RMSD) in report_* files with lines in epochs of 4 steps.
 
-Example to print BE against RMSD with gnuplot::
+Example to print BE against RMSD::
 
-    python -m AdaptivePELE.analysis.plotAdaptive 4 5 6 report_ -points | gnuplot -persist
+    python -m AdaptivePELE.analysis.plotAdaptive 4 5 6 report_ -points
 
 It prints the column 6 against column 5 with points. Epoch length is ignored in this case
 
