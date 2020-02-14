@@ -1,11 +1,16 @@
-#/usr/bin/python2.7
-
 import matplotlib
+import mdtraj
+import time
 matplotlib.use('TkAgg')
+import signal
 import matplotlib.pyplot as plt
 from matplotlib.widgets  import RectangleSelector
 import numpy as np
+from multiprocessing import Pool
 import os
+import hdbscan
+import sklearn.metrics as mt
+import prody
 import errno
 import argparse
 import pandas as pd
@@ -14,6 +19,7 @@ import re
 import sys
 import warnings
 import AdaptivePELE.analysis.splitTrajectory as st
+import AdaptivePELE.analysis.backtrackAdaptiveTrajectory as bk
 
 """
 
@@ -55,9 +61,14 @@ def parse_args():
     parser.add_argument("--out", "-o", type=str, help="Output Path. i.e: BindingEnergies_apo", default=OUTPUT_FOLDER)
     parser.add_argument("--numfolders", "-nm", action="store_true", help="Not to parse non numerical folders")
     parser.add_argument("--top", "-t", type=str, help="Topology file for xtc", default=None)
+    parser.add_argument("--first", action="store_true",  help="Skip first line")
+    parser.add_argument("--zcol", type=int, help="Thirs Criteria we want to rank and output the strutures for. Must be a column of the report. i.e: SASA", default=2)
+    parser.add_argument("--resname", type=str, help="Resname of the ligand. Resquested for clusterization", default="LIG")
+    parser.add_argument("--xlim", nargs='+', type=float, help="Xrange. i.e --xlim 0 3", default=None)
+    parser.add_argument("--ylim", nargs='+', type=float, help="Yrange. i.e --ylim 0 3", default=None)
     args = parser.parse_args()
 
-    return args.crit1, args.crit2, args.ad_steps, os.path.abspath(args.path), args.ofreq, args.out, args.numfolders, args.top
+    return args.crit1, args.crit2, args.zcol, args.ad_steps, os.path.abspath(args.path), args.ofreq, args.out, args.numfolders, args.top, args.first, args.resname, args.xlim, args.ylim
 
 def is_adaptive():
   folders = glob.glob("{}/*/".format(DIR))
@@ -70,23 +81,26 @@ def is_adaptive():
 
 class DataHandler(object):
 
-  def __init__(self, metrics, crit1, crit2, index1, index2, steps, adaptive, ad_steps, axis):
+  def __init__(self, metrics, crit1, crit2, crit3, index1, index2, index3, steps, adaptive, ad_steps, axis, resname):
     self.metrics = metrics
     self.crit1 = crit1
     self.crit2 = crit2
+    self.crit3 = crit3
     self.index1 = index1
     self.index2 = index2
+    self.index3 = index3
     self.steps = steps
     self.adaptive = adaptive
     self.ad_steps = ad_steps
     self.axis = axis
+    self.resname = resname
     self.descompose_values()
 
 
   def descompose_values(self):
     self.paths = self.metrics[DIR].tolist()
     self.epochs = [os.path.basename(os.path.normpath(os.path.dirname(Path))) for Path in self.paths]
-    self.values1, self.values2 = self.retrieve_values()
+    self.values1, self.values2, self.values3 = self.retrieve_values()
     self.file_ids = self.metrics.report.tolist()
     self.step_indexes = self.metrics[self.steps].tolist()
 
@@ -94,21 +108,72 @@ class DataHandler(object):
     self.limits_start = [self.axis.get_xlim(), self.axis.get_ylim()]
     if not event.inaxes: return
     self.xo, self.yo = event.xdata, event.ydata
-
    
   def on_release(self, event):
-    self.limits_end = [self.axis.get_xlim(), self.axis.get_ylim()]
-    if not event.inaxes: return
-    self.xf, self.yf = event.xdata, event.ydata
-    if self.limits_start == self.limits_end:
-      self.compute()
+        self.limits_end = [self.axis.get_xlim(), self.axis.get_ylim()]
+        if not event.inaxes: return
+        self.xf, self.yf = event.xdata, event.ydata
+        if self.limits_start == self.limits_end:
+          self.compute(event)
 
-  def compute(self):
+  def compute(self, event):
     self.retrieve_data()
-    if topology:
-        self.extract_snapshots_from_xtc(self.data_to_extract, self.steps)
-    else:
-        self.extract_snapshots_from_pdb(self.data_to_extract, self.steps)
+    if event.button == 1:
+        if topology:
+            self.extract_snapshots_from_xtc(self.data_to_extract, self.steps)
+        else:
+            self.extract_snapshots_from_pdb(self.data_to_extract, self.steps)
+    elif event.button == 2:
+        try:
+            epoch = os.path.basename(os.path.dirname(self.data_to_extract[DIR].tolist()[0]))
+            trajectory = int(self.data_to_extract[REPORT].tolist()[0])
+            snapshot = self.data_to_extract.iloc[0,4]
+            out_filename = "epoch{}traj{}snapshot{}.pdb".format(epoch, trajectory, snapshot)
+            outputPath = "."
+            bk.main(trajectory, snapshot, epoch, outputPath, out_filename, topology)
+            print("Movie {} produced".format(out_filename))
+        except ValueError:
+            pass
+    elif event.button == 3:
+        print("Clusterizing")
+        epoch = self.data_to_extract[DIR].tolist()
+        trajectory = self.data_to_extract[REPORT].tolist()
+        snapshot = self.data_to_extract.iloc[:,4].tolist()
+        snapshots = [ "{}/*trajectory_{}.*".format(os.path.basename(os.path.dirname(e)), traj) for e, traj in zip(epoch, trajectory) ]
+        #Get Files
+        paths = []
+        for s in snapshots:
+            if glob.glob(s):
+                paths.extend(glob.glob(s))
+            else:
+                paths.extend(glob.glob(os.path.basename(s)))
+        #Extract atom coordinates from files
+        # Could be parallelize in a future
+        t0 = time.time()
+        all_coords = []
+        for p, v in zip(paths, snapshot):
+            # Most time consuming step 0.1
+            traj = mdtraj.load_frame(p, v, top="topology.pdb")
+            atoms_info  = traj.topology.to_dataframe()[0]
+            condition = atoms_info['resName'] == self.resname
+            atom_numbers_ligand = atoms_info[condition].serial.tolist()
+            coords = []
+            for atom_num in atom_numbers_ligand:
+                try:
+                    coords.extend(traj.xyz[0, atom_num-1].tolist())
+                except IndexError:
+                    continue
+            all_coords.append(coords)
+        t1 = time.time()
+        print("Time extract atom coords")
+        print(t1-t0)
+
+        #Extrac metrics from plot
+        values1 = self.data_to_extract[self.crit1].tolist()
+        values2 = self.data_to_extract[self.crit2].tolist()
+
+        #Clusterize and make plot
+        clusterize(paths, snapshot, all_coords, values1, values2, topology=topology)
 
   def retrieve_data(self):
     if (self.xf > self.xo) and (self.yf < self.yo):
@@ -143,7 +208,7 @@ class DataHandler(object):
       for f_id, f_out, step, path in zip(file_ids, files_out, step_indexes, paths):
 
           # Read Trajetory from PELE's output
-          f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.pdb".format(f_id)))
+          f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory_{}.*".format(f_id)))
           if len(f_in) == 0:
               sys.exit("Trajectory {} not found. Be aware that PELE trajectories must contain the label \'trajectory\' in their file name to be detected".format("*trajectory*_{}".format(f_id)))
           f_in = f_in[0]
@@ -170,7 +235,7 @@ class DataHandler(object):
               try:
                   traj.append(trajectory_selected.group(1))
               except AttributeError:
-                  raise AttributeError("Model not found. Check the -f option.")
+                  raise AttributeError("Model {} not found. Check the -f option.".format(f_out))
               traj.append("ENDMDL\n")
               f.write("\n".join(traj))
           print("MODEL {} has been selected".format(f_out))
@@ -208,8 +273,9 @@ class DataHandler(object):
 
     values1 = self.metrics[self.crit1].tolist()
     values2 = self.metrics[self.crit2].tolist()
+    values3 = self.metrics[self.crit3].tolist()
 
-    return values1, values2
+    return values1, values2, values3
 
 
 def line_select_callback(eclick, erelease):
@@ -225,7 +291,8 @@ def toggle_selector(event):
         toggle_selector.RS.set_active(False)
 
 
-def main(criteria1, criteria2, ad_steps, path=DIR, out_freq=FREQ, output=OUTPUT_FOLDER, numfolders=False, topology=None):
+def main(criteria1, criteria2, criteria3, ad_steps, path=DIR, out_freq=FREQ, output=OUTPUT_FOLDER, numfolders=False, topology=None, skip_first=False,
+    resname="LIG", xlim=None, ylim=None):
     """
 
       Description: Rank the traj found in the report files under path
@@ -249,38 +316,42 @@ def main(criteria1, criteria2, ad_steps, path=DIR, out_freq=FREQ, output=OUTPUT_
 
         f_out: Name of the n outpu
     """
+    #Check whether is adaptive simulation or not
     adaptive = is_adaptive()
 
+    #Find reports
     reports = find_reports(path, numfolders)
 
 
-    # Retrieve Column Names
-    steps, crit1_name, crit2_name = get_column_names(reports, STEPS, criteria1, criteria2)
+    # Retrieve Column Names from report
+    steps, crit1_name, crit2_name, crit3_name = get_column_names(reports, STEPS, criteria1, criteria2, criteria3)
 
-    # Data Mining
-    min_values = parse_values(reports, criteria1, criteria2, steps, crit1_name, crit2_name)
-
-
+    # Retrieve Data from reports
+    min_values = parse_values(reports, criteria1, criteria2, steps, crit1_name, crit2_name, skip_first)
 
     # Figure
     fig, current_ax = plt.subplots()
 
     # Plot data
-    data = DataHandler(min_values, crit1_name, crit2_name, criteria1, criteria2, steps, adaptive, ad_steps, current_ax)
+    data = DataHandler(min_values, crit1_name, crit2_name, crit3_name, criteria1, criteria2, criteria3, steps, adaptive, ad_steps, current_ax, resname)
 
-    # Plot axis  
-    plt.plot(data.values1, data.values2, 'ro')
+    # Plot axis 
+    plt.scatter(data.values1, data.values2, c=data.values3)
+    plt.colorbar()
     plt.title('{} vs {}'.format(crit1_name, crit2_name))
+    if xlim:
+        plt.xlim(xlim[0], xlim[1])
+    if ylim:
+        plt.ylim(ylim[0], ylim[1])
     plt.xlabel(crit1_name)
     plt.ylabel(crit2_name)
-
 
     # Plot Callbacks
     cidpress = fig.canvas.mpl_connect('button_press_event', data.on_press)
     cidrealese= fig.canvas.mpl_connect('button_release_event', data.on_release)
     toggle_selector.RS = RectangleSelector(current_ax, line_select_callback,
                          drawtype='box', useblit=True,
-                         button=[1, 3],  # don't use middle button
+                         button=[1, 2, 3],  # don't use middle button
                          minspanx=5, minspany=5,
                          spancoords='pixels',
                          interactive=False)
@@ -289,8 +360,8 @@ def main(criteria1, criteria2, ad_steps, path=DIR, out_freq=FREQ, output=OUTPUT_
     plt.show()
 
 def find_reports(path, numfolders):
-    reports = glob.glob(os.path.join(path, "*/*report*"))
-    reports = glob.glob(os.path.join(path, "*report*")) if not reports else reports
+    reports = glob.glob(os.path.join(path, "*/*report_*"))
+    reports = glob.glob(os.path.join(path, "*report_*")) if not reports else reports
     reports = filter_non_numerical_folders(reports, numfolders)
     try:
         reports[0]
@@ -298,51 +369,42 @@ def find_reports(path, numfolders):
         raise IndexError("Not report file found. Check you are in adaptive's or Pele root folder")
     return reports
 
-def parse_values(reports, criteria1, criteria2,  steps, crit1_name, crit2_name):
+def parse_values(reports, criteria1, criteria2,  steps, crit1_name, crit2_name, first=False, cpus=1):
     """
 
        Description: Parse the 'reports' and create a sorted array
        of size n_structs following the criteria chosen by the user.
 
     """
-    if steps == crit1_name:
-      INITIAL_DATA = [(DIR, []),
-                      (REPORT, []),
-                      (steps, []),
-                      (crit2_name, [])
-                      ]
-    elif steps == crit2_name:
-      INITIAL_DATA = [(DIR, []),
-                    (REPORT, []),
-                    (steps, []),
-                    (crit1_name, []),
-                    ]
-    else:
-      INITIAL_DATA = [(DIR, []),
-                    (REPORT, []),
-                    (steps, []),
-                    (crit1_name, []),
-                    (crit2_name, [])
-                    ]
-    min_values = pd.DataFrame.from_items(INITIAL_DATA)
-    for file in reports:
-        report_number = os.path.basename(file).split("_")[-1]
-        try:
-            data = pd.read_csv(file, sep='    ', engine='python')
-        except pd.errors.EmptyDataError:
-            warnings.warn("Report {} corrupted".format(file), UserWarning)
-            continue
-        if steps == crit1_name:
-          selected_data = data.iloc[:, [2, criteria2-1]]
-        elif steps == crit1_name:
-          selected_data = data.iloc[:, [2, criteria1-1]]
-        else:
-          selected_data = data.iloc[:, [2, criteria1-1, criteria2-1]]
-        selected_data.insert(0, DIR, [file]*selected_data[steps].size)
-        selected_data.insert(1, REPORT, [report_number]*selected_data[steps].size)
-        min_values = pd.concat([min_values, selected_data])
-    return min_values 
+    p = Pool(processes=cpus)
+    try:
+        datas = p.map(retrieve_report_data, reports)
+    except KeyboardInterrupt:
+        p.close()
+        p.terminate()
+        return
+    p.close()
+    min_values = pd.concat(datas)
+    min_values.drop_duplicates(subset=[crit1_name, crit2_name], inplace=True)
+    return min_values
 
+
+def retrieve_report_data(report):
+    #Get report
+    report_number = os.path.basename(report).split("_")[-1]
+    #Read data
+    try:
+        data = pd.read_csv(report, sep='    ', engine='python')
+    except pd.errors.EmptyDataError:
+        warnings.warn("Report {} corrupted".format(report), UserWarning)
+        return pd.DataFrame()
+    #Skip first line if asked
+    #if first and os.path.basename(os.path.dirname(report)):
+        #data = data.iloc[1:]
+    #Insert path and filename
+    data.insert(0, DIR, [report]*data.shape[0])
+    data.insert(1, REPORT, [report_number]*data.shape[0])
+    return data
 
 def filter_non_numerical_folders(reports, numfolders):
     """
@@ -355,11 +417,11 @@ def filter_non_numerical_folders(reports, numfolders):
     else:
         return reports
 
-def get_column_names(reports, steps, criteria1, criteria2):
+def get_column_names(reports, steps, criteria1, criteria2, criteria3):
     data = pd.read_csv(reports[0], sep='    ', engine='python')
     data = list(data)
 
-    return data[int(steps)-1], data[criteria1-1], data[criteria2-1]
+    return data[int(steps)-1], data[criteria1-1], data[criteria2-1], data[criteria3-1]
 
 def mkdir_p(path):
     try:
@@ -370,7 +432,79 @@ def mkdir_p(path):
         else:
             raise
 
+def clusterize(paths, snapshots, all_coordinates, values1, values2, topology=None):
+
+    """
+    Use high performance computing hdbscan
+    to do an all-atom cluster of the chosen
+    plot structures
+    """
+    
+    n_samples = len(snapshots)
+    
+    #Clusterize
+    labels = []
+    results = []
+    import time; t0 = time.time()
+    try:
+        db = hdbscan.HDBSCAN(min_samples=int(n_samples*0.10)+1).fit(all_coordinates)
+    except ValueError:
+        raise ValueError("Ligand not found check the option --resname. i.e python interactive.py 5 6 7 --resname LIG")
+    result = db.labels_
+    labels.append(len(set(result)))
+    results.append(result)
+    t1 = time.time()
+    print("time clustering")
+    print(t1-t0)
+    
+    #Get Plot
+    
+    
+    # Get Best Result
+    t0 = time.time()
+    mx_idx = np.argmax(np.array(labels))
+    final_result = results[mx_idx]
+    try:
+        silhouette_samples = mt.silhouette_samples(all_coordinates, final_result)
+    except ValueError:
+        raise ValueError("Clustering failed. Structures do not follow any pattern or they are not enough")
+    max_clust =  { label : [path, snap, sil] for (path, snap, label, sil) in zip(paths, snapshots, final_result, silhouette_samples)}
+    
+    # Get representative
+    for path, snapshot, label, sil in zip(paths, snapshots, final_result, silhouette_samples):
+        if sil > max_clust[label][2]:
+            max_clust[label] = [path, snapshot, sil]
+    #Get Structures
+    for i, (label, info) in enumerate(max_clust.items()):
+        #if label == -1: continue
+        output = "Clusters"
+        f_out = "cluster_{}.pdb".format(label+1)
+        f_in, snapshot, _ = info
+        if topology:
+            found = st.main(output, [f_in,], topology, [snapshot, ], template=f_out)
+            if found:
+                print("MODEL {} has been selected".format(f_out))
+            else:
+                print("MODEL {} not found. Check -f option".format(f_out))
+        else:   
+            with open(f_in, 'r') as input_file:
+                file_content = input_file.read()
+                trajectory_selected = re.search('MODEL\s+%d(.*?)ENDMDL' %int(snapshot), file_content, re.DOTALL)
+            with open(os.path.join(output, f_out),'w') as f:
+                traj.append("MODEL     %d" %int(model))
+                try:
+                    traj.append(trajectory_selected.group(1))
+                except AttributeError:
+                    raise AttributeError("Model {} not found. Check the -f option.".format(f_out))
+                traj.append("ENDMDL\n")
+                f.write("\n".join(traj))
+            print("MODEL {} has been selected".format(f_out))
+    t1 = time.time()
+    print("Time post processing")
+    print(t1-t0)
+        
+
 
 if __name__ == "__main__":
-    criteria1, criteria2, ad_steps, path, out_freq, output, numfolders, topology = parse_args()
-    main(criteria1, criteria2, ad_steps, path, out_freq, output, numfolders, topology)
+    criteria1, criteria2, criteria3, ad_steps, path, out_freq, output, numfolders, topology, skip_first, resname, xlim, ylim = parse_args()
+    main(criteria1, criteria2, criteria3, ad_steps, path, out_freq, output, numfolders, topology, skip_first, resname, xlim, ylim)

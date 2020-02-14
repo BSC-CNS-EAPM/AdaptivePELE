@@ -11,7 +11,7 @@ config.show_progress_bars = False
 
 
 class Cluster:
-    def __init__(self, numClusters, trajectoryFolder, trajectoryBasename, stride=1, alwaysCluster=True, discretizedPath=None):
+    def __init__(self, numClusters, trajectoryFolder, trajectoryBasename, stride=1, alwaysCluster=True, discretizedPath=None, seed=False):
         """
             alwaysCluster: clusterize regardless of whether discretized/clusterCenters.dat exists or not
         """
@@ -24,6 +24,7 @@ class Cluster:
         self.dTrajTemplateName = os.path.join(self.discretizedFolder, "%s.disctraj")
         self.clusteringFile = "clustering_object.pkl"
         self.stride = stride
+        self.seed = seed
         self.trajFilenames = []
         self.dtrajs = []
         self.alwaysCluster = alwaysCluster
@@ -41,7 +42,7 @@ class Cluster:
         algorithm.
         Returns a KmeansClusteringObject
         """
-        return coor.cluster_kmeans(data=trajectories, k=self.numClusters, max_iter=500, stride=self.stride)
+        return coor.cluster_kmeans(data=trajectories, k=self.numClusters, max_iter=500, stride=self.stride, fixed_seed=self.seed)
 
     def assignNewTrajectories(self, trajs):
         # wrap the clusterCentersFile argument in a str call to pass pyemma
@@ -109,7 +110,6 @@ class Cluster:
 
 def loadTrajFiles(trajectoryFolder, trajectory_basename):
     trajectoryBasename = os.path.join(trajectoryFolder, trajectory_basename)
-
     # load traj
     files = glob.glob(trajectoryBasename)
     x = len(files)*[0]
