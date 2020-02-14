@@ -35,9 +35,9 @@ def parseArguments():
     parser.add_argument("--xlabel", type=str, default=None, help="Label for the x axis")
     parser.add_argument("--ylabel", type=str, default=None, help="Label for the y axis")
     parser.add_argument("--cblabel", type=str, default=None, help="Label for the colorbar")
-
+    parser.add_argument("--figure_size", "-f_size", type=str, default="6x6", help="Figure size in inches, specified as widthxheight, default 6x6")
     args = parser.parse_args()
-    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel
+    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size
 
 
 def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
@@ -73,7 +73,7 @@ def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
         artists.append(plt.scatter(x, y, c=colors, cmap=opt_dict['cmap'].cmap, s=15, zorder=2))
 
 
-def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, paletteModifier, trajs_range=None, path_out=None, label_x=None, label_y=None, label_colorbar=None):
+def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, paletteModifier, trajs_range=None, path_out=None, label_x=None, label_y=None, label_colorbar=None, fig_size=(6, 6)):
     """
         Generate a string to be passed to gnuplot
 
@@ -97,6 +97,8 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
         :type label_y: str
         :param label_colorbar: Label of the colorbar
         :type label_colorbar: str
+        :param fig_size: Size of the plot figure (default (6in, 6in))
+        :type fig_size: tuple
     """
     epochs = utilities.get_epoch_folders('.')
     numberOfEpochs = int(len(epochs))
@@ -131,7 +133,7 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
                 cmin = min(cmin, data[:, paletteModifier].min())
                 cmax = max(cmax, data[:, paletteModifier].max())
             data_dict[(ep, report_num)] = data
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=fig_size)
     ticks = None
     if paletteModifier == -1:
         cmin = min_report
@@ -218,7 +220,7 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
 
-def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier, trajs_range, path_to_save, xlabel, ylabel, cblabel):
+def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier, trajs_range, path_to_save, xlabel, ylabel, cblabel, fig_size=(6, 6)):
     """
         Generate a template string to use with gnuplot
 
@@ -244,6 +246,8 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         :type ylabel: str
         :param cblabel: Label of the colorbar
         :type cblabel: str
+        :param fig_size: Size of the plot figure (default (6in, 6in))
+        :type fig_size: tuple
 
         :returns: str -- String to plot using gnuplot
     """
@@ -251,16 +255,17 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         printWithLines = True
     elif kindOfPrint == "PRINT_BE_RMSD":
         printWithLines = False
-    createPlot(reportName, xcol, ycol, stepsPerRun, printWithLines, paletteModifier, trajs_range=trajs_range, path_out=path_to_save, label_x=xlabel, label_y=ylabel, label_colorbar=cblabel)
+    createPlot(reportName, xcol, ycol, stepsPerRun, printWithLines, paletteModifier, trajs_range=trajs_range, path_out=path_to_save, label_x=xlabel, label_y=ylabel, label_colorbar=cblabel, fig_size=fig_size)
     if path_to_save is not None:
         folder, _ = os.path.split(path_to_save)
         if folder:
             utilities.makeFolder(folder)
-        plt.savefig(path_to_save)
+        plt.savefig(path_to_save, dpi=300, bbox_inches='tight')
     plt.show()
 
 if __name__ == "__main__":
-    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range, color_traj, output_path, xlab, ylab, cblab = parseArguments()
+    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range, color_traj, output_path, xlab, ylab, cblab, figure_size = parseArguments()
+    figure_size = tuple(map(int, figure_size.split("x")))
     Xcol -= 1
     Ycol -= 1
     if colModifier is not None:
@@ -273,4 +278,4 @@ if __name__ == "__main__":
     if color_traj:
         colModifier = -1
 
-    generatePlot(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier, traj_range, output_path, xlab, ylab, cblab)
+    generatePlot(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier, traj_range, output_path, xlab, ylab, cblab, figure_size)

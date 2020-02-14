@@ -7,12 +7,12 @@ from six import reraise as raise_
 from AdaptivePELE.freeEnergies import estimateDG
 
 
-def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1, nruns=10, lagtimes=[1, 10, 25, 50, 100, 250, 400, 500, 600, 1000]):
+def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1, nruns=10, lagtimes=[1, 10, 25, 50, 100, 250, 400, 500, 600, 1000], output=False, only_last=False):
     allFolders = np.array(glob.glob("MSM_*"))
     epochs = [int(folder[4:]) for folder in allFolders]
     args = np.argsort(epochs)
     sortedFolders = allFolders[args]
-    origDir = os.getcwd()
+    origDir = output if output else os.getcwd()
     resultsFile = os.path.join(origDir, "results.txt")
 
     with open(resultsFile, "a") as f:
@@ -20,7 +20,7 @@ def main(trajsPerEpoch, lagtime, nclusters, clusteringStride=1, nruns=10, lagtim
         f.write("#=======================\n")
 
     resultsEpoch = []
-    initialEpoch = 0
+    initialEpoch = len(sortedFolders)-1 if only_last else 0
     for i, folder in enumerate(sortedFolders[initialEpoch:]):
         epoch = i + initialEpoch
         print(epoch, folder)

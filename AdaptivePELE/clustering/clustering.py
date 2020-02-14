@@ -1205,7 +1205,8 @@ class Clustering(object):
             else:
                 metric = cluster.getMetricFromColumn(column)
             metrics.append(metric)
-
+        if None in metrics:
+            raise utilities.RequiredParameterMissingException("Metrics not found in clusters and required for filtering!!")
         if simulationType.lower() == "min":
             optimalMetricIndex = np.argmin(metrics)
         elif simulationType.lower() == "max":
