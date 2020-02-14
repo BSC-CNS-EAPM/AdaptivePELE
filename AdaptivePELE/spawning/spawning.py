@@ -219,6 +219,9 @@ class SpawningParams:
             # reportFilename is now mandatory for all spawning not related to
             # MSM
             self.reportFilename = spawningParamsBlock[blockNames.SpawningParams.report_filename]
+            if spawningType == blockNames.StringSpawningTypes.independent:
+                # independent spawning only requires the reportFilename
+                return
             # this paramaters are optional for many methods, some of the
             # assignments are redundant and might be later overriden, but since
             # there are many spawning methods we trade in a bit of efficient for
