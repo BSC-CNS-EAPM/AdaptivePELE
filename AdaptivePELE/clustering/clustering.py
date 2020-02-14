@@ -449,7 +449,7 @@ class Cluster(object):
 
             :returns: float -- Value of the prefered metric
         """
-        if len(self.metrics) and self.metricCol is not None:
+        if self.metricCol is not None and len(self.metrics) > self.metricCol:
             return self.metrics[self.metricCol]
         else:
             return None
