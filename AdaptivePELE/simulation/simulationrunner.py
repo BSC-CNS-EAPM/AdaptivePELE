@@ -783,7 +783,7 @@ class PeleSimulation(SimulationRunner):
             rowIndex += len(report_values)
 
         values = np.array(values)
-        if energyColumn > similarityColumn or similarityColumn is None:
+        if similarityColumn is None or energyColumn > similarityColumn:
             similarityColumn, energyColumn = list(range(2))
         else:
             energyColumn, similarityColumn = list(range(2))
