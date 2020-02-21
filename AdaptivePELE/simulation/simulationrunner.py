@@ -929,6 +929,9 @@ class MDSimulation(SimulationRunner):
 
             :returns: list -- List with initial structures
         """
+        
+        COFACTOR_PATH = "/home/alexis/Desktop/AdaptivePELE/AdaptivePELE/constants/MDtemplates"
+
         if self.parameters.trajsPerReplica*processManager.id >= len(initialStructures):
             # Only need to launch as many simulations as initial structures
             # synchronize the replicas that will not run equilibration with the
@@ -1006,6 +1009,16 @@ class MDSimulation(SimulationRunner):
             Tleapdict["INPCRD"] = inpcrd
             Tleapdict["SOLVATED_PDB"] = finalPDB
             Tleapdict["BONDS"] = pdb.getDisulphideBondsforTleapTemplate()
+            if paramsBlock.get(blockNames.SimulationParams.cofactors) is not None:
+                for cof in paramsBlock.get(blockNames.SimulationParams.cofactors):
+                    if "fadh-" == cof:
+                        Tleapdict["COFACTORS"] = "loadamberparams {}{}.lib\n".format(COFACTOR_PATH, cof)
+                    elif "fmn" == cof :
+                        Tleapdict["COFACTORS"] = "loadoff {}{}.off\n".format(COFACTOR_PATH, cof)
+                    elif "nad" in cof:
+                        Tleapdict["COFACTORS"] = "loadamberprep {}{}.prep\n".format(COFACTOR_PATH, cof)
+            else:
+                pass
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
             if self.parameters.boxCenter or self.parameters.cylinderBases:
                 Tleapdict["DUM"] = "loadamberprep %s.prep\nloadamberparams %s.frcmod\n" % (constants.AmberTemplates.DUM_res, constants.AmberTemplates.DUM_res)
@@ -1484,6 +1497,7 @@ class RunnerBuilder:
             params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
             params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
+            params.cofactors = paramsBlock.get(blockNames.SimulationParams.cofactors)
             params.constraints = paramsBlock.get(blockNames.SimulationParams.constraints)
             params.postprocessing = paramsBlock.get(blockNames.SimulationParams.postprocessing, True)
             if params.ligandName is None and (params.boxCenter is not None or params.cylinderBases is not None):
@@ -1570,5 +1584,3 @@ def processTraj(input_files):
     t = MDA.Universe(top_file, traj_file)
     t.atoms.wrap(compound="residues")
     alignment = align.AlignTraj(t, mobile, select="backbone", filename=new_file)
-    alignment.run()
-    os.rename(new_file, traj_file)

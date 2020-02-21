@@ -58,6 +58,7 @@ class AmberTemplates:
                     "$DUM " \
                     "COMPLX = loadpdb $COMPLEX\n" \
                     "$BONDS " \
+                    "$COFACTORS " \
                     "addions COMPLX Cl- 0\n" \
                     "addions COMPLX Na+ 0\n" \
                     "solvatebox COMPLX TIP3PBOX $BOXSIZE\n" \
@@ -85,6 +86,7 @@ class AmberTemplates:
                "%s\n" \
                "%s   INT  0\n" \
                "CHANGE OMIT DU  BEG\n" \
+               " 0.0\n" \
                " 0.0\n" \
                "   1 DUMM  DU  M  0  -1  -2  0.000     0.000     0.000    0.000\n" \
                "   2 DUMM  DU  M  1   0  -1  1.0000    0.0000    0.0000   0.000\n" \
@@ -167,7 +169,6 @@ class OutputPathConstants():
         self.clusteringOutputObject = os.path.join(self.clusteringOutputDir, "object.pkl")
         self.MSMObjectEpoch = os.path.join(self.epochOutputPathTempletized, "MSM_object.pkl")
         self.topologies = os.path.join(outputPath, "topologies")
-        self.equilibrationDir = os.path.join(outputPath, "equilibration")
         self.allTrajsPath = os.path.join(outputPath, "allTrajs")
 
     def buildTmpFolderConstants(self, tmpFolder):
