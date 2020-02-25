@@ -169,6 +169,7 @@ class OutputPathConstants():
         self.clusteringOutputObject = os.path.join(self.clusteringOutputDir, "object.pkl")
         self.MSMObjectEpoch = os.path.join(self.epochOutputPathTempletized, "MSM_object.pkl")
         self.topologies = os.path.join(outputPath, "topologies")
+        self.equilibrationDir = os.path.join(outputPath, "equilibration")
         self.allTrajsPath = os.path.join(outputPath, "allTrajs")
 
     def buildTmpFolderConstants(self, tmpFolder):
