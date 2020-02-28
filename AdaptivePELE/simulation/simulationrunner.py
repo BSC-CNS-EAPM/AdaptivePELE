@@ -10,6 +10,7 @@ import itertools
 import numpy as np
 import MDAnalysis as MDA
 import multiprocessing as mp
+import AdaptivePELE.constants
 from MDAnalysis.analysis import align
 from builtins import range
 from AdaptivePELE.constants import constants, blockNames
@@ -905,7 +906,7 @@ class MDSimulation(SimulationRunner):
         """
         return self.parameters.ligandName
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, processManager, topologies=None):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, processManager, simulationRunnerBlock, topologies=None):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure
@@ -930,7 +931,7 @@ class MDSimulation(SimulationRunner):
             :returns: list -- List with initial structures
         """
         
-        COFACTOR_PATH = "/home/alexis/Desktop/AdaptivePELE/AdaptivePELE/constants/MDtemplates"
+        COFACTOR_PATH = os.path.join("".join(AdaptivePELE.constants.__path__), "MDtemplates/")
 
         if self.parameters.trajsPerReplica*processManager.id >= len(initialStructures):
             # Only need to launch as many simulations as initial structures
@@ -1009,16 +1010,20 @@ class MDSimulation(SimulationRunner):
             Tleapdict["INPCRD"] = inpcrd
             Tleapdict["SOLVATED_PDB"] = finalPDB
             Tleapdict["BONDS"] = pdb.getDisulphideBondsforTleapTemplate()
-            if paramsBlock.get(blockNames.SimulationParams.cofactors) is not None:
-                for cof in paramsBlock.get(blockNames.SimulationParams.cofactors):
+            Tleapdict["COFACTORS"] = ""
+        #    import pdb
+       #     pdb.set_trace()
+            if self.parameters.cofactors is not None:
+                for cof in self.parameters.cofactors:
                     if "fadh-" == cof:
-                        Tleapdict["COFACTORS"] = "loadamberparams {}{}.lib\n".format(COFACTOR_PATH, cof)
+                        Tleapdict["COFACTORS"] += "loadoff {}new_{}.lib\n".format(COFACTOR_PATH, cof)
+                        Tleapdict["COFACTORS"] += "loadamberparams {}{}.frcfld\n".format(COFACTOR_PATH, cof)
                     elif "fmn" == cof :
-                        Tleapdict["COFACTORS"] = "loadoff {}{}.off\n".format(COFACTOR_PATH, cof)
+                        Tleapdict["COFACTORS"] += "loadoff {}{}.off\n".format(COFACTOR_PATH, cof)
+                        Tleapdict["COFACTORS"] += "loadamberparams {}{}.frcfld\n".format(COFACTOR_PATH, cof)
                     elif "nad" in cof:
-                        Tleapdict["COFACTORS"] = "loadamberprep {}{}.prep\n".format(COFACTOR_PATH, cof)
-            else:
-                pass
+                        Tleapdict["COFACTORS"] += "loadamberprep {}{}.prep\n".format(COFACTOR_PATH, cof)
+                        Tleapdict["COFACTORS"] += "loadamberparams {}nad.frcmod\n".format(COFACTOR_PATH, cof)
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
             if self.parameters.boxCenter or self.parameters.cylinderBases:
                 Tleapdict["DUM"] = "loadamberprep %s.prep\nloadamberparams %s.frcmod\n" % (constants.AmberTemplates.DUM_res, constants.AmberTemplates.DUM_res)

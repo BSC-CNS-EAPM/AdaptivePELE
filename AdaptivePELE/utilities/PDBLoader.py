@@ -129,7 +129,8 @@ class PDBManager:
                             currentChain = Chain(currentStructure, currentChainName)
 
                     elif columns[self.POSITIONS["RESNAME"]] in self.VALID_ION or columns[self.POSITIONS["RESNAME"]]\
-                            in ["WAT", "HOH"] or columns[self.POSITIONS["RESNAME"]] in self.VALID_NUCLEIC:
+                            in ["WAT", "HOH"] or columns[self.POSITIONS["RESNAME"]] in self.VALID_NUCLEIC or columns[self.POSITIONS["RESNAME"]]\
+                            in self.VALID_COFACTOR:
                         if currentStructure != self.Other:
                             currentStructure = self.Other
                             currentChainName = columns[self.POSITIONS["CHAINID"]]

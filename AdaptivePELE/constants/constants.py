@@ -70,6 +70,7 @@ class AmberTemplates:
                             "source leaprc.water.tip3p\n" \
                             "$MODIFIED_RES " \
                             "$DUM " \
+                            "$COFACTORS " \
                             "COMPLX = loadpdb $COMPLEX\n" \
                             "$BONDS " \
                             "addions COMPLX Cl- 0\n" \

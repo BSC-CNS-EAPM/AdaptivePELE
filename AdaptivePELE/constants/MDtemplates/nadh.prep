@@ -2,7 +2,7 @@
 
 NADH, AMBER 5.0 compatible; U. Ryde, to be published, 22/4-98
 nah.dat
- NAH  INT     1
+ NAP  INT     1
  CORR OMIT DU   BEG
    0.00000
    1  DUMM  DU    M    0  -1  -2      .000      .000      .000    .00000 
