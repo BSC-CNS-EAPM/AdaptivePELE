@@ -213,3 +213,9 @@ class GeneralParams:
     debug = "debug"
     writeAllClustering = "writeAllClusteringStructures"
     nativeStructure = "nativeStructure"
+
+
+class CofactorTemplateNames:
+    fadh = "fadh-"
+    fmn = "fmn"
+    nad = "nad"

@@ -1011,17 +1011,15 @@ class MDSimulation(SimulationRunner):
             Tleapdict["SOLVATED_PDB"] = finalPDB
             Tleapdict["BONDS"] = pdb.getDisulphideBondsforTleapTemplate()
             Tleapdict["COFACTORS"] = ""
-        #    import pdb
-       #     pdb.set_trace()
             if self.parameters.cofactors is not None:
                 for cof in self.parameters.cofactors:
-                    if "fadh-" == cof:
+                    if blockNames.CofactorTemplateNames.fadh == cof:
                         Tleapdict["COFACTORS"] += "loadoff {}new_{}.lib\n".format(COFACTOR_PATH, cof)
                         Tleapdict["COFACTORS"] += "loadamberparams {}{}.frcfld\n".format(COFACTOR_PATH, cof)
-                    elif "fmn" == cof :
+                    elif blockNames.CofactorTemplateNames.fmn == cof :
                         Tleapdict["COFACTORS"] += "loadoff {}{}.off\n".format(COFACTOR_PATH, cof)
                         Tleapdict["COFACTORS"] += "loadamberparams {}{}.frcfld\n".format(COFACTOR_PATH, cof)
-                    elif "nad" in cof:
+                    elif blockNames.CofactorTemplateNames.nad in cof:
                         Tleapdict["COFACTORS"] += "loadamberprep {}{}.prep\n".format(COFACTOR_PATH, cof)
                         Tleapdict["COFACTORS"] += "loadamberparams {}nad.frcmod\n".format(COFACTOR_PATH, cof)
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
@@ -1092,16 +1090,31 @@ class MDSimulation(SimulationRunner):
 
             :returns: str -- string with the ligand pdb
         """
+        line_dict = {}
+
         ligandpdb = os.path.join(outputpath, "raw_ligand.pdb")
         if resname is None:
             return ""
         if id_replica:
             return ligandpdb
+
+        with open(PDBtoOpen, "r") as inp:
+            for line in inp:
+                if resname in line and line.startswith("HETATM"):
+                    if not line_dict:
+                        line_dict[(resname,line[21])] = line
+                    else:
+                        if (resname, line[21]) in line_dict:
+                            line_dict[(resname,line[21])] += line
+                        else:
+                            line_dict[(resname,line[21])] = line
+
+
         with open(ligandpdb, "w") as out:
-            with open(PDBtoOpen, "r") as inp:
-                for line in inp:
-                    if resname in line:
-                        out.write(line)
+            for pdb_line in line_dict[list(line_dict.keys())[0]]:
+                out.write(pdb_line)
+
+
         return ligandpdb
 
     def prepareLigand(self, antechamberDict, parmchkDict):

@@ -248,3 +248,11 @@ class TestadaptiveSampling(unittest.TestCase):
         self.check_succesful_simulation(output_path, 2)
         # cleanup
         shutil.rmtree(output_path)
+
+    def simulation_cofactors(self):
+        output_path = "tests/data/cofactors"
+        controlFile = "tests/data/cofactors.conf"
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2)
+        # cleanup
+        shutil.rmtree(output_path)
