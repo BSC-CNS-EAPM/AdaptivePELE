@@ -36,8 +36,9 @@ def parseArguments():
     parser.add_argument("--ylabel", type=str, default=None, help="Label for the y axis")
     parser.add_argument("--cblabel", type=str, default=None, help="Label for the colorbar")
     parser.add_argument("--figure_size", "-f_size", type=str, default="6x6", help="Figure size in inches, specified as widthxheight, default 6x6")
+    parser.add_argument("--show_plots", action="store_false", help="Deactivate the display of the plot (if not specified it will be shown)")
     args = parser.parse_args()
-    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size
+    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size. args.show_plots
 
 
 def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
@@ -220,7 +221,7 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
 
-def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier, trajs_range, path_to_save, xlabel, ylabel, cblabel, fig_size=(6, 6)):
+def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier, trajs_range, path_to_save, xlabel, ylabel, cblabel, fig_size=(6, 6), show_plot=True):
     """
         Generate a template string to use with gnuplot
 
@@ -248,6 +249,8 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         :type cblabel: str
         :param fig_size: Size of the plot figure (default (6in, 6in))
         :type fig_size: tuple
+        :param show_plot: Wheter to show the plot to screen
+        :type show_plot: bool
 
         :returns: str -- String to plot using gnuplot
     """
@@ -261,10 +264,11 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         if folder:
             utilities.makeFolder(folder)
         plt.savefig(path_to_save, dpi=300, bbox_inches='tight')
-    plt.show()
+    if show_plot:
+        plt.show()
 
 if __name__ == "__main__":
-    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range, color_traj, output_path, xlab, ylab, cblab, figure_size = parseArguments()
+    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range, color_traj, output_path, xlab, ylab, cblab, figure_size, plots_show = parseArguments()
     figure_size = tuple(map(int, figure_size.split("x")))
     Xcol -= 1
     Ycol -= 1
@@ -278,4 +282,4 @@ if __name__ == "__main__":
     if color_traj:
         colModifier = -1
 
-    generatePlot(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier, traj_range, output_path, xlab, ylab, cblab, figure_size)
+    generatePlot(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier, traj_range, output_path, xlab, ylab, cblab, figure_size, show_plot=plots_show)
