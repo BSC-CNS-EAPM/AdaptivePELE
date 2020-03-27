@@ -19,8 +19,9 @@ def parse_arguments():
     parser.add_argument("-c", "--clusters", type=int, nargs="*", help="Number of clusters to analyse")
     parser.add_argument("-l", "--lagtimes", type=int, nargs="*", help="Lagtimes to analyse")
     parser.add_argument("--nRuns", type=int, default=10, help="Number of independent calculations")
+    parser.add_argument("--resume", action='store_true', help="Whether to continue previous calculations")
     args = parser.parse_args()
-    return args.nTrajs, args.clusters, args.lagtimes, args.nRuns
+    return args.nTrajs, args.clusters, args.lagtimes, args.nRuns, args.resume
 
 
 def isfinished(folders):
@@ -37,7 +38,7 @@ def move(listFiles, dest):
         shutil.move(element, dest)
 
 
-def main(trajsPerEpoch, clusters, lagtimes, nruns):
+def main(trajsPerEpoch, clusters, lagtimes, nruns, resume=False):
     runFolder = os.getcwd()
     print("Running from " + runFolder)
     for tau, k in itertools.product(lagtimes, clusters):
@@ -50,14 +51,14 @@ def main(trajsPerEpoch, clusters, lagtimes, nruns):
             print("Skipping run with lagtime %d, clusters %d" % (tau, k))
             os.chdir(runFolder)
             continue
-        else:
+        if not resume:
             for folder in folders_MSM:
                 shutil.rmtree(folder)
         prepareMSMFolders.main(trajsPath=runFolder)
         print("***************")
         print("Estimating dG value in folder" + os.getcwd())
         try:
-            estimateDGAdaptive.main(trajsPerEpoch, tau, k, nruns=nruns)
+            estimateDGAdaptive.main(trajsPerEpoch, tau, k, nruns=nruns, resuming=resume)
         except Exception as err:
             if "distribution contains entries smaller" in str(err):
                 print("Caught exception in step with lag %d and k %d, moving to next iteration" % (tau, k))
@@ -68,5 +69,5 @@ def main(trajsPerEpoch, clusters, lagtimes, nruns):
         os.chdir(runFolder)
 
 if __name__ == "__main__":
-    ntrajs, clusters_list, lagtimes_list, nRuns = parse_arguments()
-    main(ntrajs, clusters_list, lagtimes_list, nRuns)
+    ntrajs, clusters_list, lagtimes_list, nRuns, resuming = parse_arguments()
+    main(ntrajs, clusters_list, lagtimes_list, nRuns, resume=resuming)
