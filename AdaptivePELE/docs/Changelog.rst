@@ -33,6 +33,7 @@ Behaviour changes from previous version:
     - Constrain the heavy atoms in the minimization run at the begining of the
       epochs in MD simulation, to preserve similarity with the original
       cluster
+    - Check PELE return code and raise proper exception if PELE crashes
 
 1.6.2 - 2019-07-24
 ------------------

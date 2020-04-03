@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Constrain the heavy atoms in the minimization run at the begging of the
       epochs in MD simulation, to preserve similiraty with the original
       cluster
+    - Check PELE return code and raise proper exception if PELE crashes
 
 ## [1.6.2] - 2019-07-24
 
