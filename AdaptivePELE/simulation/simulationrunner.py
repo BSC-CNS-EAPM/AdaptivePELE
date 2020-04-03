@@ -427,14 +427,12 @@ class PeleSimulation(SimulationRunner):
         utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
-        (out, err) = proc.communicate()
-        if out:
-            print(out)
-        if err:
-            print(err)
+        proc.communicate()
+        if 0 < proc.returncode < 32:
+            raise utilities.UnspecifiedPELECrashException("PELE equilibration had an error with exit code %d, please check your job output" % (-proc.returncode))
 
         endTime = time.time()
-        utilities.print_unbuffered("PELE took %.2f sec" % (endTime - startTime))
+        utilities.print_unbuffered("PELE equilibration took %.2f sec" % (endTime - startTime))
 
     def runSimulation(self, epoch, outputPathConstants, initialStructuresAsString, topologies, reportFileName, processManager):
         """
@@ -471,18 +469,19 @@ class PeleSimulation(SimulationRunner):
         if self.parameters.time:
             try:
                 proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
-                (out, err) = proc.communicate(timeout=self.parameters.time)
+                proc.communicate(timeout=self.parameters.time)
+                if 0 < proc.returncode < 32:
+                    raise utilities.UnspecifiedPELECrashException("PELE had an error with exit code %d, please check your job output" % (-proc.returncode))
             except subprocess.TimeoutExpired:
                 utilities.print_unbuffered("Simulation has reached the established time limit, exiting now!!")
-                out = err = None
                 proc.kill()
         else:
             proc = subprocess.Popen(toRun, shell=False, universal_newlines=True)
-            (out, err) = proc.communicate()
-        if out:
-            print(out)
-        if err:
-            print(err)
+            proc.communicate()
+            if 0 < proc.returncode < 32:
+                # this should catch in theory negative numbers, but PELE signals
+                # seem to be positive for some reason
+                raise utilities.UnspecifiedPELECrashException("PELE had an error with exit code %d, please check your job output" % (proc.returncode))
 
         endTime = time.time()
         utilities.print_unbuffered("PELE took %.2f sec" % (endTime - startTime))
