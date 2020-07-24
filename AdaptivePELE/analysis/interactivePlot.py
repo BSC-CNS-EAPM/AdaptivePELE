@@ -1,10 +1,9 @@
-#/usr/bin/python2.7
+# /usr/bin/python2.7
 
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
-from matplotlib.widgets  import RectangleSelector
-import numpy as np
+from matplotlib.widgets import RectangleSelector
 import os
 import errno
 import argparse
@@ -41,7 +40,7 @@ TRAJ = "trajectory"
 ACCEPTED_STEPS = 'numberOfAcceptedPeleSteps'
 OUTPUT_FOLDER = 'BestStructs'
 DIR = os.path.abspath(os.getcwd())
-STEPS=3
+STEPS = 3
 
 
 def parse_args():
@@ -59,163 +58,158 @@ def parse_args():
 
     return args.crit1, args.crit2, args.ad_steps, os.path.abspath(args.path), args.ofreq, args.out, args.numfolders, args.top
 
+
 def is_adaptive():
-  folders = glob.glob("{}/*/".format(DIR))
-  folders_numerical = [os.path.basename(os.path.normpath(folder)) for folder in folders]
-  if len(folders_numerical) > 1:
-    return True
-  else:
-    return False
+    folders = glob.glob("{}/*/".format(DIR))
+    folders_numerical = [os.path.basename(os.path.normpath(folder)) for folder in folders]
+    if len(folders_numerical) > 1:
+        return True
+    else:
+        return False
 
 
 class DataHandler(object):
 
-  def __init__(self, metrics, crit1, crit2, index1, index2, steps, adaptive, ad_steps, axis):
-    self.metrics = metrics
-    self.crit1 = crit1
-    self.crit2 = crit2
-    self.index1 = index1
-    self.index2 = index2
-    self.steps = steps
-    self.adaptive = adaptive
-    self.ad_steps = ad_steps
-    self.axis = axis
-    self.descompose_values()
+    def __init__(self, metrics, crit1, crit2, index1, index2, steps, adaptive, ad_steps, axis):
+        self.metrics = metrics
+        self.crit1 = crit1
+        self.crit2 = crit2
+        self.index1 = index1
+        self.index2 = index2
+        self.steps = steps
+        self.adaptive = adaptive
+        self.ad_steps = ad_steps
+        self.axis = axis
+        self.descompose_values()
 
+    def descompose_values(self):
+        self.paths = self.metrics[DIR].tolist()
+        self.epochs = [os.path.basename(os.path.normpath(os.path.dirname(Path))) for Path in self.paths]
+        self.values1, self.values2 = self.retrieve_values()
+        self.file_ids = self.metrics.report.tolist()
+        self.step_indexes = self.metrics[self.steps].tolist()
 
-  def descompose_values(self):
-    self.paths = self.metrics[DIR].tolist()
-    self.epochs = [os.path.basename(os.path.normpath(os.path.dirname(Path))) for Path in self.paths]
-    self.values1, self.values2 = self.retrieve_values()
-    self.file_ids = self.metrics.report.tolist()
-    self.step_indexes = self.metrics[self.steps].tolist()
+    def on_press(self, event):
+        self.limits_start = [self.axis.get_xlim(), self.axis.get_ylim()]
+        if not event.inaxes:
+            return
+        self.xo, self.yo = event.xdata, event.ydata
 
-  def on_press(self, event):
-    self.limits_start = [self.axis.get_xlim(), self.axis.get_ylim()]
-    if not event.inaxes: return
-    self.xo, self.yo = event.xdata, event.ydata
+    def on_release(self, event):
+        self.limits_end = [self.axis.get_xlim(), self.axis.get_ylim()]
+        if not event.inaxes:
+            return
+        self.xf, self.yf = event.xdata, event.ydata
+        if self.limits_start == self.limits_end:
+            self.compute()
 
-   
-  def on_release(self, event):
-    self.limits_end = [self.axis.get_xlim(), self.axis.get_ylim()]
-    if not event.inaxes: return
-    self.xf, self.yf = event.xdata, event.ydata
-    if self.limits_start == self.limits_end:
-      self.compute()
-
-  def compute(self):
-    self.retrieve_data()
-    if topology:
-        self.extract_snapshots_from_xtc(self.data_to_extract, self.steps)
-    else:
-        self.extract_snapshots_from_pdb(self.data_to_extract, self.steps)
-
-  def retrieve_data(self):
-    if (self.xf > self.xo) and (self.yf < self.yo):
-      self.data_to_extract = (self.metrics[(self.metrics[self.crit2] > self.yf) & (self.metrics[self.crit2] < self.yo) &
-      (self.metrics[self.crit1] > self.xo) & (self.metrics[self.crit1] < self.xf) ])
-
-    elif (self.xf > self.xo) and (self.yf > self.yo):
-      self.data_to_extract = (self.metrics[(self.metrics[self.crit2] < self.yf) & (self.metrics[self.crit2] > self.yo) &
-      (self.metrics[self.crit1] > self.xo) & (self.metrics[self.crit1] < self.xf) ])
-
-    elif (self.xf < self.xo) and (self.yf > self.yo):
-      self.data_to_extract = (self.metrics[(self.metrics[self.crit2] < self.yf) & (self.metrics[self.crit2] > self.yo) &
-      (self.metrics[self.crit1] < self.xo) & (self.metrics[self.crit1] > self.xf) ])
-
-    elif (self.xf < self.xo) and (self.yf < self.yo):
-      self.data_to_extract = (self.metrics[(self.metrics[self.crit2] > self.yf) & (self.metrics[self.crit2] < self.yo) &
-      (self.metrics[self.crit1] < self.xo) & (self.metrics[self.crit1] > self.xf) ])
-    else:
-      self.data_to_extract = pd.DataFrame(columns=list(self.metrics))
-
-
-  def extract_snapshots_from_pdb(self, min_values, steps):
-      paths = min_values[DIR].tolist()
-      epochs = [os.path.basename(os.path.normpath(os.path.dirname(Path))) for Path in paths]
-      values1 = min_values[self.crit1].tolist()
-      values2 = min_values[self.crit2].tolist()
-      file_ids = min_values.report.tolist()
-      step_indexes = min_values[steps].tolist()
-      files_out = ["epoch{}_trajectory_{}.{}_{}{:.2f}_{}{:.3f}.pdb".format(epoch, report, int(step), self.crit1.replace(" ",""),
-        value1, self.crit2.replace(" ",""), value2) \
-        for epoch, step, report, value1, value2 in zip(epochs, step_indexes, file_ids, values1, values2)]
-      for f_id, f_out, step, path in zip(file_ids, files_out, step_indexes, paths):
-
-          # Read Trajetory from PELE's output
-          f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.pdb".format(f_id)))
-          if len(f_in) == 0:
-              sys.exit("Trajectory {} not found. Be aware that PELE trajectories must contain the label \'trajectory\' in their file name to be detected".format("*trajectory*_{}".format(f_id)))
-          f_in = f_in[0]
-
-          with open(f_in, 'r') as input_file:
-              file_content = input_file.read()
-
-          if self.adaptive and (self.steps in [self.crit1, self.crit2]):
-            model = (step % self.ad_steps)/out_freq+1
-          else:
-            model = (step)/out_freq+1
-
-          trajectory_selected = re.search('MODEL\s+%d(.*?)ENDMDL' %int(model), file_content, re.DOTALL)
-
-          # Output Trajectory
-          try:
-              mkdir_p(output)
-          except OSError:
-              pass
-
-          traj = []
-          with open(os.path.join(output,f_out),'w') as f:
-              traj.append("MODEL     %d" %int(model))
-              try:
-                  traj.append(trajectory_selected.group(1))
-              except AttributeError:
-                  raise AttributeError("Model not found. Check the -f option.")
-              traj.append("ENDMDL\n")
-              f.write("\n".join(traj))
-          print("MODEL {} has been selected".format(f_out))
-
-  def extract_snapshots_from_xtc(self, min_values, steps):
-    paths = min_values[DIR].tolist()
-    epochs = [os.path.basename(os.path.normpath(os.path.dirname(Path))) for Path in paths]
-    values1 = min_values[self.crit1].tolist()
-    values2 = min_values[self.crit2].tolist()
-    file_ids = min_values.report.tolist()
-    step_indexes = min_values[steps].tolist()
-    files_out = ["epoch{}_trajectory_{}.{}_{}{:.2f}_{}{:.3f}.pdb".format(epoch, report, int(step), self.crit1.replace(" ",""),
-        value1, self.crit2.replace(" ",""), value2) \
-        for epoch, step, report, value1, value2 in zip(epochs, step_indexes, file_ids, values1, values2)]
-    for f_id, f_out, step, path in zip(file_ids, files_out, step_indexes, paths):
-        f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.xtc".format(f_id)))
-        found = st.main(output, f_in, topology, [step % self.ad_steps/out_freq+1], template=f_out)
-        if found:
-            print("MODEL {} has been selected".format(f_out))
+    def compute(self):
+        self.retrieve_data()
+        if topology:
+            self.extract_snapshots_from_xtc(self.data_to_extract, self.steps)
         else:
-            print("MODEL {} not found. Check -f option".format(f_out))
+            self.extract_snapshots_from_pdb(self.data_to_extract, self.steps)
 
+    def retrieve_data(self):
+        if (self.xf > self.xo) and (self.yf < self.yo):
+            self.data_to_extract = (self.metrics[(self.metrics[self.crit2] > self.yf) & (self.metrics[self.crit2] < self.yo) &
+                                    (self.metrics[self.crit1] > self.xo) & (self.metrics[self.crit1] < self.xf)])
 
-  def retrieve_values(self):
+        elif (self.xf > self.xo) and (self.yf > self.yo):
+            self.data_to_extract = (self.metrics[(self.metrics[self.crit2] < self.yf) & (self.metrics[self.crit2] > self.yo) &
+                                    (self.metrics[self.crit1] > self.xo) & (self.metrics[self.crit1] < self.xf)])
 
-    if (self.steps == self.crit1) & self.adaptive:
-      values1_raw = self.metrics[self.crit1]
-      for i, (value, epoch) in enumerate(zip(values1_raw, self.epochs)):
-        self.metrics.iloc[i, self.index1-1] = (int(epoch) * self.ad_steps + value)
+        elif (self.xf < self.xo) and (self.yf > self.yo):
+            self.data_to_extract = (self.metrics[(self.metrics[self.crit2] < self.yf) & (self.metrics[self.crit2] > self.yo) &
+                                    (self.metrics[self.crit1] < self.xo) & (self.metrics[self.crit1] > self.xf)])
 
-    if (self.steps == self.crit2) & self.adaptive:
-      values1_raw = self.metrics[self.crit2]
-      for i, (value, epoch) in enumerate(zip(values1_raw, self.epochs)):
-        self.metrics.iloc[i, self.index2-1] = (int(epoch) * self.ad_steps + value)
+        elif (self.xf < self.xo) and (self.yf < self.yo):
+            self.data_to_extract = (self.metrics[(self.metrics[self.crit2] > self.yf) & (self.metrics[self.crit2] < self.yo) &
+                                    (self.metrics[self.crit1] < self.xo) & (self.metrics[self.crit1] > self.xf)])
+        else:
+            self.data_to_extract = pd.DataFrame(columns=list(self.metrics))
 
-    values1 = self.metrics[self.crit1].tolist()
-    values2 = self.metrics[self.crit2].tolist()
+    def extract_snapshots_from_pdb(self, min_values, steps):
+        paths = min_values[DIR].tolist()
+        epochs = [os.path.basename(os.path.normpath(os.path.dirname(Path))) for Path in paths]
+        values1 = min_values[self.crit1].tolist()
+        values2 = min_values[self.crit2].tolist()
+        file_ids = min_values.report.tolist()
+        step_indexes = min_values[steps].tolist()
+        files_out = ["epoch{}_trajectory_{}.{}_{}{:.2f}_{}{:.3f}.pdb".format(epoch, report, int(step), self.crit1.replace(" ", ""),
+                     value1, self.crit2.replace(" ", ""), value2) for epoch, step, report, value1, value2 in zip(epochs, step_indexes, file_ids, values1, values2)]
+        for f_id, f_out, step, path in zip(file_ids, files_out, step_indexes, paths):
 
-    return values1, values2
+            # Read Trajetory from PELE's output
+            f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.pdb".format(f_id)))
+            if len(f_in) == 0:
+                sys.exit("Trajectory {} not found. Be aware that PELE trajectories must contain the label \'trajectory\' in their file name to be detected".format("*trajectory*_{}".format(f_id)))
+            f_in = f_in[0]
+
+            with open(f_in, 'r') as input_file:
+                file_content = input_file.read()
+
+            if self.adaptive and (self.steps in [self.crit1, self.crit2]):
+                model = (step % self.ad_steps) / out_freq + 1
+            else:
+                model = (step) / out_freq + 1
+
+            trajectory_selected = re.search('MODEL\s+%d(.*?)ENDMDL' % int(model), file_content, re.DOTALL)
+
+            # Output Trajectory
+            try:
+                mkdir_p(output)
+            except OSError:
+                pass
+
+            traj = []
+            with open(os.path.join(output, f_out), 'w') as f:
+                traj.append("MODEL     %d" % int(model))
+                try:
+                    traj.append(trajectory_selected.group(1))
+                except AttributeError:
+                    raise AttributeError("Model not found. Check the -f option.")
+                traj.append("ENDMDL\n")
+                f.write("\n".join(traj))
+            print("MODEL {} has been selected".format(f_out))
+
+    def extract_snapshots_from_xtc(self, min_values, steps):
+        paths = min_values[DIR].tolist()
+        epochs = [os.path.basename(os.path.normpath(os.path.dirname(Path))) for Path in paths]
+        values1 = min_values[self.crit1].tolist()
+        values2 = min_values[self.crit2].tolist()
+        file_ids = min_values.report.tolist()
+        step_indexes = min_values[steps].tolist()
+        files_out = ["epoch{}_trajectory_{}.{}_{}{:.2f}_{}{:.3f}.pdb".format(epoch, report, int(step), self.crit1.replace(" ", ""),
+                     value1, self.crit2.replace(" ", ""), value2) for epoch, step, report, value1, value2 in zip(epochs, step_indexes, file_ids, values1, values2)]
+        for f_id, f_out, step, path in zip(file_ids, files_out, step_indexes, paths):
+            f_in = glob.glob(os.path.join(os.path.dirname(path), "*trajectory*_{}.xtc".format(f_id)))
+            found = st.main(output, f_in, topology, [step % self.ad_steps / out_freq + 1], template=f_out)
+            if found:
+                print("MODEL {} has been selected".format(f_out))
+            else:
+                print("MODEL {} not found. Check -f option".format(f_out))
+
+    def retrieve_values(self):
+        if (self.steps == self.crit1) & self.adaptive:
+            values1_raw = self.metrics[self.crit1]
+        for i, (value, epoch) in enumerate(zip(values1_raw, self.epochs)):
+            self.metrics.iloc[i, self.index1 - 1] = (int(epoch) * self.ad_steps + value)
+
+        if (self.steps == self.crit2) & self.adaptive:
+            values1_raw = self.metrics[self.crit2]
+        for i, (value, epoch) in enumerate(zip(values1_raw, self.epochs)):
+            self.metrics.iloc[i, self.index2 - 1] = (int(epoch) * self.ad_steps + value)
+
+        values1 = self.metrics[self.crit1].tolist()
+        values2 = self.metrics[self.crit2].tolist()
+
+        return values1, values2
 
 
 def line_select_callback(eclick, erelease):
     x1, y1 = eclick.xdata, eclick.ydata
     x2, y2 = erelease.xdata, erelease.ydata
-
 
 
 def toggle_selector(event):
@@ -253,14 +247,11 @@ def main(criteria1, criteria2, ad_steps, path=DIR, out_freq=FREQ, output=OUTPUT_
 
     reports = find_reports(path, numfolders)
 
-
     # Retrieve Column Names
     steps, crit1_name, crit2_name = get_column_names(reports, STEPS, criteria1, criteria2)
 
     # Data Mining
     min_values = parse_values(reports, criteria1, criteria2, steps, crit1_name, crit2_name)
-
-
 
     # Figure
     fig, current_ax = plt.subplots()
@@ -268,25 +259,25 @@ def main(criteria1, criteria2, ad_steps, path=DIR, out_freq=FREQ, output=OUTPUT_
     # Plot data
     data = DataHandler(min_values, crit1_name, crit2_name, criteria1, criteria2, steps, adaptive, ad_steps, current_ax)
 
-    # Plot axis  
+    # Plot axis
     plt.plot(data.values1, data.values2, 'ro')
     plt.title('{} vs {}'.format(crit1_name, crit2_name))
     plt.xlabel(crit1_name)
     plt.ylabel(crit2_name)
 
-
     # Plot Callbacks
     cidpress = fig.canvas.mpl_connect('button_press_event', data.on_press)
-    cidrealese= fig.canvas.mpl_connect('button_release_event', data.on_release)
+    cidrealese = fig.canvas.mpl_connect('button_release_event', data.on_release)
     toggle_selector.RS = RectangleSelector(current_ax, line_select_callback,
-                         drawtype='box', useblit=True,
-                         button=[1, 3],  # don't use middle button
-                         minspanx=5, minspany=5,
-                         spancoords='pixels',
-                         interactive=False)
+                                           drawtype='box', useblit=True,
+                                           button=[1, 3],  # don't use middle button
+                                           minspanx=5, minspany=5,
+                                           spancoords='pixels',
+                                           interactive=False)
 
     # Show Plot on screen
     plt.show()
+
 
 def find_reports(path, numfolders):
     reports = glob.glob(os.path.join(path, "*/*report*"))
@@ -298,7 +289,8 @@ def find_reports(path, numfolders):
         raise IndexError("Not report file found. Check you are in adaptive's or Pele root folder")
     return reports
 
-def parse_values(reports, criteria1, criteria2,  steps, crit1_name, crit2_name):
+
+def parse_values(reports, criteria1, criteria2, steps, crit1_name, crit2_name):
     """
 
        Description: Parse the 'reports' and create a sorted array
@@ -306,24 +298,24 @@ def parse_values(reports, criteria1, criteria2,  steps, crit1_name, crit2_name):
 
     """
     if steps == crit1_name:
-      INITIAL_DATA = [(DIR, []),
-                      (REPORT, []),
-                      (steps, []),
-                      (crit2_name, [])
-                      ]
+        INITIAL_DATA = [(DIR, []),
+                        (REPORT, []),
+                        (steps, []),
+                        (crit2_name, [])
+                        ]
     elif steps == crit2_name:
-      INITIAL_DATA = [(DIR, []),
-                    (REPORT, []),
-                    (steps, []),
-                    (crit1_name, []),
-                    ]
+        INITIAL_DATA = [(DIR, []),
+                        (REPORT, []),
+                        (steps, []),
+                        (crit1_name, []),
+                        ]
     else:
-      INITIAL_DATA = [(DIR, []),
-                    (REPORT, []),
-                    (steps, []),
-                    (crit1_name, []),
-                    (crit2_name, [])
-                    ]
+        INITIAL_DATA = [(DIR, []),
+                        (REPORT, []),
+                        (steps, []),
+                        (crit1_name, []),
+                        (crit2_name, [])
+                        ]
     min_values = pd.DataFrame.from_items(INITIAL_DATA)
     for file in reports:
         report_number = os.path.basename(file).split("_")[-1]
@@ -333,15 +325,15 @@ def parse_values(reports, criteria1, criteria2,  steps, crit1_name, crit2_name):
             warnings.warn("Report {} corrupted".format(file), UserWarning)
             continue
         if steps == crit1_name:
-          selected_data = data.iloc[:, [2, criteria2-1]]
+            selected_data = data.iloc[:, [2, criteria2 - 1]]
         elif steps == crit1_name:
-          selected_data = data.iloc[:, [2, criteria1-1]]
+            selected_data = data.iloc[:, [2, criteria1 - 1]]
         else:
-          selected_data = data.iloc[:, [2, criteria1-1, criteria2-1]]
-        selected_data.insert(0, DIR, [file]*selected_data[steps].size)
-        selected_data.insert(1, REPORT, [report_number]*selected_data[steps].size)
+            selected_data = data.iloc[:, [2, criteria1 - 1, criteria2 - 1]]
+        selected_data.insert(0, DIR, [file] * selected_data[steps].size)
+        selected_data.insert(1, REPORT, [report_number] * selected_data[steps].size)
         min_values = pd.concat([min_values, selected_data])
-    return min_values 
+    return min_values
 
 
 def filter_non_numerical_folders(reports, numfolders):
@@ -355,11 +347,12 @@ def filter_non_numerical_folders(reports, numfolders):
     else:
         return reports
 
+
 def get_column_names(reports, steps, criteria1, criteria2):
     data = pd.read_csv(reports[0], sep='    ', engine='python')
     data = list(data)
+    return data[int(steps) - 1], data[criteria1 - 1], data[criteria2 - 1]
 
-    return data[int(steps)-1], data[criteria1-1], data[criteria2-1]
 
 def mkdir_p(path):
     try:
