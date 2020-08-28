@@ -906,7 +906,7 @@ class MDSimulation(SimulationRunner):
         """
         return self.parameters.ligandName
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, processManager, simulationRunnerBlock, topologies=None):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, processManager, topologies=None):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure
@@ -930,7 +930,7 @@ class MDSimulation(SimulationRunner):
 
             :returns: list -- List with initial structures
         """
-        
+
         COFACTOR_PATH = os.path.join("".join(AdaptivePELE.constants.__path__), "MDtemplates/")
 
         if self.parameters.trajsPerReplica*processManager.id >= len(initialStructures):
@@ -1602,3 +1602,5 @@ def processTraj(input_files):
     t = MDA.Universe(top_file, traj_file)
     t.atoms.wrap(compound="residues")
     alignment = align.AlignTraj(t, mobile, select="backbone", filename=new_file)
+    alignment.run()
+    os.rename(new_file, traj_file)
