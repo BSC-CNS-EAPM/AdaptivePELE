@@ -84,6 +84,32 @@ def calculateAutoCorrelation(lagtimes, dtrajs, nclusters, nLags):
 
 
 def create_plots(autoCorr, plots_path, save_plot, show_plot, nclusters, lagtimes, threshold=2, title=""):
+
+    def update_annot(ind, pos, index):
+        annot.xy = pos
+        annot.set_text(annotations[index])
+
+    def locate_event(event):
+        for j, el in enumerate(axes):
+            found, info = el.contains(event)
+            if found:
+                return j, found, info, el
+        return 0, False, None, None
+
+    def hover(event):
+        """Action to perform when hovering the mouse on a point"""
+        vis = annot.get_visible()
+        if event.inaxes == ax:
+            index, cont, ind, _ = locate_event(event)
+            if cont:
+                update_annot(ind, (event.xdata, event.ydata), index)
+                annot.set_visible(True)
+                fig.canvas.draw_idle()
+            else:
+                if vis:
+                    annot.set_visible(False)
+                    fig.canvas.draw_idle()
+
     if threshold < 1:
         fig_filename = "autoCorr_thres_%s.png" % str(threshold).replace(".", "_")
         filtered = np.where(autoCorr[:, -1] > threshold)[0]
@@ -92,7 +118,13 @@ def create_plots(autoCorr, plots_path, save_plot, show_plot, nclusters, lagtimes
     else:
         fig_filename = "autoCorr_no_thres.png"
         filtered = list(range(nclusters))
-    plt.figure()
+    fig, ax = plt.subplots()
+    annot = ax.annotate("", xy=(0, 0), xytext=(20, 20),
+                        textcoords="offset points",
+                        bbox=dict(boxstyle="round", fc="w"),
+                        arrowprops=dict(arrowstyle="->"))
+    annot.set_visible(False)
+    annotations = ["Cluster %d" % k for k in filtered]
     axes = plt.plot(lagtimes, autoCorr.T[:, filtered])
     plt.xlabel("Lagtime")
     plt.title("Autocorrelation of membership function %s" % title)
@@ -100,6 +132,10 @@ def create_plots(autoCorr, plots_path, save_plot, show_plot, nclusters, lagtimes
         for i, ax in zip(filtered, axes):
             ax.set_label("Cluster %d" % i)
         plt.legend()
+
+    # Respond to mouse motion
+    fig.canvas.mpl_connect("motion_notify_event", hover)
+
     if save_plot:
         plt.savefig(os.path.join(plots_path, fig_filename))
     if show_plot:
@@ -124,7 +160,7 @@ def main(lagtime, clusters_file, disctraj, trajs, n_clusters, plots_path, save_p
         raise ValueError("Number of clusters specified in the -n parameter does not match the provided clusters")
     print("Calculating autocorrelation...")
     dtrajs = glob.glob(os.path.join(disctraj, "traj*"))
-    dtrajs_loaded = [utilities.loadtxtfile(dtraj, dtype=int) for dtraj in dtrajs]
+    dtrajs_loaded = [np.loadtxt(dtraj, dtype=int) for dtraj in dtrajs]
 
     autoCorr = utils.calculateAutoCorrelation(lagtimes, dtrajs_loaded, n_clusters, n_lags)
     np.save("autoCorr.npy", autoCorr)

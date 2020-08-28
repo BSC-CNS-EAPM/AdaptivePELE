@@ -518,7 +518,6 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     # the trajectory file number)
     workerNumber += replica_id*trajsPerReplica + 1
     prmtop, pdb = equilibrationFiles
-    prmtop = app.AmberPrmtopFile(prmtop)
     trajName = os.path.join(outputDir, constants.AmberTemplates.trajectoryTemplate % (workerNumber, parameters.format))
     stateReporter = os.path.join(outputDir, "%s_%s" % (reportFileName, workerNumber))
     checkpointReporter = os.path.join(outputDir, constants.AmberTemplates.CheckPointReporterTemplate % workerNumber)
@@ -528,6 +527,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     # probably due to the fact that openmm was built with python2 in my
     # computer, will need to test thoroughly with python3)
     pdb = app.PDBFile(str(pdb))
+    prmtop = app.AmberPrmtopFile(prmtop)
     PLATFORM = mm.Platform_getPlatformByName(str(parameters.runningPlatform))
     if parameters.runningPlatform == "CUDA":
         platformProperties = {"Precision": "mixed", "DeviceIndex": getDeviceIndexStr(deviceIndex, parameters.devicesPerTrajectory, devicesPerReplica=parameters.maxDevicesPerReplica), "UseCpuPme": "false"}
@@ -567,7 +567,6 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
                 utilities.print_unbuffered("Adding cylinder ligand box")
             addLigandCylinderBox(prmtop.topology, positions, system, parameters.ligandName, dummies, parameters.boxRadius, deviceIndex)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
-    utilities.print_unbuffered(workerNumber, equilibrationFiles, dummies, len(positions), prmtop.topology.getNumAtoms(), system.getNumParticles())
     simulation.context.setPositions(positions)
     if restart:
         with open(str(checkpoint), 'rb') as check:
@@ -660,8 +659,8 @@ def addConstraints(system, topology, constraints):
             atomIndices[atom_str] = atom.index
     for constraint in constraints:
         assert atomIndices[constraint[0]] != atomIndices[constraint[1]], (constraint, atomIndices[constraint[0]], atomIndices[constraint[1]])
-        assert atomIndices[constraint[0]] is not None
-        assert atomIndices[constraint[1]] is not None
+        assert atomIndices[constraint[0]] is not None, (constraint, atomIndices[constraint[0]])
+        assert atomIndices[constraint[1]] is not None, (constraint, atomIndices[constraint[1]])
         # pass distance constraint in nm
         system.addConstraint(atomIndices[constraint[0]], atomIndices[constraint[1]], float(constraint[2])/10.0)
 

@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import sparse, linalg
 from AdaptivePELE.freeEnergies import utils
+from AdaptivePELE.freeEnergies.utilitiesFreeEnergies import getStationaryDistr, getSortedEigen
 
 
 def buildLinearChainCountMatrix():
@@ -186,24 +187,10 @@ def estimateTransitionMatrix(trajectories, n, tau, symm=True):
     return buildTransitionMatrix(C)
 
 
-def getSortedEigen(T):
-    eigenvals, eigenvectors = linalg.eig(T, left=True, right=False)
-    sortedIndices = np.argsort(eigenvals)[::-1]
-
-    # reigenvals, reigenvectors = linalg.eig(T.T)
-    # rsortedIndices = np.argsort(reigenvals)[::-1]
-    return eigenvals[sortedIndices], eigenvectors[:, sortedIndices]
-
-
 def getSortedEigenFromDtrajs(tau, trajs, n, symm=True):
     estimatedT = estimateTransitionMatrix(trajs, n, tau, symm=symm)
     # T.T*pi = pi; or pi*T = pi, where pi is col and row array respectively
     return getSortedEigen(estimatedT)
-
-
-def getStationaryDistr(lowestEigenvector):
-    absStationary = np.abs(lowestEigenvector)
-    return absStationary / absStationary.sum()
 
 
 def getStationaryDistrFromTransition(transitionMatrix):

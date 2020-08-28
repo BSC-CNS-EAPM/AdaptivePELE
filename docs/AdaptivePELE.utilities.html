@@ -87,7 +87,7 @@
             
             
                 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Examples.html">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="UserManual.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#adaptivesampling-module"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
@@ -189,7 +189,8 @@ by the checker</p>
 <dl class="class">
 <dt id="AdaptivePELE.utilities.utilities.Topology">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">Topology</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Container object that points to the topology used in each trajectory</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Container object that points to the topology used in each trajectory</p>
 <dl class="method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.cleanTopologies">
 <code class="descname">cleanTopologies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.cleanTopologies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.cleanTopologies" title="Permalink to this definition">¶</a></dt>
@@ -731,11 +732,33 @@ trajectories and reports</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>conformation</strong> – Mdtraj trajectory object to write</li>
-<li><strong>topology</strong> (<em>list</em>) – Topoloy-like object</li>
+<li><strong>topology</strong> (<em>list</em>) – Topology-like object</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – The pdb representation of a snapshot from a xtc</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.get_workers_output">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_workers_output</code><span class="sig-paren">(</span><em>workers</em>, <em>wait_time=60</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_workers_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_workers_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the output of a pool of workers without serializing the program at the get.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>workers</strong> (<em>list</em>) – List of AsyncResult objects created when passing work to the pool</li>
+<li><strong>wait_time</strong> (<em>int</em>) – Number of second to wait before checking if next worker is finished</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List containing the output of all workers, if the function
+passed to the pool had no return value it will be a list of None objects</p>
 </td>
 </tr>
 </tbody>
@@ -947,7 +970,7 @@ processorsToClusterMapping</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>conformation</strong> – Mdtraj trajectory object to write</li>
 <li><strong>output</strong> (<em>str</em>) – Output where to write the object</li>
-<li><strong>topology</strong> (<em>list</em>) – Topoloy-like object</li>
+<li><strong>topology</strong> (<em>list</em>) – Topology-like object</li>
 </ul>
 </td>
 </tr>
@@ -1001,7 +1024,7 @@ processorsToClusterMapping</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Daniel Lecina, Joan Francesc Gilabert.
+        &copy; Copyright 2019, Daniel Lecina, Joan Francesc Gilabert.
 
     </p>
   </div>

@@ -1747,7 +1747,6 @@ class MSMClustering(Clustering):
         # create Adaptive clusters from the kmeans result
         trajectory_files = glob.glob(os.path.join(outputPathConstants.allTrajsPath, "extractedCoordinates", base_traj_names))
         trajectories = [utilities.loadtxtfile(f)[:, 1:] for f in trajectory_files]
-
         centersInfo = getCentersInfo(self.pyemma_clustering.clusterCenters, trajectories, trajectory_files, self.pyemma_clustering.dtrajs)
         centersInfo_processed = []
         for cluster in centersInfo:
