@@ -220,7 +220,7 @@ class SimulationRunner:
                 will start in the next iteration
             :type mapping: list
         """
-        self.processorsToClusterMapping = mapping[1:]+[mapping[0]]
+        self.processorsToClusterMapping = mapping[1:] + [mapping[0]]
 
     def writeMappingToDisk(self, epochDir):
         """
@@ -341,7 +341,7 @@ class PeleSimulation(SimulationRunner):
         """
             Return the number of working processors, i.e. number of trajectories
         """
-        return self.parameters.processors-1
+        return self.parameters.processors - 1
 
     def getNextIterationBox(self, outputFolder, resname, topologies=None, epoch=None):
         """
@@ -528,8 +528,7 @@ class PeleSimulation(SimulationRunner):
             "ifAnyIsTrue": ["rand >= .5"],
             "otherwise": {
                 "Perturbation::parameters": {"rotationScalingFactor": 0.15}
-            }
-            }
+            }}
         peleControlFileDict["commands"][0]["PeleTasks"][0]["parametersChanges"] = [changes]
 
         return peleControlFileDict
@@ -550,10 +549,10 @@ class PeleSimulation(SimulationRunner):
         for i, metricBlock in enumerate(JSONdict["commands"][0]["PeleTasks"][0]['metrics']):
             if 'rmsd' in metricBlock['type'].lower():
                 hasRMSD = True
-                RMSDCol = i+4
+                RMSDCol = i + 4
             elif 'distance' in metricBlock['type'].lower():
                 hasDistance = True
-                distanceCol = i+4
+                distanceCol = i + 4
         if hasRMSD:
             return RMSDCol
         elif hasDistance:
@@ -569,7 +568,7 @@ class PeleSimulation(SimulationRunner):
         # Total steps is an approximate number of total steps to produce
         totalSteps = 1000
         # Take at least 5 steps
-        stepsPerProc = max(int(totalSteps/float(self.parameters.processors)), 5)
+        stepsPerProc = max(int(totalSteps / float(self.parameters.processors)), 5)
         # but no more than 50
         return min(stepsPerProc, 50)
 
@@ -1016,7 +1015,7 @@ class MDSimulation(SimulationRunner):
                     if blockNames.CofactorTemplateNames.fadh == cof:
                         Tleapdict["COFACTORS"] += "loadoff {}new_{}.lib\n".format(COFACTOR_PATH, cof)
                         Tleapdict["COFACTORS"] += "loadamberparams {}{}.frcfld\n".format(COFACTOR_PATH, cof)
-                    elif blockNames.CofactorTemplateNames.fmn == cof :
+                    elif blockNames.CofactorTemplateNames.fmn == cof:
                         Tleapdict["COFACTORS"] += "loadoff {}{}.off\n".format(COFACTOR_PATH, cof)
                         Tleapdict["COFACTORS"] += "loadamberparams {}{}.frcfld\n".format(COFACTOR_PATH, cof)
                     elif blockNames.CofactorTemplateNames.nad in cof:
@@ -1102,18 +1101,16 @@ class MDSimulation(SimulationRunner):
             for line in inp:
                 if resname in line and line.startswith("HETATM"):
                     if not line_dict:
-                        line_dict[(resname,line[21])] = line
+                        line_dict[(resname, line[21])] = line
                     else:
                         if (resname, line[21]) in line_dict:
-                            line_dict[(resname,line[21])] += line
+                            line_dict[(resname, line[21])] += line
                         else:
-                            line_dict[(resname,line[21])] = line
-
+                            line_dict[(resname, line[21])] = line
 
         with open(ligandpdb, "w") as out:
             for pdb_line in line_dict[list(line_dict.keys())[0]]:
                 out.write(pdb_line)
-
 
         return ligandpdb
 
