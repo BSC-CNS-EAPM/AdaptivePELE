@@ -56,6 +56,7 @@ class AmberTemplates:
                     "$RESNAME = loadmol2 $MOL2\n" \
                     "loadamberparams $FRCMOD\n" \
                     "$DUM " \
+                    "$COFACTORS " \
                     "COMPLX = loadpdb $COMPLEX\n" \
                     "$BONDS " \
                     "addions COMPLX Cl- 0\n" \
@@ -69,6 +70,7 @@ class AmberTemplates:
                             "source leaprc.water.tip3p\n" \
                             "$MODIFIED_RES " \
                             "$DUM " \
+                            "$COFACTORS " \
                             "COMPLX = loadpdb $COMPLEX\n" \
                             "$BONDS " \
                             "addions COMPLX Cl- 0\n" \
@@ -85,6 +87,7 @@ class AmberTemplates:
                "%s\n" \
                "%s   INT  0\n" \
                "CHANGE OMIT DU  BEG\n" \
+               " 0.0\n" \
                " 0.0\n" \
                "   1 DUMM  DU  M  0  -1  -2  0.000     0.000     0.000    0.000\n" \
                "   2 DUMM  DU  M  1   0  -1  1.0000    0.0000    0.0000   0.000\n" \

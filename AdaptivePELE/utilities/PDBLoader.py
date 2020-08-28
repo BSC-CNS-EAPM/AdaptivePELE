@@ -34,9 +34,12 @@ class PDBManager:
                  "Nd", "PB", "PD", "PR", "PT", "Pu", "RB", "Ra", "SM", "SR", "Sm", "Sn", "TB", "TL", "Th",
                  "Tl", "Tm", "U4+", "V2+", "Y", "YB2", "ZN", "Zr"}
 
+    VALID_COFACTOR = {"NAP","FAD","FMN"}
+
     VALID_WATER_ATOMS = set(["H1", "H2", "O"])
     WATERS = ["WAT", "HOH"]
     WATER_ATOMS = {"1HW": "H1", "2HW": "H2", "OW": "O"}
+
 
     # Modified residues for which there is a template in AdaptivePELE/constants/MDtemplates/
     TEMPLATE_PATH = os.path.join("".join(AdaptivePELE.constants.__path__), "MDtemplates/amber_*.lib")
@@ -126,7 +129,8 @@ class PDBManager:
                             currentChain = Chain(currentStructure, currentChainName)
 
                     elif columns[self.POSITIONS["RESNAME"]] in self.VALID_ION or columns[self.POSITIONS["RESNAME"]]\
-                            in ["WAT", "HOH"] or columns[self.POSITIONS["RESNAME"]] in self.VALID_NUCLEIC:
+                            in ["WAT", "HOH"] or columns[self.POSITIONS["RESNAME"]] in self.VALID_NUCLEIC or columns[self.POSITIONS["RESNAME"]]\
+                            in self.VALID_COFACTOR:
                         if currentStructure != self.Other:
                             currentStructure = self.Other
                             currentChainName = columns[self.POSITIONS["CHAINID"]]

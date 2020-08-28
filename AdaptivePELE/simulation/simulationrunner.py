@@ -10,6 +10,7 @@ import itertools
 import numpy as np
 import MDAnalysis as MDA
 import multiprocessing as mp
+import AdaptivePELE.constants
 from MDAnalysis.analysis import align
 from builtins import range
 from AdaptivePELE.constants import constants, blockNames
@@ -83,6 +84,7 @@ class SimulationParameters:
         self.energyReport = True
         self.productionLength = 0
         self.ligandName = None
+        self.cofactors = None
         self.waterBoxSize = 8
         self.trajsPerReplica = None
         self.numReplicas = 1
@@ -218,7 +220,7 @@ class SimulationRunner:
                 will start in the next iteration
             :type mapping: list
         """
-        self.processorsToClusterMapping = mapping[1:]+[mapping[0]]
+        self.processorsToClusterMapping = mapping[1:] + [mapping[0]]
 
     def writeMappingToDisk(self, epochDir):
         """
@@ -339,7 +341,7 @@ class PeleSimulation(SimulationRunner):
         """
             Return the number of working processors, i.e. number of trajectories
         """
-        return self.parameters.processors-1
+        return self.parameters.processors - 1
 
     def getNextIterationBox(self, outputFolder, resname, topologies=None, epoch=None):
         """
@@ -526,8 +528,7 @@ class PeleSimulation(SimulationRunner):
             "ifAnyIsTrue": ["rand >= .5"],
             "otherwise": {
                 "Perturbation::parameters": {"rotationScalingFactor": 0.15}
-            }
-            }
+            }}
         peleControlFileDict["commands"][0]["PeleTasks"][0]["parametersChanges"] = [changes]
 
         return peleControlFileDict
@@ -548,10 +549,10 @@ class PeleSimulation(SimulationRunner):
         for i, metricBlock in enumerate(JSONdict["commands"][0]["PeleTasks"][0]['metrics']):
             if 'rmsd' in metricBlock['type'].lower():
                 hasRMSD = True
-                RMSDCol = i+4
+                RMSDCol = i + 4
             elif 'distance' in metricBlock['type'].lower():
                 hasDistance = True
-                distanceCol = i+4
+                distanceCol = i + 4
         if hasRMSD:
             return RMSDCol
         elif hasDistance:
@@ -567,7 +568,7 @@ class PeleSimulation(SimulationRunner):
         # Total steps is an approximate number of total steps to produce
         totalSteps = 1000
         # Take at least 5 steps
-        stepsPerProc = max(int(totalSteps/float(self.parameters.processors)), 5)
+        stepsPerProc = max(int(totalSteps / float(self.parameters.processors)), 5)
         # but no more than 50
         return min(stepsPerProc, 50)
 
@@ -928,6 +929,9 @@ class MDSimulation(SimulationRunner):
 
             :returns: list -- List with initial structures
         """
+
+        COFACTOR_PATH = os.path.join("".join(AdaptivePELE.constants.__path__), "MDtemplates/")
+
         if self.parameters.trajsPerReplica*processManager.id >= len(initialStructures):
             # Only need to launch as many simulations as initial structures
             # synchronize the replicas that will not run equilibration with the
@@ -1005,6 +1009,18 @@ class MDSimulation(SimulationRunner):
             Tleapdict["INPCRD"] = inpcrd
             Tleapdict["SOLVATED_PDB"] = finalPDB
             Tleapdict["BONDS"] = pdb.getDisulphideBondsforTleapTemplate()
+            Tleapdict["COFACTORS"] = ""
+            if self.parameters.cofactors is not None:
+                for cof in self.parameters.cofactors:
+                    if blockNames.CofactorTemplateNames.fadh == cof:
+                        Tleapdict["COFACTORS"] += "loadoff {}new_{}.lib\n".format(COFACTOR_PATH, cof)
+                        Tleapdict["COFACTORS"] += "loadamberparams {}{}.frcfld\n".format(COFACTOR_PATH, cof)
+                    elif blockNames.CofactorTemplateNames.fmn == cof:
+                        Tleapdict["COFACTORS"] += "loadoff {}{}.off\n".format(COFACTOR_PATH, cof)
+                        Tleapdict["COFACTORS"] += "loadamberparams {}{}.frcfld\n".format(COFACTOR_PATH, cof)
+                    elif blockNames.CofactorTemplateNames.nad in cof:
+                        Tleapdict["COFACTORS"] += "loadamberprep {}{}.prep\n".format(COFACTOR_PATH, cof)
+                        Tleapdict["COFACTORS"] += "loadamberparams {}nad.frcmod\n".format(COFACTOR_PATH, cof)
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
             if self.parameters.boxCenter or self.parameters.cylinderBases:
                 Tleapdict["DUM"] = "loadamberprep %s.prep\nloadamberparams %s.frcmod\n" % (constants.AmberTemplates.DUM_res, constants.AmberTemplates.DUM_res)
@@ -1073,16 +1089,29 @@ class MDSimulation(SimulationRunner):
 
             :returns: str -- string with the ligand pdb
         """
+        line_dict = {}
+
         ligandpdb = os.path.join(outputpath, "raw_ligand.pdb")
         if resname is None:
             return ""
         if id_replica:
             return ligandpdb
+
+        with open(PDBtoOpen, "r") as inp:
+            for line in inp:
+                if resname in line and line.startswith("HETATM"):
+                    if not line_dict:
+                        line_dict[(resname, line[21])] = line
+                    else:
+                        if (resname, line[21]) in line_dict:
+                            line_dict[(resname, line[21])] += line
+                        else:
+                            line_dict[(resname, line[21])] = line
+
         with open(ligandpdb, "w") as out:
-            with open(PDBtoOpen, "r") as inp:
-                for line in inp:
-                    if resname in line:
-                        out.write(line)
+            for pdb_line in line_dict[list(line_dict.keys())[0]]:
+                out.write(pdb_line)
+
         return ligandpdb
 
     def prepareLigand(self, antechamberDict, parmchkDict):
@@ -1483,6 +1512,7 @@ class RunnerBuilder:
             params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
             params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
+            params.cofactors = paramsBlock.get(blockNames.SimulationParams.cofactors)
             params.constraints = paramsBlock.get(blockNames.SimulationParams.constraints)
             params.postprocessing = paramsBlock.get(blockNames.SimulationParams.postprocessing, True)
             if params.ligandName is None and (params.boxCenter is not None or params.cylinderBases is not None):

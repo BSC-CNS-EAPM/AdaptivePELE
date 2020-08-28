@@ -177,6 +177,7 @@ class SimulationParams:
         "trajectoryName": "basestring",
         "ligandCharge": "numbers.Real",
         "ligandName": "basestring",
+        "cofactors": "list",
         "nonBondedCutoff": "numbers.Real",
         "timeStep": "numbers.Real",
         "temperature": "numbers.Real",

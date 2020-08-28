@@ -183,6 +183,7 @@ class SimulationParams:
     maxDevicesPerReplica = "maxDevicesPerReplica"
     format = "format"
     ligandName = "ligandName"
+    cofactors = "cofactors"
     constraints = "constraints"
     boxType = "boxType"
     cylinder = "cylinder"
@@ -212,3 +213,9 @@ class GeneralParams:
     debug = "debug"
     writeAllClustering = "writeAllClusteringStructures"
     nativeStructure = "nativeStructure"
+
+
+class CofactorTemplateNames:
+    fadh = "fadh-"
+    fmn = "fmn"
+    nad = "nad"
