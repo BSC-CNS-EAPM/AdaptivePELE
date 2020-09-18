@@ -88,7 +88,6 @@ class AmberTemplates:
                "%s   INT  0\n" \
                "CHANGE OMIT DU  BEG\n" \
                " 0.0\n" \
-               " 0.0\n" \
                "   1 DUMM  DU  M  0  -1  -2  0.000     0.000     0.000    0.000\n" \
                "   2 DUMM  DU  M  1   0  -1  1.0000    0.0000    0.0000   0.000\n" \
                "   3 DUMM  DU  M  2   1   0  1.0000   90.0000    0.0000   0.000\n" \
