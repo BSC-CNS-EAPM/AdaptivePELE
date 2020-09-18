@@ -329,7 +329,7 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters, platformProp
         force.addPerParticleParameter(str("z0"))
         atomNames = ('CA', 'C', 'N', 'O')
         for j, atom in enumerate(prmtop.topology.atoms()):
-            if (atom.name in atomNames and atom.residue.name != "HOH") or (atom.residue.name == parameters.ligandName and atom.element.symbol != "H"):
+            if (atom.name in atomNames and atom.residue.name != "HOH") or (atom.residue.name in parameters.ligandName and atom.element.symbol != "H"):
                 force.addParticle(j, inpcrd.positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
@@ -392,7 +392,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         force.addPerParticleParameter(str("y0"))
         force.addPerParticleParameter(str("z0"))
         for j, atom in enumerate(topology.topology.atoms()):
-            if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (atom.residue.name == parameters.ligandName and atom.element.symbol != "H"):
+            if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (atom.residue.name in parameters.ligandName and atom.element.symbol != "H"):
                 force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
     simulation = app.Simulation(topology.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
@@ -459,7 +459,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         force.addPerParticleParameter(str("y0"))
         force.addPerParticleParameter(str("z0"))
         for j, atom in enumerate(topology.topology.atoms()):
-            if atom.name == 'CA' or (atom.residue.name == parameters.ligandName and atom.element.symbol != "H"):
+            if atom.name == 'CA' or (atom.residue.name in parameters.ligandName and atom.element.symbol != "H"):
                 force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
     simulation = app.Simulation(topology.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
@@ -500,8 +500,8 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     :type reportFileName: str
     :param checkpoint: Path to the checkpoint from where the production run will be restarted (Optional)
     :type checkpoint: str
-    :param ligandName: Code Name for the ligand
-    :type ligandName: str
+    :param ligandName: Code Name for the ligands
+    :type ligandName: list
     :param replica_id: Id of the replica running
     :type replica_id: int
     :param trajsPerReplica: Number of trajectories per replica
@@ -556,16 +556,18 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         # Add the specified constraints to the system
         addConstraints(system, prmtop.topology, parameters.constraints)
 
-    if parameters.boxCenter or parameters.cylinderBases:
-        if parameters.boxType == blockNames.SimulationParams.sphere:
-            if deviceIndex == 0:
-                utilities.print_unbuffered("Adding spherical ligand box")
-            assert len(dummies) == 1
-            addLigandBox(prmtop.topology, positions, system, parameters.ligandName, dummies[0], parameters.boxRadius, deviceIndex)
-        elif parameters.boxType == blockNames.SimulationParams.cylinder:
-            if deviceIndex == 0:
-                utilities.print_unbuffered("Adding cylinder ligand box")
-            addLigandCylinderBox(prmtop.topology, positions, system, parameters.ligandName, dummies, parameters.boxRadius, deviceIndex)
+    for ligand_resname in parameters.ligandName:
+        if parameters.boxCenter or parameters.cylinderBases:
+            if parameters.boxType == blockNames.SimulationParams.sphere:
+                if deviceIndex == 0:
+                    utilities.print_unbuffered("Adding spherical ligand box")
+                assert len(dummies) == 1
+                addLigandBox(prmtop.topology, positions, system, ligand_resname, dummies[0], parameters.boxRadius, deviceIndex)
+            elif parameters.boxType == blockNames.SimulationParams.cylinder:
+                if deviceIndex == 0:
+                    utilities.print_unbuffered("Adding cylinder ligand box")
+                addLigandCylinderBox(prmtop.topology, positions, system, ligand_resname, dummies, parameters.boxRadius, deviceIndex)
+
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
     simulation.context.setPositions(positions)
     if restart:
@@ -681,14 +683,12 @@ def findDummyAtom(model, name=constants.AmberTemplates.DUM_atom, resname=constan
             dummies.append(atom.index)
     if dummies:
         return dummies
-    else:
-        return None
 
 
 def addDummyAtomToSystem(system, topology, positions, resname, dummies, worker):
     protein_CAs = []
     for atom in topology.atoms():
-        if atom.residue.name not in ("HOH", "Cl-", "Na+", resname) and atom.name == "CA":
+        if atom.residue.name not in ("HOH", "Cl-", "Na+") or atom.residue.name not in resname and atom.name == "CA":
             protein_CAs.append(atom.index)
     modul = len(protein_CAs) % 20
     step_to_use = int((len(protein_CAs)-modul)/20)

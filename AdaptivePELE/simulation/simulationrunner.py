@@ -6,13 +6,14 @@ import time
 import glob
 import shutil
 import string
+import numbers
 import itertools
+from builtins import range
+import multiprocessing as mp
 import numpy as np
 import MDAnalysis as MDA
-import multiprocessing as mp
-import AdaptivePELE.constants
 from MDAnalysis.analysis import align
-from builtins import range
+import AdaptivePELE.constants
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
 from AdaptivePELE.atomset import atomset, RMSDCalculator
@@ -903,9 +904,11 @@ class MDSimulation(SimulationRunner):
         """
             Return the value of the ligand name
         """
-        return self.parameters.ligandName
+        if self.parameters.ligandName is not None:
+            # arbitrarely return the first ligand name
+            return self.parameters.ligandName[0]
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, processManager, topologies=None):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resnames, processManager, topologies=None):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure
@@ -920,8 +923,8 @@ class MDSimulation(SimulationRunner):
             :type reportBaseFilename: str
             :param outputPath: Path where trajectories are found
             :type outputPath: str
-            :param resname: Residue name of the ligand in the system pdb
-            :type resname: str
+            :param resnames: Residue name of the ligands in the system pdb
+            :type resnames: list
             :param processManager: Object to synchronize the possibly multiple processes
             :type processManager: :py:class:`.ProcessesManager`
             :param topology: Topology object
@@ -948,27 +951,27 @@ class MDSimulation(SimulationRunner):
         workingdirectory = os.getcwd()
         os.chdir(outputPathConstants.tmpFolder)
         temporalFolder = os.getcwd()
-        ligandPDB = self.extractLigand(initialStructures[0][1], resname, "", processManager.id)
-        ligandmol2 = "%s.mol2" % resname
-        ligandfrcmod = "%s.frcmod" % resname
-        Tleapdict = {"RESNAME": resname, "MOL2": ligandmol2, "FRCMOD": ligandfrcmod, "DUM": ""}
-        antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": self.parameters.ligandCharge}
-        parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
-        if processManager.isMaster() and not self.parameters.customparamspath and resname is not None:
-            self.prepareLigand(antechamberDict, parmchkDict)
-        amber_file_path = ""
-        # Change the Mol2 and Frcmod path to the new user defined path
-        if resname is None:
-            self.tleapTemplate = constants.AmberTemplates.tleapTemplatenoLigand
-        if self.parameters.customparamspath and resname is not None:
-            if not os.path.exists(self.parameters.customparamspath):
-                # As the working directory has changed, eval if the given path is a global or relative one.
-                self.parameters.customparamspath = os.path.join(workingdirectory, self.parameters.customparamspath)
+        Tleapdict = {"LIGANDS": "", "DUM": ""}
+        for charge, resname in zip(self.parameters.ligandCharge, self.parameters.ligandName):
+            ligandPDB = self.extractLigand(initialStructures[0][1], resname, "", processManager.id)
+            ligandmol2 = "%s.mol2" % resname
+            ligandfrcmod = "%s.frcmod" % resname
+            antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": charge}
+            parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
+            if processManager.isMaster() and not self.parameters.customparamspath and resname is not None:
+                self.prepareLigand(antechamberDict, parmchkDict)
+            amber_file_path = ""
+            # Change the Mol2 and Frcmod path to the new user defined path
+            if self.parameters.customparamspath and resname is not None:
                 if not os.path.exists(self.parameters.customparamspath):
-                    raise FileNotFoundError("No custom parameters found in the given path")
-            Tleapdict["MOL2"] = os.path.join(self.parameters.customparamspath, Tleapdict["MOL2"])
-            Tleapdict["FRCMOD"] = os.path.join(self.parameters.customparamspath, Tleapdict["FRCMOD"])
-            amber_file_path = self.parameters.customparamspath
+                    # As the working directory has changed, eval if the given path is a global or relative one.
+                    self.parameters.customparamspath = os.path.join(workingdirectory, self.parameters.customparamspath)
+                    if not os.path.exists(self.parameters.customparamspath):
+                        raise FileNotFoundError("No custom parameters found in the given path")
+                ligandmol2 = os.path.join(self.parameters.customparamspath, ligandmol2)
+                ligandfrcmod = os.path.join(self.parameters.customparamspath, ligandfrcmod)
+                amber_file_path = self.parameters.customparamspath
+            Tleapdict["LIGANDS"] += "{} = loadmol2 {}\nloadamberparams {}\n".format(resname, ligandmol2, ligandfrcmod)
         if self.parameters.boxCenter or self.parameters.cylinderBases:
             if self.parameters.boxType == blockNames.SimulationParams.sphere:
                 prep_template = constants.AmberTemplates.DUM_prep
@@ -987,7 +990,7 @@ class MDSimulation(SimulationRunner):
         new_constraints = None
         for i, structure in initialStructures:
             TleapControlFile = "tleap_equilibration_%d.in" % i
-            pdb = PDBLoader.PDBManager(structure, resname)
+            pdb = PDBLoader.PDBManager(structure, self.parameters.ligandName)
             constraints_map = pdb.preparePDBforMD(constraints=self.parameters.constraints, boxCenter=self.parameters.boxCenter, cylinderBases=self.parameters.cylinderBases)
             if constraints_map is not None:
                 new_constraints = updateConstraints(self.parameters.constraints, constraints_map)
@@ -1020,7 +1023,7 @@ class MDSimulation(SimulationRunner):
                         Tleapdict["COFACTORS"] += "loadamberparams {}{}.frcfld\n".format(COFACTOR_PATH, cof)
                     elif blockNames.CofactorTemplateNames.nad in cof:
                         Tleapdict["COFACTORS"] += "loadamberprep {}{}.prep\n".format(COFACTOR_PATH, cof)
-                        Tleapdict["COFACTORS"] += "loadamberparams {}nad.frcmod\n".format(COFACTOR_PATH, cof)
+                        Tleapdict["COFACTORS"] += "loadamberparams {}{}.frcmod\n".format(COFACTOR_PATH, cof)
             Tleapdict["MODIFIED_RES"] = pdb.getModifiedResiduesTleapTemplate()
             if self.parameters.boxCenter or self.parameters.cylinderBases:
                 Tleapdict["DUM"] = "loadamberprep %s.prep\nloadamberparams %s.frcmod\n" % (constants.AmberTemplates.DUM_res, constants.AmberTemplates.DUM_res)
@@ -1080,7 +1083,7 @@ class MDSimulation(SimulationRunner):
 
             :param PDBtoOpen: string with the pdb to prepare
             :type PDBtoOpen: str
-            :param resname: string with the code of the ligand
+            :param resname: resname of the ligand to extract
             :type resname: str
             :param outputPath: Path where the pdb is written
             :type outputPath: str
@@ -1090,26 +1093,22 @@ class MDSimulation(SimulationRunner):
             :returns: str -- string with the ligand pdb
         """
         line_dict = {}
-
-        ligandpdb = os.path.join(outputpath, "raw_ligand.pdb")
         if resname is None:
             return ""
+        ligandpdb = os.path.join(outputpath, "raw_ligand_%s.pdb" % resname)
         if id_replica:
             return ligandpdb
 
         with open(PDBtoOpen, "r") as inp:
             for line in inp:
                 if resname in line and line.startswith("HETATM"):
-                    if not line_dict:
-                        line_dict[(resname, line[21])] = line
+                    if (resname, line[21]) in line_dict:
+                        line_dict[(resname, line[21])] += line
                     else:
-                        if (resname, line[21]) in line_dict:
-                            line_dict[(resname, line[21])] += line
-                        else:
-                            line_dict[(resname, line[21])] = line
+                        line_dict[(resname, line[21])] = line
 
         with open(ligandpdb, "w") as out:
-            for pdb_line in line_dict[list(line_dict.keys())[0]]:
+            for pdb_line in list(line_dict.values())[0]:
                 out.write(pdb_line)
 
         return ligandpdb
@@ -1500,7 +1499,7 @@ class RunnerBuilder:
                 params.cylinderBases = [np.round(el, decimals=3) for el in params.cylinderBases]
             if params.boxType is not None and params.boxType not in (blockNames.SimulationParams.sphere, blockNames.SimulationParams.cylinder):
                 raise utilities.ImproperParameterValueException("Unknown %s box type, supported formats are %s" % (params.boxType, " ".join([blockNames.SimulationParams.sphere, blockNames.SimulationParams.cylinder])))
-            params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge, 1)
+            params.ligandCharge = paramsBlock.get(blockNames.SimulationParams.ligandCharge)
             params.waterBoxSize = paramsBlock.get(blockNames.SimulationParams.waterBoxSize, 8)
             params.forcefield = paramsBlock.get(blockNames.SimulationParams.forcefield, "ff99SB")
             params.nonBondedCutoff = paramsBlock.get(blockNames.SimulationParams.nonBondedCutoff, 8)
@@ -1512,6 +1511,14 @@ class RunnerBuilder:
             params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
             params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
+            if (params.ligandName is None and params.ligandCharge is not None) or (params.ligandName is not None and params.ligandCharge is None):
+                raise utilities.ImproperParameterValueException("Both the ligand names and charges are necessary")
+            if isinstance(params.ligandName, basestring):
+                params.ligandName = [params.ligandName]
+            if isinstance(params.ligandCharge, numbers.Real):
+                params.ligandCharge = [params.ligandCharge]
+            if len(params.ligandName) != len(params.ligandCharge):
+                raise utilities.ImproperParameterValueException("The smae amount of ligand names and charges should be specified")
             params.cofactors = paramsBlock.get(blockNames.SimulationParams.cofactors)
             params.constraints = paramsBlock.get(blockNames.SimulationParams.constraints)
             params.postprocessing = paramsBlock.get(blockNames.SimulationParams.postprocessing, True)
