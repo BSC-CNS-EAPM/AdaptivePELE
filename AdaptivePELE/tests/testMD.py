@@ -68,3 +68,23 @@ class TestMD(unittest.TestCase):
         self.check_succesful_simulation(output_path, 2, 4)
         # cleanup
         shutil.rmtree(output_path)
+
+    def test_simulation_cofactors(self):
+        output_path = "tests/data/cofactors"
+        controlFile = "tests/data/cofactors.conf"
+        if os.path.exists(output_path):
+            shutil.rmtree(output_path)
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2)
+        # cleanup
+        shutil.rmtree(output_path)
+
+    def test_simulation_cofactors_ligand(self):
+        output_path = "tests/data/cofactors_ligand"
+        controlFile = "tests/data/cofactors_ligand.conf"
+        if os.path.exists(output_path):
+            shutil.rmtree(output_path)
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2)
+        # cleanup
+        shutil.rmtree(output_path)
