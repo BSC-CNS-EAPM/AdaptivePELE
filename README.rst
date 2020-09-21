@@ -27,12 +27,14 @@ An example of usage::
 Installation
 ------------
 
-There are two methods to install AdaptivePELE, from PyPI (recommended) or
-directly from source.
+There are two methods to install AdaptivePELE, from repositories, either PyPI or Conda (recommended), or directly from source.
 
 To install from PyPI simply run::
 
     pip install AdaptivePELE
+
+To install from Conda simply run::
+    conda install -c nostrumbiodiscovery adaptive_pele 
 
 To install from source, you need to install and compile cython files in the base folder with::
 

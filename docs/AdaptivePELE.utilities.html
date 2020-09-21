@@ -90,8 +90,8 @@
 <li class="toctree-l1"><a class="reference internal" href="UserManual.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#adaptivesampling-module"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#automateroundsadaptive-module"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#adaptivesampling-module"><code class="docutils literal notranslate"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#automateroundsadaptive-module"><code class="docutils literal notranslate"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.analysis.html">analysis Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.atomset.html">atomset Package</a></li>
@@ -99,8 +99,8 @@
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.simulation.html">simulation Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.spawning.html">spawning Package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">utilities Package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.clusteringUtilities"><code class="docutils literal"><span class="pre">clusteringUtilities</span></code> Module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.utilities"><code class="docutils literal"><span class="pre">utilities</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.clusteringUtilities"><code class="docutils literal notranslate"><span class="pre">clusteringUtilities</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.utilities"><code class="docutils literal notranslate"><span class="pre">utilities</span></code> Module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.validator.html">validator Package</a></li>
@@ -162,10 +162,10 @@
   <div class="section" id="utilities-package">
 <h1>utilities Package<a class="headerlink" href="#utilities-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-AdaptivePELE.utilities.clusteringUtilities">
-<span id="clusteringutilities-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">clusteringUtilities</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.clusteringUtilities" title="Permalink to this headline">¶</a></h2>
+<span id="clusteringutilities-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">clusteringUtilities</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.clusteringUtilities" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="AdaptivePELE.utilities.clusteringUtilities.writeStructures">
-<code class="descclassname">AdaptivePELE.utilities.clusteringUtilities.</code><code class="descname">writeStructures</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>listStructures</em>, <em>checker=&lt;function &lt;lambda&gt;&gt;</em>, <em>outputPath=u'cluster.pdb'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/clusteringUtilities.html#writeStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.clusteringUtilities.writeStructures" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.utilities.clusteringUtilities.</code><code class="descname">writeStructures</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>listStructures</em>, <em>checker=&lt;function &lt;lambda&gt;&gt;</em>, <em>outputPath='cluster.pdb'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/clusteringUtilities.html#writeStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.clusteringUtilities.writeStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print all clusters in listStructures that meet the condition specified
 by the checker</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -173,7 +173,7 @@ by the checker</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a>) – Clustering object with clusters to print</li>
+<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal notranslate"><span class="pre">Clustering</span></code></a>) – Clustering object with clusters to print</li>
 <li><strong>checker</strong> (<em>function</em>) – Lambda function with the checker that should evaluate to True for intersted structures</li>
 <li><strong>outputPath</strong> (<em>str</em>) – Output cluster pdb filename</li>
 </ul>
@@ -185,11 +185,11 @@ by the checker</p>
 
 </div>
 <div class="section" id="module-AdaptivePELE.utilities.utilities">
-<span id="utilities-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">utilities</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.utilities" title="Permalink to this headline">¶</a></h2>
+<span id="utilities-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">utilities</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.utilities" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="AdaptivePELE.utilities.utilities.Topology">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">Topology</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Container object that points to the topology used in each trajectory</p>
 <dl class="method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.cleanTopologies">
@@ -359,7 +359,7 @@ mapping</td>
 <dl class="class">
 <dt id="AdaptivePELE.utilities.utilities.TopologyCompat">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">TopologyCompat</code><span class="sig-paren">(</span><em>pdb_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="AdaptivePELE.utilities.utilities.TopologyCompat.getTopology">
 <code class="descname">getTopology</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.getTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.getTopology" title="Permalink to this definition">¶</a></dt>
@@ -424,7 +424,7 @@ mapping</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>symmetries</strong> (<em>list of str</em>) – List of symmetry groups</li>
-<li><strong>PDB</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal"><span class="pre">PDB</span></code></a>) – PDB object to check symmetry list against</li>
+<li><strong>PDB</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal notranslate"><span class="pre">PDB</span></code></a>) – PDB object to check symmetry list against</li>
 </ul>
 </td>
 </tr>
@@ -786,7 +786,7 @@ an 1XN array representing some metric of the clusters</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.loadtxtfile">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">loadtxtfile</code><span class="sig-paren">(</span><em>filename</em>, <em>usecols=None</em>, <em>postprocess=True</em>, <em>dtype=&lt;type 'float'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#loadtxtfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.loadtxtfile" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">loadtxtfile</code><span class="sig-paren">(</span><em>filename</em>, <em>usecols=None</em>, <em>postprocess=True</em>, <em>dtype=&lt;class 'float'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#loadtxtfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.loadtxtfile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a table file from a text file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -839,7 +839,7 @@ an 1XN array representing some metric of the clusters</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>EOFError</strong> – If the object is empty</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal"><span class="pre">Clustering</span></code></a> – clusteringObject</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal notranslate"><span class="pre">Clustering</span></code></a> – clusteringObject</td>
 </tr>
 </tbody>
 </table>
@@ -956,7 +956,7 @@ processorsToClusterMapping</li>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.write_PDB_clusters">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">write_PDB_clusters</code><span class="sig-paren">(</span><em>pmf_xyzg</em>, <em>title=u'clusters.pdb'</em>, <em>use_beta=False</em>, <em>elements=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#write_PDB_clusters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.write_PDB_clusters" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">write_PDB_clusters</code><span class="sig-paren">(</span><em>pmf_xyzg</em>, <em>title='clusters.pdb'</em>, <em>use_beta=False</em>, <em>elements=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#write_PDB_clusters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.write_PDB_clusters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
