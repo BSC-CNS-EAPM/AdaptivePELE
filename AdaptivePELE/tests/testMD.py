@@ -75,7 +75,7 @@ class TestMD(unittest.TestCase):
         if os.path.exists(output_path):
             shutil.rmtree(output_path)
         adaptiveSampling.main(controlFile)
-        self.check_succesful_simulation(output_path, 2)
+        self.check_succesful_simulation(output_path, 1, 4)
         # cleanup
         shutil.rmtree(output_path)
 
@@ -85,6 +85,6 @@ class TestMD(unittest.TestCase):
         if os.path.exists(output_path):
             shutil.rmtree(output_path)
         adaptiveSampling.main(controlFile)
-        self.check_succesful_simulation(output_path, 2)
+        self.check_succesful_simulation(output_path, 1, 4)
         # cleanup
         shutil.rmtree(output_path)
