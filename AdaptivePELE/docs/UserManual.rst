@@ -225,7 +225,7 @@ Optionally, you can also use the following parameters:
   equilibration run (default corresponds to 1 ns)
 * **timeStep** (*float*, default=2): Value of the time step for the integration
   (in femtoseconds)
-* **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center
+* **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center. When using a simulation box in a run with multiple ligands, please ensure that the *ligandsToRestrict* parameter is correctly set.
 * **boxRadius** (*float*, default=20): Radius of the spherical box the ligand will be restrained to (in angstroms). Note that when using the spherical box restraint only xtc trajectories are supported.
 * **ligandName** (*str* or *list*, default=None): Ligand residue name in the PDB for all
   residues that must be parametrised, starting from version 1.6.3 more than one
@@ -284,6 +284,15 @@ Optionally, you can also use the following parameters:
   options are *fadh-*, *fmn* and *nad*, and they must have PDB names *FAD*,
   *FMN* and *NAP* respectively. The parameters are pulled from the `AMBER
   parameter database <http://research.bmh.manchester.ac.uk/bryce/amber>`_.
+* **ligandsToRestrict** (*list*, default=None): List of ligands that should be
+  restricted to the simulation box. This is useful when multiple ligands are
+  specified to parametrise, e.g a small molecule and a strange cofactor.
+  Typically, one might one to constrain the cofactor but allow mobility for the
+  small molecule, in that case the value of this parameter should be a list
+  containing only the PDB name of the small molecule. To ensure backwards
+  compatibility, if only one ligand is specified in the *ligandName* parameter
+  and a simulation box is set, the value of **ligandsToRestrict** will be set
+  to the same as *ligandName*.
 
 Exit condition
 ..............

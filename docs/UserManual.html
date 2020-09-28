@@ -382,7 +382,7 @@ equilibration run (default corresponds to 1 ns)</p>
 <li><p class="first"><strong>timeStep</strong> (<em>float</em>, default=2): Value of the time step for the integration
 (in femtoseconds)</p>
 </li>
-<li><p class="first"><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</p>
+<li><p class="first"><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center. When using a simulation box in a run with multiple ligands, please ensure that the <em>ligandsToRestrict</em> parameter is correctly set.</p>
 </li>
 <li><p class="first"><strong>boxRadius</strong> (<em>float</em>, default=20): Radius of the spherical box the ligand will be restrained to (in angstroms). Note that when using the spherical box restraint only xtc trajectories are supported.</p>
 </li>
@@ -460,6 +460,16 @@ bases of the cylinder (in angstroms), this should look like:</p>
 options are <em>fadh-</em>, <em>fmn</em> and <em>nad</em>, and they must have PDB names <em>FAD</em>,
 <em>FMN</em> and <em>NAP</em> respectively. The parameters are pulled from the <a class="reference external" href="http://research.bmh.manchester.ac.uk/bryce/amber">AMBER
 parameter database</a>.</p>
+</li>
+<li><p class="first"><strong>ligandsToRestrict</strong> (<em>list</em>, default=None): List of ligands that should be
+restricted to the simulation box. This is useful when multiple ligands are
+specified to parametrise, e.g a small molecule and a strange cofactor.
+Typically, one might one to constrain the cofactor but allow mobility for the
+small molecule, in that case the value of this parameter should be a list
+containing only the PDB name of the small molecule. To ensure backwards
+compatibility, if only one ligand is specified in the <em>ligandName</em> parameter
+and a simulation box is set, the value of <strong>ligandsToRestrict</strong> will be set
+to the same as <em>ligandName</em>.</p>
 </li>
 </ul>
 </div>
