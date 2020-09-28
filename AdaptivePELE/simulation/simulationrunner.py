@@ -11,8 +11,7 @@ import itertools
 from builtins import range
 import multiprocessing as mp
 import numpy as np
-import MDAnalysis as MDA
-from MDAnalysis.analysis import align
+import mdtraj as md
 import AdaptivePELE.constants
 from AdaptivePELE.constants import constants, blockNames
 from AdaptivePELE.simulation import simulationTypes
@@ -20,6 +19,7 @@ from AdaptivePELE.atomset import atomset, RMSDCalculator
 from AdaptivePELE.utilities import utilities, PDBLoader
 SKLEARN = True
 OPENMM = True
+MDANALYSIS = True
 try:
     from sklearn.cluster import KMeans
 except ImportError:
@@ -29,6 +29,12 @@ try:
     import subprocess32 as subprocess
 except ImportError:
     import subprocess
+
+try:
+    import MDAnalysis as MDA
+    from MDAnalysis.analysis import align
+except ImportError:
+    MDANALYSIS = False
 
 try:
     basestring
@@ -1596,8 +1602,35 @@ def updateConstraints(constraints_orig, constraints_map):
         new_const.append([":".join([str(i) for i in atom1]), ":".join([str(i) for i in atom2]), str(dist)])
     return new_const
 
-
 def processTraj(input_files):
+    """
+        Align a single trajectory file (helper function for parallelization)
+
+        :param input_files: Tuple with (trajectory_file, topology_file)
+        :type input_files: tuple
+    """
+    try:
+        # try if we have a complete installation of mdtraj, if not (PCPower
+        # cluster) run the MDAnalysis version
+        processTraj_mdtraj(input_files)
+    except NameError:
+        processTraj_mdanalysis(input_files)
+
+def processTraj_mdtraj(input_files):
+    """
+        Align a single trajectory file (helper function for parallelization)
+
+        :param input_files: Tuple with (trajectory_file, topology_file)
+        :type input_files: tuple
+    """
+    traj_file, top_file = input_files
+    t = md.load(traj_file, top=top_file)
+    backbone_selection = t.top.select("backbone")
+    t.image_molecules()
+    t.superpose(t, atom_indices=backbone_selection)
+    t.save(traj_file)
+
+def processTraj_mdanalysis(input_files):
     """
         Align a single trajectory file (helper function for parallelization)
 
