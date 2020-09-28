@@ -1,14 +1,14 @@
 """
     Only for developers.
-    Change releaseName to build a new release.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
-import socket
-import glob
-import shutil
 import os
-import subprocess
+import glob
+import socket
+import shutil
 import argparse
+import subprocess
+from datetime import datetime
 import AdaptivePELE as a
 from AdaptivePELE.utilities import utilities
 
@@ -46,6 +46,8 @@ def main(releaseName):
 
 
     files = glob.glob("*")
+    if os.path.exists(os.path.join(releaseFolder, releaseName)):
+        raise ValueError("Installation already found! Check that the version of the user-provided release name is correct")
     utilities.makeFolder(os.path.join(releaseFolder, releaseName))
     destFolder = os.path.join(releaseFolder, releaseName, "AdaptivePELE", "%s")
     for filename in files:
@@ -67,9 +69,23 @@ def main(releaseName):
     print("Compiling cython extensions")
     os.chdir(destFolder % "..")
     subprocess.call(['python', 'setup.py', 'build_ext', '--inplace'])
+    with open(os.path.join(releaseFolder, releaseName, "installation_info.txt"), "w") as fw:
+        fw.write("Python used in installation: ")
+        version = subprocess.check_output(["python", "--version"], universal_newlines=True)
+        fw.write(version)
+
+        fw.write("Compiler used in installation: ")
+        fw.write(os.getenv("CC")+"\n")
+
+        fw.write("Installed on %s\n" % str(datetime.now()))
+
+        fw.write("Modules loaded in installation:\n")
+
+        modules = subprocess.check_output("module list", universal_newlines=True, shell=True, stderr=subprocess.STDOUT)
+        fw.write(modules)
 
     print("Done with release %s!" % releaseName)
 
 if __name__ == "__main__":
-    name = parseArgs()
-    main(name)
+    name_install = parseArgs()
+    main(name_install)
