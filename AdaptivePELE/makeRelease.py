@@ -71,7 +71,7 @@ def main(releaseName):
     subprocess.call(['python', 'setup.py', 'build_ext', '--inplace'])
     with open(os.path.join(releaseFolder, releaseName, "installation_info.txt"), "w") as fw:
         fw.write("Python used in installation: ")
-        version = subprocess.check_output(["python", "--version"], universal_newlines=True)
+        version = subprocess.check_output(["python", "--version"], universal_newlines=True, stderr=subprocess.STDOUT)
         fw.write(version)
 
         fw.write("Compiler used in installation: ")
