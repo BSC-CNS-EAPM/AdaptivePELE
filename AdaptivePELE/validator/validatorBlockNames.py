@@ -178,6 +178,7 @@ class SimulationParams:
         "ligandCharge": "list|numbers.Real",
         "ligandName": "list|basestring",
         "cofactors": "list",
+        "ligandsToRestrict": "list",
         "nonBondedCutoff": "numbers.Real",
         "timeStep": "numbers.Real",
         "temperature": "numbers.Real",

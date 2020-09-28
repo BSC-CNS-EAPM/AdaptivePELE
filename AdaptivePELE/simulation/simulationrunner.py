@@ -86,6 +86,7 @@ class SimulationParameters:
         self.productionLength = 0
         self.ligandName = None
         self.cofactors = None
+        self.ligandsToRestrict = None
         self.waterBoxSize = 8
         self.trajsPerReplica = None
         self.numReplicas = 1
@@ -1510,6 +1511,7 @@ class RunnerBuilder:
             params.constraintsNVT = paramsBlock.get(blockNames.SimulationParams.constraintsNVT, 5)
             params.constraintsNPT = paramsBlock.get(blockNames.SimulationParams.constraintsNPT, 0.5)
             params.customparamspath = paramsBlock.get(blockNames.SimulationParams.customparamspath)
+            params.ligandsToRestrict = paramsBlock.get(blockNames.SimulationParams.ligandsToRestrict)
             params.ligandName = paramsBlock.get(blockNames.SimulationParams.ligandName)
             if (params.ligandName is None and params.ligandCharge is not None) or (params.ligandName is not None and params.ligandCharge is None):
                 raise utilities.ImproperParameterValueException("Both the ligand names and charges are necessary")
@@ -1524,6 +1526,9 @@ class RunnerBuilder:
             params.postprocessing = paramsBlock.get(blockNames.SimulationParams.postprocessing, True)
             if params.ligandName is None and (params.boxCenter is not None or params.cylinderBases is not None):
                 raise utilities.ImproperParameterValueException("Ligand name is necessary to establish the box")
+            if params.ligandsToRestrict is None and (params.boxCenter is not None or params.cylinderBases is not None):
+                if len(params.ligandName) == 1:
+                    params.ligandsToRestrict = params.ligandName
             return MDSimulation(params)
         elif simulationType == blockNames.SimulationType.test:
             params.processors = paramsBlock[blockNames.SimulationParams.processors]

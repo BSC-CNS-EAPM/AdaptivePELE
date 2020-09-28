@@ -556,8 +556,8 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
         # Add the specified constraints to the system
         addConstraints(system, prmtop.topology, parameters.constraints)
 
-    for ligand_resname in parameters.ligandName:
-        if parameters.boxCenter or parameters.cylinderBases:
+    if (parameters.boxCenter or parameters.cylinderBases) and parameters.ligandsToRestrict is not None:
+        for ligand_resname in parameters.ligandsToRestrict:
             if parameters.boxType == blockNames.SimulationParams.sphere:
                 if deviceIndex == 0:
                     utilities.print_unbuffered("Adding spherical ligand box")

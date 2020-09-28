@@ -190,6 +190,7 @@ class SimulationParams:
     cylinderBases = "cylinderBases"
     sphere = "sphere"
     postprocessing = "postprocessing"
+    ligandsToRestrict = "ligandsToRestrict"
 
 
 class ExitConditionType:
