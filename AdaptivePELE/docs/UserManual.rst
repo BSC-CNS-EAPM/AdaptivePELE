@@ -11,6 +11,10 @@ To install from PyPI simply run::
 
     pip install AdaptivePELE
 
+To install from Conda run::
+
+     conda install -c nostrumbiodiscovery adaptive_pele 
+
 To install from source, you need to install and compile cython files in the base folder with::
 
     git clone https://github.com/AdaptivePELE/AdaptivePELE.git
@@ -212,7 +216,6 @@ When using MD as a progagator, the following parameters are mandatory:
 * **reporterFrequency** (*integer*, mandatory): Frequency to write the report
   and trajectories (in time steps, see **timeStep** property)
 * **numReplicas** (*integer*, mandatory): Number of replicas to run (see `Running AdaptivePELE with GPUs`_ section), each replica will run the same number of trajectories, calculated as **t = p/n**, where *t* is the number of the trajectories per replica, *p* is the number of processors and *n* is the number of replicas
-* **ligandName** (*str*, mandatory): Ligand residue name in the PDB
 
 Optionally, you can also use the following parameters:
 
@@ -222,9 +225,14 @@ Optionally, you can also use the following parameters:
   equilibration run (default corresponds to 1 ns)
 * **timeStep** (*float*, default=2): Value of the time step for the integration
   (in femtoseconds)
-* **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center
+* **boxCenter** (*list*, default=None): List with the coordinates of the simulation box center. When using a simulation box in a run with multiple ligands, please ensure that the *ligandsToRestrict* parameter is correctly set.
 * **boxRadius** (*float*, default=20): Radius of the spherical box the ligand will be restrained to (in angstroms). Note that when using the spherical box restraint only xtc trajectories are supported.
-* **ligandCharge** (*integer*, default=0): Charge of the ligand
+* **ligandName** (*str* or *list*, default=None): Ligand residue name in the PDB for all
+  residues that must be parametrised, starting from version 1.6.3 more than one
+  ligand can be specified
+* **ligandCharge** (*integer* or *list*, default=None): Charge of the ligand for all
+  residues that must be parametrised, starting from version 1.6.3 more than one
+  ligand can be specified
 * **WaterBoxSize** (*float*, default=8): Distance of the edge of the solvation
   box from the closest atom (in angstroms)
 * **nonBondedCutoff** (*float*, default=8): Radius for the nonBonded cutoff of
@@ -272,6 +280,19 @@ Optionally, you can also use the following parameters:
 
 * **forcefield** (*str*, default="ff99SB"): Forcefield to use in the simulation, current options are: {"ff99SB", "ff14SB"}
 * **postprocessing** (*bool*, defuault=True): "Whether to postprocess the trajectories (wrapping of the water box and alginment of the protein)"
+* **cofactors** (*list*, default=None): List of predefined cofactors to load,
+  options are *fadh-*, *fmn* and *nad*, and they must have PDB names *FAD*,
+  *FMN* and *NAP* respectively. The parameters are pulled from the `AMBER
+  parameter database <http://research.bmh.manchester.ac.uk/bryce/amber>`_.
+* **ligandsToRestrict** (*list*, default=None): List of ligands that should be
+  restricted to the simulation box. This is useful when multiple ligands are
+  specified to parametrise, e.g a small molecule and a strange cofactor.
+  Typically, one might one to constrain the cofactor but allow mobility for the
+  small molecule, in that case the value of this parameter should be a list
+  containing only the PDB name of the small molecule. To ensure backwards
+  compatibility, if only one ligand is specified in the *ligandName* parameter
+  and a simulation box is set, the value of **ligandsToRestrict** will be set
+  to the same as *ligandName*.
 
 Exit condition
 ..............
@@ -1052,6 +1073,8 @@ mind when providing input for the MD runs:
   Disulphide bonds will be automatically detected, but can be also specified
   manually by renaming the cysteines as *CYX*. Furthermore, cysteines bound to
   metals should be renamed to *CYM*.
+
+Starting from version v1.6.3, it is possible to use cofactors as well as multiple ligands as input. For more details on how to include them, see the `MD Parameters`_ section.
 
 Equilibration procedure in MD
 -----------------------------

@@ -114,7 +114,7 @@ def cleanPreviousSimulation(output_path, allTrajs):
                 raise
     try:
         shutil.rmtree(allTrajs)
-    except OSError as exc:
+    except OSError:
         # this folder may not exist, in which case we just carry on
         pass
 
@@ -131,8 +131,8 @@ def createMappingForFirstEpoch(initialStructures, topologies, processors):
         :type processors: int
 
     """
-    topologyMapping = list(range(1, len(initialStructures)))+[0]
-    topologyMapping = topologyMapping*int(np.ceil(processors/len(initialStructures)))
+    topologyMapping = list(range(1, len(initialStructures))) + [0]
+    topologyMapping = topologyMapping * int(np.ceil(processors / len(initialStructures)))
     topologies.topologyMap[0] = topologyMapping[:processors]
 
 
@@ -263,7 +263,7 @@ def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries, topolog
             report = f.readlines()
         outfile = open(os.path.join(outputPath, outputFilename % trajNum), "w")
         for line, value in zip(report, rmsd):
-            outfile.write(line.rstrip("\n")+str(value)+"\n")
+            outfile.write(line.rstrip("\n") + str(value) + "\n")
         outfile.close()
 
 
@@ -329,7 +329,7 @@ def findFirstRun(outputPath, clusteringOutputObject, simulationRunner, restart):
             return epoch
         if os.path.exists(clusteringOutputObject % epoch):
             objectsFound.append(epoch)
-        if objectsFound and epoch < (objectsFound[0]-5):
+        if objectsFound and epoch < (objectsFound[0] - 5):
             break
     while objectsFound:
         epoch = objectsFound.pop(0)
@@ -407,7 +407,7 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
     if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.rmsd or\
        oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMap:
         return oldClusteringMethod.thresholdCalculator != newClusteringMethod.thresholdCalculator or\
-                abs(oldClusteringMethod.contactThresholdDistance - newClusteringMethod.contactThresholdDistance) > 1e-7
+            abs(oldClusteringMethod.contactThresholdDistance - newClusteringMethod.contactThresholdDistance) > 1e-7
 
     # Check 3: Change of similarity Evaluator in contactMap clustering
     if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMap:
@@ -739,7 +739,7 @@ def main(jsonParams, clusteringHook=None):
             utilities.print_unbuffered("Clustering ligand: %s sec" % (endTime - startTime))
 
             if clusteringHook is not None:
-                clusteringHook(clusteringMethod, outputPathConstants, simulationRunner, i+1)
+                clusteringHook(clusteringMethod, outputPathConstants, simulationRunner, i + 1)
             clustersList = clusteringMethod.getClusterListForSpawning()
             clustersFiltered = [True for _ in clusteringMethod]
 
@@ -775,13 +775,13 @@ def main(jsonParams, clusteringHook=None):
             if i > 0:
                 # Remove old clustering object, since we already have a newer one
                 try:
-                    os.remove(outputPathConstants.clusteringOutputObject % (i-1))
+                    os.remove(outputPathConstants.clusteringOutputObject % (i - 1))
                 except OSError:
                     # In case of restart
                     pass
 
         # Prepare for next pele iteration
-        if i != simulationRunner.parameters.iterations-1:
+        if i != simulationRunner.parameters.iterations - 1:
             # Differentiate between null spawning and the rest of spawning
             # methods
             if spawningCalculator.shouldWriteStructures():
@@ -789,14 +789,14 @@ def main(jsonParams, clusteringHook=None):
                     _, procMapping = spawningCalculator.writeSpawningInitialStructures(outputPathConstants,
                                                                                        degeneracyOfRepresentatives,
                                                                                        clusteringMethod,
-                                                                                       i+1,
+                                                                                       i + 1,
                                                                                        topologies=topologies)
                     utilities.writeProcessorMappingToDisk(outputPathConstants.tmpFolder, "processMapping.txt", procMapping)
                 processManager.barrier()
                 if not processManager.isMaster():
                     procMapping = utilities.readProcessorMappingFromDisk(outputPathConstants.tmpFolder, "processMapping.txt")
                 simulationRunner.updateMappingProcessors(procMapping)
-                topologies.mapEpochTopologies(i+1, procMapping)
+                topologies.mapEpochTopologies(i + 1, procMapping)
                 initialStructuresAsString = simulationRunner.createMultipleComplexesFilenames(simulationRunner.getWorkingProcessors(),
                                                                                               outputPathConstants.tmpInitialStructuresTemplate,
                                                                                               i+1)
@@ -821,6 +821,7 @@ def main(jsonParams, clusteringHook=None):
                 else:
                     utilities.print_unbuffered("Simulation exit condition not met at iteration %d, continuing..." % i)
         processManager.barrier()
+
 
 if __name__ == '__main__':
     args = parseArgs()

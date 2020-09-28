@@ -53,9 +53,9 @@ class AmberTemplates:
                     "source leaprc.gaff\n" \
                     "source leaprc.water.tip3p\n" \
                     "$MODIFIED_RES " \
-                    "$RESNAME = loadmol2 $MOL2\n" \
-                    "loadamberparams $FRCMOD\n" \
+                    "$LIGANDS " \
                     "$DUM " \
+                    "$COFACTORS " \
                     "COMPLX = loadpdb $COMPLEX\n" \
                     "$BONDS " \
                     "addions COMPLX Cl- 0\n" \
@@ -64,19 +64,6 @@ class AmberTemplates:
                     "saveamberparm COMPLX $PRMTOP $INPCRD\n" \
                     "savepdb COMPLX $SOLVATED_PDB\n" \
                     "quit"
-    tleapTemplatenoLigand = "source $FORCEFIELD\n" \
-                            "source leaprc.gaff\n" \
-                            "source leaprc.water.tip3p\n" \
-                            "$MODIFIED_RES " \
-                            "$DUM " \
-                            "COMPLX = loadpdb $COMPLEX\n" \
-                            "$BONDS " \
-                            "addions COMPLX Cl- 0\n" \
-                            "addions COMPLX Na+ 0\n" \
-                            "solvatebox COMPLX TIP3PBOX $BOXSIZE\n" \
-                            "saveamberparm COMPLX $PRMTOP $INPCRD\n" \
-                            "savepdb COMPLX $SOLVATED_PDB\n" \
-                            "quit"
     DUM_atom = "DUM"
     DUM_res = "DUM"
     DUM_prep = "  0  0  0\n" \

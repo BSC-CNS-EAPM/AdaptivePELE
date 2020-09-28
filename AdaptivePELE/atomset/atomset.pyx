@@ -142,6 +142,7 @@ _AMINO_ACID_CODES =  {'ACE': None, 'NME':  None, '00C': 'C', '01W':  'X', '02K':
 'Y', 'YTH':  'T', 'Z01': 'A',  'ZAL': 'A', 'ZCL':  'F', 'ZFB': 'X',  'ZU0': 'T',
 'ZZJ': 'A'}
 
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
@@ -429,6 +430,7 @@ cdef class PDB:
                u"ASP": u"OD1", u"GLU": u"OE1", u"GLY": u"empty"}
     ATOM_LINE_TEMPLATE = u"%s%s %s %s %s%s%s   %.3f%.3f%.3f%.2f%.2f          %s   "
 
+    
     def __init__(self):
         """
             Object that will contain the information of a PDB file. Has to call

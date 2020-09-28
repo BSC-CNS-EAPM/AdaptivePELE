@@ -90,12 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="UserManual.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal"><span class="pre">adaptiveSampling</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#adaptivesampling-module"><code class="docutils literal notranslate"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#automateroundsadaptive-module"><code class="docutils literal notranslate"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.analysis.html">analysis Package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">atomset Package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.atomset.atomset"><code class="docutils literal"><span class="pre">atomset</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.atomset.atomset"><code class="docutils literal notranslate"><span class="pre">atomset</span></code> Module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.clustering.html">clustering Package</a></li>
@@ -161,11 +161,11 @@
   <div class="section" id="atomset-package">
 <h1>atomset Package<a class="headerlink" href="#atomset-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-AdaptivePELE.atomset.atomset">
-<span id="atomset-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">atomset</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.atomset.atomset" title="Permalink to this headline">¶</a></h2>
+<span id="atomset-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">atomset</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.atomset.atomset" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="AdaptivePELE.atomset.atomset.Atom">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.atomset.atomset.</code><code class="descname">Atom</code><a class="headerlink" href="#AdaptivePELE.atomset.atomset.Atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Create an atom from a pdb line</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -328,17 +328,17 @@
 <dl class="class">
 <dt id="AdaptivePELE.atomset.atomset.PDB">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.atomset.atomset.</code><code class="descname">PDB</code><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Object that will contain the information of a PDB file. Has to call
 the initialise method to load the file</p>
 <dl class="attribute">
 <dt id="AdaptivePELE.atomset.atomset.PDB.ATOM_LINE_TEMPLATE">
-<code class="descname">ATOM_LINE_TEMPLATE</code><em class="property"> = u'%s%s %s %s %s%s%s   %.3f%.3f%.3f%.2f%.2f          %s   '</em><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.ATOM_LINE_TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ATOM_LINE_TEMPLATE</code><em class="property"> = '%s%s %s %s %s%s%s   %.3f%.3f%.3f%.2f%.2f          %s   '</em><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.ATOM_LINE_TEMPLATE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="AdaptivePELE.atomset.atomset.PDB.CMAtoms">
-<code class="descname">CMAtoms</code><em class="property"> = {u'ILE': u'empty', u'GLN': u'empty', u'GLY': u'empty', u'GLU': u'OE1', u'CYS': u'empty', u'ASP': u'OD1', u'SER': u'empty', u'LYS': u'NZ', u'PRO': u'empty', u'HID': u'CE1', u'HIE': u'CE1', u'ASN': u'empty', u'HIP': u'CE1', u'VAL': u'empty', u'THR': u'empty', u'HIS': u'CE1', u'TRP': u'CH2', u'PHE': u'CZ', u'ALA': u'empty', u'MET': u'empty', u'LEU': u'empty', u'ARG': u'NE', u'TYR': u'OH'}</em><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.CMAtoms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">CMAtoms</code><em class="property"> = {'ALA': 'empty', 'ARG': 'NE', 'ASN': 'empty', 'ASP': 'OD1', 'CYS': 'empty', 'GLN': 'empty', 'GLU': 'OE1', 'GLY': 'empty', 'HID': 'CE1', 'HIE': 'CE1', 'HIP': 'CE1', 'HIS': 'CE1', 'ILE': 'empty', 'LEU': 'empty', 'LYS': 'NZ', 'MET': 'empty', 'PHE': 'CZ', 'PRO': 'empty', 'SER': 'empty', 'THR': 'empty', 'TRP': 'CH2', 'TYR': 'OH', 'VAL': 'empty'}</em><a class="headerlink" href="#AdaptivePELE.atomset.atomset.PDB.CMAtoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -623,7 +623,7 @@ created</p>
 <span class="target" id="module-AdaptivePELE.atomset.RMSDCalculator"></span><dl class="class">
 <dt id="AdaptivePELE.atomset.RMSDCalculator.RMSDCalculator">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.atomset.RMSDCalculator.</code><code class="descname">RMSDCalculator</code><a class="headerlink" href="#AdaptivePELE.atomset.RMSDCalculator.RMSDCalculator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -694,7 +694,7 @@ created</p>
 <span class="target" id="module-AdaptivePELE.atomset.SymmetryContactMapEvaluator"></span><dl class="class">
 <dt id="AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator">
 <em class="property">class </em><code class="descclassname">AdaptivePELE.atomset.SymmetryContactMapEvaluator.</code><code class="descname">SymmetryContactMapEvaluator</code><a class="headerlink" href="#AdaptivePELE.atomset.SymmetryContactMapEvaluator.SymmetryContactMapEvaluator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

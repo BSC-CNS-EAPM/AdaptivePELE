@@ -145,11 +145,11 @@ AdaptivePELE simulation.</p>
 <blockquote>
 <div><ul>
 <li><p class="first">Not having AdaptivePELE in your PYTHONPATH variable. If you get an error like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ne">ImportError</span><span class="p">:</span> <span class="n">No</span> <span class="n">module</span> <span class="n">named</span> <span class="n">AdaptivePELE</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ne">ImportError</span><span class="p">:</span> <span class="n">No</span> <span class="n">module</span> <span class="n">named</span> <span class="n">AdaptivePELE</span>
 </pre></div>
 </div>
 <p>python is not able to find the adaptive module. You need to add the path as:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;/path/to/repo/AdaptivePELE:PYTHONPATH&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;/path/to/repo/AdaptivePELE:PYTHONPATH&quot;</span>
 </pre></div>
 </div>
 </li>
@@ -157,7 +157,7 @@ AdaptivePELE simulation.</p>
 freeEnergies.utils, RMSDCalculator or SymmetryContactMapEvaluator, the issue
 might be that the cython extension of AdaptivePELE are not compiled, to do
 so find the setup.py script in the AdaptivePELE repository and run:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">inplace</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">inplace</span>
 </pre></div>
 </div>
 </li>
@@ -166,13 +166,13 @@ almost always is related to a PELE error that was not handled properly. One
 frequent source of this issue in simulation running in the life or nord
 clusters is a bug of mpi that requieres to declare the following environment
 variables:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">OMPI_MCA_coll_hcoll_enable</span><span class="o">=</span><span class="mi">0</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">OMPI_MCA_coll_hcoll_enable</span><span class="o">=</span><span class="mi">0</span>
 <span class="n">export</span> <span class="n">OMPI_MCA_mtl</span><span class="o">=^</span><span class="n">mxm</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first">If you get an error including the message:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>No trajectories to cluster! Matching path:
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>No trajectories to cluster! Matching path:
 </pre></div>
 </div>
 <p>adaptivePELE has not been able to find trajectories to cluster. This is
@@ -180,7 +180,7 @@ tipically because the simulation died before it could produce any
 trajectories, in such case check for PELE errors.</p>
 </li>
 <li><p class="first">If you get an error like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">UnsatisfiedDependencyException</span><span class="p">:</span> <span class="n">Missing</span> <span class="n">package</span><span class="o">....</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">UnsatisfiedDependencyException</span><span class="p">:</span> <span class="n">Missing</span> <span class="n">package</span><span class="o">....</span>
 </pre></div>
 </div>
 <p>it means that an optional dependence is missing. That is a package that

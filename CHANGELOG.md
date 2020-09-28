@@ -6,13 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 [//] : # ## [1.x] - Unreleased
 
-## [1.6.3] - Unreleased
+## [1.6.3] - 2020-09-28
 
 ### New features:
 
     - Add annotations to plotAdaptive, which show the origin (epoch, trajectory and snapshot) of the plot points
-    - Improve python2/python3 compatibility for pickling objects
-    - Now MD simulation can be extended in time
+    - Parametrize more than one ligand in MD simulations
+    - Include confactors in MD simulations
+    - MD simulations can now be extended in time
 
 ### Bug fixes:
 
@@ -25,7 +26,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Constrain the heavy atoms in the minimization run at the begging of the
       epochs in MD simulation, to preserve similiraty with the original
       cluster
-    - Check PELE return code and raise proper exception if PELE crashes
 
 ## [1.6.2] - 2019-07-24
 

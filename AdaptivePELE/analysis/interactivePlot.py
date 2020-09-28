@@ -1,25 +1,23 @@
-import matplotlib
-import mdtraj
+import os
+import re
+import sys
 import time
-matplotlib.use('TkAgg')
-import signal
+import glob
+import errno
+import argparse
+import warnings
+from multiprocessing import Pool
+import mdtraj
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets  import RectangleSelector
 import numpy as np
-from multiprocessing import Pool
-import os
-import hdbscan
-import sklearn.metrics as mt
-import prody
-import errno
-import argparse
 import pandas as pd
-import glob
-import re
-import sys
-import warnings
+import sklearn.metrics as mt
+import hdbscan
 import AdaptivePELE.analysis.splitTrajectory as st
 import AdaptivePELE.analysis.backtrackAdaptiveTrajectory as bk
+matplotlib.use('TkAgg')
 
 """
 
@@ -47,7 +45,7 @@ TRAJ = "trajectory"
 ACCEPTED_STEPS = 'numberOfAcceptedPeleSteps'
 OUTPUT_FOLDER = 'BestStructs'
 DIR = os.path.abspath(os.getcwd())
-STEPS=3
+STEPS = 3
 
 
 def parse_args():
@@ -61,7 +59,7 @@ def parse_args():
     parser.add_argument("--out", "-o", type=str, help="Output Path. i.e: BindingEnergies_apo", default=OUTPUT_FOLDER)
     parser.add_argument("--numfolders", "-nm", action="store_true", help="Not to parse non numerical folders")
     parser.add_argument("--top", "-t", type=str, help="Topology file for xtc", default=None)
-    parser.add_argument("--first", action="store_true",  help="Skip first line")
+    parser.add_argument("--first", action="store_true", help="Skip first line")
     parser.add_argument("--zcol", type=int, help="Thirs Criteria we want to rank and output the strutures for. Must be a column of the report. i.e: SASA", default=2)
     parser.add_argument("--resname", type=str, help="Resname of the ligand. Resquested for clusterization", default="LIG")
     parser.add_argument("--xlim", nargs='+', type=float, help="Xrange. i.e --xlim 0 3", default=None)
@@ -70,13 +68,14 @@ def parse_args():
 
     return args.crit1, args.crit2, args.zcol, args.ad_steps, os.path.abspath(args.path), args.ofreq, args.out, args.numfolders, args.top, args.first, args.resname, args.xlim, args.ylim
 
+
 def is_adaptive():
-  folders = glob.glob("{}/*/".format(DIR))
-  folders_numerical = [os.path.basename(os.path.normpath(folder)) for folder in folders]
-  if len(folders_numerical) > 1:
-    return True
-  else:
-    return False
+    folders = glob.glob("{}/*/".format(DIR))
+    folders_numerical = [os.path.basename(os.path.normpath(folder)) for folder in folders]
+    if len(folders_numerical) > 1:
+        return True
+    else:
+        return False
 
 
 class DataHandler(object):
@@ -175,24 +174,25 @@ class DataHandler(object):
         #Clusterize and make plot
         clusterize(paths, snapshot, all_coords, values1, values2, topology=topology)
 
+
   def retrieve_data(self):
-    if (self.xf > self.xo) and (self.yf < self.yo):
-      self.data_to_extract = (self.metrics[(self.metrics[self.crit2] > self.yf) & (self.metrics[self.crit2] < self.yo) &
-      (self.metrics[self.crit1] > self.xo) & (self.metrics[self.crit1] < self.xf) ])
+      if (self.xf > self.xo) and (self.yf < self.yo):
+        self.data_to_extract = (self.metrics[(self.metrics[self.crit2] > self.yf) & (self.metrics[self.crit2] < self.yo) &
+        (self.metrics[self.crit1] > self.xo) & (self.metrics[self.crit1] < self.xf) ])
 
-    elif (self.xf > self.xo) and (self.yf > self.yo):
-      self.data_to_extract = (self.metrics[(self.metrics[self.crit2] < self.yf) & (self.metrics[self.crit2] > self.yo) &
-      (self.metrics[self.crit1] > self.xo) & (self.metrics[self.crit1] < self.xf) ])
+      elif (self.xf > self.xo) and (self.yf > self.yo):
+        self.data_to_extract = (self.metrics[(self.metrics[self.crit2] < self.yf) & (self.metrics[self.crit2] > self.yo) &
+        (self.metrics[self.crit1] > self.xo) & (self.metrics[self.crit1] < self.xf) ])
 
-    elif (self.xf < self.xo) and (self.yf > self.yo):
-      self.data_to_extract = (self.metrics[(self.metrics[self.crit2] < self.yf) & (self.metrics[self.crit2] > self.yo) &
-      (self.metrics[self.crit1] < self.xo) & (self.metrics[self.crit1] > self.xf) ])
+      elif (self.xf < self.xo) and (self.yf > self.yo):
+        self.data_to_extract = (self.metrics[(self.metrics[self.crit2] < self.yf) & (self.metrics[self.crit2] > self.yo) &
+        (self.metrics[self.crit1] < self.xo) & (self.metrics[self.crit1] > self.xf) ])
 
-    elif (self.xf < self.xo) and (self.yf < self.yo):
-      self.data_to_extract = (self.metrics[(self.metrics[self.crit2] > self.yf) & (self.metrics[self.crit2] < self.yo) &
-      (self.metrics[self.crit1] < self.xo) & (self.metrics[self.crit1] > self.xf) ])
-    else:
-      self.data_to_extract = pd.DataFrame(columns=list(self.metrics))
+      elif (self.xf < self.xo) and (self.yf < self.yo):
+        self.data_to_extract = (self.metrics[(self.metrics[self.crit2] > self.yf) & (self.metrics[self.crit2] < self.yo) &
+        (self.metrics[self.crit1] < self.xo) & (self.metrics[self.crit1] > self.xf) ])
+      else:
+        self.data_to_extract = pd.DataFrame(columns=list(self.metrics))
 
 
   def extract_snapshots_from_pdb(self, min_values, steps):
@@ -255,9 +255,6 @@ class DataHandler(object):
         found = st.main(output, f_in, topology, [step % self.ad_steps/out_freq+1], template=f_out)
         if found:
             print("MODEL {} has been selected".format(f_out))
-        else:
-            print("MODEL {} not found. Check -f option".format(f_out))
-
 
   def retrieve_values(self):
 
@@ -281,7 +278,6 @@ class DataHandler(object):
 def line_select_callback(eclick, erelease):
     x1, y1 = eclick.xdata, eclick.ydata
     x2, y2 = erelease.xdata, erelease.ydata
-
 
 
 def toggle_selector(event):
@@ -322,7 +318,6 @@ def main(criteria1, criteria2, criteria3, ad_steps, path=DIR, out_freq=FREQ, out
     #Find reports
     reports = find_reports(path, numfolders)
 
-
     # Retrieve Column Names from report
     steps, crit1_name, crit2_name, crit3_name = get_column_names(reports, STEPS, criteria1, criteria2, criteria3)
 
@@ -335,7 +330,7 @@ def main(criteria1, criteria2, criteria3, ad_steps, path=DIR, out_freq=FREQ, out
     # Plot data
     data = DataHandler(min_values, crit1_name, crit2_name, crit3_name, criteria1, criteria2, criteria3, steps, adaptive, ad_steps, current_ax, resname)
 
-    # Plot axis 
+    # Plot axis
     plt.scatter(data.values1, data.values2, c=data.values3)
     plt.colorbar()
     plt.title('{} vs {}'.format(crit1_name, crit2_name))
@@ -348,16 +343,13 @@ def main(criteria1, criteria2, criteria3, ad_steps, path=DIR, out_freq=FREQ, out
 
     # Plot Callbacks
     cidpress = fig.canvas.mpl_connect('button_press_event', data.on_press)
-    cidrealese= fig.canvas.mpl_connect('button_release_event', data.on_release)
-    toggle_selector.RS = RectangleSelector(current_ax, line_select_callback,
-                         drawtype='box', useblit=True,
-                         button=[1, 2, 3],  # don't use middle button
-                         minspanx=5, minspany=5,
-                         spancoords='pixels',
-                         interactive=False)
+    cidrealese = fig.canvas.mpl_connect('button_release_event', data.on_release)
+    # don't use middle button minspanx=5, minspany=5,
+    toggle_selector.RS = RectangleSelector(current_ax, line_select_callback, drawtype='box', useblit=True, button=[1, 2, 3],  spancoords='pixels', interactive=False)
 
     # Show Plot on screen
     plt.show()
+
 
 def find_reports(path, numfolders):
     reports = glob.glob(os.path.join(path, "*/*report_*"))
@@ -420,7 +412,6 @@ def filter_non_numerical_folders(reports, numfolders):
 def get_column_names(reports, steps, criteria1, criteria2, criteria3):
     data = pd.read_csv(reports[0], sep='    ', engine='python')
     data = list(data)
-
     return data[int(steps)-1], data[criteria1-1], data[criteria2-1], data[criteria3-1]
 
 def mkdir_p(path):

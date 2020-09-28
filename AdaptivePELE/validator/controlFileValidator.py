@@ -1,16 +1,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+import sys
+import json
+import numbers
+import warnings
 from AdaptivePELE.validator import validatorBlockNames
 from AdaptivePELE.constants import blockNames
-import json
-import warnings
-import numbers
-import sys
-import ast
 try:
     # Check if the basestring type if available, this will fail in python3
     basestring
 except NameError:
     basestring = str
+
+
+def check_types(original_value, dest_str):
+    return any([isinstance(original_value, eval(x)) for x in dest_str.split("|")])
 
 
 def validate(control_file):
@@ -98,7 +101,7 @@ def validateBlock(blockName, controlFileBlock):
     try:
         for mandatory, value in blockName.types[blockType].items():
             try:
-                if not isinstance(controlFileBlock['params'][mandatory], eval(value)):
+                if not check_types(controlFileBlock['params'][mandatory], value):
                     warnings.warn("Type for %s should be %s and instead is %s" %
                                   (mandatory, value, type(controlFileBlock['params'][mandatory]).__name__))
                     isCorrect = False
@@ -114,7 +117,7 @@ def validateBlock(blockName, controlFileBlock):
     try:
         for param, value in controlFileBlock["params"].items():
             try:
-                if not isinstance(value, eval(blockName.params[param])):
+                if not check_types(value, blockName.params[param]):
                     warnings.warn("Type for %s should be %s and instead is %s" %
                                   (param, blockName.params[param],
                                    type(value).__name__))
@@ -159,7 +162,7 @@ def validateBlock(blockName, controlFileBlock):
             paramsControlFile = controlFileBlock[block].get("params", {})
             for param, value in paramsControlFile.items():
                 try:
-                    if not isinstance(value, eval(params_dict[param])):
+                    if not check_types(value, params_dict[param]):
                         warnings.warn("Type for %s should be %s and instead is %s" %
                                       (param, params_dict[param], type(value).__name__))
                         isCorrect = False
@@ -188,7 +191,7 @@ def validateGeneralBlock(blockName, controlFileBlock):
     isCorrect = True
     for key, value in blockName.mandatory.items():
         try:
-            if not isinstance(controlFileBlock[key], eval(value)):
+            if not check_types(controlFileBlock[key], value):
                 warnings.warn("Type for %s should be %s and instead is %s" %
                               (key, value, type(controlFileBlock[key]).__name__))
                 isCorrect = False
@@ -199,7 +202,7 @@ def validateGeneralBlock(blockName, controlFileBlock):
 
     for key, value in controlFileBlock.items():
         try:
-            if not isinstance(value, eval(blockName.params[key])):
+            if not check_types(value, blockName.params[key]):
                 warnings.warn("Type for %s should be %s and instead is %s" %
                               (key, value, type(blockName.params[key]).__name__))
                 isCorrect = False

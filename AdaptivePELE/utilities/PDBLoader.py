@@ -34,27 +34,29 @@ class PDBManager:
                  "Nd", "PB", "PD", "PR", "PT", "Pu", "RB", "Ra", "SM", "SR", "Sm", "Sn", "TB", "TL", "Th",
                  "Tl", "Tm", "U4+", "V2+", "Y", "YB2", "ZN", "Zr"}
 
+    VALID_COFACTOR = {"NAP","FAD","FMN"}
+
     VALID_WATER_ATOMS = set(["H1", "H2", "O"])
     WATERS = ["WAT", "HOH"]
     WATER_ATOMS = {"1HW": "H1", "2HW": "H2", "OW": "O"}
+
 
     # Modified residues for which there is a template in AdaptivePELE/constants/MDtemplates/
     TEMPLATE_PATH = os.path.join("".join(AdaptivePELE.constants.__path__), "MDtemplates/amber_*.lib")
 
     VALID_MODIFIED_RES = [name.split("_")[-1][:-4] for name in glob.glob(TEMPLATE_PATH)]
 
-    def __init__(self, PDBtoLoad, resname):
+    def __init__(self, PDBtoLoad, resnames):
         """
 
         :param PDBtoLoad: Path to the pdb to load into memory
         :type PDBtoLoad: str
-        :param resname: Name of the ligand
-        :type resname: str
+        :param resnames: Names of the ligand
+        :type resnames: list
         """
         self.PDBtoLoad = PDBtoLoad
-        self.resname = resname
         self.Protein = Structure(parent=None, ID="protein")
-        self.Ligand = Structure(parent=None, ID=self.resname)
+        self.Ligands = {resname: Structure(parent=None, ID=resname) for resname in resnames}
         self.Other = Structure(parent=None, ID="other")
         # Dictionary with the information that appears in each of the pdb fields. Used to avoid using magic numbers
         self.POSITIONS = {"DBREF": 0, "IDCODE": 1, "ATOMNAME": 2, "RESNAME": 3, "CHAINID": 4, "RESNUMBER": 5,
@@ -119,14 +121,15 @@ class PDBManager:
                             currentChainName = columns[self.POSITIONS["CHAINID"]]
                             currentChain = Chain(currentStructure, currentChainName)
 
-                    elif columns[self.POSITIONS["RESNAME"]] == self.resname:
-                        if currentStructure != self.Ligand:
-                            currentStructure = self.Ligand
+                    elif columns[self.POSITIONS["RESNAME"]] in self.Ligands:
+                        if currentStructure != self.Ligands[columns[self.POSITIONS["RESNAME"]]]:
+                            currentStructure = self.Ligands[columns[self.POSITIONS["RESNAME"]]]
                             currentChainName = columns[self.POSITIONS["CHAINID"]]
                             currentChain = Chain(currentStructure, currentChainName)
 
                     elif columns[self.POSITIONS["RESNAME"]] in self.VALID_ION or columns[self.POSITIONS["RESNAME"]]\
-                            in ["WAT", "HOH"] or columns[self.POSITIONS["RESNAME"]] in self.VALID_NUCLEIC:
+                            in ["WAT", "HOH"] or columns[self.POSITIONS["RESNAME"]] in self.VALID_NUCLEIC or columns[self.POSITIONS["RESNAME"]]\
+                            in self.VALID_COFACTOR:
                         if currentStructure != self.Other:
                             currentStructure = self.Other
                             currentChainName = columns[self.POSITIONS["CHAINID"]]
@@ -153,18 +156,19 @@ class PDBManager:
                                           float(columns[self.POSITIONS["COORDZ"]])])
                     self.ndarray_xyz_coords = np.vstack((self.ndarray_xyz_coords, xyzcoords))
 
-    def writePDB(self, finalpdb, *args):
+    def writePDB(self, finalpdb, structures):
         """
         Method that writes a pdb of the selected structures
         :param outputpath: name of the path to save the pdb
         :type: str
         :param outputname: name of the output pdb
         :type: str
-        :param args: structure objects to save into the pdb
+        :param structures: structure objects to save into the pdb
+        :param structures: tuple
         """
         atomNumber = 0
         with open(finalpdb, "w") as out_pdb:
-            for structure in args:
+            for structure in structures:
                 if structure.id == "protein":
                     Atomtype = "ATOM"
                 else:
@@ -189,7 +193,7 @@ class PDBManager:
         :return: the path of the new pdb
         """
         finalpdb = os.path.join(outputpath, outputname)
-        self.writePDB(finalpdb, self.Protein, self.Ligand, self.Other)
+        self.writePDB(finalpdb, tuple([self.Protein] + [self.Ligands[x] for x in self.Ligands] + [self.Other]))
         return finalpdb
 
     def checkprotonation(self):
@@ -216,13 +220,14 @@ class PDBManager:
                     constraint_dict[res_id] = resnumber
                 residue.renumber(resnumber)
                 resnumber += 1
-        for chain in self.Ligand:
-            for residue in chain:
-                res_id = (residue.id, residue.num)
-                if constraint_dict is not None and res_id in constraint_dict:
-                    constraint_dict[res_id] = resnumber
-                residue.renumber(resnumber)
-                resnumber += 1
+        for struct in self.Ligands:
+            for chain in self.Ligands[struct]:
+                for residue in chain:
+                    res_id = (residue.id, residue.num)
+                    if constraint_dict is not None and res_id in constraint_dict:
+                        constraint_dict[res_id] = resnumber
+                    residue.renumber(resnumber)
+                    resnumber += 1
         for chain in self.Other:
             for residue in chain:
                 res_id = (residue.id, residue.num)
@@ -342,7 +347,7 @@ class PDBManager:
 
     def correctAlternativePositions(self):
         # This method selects the positions with higher occupancy when alternative positions are found
-        All = (self.Protein, self.Ligand, self.Other)
+        All = [self.Protein] + [self.Ligands[x] for x in self.Ligands] + [self.Other]
         for structure in All:
             for chain in structure:
                 for residue in chain:
@@ -358,13 +363,15 @@ class PDBManager:
                 prev_residue = residue.num
 
     def checkLigand(self):
-        for chain in self.Ligand:
-            for residue in chain:
-                for atom in residue:
-                    if atom.id.startswith("CL"):
-                        oldname = atom.id
-                        atom.id = "Cl%s" % oldname[2:]
-                        print("Atom %s of %s rename to %s" % (oldname, self.resname, atom.id))
+        for resname in self.Ligands:
+            struct = self.Ligands[resname]
+            for chain in struct:
+                for residue in chain:
+                    for atom in residue:
+                        if atom.id.startswith("CL"):
+                            oldname = atom.id
+                            atom.id = "Cl%s" % oldname[2:]
+                            print("Atom %s of %s rename to %s" % (oldname, resname, atom.id))
 
     def addBoxAtom(self, boxCenter, cylinderBases):
         """

@@ -77,5 +77,4 @@ setup(
     'Source': 'https://github.com/AdaptivePELE/AdaptivePELE',
     'Tracker': 'https://github.com/AdaptivePELE/AdaptivePELE/issues',
 },
-
 )

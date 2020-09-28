@@ -4,7 +4,7 @@
 #SBATCH --output=MDTest.out
 #SBATCH --error=MDTest.err
 #SBATCH --ntasks=4
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --qos=debug
 
 
