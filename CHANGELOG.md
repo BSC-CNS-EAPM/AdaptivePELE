@@ -6,11 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 [//] : # ## [1.x] - Unreleased
 
-## [1.6.3] - Unreleased
+## [1.6.3] - 2020-09-28
 
 ### New features:
 
     - Add annotations to plotAdaptive, which show the origin (epoch, trajectory and snapshot) of the plot points
+    - Parametrize more than one ligand in MD simulations
+    - Include confactors in MD simulations
+    - MD simulations can now be extended in time
 
 ### Bug fixes:
 

@@ -191,17 +191,21 @@
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>There are two methods to install AdaptivePELE <a class="reference internal" href="#apele" id="id1">[APELE]</a>, from PyPI (recommended) or directly from source.</p>
 <p>To install from PyPI simply run:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">AdaptivePELE</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">AdaptivePELE</span>
+</pre></div>
+</div>
+<p>To install from Conda run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">nostrumbiodiscovery</span> <span class="n">adaptive_pele</span>
 </pre></div>
 </div>
 <p>To install from source, you need to install and compile cython files in the base folder with:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">AdaptivePELE</span><span class="o">/</span><span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">git</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">AdaptivePELE</span><span class="o">/</span><span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">git</span>
 <span class="n">cd</span> <span class="n">AdaptivePELE</span>
 <span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">inplace</span>
 </pre></div>
 </div>
 <p>Also, if AdaptivePELE was not installed in a typical library directory, a common option is to add it to your local PYTHONPATH:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;/location/of/AdaptivePELE:$PYTHONPATH&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;/location/of/AdaptivePELE:$PYTHONPATH&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -219,7 +223,7 @@ The algorithm can be summarized in the flow diagram shown below:</p>
 <h2>Control file outline<a class="headerlink" href="#control-file-outline" title="Permalink to this headline">¶</a></h2>
 <p>AdaptivePELE is a Python program called with a parameter: the control
 file.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">adaptiveSampling</span> <span class="n">controlFile</span><span class="o">.</span><span class="n">conf</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">adaptiveSampling</span> <span class="n">controlFile</span><span class="o">.</span><span class="n">conf</span>
 </pre></div>
 </div>
 <p>The control file is a JSON document that permits tuning its behavior. It contains 4 blocks:
@@ -227,11 +231,11 @@ the general parameters, simulation parameters, clustering
 parameters and spawning parameters. The first block refers to general
 parameters such as the output path, initial structures, or whether to restart (resume) a simulation.
 The other three blocks configure the three iterative steps of an adaptive run, and have a
-<code class="docutils literal"><span class="pre">{&quot;type&quot;:str,</span> <span class="pre">&quot;params&quot;:{},</span> <span class="pre">&quot;optionalClasses&quot;:{}}</span></code> structure. Namely, the <strong>simulation</strong> block
+<code class="docutils literal notranslate"><span class="pre">{&quot;type&quot;:str,</span> <span class="pre">&quot;params&quot;:{},</span> <span class="pre">&quot;optionalClasses&quot;:{}}</span></code> structure. Namely, the <strong>simulation</strong> block
 chooses and tunes the propagation algorithm, typically PELE, the <strong>clustering</strong> block tunes the clustering method,
 cluster sizes… and the <strong>spawning</strong> block selects the strategy to choose the most interesting
 structures.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{},</span>
     <span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:{}},</span>
     <span class="s2">&quot;clustering&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:{}},</span>
@@ -270,7 +274,7 @@ the path to the native structure. This structure will only be used to correct
 the RMSD in case of symmetries. The symmetries will also have to be specified
 (see <a class="reference internal" href="#clustering-block">clustering block</a>).</p>
 <p>Example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
     <span class="s2">&quot;debug&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
     <span class="s2">&quot;outputPath&quot;</span><span class="p">:</span><span class="s2">&quot;simulationOutput&quot;</span><span class="p">,</span>
@@ -293,17 +297,17 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <h3>Templetized PELE control file<a class="headerlink" href="#templetized-pele-control-file" title="Permalink to this headline">¶</a></h3>
 <p>In order to run adaptivePELE, PELE control file needs to be templetized. In particular:</p>
 <ul class="simple">
-<li><strong>MultipleComplexes”</strong>: AdaptivePELE requieres the use of multiple complexes: <code class="docutils literal"><span class="pre">&quot;MultipleComplex&quot;:</span> <span class="pre">[</span> <span class="pre">$COMPLEXES</span> <span class="pre">]</span></code></li>
-<li><strong>seed</strong>: The seed needs to be templetized: <code class="docutils literal"><span class="pre">&quot;seed&quot;:</span> <span class="pre">$SEED</span></code></li>
-<li><strong>outputPath</strong>: The output path needs to be changed for: <code class="docutils literal"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/report&quot;</span></code></li>
-<li><strong>numberOfPeleSteps</strong>: The number of pele steps needs to be templetized as <code class="docutils literal"><span class="pre">&quot;numberOfPeleSteps&quot;:</span> <span class="pre">$PELE_STEPS</span></code></li>
+<li><strong>MultipleComplexes”</strong>: AdaptivePELE requieres the use of multiple complexes: <code class="docutils literal notranslate"><span class="pre">&quot;MultipleComplex&quot;:</span> <span class="pre">[</span> <span class="pre">$COMPLEXES</span> <span class="pre">]</span></code></li>
+<li><strong>seed</strong>: The seed needs to be templetized: <code class="docutils literal notranslate"><span class="pre">&quot;seed&quot;:</span> <span class="pre">$SEED</span></code></li>
+<li><strong>outputPath</strong>: The output path needs to be changed for: <code class="docutils literal notranslate"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/report&quot;</span></code></li>
+<li><strong>numberOfPeleSteps</strong>: The number of pele steps needs to be templetized as <code class="docutils literal notranslate"><span class="pre">&quot;numberOfPeleSteps&quot;:</span> <span class="pre">$PELE_STEPS</span></code></li>
 </ul>
 <p>Optionally other fields might be templetized as well:</p>
 <ul class="simple">
-<li><strong>fixedCenter</strong>: The center of the simulation box is templetized as <code class="docutils literal"><span class="pre">&quot;fixedCenter&quot;:</span> <span class="pre">$BOX_CENTER</span></code></li>
-<li><strong>radius</strong>: The radius of the simulation box is templetized as <code class="docutils literal"><span class="pre">&quot;radius&quot;:</span> <span class="pre">$BOX_RADIUS</span></code></li>
-<li><strong>reportName</strong>: The name of the report file is templetized as <code class="docutils literal"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$REPORT_NAME&quot;</span></code>. Note that the value of the reportName is not a parameter of the simulation block, but is given by the <strong>reportFilename</strong> option of the spawning block</li>
-<li><strong>trajectoryName</strong>: The name of the trajectory file is templetized as <code class="docutils literal"><span class="pre">&quot;trajectoryPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$TRAJECTORY_NAME&quot;</span></code></li>
+<li><strong>fixedCenter</strong>: The center of the simulation box is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;fixedCenter&quot;:</span> <span class="pre">$BOX_CENTER</span></code></li>
+<li><strong>radius</strong>: The radius of the simulation box is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;radius&quot;:</span> <span class="pre">$BOX_RADIUS</span></code></li>
+<li><strong>reportName</strong>: The name of the report file is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$REPORT_NAME&quot;</span></code>. Note that the value of the reportName is not a parameter of the simulation block, but is given by the <strong>reportFilename</strong> option of the spawning block</li>
+<li><strong>trajectoryName</strong>: The name of the trajectory file is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;trajectoryPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$TRAJECTORY_NAME&quot;</span></code></li>
 </ul>
 </div>
 <div class="section" id="pele-parameters">
@@ -366,7 +370,6 @@ if no value is specified simulation is run until the number of steps in
 <li><strong>reporterFrequency</strong> (<em>integer</em>, mandatory): Frequency to write the report
 and trajectories (in time steps, see <strong>timeStep</strong> property)</li>
 <li><strong>numReplicas</strong> (<em>integer</em>, mandatory): Number of replicas to run (see <a class="reference internal" href="#running-adaptivepele-with-gpus">Running AdaptivePELE with GPUs</a> section), each replica will run the same number of trajectories, calculated as <strong>t = p/n</strong>, where <em>t</em> is the number of the trajectories per replica, <em>p</em> is the number of processors and <em>n</em> is the number of replicas</li>
-<li><strong>ligandName</strong> (<em>str</em>, mandatory): Ligand residue name in the PDB</li>
 </ul>
 <p>Optionally, you can also use the following parameters:</p>
 <ul>
@@ -379,11 +382,17 @@ equilibration run (default corresponds to 1 ns)</p>
 <li><p class="first"><strong>timeStep</strong> (<em>float</em>, default=2): Value of the time step for the integration
 (in femtoseconds)</p>
 </li>
-<li><p class="first"><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</p>
+<li><p class="first"><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center. When using a simulation box in a run with multiple ligands, please ensure that the <em>ligandsToRestrict</em> parameter is correctly set.</p>
 </li>
 <li><p class="first"><strong>boxRadius</strong> (<em>float</em>, default=20): Radius of the spherical box the ligand will be restrained to (in angstroms). Note that when using the spherical box restraint only xtc trajectories are supported.</p>
 </li>
-<li><p class="first"><strong>ligandCharge</strong> (<em>integer</em>, default=0): Charge of the ligand</p>
+<li><p class="first"><strong>ligandName</strong> (<em>str</em> or <em>list</em>, default=None): Ligand residue name in the PDB for all
+residues that must be parametrised, starting from version 1.6.3 more than one
+ligand can be specified</p>
+</li>
+<li><p class="first"><strong>ligandCharge</strong> (<em>integer</em> or <em>list</em>, default=None): Charge of the ligand for all
+residues that must be parametrised, starting from version 1.6.3 more than one
+ligand can be specified</p>
 </li>
 <li><p class="first"><strong>WaterBoxSize</strong> (<em>float</em>, default=8): Distance of the edge of the solvation
 box from the closest atom (in angstroms)</p>
@@ -427,7 +436,7 @@ moment this was written)</p>
 establish in a simulation. The constraints must be specified as a list in the
 following format (see <a class="reference internal" href="#control-file-examples">Control File Examples</a> section for an example on how
 to set constraints.  <strong>Note</strong>: the distance of the constraints <strong>must</strong> be specified in angstroms):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;atom1:res1:resnum1&quot;</span><span class="p">,</span> <span class="s2">&quot;atom2:res2:resnum2&quot;</span><span class="p">,</span> <span class="n">distance</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;atom1:res1:resnum1&quot;</span><span class="p">,</span> <span class="s2">&quot;atom2:res2:resnum2&quot;</span><span class="p">,</span> <span class="n">distance</span><span class="p">]</span>
 </pre></div>
 </div>
 <p><strong>Note 2</strong>: Histidines present in constraints should be named HIS regardless
@@ -439,13 +448,28 @@ details on histidines naming.</p>
 </li>
 <li><p class="first"><strong>cylinderBases</strong> (<em>list</em>, default=None): List with the coordinates of the
 bases of the cylinder (in angstroms), this should look like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">,</span> <span class="n">zb</span><span class="p">],</span> <span class="p">[</span><span class="n">xt</span><span class="p">,</span> <span class="n">yt</span><span class="p">,</span> <span class="n">zt</span><span class="p">]]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">,</span> <span class="n">zb</span><span class="p">],</span> <span class="p">[</span><span class="n">xt</span><span class="p">,</span> <span class="n">yt</span><span class="p">,</span> <span class="n">zt</span><span class="p">]]</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first"><strong>forcefield</strong> (<em>str</em>, default=”ff99SB”): Forcefield to use in the simulation, current options are: {“ff99SB”, “ff14SB”}</p>
 </li>
 <li><p class="first"><strong>postprocessing</strong> (<em>bool</em>, defuault=True): “Whether to postprocess the trajectories (wrapping of the water box and alginment of the protein)”</p>
+</li>
+<li><p class="first"><strong>cofactors</strong> (<em>list</em>, default=None): List of predefined cofactors to load,
+options are <em>fadh-</em>, <em>fmn</em> and <em>nad</em>, and they must have PDB names <em>FAD</em>,
+<em>FMN</em> and <em>NAP</em> respectively. The parameters are pulled from the <a class="reference external" href="http://research.bmh.manchester.ac.uk/bryce/amber">AMBER
+parameter database</a>.</p>
+</li>
+<li><p class="first"><strong>ligandsToRestrict</strong> (<em>list</em>, default=None): List of ligands that should be
+restricted to the simulation box. This is useful when multiple ligands are
+specified to parametrise, e.g a small molecule and a strange cofactor.
+Typically, one might one to constrain the cofactor but allow mobility for the
+small molecule, in that case the value of this parameter should be a list
+containing only the PDB name of the small molecule. To ensure backwards
+compatibility, if only one ligand is specified in the <em>ligandName</em> parameter
+and a simulation box is set, the value of <strong>ligandsToRestrict</strong> will be set
+to the same as <em>ligandName</em>.</p>
 </li>
 </ul>
 </div>
@@ -464,7 +488,7 @@ be either “&lt;” or “&gt;”, default value is “&lt;”. The simulation 
 written in the <em>metricCol</em> reaches a value smaller or greater than <em>exitValue</em>, depending on the condition specified.
 An example of the exit condition block that would terminate the program after a trajectory reaches a value of less
 than 2 for the fifth column (4th starting to count from 0) of the report file would look like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;exitCondition&quot;</span> <span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;exitCondition&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;metric&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;metricCol&quot;</span> <span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
@@ -484,7 +508,7 @@ written in the <em>metricCol</em> reaches a value smaller or greater than <em>ex
 number of trajectories greater or equal than <em>numberTrajectories</em>. An example of the exit condition block that would terminate the
 program after 10 trajectories reach a value of more than 2 for the fifth column (4th starting to count from 0) of the report
 file would look like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;exitCondition&quot;</span> <span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;exitCondition&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;metricMultipleTrajectories&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;metricCol&quot;</span> <span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
@@ -500,7 +524,7 @@ file would look like:</p>
 </li>
 </ul>
 <p>Example of a minimal simulation block:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;simulation&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;pele&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;iterations&quot;</span> <span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
@@ -620,7 +644,7 @@ distance with TICA</li>
 <div class="section" id="example">
 <h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
 <p>A typical setting of the rmsd clustering is:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;clustering&quot;</span> <span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;clustering&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;ligandResname&quot;</span> <span class="p">:</span> <span class="s2">&quot;AEN&quot;</span><span class="p">,</span>
@@ -638,7 +662,7 @@ distance with TICA</li>
 </pre></div>
 </div>
 <p>which, given the default options, is equivalent to:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;clustering&quot;</span> <span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;clustering&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;ligandResname&quot;</span> <span class="p">:</span> <span class="s2">&quot;AEN&quot;</span><span class="p">,</span>
@@ -654,7 +678,7 @@ treshold of 2, those with contacts ratio between 1 and 0.75 have a treshold of
 the cluster size will be smaller and therefore those regions will be more
 finely discretized.</p>
 <p>Example of contactMap clustering:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">clustering</span><span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">clustering</span><span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;contactMap&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;ligandResname&quot;</span><span class="p">:</span> <span class="s2">&quot;AIN&quot;</span><span class="p">,</span>
@@ -670,7 +694,7 @@ finely discretized.</p>
 </pre></div>
 </div>
 <p>Example of MSM clustering:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">clustering</span><span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">clustering</span><span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;MSM&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;ligandResname&quot;</span><span class="p">:</span> <span class="s2">&quot;BEN&quot;</span><span class="p">,</span>
@@ -680,7 +704,7 @@ finely discretized.</p>
 </pre></div>
 </div>
 <p>Example of null clustering:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">clustering</span><span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">clustering</span><span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;null&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{}</span>
 <span class="p">}</span>
@@ -766,7 +790,7 @@ plots for the MSM-based spawnings</li>
 <div class="section" id="examples">
 <h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
 <p>Running inverselyProportional:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;inverselyProportional&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span>
@@ -775,7 +799,7 @@ plots for the MSM-based spawnings</li>
 </pre></div>
 </div>
 <p>Running epsilon:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;epsilon&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span><span class="p">,</span>
@@ -789,7 +813,7 @@ plots for the MSM-based spawnings</li>
 </pre></div>
 </div>
 <p>Running independent spawning:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;independent&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span>
@@ -798,7 +822,7 @@ plots for the MSM-based spawnings</li>
 </pre></div>
 </div>
 <p>Running independentMSM spawning (needs to be coupled with MSM clustering):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;IndependentMSM&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;lagtime&quot;</span> <span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
@@ -809,7 +833,7 @@ plots for the MSM-based spawnings</li>
 </pre></div>
 </div>
 <p>Running variableEpsilon:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;spawning&quot;</span> <span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;variableEpsilon&quot;</span><span class="p">,</span>
     <span class="s2">&quot;params&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;reportFilename&quot;</span> <span class="p">:</span> <span class="s2">&quot;report&quot;</span><span class="p">,</span>
@@ -836,7 +860,7 @@ plots for the MSM-based spawnings</li>
 <div class="section" id="example-1-pele-with-default-parameters">
 <h3>Example 1 – PELE with default parameters<a class="headerlink" href="#example-1-pele-with-default-parameters" title="Permalink to this headline">¶</a></h3>
 <p>The first example makes use of default parameters, using PELE as propagator (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id7">[APELE]</a>).</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
         <span class="s2">&quot;outputPath&quot;</span><span class="p">:</span><span class="s2">&quot;example1&quot;</span><span class="p">,</span>
@@ -876,7 +900,7 @@ plots for the MSM-based spawnings</li>
 <div class="section" id="example-2-pele-with-more-specific-parameters">
 <h3>Example 2 – PELE with more specific parameters<a class="headerlink" href="#example-2-pele-with-more-specific-parameters" title="Permalink to this headline">¶</a></h3>
 <p>A more complete (although not so comprehensible) example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
         <span class="s2">&quot;debug&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
@@ -936,7 +960,7 @@ plots for the MSM-based spawnings</li>
 <div class="section" id="example-3-md-using-openmm-with-default-parameters">
 <h3>Example 3 – MD using OpenMM with default parameters<a class="headerlink" href="#example-3-md-using-openmm-with-default-parameters" title="Permalink to this headline">¶</a></h3>
 <p>A simple example of running an MD simulation with OpenMM:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
         <span class="s2">&quot;debug&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
@@ -985,7 +1009,7 @@ plots for the MSM-based spawnings</li>
 <div class="section" id="example-4-md-using-openmm-with-constraints-and-other-parameters">
 <h3>Example 4 – MD using OpenMM with constraints and other parameters<a class="headerlink" href="#example-4-md-using-openmm-with-constraints-and-other-parameters" title="Permalink to this headline">¶</a></h3>
 <p>An sligthly more complex example of running an MD simulation with OpenMM:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
         <span class="s2">&quot;debug&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
@@ -1055,23 +1079,23 @@ If we change a clustering parameter in a restart run, AdaptivePELE will recluste
 </div>
 <div class="section" id="analysis">
 <h2>Analysis<a class="headerlink" href="#analysis" title="Permalink to this headline">¶</a></h2>
-<p>In order to analyse simulation results, a bunch of scripts are provided in <code class="docutils literal"><span class="pre">AdaptivePELE/analysis</span></code>. Get help to run them with: <code class="docutils literal"><span class="pre">python</span> <span class="pre">&lt;script&gt;</span> <span class="pre">-h</span></code></p>
+<p>In order to analyse simulation results, a bunch of scripts are provided in <code class="docutils literal notranslate"><span class="pre">AdaptivePELE/analysis</span></code>. Get help to run them with: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">&lt;script&gt;</span> <span class="pre">-h</span></code></p>
 <p>Example to print column 5 evolution with gnuplot:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">2</span> <span class="mi">5</span> <span class="n">report_</span> <span class="o">-</span><span class="n">lines</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">2</span> <span class="mi">5</span> <span class="n">report_</span> <span class="o">-</span><span class="n">lines</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
 </pre></div>
 </div>
 <p>It prints the evolution of column 5 (e.g. RMSD) in report_* files with lines in epochs of 4 steps.</p>
 <p>Example to print BE against RMSD with gnuplot:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span> <span class="n">report_</span> <span class="o">-</span><span class="n">points</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span> <span class="n">report_</span> <span class="o">-</span><span class="n">points</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
 </pre></div>
 </div>
 <p>It prints the column 6 against column 5 with points. Epoch length is ignored in this case</p>
 <p>To plot the evolution of the number of clusters along the simulation:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">numberOfClusters</span> <span class="o">-</span><span class="n">filename</span> <span class="s2">&quot;plot&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">numberOfClusters</span> <span class="o">-</span><span class="n">filename</span> <span class="s2">&quot;plot&quot;</span>
 </pre></div>
 </div>
 <p>It shows the evolution of the total number of clusters, and the number of clusters divided in different densities and cluster thresholds.
-It also prints a histogram with the ratio of counts <em>r</em> (see above). When <code class="docutils literal"><span class="pre">-filename</span></code> is provided, it saves the plots as png files.</p>
+It also prints a histogram with the ratio of counts <em>r</em> (see above). When <code class="docutils literal notranslate"><span class="pre">-filename</span></code> is provided, it saves the plots as png files.</p>
 </div>
 <div class="section" id="dynamical-hooks">
 <h2>Dynamical hooks<a class="headerlink" href="#dynamical-hooks" title="Permalink to this headline">¶</a></h2>
@@ -1079,7 +1103,7 @@ It also prints a histogram with the ratio of counts <em>r</em> (see above). When
 is implemented using a hook. This hook is a function that is passed to the
 adaptive main function which accepts two arguments: <em>clustering</em> and <em>outputPath</em>
 and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clustering</em> refers to  the clustering object, while <em>hasChanged</em> is a boolean that marks whether any change has been done to the clustering object in the hook function. If so, the data is reclustered before starting the new iteration. One example of such function would look like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">hook_function</span><span class="p">(</span><span class="n">clustering</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">hook_function</span><span class="p">(</span><span class="n">clustering</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">):</span>
     <span class="n">hasChanged</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">clustering</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">clustering</span><span class="o">.</span><span class="n">thresholdCalculator</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
@@ -1106,7 +1130,7 @@ or third decimal, so most structures should be fine</li>
 </ul>
 <p>To overcome these issues, the splitTrajectories script in the analysis
 subpackage can be used::</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">splitTrajectory</span> <span class="mi">0</span><span class="o">/</span><span class="n">trajectory_10</span><span class="o">.</span><span class="n">xtc</span> <span class="o">-</span><span class="n">o</span> <span class="n">output_pdb</span> <span class="o">--</span><span class="n">top</span> <span class="n">topology</span><span class="o">.</span><span class="n">pdb</span> <span class="o">--</span><span class="n">structs</span> <span class="mi">2</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">splitTrajectory</span> <span class="mi">0</span><span class="o">/</span><span class="n">trajectory_10</span><span class="o">.</span><span class="n">xtc</span> <span class="o">-</span><span class="n">o</span> <span class="n">output_pdb</span> <span class="o">--</span><span class="n">top</span> <span class="n">topology</span><span class="o">.</span><span class="n">pdb</span> <span class="o">--</span><span class="n">structs</span> <span class="mi">2</span>
 </pre></div>
 </div>
 <p>The top parameter stands for topology and is necessary for dealing with xtc
@@ -1116,7 +1140,7 @@ call shown above will extract the second, fifth and tenth snapshots of the file
 described with the file topology.pdb</p>
 <p>If a whole trajectory has to be converted one can also use the
 convertTrajectory script, also in the analysis subpackage:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">convertTrajectory</span> <span class="mi">0</span><span class="o">/</span><span class="n">trajectory_3</span><span class="o">.</span><span class="n">xtc</span> <span class="o">--</span><span class="n">top</span> <span class="n">topology</span><span class="o">.</span><span class="n">pdb</span> <span class="o">-</span><span class="n">o</span> <span class="n">trajectory_0_3</span><span class="o">.</span><span class="n">pdb</span> <span class="o">--</span><span class="nb">dir</span> <span class="n">outupt_pdb</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">convertTrajectory</span> <span class="mi">0</span><span class="o">/</span><span class="n">trajectory_3</span><span class="o">.</span><span class="n">xtc</span> <span class="o">--</span><span class="n">top</span> <span class="n">topology</span><span class="o">.</span><span class="n">pdb</span> <span class="o">-</span><span class="n">o</span> <span class="n">trajectory_0_3</span><span class="o">.</span><span class="n">pdb</span> <span class="o">--</span><span class="nb">dir</span> <span class="n">outupt_pdb</span>
 </pre></div>
 </div>
 <p>As before, the top parameter stands for topology. The
@@ -1159,6 +1183,7 @@ Disulphide bonds will be automatically detected, but can be also specified
 manually by renaming the cysteines as <em>CYX</em>. Furthermore, cysteines bound to
 metals should be renamed to <em>CYM</em>.</li>
 </ul>
+<p>Starting from version v1.6.3, it is possible to use cofactors as well as multiple ligands as input. For more details on how to include them, see the <a class="reference internal" href="#md-parameters">MD Parameters</a> section.</p>
 </div>
 <div class="section" id="equilibration-procedure-in-md">
 <h2>Equilibration procedure in MD<a class="headerlink" href="#equilibration-procedure-in-md" title="Permalink to this headline">¶</a></h2>
@@ -1195,7 +1220,7 @@ such simulation only one extra parameter is necessary, <em>numReplicas</em> (see
 <a class="reference internal" href="#simulation-block">Simulation block</a> section for more details).
 Here we show and example control file to run an MD simulation with 2 replicas
 and 4 trajectories per replica (8 trajectories total):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
         <span class="s2">&quot;debug&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
@@ -1249,7 +1274,7 @@ one replica of adaptivePELE in each node. We can do it by using the srun
 command in cluster that use slurm, for clusters with different software you
 will need to contact the cluster support team. An example slurm file would look
 like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#SBATCH --job-name=&quot;3ptb_Ad_MD_mt&quot;</span>
 <span class="c1">#SBATCH -D .</span>
 <span class="c1">#SBATCH --output=test_3ptb_Ad_MD_mt.out</span>
@@ -1272,7 +1297,7 @@ like:</p>
 per replica equal to the number of trajectories per replica are required.
 Similarly, the CTE-POWER cluster also has 4 gpus per node, so the configuration
 is very similar. An example for this machin would look like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#SBATCH --job-name=&quot;md_PK2_evoCt&quot;</span>
 <span class="c1">#SBATCH -D .</span>
 <span class="c1">#SBATCH --output=md_PK2_evoCt.out</span>
