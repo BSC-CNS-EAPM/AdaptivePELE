@@ -9,7 +9,10 @@ from AdaptivePELE.tests import testThresholdcalculator as tThreshold
 from AdaptivePELE.tests import testDensityCalculator as tDensity
 from AdaptivePELE.tests import testMD as tMD
 from AdaptivePELE.tests import testMD_CUDA as tMD_CUDA
-from AdaptivePELE.tests import testReporter as tR
+try:
+    from AdaptivePELE.tests import testReporter as tR
+except ImportError:
+    pass
 
 
 def parse_args():
