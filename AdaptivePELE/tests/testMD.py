@@ -3,13 +3,7 @@ import os
 import glob
 import shutil
 import unittest
-import numpy as np
-import simtk.openmm as mm
-import simtk.openmm.app as app
-import simtk.unit as unit
-import mdtraj as md
 import AdaptivePELE.adaptiveSampling as adaptiveSampling
-from AdaptivePELE.simulation.openmm_simulations import XTCReporter
 
 
 class TestMD(unittest.TestCase):
@@ -30,7 +24,7 @@ class TestMD(unittest.TestCase):
         # cleanup
         shutil.rmtree(output_path)
 
-    def testOpenMM3ptb(self):
+    def testOpenMM3ptb_cyl(self):
         output_path = "tests/data/openmm_3ptb_cyl"
         controlFile = "tests/data/templetized_controlFile_3ptb_cyl_md.conf"
 
