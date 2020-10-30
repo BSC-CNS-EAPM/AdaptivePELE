@@ -1108,7 +1108,7 @@ class MDSimulation(SimulationRunner):
 
         with open(PDBtoOpen, "r") as inp:
             for line in inp:
-                if resname in line and line.startswith("HETATM"):
+                if resname in line:
                     if (resname, line[21]) in line_dict:
                         line_dict[(resname, line[21])] += line
                     else:
