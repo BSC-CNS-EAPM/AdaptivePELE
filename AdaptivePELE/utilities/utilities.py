@@ -1,16 +1,16 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from builtins import range
-from six import reraise as raise_
 import os
 import ast
 import sys
-import six
 import glob
 import json
 import errno
 import socket
 import shutil
 import string
+from builtins import range
+import six
+from six import reraise as raise_
 import numpy as np
 import mdtraj as md
 from scipy import linalg
@@ -966,3 +966,35 @@ def get_string_from_array(array, sep=", ", decimals=None, remove_newlines=True):
     if remove_newlines:
         return representation.replace('\n', '')
     return representation
+
+
+def get_file_name_extension(full_path):
+    """
+        Get the name and the extension of the file pointed by full_path
+
+        :param full_path: Path to the file
+        :type full_path: str
+    """
+    return os.path.splitext(os.path.split(full_path)[1])
+
+
+def get_file_name(full_path):
+    """
+        Get the name of the file pointed by full_path
+
+        :param full_path: Path to the file
+        :type full_path: str
+    """
+    name, _ = get_file_name_extension(full_path)
+    return name
+
+
+def get_file_extension(full_path):
+    """
+        Get the extension of the file pointed by full_path
+
+        :param full_path: Path to the file
+        :type full_path: str
+    """
+    _, ext = get_file_name_extension(full_path)
+    return ext
