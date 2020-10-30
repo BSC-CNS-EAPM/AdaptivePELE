@@ -56,7 +56,9 @@ class PDBManager:
         """
         self.PDBtoLoad = PDBtoLoad
         self.Protein = Structure(parent=None, ID="protein")
-        self.Ligands = {resname: Structure(parent=None, ID=resname) for resname in resnames}
+        self.Ligands = {}
+        if resnames is not None:
+            self.Ligands = {resname: Structure(parent=None, ID=resname) for resname in resnames}
         self.Other = Structure(parent=None, ID="other")
         # Dictionary with the information that appears in each of the pdb fields. Used to avoid using magic numbers
         self.POSITIONS = {"DBREF": 0, "IDCODE": 1, "ATOMNAME": 2, "RESNAME": 3, "CHAINID": 4, "RESNUMBER": 5,
