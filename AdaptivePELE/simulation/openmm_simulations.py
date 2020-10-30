@@ -309,7 +309,7 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters, platformProp
 
     :return: The minimized OpenMM simulation object
     """
-    if ligandNames is None:
+    if parameters.ligandName is None:
         ligandNames = []
     else:
         ligandNames = parameters.ligandName
@@ -376,7 +376,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 
     :return: The equilibrated OpenMM simulation object
     """
-    if ligandNames is None:
+    if parameters.ligandName is None:
         ligandNames = []
     else:
         ligandNames = parameters.ligandName
@@ -446,7 +446,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 
     :return: The equilibrated OpenMM simulation object
     """
-    if ligandNames is None:
+    if parameters.ligandName is None:
         ligandNames = []
     else:
         ligandNames = parameters.ligandName
@@ -524,7 +524,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     :type epoch_number: int
 
     """
-    if ligandNames is None:
+    if parameters.ligandName is None:
         ligandNames = []
     else:
         ligandNames = parameters.ligandName
