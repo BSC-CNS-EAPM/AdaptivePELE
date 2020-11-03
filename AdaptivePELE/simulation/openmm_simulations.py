@@ -309,6 +309,10 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters, platformProp
 
     :return: The minimized OpenMM simulation object
     """
+    if parameters.ligandName is None:
+        ligandNames = []
+    else:
+        ligandNames = parameters.ligandName
     system = prmtop.createSystem(nonbondedMethod=app.PME,
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms, constraints=app.HBonds)
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
@@ -319,7 +323,7 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters, platformProp
     if parameters.boxCenter or parameters.cylinderBases:
         # the last parameter is only used to print a message, by passing a
         # value different than 0 we avoid having too many prints
-        addDummyAtomToSystem(system, prmtop.topology, inpcrd.positions, parameters.ligandName, dummy, 3)
+        addDummyAtomToSystem(system, prmtop.topology, inpcrd.positions, ligandNames, dummy, 3)
     if constraints:
         # Add positional restraints to protein backbone
         force = mm.CustomExternalForce(str("k*periodicdistance(x, y, z, x0, y0, z0)^2"))
@@ -329,7 +333,7 @@ def minimization(prmtop, inpcrd, PLATFORM, constraints, parameters, platformProp
         force.addPerParticleParameter(str("z0"))
         atomNames = ('CA', 'C', 'N', 'O')
         for j, atom in enumerate(prmtop.topology.atoms()):
-            if (atom.name in atomNames and atom.residue.name != "HOH") or (atom.residue.name in parameters.ligandName and atom.element.symbol != "H"):
+            if (atom.name in atomNames and atom.residue.name != "HOH") or (atom.residue.name in ligandNames and atom.element.symbol != "H"):
                 force.addParticle(j, inpcrd.positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
     simulation = app.Simulation(prmtop.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
@@ -372,6 +376,10 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 
     :return: The equilibrated OpenMM simulation object
     """
+    if parameters.ligandName is None:
+        ligandNames = []
+    else:
+        ligandNames = parameters.ligandName
     system = topology.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                    constraints=app.HBonds)
@@ -383,7 +391,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     if parameters.boxCenter or parameters.cylinderBases:
         # the last parameter is only used to print a message, by passing a
         # value different than 0 we avoid having too many prints
-        addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, 3)
+        addDummyAtomToSystem(system, topology.topology, positions, ligandNames, dummy, 3)
 
     if constraints:
         force = mm.CustomExternalForce(str("k*periodicdistance(x, y, z, x0, y0, z0)^2"))
@@ -392,7 +400,7 @@ def NVTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         force.addPerParticleParameter(str("y0"))
         force.addPerParticleParameter(str("z0"))
         for j, atom in enumerate(topology.topology.atoms()):
-            if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (atom.residue.name in parameters.ligandName and atom.element.symbol != "H"):
+            if (atom.name in ('CA', 'C', 'N', 'O') and atom.residue.name != "HOH") or (atom.residue.name in ligandNames and atom.element.symbol != "H"):
                 force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
     simulation = app.Simulation(topology.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
@@ -438,6 +446,10 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
 
     :return: The equilibrated OpenMM simulation object
     """
+    if parameters.ligandName is None:
+        ligandNames = []
+    else:
+        ligandNames = parameters.ligandName
     system = topology.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                    constraints=app.HBonds)
@@ -450,7 +462,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
     if parameters.boxCenter or parameters.cylinderBases:
         # the last parameter is only used to print a message, by passing a
         # value different than 0 we avoid having too many prints
-        addDummyAtomToSystem(system, topology.topology, positions, parameters.ligandName, dummy, 3)
+        addDummyAtomToSystem(system, topology.topology, positions, ligandNames, dummy, 3)
 
     if constraints:
         force = mm.CustomExternalForce(str("k*periodicdistance(x, y, z, x0, y0, z0)^2"))
@@ -459,7 +471,7 @@ def NPTequilibration(topology, positions, PLATFORM, simulation_steps, constraint
         force.addPerParticleParameter(str("y0"))
         force.addPerParticleParameter(str("z0"))
         for j, atom in enumerate(topology.topology.atoms()):
-            if atom.name == 'CA' or (atom.residue.name in parameters.ligandName and atom.element.symbol != "H"):
+            if atom.name == 'CA' or (atom.residue.name in ligandNames and atom.element.symbol != "H"):
                 force.addParticle(j, positions[j].value_in_unit(unit.nanometers))
         system.addForce(force)
     simulation = app.Simulation(topology.topology, system, integrator, PLATFORM, platformProperties=platformProperties)
@@ -512,6 +524,10 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
     :type epoch_number: int
 
     """
+    if parameters.ligandName is None:
+        ligandNames = []
+    else:
+        ligandNames = parameters.ligandName
     # this number gives the number of the subprocess in the given node
     deviceIndex = workerNumber
     # this one gives the number of the subprocess in the overall simulation (i.e
@@ -547,7 +563,7 @@ def runProductionSimulation(equilibrationFiles, workerNumber, outputDir, seed, p
                                  nonbondedCutoff=parameters.nonBondedCutoff * unit.angstroms,
                                  constraints=app.HBonds, removeCMMotion=True)
     if parameters.boxCenter or parameters.cylinderBases:
-        addDummyAtomToSystem(system, prmtop.topology, positions, parameters.ligandName, dummies, deviceIndex)
+        addDummyAtomToSystem(system, prmtop.topology, positions, ligandNames, dummies, deviceIndex)
 
     system.addForce(mm.AndersenThermostat(parameters.Temperature * unit.kelvin, 1 / unit.picosecond))
     integrator = mm.VerletIntegrator(parameters.timeStep * unit.femtoseconds)
@@ -688,7 +704,7 @@ def findDummyAtom(model, name=constants.AmberTemplates.DUM_atom, resname=constan
 def addDummyAtomToSystem(system, topology, positions, resname, dummies, worker):
     protein_CAs = []
     for atom in topology.atoms():
-        if atom.residue.name not in ("HOH", "Cl-", "Na+") or atom.residue.name not in resname and atom.name == "CA":
+        if (atom.residue.name not in ("HOH", "Cl-", "Na+") or atom.residue.name not in resname) and atom.name == "CA":
             protein_CAs.append(atom.index)
     modul = len(protein_CAs) % 20
     step_to_use = int((len(protein_CAs)-modul)/20)

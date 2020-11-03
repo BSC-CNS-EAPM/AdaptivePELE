@@ -24,6 +24,15 @@ class TestMD(unittest.TestCase):
         # cleanup
         shutil.rmtree(output_path)
 
+    def testOpenMM3ptb_noligand(self):
+        output_path = "tests/data/openmm_3ptb_no_ligand"
+        controlFile = "tests/data/templetized_controlFile_3ptb_no_ligand_md.conf"
+
+        adaptiveSampling.main(controlFile)
+        self.check_succesful_simulation(output_path, 2, 4)
+        # cleanup
+        shutil.rmtree(output_path)
+
     def testOpenMM3ptb_cyl(self):
         output_path = "tests/data/openmm_3ptb_cyl"
         controlFile = "tests/data/templetized_controlFile_3ptb_cyl_md.conf"

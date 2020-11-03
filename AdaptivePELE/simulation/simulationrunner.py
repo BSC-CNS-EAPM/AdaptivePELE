@@ -958,26 +958,27 @@ class MDSimulation(SimulationRunner):
         os.chdir(outputPathConstants.tmpFolder)
         temporalFolder = os.getcwd()
         Tleapdict = {"LIGANDS": "", "DUM": ""}
-        for charge, resname in zip(self.parameters.ligandCharge, self.parameters.ligandName):
-            ligandPDB = self.extractLigand(initialStructures[0][1], resname, "", processManager.id)
-            ligandmol2 = "%s.mol2" % resname
-            ligandfrcmod = "%s.frcmod" % resname
-            antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": charge}
-            parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
-            if processManager.isMaster() and not self.parameters.customparamspath and resname is not None:
-                self.prepareLigand(antechamberDict, parmchkDict)
-            amber_file_path = ""
-            # Change the Mol2 and Frcmod path to the new user defined path
-            if self.parameters.customparamspath and resname is not None:
-                if not os.path.exists(self.parameters.customparamspath):
-                    # As the working directory has changed, eval if the given path is a global or relative one.
-                    self.parameters.customparamspath = os.path.join(workingdirectory, self.parameters.customparamspath)
+        if self.parameters.ligandCharge is not None and self.parameters.ligandName is not None:
+            for charge, resname in zip(self.parameters.ligandCharge, self.parameters.ligandName):
+                ligandPDB = self.extractLigand(initialStructures[0][1], resname, "", processManager.id)
+                ligandmol2 = "%s.mol2" % resname
+                ligandfrcmod = "%s.frcmod" % resname
+                antechamberDict = {"LIGAND": ligandPDB, "OUTPUT": ligandmol2, "CHARGE": charge}
+                parmchkDict = {"MOL2": ligandmol2, "OUTPUT": ligandfrcmod}
+                if processManager.isMaster() and not self.parameters.customparamspath and resname is not None:
+                    self.prepareLigand(antechamberDict, parmchkDict)
+                amber_file_path = ""
+                # Change the Mol2 and Frcmod path to the new user defined path
+                if self.parameters.customparamspath and resname is not None:
                     if not os.path.exists(self.parameters.customparamspath):
-                        raise FileNotFoundError("No custom parameters found in the given path")
-                ligandmol2 = os.path.join(self.parameters.customparamspath, ligandmol2)
-                ligandfrcmod = os.path.join(self.parameters.customparamspath, ligandfrcmod)
-                amber_file_path = self.parameters.customparamspath
-            Tleapdict["LIGANDS"] += "{} = loadmol2 {}\nloadamberparams {}\n".format(resname, ligandmol2, ligandfrcmod)
+                        # As the working directory has changed, eval if the given path is a global or relative one.
+                        self.parameters.customparamspath = os.path.join(workingdirectory, self.parameters.customparamspath)
+                        if not os.path.exists(self.parameters.customparamspath):
+                            raise FileNotFoundError("No custom parameters found in the given path")
+                    ligandmol2 = os.path.join(self.parameters.customparamspath, ligandmol2)
+                    ligandfrcmod = os.path.join(self.parameters.customparamspath, ligandfrcmod)
+                    amber_file_path = self.parameters.customparamspath
+                Tleapdict["LIGANDS"] += "{} = loadmol2 {}\nloadamberparams {}\n".format(resname, ligandmol2, ligandfrcmod)
         if self.parameters.boxCenter or self.parameters.cylinderBases:
             if self.parameters.boxType == blockNames.SimulationParams.sphere:
                 prep_template = constants.AmberTemplates.DUM_prep
@@ -1107,7 +1108,7 @@ class MDSimulation(SimulationRunner):
 
         with open(PDBtoOpen, "r") as inp:
             for line in inp:
-                if resname in line and line.startswith("HETATM"):
+                if resname in line and (line.startswith("ATOM") or line.startswith("HETATM")):
                     if (resname, line[21]) in line_dict:
                         line_dict[(resname, line[21])] += line
                     else:
@@ -1524,8 +1525,9 @@ class RunnerBuilder:
                 params.ligandName = [params.ligandName]
             if isinstance(params.ligandCharge, numbers.Real):
                 params.ligandCharge = [params.ligandCharge]
-            if len(params.ligandName) != len(params.ligandCharge):
-                raise utilities.ImproperParameterValueException("The smae amount of ligand names and charges should be specified")
+            if params.ligandName is not None and params.ligandCharge is not None:
+                if len(params.ligandName) != len(params.ligandCharge):
+                    raise utilities.ImproperParameterValueException("The same amount of ligand names and charges should be specified")
             params.cofactors = paramsBlock.get(blockNames.SimulationParams.cofactors)
             params.constraints = paramsBlock.get(blockNames.SimulationParams.constraints)
             params.postprocessing = paramsBlock.get(blockNames.SimulationParams.postprocessing, True)
