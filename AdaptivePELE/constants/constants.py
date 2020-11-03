@@ -31,9 +31,9 @@ elif "bullx" in machine:
     DOCUMENTS_FOLDER = "/gpfs/projects/bsc72/PELE++/nord/rev090518/Documents"
 
 elif machine == "bscls309":
-    PELE_EXECUTABLE = "/home/jgilaber/PELE/PELE-1.5/bin/PELE-1.5_mpi"
-    DATA_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Data"
-    DOCUMENTS_FOLDER = "/home/jgilaber/PELE/PELE-1.5/Documents"
+    PELE_EXECUTABLE = "/home/jgilaber/PELE-repo/bin/PELE-1.6_mpi"
+    DATA_FOLDER = "/home/jgilaber/PELE-repo/Data"
+    DOCUMENTS_FOLDER = "/home/jgilaber/PELE-repo/Documents"
 
 else:
     PELE_EXECUTABLE = None
