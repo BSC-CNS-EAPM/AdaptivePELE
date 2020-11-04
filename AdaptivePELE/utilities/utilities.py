@@ -383,7 +383,7 @@ def assertSymmetriesDict(symmetries, PDB):
         print("Symmetry dictionary correctly defined!")
 
 
-def getRMSD(traj, nativePDB, resname, symmetries, topology=None):
+def getRMSD(traj, nativePDB, resname, reschain, resnum, symmetries, topology=None):
     """
         Computes the RMSD of a trajectory, given a native and symmetries
 
@@ -391,8 +391,12 @@ def getRMSD(traj, nativePDB, resname, symmetries, topology=None):
         :type traj: str
         :param nativePDB:  Native PDB object
         :type native PDB: :py:class:`.PDB`
-        :param resname: Resname to compute its RMSD
+        :param resname: Residue name of the ligand in the system pdb
         :type resname: str
+        :param reschain: Chain name of the ligand in the system pdb
+        :type reschain: str
+        :param resnum: Residue number of the ligand in the system pdb
+        :type resnum: int
         :param symmetries: Symmetries dictionary list with independent symmetry groups
         :type symmetries: list of dict
         :param topology: Topology for non-pdb trajectories
@@ -406,7 +410,7 @@ def getRMSD(traj, nativePDB, resname, symmetries, topology=None):
     RMSDCalc = RMSDCalculator.RMSDCalculator(symmetries)
     for i, snapshot in enumerate(snapshots):
         snapshotPDB = atomset.PDB()
-        snapshotPDB.initialise(snapshot, resname=resname, topology=topology)
+        snapshotPDB.initialise(snapshot, resname=resname, chain=reschain, resnum=resnum, topology=topology)
 
         rmsds[i] = RMSDCalc.computeRMSD(nativePDB, snapshotPDB)
 

@@ -206,7 +206,7 @@ def expandInitialStructuresWildcard(initialStructuresWildcard):
     return totalInitialStructures
 
 
-def checkSymmetryDict(clusteringBlock, initialStructures, resname):
+def checkSymmetryDict(clusteringBlock, initialStructures, resname, reschain, resnum):
     """
         Check if the symmetries dictionary is valid for the ligand
 
@@ -216,25 +216,33 @@ def checkSymmetryDict(clusteringBlock, initialStructures, resname):
         :type initialStructures: list
         :param resname: Residue name of the ligand in the system pdb
         :type resname: str
+        :param reschain: Chain name of the ligand in the system pdb
+        :type reschain: str
+        :param resnum: Residue number of the ligand in the system pdb
+        :type resnum: int
 
         :raise AssertionError: If atoms are not found in the structure
      """
     symmetries = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.symmetries, {})
     for structure in initialStructures:
         PDB = atomset.PDB()
-        PDB.initialise(structure, resname=resname)
+        PDB.initialise(structure, resname=resname,chain=reschain, resnum = resnum)
         utilities.assertSymmetriesDict(symmetries, PDB)
 
 
-def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries, topologies):
+def fixReportsSymmetry(outputPath, resname, reschain, resnum, nativeStructure, symmetries, topologies):
     """
         Adds a new column in the report file with the RMSD that takes into account symmetries.
         New reports are stored in the fixedReport_i where i is the number of the report
 
         :param outputPath: Path where trajectories are found
         :type outputPath: str
-        :param resname: Residue name of the ligand in the pdb
+        :param resname: Residue name of the ligand in the system pdb
         :type resname: str
+        :param reschain: Chain name of the ligand in the system pdb
+        :type reschain: str
+        :param resnum: Residue number of the ligand in the system pdb
+        :type resnum: int
         :param nativeStructure: Path to the native structure pdb
         :type nativeStructure: str
         :param symmetries: Dictionary containg the symmetries of the ligand
@@ -250,10 +258,10 @@ def fixReportsSymmetry(outputPath, resname, nativeStructure, symmetries, topolog
     epoch = int(os.path.basename(outputPath))
     trajs = glob.glob(os.path.join(outputPath, trajName))
     nativePDB = atomset.PDB()
-    nativePDB.initialise(str(nativeStructure), resname=resname)
+    nativePDB.initialise(str(nativeStructure), resname=resname, chain=reschain, resnum = resnum)
     for traj in trajs:
         trajNum = utilities.getTrajNum(traj)
-        rmsd = list(utilities.getRMSD(traj, nativePDB, resname, symmetries, topology=topologies.getTopology(epoch, trajNum)))
+        rmsd = list(utilities.getRMSD(traj, nativePDB, resname, reschain, resnum, symmetries, topology=topologies.getTopology(epoch, trajNum)))
         try:
             reportFilename = glob.glob(os.path.join(outputPath, reportName) % trajNum)[0]
         except IndexError:
@@ -600,6 +608,23 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, controlFil
     return clusteringMethod, initialStructuresAsString
 
 
+def getClusteringLigandInfo(clustering_block_json):
+    """
+        Get the ligand information (resname, resnum and chain from the cluering
+        parameters block in the control file)
+
+        :param clustering_block_json: JSON block with the clustering-related parameters
+        :type clustering_block_json: json
+
+        :returns: str, int, str -- Residue name, residue number and chain of the
+            molecule to use for the clutering
+
+    """
+    resname = str(clustering_block_json.get(blockNames.ClusteringTypes.ligandResname, "")).upper()
+    resnum = int(clustering_block_json.get(blockNames.ClusteringTypes.ligandResnum, 0))
+    resChain = str(clustering_block_json.get(blockNames.ClusteringTypes.ligandChain, "")).upper()
+    return resname, resnum, resChain
+
 def main(jsonParams, clusteringHook=None):
     """
         Main body of the adaptive sampling program.
@@ -623,10 +648,7 @@ def main(jsonParams, clusteringHook=None):
     initialStructuresWildcard = generalParams[blockNames.GeneralParams.initialStructures]
     writeAll = generalParams.get(blockNames.GeneralParams.writeAllClustering, False)
     nativeStructure = generalParams.get(blockNames.GeneralParams.nativeStructure, '')
-    resname = clusteringBlock[blockNames.ClusteringTypes.params].get(blockNames.ClusteringTypes.ligandResname)
-    if resname is None:
-        # check if resname is provided in the simulation block
-        resname = simulationRunner.getResname()
+    resname, resnum, reschain = getClusteringLigandInfo(clusteringBlock)
 
     initialStructures = expandInitialStructuresWildcard(initialStructuresWildcard)
     if not initialStructures:
@@ -635,8 +657,8 @@ def main(jsonParams, clusteringHook=None):
     if len(initialStructures) > simulationRunner.getWorkingProcessors():
         raise InitialStructuresError("Error: More initial structures than Working Processors found!!!")
 
-    if resname is not None:
-        checkSymmetryDict(clusteringBlock, initialStructures, resname)
+    if any([x is not None for x in (resname, resnum, reschain)]):
+        checkSymmetryDict(clusteringBlock, initialStructures, resname, reschain, resnum)
 
     outputPathConstants = constants.OutputPathConstants(outputPath)
 
@@ -680,7 +702,7 @@ def main(jsonParams, clusteringHook=None):
         firstRun = 0  # if restart false, but there were previous simulations
 
         if simulationRunner.parameters.runEquilibration:
-            initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningCalculator.parameters.reportFilename, outputPath, resname, processManager, topologies)
+            initialStructures = simulationRunner.equilibrate(initialStructures, outputPathConstants, spawningCalculator.parameters.reportFilename, outputPath, resname, reschain, resnum, processManager, topologies)
             # write the equilibration structures for each replica
             processManager.writeEquilibrationStructures(outputPathConstants.tmpFolder, initialStructures)
             if processManager.isMaster() and simulationRunner.parameters.constraints:
@@ -709,7 +731,7 @@ def main(jsonParams, clusteringHook=None):
         clusteringMethod.updateRepeatParameters(repeat, numSteps)
         clusteringMethod.setProcessors(simulationRunner.getWorkingProcessors())
     if simulationRunner.parameters.modeMovingBox is not None and simulationRunner.parameters.boxCenter is None:
-        simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname)
+        simulationRunner.parameters.boxCenter = simulationRunner.selectInitialBoxCenter(initialStructuresAsString, resname, reschain, resnum)
     for i in range(firstRun, simulationRunner.parameters.iterations):
         if processManager.isMaster():
             utilities.print_unbuffered("Iteration", i)
@@ -744,7 +766,7 @@ def main(jsonParams, clusteringHook=None):
             clustersFiltered = [True for _ in clusteringMethod]
 
         if simulationRunner.parameters.modeMovingBox is not None:
-            simulationRunner.getNextIterationBox(outputPathConstants.epochOutputPathTempletized % i, resname, topologies, i)
+            simulationRunner.getNextIterationBox(outputPathConstants.epochOutputPathTempletized % i, resname, reschain, resnum, topologies, i)
             if processManager.isMaster():
                 clustersList, clustersFiltered = clusteringMethod.filterClustersAccordingToBox(simulationRunner.parameters)
 
@@ -806,7 +828,7 @@ def main(jsonParams, clusteringHook=None):
         if processManager.isMaster():
             topologies.writeTopologyObject()
             if clusteringMethod.symmetries and nativeStructure:
-                fixReportsSymmetry(outputPathConstants.epochOutputPathTempletized % i, resname,
+                fixReportsSymmetry(outputPathConstants.epochOutputPathTempletized % i, resname, reschain, resnum,
                                    nativeStructure, clusteringMethod.symmetries, topologies)
 
             # check exit condition, if defined

@@ -351,15 +351,19 @@ class PeleSimulation(SimulationRunner):
         """
         return self.parameters.processors - 1
 
-    def getNextIterationBox(self, outputFolder, resname, topologies=None, epoch=None):
+    def getNextIterationBox(self, outputFolder, resname, reschain, resnum, topologies=None, epoch=None):
         """
             Select the box for the next epoch, currently selecting the COM of
             the cluster with max SASA
 
             :param outputFolder: Folder to the trajectories
             :type outputFolder: str
-            :param resname: Name of the ligand in the pdb
+            :param resname: Residue name of the ligand in the system pdb
             :type resname: str
+            :param reschain: Chain name of the ligand in the system pdb
+            :type reschain: str
+            :param resnum: Residue number of the ligand in the system pdb
+            :type resnum: int
             :param topologies: Topology object containing the set of topologies needed for the simulation
             :type topologies: :py:class:`.Topology`
             :param epoch: Epoch of the trajectories to analyse
@@ -388,11 +392,11 @@ class PeleSimulation(SimulationRunner):
         snapshotNum = int(metrics[SASAcluster, -1])
         snapshot = utilities.getSnapshots(os.path.join(outputFolder, self.parameters.trajectoryName % trajNum))[snapshotNum]
         snapshotPDB = atomset.PDB()
-        snapshotPDB.initialise(snapshot, resname=resname, topology=topologies.getTopology(epoch, trajNum))
+        snapshotPDB.initialise(snapshot, resname=resname, chain=reschain, resnum=resnum, topology=topologies.getTopology(epoch, trajNum))
         self.parameters.boxCenter = str(snapshotPDB.getCOM())
         return
 
-    def selectInitialBoxCenter(self, initialStructuresAsString, resname):
+    def selectInitialBoxCenter(self, initialStructuresAsString, resname, reschain, resnum):
         """
             Select the coordinates of the first box, currently as the center of
             mass of the first initial structure provided
@@ -401,6 +405,10 @@ class PeleSimulation(SimulationRunner):
             :type initialStructuresAsString: str
             :param resname: Residue name of the ligand in the system pdb
             :type resname: str
+            :param reschain: Chain name of the ligand in the system pdb
+            :type reschain: str
+            :param resnum: Residue number of the ligand in the system pdb
+            :type resnum: int
 
             :returns str: -- string to be substitued in PELE control file
         """
@@ -418,7 +426,7 @@ class PeleSimulation(SimulationRunner):
         # trajectories because it was assumed that initial structures would
         # still be pdbs
         PDBinitial = atomset.PDB()
-        PDBinitial.initialise(initialStruct, resname=resname)
+        PDBinitial.initialise(initialStruct, resname=resname, chain=reschain, resnum=resnum)
         return repr(PDBinitial.getCOM())
 
     def runEquilibrationPELE(self, runningControlFile):
@@ -579,7 +587,7 @@ class PeleSimulation(SimulationRunner):
         # but no more than 50
         return min(stepsPerProc, 50)
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, processManager, topologies=None):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resname, reschain, resnum, processManager, topologies=None):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure and select appropiate
@@ -595,6 +603,10 @@ class PeleSimulation(SimulationRunner):
             :type outputPath: str
             :param resname: Residue name of the ligand in the system pdb
             :type resname: str
+            :param reschain: Chain name of the ligand in the system pdb
+            :type reschain: str
+            :param resnum: Residue number of the ligand in the system pdb
+            :type resnum: int
             :param processManager: Object to synchronize the possibly multiple processes
             :type processManager: :py:class:`.ProcessesManager`
             :param topologies: Topology object containing the set of topologies needed for the simulation
@@ -602,8 +614,8 @@ class PeleSimulation(SimulationRunner):
 
             :returns: list --  List with initial structures
         """
-        if resname is None:
-            raise utilities.RequiredParameterMissingException("Resname not specified in clustering block!!!")
+        if not any([x is not None for x in (resname, resnum, reschain)]):
+            raise utilities.RequiredParameterMissingException("Ligand information not specified in clustering block!!!")
         newInitialStructures = []
         newStructure = []
         if self.parameters.equilibrationLength is None:
@@ -622,7 +634,7 @@ class PeleSimulation(SimulationRunner):
             initialStructureString = self.createMultipleComplexesFilenames(1, outputPathConstants.tmpInitialStructuresEquilibrationTemplate, i+1, equilibration=True)
             equilibrationPeleDict["OUTPUT_PATH"] = equilibrationOutput
             equilibrationPeleDict["COMPLEXES"] = initialStructureString
-            equilibrationPeleDict["BOX_CENTER"] = self.selectInitialBoxCenter(structure, resname)
+            equilibrationPeleDict["BOX_CENTER"] = self.selectInitialBoxCenter(structure, resname, reschain, resnum)
             equilibrationPeleDict["BOX_RADIUS"] = 2
             equilibrationPeleDict["REPORT_NAME"] = reportFilename
             equilibrationPeleDict["TRAJECTORY_NAME"] = trajName
@@ -646,9 +658,9 @@ class PeleSimulation(SimulationRunner):
             if len(initialStructures) == 1 and self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationLastSnapshot:
                 newStructure.extend(self.selectEquilibrationLastSnapshot(self.parameters.processors, trajNames, topology=topologies.topologies[i]))
             elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationSelect:
-                newStructure.extend(self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, trajNames, reportNames, topology=topologies.topologies[i]))
+                newStructure.extend(self.selectEquilibratedStructure(self.parameters.processors, similarityColumn, resname, reschain, resnum, trajNames, reportNames, topology=topologies.topologies[i]))
             elif self.parameters.equilibrationMode == blockNames.SimulationParams.equilibrationCluster:
-                newStructure.extend(self.clusterEquilibrationStructures(resname, trajNames, reportNames, topology=topologies.topologies[i]))
+                newStructure.extend(self.clusterEquilibrationStructures(resname, reschain, resnum, trajNames, reportNames, topology=topologies.topologies[i]))
 
         if len(newStructure) > self.getWorkingProcessors():
             # if for some reason the number of selected structures exceeds
@@ -662,12 +674,16 @@ class PeleSimulation(SimulationRunner):
             newInitialStructures.append(newStructurePath)
         return newInitialStructures
 
-    def clusterEquilibrationStructures(self, resname, trajWildcard, reportWildcard, topology=None):
+    def clusterEquilibrationStructures(self, resname, reschain, resnum, trajWildcard, reportWildcard, topology=None):
         """
             Cluster the equilibration run
 
-            :param resname: Name of the ligand in the pdb
+            :param resname: Residue name of the ligand in the system pdb
             :type resname: str
+            :param reschain: Chain name of the ligand in the system pdb
+            :type reschain: str
+            :param resnum: Residue number of the ligand in the system pdb
+            :type resnum: int
             :param trajWildcard: Templetized path to trajectory files"
             :type trajWildcard: str
             :param reportWildcard: Templetized path to report files"
@@ -688,7 +704,7 @@ class PeleSimulation(SimulationRunner):
             snapshots = utilities.getSnapshots(trajWildcard % i)
             for nSnap, (line, snapshot) in enumerate(zip(report, snapshots)):
                 conformation = atomset.PDB()
-                conformation.initialise(snapshot, resname=resname, topology=topology)
+                conformation.initialise(snapshot, resname=resname, chain=reschain, resnum=resnum, topology=topology)
                 com = conformation.getCOM()
                 data.append([line[energyColumn], i, nSnap]+com)
         if not data:
@@ -741,7 +757,7 @@ class PeleSimulation(SimulationRunner):
 
         return initialStructures
 
-    def selectEquilibratedStructure(self, nTrajs, similarityColumn, resname, trajWildcard, reportWildcard, topology=None):
+    def selectEquilibratedStructure(self, nTrajs, similarityColumn, resname, reschain, resnum, trajWildcard, reportWildcard, topology=None):
         """
             Select a representative initial structure from the equilibration
             run
@@ -751,8 +767,12 @@ class PeleSimulation(SimulationRunner):
             :param similarityColumn: Column number of the similarity metric
                 (RMSD or distance)
             :type similarityColumn: int
-            :param resname: Name of the ligand in the pdb
+            :param resname: Residue name of the ligand in the system pdb
             :type resname: str
+            :param reschain: Chain name of the ligand in the system pdb
+            :type reschain: str
+            :param resnum: Residue number of the ligand in the system pdb
+            :type resnum: int
             :param trajWildcard: Templetized path to trajectory files"
             :type trajWildcard: str
             :param reportWildcard: Templetized path to report files"
@@ -779,12 +799,12 @@ class PeleSimulation(SimulationRunner):
                 snapshots = utilities.getSnapshots(trajWildcard % i)
                 report_values = []
                 if i == 1:
-                    initial.initialise(snapshots.pop(0), resname=resname, topology=topology)
+                    initial.initialise(snapshots.pop(0), resname=resname, chain=reschain, resnum=resnum, topology=topology)
                     report_values.append([0, report[0, energyColumn]])
                     report = report[1:, :]
                 for j, snap in enumerate(snapshots):
                     pdbConformation = atomset.PDB()
-                    pdbConformation.initialise(snap, resname=resname, topology=topology)
+                    pdbConformation.initialise(snap, resname=resname, chain=reschain, resnum=resnum, topology=topology)
                     report_values.append([RMSDCalc.computeRMSD(initial, pdbConformation), report[j, energyColumn]])
             else:
                 report_values = report[:, cols]
