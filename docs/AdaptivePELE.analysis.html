@@ -90,8 +90,8 @@
 <li class="toctree-l1"><a class="reference internal" href="UserManual.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#adaptivesampling-module"><code class="docutils literal notranslate"><span class="pre">adaptiveSampling</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#automateroundsadaptive-module"><code class="docutils literal notranslate"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal notranslate"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal notranslate"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">analysis Package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.analysis.correctRMSD"><code class="docutils literal notranslate"><span class="pre">correctRMSD</span></code> Module</a></li>
@@ -532,7 +532,7 @@ clustering summary file</li>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.plotAdaptive.createPlot">
-<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">createPlot</code><span class="sig-paren">(</span><em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>paletteModifier</em>, <em>trajs_range=None</em>, <em>path_out=None</em>, <em>label_x=None</em>, <em>label_y=None</em>, <em>label_colorbar=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#createPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.createPlot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">createPlot</code><span class="sig-paren">(</span><em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>paletteModifier</em>, <em>trajs_range=None</em>, <em>path_out=None</em>, <em>label_x=None</em>, <em>label_y=None</em>, <em>label_colorbar=None</em>, <em>fig_size=(6</em>, <em>6)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#createPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.createPlot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a string to be passed to gnuplot</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -549,6 +549,7 @@ clustering summary file</li>
 <li><strong>label_x</strong> (<em>str</em>) – Label of the x-axis</li>
 <li><strong>label_y</strong> (<em>str</em>) – Label of the y-axis</li>
 <li><strong>label_colorbar</strong> (<em>str</em>) – Label of the colorbar</li>
+<li><strong>fig_size</strong> (<em>tuple</em>) – Size of the plot figure (default (6in, 6in))</li>
 </ul>
 </td>
 </tr>
@@ -558,7 +559,7 @@ clustering summary file</li>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.plotAdaptive.generatePlot">
-<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generatePlot</code><span class="sig-paren">(</span><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em>, <em>paletteModifier</em>, <em>trajs_range</em>, <em>path_to_save</em>, <em>xlabel</em>, <em>ylabel</em>, <em>cblabel</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generatePlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generatePlot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generatePlot</code><span class="sig-paren">(</span><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em>, <em>paletteModifier</em>, <em>trajs_range</em>, <em>path_to_save</em>, <em>xlabel</em>, <em>ylabel</em>, <em>cblabel</em>, <em>fig_size=(6</em>, <em>6)</em>, <em>show_plot=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generatePlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generatePlot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a template string to use with gnuplot</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -576,6 +577,8 @@ clustering summary file</li>
 <li><strong>xlabel</strong> (<em>str</em>) – Label of the x axis</li>
 <li><strong>ylabel</strong> (<em>str</em>) – Label of the y axis</li>
 <li><strong>cblabel</strong> (<em>str</em>) – Label of the colorbar</li>
+<li><strong>fig_size</strong> (<em>tuple</em>) – Size of the plot figure (default (6in, 6in))</li>
+<li><strong>show_plot</strong> (<em>bool</em>) – Wheter to show the plot to screen</li>
 </ul>
 </td>
 </tr>

@@ -389,6 +389,12 @@ number of contacts and a value of 1 typically indicates that the ligand is on th
 We encourage the use of default parameters with very few exceptions such as in the study 
 of the diffusion of ions or tiny molecules (e.g. a oxygen molecule).
 
+It should be noted that both in this document as well as in the parameter
+names, the use of the term *ligand* does not only refer to a small molecule but
+to the molecule used to compare the conformations in the clustering procedure.
+For example, one could run a simulation with a protein-protein complex and use
+the chain identifier to compare the conformations (see **Parameters** section
+below), thus one of the proteins would be considered a "ligand".
 
 ThresholdCalculator
 ...................

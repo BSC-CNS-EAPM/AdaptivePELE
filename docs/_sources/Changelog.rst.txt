@@ -10,6 +10,21 @@ The format is based on `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_
 .. XXX - Unreleased
 .. ----------------
 
+1.7 - Unreleased
+----------------
+
+New features:
+.............
+
+    - Use residue numbers and chain names in clustering, which makes possible
+      to run protein-protein simulations
+    
+Bug fixes:
+..........
+
+    - Fix bugs running MD simulations without ligand after the changes in
+      previous version
+
 1.6.3 - 2020-09-28
 ------------------
 

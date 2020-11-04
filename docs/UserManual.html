@@ -566,11 +566,17 @@ protein-ligand geometry and ligand size, this measure is more ligand-independent
 number of contacts and a value of 1 typically indicates that the ligand is on the surface entering a protein pocket.
 We encourage the use of default parameters with very few exceptions such as in the study
 of the diffusion of ions or tiny molecules (e.g. a oxygen molecule).</p>
+<p>It should be noted that both in this document as well as in the parameter
+names, the use of the term <em>ligand</em> does not only refer to a small molecule but
+to the molecule used to compare the conformations in the clustering procedure.
+For example, one could run a simulation with a protein-protein complex and use
+the chain identifier to compare the conformations (see <strong>Parameters</strong> section
+below), thus one of the proteins would be considered a “ligand”.</p>
 <div class="section" id="thresholdcalculator">
 <h3>ThresholdCalculator<a class="headerlink" href="#thresholdcalculator" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><strong>constant</strong>, where all clusters have the same threshold. A sound value may be 3Å.</li>
-<li><strong>heaviside</strong> (default), where thesholds (values) are assigned according to a set of step functions that
+<li><strong>constant</strong>, where all clusters have the same threshold. A sound value may be 3 Å.</li>
+<li><strong>heaviside</strong> (default), where thresholds (values) are assigned according to a set of step functions that
 vary according to a ratio of protein-ligand contacts and ligand size , <em>r</em>, (conditions, see below). The values and conditions
 of change are defined with two lists. The condition list is iterated until <em>r</em> &gt; condition[i], and the used
 threshold is values[i]. If r &lt;= conditions[i] for all i, it returns the last element in values.
@@ -672,9 +678,9 @@ distance with TICA</li>
 </pre></div>
 </div>
 <p>In this exemple, clusters having a contacts ration greater than 1 have a
-treshold of 2, those with contacts ratio between 1 and 0.75 have a treshold of
-3, between 0.75 and 0.5 a threshold of 4 and the rest have a threshold size of
-5. This means that for greater contacts ratio, typically closer to the binding site,
+treshold of 2 Å, those with contacts ratio between 1 and 0.75 have a treshold of
+3 Å, between 0.75 and 0.5 a threshold of 4 Å and the rest have a threshold size of
+5 Å. This means that for greater contacts ratio, typically closer to the binding site,
 the cluster size will be smaller and therefore those regions will be more
 finely discretized.</p>
 <p>Example of contactMap clustering:</p>
@@ -1080,13 +1086,13 @@ If we change a clustering parameter in a restart run, AdaptivePELE will recluste
 <div class="section" id="analysis">
 <h2>Analysis<a class="headerlink" href="#analysis" title="Permalink to this headline">¶</a></h2>
 <p>In order to analyse simulation results, a bunch of scripts are provided in <code class="docutils literal notranslate"><span class="pre">AdaptivePELE/analysis</span></code>. Get help to run them with: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">&lt;script&gt;</span> <span class="pre">-h</span></code></p>
-<p>Example to print column 5 evolution with gnuplot:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">2</span> <span class="mi">5</span> <span class="n">report_</span> <span class="o">-</span><span class="n">lines</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
+<p>Example to plot column 5 evolution:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">2</span> <span class="mi">5</span> <span class="n">report_</span> <span class="o">-</span><span class="n">lines</span>
 </pre></div>
 </div>
 <p>It prints the evolution of column 5 (e.g. RMSD) in report_* files with lines in epochs of 4 steps.</p>
-<p>Example to print BE against RMSD with gnuplot:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span> <span class="n">report_</span> <span class="o">-</span><span class="n">points</span> <span class="o">|</span> <span class="n">gnuplot</span> <span class="o">-</span><span class="n">persist</span>
+<p>Example to print BE against RMSD:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">plotAdaptive</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span> <span class="n">report_</span> <span class="o">-</span><span class="n">points</span>
 </pre></div>
 </div>
 <p>It prints the column 6 against column 5 with points. Epoch length is ignored in this case</p>

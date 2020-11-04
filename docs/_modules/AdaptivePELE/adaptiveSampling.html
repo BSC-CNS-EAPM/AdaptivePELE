@@ -254,7 +254,7 @@
                 <span class="k">raise</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">allTrajs</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
         <span class="c1"># this folder may not exist, in which case we just carry on</span>
         <span class="k">pass</span></div>
 
@@ -271,8 +271,8 @@
 <span class="sd">        :type processors: int</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">topologyMapping</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">)))</span><span class="o">+</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">topologyMapping</span> <span class="o">=</span> <span class="n">topologyMapping</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">processors</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">)))</span>
+    <span class="n">topologyMapping</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">)))</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">topologyMapping</span> <span class="o">=</span> <span class="n">topologyMapping</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">processors</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">)))</span>
     <span class="n">topologies</span><span class="o">.</span><span class="n">topologyMap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">topologyMapping</span><span class="p">[:</span><span class="n">processors</span><span class="p">]</span></div>
 
 
@@ -346,7 +346,7 @@
     <span class="k">return</span> <span class="n">totalInitialStructures</span></div>
 
 
-<div class="viewcode-block" id="checkSymmetryDict"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.checkSymmetryDict">[docs]</a><span class="k">def</span> <span class="nf">checkSymmetryDict</span><span class="p">(</span><span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+<div class="viewcode-block" id="checkSymmetryDict"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.checkSymmetryDict">[docs]</a><span class="k">def</span> <span class="nf">checkSymmetryDict</span><span class="p">(</span><span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reschain</span><span class="p">,</span> <span class="n">resnum</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the symmetries dictionary is valid for the ligand</span>
 
@@ -356,25 +356,33 @@
 <span class="sd">        :type initialStructures: list</span>
 <span class="sd">        :param resname: Residue name of the ligand in the system pdb</span>
 <span class="sd">        :type resname: str</span>
+<span class="sd">        :param reschain: Chain name of the ligand in the system pdb</span>
+<span class="sd">        :type reschain: str</span>
+<span class="sd">        :param resnum: Residue number of the ligand in the system pdb</span>
+<span class="sd">        :type resnum: int</span>
 
 <span class="sd">        :raise AssertionError: If atoms are not found in the structure</span>
 <span class="sd">     &quot;&quot;&quot;</span>
     <span class="n">symmetries</span> <span class="o">=</span> <span class="n">clusteringBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">params</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">symmetries</span><span class="p">,</span> <span class="p">{})</span>
     <span class="k">for</span> <span class="n">structure</span> <span class="ow">in</span> <span class="n">initialStructures</span><span class="p">:</span>
         <span class="n">PDB</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
-        <span class="n">PDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
+        <span class="n">PDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span><span class="n">chain</span><span class="o">=</span><span class="n">reschain</span><span class="p">,</span> <span class="n">resnum</span> <span class="o">=</span> <span class="n">resnum</span><span class="p">)</span>
         <span class="n">utilities</span><span class="o">.</span><span class="n">assertSymmetriesDict</span><span class="p">(</span><span class="n">symmetries</span><span class="p">,</span> <span class="n">PDB</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="fixReportsSymmetry"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.fixReportsSymmetry">[docs]</a><span class="k">def</span> <span class="nf">fixReportsSymmetry</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">nativeStructure</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
+<div class="viewcode-block" id="fixReportsSymmetry"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.fixReportsSymmetry">[docs]</a><span class="k">def</span> <span class="nf">fixReportsSymmetry</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reschain</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">nativeStructure</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new column in the report file with the RMSD that takes into account symmetries.</span>
 <span class="sd">        New reports are stored in the fixedReport_i where i is the number of the report</span>
 
 <span class="sd">        :param outputPath: Path where trajectories are found</span>
 <span class="sd">        :type outputPath: str</span>
-<span class="sd">        :param resname: Residue name of the ligand in the pdb</span>
+<span class="sd">        :param resname: Residue name of the ligand in the system pdb</span>
 <span class="sd">        :type resname: str</span>
+<span class="sd">        :param reschain: Chain name of the ligand in the system pdb</span>
+<span class="sd">        :type reschain: str</span>
+<span class="sd">        :param resnum: Residue number of the ligand in the system pdb</span>
+<span class="sd">        :type resnum: int</span>
 <span class="sd">        :param nativeStructure: Path to the native structure pdb</span>
 <span class="sd">        :type nativeStructure: str</span>
 <span class="sd">        :param symmetries: Dictionary containg the symmetries of the ligand</span>
@@ -390,10 +398,10 @@
     <span class="n">epoch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">outputPath</span><span class="p">))</span>
     <span class="n">trajs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">trajName</span><span class="p">))</span>
     <span class="n">nativePDB</span> <span class="o">=</span> <span class="n">atomset</span><span class="o">.</span><span class="n">PDB</span><span class="p">()</span>
-    <span class="n">nativePDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">nativeStructure</span><span class="p">),</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">)</span>
+    <span class="n">nativePDB</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">nativeStructure</span><span class="p">),</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="n">reschain</span><span class="p">,</span> <span class="n">resnum</span> <span class="o">=</span> <span class="n">resnum</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">traj</span> <span class="ow">in</span> <span class="n">trajs</span><span class="p">:</span>
         <span class="n">trajNum</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTrajNum</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
-        <span class="n">rmsd</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">utilities</span><span class="o">.</span><span class="n">getRMSD</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">nativePDB</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topologies</span><span class="o">.</span><span class="n">getTopology</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">)))</span>
+        <span class="n">rmsd</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">utilities</span><span class="o">.</span><span class="n">getRMSD</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">nativePDB</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reschain</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">symmetries</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="n">topologies</span><span class="o">.</span><span class="n">getTopology</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">trajNum</span><span class="p">)))</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">reportFilename</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">reportName</span><span class="p">)</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
@@ -403,7 +411,7 @@
             <span class="n">report</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
         <span class="n">outfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="n">outputFilename</span> <span class="o">%</span> <span class="n">trajNum</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">rmsd</span><span class="p">):</span>
-            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">outfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
@@ -469,7 +477,7 @@
             <span class="k">return</span> <span class="n">epoch</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">clusteringOutputObject</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">):</span>
             <span class="n">objectsFound</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">objectsFound</span> <span class="ow">and</span> <span class="n">epoch</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">objectsFound</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">5</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">objectsFound</span> <span class="ow">and</span> <span class="n">epoch</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">objectsFound</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">5</span><span class="p">):</span>
             <span class="k">break</span>
     <span class="k">while</span> <span class="n">objectsFound</span><span class="p">:</span>
         <span class="n">epoch</span> <span class="o">=</span> <span class="n">objectsFound</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -547,7 +555,7 @@
     <span class="k">if</span> <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">rmsd</span> <span class="ow">or</span>\
        <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMap</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">thresholdCalculator</span> <span class="o">!=</span> <span class="n">newClusteringMethod</span><span class="o">.</span><span class="n">thresholdCalculator</span> <span class="ow">or</span>\
-                <span class="nb">abs</span><span class="p">(</span><span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span> <span class="o">-</span> <span class="n">newClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-7</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span> <span class="o">-</span> <span class="n">newClusteringMethod</span><span class="o">.</span><span class="n">contactThresholdDistance</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-7</span>
 
     <span class="c1"># Check 3: Change of similarity Evaluator in contactMap clustering</span>
     <span class="k">if</span> <span class="n">oldClusteringMethod</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">contactMap</span><span class="p">:</span>
@@ -740,6 +748,23 @@
     <span class="k">return</span> <span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">initialStructuresAsString</span></div>
 
 
+<div class="viewcode-block" id="getClusteringLigandInfo"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.getClusteringLigandInfo">[docs]</a><span class="k">def</span> <span class="nf">getClusteringLigandInfo</span><span class="p">(</span><span class="n">clustering_block_json</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the ligand information (resname, resnum and chain from the cluering</span>
+<span class="sd">        parameters block in the control file)</span>
+
+<span class="sd">        :param clustering_block_json: JSON block with the clustering-related parameters</span>
+<span class="sd">        :type clustering_block_json: json</span>
+
+<span class="sd">        :returns: str, int, str -- Residue name, residue number and chain of the</span>
+<span class="sd">            molecule to use for the clutering</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">resname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">clustering_block_json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">ligandResname</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="n">resnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clustering_block_json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">ligandResnum</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">resChain</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">clustering_block_json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">ligandChain</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">resChain</span></div>
+
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">jsonParams</span><span class="p">,</span> <span class="n">clusteringHook</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Main body of the adaptive sampling program.</span>
@@ -763,10 +788,7 @@
     <span class="n">initialStructuresWildcard</span> <span class="o">=</span> <span class="n">generalParams</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">GeneralParams</span><span class="o">.</span><span class="n">initialStructures</span><span class="p">]</span>
     <span class="n">writeAll</span> <span class="o">=</span> <span class="n">generalParams</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">GeneralParams</span><span class="o">.</span><span class="n">writeAllClustering</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="n">nativeStructure</span> <span class="o">=</span> <span class="n">generalParams</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">GeneralParams</span><span class="o">.</span><span class="n">nativeStructure</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="n">resname</span> <span class="o">=</span> <span class="n">clusteringBlock</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">params</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">blockNames</span><span class="o">.</span><span class="n">ClusteringTypes</span><span class="o">.</span><span class="n">ligandResname</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">resname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># check if resname is provided in the simulation block</span>
-        <span class="n">resname</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">getResname</span><span class="p">()</span>
+    <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">reschain</span> <span class="o">=</span> <span class="n">getClusteringLigandInfo</span><span class="p">(</span><span class="n">clusteringBlock</span><span class="p">)</span>
 
     <span class="n">initialStructures</span> <span class="o">=</span> <span class="n">expandInitialStructuresWildcard</span><span class="p">(</span><span class="n">initialStructuresWildcard</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">initialStructures</span><span class="p">:</span>
@@ -775,8 +797,8 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">getWorkingProcessors</span><span class="p">():</span>
         <span class="k">raise</span> <span class="n">InitialStructuresError</span><span class="p">(</span><span class="s2">&quot;Error: More initial structures than Working Processors found!!!&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">resname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">checkSymmetryDict</span><span class="p">(</span><span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">,</span> <span class="n">resname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">reschain</span><span class="p">)]):</span>
+        <span class="n">checkSymmetryDict</span><span class="p">(</span><span class="n">clusteringBlock</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reschain</span><span class="p">,</span> <span class="n">resnum</span><span class="p">)</span>
 
     <span class="n">outputPathConstants</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">OutputPathConstants</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
 
@@ -820,7 +842,7 @@
         <span class="n">firstRun</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># if restart false, but there were previous simulations</span>
 
         <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">runEquilibration</span><span class="p">:</span>
-            <span class="n">initialStructures</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">equilibrate</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">reportFilename</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">processManager</span><span class="p">,</span> <span class="n">topologies</span><span class="p">)</span>
+            <span class="n">initialStructures</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">equilibrate</span><span class="p">(</span><span class="n">initialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">reportFilename</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reschain</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">processManager</span><span class="p">,</span> <span class="n">topologies</span><span class="p">)</span>
             <span class="c1"># write the equilibration structures for each replica</span>
             <span class="n">processManager</span><span class="o">.</span><span class="n">writeEquilibrationStructures</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">()</span> <span class="ow">and</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span>
@@ -849,7 +871,7 @@
         <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">updateRepeatParameters</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span> <span class="n">numSteps</span><span class="p">)</span>
         <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">setProcessors</span><span class="p">(</span><span class="n">simulationRunner</span><span class="o">.</span><span class="n">getWorkingProcessors</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">modeMovingBox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">boxCenter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">boxCenter</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">selectInitialBoxCenter</span><span class="p">(</span><span class="n">initialStructuresAsString</span><span class="p">,</span> <span class="n">resname</span><span class="p">)</span>
+        <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">boxCenter</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">selectInitialBoxCenter</span><span class="p">(</span><span class="n">initialStructuresAsString</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reschain</span><span class="p">,</span> <span class="n">resnum</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">firstRun</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">iterations</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
             <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Iteration&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
@@ -879,12 +901,12 @@
             <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Clustering ligand: </span><span class="si">%s</span><span class="s2"> sec&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="n">clusteringHook</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">clusteringHook</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">clusteringHook</span><span class="p">(</span><span class="n">clusteringMethod</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">simulationRunner</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">clustersList</span> <span class="o">=</span> <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">getClusterListForSpawning</span><span class="p">()</span>
             <span class="n">clustersFiltered</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">clusteringMethod</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">modeMovingBox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">simulationRunner</span><span class="o">.</span><span class="n">getNextIterationBox</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">topologies</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">simulationRunner</span><span class="o">.</span><span class="n">getNextIterationBox</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reschain</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">topologies</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
                 <span class="n">clustersList</span><span class="p">,</span> <span class="n">clustersFiltered</span> <span class="o">=</span> <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">filterClustersAccordingToBox</span><span class="p">(</span><span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
 
@@ -911,18 +933,17 @@
             <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">writeOutput</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">clusteringOutputDir</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span>
                                          <span class="n">degeneracyOfRepresentatives</span><span class="p">,</span>
                                          <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">clusteringOutputObject</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">writeAll</span><span class="p">)</span>
-            <span class="n">simulationRunner</span><span class="o">.</span><span class="n">cleanCheckpointFiles</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># Remove old clustering object, since we already have a newer one</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">clusteringOutputObject</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">clusteringOutputObject</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
                 <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
                     <span class="c1"># In case of restart</span>
                     <span class="k">pass</span>
 
         <span class="c1"># Prepare for next pele iteration</span>
-        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">iterations</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">iterations</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># Differentiate between null spawning and the rest of spawning</span>
             <span class="c1"># methods</span>
             <span class="k">if</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">shouldWriteStructures</span><span class="p">():</span>
@@ -930,22 +951,24 @@
                     <span class="n">_</span><span class="p">,</span> <span class="n">procMapping</span> <span class="o">=</span> <span class="n">spawningCalculator</span><span class="o">.</span><span class="n">writeSpawningInitialStructures</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="p">,</span>
                                                                                        <span class="n">degeneracyOfRepresentatives</span><span class="p">,</span>
                                                                                        <span class="n">clusteringMethod</span><span class="p">,</span>
-                                                                                       <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                                                                       <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                                                                                        <span class="n">topologies</span><span class="o">=</span><span class="n">topologies</span><span class="p">)</span>
                     <span class="n">utilities</span><span class="o">.</span><span class="n">writeProcessorMappingToDisk</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">,</span> <span class="s2">&quot;processMapping.txt&quot;</span><span class="p">,</span> <span class="n">procMapping</span><span class="p">)</span>
                 <span class="n">processManager</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
                     <span class="n">procMapping</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">readProcessorMappingFromDisk</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpFolder</span><span class="p">,</span> <span class="s2">&quot;processMapping.txt&quot;</span><span class="p">)</span>
                 <span class="n">simulationRunner</span><span class="o">.</span><span class="n">updateMappingProcessors</span><span class="p">(</span><span class="n">procMapping</span><span class="p">)</span>
-                <span class="n">topologies</span><span class="o">.</span><span class="n">mapEpochTopologies</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">procMapping</span><span class="p">)</span>
+                <span class="n">topologies</span><span class="o">.</span><span class="n">mapEpochTopologies</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">procMapping</span><span class="p">)</span>
                 <span class="n">initialStructuresAsString</span> <span class="o">=</span> <span class="n">simulationRunner</span><span class="o">.</span><span class="n">createMultipleComplexesFilenames</span><span class="p">(</span><span class="n">simulationRunner</span><span class="o">.</span><span class="n">getWorkingProcessors</span><span class="p">(),</span>
                                                                                               <span class="n">outputPathConstants</span><span class="o">.</span><span class="n">tmpInitialStructuresTemplate</span><span class="p">,</span>
                                                                                               <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
+                <span class="n">simulationRunner</span><span class="o">.</span><span class="n">cleanCheckpointFiles</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">processManager</span><span class="o">.</span><span class="n">isMaster</span><span class="p">():</span>
             <span class="n">topologies</span><span class="o">.</span><span class="n">writeTopologyObject</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">symmetries</span> <span class="ow">and</span> <span class="n">nativeStructure</span><span class="p">:</span>
-                <span class="n">fixReportsSymmetry</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span>
+                <span class="n">fixReportsSymmetry</span><span class="p">(</span><span class="n">outputPathConstants</span><span class="o">.</span><span class="n">epochOutputPathTempletized</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">reschain</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span>
                                    <span class="n">nativeStructure</span><span class="p">,</span> <span class="n">clusteringMethod</span><span class="o">.</span><span class="n">symmetries</span><span class="p">,</span> <span class="n">topologies</span><span class="p">)</span>
 
             <span class="c1"># check exit condition, if defined</span>
@@ -960,6 +983,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">utilities</span><span class="o">.</span><span class="n">print_unbuffered</span><span class="p">(</span><span class="s2">&quot;Simulation exit condition not met at iteration </span><span class="si">%d</span><span class="s2">, continuing...&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
         <span class="n">processManager</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span></div>
+
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parseArgs</span><span class="p">()</span>

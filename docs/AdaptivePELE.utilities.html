@@ -90,8 +90,8 @@
 <li class="toctree-l1"><a class="reference internal" href="UserManual.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#adaptivesampling-module"><code class="docutils literal notranslate"><span class="pre">adaptiveSampling</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#automateroundsadaptive-module"><code class="docutils literal notranslate"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal notranslate"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal notranslate"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.analysis.html">analysis Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.atomset.html">atomset Package</a></li>
@@ -573,7 +573,7 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 
 <dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.getRMSD">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getRMSD</code><span class="sig-paren">(</span><em>traj</em>, <em>nativePDB</em>, <em>resname</em>, <em>symmetries</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getRMSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getRMSD" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getRMSD</code><span class="sig-paren">(</span><em>traj</em>, <em>nativePDB</em>, <em>resname</em>, <em>reschain</em>, <em>resnum</em>, <em>symmetries</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getRMSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getRMSD" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the RMSD of a trajectory, given a native and symmetries</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -582,7 +582,9 @@ positives. This function is created for assign atomnames for custom pdbs</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>traj</strong> (<em>str</em>) – Trajecotry filename</li>
 <li><strong>nativePDB</strong> – Native PDB object</li>
-<li><strong>resname</strong> (<em>str</em>) – Resname to compute its RMSD</li>
+<li><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the system pdb</li>
+<li><strong>reschain</strong> (<em>str</em>) – Chain name of the ligand in the system pdb</li>
+<li><strong>resnum</strong> (<em>int</em>) – Residue number of the ligand in the system pdb</li>
 <li><strong>symmetries</strong> (<em>list of dict</em>) – Symmetries dictionary list with independent symmetry groups</li>
 <li><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</li>
 </ul>
@@ -723,6 +725,48 @@ trajectories and reports</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.get_file_extension">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_file_extension</code><span class="sig-paren">(</span><em>full_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_file_extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_file_extension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the extension of the file pointed by full_path</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>full_path</strong> (<em>str</em>) – Path to the file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.get_file_name">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_file_name</code><span class="sig-paren">(</span><em>full_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_file_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of the file pointed by full_path</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>full_path</strong> (<em>str</em>) – Path to the file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.get_file_name_extension">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_file_name_extension</code><span class="sig-paren">(</span><em>full_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_file_name_extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_file_name_extension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name and the extension of the file pointed by full_path</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>full_path</strong> (<em>str</em>) – Path to the file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.get_mdtraj_object_PDBstring">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_mdtraj_object_PDBstring</code><span class="sig-paren">(</span><em>conformation</em>, <em>topology</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_mdtraj_object_PDBstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_mdtraj_object_PDBstring" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the pdb string of a snapshot from a xtc trajectory to pdb</p>
@@ -744,6 +788,27 @@ trajectories and reports</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.get_string_from_array">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_string_from_array</code><span class="sig-paren">(</span><em>array</em>, <em>sep='</em>, <em>'</em>, <em>decimals=None</em>, <em>remove_newlines=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_string_from_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_string_from_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a string representation of an array, specifiying separator and
+decimal rounding</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>array</strong> (<em>ndarray</em><em> or </em><em>list</em>) – Input array</li>
+<li><strong>sep</strong> (<em>str</em>) – Separator</li>
+<li><strong>decimals</strong> (<em>int</em>) – Number of decimals to round the array</li>
+<li><strong>remove_newlines</strong> (<em>bool</em>) – Wheter to remove the newlines between dimensions</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="AdaptivePELE.utilities.utilities.get_workers_output">
 <code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_workers_output</code><span class="sig-paren">(</span><em>workers</em>, <em>wait_time=60</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_workers_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_workers_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the output of a pool of workers without serializing the program at the get.</p>
@@ -754,6 +819,29 @@ trajectories and reports</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>workers</strong> (<em>list</em>) – List of AsyncResult objects created when passing work to the pool</li>
 <li><strong>wait_time</strong> (<em>int</em>) – Number of second to wait before checking if next worker is finished</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List containing the output of all workers, if the function
+passed to the pool had no return value it will be a list of None objects</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="AdaptivePELE.utilities.utilities.glob_sorted">
+<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">glob_sorted</code><span class="sig-paren">(</span><em>pattern</em>, <em>reverse=False</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#glob_sorted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.glob_sorted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run glob and sort the output to ensure cross-platform compatibility</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pattern</strong> (<em>str</em>) – pathname to match files</li>
+<li><strong>reverse</strong> (<em>bool</em>) – If set to True, then the list elements are sorted as if each comparison were reversed</li>
+<li><strong>key</strong> (<em>function</em>) – Function of one argument that is used to extract a comparison key from each list element</li>
 </ul>
 </td>
 </tr>
