@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from AdaptivePELE.clustering import clustering
 import unittest
+from AdaptivePELE.clustering import clustering
 
 
 class clusteringTest(unittest.TestCase):
@@ -103,3 +103,35 @@ class clusteringTest(unittest.TestCase):
         # self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_6), 4)
         # self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster1_4), 10)
         # self.assertAlmostEqual(CMEvaluator.getInnerLimit(cluster2_4), 4)
+
+    def testCluster_protein_protein(self):
+        # preparation
+        clusteringBuilder = clustering.ClusteringBuilder()
+        clusteringParams = {"type": "rmsd",
+                            "params": {"ligandChain": "B",
+                                       "contactThresholdDistance": 8},
+                            "thresholdCalculator" : {
+                                        "type" : "constant",
+                                        "params" : { "value" : 4.0 }
+                                }}
+        clusteringInstance = clusteringBuilder.buildClustering(clusteringParams,
+                                                               "report", 3)
+
+        trajNames = ["tests/data/protein_protein_data/traj*"]
+
+        # function to test
+        clusteringInstance.cluster(trajNames)
+
+        # assertion
+        allClusters = clusteringInstance.clusters.clusters
+        goldenNumberOfClusters = 2
+        goldenEnergyCluster1 = -18906.7
+        goldenEnergyCluster2 = -18905
+        goldenElementsCluster1 = 8
+        goldenElementsCluster2 = 3
+
+        self.assertEqual(len(allClusters), goldenNumberOfClusters)
+        self.assertAlmostEqual(allClusters[0].getMetric(), goldenEnergyCluster1, 2)
+        self.assertAlmostEqual(allClusters[1].getMetric(), goldenEnergyCluster2, 2)
+        self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
+        self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
