@@ -881,11 +881,16 @@ cdef class PDB:
         cdef int rowind, colind
         cdef basestring proteinAtomId
         cdef Atom ligandAtom, proteinAtom
-        for rowind in range(len(ligandPDB.atomList)):
         # can be optimised with cell list
+        for rowind in range(len(ligandPDB.atomList)):
             ligandAtom = ligandPDB.atoms[ligandPDB.atomList[rowind]]
             for colind in range(len(alphaCarbonsPDB.atomList)):
                 proteinAtomId = alphaCarbonsPDB.atomList[colind]
+                if proteinAtomId in ligandPDB.atoms:
+                    # skip CA atoms that are present in the ligand, useful when
+                    # working with protein-protein complexes and using one of
+                    # the proteins as ligand
+                    continue
                 proteinAtom = alphaCarbonsPDB.atoms[proteinAtomId]
                 dist2 = ligandAtom.squaredDistance(proteinAtom)
                 if (dist2 - contactThresholdDistance2) < 0.1:
