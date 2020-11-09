@@ -934,7 +934,7 @@ class MDSimulation(SimulationRunner):
             # arbitrarely return the first ligand name
             return self.parameters.ligandName[0]
 
-    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resnames, processManager, topologies=None):
+    def equilibrate(self, initialStructures, outputPathConstants, reportFilename, outputPath, resnames, reschain, resnum, processManager, topologies=None):
         """
             Run short simulation to equilibrate the system. It will run one
             such simulation for every initial structure
@@ -951,6 +951,10 @@ class MDSimulation(SimulationRunner):
             :type outputPath: str
             :param resnames: Residue name of the ligands in the system pdb
             :type resnames: list
+            :param reschain: Chain name of the ligand in the system pdb
+            :type reschain: str
+            :param resnum: Residue number of the ligand in the system pdb
+            :type resnum: int
             :param processManager: Object to synchronize the possibly multiple processes
             :type processManager: :py:class:`.ProcessesManager`
             :param topology: Topology object
