@@ -20,7 +20,7 @@ class TestMD(unittest.TestCase):
         controlFile = "tests/data/templetized_controlFile_3ptb_md.conf"
 
         adaptiveSampling.main(controlFile)
-        self.check_succesful_simulation(output_path, 2, 4)
+        self.check_succesful_simulation(output_path, 1, 4)
         # cleanup
         shutil.rmtree(output_path)
 
