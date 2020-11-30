@@ -38,7 +38,7 @@ def parseArguments():
     parser.add_argument("--figure_size", "-f_size", type=str, default="6x6", help="Figure size in inches, specified as widthxheight, default 6x6")
     parser.add_argument("--show_plots", action="store_false", help="Deactivate the display of the plot (if not specified it will be shown)")
     args = parser.parse_args()
-    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size. args.show_plots
+    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size, args.show_plots
 
 
 def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
