@@ -31,14 +31,15 @@ def parseArguments():
     parser.add_argument("-zcol", type=int, default=None, help="Column to define color according to metric")
     parser.add_argument("-traj_col", action="store_true", help="Color differently each trajectory")
     parser.add_argument("-t", "--traj_range", type=str, default=None, help="Range of trajs to select, e.g to select trajs from 1 to 10, 1:10")
-    parser.add_argument("--output_path", type=str, default=None, help="Where to save the file, including the name of the image file (for exmple path/plot.png)")
+    parser.add_argument("--output_path", type=str, default=None, help="Where to save the file, including the name of the image file (for example path/plot.png)")
     parser.add_argument("--xlabel", type=str, default=None, help="Label for the x axis")
     parser.add_argument("--ylabel", type=str, default=None, help="Label for the y axis")
     parser.add_argument("--cblabel", type=str, default=None, help="Label for the colorbar")
     parser.add_argument("--figure_size", "-f_size", type=str, default="6x6", help="Figure size in inches, specified as widthxheight, default 6x6")
     parser.add_argument("--show_plots", action="store_false", help="Deactivate the display of the plot (if not specified it will be shown)")
+    parser.add_argument("--simulation_path", type=str, default=".", help="Path to the simulation output, defult is the current directory")
     args = parser.parse_args()
-    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size. args.show_plots
+    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size, args.show_plots, args.simulation_path
 
 
 def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
@@ -74,7 +75,7 @@ def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
         artists.append(plt.scatter(x, y, c=colors, cmap=opt_dict['cmap'].cmap, s=15, zorder=2))
 
 
-def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, paletteModifier, trajs_range=None, path_out=None, label_x=None, label_y=None, label_colorbar=None, fig_size=(6, 6)):
+def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, paletteModifier, trajs_range=None, label_x=None, label_y=None, label_colorbar=None, fig_size=(6, 6), simulation_path="."):
     """
         Generate a string to be passed to gnuplot
 
@@ -90,8 +91,6 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
         :type paletteModifier: int
         :param trajs_range: Range of trajectories to plot
         :type trajs_range: str
-        :param path_out: Path where to store the plot
-        :type path_out: str
         :param label_x: Label of the x-axis
         :type label_x: str
         :param label_y: Label of the y-axis
@@ -100,9 +99,13 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
         :type label_colorbar: str
         :param fig_size: Size of the plot figure (default (6in, 6in))
         :type fig_size: tuple
+        :param simulation_path: Path to the simulation data
+        :type simulation_path: str
     """
-    epochs = utilities.get_epoch_folders('.')
+    epochs = utilities.get_epoch_folders(simulation_path)
     numberOfEpochs = int(len(epochs))
+    if numberOfEpochs == 0:
+        raise ValueError("No simulation found in specified path ", os.path.abspath(simulation_path))
     cmap_name = "viridis"
 
     dictionary = {'reportName': reportName, 'col2': column2, 'numberOfEpochs': numberOfEpochs,
@@ -121,7 +124,7 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
     for epoch in epochs:
         ep = int(epoch)
         reports = glob.glob(os.path.join(epoch, reportName+"*"))
-        if not len(reports):
+        if not reports:
             raise ValueError("Could not find any reports with the given name!!")
         for report in glob.glob(os.path.join(epoch, reportName+"*")):
             report_num = utilities.getReportNum(report)
@@ -221,7 +224,7 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
 
-def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier, trajs_range, path_to_save, xlabel, ylabel, cblabel, fig_size=(6, 6), show_plot=True):
+def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier, trajs_range, path_to_save, xlabel, ylabel, cblabel, fig_size=(6, 6), show_plot=True, simulation_path="."):
     """
         Generate a template string to use with gnuplot
 
@@ -251,6 +254,8 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         :type fig_size: tuple
         :param show_plot: Wheter to show the plot to screen
         :type show_plot: bool
+        :param simulation_path: Path to the simulation data
+        :type simulation_path: str
 
         :returns: str -- String to plot using gnuplot
     """
@@ -258,7 +263,7 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         printWithLines = True
     elif kindOfPrint == "PRINT_BE_RMSD":
         printWithLines = False
-    createPlot(reportName, xcol, ycol, stepsPerRun, printWithLines, paletteModifier, trajs_range=trajs_range, path_out=path_to_save, label_x=xlabel, label_y=ylabel, label_colorbar=cblabel, fig_size=fig_size)
+    createPlot(reportName, xcol, ycol, stepsPerRun, printWithLines, paletteModifier, trajs_range=trajs_range, label_x=xlabel, label_y=ylabel, label_colorbar=cblabel, fig_size=fig_size, simulation_path=simulation_path)
     if path_to_save is not None:
         folder, _ = os.path.split(path_to_save)
         if folder:
@@ -268,7 +273,7 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         plt.show()
 
 if __name__ == "__main__":
-    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range, color_traj, output_path, xlab, ylab, cblab, figure_size, plots_show = parseArguments()
+    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range, color_traj, output_path, xlab, ylab, cblab, figure_size, plots_show, path_simulation = parseArguments()
     figure_size = tuple(map(int, figure_size.split("x")))
     Xcol -= 1
     Ycol -= 1
@@ -282,4 +287,4 @@ if __name__ == "__main__":
     if color_traj:
         colModifier = -1
 
-    generatePlot(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier, traj_range, output_path, xlab, ylab, cblab, figure_size, show_plot=plots_show)
+    generatePlot(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier, traj_range, output_path, xlab, ylab, cblab, figure_size, show_plot=plots_show, simulation_path=path_simulation)
