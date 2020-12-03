@@ -532,7 +532,7 @@ clustering summary file</li>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.plotAdaptive.createPlot">
-<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">createPlot</code><span class="sig-paren">(</span><em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>paletteModifier</em>, <em>trajs_range=None</em>, <em>path_out=None</em>, <em>label_x=None</em>, <em>label_y=None</em>, <em>label_colorbar=None</em>, <em>fig_size=(6</em>, <em>6)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#createPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.createPlot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">createPlot</code><span class="sig-paren">(</span><em>reportName</em>, <em>column1</em>, <em>column2</em>, <em>stepsPerRun</em>, <em>printWithLines</em>, <em>paletteModifier</em>, <em>trajs_range=None</em>, <em>label_x=None</em>, <em>label_y=None</em>, <em>label_colorbar=None</em>, <em>fig_size=(6</em>, <em>6)</em>, <em>simulation_path='.'</em>, <em>skip_first_step=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#createPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.createPlot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a string to be passed to gnuplot</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -543,13 +543,14 @@ clustering summary file</li>
 <li><strong>column1</strong> (<em>int</em>) – Column to plot in the X axis</li>
 <li><strong>column2</strong> (<em>int</em>) – Column to plot in the Y axis</li>
 <li><strong>stepsPerRun</strong> (<em>int</em>) – Number of steps per epoch,</li>
-<li><strong>paletteModifier</strong> (<em>int</em>) – Wheter to use the epoch as color or a column</li>
+<li><strong>paletteModifier</strong> (<em>int</em>) – Whether to use the epoch as color or a column</li>
 <li><strong>trajs_range</strong> (<em>str</em>) – Range of trajectories to plot</li>
-<li><strong>path_out</strong> (<em>str</em>) – Path where to store the plot</li>
 <li><strong>label_x</strong> (<em>str</em>) – Label of the x-axis</li>
 <li><strong>label_y</strong> (<em>str</em>) – Label of the y-axis</li>
 <li><strong>label_colorbar</strong> (<em>str</em>) – Label of the colorbar</li>
 <li><strong>fig_size</strong> (<em>tuple</em>) – Size of the plot figure (default (6in, 6in))</li>
+<li><strong>simulation_path</strong> (<em>str</em>) – Path to the simulation data</li>
+<li><strong>skip_first_step</strong> (<em>bool</em>) – Whether to avoid plotting the first point in each report</li>
 </ul>
 </td>
 </tr>
@@ -559,7 +560,7 @@ clustering summary file</li>
 
 <dl class="function">
 <dt id="AdaptivePELE.analysis.plotAdaptive.generatePlot">
-<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generatePlot</code><span class="sig-paren">(</span><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em>, <em>paletteModifier</em>, <em>trajs_range</em>, <em>path_to_save</em>, <em>xlabel</em>, <em>ylabel</em>, <em>cblabel</em>, <em>fig_size=(6</em>, <em>6)</em>, <em>show_plot=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generatePlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generatePlot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AdaptivePELE.analysis.plotAdaptive.</code><code class="descname">generatePlot</code><span class="sig-paren">(</span><em>stepsPerRun</em>, <em>xcol</em>, <em>ycol</em>, <em>reportName</em>, <em>kindOfPrint</em>, <em>paletteModifier</em>, <em>trajs_range</em>, <em>path_to_save</em>, <em>xlabel</em>, <em>ylabel</em>, <em>cblabel</em>, <em>fig_size=(6</em>, <em>6)</em>, <em>show_plot=True</em>, <em>simulation_path='.'</em>, <em>skip_first_step=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/analysis/plotAdaptive.html#generatePlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.analysis.plotAdaptive.generatePlot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a template string to use with gnuplot</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -579,6 +580,8 @@ clustering summary file</li>
 <li><strong>cblabel</strong> (<em>str</em>) – Label of the colorbar</li>
 <li><strong>fig_size</strong> (<em>tuple</em>) – Size of the plot figure (default (6in, 6in))</li>
 <li><strong>show_plot</strong> (<em>bool</em>) – Wheter to show the plot to screen</li>
+<li><strong>simulation_path</strong> (<em>str</em>) – Path to the simulation data</li>
+<li><strong>skip_first_step</strong> (<em>bool</em>) – Whether to avoid plotting the first point in each report</li>
 </ul>
 </td>
 </tr>

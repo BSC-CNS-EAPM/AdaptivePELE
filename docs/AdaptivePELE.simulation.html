@@ -327,7 +327,7 @@ equilibration run</li>
 
 <dl class="method">
 <dt id="AdaptivePELE.simulation.simulationrunner.MDSimulation.equilibrate">
-<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>initialStructures</em>, <em>outputPathConstants</em>, <em>reportFilename</em>, <em>outputPath</em>, <em>resnames</em>, <em>processManager</em>, <em>topologies=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.equilibrate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>initialStructures</em>, <em>outputPathConstants</em>, <em>reportFilename</em>, <em>outputPath</em>, <em>resnames</em>, <em>reschain</em>, <em>resnum</em>, <em>processManager</em>, <em>topologies=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/simulation/simulationrunner.html#MDSimulation.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.simulation.simulationrunner.MDSimulation.equilibrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run short simulation to equilibrate the system. It will run one
 such simulation for every initial structure
 (some of the arguments are not needed, such as (reportFilename, outputPath and topology) but they are kept
@@ -342,6 +342,8 @@ to follow the same structure has the Super class definition)</p>
 <li><strong>reportBaseFilename</strong> (<em>str</em>) – Name of the file that contains the metrics of the snapshots to cluster</li>
 <li><strong>outputPath</strong> (<em>str</em>) – Path where trajectories are found</li>
 <li><strong>resnames</strong> (<em>list</em>) – Residue name of the ligands in the system pdb</li>
+<li><strong>reschain</strong> (<em>str</em>) – Chain name of the ligand in the system pdb</li>
+<li><strong>resnum</strong> (<em>int</em>) – Residue number of the ligand in the system pdb</li>
 <li><strong>processManager</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessesManager</span></code>) – Object to synchronize the possibly multiple processes</li>
 <li><strong>topology</strong> (<em>:py:class:</em>) – Topology object</li>
 </ul>
