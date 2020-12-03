@@ -38,8 +38,9 @@ def parseArguments():
     parser.add_argument("--figure_size", "-f_size", type=str, default="6x6", help="Figure size in inches, specified as widthxheight, default 6x6")
     parser.add_argument("--show_plots", action="store_false", help="Deactivate the display of the plot (if not specified it will be shown)")
     parser.add_argument("--simulation_path", type=str, default=".", help="Path to the simulation output, defult is the current directory")
+    parser.add_argument("--skip_first_step", action="store_true", help="Avoid plotting the first step of each report")
     args = parser.parse_args()
-    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size, args.show_plots, args.simulation_path
+    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size, args.show_plots, args.simulation_path, args.skip_first_step
 
 
 def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
@@ -75,7 +76,10 @@ def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
         artists.append(plt.scatter(x, y, c=colors, cmap=opt_dict['cmap'].cmap, s=15, zorder=2))
 
 
-def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, paletteModifier, trajs_range=None, label_x=None, label_y=None, label_colorbar=None, fig_size=(6, 6), simulation_path="."):
+def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
+               paletteModifier, trajs_range=None, label_x=None, label_y=None,
+               label_colorbar=None, fig_size=(6, 6), simulation_path=".",
+               skip_first_step=False):
     """
         Generate a string to be passed to gnuplot
 
@@ -87,7 +91,7 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
         :type column2: int
         :param stepsPerRun: Number of steps per epoch,
         :type stepsPerRun: int
-        :param paletteModifier: Wheter to use the epoch as color or a column
+        :param paletteModifier: Whether to use the epoch as color or a column
         :type paletteModifier: int
         :param trajs_range: Range of trajectories to plot
         :type trajs_range: str
@@ -101,6 +105,8 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
         :type fig_size: tuple
         :param simulation_path: Path to the simulation data
         :type simulation_path: str
+        :param skip_first_step: Whether to avoid plotting the first point in each report
+        :type skip_first_step: bool
     """
     epochs = utilities.get_epoch_folders(simulation_path)
     numberOfEpochs = int(len(epochs))
@@ -133,6 +139,8 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
             if trajs_range is not None and report_num not in trajectory_range:
                 continue
             data = utilities.loadtxtfile(report)
+            if skip_first_step:
+                data = data[1:]
             if paletteModifier is not None and paletteModifier != -1:
                 cmin = min(cmin, data[:, paletteModifier].min())
                 cmax = max(cmax, data[:, paletteModifier].max())
@@ -152,9 +160,14 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
     if paletteModifier != -1:
         cbar = plt.colorbar(sm, ticks=ticks)
         cbar.ax.zorder = -1
+    offset = 0
+    if skip_first_step:
+        # if we skipt the first step there is a point that is not shown but we
+        # should count either way
+        offset = 1
     for el in data_dict:
         addLine(data_dict[el], el[1], el[0], stepsPerRun, dictionary, artists)
-        annotations.append(["Epoch: %d\nTrajectory: %d\nModel: %d" % (el[0], el[1], i+1) for i in range(len(data_dict[el]))])
+        annotations.append(["Epoch: %d\nTrajectory: %d\nModel: %d" % (el[0], el[1], i+1+offset) for i in range(len(data_dict[el]))])
     if label_x is not None:
         plt.xlabel(label_x)
     if label_y is not None:
@@ -224,7 +237,9 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines, palett
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
 
-def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier, trajs_range, path_to_save, xlabel, ylabel, cblabel, fig_size=(6, 6), show_plot=True, simulation_path="."):
+def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier,
+                 trajs_range, path_to_save, xlabel, ylabel, cblabel, fig_size=(6, 6),
+                 show_plot=True, simulation_path=".", skip_first_step=False):
     """
         Generate a template string to use with gnuplot
 
@@ -256,6 +271,8 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         :type show_plot: bool
         :param simulation_path: Path to the simulation data
         :type simulation_path: str
+        :param skip_first_step: Whether to avoid plotting the first point in each report
+        :type skip_first_step: bool
 
         :returns: str -- String to plot using gnuplot
     """
@@ -263,7 +280,9 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         printWithLines = True
     elif kindOfPrint == "PRINT_BE_RMSD":
         printWithLines = False
-    createPlot(reportName, xcol, ycol, stepsPerRun, printWithLines, paletteModifier, trajs_range=trajs_range, label_x=xlabel, label_y=ylabel, label_colorbar=cblabel, fig_size=fig_size, simulation_path=simulation_path)
+    createPlot(reportName, xcol, ycol, stepsPerRun, printWithLines, paletteModifier,
+               trajs_range=trajs_range, label_x=xlabel, label_y=ylabel, label_colorbar=cblabel,
+               fig_size=fig_size, simulation_path=simulation_path, skip_first_step=skip_first_step)
     if path_to_save is not None:
         folder, _ = os.path.split(path_to_save)
         if folder:
@@ -273,7 +292,7 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         plt.show()
 
 if __name__ == "__main__":
-    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range, color_traj, output_path, xlab, ylab, cblab, figure_size, plots_show, path_simulation = parseArguments()
+    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range, color_traj, output_path, xlab, ylab, cblab, figure_size, plots_show, path_simulation, should_skip_first_step = parseArguments()
     figure_size = tuple(map(int, figure_size.split("x")))
     Xcol -= 1
     Ycol -= 1
@@ -287,4 +306,7 @@ if __name__ == "__main__":
     if color_traj:
         colModifier = -1
 
-    generatePlot(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier, traj_range, output_path, xlab, ylab, cblab, figure_size, show_plot=plots_show, simulation_path=path_simulation)
+    generatePlot(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier,
+                 traj_range, output_path, xlab, ylab, cblab, figure_size,
+                 show_plot=plots_show, simulation_path=path_simulation,
+                 skip_first_step=should_skip_first_step)
