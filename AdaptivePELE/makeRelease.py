@@ -6,7 +6,6 @@ import os
 import glob
 import socket
 import shutil
-import select
 import argparse
 import subprocess
 from datetime import datetime
@@ -24,28 +23,6 @@ def parseArgs():
 
 def copy_ignore(src, names):
     return [x for x in names if x.endswith(".so")]
-
-def read_process_output(process, timeout=0.5):
-    stdout = ""
-    stderr = ""
-    while True:
-        try:
-            i,_,_ = select.select([process.stdout], [], [], timeout) # 0.5 second timeout
-            stdout += i[0].readline().replace('\r\n', '\n').replace('\r', '\n')
-        except IndexError:
-            # nothing was written to the pipe in 0.5 seconds, we're done here
-            break
-    while True:
-        try:
-            i,_,_ = select.select([process.stderr], [], [], timeout) # 0.5 second timeout
-            #import ipdb
-            #ipdb.set_trace()
-            #print(i[0].readline(), end="")
-            # stderr += str(os.read(i[0].fileno(), 1024))
-            stderr += i[0].readline().replace('\r\n', '\n').replace('\r', '\n')
-        except IndexError:
-            break
-    return stdout, stderr
 
 def join_cmds(prefix, suffix):
     if prefix:
