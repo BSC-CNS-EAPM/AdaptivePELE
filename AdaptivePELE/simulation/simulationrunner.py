@@ -515,12 +515,17 @@ class PeleSimulation(SimulationRunner):
 
             :returns: dict -- Dictionary with pele control file options
         """
-        # Set small rotations and translations
-        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["translationRange"] = 0.5
-        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["rotationScalingFactor"] = 0.05
         # Remove dynamical changes in control file
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("exitConditions", None)
         peleControlFileDict["commands"][0]["PeleTasks"][0].pop("parametersChanges", None)
+        if "Perturbation" not in peleControlFileDict["commands"][0]:
+            # if the PELE control file contains no Perturbation block we do not
+            # need to change anything else
+            return peleControlFileDict
+
+        # Set small rotations and translations
+        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["translationRange"] = 0.5
+        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["rotationScalingFactor"] = 0.05
         if "Box" in peleControlFileDict["commands"][0]["Perturbation"]:
             # Set box_radius to 2
             peleControlFileDict["commands"][0]["Perturbation"]["Box"]["fixedCenter"] = "$BOX_CENTER"
