@@ -25,7 +25,7 @@ def copy_ignore(src, names):
     return [x for x in names if x.endswith(".so")]
 
 def join_cmds(prefix, suffix):
-    if prefix:
+    if not prefix:
         return suffix
     else:
         return prefix+"; "+suffix
@@ -61,9 +61,11 @@ def build_extensions(name, releaseFolder, releaseName):
             log_install(fw, "")
         else:
             for env_str in all_envs:
-                prepare_str = "; ".join(["module purge 2> /dev/null", env_str+" 2> /dev/null"])
+                prepare_str = "; ".join(["module purge 2> /dev/null", env_str])
                 # call all commands in the same shell, so the module changes
                 # take effect
+                print(join_cmds(prepare_str, compile_cmd))
+                subprocess.call(join_cmds(prepare_str, "python --version"), universal_newlines=True, shell=True)
                 subprocess.call(join_cmds(prepare_str, compile_cmd), universal_newlines=True, shell=True)
                 log_install(fw, prepare_str)
                 fw.write("\n")
