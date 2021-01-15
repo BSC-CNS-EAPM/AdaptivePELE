@@ -6,11 +6,13 @@ import os
 import glob
 import socket
 import shutil
+import select
 import argparse
 import subprocess
 from datetime import datetime
 import AdaptivePELE as a
 from AdaptivePELE.utilities import utilities
+from AdaptivePELE.constants import environments
 
 
 def parseArgs():
@@ -23,10 +25,77 @@ def parseArgs():
 def copy_ignore(src, names):
     return [x for x in names if x.endswith(".so")]
 
+def read_process_output(process, timeout=0.5):
+    stdout = ""
+    stderr = ""
+    while True:
+        try:
+            i,_,_ = select.select([process.stdout], [], [], timeout) # 0.5 second timeout
+            stdout += i[0].readline().replace('\r\n', '\n').replace('\r', '\n')
+        except IndexError:
+            # nothing was written to the pipe in 0.5 seconds, we're done here
+            break
+    while True:
+        try:
+            i,_,_ = select.select([process.stderr], [], [], timeout) # 0.5 second timeout
+            #import ipdb
+            #ipdb.set_trace()
+            #print(i[0].readline(), end="")
+            # stderr += str(os.read(i[0].fileno(), 1024))
+            stderr += i[0].readline().replace('\r\n', '\n').replace('\r', '\n')
+        except IndexError:
+            break
+    return stdout, stderr
+
+def join_cmds(prefix, suffix):
+    if prefix:
+        return suffix
+    else:
+        return prefix+"; "+suffix
+
+def log_install(file_descriptor, prepare_str):
+    file_descriptor.write("Python used in installation: ")
+    version = subprocess.check_output(join_cmds(prepare_str, "python --version"), shell=True,
+                                      universal_newlines=True, stderr=subprocess.STDOUT)
+    file_descriptor.write(version)
+
+    file_descriptor.write("Compiler used in installation: ")
+    compiler = subprocess.check_output(join_cmds(prepare_str, "echo $CC"), shell=True,
+                                       universal_newlines=True, stderr=subprocess.STDOUT)
+    file_descriptor.write(compiler)
+
+    file_descriptor.write("Installed on %s\n" % str(datetime.now()))
+    file_descriptor.write("Modules loaded in installation:\n")
+
+    modules = subprocess.check_output(join_cmds(prepare_str, "module list"), shell=True,
+                                       universal_newlines=True, stderr=subprocess.STDOUT)
+    file_descriptor.write(modules)
+
+def build_extensions(name, releaseFolder, releaseName):
+    all_envs = environments.get(name)
+    # force recompiles everything even if no changes are detected, needed
+    # to recompile with different versions
+    compile_cmd = 'python setup.py build_ext --inplace --force'
+    with open(os.path.join(releaseFolder, releaseName, "installation_info.txt"), "w") as fw:
+        if all_envs is None:
+            # if no particular environment is specified just rely on whathever is
+            # set when calling the script
+            subprocess.call(['python', 'setup.py', 'build_ext', '--inplace'])
+            log_install(fw, "")
+        else:
+            for env_str in all_envs:
+                prepare_str = "; ".join(["module purge 2> /dev/null", env_str+" 2> /dev/null"])
+                # call all commands in the same shell, so the module changes
+                # take effect
+                subprocess.call(join_cmds(prepare_str, compile_cmd), universal_newlines=True, shell=True)
+                log_install(fw, prepare_str)
+                fw.write("\n")
 
 def main(releaseName):
     machine = socket.gethostname()
+    name = machine
     if "bsccv" in machine:
+        name = "life"
         releaseFolder = "/data2/bsc72/AdaptiveSampling/bin"
     elif 'login' in machine:
         name = os.getenv("BSC_MACHINE")
@@ -68,21 +137,7 @@ def main(releaseName):
 
     print("Compiling cython extensions")
     os.chdir(destFolder % "..")
-    subprocess.call(['python', 'setup.py', 'build_ext', '--inplace'])
-    with open(os.path.join(releaseFolder, releaseName, "installation_info.txt"), "w") as fw:
-        fw.write("Python used in installation: ")
-        version = subprocess.check_output(["python", "--version"], universal_newlines=True, stderr=subprocess.STDOUT)
-        fw.write(version)
-
-        fw.write("Compiler used in installation: ")
-        fw.write(os.getenv("CC")+"\n")
-
-        fw.write("Installed on %s\n" % str(datetime.now()))
-
-        fw.write("Modules loaded in installation:\n")
-
-        modules = subprocess.check_output("module list", universal_newlines=True, shell=True, stderr=subprocess.STDOUT)
-        fw.write(modules)
+    build_extensions(name, releaseFolder, releaseName)
 
     print("Done with release %s!" % releaseName)
 
