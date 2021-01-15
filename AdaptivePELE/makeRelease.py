@@ -21,7 +21,7 @@ def parseArgs():
 
 
 def copy_ignore(src, names):
-    return [x for x in names if x.endswith(".c") or x.endswith(".so")]
+    return [x for x in names if x.endswith(".so")]
 
 
 def main(releaseName):
