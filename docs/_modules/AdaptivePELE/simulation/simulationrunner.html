@@ -1074,7 +1074,7 @@
             <span class="c1"># arbitrarely return the first ligand name</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">ligandName</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="MDSimulation.equilibrate"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MDSimulation.equilibrate">[docs]</a>    <span class="k">def</span> <span class="nf">equilibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">reportFilename</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">resnames</span><span class="p">,</span> <span class="n">processManager</span><span class="p">,</span> <span class="n">topologies</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="MDSimulation.equilibrate"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MDSimulation.equilibrate">[docs]</a>    <span class="k">def</span> <span class="nf">equilibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialStructures</span><span class="p">,</span> <span class="n">outputPathConstants</span><span class="p">,</span> <span class="n">reportFilename</span><span class="p">,</span> <span class="n">outputPath</span><span class="p">,</span> <span class="n">resnames</span><span class="p">,</span> <span class="n">reschain</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">processManager</span><span class="p">,</span> <span class="n">topologies</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Run short simulation to equilibrate the system. It will run one</span>
 <span class="sd">            such simulation for every initial structure</span>
@@ -1091,6 +1091,10 @@
 <span class="sd">            :type outputPath: str</span>
 <span class="sd">            :param resnames: Residue name of the ligands in the system pdb</span>
 <span class="sd">            :type resnames: list</span>
+<span class="sd">            :param reschain: Chain name of the ligand in the system pdb</span>
+<span class="sd">            :type reschain: str</span>
+<span class="sd">            :param resnum: Residue number of the ligand in the system pdb</span>
+<span class="sd">            :type resnum: int</span>
 <span class="sd">            :param processManager: Object to synchronize the possibly multiple processes</span>
 <span class="sd">            :type processManager: :py:class:`.ProcessesManager`</span>
 <span class="sd">            :param topology: Topology object</span>

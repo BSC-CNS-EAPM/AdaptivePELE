@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
     - Parametrize more than one ligand in MD simulations
     - Include confactors in MD simulations
     - MD simulations can now be extended in time
+    - The plotAdaptive script now accepts a path to the simulation folder and
+      has an option to skip the first step when plotting
 
 ### Bug fixes:
 
