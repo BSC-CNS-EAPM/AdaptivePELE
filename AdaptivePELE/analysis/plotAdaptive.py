@@ -133,6 +133,8 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
         if not reports:
             raise ValueError("Could not find any reports with the given name!!")
         for report in reports:
+            if not utilities.isReport(report):
+                continue
             report_num = utilities.getReportNum(report)
             max_report = max(max_report, report_num)
             min_report = min(min_report, report_num)

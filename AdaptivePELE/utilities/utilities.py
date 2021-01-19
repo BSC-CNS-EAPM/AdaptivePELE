@@ -322,6 +322,31 @@ def getTrajNum(trajFilename):
     return int(trajFilename.split("_")[-1][:-4])
 
 
+def getFileSuffix(filename, separator="_"):
+    """
+        Gets the suffix appendend to a file name
+
+        :param filename: filename
+        :type filename: str
+        :param separator: character used as separator for the suffix
+        :type separator: str
+
+        :returns: int -- Trajectory number
+    """
+    name, _ = os.path.splitext(filename)
+    return name.split(separator)[-1]
+
+def isReport(reportFilename):
+    """
+        Checks whether the file is a PELE report
+
+        :param reportFilename: Trajectory filename
+        :type reportFilename: str
+
+        :returns: bool -- Whether the file is a PELE report
+    """
+    return getFileSuffix(reportFilename).isdigit()
+
 def getReportNum(reportFilename):
     """
         Gets the report number
@@ -331,8 +356,7 @@ def getReportNum(reportFilename):
 
         :returns: int -- Report number
     """
-    name, _ = os.path.splitext(reportFilename)
-    return int(name.split("_")[-1])
+    return int(getFileSuffix(reportFilename))
 
 
 def getPrmtopNum(prmtopFilename):
