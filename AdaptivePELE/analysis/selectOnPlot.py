@@ -71,10 +71,11 @@ def parseArguments():
                         help="Adaptive's trajectory prefix.")
     parser.add_argument("-sep", type=str, default=";",
                         help="Separator string that will be used in the CSV files.")
+    parser.add_argument("-skip_first_row", action="store_true", help="Skip the first row in the reports (initial conformation)")
 
     args = parser.parse_args()
 
-    return args.res_path, args.xcol, args.ycol, args.zcol, args.outfol, args.done, args.cpus, args.report, args.traj, args.sep, args.top
+    return args.res_path, args.xcol, args.ycol, args.zcol, args.outfol, args.done, args.cpus, args.report, args.traj, args.sep, args.top, args.skip_first_row
 
 
 class SelectFromCollection(object):
@@ -135,7 +136,8 @@ class SelectFromCollection(object):
 
 
 def concat_reports_in_csv(adaptive_results_path, output_file_path, report_prefix="report_",
-                          trajectory_prefix="trajectory_", separator_out=";"):
+                          trajectory_prefix="trajectory_", separator_out=";",
+                          skip_first=False):
     """
     It search report files in Adaptive's result folder and creates a csv file with everything concatenated, adding the
     epoch and trajectory information.
@@ -149,6 +151,8 @@ def concat_reports_in_csv(adaptive_results_path, output_file_path, report_prefix
     :type trajectory_prefix: str
     :param separator_out: Separator string used in the csv file.
     :type separator_out: str
+    :param skip_first: Whether to skip the first row of the report
+    :type skip_first: bool
     :return: Creates a csv file.
     """
     dataframe_lists = []
@@ -161,7 +165,10 @@ def concat_reports_in_csv(adaptive_results_path, output_file_path, report_prefix
             report_list = [x for x in report_list if adapt_tools.isReport(x)]
             report_list = sorted(report_list, key=adapt_tools.getReportNum)
             for n, report in enumerate(report_list):
-                pandas_df = pd.read_csv(report, sep="    ", engine="python", index_col=False, header=0)
+                if skip_first:
+                    pandas_df = pd.read_csv(report, sep="    ", engine="python", index_col=False, header=0, skiprows=[1])
+                else:
+                    pandas_df = pd.read_csv(report, sep="    ", engine="python", index_col=False, header=0)
                 pandas_df["epoch"] = adaptive_epoch
                 pandas_df["trajectory"] = glob.glob("{}/{}/*{}{}.*".format(adaptive_results_path, adaptive_epoch,
                                                                            trajectory_prefix, n + 1))[0]
@@ -250,7 +257,8 @@ def get_pdbs_from_df_in_xtc(df, pdbs_output_path, processors=4, column_file="tra
 
 def main(adaptive_results_folder, column_to_x="epoch", column_to_y="Binding Energy", column_to_z=None,
          output_selection_folder=None, summary_done=False, processors=4, report_pref="report_",
-         trajectory_pref="trajectory_", separator=";", column_file="trajectory", topology=None):
+         trajectory_pref="trajectory_", separator=";",
+         column_file="trajectory", topology=None, skip_first=False):
     """
     Generates a scatterplot of Adaptive's results given two or three columns (X, Y, and Z if set).
     This plot allows the selection of desired points by drawing. Structures will be selected and
@@ -282,12 +290,15 @@ def main(adaptive_results_folder, column_to_x="epoch", column_to_y="Binding Ener
     :type column_file: str
     :param topology: Path to the topology for the simulation
     :type topology: str
+    :param skip_first: Whether to skip the first row of the report
+    :type skip_first: bool
     :return:
     """
     summary_csv_filename = os.path.join(adaptive_results_folder, "summary.csv")
     if not summary_done:
         concat_reports_in_csv(adaptive_results_path=adaptive_results_folder, output_file_path=summary_csv_filename,
-                              report_prefix=report_pref, trajectory_prefix=trajectory_pref, separator_out=separator)
+                              report_prefix=report_pref, trajectory_prefix=trajectory_pref,
+                              separator_out=separator, skip_first=skip_first)
     dataframe = pd.read_csv(summary_csv_filename, sep=separator, engine='python', header=0)
     fig, ax = plt.subplots()
     if column_to_z:
@@ -331,7 +342,7 @@ def main(adaptive_results_folder, column_to_x="epoch", column_to_y="Binding Ener
 
 
 if __name__ == '__main__':
-    res_path, xcol, ycol, zcol, outfol, done, cpus, report_name, traj_name, sep, top = parseArguments()
+    res_path, xcol, ycol, zcol, outfol, done, cpus, report_name, traj_name, sep, top, skip_first_row = parseArguments()
     main(adaptive_results_folder=res_path, column_to_x=xcol, column_to_y=ycol, column_to_z=zcol,
          output_selection_folder=outfol, summary_done=done, processors=cpus, report_pref=report_name,
-         trajectory_pref=traj_name, separator=sep, topology=top)
+         trajectory_pref=traj_name, separator=sep, topology=top, skip_first=skip_first_row)
