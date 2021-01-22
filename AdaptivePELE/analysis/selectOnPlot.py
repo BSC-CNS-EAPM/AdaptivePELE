@@ -156,7 +156,10 @@ def concat_reports_in_csv(adaptive_results_path, output_file_path, report_prefix
         folder = os.path.join(adaptive_results_path, str(adaptive_epoch))
         if os.path.exists(folder):
             report_list = glob.glob("{}/*{}*".format(folder, report_prefix))
-            report_list = sorted(report_list, key=lambda x: int(x.split("_")[-1]))
+            # filter names that identify proper PELE reports, not interstep
+            # reports
+            report_list = [x for x in report_list if adapt_tools.isReport(x)]
+            report_list = sorted(report_list, key=adapt_tools.getReportNum)
             for n, report in enumerate(report_list):
                 pandas_df = pd.read_csv(report, sep="    ", engine="python", index_col=False, header=0)
                 pandas_df["epoch"] = adaptive_epoch
