@@ -39,8 +39,9 @@ def parseArguments():
     parser.add_argument("--show_plots", action="store_false", help="Deactivate the display of the plot (if not specified it will be shown)")
     parser.add_argument("--simulation_path", type=str, default=".", help="Path to the simulation output, defult is the current directory")
     parser.add_argument("--skip_first_step", action="store_true", help="Avoid plotting the first step of each report")
+    parser.add_argument("--skip_steps", default=None, type=int, help="Number of steps to skip")
     args = parser.parse_args()
-    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size, args.show_plots, args.simulation_path, args.skip_first_step
+    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size, args.show_plots, args.simulation_path, args.skip_first_step, args.skip_steps
 
 
 def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
@@ -79,7 +80,7 @@ def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
 def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
                paletteModifier, trajs_range=None, label_x=None, label_y=None,
                label_colorbar=None, fig_size=(6, 6), simulation_path=".",
-               skip_first_step=False):
+               skip_first_step=False, skip_steps=None):
     """
         Generate a string to be passed to gnuplot
 
@@ -107,6 +108,8 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
         :type simulation_path: str
         :param skip_first_step: Whether to avoid plotting the first point in each report
         :type skip_first_step: bool
+        :param skip_steps: Number of steps to skip in the plot
+        :type skip_steps: int
     """
     epochs = utilities.get_epoch_folders(simulation_path)
     numberOfEpochs = int(len(epochs))
@@ -141,7 +144,11 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
             if trajs_range is not None and report_num not in trajectory_range:
                 continue
             data = utilities.loadtxtfile(report)
-            if skip_first_step:
+            if skip_steps is not None:
+                if data.shape[0] <= skip_steps:
+                    continue
+                data = data[skip_steps+1:]
+            elif skip_first_step:
                 data = data[1:]
             if paletteModifier is not None and paletteModifier != -1:
                 cmin = min(cmin, data[:, paletteModifier].min())
@@ -163,7 +170,9 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
         cbar = plt.colorbar(sm, ticks=ticks)
         cbar.ax.zorder = -1
     offset = 0
-    if skip_first_step:
+    if skip_steps is not None:
+        offset = skip_steps
+    elif skip_first_step:
         # if we skipt the first step there is a point that is not shown but we
         # should count either way
         offset = 1
@@ -241,7 +250,8 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
 
 def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier,
                  trajs_range, path_to_save, xlabel, ylabel, cblabel, fig_size=(6, 6),
-                 show_plot=True, simulation_path=".", skip_first_step=False):
+                 show_plot=True, simulation_path=".", skip_first_step=False,
+                 skip_steps=None):
     """
         Generate a template string to use with gnuplot
 
@@ -275,6 +285,8 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         :type simulation_path: str
         :param skip_first_step: Whether to avoid plotting the first point in each report
         :type skip_first_step: bool
+        :param skip_first_step: Whether to avoid plotting the first point in each report
+        :type skip_first_step: bool
 
         :returns: str -- String to plot using gnuplot
     """
@@ -284,7 +296,8 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         printWithLines = False
     createPlot(reportName, xcol, ycol, stepsPerRun, printWithLines, paletteModifier,
                trajs_range=trajs_range, label_x=xlabel, label_y=ylabel, label_colorbar=cblabel,
-               fig_size=fig_size, simulation_path=simulation_path, skip_first_step=skip_first_step)
+               fig_size=fig_size, simulation_path=simulation_path,
+               skip_first_step=skip_first_step, skip_steps=skip_steps)
     if path_to_save is not None:
         folder, _ = os.path.split(path_to_save)
         if folder:
@@ -294,7 +307,7 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         plt.show()
 
 if __name__ == "__main__":
-    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range, color_traj, output_path, xlab, ylab, cblab, figure_size, plots_show, path_simulation, should_skip_first_step = parseArguments()
+    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range, color_traj, output_path, xlab, ylab, cblab, figure_size, plots_show, path_simulation, should_skip_first_step, n_skip_steps = parseArguments()
     figure_size = tuple(map(int, figure_size.split("x")))
     Xcol -= 1
     Ycol -= 1
@@ -311,4 +324,4 @@ if __name__ == "__main__":
     generatePlot(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier,
                  traj_range, output_path, xlab, ylab, cblab, figure_size,
                  show_plot=plots_show, simulation_path=path_simulation,
-                 skip_first_step=should_skip_first_step)
+                 skip_first_step=should_skip_first_step, skip_steps=n_skip_steps)
