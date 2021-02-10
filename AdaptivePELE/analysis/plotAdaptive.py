@@ -147,7 +147,7 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
             if skip_steps is not None:
                 if data.shape[0] <= skip_steps:
                     continue
-                data = data[skip_steps+1:]
+                data = data[skip_steps:]
             elif skip_first_step:
                 data = data[1:]
             if paletteModifier is not None and paletteModifier != -1:
