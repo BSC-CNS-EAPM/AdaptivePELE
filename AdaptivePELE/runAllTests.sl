@@ -10,10 +10,7 @@
 
 
 module purge #2> /dev/null
-module load intel mkl impi gcc # 2> /dev/null
-module load python/2.7.13 # 2> /dev/null
-module load boost/1.64.0_py2 # 2> /dev/null
-module load openmp
+module load intel mkl impi python/2.7.13 boost/1.64.0_py2 gcc openmp 2> /dev/null
 export PYTHONPATH="/home/bsc72/bsc72021/adaptiveSampling/AdaptiveSampling"
 export PYTHONPATH="/gpfs/projects/bsc72/MSM_PELE/bin:/home/bsc72/bsc72021/python-tools:$PYTHONPATH"
 export PYTHONPATH="$PYTHONPATH:/gpfs/projects/bsc72/lib/site-packages"
