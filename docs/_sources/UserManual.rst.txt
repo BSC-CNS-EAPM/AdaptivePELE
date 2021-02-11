@@ -446,8 +446,13 @@ MSM Clustering
 The **MSM** clusters a simulation in order to estimate an MSM, this includes
 the possibility of preprocessing the trajectories with the TICA method [TICA]_
 
-Parameters
-..........
+Clustering Parameters
+.....................
+
+Below you can find  a list of all parameters that can be used in the clustering
+block. Typically, all parameters apply to all kinds of clustering except Null
+Clustering, except those that are specified otherwise (often exclusive to MSM
+clustering):
 
 * **ligandResname** (*string*, default=""): Ligand residue name in the PDB (if necessary)
 * **ligandChain** (*string*, default=""): Ligand chain (if necessary)

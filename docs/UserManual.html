@@ -107,14 +107,14 @@
 <li class="toctree-l3"><a class="reference internal" href="#contactmap-clustering">ContactMap clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#null-clustering">Null clustering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#msm-clustering">MSM Clustering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id4">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clustering-parameters">Clustering Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#spawning-block">Spawning block</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#spawning-types">Spawning types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#density-calculator">Density calculator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id6">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
@@ -615,8 +615,12 @@ time.</p>
 <p>The <strong>MSM</strong> clusters a simulation in order to estimate an MSM, this includes
 the possibility of preprocessing the trajectories with the TICA method <a class="reference internal" href="#tica" id="id3">[TICA]</a></p>
 </div>
-<div class="section" id="id4">
-<h3>Parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="clustering-parameters">
+<h3>Clustering Parameters<a class="headerlink" href="#clustering-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Below you can find  a list of all parameters that can be used in the clustering
+block. Typically, all parameters apply to all kinds of clustering except Null
+Clustering, except those that are specified otherwise (often exclusive to MSM
+clustering):</p>
 <ul class="simple">
 <li><strong>ligandResname</strong> (<em>string</em>, default=”“): Ligand residue name in the PDB (if necessary)</li>
 <li><strong>ligandChain</strong> (<em>string</em>, default=”“): Ligand chain (if necessary)</li>
@@ -734,7 +738,7 @@ There are several implemented strategies:</p>
 <li><strong>UCB</strong>: Upper confidence bound.</li>
 <li><strong>FAST</strong>: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).</li>
 <li><strong>ProbabilityMSM</strong>: Distributes the processors with a weight that is
-proportional to the stationary probability of each cluster in an MSM (see <a class="reference internal" href="#msm" id="id5">[MSM]</a> for more details, needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</li>
+proportional to the stationary probability of each cluster in an MSM (see <a class="reference internal" href="#msm" id="id4">[MSM]</a> for more details, needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</li>
 <li><strong>MetastabilityMSM</strong> Distributes the processors with a weight that is
 proportional to the metastability of each cluster in an MSM calulated as q <sub>ii</sub>/<em>N</em>, where q <sub>ii</sub> is the number of self-transitions of state i and N is the total number of counts for the simulation (needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</li>
 <li><strong>IndependentMSM</strong> Trajectories are run independently, as in the
@@ -756,8 +760,8 @@ There are two types of density calculators:</p>
 <li><strong>exitContinuous</strong>, which assings decreasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 1/8, otherwise, density = (-4 <strong>r</strong> + 6)^3/64.0</li>
 </ul>
 </div>
-<div class="section" id="id6">
-<h3>Parameters<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. “report”.</li>
 <li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (one indexed)</li>
@@ -865,7 +869,7 @@ plots for the MSM-based spawnings</li>
 <h2>Control File Examples<a class="headerlink" href="#control-file-examples" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="example-1-pele-with-default-parameters">
 <h3>Example 1 – PELE with default parameters<a class="headerlink" href="#example-1-pele-with-default-parameters" title="Permalink to this headline">¶</a></h3>
-<p>The first example makes use of default parameters, using PELE as propagator (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id7">[APELE]</a>).</p>
+<p>The first example makes use of default parameters, using PELE as propagator (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id6">[APELE]</a>).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
@@ -1121,7 +1125,7 @@ and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clus
 <div class="section" id="non-pdb-trajectories">
 <h2>Non-PDB trajectories<a class="headerlink" href="#non-pdb-trajectories" title="Permalink to this headline">¶</a></h2>
 <p>Starting from version 1.5, AdaptivePELE supports working with non-PDB
-trajectories by relying on the mdtraj library <a class="reference internal" href="#mdtraj" id="id8">[MDTRAJ]</a>, with only minor changes in
+trajectories by relying on the mdtraj library <a class="reference internal" href="#mdtraj" id="id7">[MDTRAJ]</a>, with only minor changes in
 the exposed interface of the atomset module. However, some caution is needed
 when using mdtraj to convert between formats:</p>
 <ul class="simple">
@@ -1323,13 +1327,13 @@ is very similar. An example for this machin would look like:</p>
 <table class="docutils citation" frame="void" id="apele" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[APELE]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id7">2</a>)</em> Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></td></tr>
+<tr><td class="label">[APELE]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id6">2</a>)</em> Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></td></tr>
 </tbody>
 </table>
 <table class="docutils citation" frame="void" id="mdtraj" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id8">[MDTRAJ]</a></td><td>Robert&nbsp;T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, <a class="reference external" href="http://mdtraj.org">http://mdtraj.org</a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id7">[MDTRAJ]</a></td><td>Robert&nbsp;T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, <a class="reference external" href="http://mdtraj.org">http://mdtraj.org</a></td></tr>
 </tbody>
 </table>
 <table class="docutils citation" frame="void" id="openmm" rules="none">
@@ -1350,7 +1354,7 @@ is very similar. An example for this machin would look like:</p>
 <table class="docutils citation" frame="void" id="msm" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id5">[MSM]</a></td><td>Prinz, J H, H Wu, M Sarich, B Keller, M Senne, M Held, J D Chodera, C Schuette and F Noe. 2011. Markov models of molecular kinetics: Generation and validation. J Chem Phys 134: 174105</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id4">[MSM]</a></td><td>Prinz, J H, H Wu, M Sarich, B Keller, M Senne, M Held, J D Chodera, C Schuette and F Noe. 2011. Markov models of molecular kinetics: Generation and validation. J Chem Phys 134: 174105</td></tr>
 </tbody>
 </table>
 </div>

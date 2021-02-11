@@ -462,6 +462,31 @@
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">trajFilename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">4</span><span class="p">])</span></div>
 
 
+<div class="viewcode-block" id="getFileSuffix"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getFileSuffix">[docs]</a><span class="k">def</span> <span class="nf">getFileSuffix</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the suffix appendend to a file name</span>
+
+<span class="sd">        :param filename: filename</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param separator: character used as separator for the suffix</span>
+<span class="sd">        :type separator: str</span>
+
+<span class="sd">        :returns: int -- Trajectory number</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">separator</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="isReport"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.isReport">[docs]</a><span class="k">def</span> <span class="nf">isReport</span><span class="p">(</span><span class="n">reportFilename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks whether the file is a PELE report</span>
+
+<span class="sd">        :param reportFilename: Trajectory filename</span>
+<span class="sd">        :type reportFilename: str</span>
+
+<span class="sd">        :returns: bool -- Whether the file is a PELE report</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">getFileSuffix</span><span class="p">(</span><span class="n">reportFilename</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="getReportNum"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getReportNum">[docs]</a><span class="k">def</span> <span class="nf">getReportNum</span><span class="p">(</span><span class="n">reportFilename</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the report number</span>
@@ -471,8 +496,7 @@
 
 <span class="sd">        :returns: int -- Report number</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">reportFilename</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">getFileSuffix</span><span class="p">(</span><span class="n">reportFilename</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="getPrmtopNum"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getPrmtopNum">[docs]</a><span class="k">def</span> <span class="nf">getPrmtopNum</span><span class="p">(</span><span class="n">prmtopFilename</span><span class="p">):</span>

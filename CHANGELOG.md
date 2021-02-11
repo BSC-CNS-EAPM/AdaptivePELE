@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
     - Use residue numbers and chain names in clustering, which makes possible
       to run protein-protein simulations
+    - The plotAdaptive script now accepts a path to the simulation folder and
+      has an option to skip the first step, or a number of steps when plotting
 
 ## Bug fixes:
 
