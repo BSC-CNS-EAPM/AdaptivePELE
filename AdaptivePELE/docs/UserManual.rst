@@ -190,6 +190,12 @@ Optionally, you can also use the following parameters:
 * **numberEquilibrationStructures** (*int*, default=10): Number of clusters to
   obtain from the *equilibrationCluster* structure selection (see
   **equilibrationMode** for more details)
+* **equilibrationBoxRadius** (*float*, default=2.0): Value of the simulation box 
+  radius for the equilibration (in angstroms)
+* **equilibrationRotationRange** (*float*, default=0.05): Value of the rotation 
+  magnitude in the equilibration simulation
+* **equilibrationTranslationRange** (*float*, default=0.5): Value of the
+  translation magnitude in the equilibration simulation
 * **useSrun** (*bool*, default=False): Whether to use srun to launch the PELE
   simulation instead of mpirun. Using srun allows a finer control over the
   resources used and might be helpful to deal with different cluster

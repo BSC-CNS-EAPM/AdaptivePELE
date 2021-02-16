@@ -80,6 +80,9 @@ class SimulationParameters:
         self.mpiParameters = None
         self.numberEquilibrationStructures = 10
         self.reportName = ""
+        self.equilibrationBoxRadius = 2
+        self.equilibrationRotationRange = 0.05
+        self.equilibrationTranslationRange = 0.5
         # parameters needed for MD simulations and their defaults
         self.timeStep = 2
         self.ligandCharge = 0
@@ -524,12 +527,11 @@ class PeleSimulation(SimulationRunner):
             return peleControlFileDict
 
         # Set small rotations and translations
-        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["translationRange"] = 0.5
-        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["rotationScalingFactor"] = 0.05
+        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["translationRange"] = self.parameters.equilibrationTranslationRange
+        peleControlFileDict["commands"][0]["Perturbation"]["parameters"]["rotationScalingFactor"] = self.parameters.equilibrationRotationRange
         if "Box" in peleControlFileDict["commands"][0]["Perturbation"]:
-            # Set box_radius to 2
             peleControlFileDict["commands"][0]["Perturbation"]["Box"]["fixedCenter"] = "$BOX_CENTER"
-            peleControlFileDict["commands"][0]["Perturbation"]["Box"]["radius"] = 2
+            peleControlFileDict["commands"][0]["Perturbation"]["Box"]["radius"] = "$BOX_RADIUS"
         # Ensure random tags exists in metrics
         metricsBlock = peleControlFileDict["commands"][0]["PeleTasks"][0]["metrics"]
         nMetrics = len(metricsBlock)
@@ -543,7 +545,7 @@ class PeleSimulation(SimulationRunner):
         # Add equilibration dynamical changes
         changes = {
             "doThesechanges": {
-                "Perturbation::parameters": {"rotationScalingFactor": 0.050}
+                "Perturbation::parameters": {"rotationScalingFactor": 0.05}
             },
             "ifAnyIsTrue": ["rand >= .5"],
             "otherwise": {
@@ -640,7 +642,7 @@ class PeleSimulation(SimulationRunner):
             equilibrationPeleDict["OUTPUT_PATH"] = equilibrationOutput
             equilibrationPeleDict["COMPLEXES"] = initialStructureString
             equilibrationPeleDict["BOX_CENTER"] = self.selectInitialBoxCenter(structure, resname, reschain, resnum)
-            equilibrationPeleDict["BOX_RADIUS"] = 2
+            equilibrationPeleDict["BOX_RADIUS"] = self.parameters.equilibrationBoxRadius
             equilibrationPeleDict["REPORT_NAME"] = reportFilename
             equilibrationPeleDict["TRAJECTORY_NAME"] = trajName
             for name in ["BOX_CENTER", "BOX_RADIUS"]:
@@ -1486,6 +1488,9 @@ class RunnerBuilder:
             params.equilibrationMode = paramsBlock.get(blockNames.SimulationParams.equilibrationMode, blockNames.SimulationParams.equilibrationSelect)
             params.equilibrationLength = paramsBlock.get(blockNames.SimulationParams.equilibrationLength)
             params.numberEquilibrationStructures = paramsBlock.get(blockNames.SimulationParams.numberEquilibrationStructures, 10)
+            params.equilibrationBoxRadius = paramsBlock.get(blockNames.SimulationParams.equilibrationBoxRadius, 2)
+            params.equilibrationRotationRange = paramsBlock.get(blockNames.SimulationParams.equilibrationRotationRange, 0.05)
+            params.equilibrationTranslationRange = paramsBlock.get(blockNames.SimulationParams.equilibrationTranslationRange, 0.5)
             params.srun = paramsBlock.get(blockNames.SimulationParams.srun, False)
             params.trajsPerReplica = params.processors
             params.numReplicas = 1
