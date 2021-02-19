@@ -620,9 +620,10 @@ def getClusteringLigandInfo(clustering_block_json):
             molecule to use for the clutering
 
     """
-    resname = str(clustering_block_json.get(blockNames.ClusteringTypes.ligandResname, "")).upper()
-    resnum = int(clustering_block_json.get(blockNames.ClusteringTypes.ligandResnum, 0))
-    resChain = str(clustering_block_json.get(blockNames.ClusteringTypes.ligandChain, "")).upper()
+    paramsBlock = clustering_block_json[blockNames.ClusteringTypes.params]
+    resname = str(paramsBlock.get(blockNames.ClusteringTypes.ligandResname, "")).upper()
+    resnum = int(paramsBlock.get(blockNames.ClusteringTypes.ligandResnum, 0))
+    resChain = str(paramsBlock.get(blockNames.ClusteringTypes.ligandChain, "")).upper()
     return resname, resnum, resChain
 
 def main(jsonParams, clusteringHook=None):
