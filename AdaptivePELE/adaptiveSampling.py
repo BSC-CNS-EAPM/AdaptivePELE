@@ -610,7 +610,7 @@ def buildNewClusteringAndWriteInitialStructuresInNewSimulation(debug, controlFil
 
 def getClusteringLigandInfo(clustering_block_json):
     """
-        Get the ligand information (resname, resnum and chain from the cluering
+        Get the ligand information (resname, resnum and chain from the clustering
         parameters block in the control file)
 
         :param clustering_block_json: JSON block with the clustering-related parameters

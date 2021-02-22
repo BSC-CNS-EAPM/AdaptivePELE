@@ -621,7 +621,9 @@ class PeleSimulation(SimulationRunner):
 
             :returns: list --  List with initial structures
         """
-        if not any([x is not None for x in (resname, resnum, reschain)]):
+        # check that we have some way of identifyin the ligand
+        ligandInputs = [resname != "", resnum != 0, reschain != ""]
+        if not any(ligandInputs):
             raise utilities.RequiredParameterMissingException("Ligand information not specified in clustering block!!!")
         newInitialStructures = []
         newStructure = []
