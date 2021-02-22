@@ -20,6 +20,13 @@ New features:
       equilibrationBoxRadius parameters to tune equilibration
       performance
 
+Bug fixes:
+..........
+
+    - Fix bug reading the ligand information in the adaptiveSampling main,
+      which caused to set the equilibration box in the center of mass of the
+      whole system
+
 1.7 - 2021-02-11
 ----------------
 
