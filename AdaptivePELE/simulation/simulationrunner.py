@@ -717,7 +717,7 @@ class PeleSimulation(SimulationRunner):
                 com = conformation.getCOM()
                 data.append([line[energyColumn], i, nSnap]+com)
         if not data:
-            raise utilities.UnspecifiedPELECrashException("Some happened with PELE and no trajectories were written!!")
+            raise utilities.UnspecifiedPELECrashException("Some error happened with PELE and no trajectories were written!!")
         data = np.array(data)
         data = data[data[:, 0].argsort()]
         nPoints = max(self.parameters.numberEquilibrationStructures, data.shape[0]//4)
@@ -1351,11 +1351,14 @@ class TestSimulation(SimulationRunner):
         self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         if not self.copied:
             tmp_sync = os.path.join(outputPathConstants.tmpFolder, os.path.split(processManager.syncFolder)[1])
+            tmp_topology = os.path.join(outputPathConstants.tmpFolder, os.path.split(topologies.path)[1])
             shutil.copytree(processManager.syncFolder, tmp_sync)
+            shutil.copytree(topologies.path, tmp_topology)
             if os.path.exists(self.parameters.destination):
                 shutil.rmtree(self.parameters.destination)
             shutil.copytree(self.parameters.origin, self.parameters.destination)
             shutil.copytree(tmp_sync, processManager.syncFolder)
+            shutil.copytree(tmp_topology, topologies.path)
             self.copied = True
 
     def makeWorkingControlFile(self, workingControlFilename, dictionary, inputTemplate=None):
