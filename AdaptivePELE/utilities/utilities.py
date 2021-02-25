@@ -368,7 +368,7 @@ def getReportList(reportBase):
 
         :return: list -- List of report files
     """
-    return [x for x in glob_sorted(reportBase, key=getReportNum) if isReport(x)]
+    return glob_sorted(reportBase, key=getReportNum, filter_func=isReport)
 
 def getPrmtopNum(prmtopFilename):
     """
@@ -967,7 +967,7 @@ def get_workers_output(workers, wait_time=60):
     return results
 
 
-def glob_sorted(pattern, reverse=False, key=None):
+def glob_sorted(pattern, reverse=False, key=None, filter_func=None):
     """
         Run glob and sort the output to ensure cross-platform compatibility
 
@@ -982,6 +982,8 @@ def glob_sorted(pattern, reverse=False, key=None):
             passed to the pool had no return value it will be a list of None objects
     """
     results = glob.glob(pattern)
+    if filter_func is not None:
+        results = filter(filter_func, results)
     return sorted(results, reverse=reverse, key=key)
 
 
