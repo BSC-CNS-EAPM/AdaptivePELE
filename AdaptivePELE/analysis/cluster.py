@@ -19,6 +19,7 @@ import glob
 import re
 import sys
 import warnings
+from AdaptivePELE.utilities import utilities
 import AdaptivePELE.analysis.splitTrajectory as st
 import AdaptivePELE.analysis.backtrackAdaptiveTrajectory as bk
 
@@ -191,8 +192,8 @@ def Filter(values, percentage, column_name, thresh=None):
 
 
 def find_reports(path, numfolders):
-    reports = glob.glob(os.path.join(path, "*/*report_*"))
-    reports = glob.glob(os.path.join(path, "*report_*")) if not reports else reports
+    reports = utilities.getReportList(os.path.join(path, "*/*report*"))
+    reports = utilities.getReportList(os.path.join(path, "*report*")) if not reports else reports
     reports = filter_non_numerical_folders(reports, numfolders)
     try:
         reports[0]

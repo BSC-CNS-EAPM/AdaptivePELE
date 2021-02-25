@@ -706,7 +706,7 @@ class PeleSimulation(SimulationRunner):
             raise utilities.UnsatisfiedDependencyException("No installation of scikit-learn found. Please, install scikit-learn or select a different equilibrationMode.")
         energyColumn = 3
         # detect number of trajectories available
-        nTrajs = len(glob.glob(trajWildcard.rsplit("_", 1)[0]+"*"))+1
+        nTrajs = len(utilities.getReportList(trajWildcard.rsplit("_", 1)[0]+"*"))
         data = []
         for i in range(1, nTrajs):
             report = utilities.loadtxtfile(reportWildcard % i)

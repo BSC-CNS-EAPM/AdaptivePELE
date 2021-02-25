@@ -132,12 +132,10 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
     min_report = 1e10
     for epoch in epochs:
         ep = int(epoch)
-        reports = glob.glob(os.path.join(simulation_path, epoch, reportName+"*"))
+        reports = utilities.getReportList(os.path.join(simulation_path, epoch, reportName+"*"))
         if not reports:
             raise ValueError("Could not find any reports with the given name!!")
         for report in reports:
-            if not utilities.isReport(report):
-                continue
             report_num = utilities.getReportNum(report)
             max_report = max(max_report, report_num)
             min_report = min(min_report, report_num)

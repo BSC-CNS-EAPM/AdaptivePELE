@@ -7,7 +7,7 @@
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import os
-import glob
+from AdaptivePELE.utilities import utilities
 
 # to be changed by user
 reportFilename = "report_"
@@ -21,7 +21,7 @@ for folder in epochFolders:
     print("Writing reports in folder", folder)
     os.chdir(folder)
 
-    reports = glob.glob(reportFilename + "*")
+    reports = utilities.getReportList(reportFilename + "*")
     for report in reports:
         with open(report, "r") as f:
             newReportContent = []

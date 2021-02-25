@@ -18,8 +18,8 @@ def retrieve_fields(report):
     return list(data)[2:]
 
 def gather_reports():
-    reports = glob.glob(os.path.join("*/*report*"))
-    reports = glob.glob(os.path.join("*report*")) if not reports else reports
+    reports = utilities.getReportList(os.path.join(path, "*/*report*"))
+    reports = utilities.getReportList(os.path.join(path, "*report*")) if not reports else reports
     reports = filter_non_numerical_folders(reports)
     try:
         reports[0]

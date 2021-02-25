@@ -1,12 +1,13 @@
 #!/usr/bin/python2.7
 
 import os
+import re
+import sys
+import glob
 import errno
 import argparse
 import pandas as pd
-import glob
-import re
-import sys
+from AdaptivePELE.utilities import utilities
 from AdaptivePELE.analysis import splitTrajectory
 
 """
@@ -82,8 +83,8 @@ def main(criteria, path=DIR, n_structs=10, sort_order="min", out_freq=FREQ, outp
         f_out: Name of the n outpu
     """
     #Get reports files
-    reports = glob.glob(os.path.join(path, "*/*report*"))
-    reports = glob.glob(os.path.join(path, "*report*")) if not reports else reports
+    reports = utilities.getReportList(os.path.join(path, "*/*report*"))
+    reports = utilities.getReportList(os.path.join(path, "*report*")) if not reports else reports
     reports = filter_non_numerical_folders(reports, numfolders)
     try:
         reports[0]

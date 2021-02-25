@@ -513,14 +513,14 @@ class IndependentRunsCalculator(SpawningCalculator):
         """
         procMapping = []
         trajWildcard = os.path.join(outputPathConstants.epochOutputPathTempletized, constants.trajectoryBasename)
-        trajectories = glob.glob(trajWildcard % (iteration-1))
+        trajectories = utilities.getReportList(trajWildcard % (iteration-1))
         for num, trajectory in enumerate(trajectories):
             snapshots = utilities.getSnapshots(trajectory)
             lastSnapshot = snapshots[-1]
             nSnapshots = len(snapshots)
             del snapshots
 
-            numTraj = int(os.path.splitext(trajectory.rsplit("_", 1)[-1])[0])
+            numTraj = utilities.getReportNum(trajectory)
             outputFilename = outputPathConstants.tmpInitialStructuresTemplate % (iteration, num)
             procMapping.append((iteration-1, numTraj, nSnapshots-1))
             if isinstance(lastSnapshot, basestring):
@@ -560,14 +560,14 @@ class IndependentMetricCalculator(SpawningCalculator):
         """
         procMapping = []
         trajWildcard = os.path.join(outputPathConstants.epochOutputPathTempletized, constants.trajectoryBasename)
-        trajectories = glob.glob(trajWildcard % (iteration-1))
+        trajectories = utilities.getReportList(trajWildcard % (iteration-1))
         for num in range(len(trajectories)):
             reportFilename = os.path.join(outputPathConstants.epochOutputPathTempletized % (iteration-1),
                                           "%s_%d" % (self.parameters.reportFilename, num+1))
             metric_array = np.genfromtxt(reportFilename, missing_values="--", filling_values=0)
             if len(metric_array.shape) < 2:
                 metric_array = metric_array[np.newaxis, :]
-            trajectory = glob.glob("%s_%d.*" % (trajWildcard % (iteration-1), num+1))
+            trajectory = utilities.getReportList("%s_%d.*" % (trajWildcard % (iteration-1), num+1))
             assert len(trajectory) == 1, "Too many trajectories found in IndependentMetricCalculator"
             trajectory = trajectory[0]
             if self.parameters.condition == blockNames.SpawningParams.minValue:
@@ -1265,7 +1265,8 @@ class MSMCalculator(SpawningCalculator):
         sasa = []
         for cl in clusters:
             epoch, traj, snapshot = cl.trajPosition
-            report_filename = glob.glob(os.path.join(outputPathConstants.epochOutputPathTempletized % epoch, "*report*_%d" % traj))[0]
+            report_filename = utilities.getReportList(os.path.join(outputPathConstants.epochOutputPathTempletized % epoch, "*report*_%d" % traj))[0]
+
             report_values = utilities.loadtxtfile(report_filename)
             sasa.append(report_values[snapshot, self.parameters.sasaColumn])
         return sasa

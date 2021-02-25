@@ -1988,11 +1988,11 @@ def getAllTrajectories(paths):
 
         :param paths: The path where to find the trajectories
         :type paths: str
-        :returns: list -- A list with the names of all th trajectories in paths
+        :returns: list -- A list with the names of all the trajectories in paths
     """
     files = []
     for path in paths:
-        files += glob.glob(path)
+        files += utilities.getReportList(path)
     # sort the files obtained by glob by name, so that the results will be the
     # same on all computers
     return sorted(files)

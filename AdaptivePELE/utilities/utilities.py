@@ -358,6 +358,17 @@ def getReportNum(reportFilename):
     """
     return int(getFileSuffix(reportFilename))
 
+def getReportList(reportBase):
+    """
+        Get a list of the report filenames in the path specified,
+        filtering interstep reports
+
+        :param reportBase: Report file basename
+        :type reportBase: str
+
+        :return: list -- List of report files
+    """
+    return [x for x in glob_sorted(reportBase, key=getReportNum) if isReport(x)]
 
 def getPrmtopNum(prmtopFilename):
     """

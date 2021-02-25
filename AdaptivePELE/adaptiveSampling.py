@@ -745,6 +745,7 @@ def main(jsonParams, clusteringHook=None):
                 # write the object to file at the start of the first epoch, so
                 # the topologies can always be loaded
                 topologies.writeTopologyObject()
+                print(os.listdir(topologies.path))
         processManager.barrier()
         if processManager.isMaster():
             utilities.print_unbuffered("Production run...")
@@ -777,7 +778,7 @@ def main(jsonParams, clusteringHook=None):
 
             degeneracyOfRepresentatives = spawningCalculator.calculate(clustersList, simulationRunner.getWorkingProcessors(), i, outputPathConstants=outputPathConstants)
             spawningCalculator.log()
-            # this method only does works with MSM-based spwaning methods,
+            # this method only does works with MSM-based spawning methods,
             # creating a plot of the stationary distribution and the PMF, for
             # the rest of methods it does nothing
             spawningCalculator.createPlots(outputPathConstants, i, clusteringMethod)
