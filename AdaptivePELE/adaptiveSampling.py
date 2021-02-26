@@ -745,7 +745,6 @@ def main(jsonParams, clusteringHook=None):
                 # write the object to file at the start of the first epoch, so
                 # the topologies can always be loaded
                 topologies.writeTopologyObject()
-                print(os.listdir(topologies.path))
         processManager.barrier()
         if processManager.isMaster():
             utilities.print_unbuffered("Production run...")

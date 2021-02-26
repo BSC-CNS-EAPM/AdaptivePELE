@@ -319,7 +319,7 @@ def getTrajNum(trajFilename):
 
         :returns: int -- Trajectory number
     """
-    return int(trajFilename.split("_")[-1][:-4])
+    return getReportNum(trajFilename)
 
 
 def getFileSuffix(filename, separator="_"):
