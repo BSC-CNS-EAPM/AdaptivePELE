@@ -2128,11 +2128,11 @@
 
 <span class="sd">        :param paths: The path where to find the trajectories</span>
 <span class="sd">        :type paths: str</span>
-<span class="sd">        :returns: list -- A list with the names of all th trajectories in paths</span>
+<span class="sd">        :returns: list -- A list with the names of all the trajectories in paths</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
-        <span class="n">files</span> <span class="o">+=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">+=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getReportList</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="c1"># sort the files obtained by glob by name, so that the results will be the</span>
     <span class="c1"># same on all computers</span>
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">files</span><span class="p">)</span></div>

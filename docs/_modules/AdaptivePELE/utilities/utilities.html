@@ -459,7 +459,7 @@
 
 <span class="sd">        :returns: int -- Trajectory number</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">trajFilename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">4</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="n">getReportNum</span><span class="p">(</span><span class="n">trajFilename</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="getFileSuffix"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getFileSuffix">[docs]</a><span class="k">def</span> <span class="nf">getFileSuffix</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
@@ -498,6 +498,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">getFileSuffix</span><span class="p">(</span><span class="n">reportFilename</span><span class="p">))</span></div>
 
+<div class="viewcode-block" id="getReportList"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getReportList">[docs]</a><span class="k">def</span> <span class="nf">getReportList</span><span class="p">(</span><span class="n">reportBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a list of the report filenames in the path specified,</span>
+<span class="sd">        filtering interstep reports</span>
+
+<span class="sd">        :param reportBase: Report file basename</span>
+<span class="sd">        :type reportBase: str</span>
+
+<span class="sd">        :return: list -- List of report files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">glob_sorted</span><span class="p">(</span><span class="n">reportBase</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">getReportNum</span><span class="p">,</span> <span class="n">filter_func</span><span class="o">=</span><span class="n">isReport</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="getPrmtopNum"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.getPrmtopNum">[docs]</a><span class="k">def</span> <span class="nf">getPrmtopNum</span><span class="p">(</span><span class="n">prmtopFilename</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1096,7 +1107,7 @@
     <span class="k">return</span> <span class="n">results</span></div>
 
 
-<div class="viewcode-block" id="glob_sorted"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.glob_sorted">[docs]</a><span class="k">def</span> <span class="nf">glob_sorted</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="glob_sorted"><a class="viewcode-back" href="../../../AdaptivePELE.utilities.html#AdaptivePELE.utilities.utilities.glob_sorted">[docs]</a><span class="k">def</span> <span class="nf">glob_sorted</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filter_func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run glob and sort the output to ensure cross-platform compatibility</span>
 
@@ -1111,6 +1122,8 @@
 <span class="sd">            passed to the pool had no return value it will be a list of None objects</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">results</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">filter_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="n">filter_func</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span></div>
 
 
