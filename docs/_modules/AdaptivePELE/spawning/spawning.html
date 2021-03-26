@@ -138,8 +138,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.spawning.spawning</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
-<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">math</span>
@@ -147,13 +147,13 @@
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="k">as</span> <span class="nn">optim</span>
-<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="k">import</span> <span class="n">lu</span><span class="p">,</span> <span class="n">solve</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.spawning</span> <span class="k">import</span> <span class="n">spawningTypes</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.spawning</span> <span class="k">import</span> <span class="n">densitycalculator</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">lu</span><span class="p">,</span> <span class="n">solve</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="kn">import</span> <span class="n">blockNames</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="kn">import</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="kn">import</span> <span class="n">utilities</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.spawning</span> <span class="kn">import</span> <span class="n">spawningTypes</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.spawning</span> <span class="kn">import</span> <span class="n">densitycalculator</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># Check if the basestring type if available, this will fail in python3</span>
     <span class="n">basestring</span>
@@ -162,7 +162,7 @@
 <span class="n">PYEMMA</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pyemma.msm</span> <span class="k">as</span> <span class="nn">msm</span>
-    <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">computeDeltaG</span> <span class="k">as</span> <span class="n">computedG</span>
+    <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="kn">import</span> <span class="n">computeDeltaG</span> <span class="k">as</span> <span class="n">computedG</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">PYEMMA</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">MATPLOTLIB</span> <span class="o">=</span> <span class="kc">True</span>
@@ -317,7 +317,7 @@
 
 <div class="viewcode-block" id="SpawningParams"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningParams">[docs]</a><span class="k">class</span> <span class="nc">SpawningParams</span><span class="p">:</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="kc">None</span>
@@ -440,7 +440,7 @@
 <span class="sd">        Spawning is the way in which we split the different explorers at the begining of each epoch.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;BaseClass&quot;</span>  <span class="c1"># change for abstract attribute</span>
 
 <div class="viewcode-block" id="SpawningCalculator.calculate"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SpawningCalculator.calculate">[docs]</a>    <span class="nd">@abstractmethod</span>
@@ -601,7 +601,7 @@
 <span class="sd">        Subclass of Spawning calculator that ensures the definition of a density calculator.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
         <span class="n">SpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;BaseDensityClass&quot;</span>  <span class="c1"># change for abstract attribute</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">densityCalculator</span> <span class="o">=</span> <span class="n">densityCalculator</span>
@@ -625,7 +625,7 @@
 
 <div class="viewcode-block" id="IndependentRunsCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.IndependentRunsCalculator">[docs]</a><span class="k">class</span> <span class="nc">IndependentRunsCalculator</span><span class="p">(</span><span class="n">SpawningCalculator</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">SpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">independent</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
@@ -674,7 +674,7 @@
 
 <div class="viewcode-block" id="IndependentMetricCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.IndependentMetricCalculator">[docs]</a><span class="k">class</span> <span class="nc">IndependentMetricCalculator</span><span class="p">(</span><span class="n">SpawningCalculator</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">SpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">independentMetric</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
@@ -732,7 +732,7 @@
 
 <div class="viewcode-block" id="SameWeightDegeneracyCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SameWeightDegeneracyCalculator">[docs]</a><span class="k">class</span> <span class="nc">SameWeightDegeneracyCalculator</span><span class="p">(</span><span class="n">SpawningCalculator</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">SpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">sameWeight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
@@ -769,7 +769,7 @@
 
 <div class="viewcode-block" id="InverselyProportionalToPopulationCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.InverselyProportionalToPopulationCalculator">[docs]</a><span class="k">class</span> <span class="nc">InverselyProportionalToPopulationCalculator</span><span class="p">(</span><span class="n">DensitySpawningCalculator</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
         <span class="n">DensitySpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">inverselyProportional</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
@@ -815,7 +815,7 @@
 <span class="sd">        We only consider the nclusters with best metric</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
         <span class="n">DensitySpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inverselyProportionalCalculator</span> <span class="o">=</span> <span class="n">InverselyProportionalToPopulationCalculator</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">epsilon</span>
@@ -922,7 +922,7 @@
 
 <div class="viewcode-block" id="VariableEpsilonDegeneracyCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.VariableEpsilonDegeneracyCalculator">[docs]</a><span class="k">class</span> <span class="nc">VariableEpsilonDegeneracyCalculator</span><span class="p">(</span><span class="n">DensitySpawningCalculator</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
         <span class="n">DensitySpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epsilonDegeneracyCalculator</span> <span class="o">=</span> <span class="n">EpsilonDegeneracyCalculator</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">variableEpsilon</span>
@@ -1020,7 +1020,7 @@
 
 <div class="viewcode-block" id="SimulatedAnnealingCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.SimulatedAnnealingCalculator">[docs]</a><span class="k">class</span> <span class="nc">SimulatedAnnealingCalculator</span><span class="p">(</span><span class="n">SpawningCalculator</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">SpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">simulatedAnnealing</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
@@ -1068,7 +1068,7 @@
 
 <div class="viewcode-block" id="FASTDegeneracyCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.FASTDegeneracyCalculator">[docs]</a><span class="k">class</span> <span class="nc">FASTDegeneracyCalculator</span><span class="p">(</span><span class="n">DensitySpawningCalculator</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
         <span class="n">DensitySpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">FAST</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">densityCalculator</span> <span class="o">=</span> <span class="n">densityCalculator</span>
@@ -1129,7 +1129,7 @@
 
 <div class="viewcode-block" id="UCBCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.UCBCalculator">[docs]</a><span class="k">class</span> <span class="nc">UCBCalculator</span><span class="p">(</span><span class="n">DensitySpawningCalculator</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
         <span class="n">DensitySpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">UCB</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prevMetrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
@@ -1216,7 +1216,7 @@
 
 
 <div class="viewcode-block" id="REAPCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.REAPCalculator">[docs]</a><span class="k">class</span> <span class="nc">REAPCalculator</span><span class="p">(</span><span class="n">DensitySpawningCalculator</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">densityCalculator</span><span class="o">=</span><span class="n">densitycalculator</span><span class="o">.</span><span class="n">NullDensityCalculator</span><span class="p">()):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Spawning following the Reinforcement learning based Adaptive</span>
 <span class="sd">            samPling (REAP) (Shamsi et al., arXiv, Oct 2017), where the reward</span>
@@ -1302,7 +1302,7 @@
 
 
 <div class="viewcode-block" id="NullSpawningCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.NullSpawningCalculator">[docs]</a><span class="k">class</span> <span class="nc">NullSpawningCalculator</span><span class="p">(</span><span class="n">SpawningCalculator</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">SpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">null</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
@@ -1331,7 +1331,7 @@
 
 <div class="viewcode-block" id="MSMCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.MSMCalculator">[docs]</a><span class="k">class</span> <span class="nc">MSMCalculator</span><span class="p">(</span><span class="n">SpawningCalculator</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">PYEMMA</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">utilities</span><span class="o">.</span><span class="n">UnsatisfiedDependencyException</span><span class="p">(</span><span class="s2">&quot;Pyemma module is necessary to use MSM based spawning&quot;</span><span class="p">)</span>
         <span class="n">SpawningCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1471,7 +1471,7 @@
 
 
 <div class="viewcode-block" id="ProbabilityMSMCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.ProbabilityMSMCalculator">[docs]</a><span class="k">class</span> <span class="nc">ProbabilityMSMCalculator</span><span class="p">(</span><span class="n">MSMCalculator</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">MSMCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">ProbabilityMSMCalculator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
@@ -1513,7 +1513,7 @@
 
 
 <div class="viewcode-block" id="MetastabilityMSMCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.MetastabilityMSMCalculator">[docs]</a><span class="k">class</span> <span class="nc">MetastabilityMSMCalculator</span><span class="p">(</span><span class="n">MSMCalculator</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">MSMCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">MetastabilityMSMCalculator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
@@ -1554,7 +1554,7 @@
 
 
 <div class="viewcode-block" id="UncertaintyMSMCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.UncertaintyMSMCalculator">[docs]</a><span class="k">class</span> <span class="nc">UncertaintyMSMCalculator</span><span class="p">(</span><span class="n">MSMCalculator</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">MSMCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">UncertaintyMSMCalculator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
@@ -1615,7 +1615,7 @@
 
 
 <div class="viewcode-block" id="IndependentMSMCalculator"><a class="viewcode-back" href="../../../AdaptivePELE.spawning.html#AdaptivePELE.spawning.spawning.IndependentMSMCalculator">[docs]</a><span class="k">class</span> <span class="nc">IndependentMSMCalculator</span><span class="p">(</span><span class="n">MSMCalculator</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">MSMCalculator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">spawningTypes</span><span class="o">.</span><span class="n">SPAWNING_TYPES</span><span class="o">.</span><span class="n">IndependentMSMCalculator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>

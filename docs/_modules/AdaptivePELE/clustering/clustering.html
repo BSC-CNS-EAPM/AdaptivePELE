@@ -138,25 +138,25 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.clustering.clustering</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">heapq</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">stats</span>
-<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">reraise</span> <span class="k">as</span> <span class="n">raise_</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">SymmetryContactMapEvaluator</span> <span class="k">as</span> <span class="n">sym</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">RMSDCalculator</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">atomset</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.clustering</span> <span class="k">import</span> <span class="n">clusteringTypes</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.clustering</span> <span class="k">import</span> <span class="n">thresholdcalculator</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">extractCoords</span> <span class="k">as</span> <span class="n">coord</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">getRepresentativeStructures</span> <span class="k">as</span> <span class="n">getRepr</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">reraise</span> <span class="k">as</span> <span class="n">raise_</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="kn">import</span> <span class="n">blockNames</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="kn">import</span> <span class="n">utilities</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="kn">import</span> <span class="n">SymmetryContactMapEvaluator</span> <span class="k">as</span> <span class="n">sym</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="kn">import</span> <span class="n">RMSDCalculator</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="kn">import</span> <span class="n">atomset</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.clustering</span> <span class="kn">import</span> <span class="n">clusteringTypes</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.clustering</span> <span class="kn">import</span> <span class="n">thresholdcalculator</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="kn">import</span> <span class="n">extractCoords</span> <span class="k">as</span> <span class="n">coord</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="kn">import</span> <span class="n">getRepresentativeStructures</span> <span class="k">as</span> <span class="n">getRepr</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
     <span class="n">NETWORK</span> <span class="o">=</span> <span class="kc">True</span>
@@ -170,8 +170,8 @@
     <span class="n">PARALELLIZATION</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="k">import</span> <span class="n">cluster</span> <span class="k">as</span> <span class="n">pyemma_cluster</span>
-    <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies.estimateDG</span> <span class="k">import</span> <span class="n">getCentersInfo</span>
+    <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies</span> <span class="kn">import</span> <span class="n">cluster</span> <span class="k">as</span> <span class="n">pyemma_cluster</span>
+    <span class="kn">from</span> <span class="nn">AdaptivePELE.freeEnergies.estimateDG</span> <span class="kn">import</span> <span class="n">getCentersInfo</span>
     <span class="kn">import</span> <span class="nn">pyemma.coordinates</span> <span class="k">as</span> <span class="nn">coor</span>
     <span class="n">PYEMMA</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -179,7 +179,7 @@
 
 
 <div class="viewcode-block" id="Clusters"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters">[docs]</a><span class="k">class</span> <span class="nc">Clusters</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -193,7 +193,7 @@
         <span class="c1"># Restore instance attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;clusters&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Clusters.addCluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clusters.addCluster">[docs]</a>    <span class="k">def</span> <span class="nf">addCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cluster</span><span class="p">):</span>
@@ -248,19 +248,19 @@
             <span class="n">cluster</span><span class="o">.</span><span class="n">printCluster</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">clusters</span>
 
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">cluster</span></div>
 
@@ -275,7 +275,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        .. [1] Networkx python package https://networkx.github.io</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">NETWORK</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -375,7 +375,7 @@
 <span class="sd">        will maintain a priority queue (pq) of alternative structures to spawn</span>
 <span class="sd">        from encoded as tuples (priority, PDB).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">altStructPQ</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">limitSize</span> <span class="o">=</span> <span class="mi">10</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
@@ -500,7 +500,7 @@
 <span class="sd">        elements, its density, threshold, number of contacts,</span>
 <span class="sd">        a contactMap(sometimes) and a metric</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb</span><span class="p">,</span> <span class="n">thresholdRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contactMap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb</span><span class="p">,</span> <span class="n">thresholdRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contactMap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">contacts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metricCol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">contactThreshold</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">trajPosition</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -580,7 +580,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">altSelection</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;altSelection&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trajPosition</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;trajPosition&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span>
 
 <div class="viewcode-block" id="Cluster.getMetric"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Cluster.getMetric">[docs]</a>    <span class="k">def</span> <span class="nf">getMetric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -641,7 +641,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Radius threshold: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of contacts: </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Cluster: elements=</span><span class="si">%d</span><span class="s2">, threshold=</span><span class="si">%.3f</span><span class="s2">, contacts=</span><span class="si">%.3f</span><span class="s2">, density=</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span> <span class="ow">or</span> <span class="mf">0.000</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Cluster.writePDB"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Cluster.writePDB">[docs]</a>    <span class="k">def</span> <span class="nf">writePDB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
@@ -682,12 +682,12 @@
                 <span class="n">trajPosition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajPosition</span>
             <span class="k">return</span> <span class="n">trajPosition</span></div>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">contacts</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ClusteringEvaluator"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ClusteringEvaluator">[docs]</a><span class="k">class</span> <span class="nc">ClusteringEvaluator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contactMap</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -700,7 +700,7 @@
 
 
 <div class="viewcode-block" id="ContactsClusteringEvaluator"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator">[docs]</a><span class="k">class</span> <span class="nc">ContactsClusteringEvaluator</span><span class="p">(</span><span class="n">ClusteringEvaluator</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">RMSDCalculator_object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">RMSDCalculator_object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Helper object to carry out the RMSD clustering</span>
 
@@ -782,7 +782,7 @@
     <span class="n">limitSlope</span> <span class="o">=</span> <span class="p">{</span><span class="mi">8</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
     <span class="n">limitMax</span> <span class="o">=</span> <span class="p">{</span><span class="mi">8</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">similarityEvaluator</span><span class="p">,</span> <span class="n">symmetryEvaluator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">similarityEvaluator</span><span class="p">,</span> <span class="n">symmetryEvaluator</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Helper object to carry out the RMSD clustering</span>
 
@@ -898,7 +898,7 @@
 
 
 <div class="viewcode-block" id="Clustering"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering">[docs]</a><span class="k">class</span> <span class="nc">Clustering</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
                  <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -965,23 +965,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">conformationNetwork</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;conformationNetwork&#39;</span><span class="p">,</span> <span class="n">ConformationNetwork</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;epoch&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Clustering: nClusters: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">cluster</span>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Clustering.setCol"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.setCol">[docs]</a>    <span class="k">def</span> <span class="nf">setCol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
@@ -1051,7 +1051,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">getNumberClusters</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reportBaseFilename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resChain</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">clusters</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">reportBaseFilename</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">resnum</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">resChain</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Clustering.filterClustersAccordingToBox"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering.filterClustersAccordingToBox">[docs]</a>    <span class="k">def</span> <span class="nf">filterClustersAccordingToBox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulationRunnerParams</span><span class="p">):</span>
@@ -1397,7 +1397,7 @@
 
 
 <div class="viewcode-block" id="ContactsClustering"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ContactsClustering">[docs]</a><span class="k">class</span> <span class="nc">ContactsClustering</span><span class="p">(</span><span class="n">Clustering</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thresholdCalculator</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thresholdCalculator</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                  <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1478,7 +1478,7 @@
 
 
 <div class="viewcode-block" id="ContactMapAccumulativeClustering"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.ContactMapAccumulativeClustering">[docs]</a><span class="k">class</span> <span class="nc">ContactMapAccumulativeClustering</span><span class="p">(</span><span class="n">Clustering</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thresholdCalculator</span><span class="p">,</span> <span class="n">similarityEvaluator</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thresholdCalculator</span><span class="p">,</span> <span class="n">similarityEvaluator</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                  <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                  <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1567,7 +1567,7 @@
 <span class="sd">        Assigned  the last snapshot of the trajectory to a cluster.</span>
 <span class="sd">        Only useful for PELE sequential runs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">reportBaseFilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">columnOfReportFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contactThresholdDistance</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
                  <span class="n">altSelection</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">Clustering</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="n">resnum</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="n">resChain</span><span class="p">,</span>
@@ -1650,7 +1650,7 @@
 <span class="sd">        Don&#39;t generate any clustering, works essentially as a placeholder</span>
 <span class="sd">        for simulation when no clustering is desired</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">Clustering</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">clusteringTypes</span><span class="o">.</span><span class="n">CLUSTERING_TYPES</span><span class="o">.</span><span class="n">null</span>
 
@@ -1699,7 +1699,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Cluster the trajectories to estimate a Markov State Model (MSM)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_clusters</span><span class="p">,</span> <span class="n">tica</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">atom_Ids</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">writeCA</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sidechains</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tica_lagtime</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tica_nICs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tica_kinetic_map</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tica_commute_map</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_clusters</span><span class="p">,</span> <span class="n">tica</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">symmetries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">atom_Ids</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">writeCA</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sidechains</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tica_lagtime</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tica_nICs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tica_kinetic_map</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tica_commute_map</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">PYEMMA</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">utilities</span><span class="o">.</span><span class="n">UnsatisfiedDependencyException</span><span class="p">(</span><span class="s2">&quot;No installation of PyEMMA found. Please, install PyEMMA to use MSMClustering option.&quot;</span><span class="p">)</span>
         <span class="n">Clustering</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="o">=</span><span class="n">resnum</span><span class="p">,</span> <span class="n">resChain</span><span class="o">=</span><span class="n">resChain</span><span class="p">)</span>
@@ -2096,7 +2096,7 @@
 <span class="sd">        maps, their correlation or their Jaccard index, that is, the ratio</span>
 <span class="sd">        between the intersection of the two contact maps and their union</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typeEvaluator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typeEvaluator</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">typeEvaluator</span> <span class="o">=</span> <span class="n">typeEvaluator</span>
 
 <div class="viewcode-block" id="CMSimilarityEvaluator.isSimilarCluster"><a class="viewcode-back" href="../../../AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.CMSimilarityEvaluator.isSimilarCluster">[docs]</a>    <span class="k">def</span> <span class="nf">isSimilarCluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contactMap</span><span class="p">,</span> <span class="n">clusterContactMap</span><span class="p">,</span> <span class="n">symContactMapEvaluator</span><span class="p">):</span>

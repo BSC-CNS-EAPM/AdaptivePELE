@@ -189,7 +189,7 @@
 <h1>User Manual<a class="headerlink" href="#user-manual" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>There are two methods to install AdaptivePELE <a class="reference internal" href="#apele" id="id1">[APELE]</a>, from PyPI (recommended) or directly from source.</p>
+<p>There are two methods to install AdaptivePELE <a class="reference internal" href="#apele" id="id1"><span>[APELE]</span></a>, from PyPI (recommended) or directly from source.</p>
 <p>To install from PyPI simply run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">AdaptivePELE</span>
 </pre></div>
@@ -257,17 +257,17 @@ using debug=true may be a great option.</p>
 <h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
 <p>The general parameters block has five possible fields:</p>
 <ul class="simple">
-<li><strong>restart</strong> (<em>boolean</em>, default=True): This parameter specifies whether you want to
+<li><p><strong>restart</strong> (<em>boolean</em>, default=True): This parameter specifies whether you want to
 continue a previous simulation or not. It requires the last epoch’s clustering object,
-which is stored as a binary file to optimize disk usage.</li>
-<li><strong>debug</strong> (<em>boolean</em>, default=False): Run adaptive in debug mode, without calling
-any propagation algorithm. Typically used to tinker with the clustering/spawning.</li>
-<li><strong>outputPath</strong> (<em>string</em>, mandatory): The path where the results of the simulation will be
-written</li>
-<li><strong>initialStructures</strong> (<em>list</em>, mandatory): The path(s) to the intial structure(s)</li>
-<li><strong>writeAllClusteringStructures</strong> (<em>boolean</em>, default=False): Whether to write all the cluster
+which is stored as a binary file to optimize disk usage.</p></li>
+<li><p><strong>debug</strong> (<em>boolean</em>, default=False): Run adaptive in debug mode, without calling
+any propagation algorithm. Typically used to tinker with the clustering/spawning.</p></li>
+<li><p><strong>outputPath</strong> (<em>string</em>, mandatory): The path where the results of the simulation will be
+written</p></li>
+<li><p><strong>initialStructures</strong> (<em>list</em>, mandatory): The path(s) to the intial structure(s)</p></li>
+<li><p><strong>writeAllClusteringStructures</strong> (<em>boolean</em>, default=False): Whether to write all the cluster
 center structures as pdbs. Setting it to True is inneficient, and cluster center structures
-can still be recovered from the binary clustering object.</li>
+can still be recovered from the binary clustering object.</p></li>
 </ul>
 <p>Additionaly, it can also have a nativeStructure parameter, a string containing
 the path to the native structure. This structure will only be used to correct
@@ -289,150 +289,132 @@ the RMSD in case of symmetries. The symmetries will also have to be specified
 <h2>Simulation block<a class="headerlink" href="#simulation-block" title="Permalink to this headline">¶</a></h2>
 <p>Currently, there are three implemented simulation types:</p>
 <ul class="simple">
-<li><strong>pele</strong>. <a class="reference external" href="https://pele.bsc.es/pele.wt">PELE</a> is a great tool to efficiently explore the energy landscape. Parameters have been optimized for its use.</li>
-<li><strong>test</strong>. The test type has no real use outside of testing.</li>
-<li><strong>MD</strong> Run molecular dynamics using the OpenMM <a class="reference internal" href="#openmm" id="id2">[OPENMM]</a> library.</li>
+<li><p><strong>pele</strong>. <a class="reference external" href="https://pele.bsc.es/pele.wt">PELE</a> is a great tool to efficiently explore the energy landscape. Parameters have been optimized for its use.</p></li>
+<li><p><strong>test</strong>. The test type has no real use outside of testing.</p></li>
+<li><p><strong>MD</strong> Run molecular dynamics using the OpenMM <a class="reference internal" href="#openmm" id="id2"><span>[OPENMM]</span></a> library.</p></li>
 </ul>
 <div class="section" id="templetized-pele-control-file">
 <h3>Templetized PELE control file<a class="headerlink" href="#templetized-pele-control-file" title="Permalink to this headline">¶</a></h3>
 <p>In order to run adaptivePELE, PELE control file needs to be templetized. In particular:</p>
 <ul class="simple">
-<li><strong>MultipleComplexes”</strong>: AdaptivePELE requieres the use of multiple complexes: <code class="docutils literal notranslate"><span class="pre">&quot;MultipleComplex&quot;:</span> <span class="pre">[</span> <span class="pre">$COMPLEXES</span> <span class="pre">]</span></code></li>
-<li><strong>seed</strong>: The seed needs to be templetized: <code class="docutils literal notranslate"><span class="pre">&quot;seed&quot;:</span> <span class="pre">$SEED</span></code></li>
-<li><strong>outputPath</strong>: The output path needs to be changed for: <code class="docutils literal notranslate"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/report&quot;</span></code></li>
-<li><strong>numberOfPeleSteps</strong>: The number of pele steps needs to be templetized as <code class="docutils literal notranslate"><span class="pre">&quot;numberOfPeleSteps&quot;:</span> <span class="pre">$PELE_STEPS</span></code></li>
+<li><p><strong>MultipleComplexes”</strong>: AdaptivePELE requieres the use of multiple complexes: <code class="docutils literal notranslate"><span class="pre">&quot;MultipleComplex&quot;:</span> <span class="pre">[</span> <span class="pre">$COMPLEXES</span> <span class="pre">]</span></code></p></li>
+<li><p><strong>seed</strong>: The seed needs to be templetized: <code class="docutils literal notranslate"><span class="pre">&quot;seed&quot;:</span> <span class="pre">$SEED</span></code></p></li>
+<li><p><strong>outputPath</strong>: The output path needs to be changed for: <code class="docutils literal notranslate"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/report&quot;</span></code></p></li>
+<li><p><strong>numberOfPeleSteps</strong>: The number of pele steps needs to be templetized as <code class="docutils literal notranslate"><span class="pre">&quot;numberOfPeleSteps&quot;:</span> <span class="pre">$PELE_STEPS</span></code></p></li>
 </ul>
 <p>Optionally other fields might be templetized as well:</p>
 <ul class="simple">
-<li><strong>fixedCenter</strong>: The center of the simulation box is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;fixedCenter&quot;:</span> <span class="pre">$BOX_CENTER</span></code></li>
-<li><strong>radius</strong>: The radius of the simulation box is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;radius&quot;:</span> <span class="pre">$BOX_RADIUS</span></code></li>
-<li><strong>reportName</strong>: The name of the report file is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$REPORT_NAME&quot;</span></code>. Note that the value of the reportName is not a parameter of the simulation block, but is given by the <strong>reportFilename</strong> option of the spawning block</li>
-<li><strong>trajectoryName</strong>: The name of the trajectory file is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;trajectoryPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$TRAJECTORY_NAME&quot;</span></code></li>
+<li><p><strong>fixedCenter</strong>: The center of the simulation box is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;fixedCenter&quot;:</span> <span class="pre">$BOX_CENTER</span></code></p></li>
+<li><p><strong>radius</strong>: The radius of the simulation box is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;radius&quot;:</span> <span class="pre">$BOX_RADIUS</span></code></p></li>
+<li><p><strong>reportName</strong>: The name of the report file is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;reportPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$REPORT_NAME&quot;</span></code>. Note that the value of the reportName is not a parameter of the simulation block, but is given by the <strong>reportFilename</strong> option of the spawning block</p></li>
+<li><p><strong>trajectoryName</strong>: The name of the trajectory file is templetized as <code class="docutils literal notranslate"><span class="pre">&quot;trajectoryPath&quot;:</span> <span class="pre">&quot;$OUTPUT_PATH/$TRAJECTORY_NAME&quot;</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="pele-parameters">
 <h3>PELE Parameters<a class="headerlink" href="#pele-parameters" title="Permalink to this headline">¶</a></h3>
 <p>When using PELE as a propagator, the following parameters are mandatory:</p>
 <ul class="simple">
-<li><strong>iterations</strong> (<em>integer</em>, mandatory): Number of adaptive sampling iterations to run</li>
-<li><strong>processors</strong> (<em>integer</em>, mandatory): Number of processors to use with PELE</li>
-<li><strong>peleSteps</strong> (<em>integer</em>, mandatory):  Number of PELE steps in a epoch (iteration)</li>
-<li><strong>seed</strong> (<em>integer</em>, mandatory): Seed for the random number generator</li>
-<li><strong>controlFile</strong> (<em>string</em>, mandatory): Path to the templetized PELE control file (see below)</li>
+<li><p><strong>iterations</strong> (<em>integer</em>, mandatory): Number of adaptive sampling iterations to run</p></li>
+<li><p><strong>processors</strong> (<em>integer</em>, mandatory): Number of processors to use with PELE</p></li>
+<li><p><strong>peleSteps</strong> (<em>integer</em>, mandatory):  Number of PELE steps in a epoch (iteration)</p></li>
+<li><p><strong>seed</strong> (<em>integer</em>, mandatory): Seed for the random number generator</p></li>
+<li><p><strong>controlFile</strong> (<em>string</em>, mandatory): Path to the templetized PELE control file (see below)</p></li>
 </ul>
 <p>Optionally, you can also use the following parameters:</p>
 <ul class="simple">
-<li><strong>data</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE</li>
-<li><strong>documents</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE</li>
-<li><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder</li>
-<li><strong>trajectoryName</strong> (<em>string</em>, default=None): Name of the trajectories to
-substitute in the PELE control file</li>
-<li><strong>modeMovingBox</strong> (<em>string</em>, default=None, possible values={<em>unbinding</em>, <em>binding</em>}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation</li>
-<li><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</li>
-<li><strong>boxRadius</strong> (<em>int</em>, default=20): Value of the simulation box radius (in
-angstroms)</li>
-<li><strong>runEquilibration</strong> (<em>bool</em>, default=False): Whether to run a short
-equilibration or burn-in simulation for each initial structure</li>
-<li><strong>equilibrationLength</strong> (<em>int</em>, default=50): Number of steps for the
-equilibration run</li>
-<li><strong>equilibrationMode</strong> (<em>string</em>, default=”equilibrationSelect”): Choose the
+<li><p><strong>data</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Data folder needed for PELE</p></li>
+<li><p><strong>documents</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Documents folder needed for PELE</p></li>
+<li><p><strong>executable</strong> (<em>string</em>, default=MareNostrum or Life cluster path): Path to the Pele executable folder</p></li>
+<li><p><strong>trajectoryName</strong> (<em>string</em>, default=None): Name of the trajectories to
+substitute in the PELE control file</p></li>
+<li><p><strong>modeMovingBox</strong> (<em>string</em>, default=None, possible values={<em>unbinding</em>, <em>binding</em>}): Whether to dynamically set the center of the simulation box along an exit or entrance simulation</p></li>
+<li><p><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center</p></li>
+<li><p><strong>boxRadius</strong> (<em>int</em>, default=20): Value of the simulation box radius (in
+angstroms)</p></li>
+<li><p><strong>runEquilibration</strong> (<em>bool</em>, default=False): Whether to run a short
+equilibration or burn-in simulation for each initial structure</p></li>
+<li><p><strong>equilibrationLength</strong> (<em>int</em>, default=50): Number of steps for the
+equilibration run</p></li>
+<li><p><strong>equilibrationMode</strong> (<em>string</em>, default=”equilibrationSelect”): Choose the
 mode of the equilbration run, <em>equilibrationSelect</em> selects one of the
 structures as a representative as a function of distance and energy, while
 <em>equilibrationLastSnapshot</em> selects the last snapshot of each trajectory as
 representatives and <em>equilibrationCluster</em> clusters the output of the 25%
-best energy structures in the equilibration by the center of mass.</li>
-<li><strong>numberEquilibrationStructures</strong> (<em>int</em>, default=10): Number of clusters to
+best energy structures in the equilibration by the center of mass.</p></li>
+<li><p><strong>numberEquilibrationStructures</strong> (<em>int</em>, default=10): Number of clusters to
 obtain from the <em>equilibrationCluster</em> structure selection (see
-<strong>equilibrationMode</strong> for more details)</li>
-<li><strong>useSrun</strong> (<em>bool</em>, default=False): Whether to use srun to launch the PELE
+<strong>equilibrationMode</strong> for more details)</p></li>
+<li><p><strong>useSrun</strong> (<em>bool</em>, default=False): Whether to use srun to launch the PELE
 simulation instead of mpirun. Using srun allows a finer control over the
 resources used and might be helpful to deal with different cluster
-configurations or SLURM installations.</li>
-<li><strong>srunParameters</strong> (<em>string</em>, default=None): String with parameters to pass
+configurations or SLURM installations.</p></li>
+<li><p><strong>srunParameters</strong> (<em>string</em>, default=None): String with parameters to pass
 to srun, if not specified it will just run without any parameters, it is
-important to avoid whitspaces both at the beginning and end of the string.</li>
-<li><strong>mpiParameters</strong> (<em>string</em>, default=None): String with parameters to pass
+important to avoid whitspaces both at the beginning and end of the string.</p></li>
+<li><p><strong>mpiParameters</strong> (<em>string</em>, default=None): String with parameters to pass
 to mpirun, if not specified it will just run without any parameters, it is
-important to avoid whitspaces both at the beginning and end of the string.</li>
-<li><strong>time</strong> (<em>float</em>, default=None): Time limit for the simulation (in seconds),
+important to avoid whitspaces both at the beginning and end of the string.</p></li>
+<li><p><strong>time</strong> (<em>float</em>, default=None): Time limit for the simulation (in seconds),
 if no value is specified simulation is run until the number of steps in
-<strong>peleSteps</strong> is finished</li>
+<strong>peleSteps</strong> is finished</p></li>
 </ul>
 </div>
 <div class="section" id="md-parameters">
 <h3>MD Parameters<a class="headerlink" href="#md-parameters" title="Permalink to this headline">¶</a></h3>
 <p>When using MD as a progagator, the following parameters are mandatory:</p>
 <ul class="simple">
-<li><strong>iterations</strong> (<em>integer</em>, mandatory): Number of adaptive sampling iterations to run</li>
-<li><strong>processors</strong> (<em>integer</em>, mandatory): Number of processors to use</li>
-<li><strong>productionLength</strong> (<em>integer</em>, mandatory):  Number of time steps in a epoch (iteration)</li>
-<li><strong>seed</strong> (<em>integer</em>, mandatory): Seed for the random number generator</li>
-<li><strong>reporterFrequency</strong> (<em>integer</em>, mandatory): Frequency to write the report
-and trajectories (in time steps, see <strong>timeStep</strong> property)</li>
-<li><strong>numReplicas</strong> (<em>integer</em>, mandatory): Number of replicas to run (see <a class="reference internal" href="#running-adaptivepele-with-gpus">Running AdaptivePELE with GPUs</a> section), each replica will run the same number of trajectories, calculated as <strong>t = p/n</strong>, where <em>t</em> is the number of the trajectories per replica, <em>p</em> is the number of processors and <em>n</em> is the number of replicas</li>
+<li><p><strong>iterations</strong> (<em>integer</em>, mandatory): Number of adaptive sampling iterations to run</p></li>
+<li><p><strong>processors</strong> (<em>integer</em>, mandatory): Number of processors to use</p></li>
+<li><p><strong>productionLength</strong> (<em>integer</em>, mandatory):  Number of time steps in a epoch (iteration)</p></li>
+<li><p><strong>seed</strong> (<em>integer</em>, mandatory): Seed for the random number generator</p></li>
+<li><p><strong>reporterFrequency</strong> (<em>integer</em>, mandatory): Frequency to write the report
+and trajectories (in time steps, see <strong>timeStep</strong> property)</p></li>
+<li><p><strong>numReplicas</strong> (<em>integer</em>, mandatory): Number of replicas to run (see <a class="reference internal" href="#running-adaptivepele-with-gpus">Running AdaptivePELE with GPUs</a> section), each replica will run the same number of trajectories, calculated as <strong>t = p/n</strong>, where <em>t</em> is the number of the trajectories per replica, <em>p</em> is the number of processors and <em>n</em> is the number of replicas</p></li>
 </ul>
 <p>Optionally, you can also use the following parameters:</p>
 <ul>
-<li><p class="first"><strong>equilibrationLengthNVT</strong> (<em>int</em>, default=200000): Number of steps for the constant volume
-equilibration run (default corresponds to 400 ps)</p>
-</li>
-<li><p class="first"><strong>equilibrationLengthNPT</strong> (<em>int</em>, default=500000): Number of steps for the constant pressure
-equilibration run (default corresponds to 1 ns)</p>
-</li>
-<li><p class="first"><strong>timeStep</strong> (<em>float</em>, default=2): Value of the time step for the integration
-(in femtoseconds)</p>
-</li>
-<li><p class="first"><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center. When using a simulation box in a run with multiple ligands, please ensure that the <em>ligandsToRestrict</em> parameter is correctly set.</p>
-</li>
-<li><p class="first"><strong>boxRadius</strong> (<em>float</em>, default=20): Radius of the spherical box the ligand will be restrained to (in angstroms). Note that when using the spherical box restraint only xtc trajectories are supported.</p>
-</li>
-<li><p class="first"><strong>ligandName</strong> (<em>str</em> or <em>list</em>, default=None): Ligand residue name in the PDB for all
+<li><p><strong>equilibrationLengthNVT</strong> (<em>int</em>, default=200000): Number of steps for the constant volume
+equilibration run (default corresponds to 400 ps)</p></li>
+<li><p><strong>equilibrationLengthNPT</strong> (<em>int</em>, default=500000): Number of steps for the constant pressure
+equilibration run (default corresponds to 1 ns)</p></li>
+<li><p><strong>timeStep</strong> (<em>float</em>, default=2): Value of the time step for the integration
+(in femtoseconds)</p></li>
+<li><p><strong>boxCenter</strong> (<em>list</em>, default=None): List with the coordinates of the simulation box center. When using a simulation box in a run with multiple ligands, please ensure that the <em>ligandsToRestrict</em> parameter is correctly set.</p></li>
+<li><p><strong>boxRadius</strong> (<em>float</em>, default=20): Radius of the spherical box the ligand will be restrained to (in angstroms). Note that when using the spherical box restraint only xtc trajectories are supported.</p></li>
+<li><p><strong>ligandName</strong> (<em>str</em> or <em>list</em>, default=None): Ligand residue name in the PDB for all
 residues that must be parametrised, starting from version 1.6.3 more than one
-ligand can be specified</p>
-</li>
-<li><p class="first"><strong>ligandCharge</strong> (<em>integer</em> or <em>list</em>, default=None): Charge of the ligand for all
+ligand can be specified</p></li>
+<li><p><strong>ligandCharge</strong> (<em>integer</em> or <em>list</em>, default=None): Charge of the ligand for all
 residues that must be parametrised, starting from version 1.6.3 more than one
-ligand can be specified</p>
-</li>
-<li><p class="first"><strong>WaterBoxSize</strong> (<em>float</em>, default=8): Distance of the edge of the solvation
-box from the closest atom (in angstroms)</p>
-</li>
-<li><p class="first"><strong>nonBondedCutoff</strong> (<em>float</em>, default=8): Radius for the nonBonded cutoff of
-the long-range interactions (in angstroms)</p>
-</li>
-<li><p class="first"><strong>temperature</strong> (<em>float</em>, default=300): Temperature of the simulation (in
-Kelvin)</p>
-</li>
-<li><p class="first"><strong>runningPlatform</strong> (<em>str</em>, default=CPU): Platform on which to run the
-simulation, options are {<em>CPU</em>, <em>CUDA</em>, <em>OpenCL</em>, <em>Reference</em>}, see  <a class="reference external" href="http://docs.openmm.org/7.1.0/userguide/library.html#platform-specific-properties">openmm documentation</a> for more details</p>
-</li>
-<li><p class="first"><strong>minimizationIterations</strong> (<em>float</em>, default=2000): Number of time steps to
-run the energy minimization</p>
-</li>
-<li><p class="first"><strong>devicesPerTrajectory</strong> (<em>int</em>, default=1): Number of gpus to use for each
+ligand can be specified</p></li>
+<li><p><strong>WaterBoxSize</strong> (<em>float</em>, default=8): Distance of the edge of the solvation
+box from the closest atom (in angstroms)</p></li>
+<li><p><strong>nonBondedCutoff</strong> (<em>float</em>, default=8): Radius for the nonBonded cutoff of
+the long-range interactions (in angstroms)</p></li>
+<li><p><strong>temperature</strong> (<em>float</em>, default=300): Temperature of the simulation (in
+Kelvin)</p></li>
+<li><p><strong>runningPlatform</strong> (<em>str</em>, default=CPU): Platform on which to run the
+simulation, options are {<em>CPU</em>, <em>CUDA</em>, <em>OpenCL</em>, <em>Reference</em>}, see  <a class="reference external" href="http://docs.openmm.org/7.1.0/userguide/library.html#platform-specific-properties">openmm documentation</a> for more details</p></li>
+<li><p><strong>minimizationIterations</strong> (<em>float</em>, default=2000): Number of time steps to
+run the energy minimization</p></li>
+<li><p><strong>devicesPerTrajectory</strong> (<em>int</em>, default=1): Number of gpus to use for each
 trajectory, this parameter only applies if using the <em>CUDA</em> platformn. Note
 that <strong>devicesPerTrajectory*numReplicas</strong> should correspond to the number of
-gpus per node that you have available</p>
-</li>
-<li><p class="first"><strong>maxDevicesPerReplica</strong> (<em>int</em>, default=None): Number of maximum gpus available per replica, this parameter is necessary if one wants to oversubscribe the gpus, i.e. run more than one trajectory in the same device</p>
-</li>
-<li><p class="first"><strong>constraintsMinimization</strong> (<em>float</em>, default=5.0): Value of the constraints
+gpus per node that you have available</p></li>
+<li><p><strong>maxDevicesPerReplica</strong> (<em>int</em>, default=None): Number of maximum gpus available per replica, this parameter is necessary if one wants to oversubscribe the gpus, i.e. run more than one trajectory in the same device</p></li>
+<li><p><strong>constraintsMinimization</strong> (<em>float</em>, default=5.0): Value of the constraints
 for the minimization (in kcal/(mol*A<sup>2</sup>)), see <a class="reference internal" href="#equilibration-procedure-in-md">Equilibration procedure in MD</a> section
-for more details on the equilibration procedure</p>
-</li>
-<li><p class="first"><strong>constraintsNVT</strong> (<em>float</em>, default=5.0): Value of the constraints
-for the NVT equilibration (in kcal/(mol*A<sup>2</sup>))</p>
-</li>
-<li><p class="first"><strong>constraintsNPT</strong> (<em>float</em>, default=0.5): Value of the constraints
-for the NPT equilibration (in kcal/(mol*A<sup>2</sup>))</p>
-</li>
-<li><p class="first"><strong>format</strong> (<em>str</em>, default=xtc): Format of the trajectory file, currently we
+for more details on the equilibration procedure</p></li>
+<li><p><strong>constraintsNVT</strong> (<em>float</em>, default=5.0): Value of the constraints
+for the NVT equilibration (in kcal/(mol*A<sup>2</sup>))</p></li>
+<li><p><strong>constraintsNPT</strong> (<em>float</em>, default=0.5): Value of the constraints
+for the NPT equilibration (in kcal/(mol*A<sup>2</sup>))</p></li>
+<li><p><strong>format</strong> (<em>str</em>, default=xtc): Format of the trajectory file, currently we
 support <em>dcd</em> and <em>xtc</em>, note however that due to issues with the xtc library
 in mdtraj writing <em>xtc</em> files might not be problematic unless you are
 currently using the latest mdtraj code (this means version &gt; 1.9.2 at the
-moment this was written)</p>
-</li>
-<li><p class="first"><strong>constraints</strong> (<em>list</em>, default=None): List of constraints between atoms to
+moment this was written)</p></li>
+<li><p><strong>constraints</strong> (<em>list</em>, default=None): List of constraints between atoms to
 establish in a simulation. The constraints must be specified as a list in the
 following format (see <a class="reference internal" href="#control-file-examples">Control File Examples</a> section for an example on how
 to set constraints.  <strong>Note</strong>: the distance of the constraints <strong>must</strong> be specified in angstroms):</p>
@@ -443,25 +425,21 @@ to set constraints.  <strong>Note</strong>: the distance of the constraints <str
 of their protonation state, see <a class="reference internal" href="#input-preparation-for-md">Input preparation for MD</a> section for more
 details on histidines naming.</p>
 </li>
-<li><p class="first"><strong>boxType</strong> (<em>str</em>, default=sphere): Type of box to use, it can be <em>sphere</em> or
-<em>cylinder</em></p>
-</li>
-<li><p class="first"><strong>cylinderBases</strong> (<em>list</em>, default=None): List with the coordinates of the
+<li><p><strong>boxType</strong> (<em>str</em>, default=sphere): Type of box to use, it can be <em>sphere</em> or
+<em>cylinder</em></p></li>
+<li><p><strong>cylinderBases</strong> (<em>list</em>, default=None): List with the coordinates of the
 bases of the cylinder (in angstroms), this should look like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">,</span> <span class="n">zb</span><span class="p">],</span> <span class="p">[</span><span class="n">xt</span><span class="p">,</span> <span class="n">yt</span><span class="p">,</span> <span class="n">zt</span><span class="p">]]</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first"><strong>forcefield</strong> (<em>str</em>, default=”ff99SB”): Forcefield to use in the simulation, current options are: {“ff99SB”, “ff14SB”}</p>
-</li>
-<li><p class="first"><strong>postprocessing</strong> (<em>bool</em>, defuault=True): “Whether to postprocess the trajectories (wrapping of the water box and alginment of the protein)”</p>
-</li>
-<li><p class="first"><strong>cofactors</strong> (<em>list</em>, default=None): List of predefined cofactors to load,
+<li><p><strong>forcefield</strong> (<em>str</em>, default=”ff99SB”): Forcefield to use in the simulation, current options are: {“ff99SB”, “ff14SB”}</p></li>
+<li><p><strong>postprocessing</strong> (<em>bool</em>, defuault=True): “Whether to postprocess the trajectories (wrapping of the water box and alginment of the protein)”</p></li>
+<li><p><strong>cofactors</strong> (<em>list</em>, default=None): List of predefined cofactors to load,
 options are <em>fadh-</em>, <em>fmn</em> and <em>nad</em>, and they must have PDB names <em>FAD</em>,
 <em>FMN</em> and <em>NAP</em> respectively. The parameters are pulled from the <a class="reference external" href="http://research.bmh.manchester.ac.uk/bryce/amber">AMBER
-parameter database</a>.</p>
-</li>
-<li><p class="first"><strong>ligandsToRestrict</strong> (<em>list</em>, default=None): List of ligands that should be
+parameter database</a>.</p></li>
+<li><p><strong>ligandsToRestrict</strong> (<em>list</em>, default=None): List of ligands that should be
 restricted to the simulation box. This is useful when multiple ligands are
 specified to parametrise, e.g a small molecule and a strange cofactor.
 Typically, one might one to constrain the cofactor but allow mobility for the
@@ -469,19 +447,18 @@ small molecule, in that case the value of this parameter should be a list
 containing only the PDB name of the small molecule. To ensure backwards
 compatibility, if only one ligand is specified in the <em>ligandName</em> parameter
 and a simulation box is set, the value of <strong>ligandsToRestrict</strong> will be set
-to the same as <em>ligandName</em>.</p>
-</li>
+to the same as <em>ligandName</em>.</p></li>
 </ul>
 </div>
 <div class="section" id="exit-condition">
 <h3>Exit condition<a class="headerlink" href="#exit-condition" title="Permalink to this headline">¶</a></h3>
 <p>Additionally, the simulation block may have an exit condition that stops the execution:</p>
 <ul>
-<li><p class="first"><strong>exitCondition</strong> (<em>dict</em>, default=None): Block that specifies an exit condition for the simulation.
+<li><p><strong>exitCondition</strong> (<em>dict</em>, default=None): Block that specifies an exit condition for the simulation.
 Currently two types are implemented: <em>metric</em> and
 <em>metricMultipleTrajectories</em>.</p>
 <ul>
-<li><p class="first"><strong>metric</strong> :
+<li><p><strong>metric</strong> :
 this type accepts a <em>metricCol</em> which represents a column in the report file, an <em>exitValue</em>
 which represents a value for the metric and a <em>condition</em> parameter which can
 be either “&lt;” or “&gt;”, default value is “&lt;”. The simulation will terminate after the metric
@@ -499,7 +476,7 @@ than 2 for the fifth column (4th starting to count from 0) of the report file wo
 </pre></div>
 </div>
 </li>
-<li><p class="first"><strong>metricMultipleTrajectories</strong> :
+<li><p><strong>metricMultipleTrajectories</strong> :
 this type accepts a <em>metricCol</em> which represents a column in the report file, an <em>exitValue</em>
 which represents a value for the metric, a <em>condition</em> parameter which can
 be either “&lt;” or “&gt;”, default value is “&lt;” and a <em>numberTrajectories</em> parameter which determines how many independent trajectories
@@ -542,11 +519,11 @@ file would look like:</p>
 <h2>Clustering block<a class="headerlink" href="#clustering-block" title="Permalink to this headline">¶</a></h2>
 <p>Currently there are four functional types of clustering:</p>
 <ul class="simple">
-<li><strong>rmsd</strong>, which solely uses the ligand rmsd</li>
-<li><strong>contactMap</strong>, which uses a protein-ligand contact map matrix</li>
-<li><strong>null</strong>, which produces no clustering</li>
-<li><strong>MSM</strong>, which uses a kmeans clustering to estimate a Markov State
-Model (MSM)</li>
+<li><p><strong>rmsd</strong>, which solely uses the ligand rmsd</p></li>
+<li><p><strong>contactMap</strong>, which uses a protein-ligand contact map matrix</p></li>
+<li><p><strong>null</strong>, which produces no clustering</p></li>
+<li><p><strong>MSM</strong>, which uses a kmeans clustering to estimate a Markov State
+Model (MSM)</p></li>
 </ul>
 <p>The first two clusterings are based on the leader algorithm, an extremely fast clustering method that in the
 worst case makes <em>kN</em> comparisons, where <em>N</em> is the number of snapshots to cluster and <em>k</em> the number of existing clusters.
@@ -575,14 +552,14 @@ below), thus one of the proteins would be considered a “ligand”.</p>
 <div class="section" id="thresholdcalculator">
 <h3>ThresholdCalculator<a class="headerlink" href="#thresholdcalculator" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><strong>constant</strong>, where all clusters have the same threshold. A sound value may be 3 Å.</li>
-<li><strong>heaviside</strong> (default), where thresholds (values) are assigned according to a set of step functions that
+<li><p><strong>constant</strong>, where all clusters have the same threshold. A sound value may be 3 Å.</p></li>
+<li><p><strong>heaviside</strong> (default), where thresholds (values) are assigned according to a set of step functions that
 vary according to a ratio of protein-ligand contacts and ligand size , <em>r</em>, (conditions, see below). The values and conditions
 of change are defined with two lists. The condition list is iterated until <em>r</em> &gt; condition[i], and the used
 threshold is values[i]. If r &lt;= conditions[i] for all i, it returns the last element in values.
 Thresholds typically vary from 5Å in the bulk to 2Å in protein pockets. This method is preferred, as it
 optimizes the number of clusters, giving more importance to regions with more contacts and interactions,
-where metastability occurs. Default values: [2,3,4,5], default conditions: [1, 0.75, 0.5].</li>
+where metastability occurs. Default values: [2,3,4,5], default conditions: [1, 0.75, 0.5].</p></li>
 </ul>
 </div>
 <div class="section" id="rmsd-clustering">
@@ -599,9 +576,9 @@ atoms (or a subset of them, typically one or two per residue) as columns and
 ligand atoms (typically only heavy atoms) as rows, and a value of True indicates a contact.
 There are currently three implemented methods to evaluate the similarity of contactMaps:</p>
 <ul class="simple">
-<li><strong>Jaccard</strong>, which calulates the Jaccard Index (<a class="reference external" href="https://en.wikipedia.org/wiki/Jaccard_index">Wikipedia page</a>). The recommended values using the heaviside threshold calculator are [0.375, 0.5, 0.55, 0.7] for the conditions [1, 0.75 , 0.5].</li>
-<li><strong>correlation</strong>, which calculates the correlation between the two matrices</li>
-<li><strong>distance</strong>, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.</li>
+<li><p><strong>Jaccard</strong>, which calulates the Jaccard Index (<a class="reference external" href="https://en.wikipedia.org/wiki/Jaccard_index">Wikipedia page</a>). The recommended values using the heaviside threshold calculator are [0.375, 0.5, 0.55, 0.7] for the conditions [1, 0.75 , 0.5].</p></li>
+<li><p><strong>correlation</strong>, which calculates the correlation between the two matrices</p></li>
+<li><p><strong>distance</strong>, which evaluates the similarity of two contactMaps by calculating the ratio of the number of differences over the average of elements in the contacts maps.</p></li>
 </ul>
 </div>
 <div class="section" id="null-clustering">
@@ -613,7 +590,7 @@ time.</p>
 <div class="section" id="msm-clustering">
 <h3>MSM Clustering<a class="headerlink" href="#msm-clustering" title="Permalink to this headline">¶</a></h3>
 <p>The <strong>MSM</strong> clusters a simulation in order to estimate an MSM, this includes
-the possibility of preprocessing the trajectories with the TICA method <a class="reference internal" href="#tica" id="id3">[TICA]</a></p>
+the possibility of preprocessing the trajectories with the TICA method <a class="reference internal" href="#tica" id="id3"><span>[TICA]</span></a></p>
 </div>
 <div class="section" id="clustering-parameters">
 <h3>Clustering Parameters<a class="headerlink" href="#clustering-parameters" title="Permalink to this headline">¶</a></h3>
@@ -622,33 +599,33 @@ block. Typically, all parameters apply to all kinds of clustering except Null
 Clustering, except those that are specified otherwise (often exclusive to MSM
 clustering):</p>
 <ul class="simple">
-<li><strong>ligandResname</strong> (<em>string</em>, default=”“): Ligand residue name in the PDB (if necessary)</li>
-<li><strong>ligandChain</strong> (<em>string</em>, default=”“): Ligand chain (if necessary)</li>
-<li><strong>ligandResnum</strong> (<em>int</em>, default=0): Ligand residue number (if necessary). If 0 or not specified, it is ignored. The ligand ought to be univoquely identified with any combination of this and the two former parameters</li>
-<li><strong>contactThresholdDistance</strong> (<em>float</em>, default=8): Maximum distance at which two atoms have to
-be separated to be considered in contact</li>
-<li><strong>symmetries</strong> (<em>list</em>, default=[]): List of symmetry groups of key:value maps with the names of atoms
-that are symmetrical in the ligand</li>
-<li><strong>similarityEvaluator</strong> (<em>string</em>, mandatory):  Name of the method to evaluate the similarity
-of contactMaps, only available and mandatory in the contactMap clustering</li>
-<li><strong>alternativeStructure</strong> (<em>bool</em>, default=False): It stores alternative spawning structures within each cluster to be used in the spawning (see below). Any two pairs of alternative structures within a cluster are separated a minimum distance of cluster_threshold_distance/2.</li>
-<li><strong>nclusters</strong> (<em>int</em>, mandatory for MSM): Number of clusters to generate</li>
-<li><strong>tica</strong> (<em>bool</em>, default=False): Whether to use TICA to preprocess the
-trajectories, only used for MSM clustering</li>
-<li><strong>atom_Ids</strong> (<em>list</em>, default=[]): List of atoms whose coordinates should be
+<li><p><strong>ligandResname</strong> (<em>string</em>, default=””): Ligand residue name in the PDB (if necessary)</p></li>
+<li><p><strong>ligandChain</strong> (<em>string</em>, default=””): Ligand chain (if necessary)</p></li>
+<li><p><strong>ligandResnum</strong> (<em>int</em>, default=0): Ligand residue number (if necessary). If 0 or not specified, it is ignored. The ligand ought to be univoquely identified with any combination of this and the two former parameters</p></li>
+<li><p><strong>contactThresholdDistance</strong> (<em>float</em>, default=8): Maximum distance at which two atoms have to
+be separated to be considered in contact</p></li>
+<li><p><strong>symmetries</strong> (<em>list</em>, default=[]): List of symmetry groups of key:value maps with the names of atoms
+that are symmetrical in the ligand</p></li>
+<li><p><strong>similarityEvaluator</strong> (<em>string</em>, mandatory):  Name of the method to evaluate the similarity
+of contactMaps, only available and mandatory in the contactMap clustering</p></li>
+<li><p><strong>alternativeStructure</strong> (<em>bool</em>, default=False): It stores alternative spawning structures within each cluster to be used in the spawning (see below). Any two pairs of alternative structures within a cluster are separated a minimum distance of cluster_threshold_distance/2.</p></li>
+<li><p><strong>nclusters</strong> (<em>int</em>, mandatory for MSM): Number of clusters to generate</p></li>
+<li><p><strong>tica</strong> (<em>bool</em>, default=False): Whether to use TICA to preprocess the
+trajectories, only used for MSM clustering</p></li>
+<li><p><strong>atom_Ids</strong> (<em>list</em>, default=[]): List of atoms whose coordinates should be
 used for the clustering, specifed as serial:atomname:residue, e.g.
-3232:C1:696, only used for MSM clustering</li>
-<li><strong>writeCA</strong> (<em>bool</em>, default=False): Whether to use the alpha carbons in the
-clustering, this is typically used when using tica, only used for MSM clustering</li>
-<li><strong>sidechains</strong> (<em>bool</em>, default=False): Whether to use the sidechains in
-contact with the ligand for clustering, this is typically used when using tica, only used for MSM clustering</li>
-<li><strong>tica_lagtime</strong> (<em>int</em>, default=10): Lagtime to use in the tica method , only used for MSM clustering</li>
-<li><strong>tica_nICs</strong> (<em>int</em>, default=3): Number of independent components from tica
-to use in the clustering, only used for MSM clustering</li>
-<li><strong>tica_kinetic_map</strong> (<em>bool</em>, default=True): Whether to use the kinetic map
-distance with TICA</li>
-<li><strong>tica_commute_map</strong> (<em>bool</em>, default=False): Whether to use the commute map
-distance with TICA</li>
+3232:C1:696, only used for MSM clustering</p></li>
+<li><p><strong>writeCA</strong> (<em>bool</em>, default=False): Whether to use the alpha carbons in the
+clustering, this is typically used when using tica, only used for MSM clustering</p></li>
+<li><p><strong>sidechains</strong> (<em>bool</em>, default=False): Whether to use the sidechains in
+contact with the ligand for clustering, this is typically used when using tica, only used for MSM clustering</p></li>
+<li><p><strong>tica_lagtime</strong> (<em>int</em>, default=10): Lagtime to use in the tica method , only used for MSM clustering</p></li>
+<li><p><strong>tica_nICs</strong> (<em>int</em>, default=3): Number of independent components from tica
+to use in the clustering, only used for MSM clustering</p></li>
+<li><p><strong>tica_kinetic_map</strong> (<em>bool</em>, default=True): Whether to use the kinetic map
+distance with TICA</p></li>
+<li><p><strong>tica_commute_map</strong> (<em>bool</em>, default=False): Whether to use the commute map
+distance with TICA</p></li>
 </ul>
 </div>
 <div class="section" id="example">
@@ -729,22 +706,22 @@ finely discretized.</p>
 <p>Finally, trajectories are spawned in different <em>interesting</em> clusters, according to a reward function.
 There are several implemented strategies:</p>
 <ul class="simple">
-<li><strong>sameWeight</strong>: Uniformly distributes the processors over all clusters</li>
-<li><strong>inverselyProportional</strong>: Distributes the processors with a weight that is inversely proportional to the cluster population.</li>
-<li><strong>epsilon</strong>: An <em>epsilon</em> fraction of processors are distributed proportionally to the value of a metric, and the rest are inverselyProportional distributed.  A param <strong>n</strong> can be specified to only consider the <em>n</em> clusters with best metric.</li>
-<li><strong>variableEpsilon</strong>: Equivalent to epsilon, with an epsilon value changing over time</li>
-<li><strong>independent</strong>: Trajectories are run independently, as in the original PELE. It may be useful to restart simulations or to use the analysis scripts built for AdaptivePELE.</li>
-<li><strong>independentMetric</strong>: Trajectories are run independently, as in the original PELE. However in this method, instead of starting the next epoch from the last snapshot of the previous we start from the one that maximizes or minimizes a certain metric.</li>
-<li><strong>UCB</strong>: Upper confidence bound.</li>
-<li><strong>FAST</strong>: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).</li>
-<li><strong>ProbabilityMSM</strong>: Distributes the processors with a weight that is
-proportional to the stationary probability of each cluster in an MSM (see <a class="reference internal" href="#msm" id="id4">[MSM]</a> for more details, needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</li>
-<li><strong>MetastabilityMSM</strong> Distributes the processors with a weight that is
-proportional to the metastability of each cluster in an MSM calulated as q <sub>ii</sub>/<em>N</em>, where q <sub>ii</sub> is the number of self-transitions of state i and N is the total number of counts for the simulation (needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</li>
-<li><strong>IndependentMSM</strong> Trajectories are run independently, as in the
+<li><p><strong>sameWeight</strong>: Uniformly distributes the processors over all clusters</p></li>
+<li><p><strong>inverselyProportional</strong>: Distributes the processors with a weight that is inversely proportional to the cluster population.</p></li>
+<li><p><strong>epsilon</strong>: An <em>epsilon</em> fraction of processors are distributed proportionally to the value of a metric, and the rest are inverselyProportional distributed.  A param <strong>n</strong> can be specified to only consider the <em>n</em> clusters with best metric.</p></li>
+<li><p><strong>variableEpsilon</strong>: Equivalent to epsilon, with an epsilon value changing over time</p></li>
+<li><p><strong>independent</strong>: Trajectories are run independently, as in the original PELE. It may be useful to restart simulations or to use the analysis scripts built for AdaptivePELE.</p></li>
+<li><p><strong>independentMetric</strong>: Trajectories are run independently, as in the original PELE. However in this method, instead of starting the next epoch from the last snapshot of the previous we start from the one that maximizes or minimizes a certain metric.</p></li>
+<li><p><strong>UCB</strong>: Upper confidence bound.</p></li>
+<li><p><strong>FAST</strong>: FAST strategy (see J. Chem. Theory Comput., 2015, 11 (12), pp 5747–5757).</p></li>
+<li><p><strong>ProbabilityMSM</strong>: Distributes the processors with a weight that is
+proportional to the stationary probability of each cluster in an MSM (see <a class="reference internal" href="#msm" id="id4"><span>[MSM]</span></a> for more details, needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</p></li>
+<li><p><strong>MetastabilityMSM</strong> Distributes the processors with a weight that is
+proportional to the metastability of each cluster in an MSM calulated as q <sub>ii</sub>/<em>N</em>, where q <sub>ii</sub> is the number of self-transitions of state i and N is the total number of counts for the simulation (needs to be used with <a class="reference internal" href="#msm-clustering">MSM Clustering</a>)</p></li>
+<li><p><strong>IndependentMSM</strong> Trajectories are run independently, as in the
 <strong>independent</strong> method, but an MSM is calculated at the end of each iteration
 and the results are reported in the form of two plots, one of the stationary
-distribution and one of the probability of binding (PMF)</li>
+distribution and one of the probability of binding (PMF)</p></li>
 </ul>
 <p>According to our experience, the best strategies are <strong>inverselyProportional</strong> and <strong>epsilon</strong>, guided with either PELE binding energy or the RMSD to the bound pose if available.</p>
 </div>
@@ -754,47 +731,47 @@ distribution and one of the probability of binding (PMF)</li>
 Again, and in analogy to the threshold calculator, the aim is to give more emphasis to interesting regions.
 There are two types of density calculators:</p>
 <ul class="simple">
-<li><strong>constant</strong> (or <strong>null</strong>, default), which assigns the same density to all the clusters regardless of the number of contacts</li>
-<li><strong>heaviside</strong>, which assigns different densities using a heaviside function, much like the thresholdCalculator (values and conditions are mandatory)</li>
-<li><strong>continuous</strong>, which assings increasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 8, otherwise, density = 64.0/(-4 <strong>r</strong> + 6)^3</li>
-<li><strong>exitContinuous</strong>, which assings decreasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 1/8, otherwise, density = (-4 <strong>r</strong> + 6)^3/64.0</li>
+<li><p><strong>constant</strong> (or <strong>null</strong>, default), which assigns the same density to all the clusters regardless of the number of contacts</p></li>
+<li><p><strong>heaviside</strong>, which assigns different densities using a heaviside function, much like the thresholdCalculator (values and conditions are mandatory)</p></li>
+<li><p><strong>continuous</strong>, which assings increasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 8, otherwise, density = 64.0/(-4 <strong>r</strong> + 6)^3</p></li>
+<li><p><strong>exitContinuous</strong>, which assings decreasing densities for an increasing number of contacts. Default values, if <strong>r</strong> &gt; 1, density = 1/8, otherwise, density = (-4 <strong>r</strong> + 6)^3/64.0</p></li>
 </ul>
 </div>
 <div class="section" id="id5">
 <h3>Parameters<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. “report”.</li>
-<li><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (one indexed)</li>
-<li><strong>epsilon</strong> (<em>float</em>, mandatory in <strong>epsilon</strong> spawning): The fraction of the processors that will be assigned according to the selected metric</li>
-<li><strong>metricWeights</strong> (<em>string</em>, default=linear): Selects how to distribute the weights of the cluster according to its metric, two options: linear (proportional to metric) or Boltzmann weigths (proportional to exp(-metric/T). Needs to define the temperature <strong>T</strong>.</li>
-<li><strong>T</strong> (<em>float</em>, default=1000): Temperature, only used for Boltzmann weights</li>
-<li><strong>condition</strong> (<em>string</em>, default=min): Selects wether to take into account maximum or minimum values in epsilon related spawning, values are <em>min</em> or <em>max</em></li>
+<li><p><strong>reportFilename</strong> (<em>string</em>, mandatory): Basename to match the report file with metrics. E.g. “report”.</p></li>
+<li><p><strong>metricColumnInReport</strong> (<em>integer</em>, mandatory): Column of the report file that contains the metric of interest (one indexed)</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>, mandatory in <strong>epsilon</strong> spawning): The fraction of the processors that will be assigned according to the selected metric</p></li>
+<li><p><strong>metricWeights</strong> (<em>string</em>, default=linear): Selects how to distribute the weights of the cluster according to its metric, two options: linear (proportional to metric) or Boltzmann weigths (proportional to exp(-metric/T). Needs to define the temperature <strong>T</strong>.</p></li>
+<li><p><strong>T</strong> (<em>float</em>, default=1000): Temperature, only used for Boltzmann weights</p></li>
+<li><p><strong>condition</strong> (<em>string</em>, default=min): Selects wether to take into account maximum or minimum values in epsilon related spawning, values are <em>min</em> or <em>max</em></p></li>
 </ul>
 <p>The following parameters are mandatory for <strong>variableEpsilon</strong>:</p>
 <ul class="simple">
-<li><strong>varEpsilonType</strong> (<em>string</em>,default=linear): Selects the type of variation for the epsilon value. At the moment only a linear variation is implemented</li>
-<li><strong>maxEpsilon</strong> (<em>float</em>): Maximum value for epsilon</li>
-<li><strong>minEpsilon</strong> (<em>float</em>): Minimum value for epsilon</li>
-<li><strong>variationWindow</strong> (<em>integer</em>): Last iteration over which to change the epsilon value</li>
-<li><strong>maxEpsilonWindow</strong> (<em>integer</em>): Number of iteration with epsilon=maxEpsilon</li>
-<li><strong>period</strong> (<em>integer</em>): Variation period (in number of iterations)</li>
-<li><strong>filterByMetric</strong> (<em>bool</em>, default=False): Whether to filter clusters for the spawning
-according to some metric</li>
-<li><strong>filter_value</strong> (<em>float</em>): Value to establish the filter</li>
-<li><strong>filter_col</strong> (<em>int</em>): Column of the report file to use for the filtering</li>
+<li><p><strong>varEpsilonType</strong> (<em>string</em>,default=linear): Selects the type of variation for the epsilon value. At the moment only a linear variation is implemented</p></li>
+<li><p><strong>maxEpsilon</strong> (<em>float</em>): Maximum value for epsilon</p></li>
+<li><p><strong>minEpsilon</strong> (<em>float</em>): Minimum value for epsilon</p></li>
+<li><p><strong>variationWindow</strong> (<em>integer</em>): Last iteration over which to change the epsilon value</p></li>
+<li><p><strong>maxEpsilonWindow</strong> (<em>integer</em>): Number of iteration with epsilon=maxEpsilon</p></li>
+<li><p><strong>period</strong> (<em>integer</em>): Variation period (in number of iterations)</p></li>
+<li><p><strong>filterByMetric</strong> (<em>bool</em>, default=False): Whether to filter clusters for the spawning
+according to some metric</p></li>
+<li><p><strong>filter_value</strong> (<em>float</em>): Value to establish the filter</p></li>
+<li><p><strong>filter_col</strong> (<em>int</em>): Column of the report file to use for the filtering</p></li>
 </ul>
 <p>The following parameter are mandatory for all <em>MSM</em>-based methods:</p>
 <ul class="simple">
-<li><strong>lagtime</strong> (<em>int</em>): Lagtime to use when estimating the MSM</li>
+<li><p><strong>lagtime</strong> (<em>int</em>): Lagtime to use when estimating the MSM</p></li>
 </ul>
 <p>Additionally, these methods can also accept the following parameters:</p>
 <ul class="simple">
-<li><strong>minPos</strong> (<em>list</em>): Coordinates of the reference minimum. This value is used
+<li><p><strong>minPos</strong> (<em>list</em>): Coordinates of the reference minimum. This value is used
 to calculate the distance to each cluster and create the probability and PMF
-plots for the MSM-based spawnings</li>
-<li><strong>SASA_column</strong> (<em>int</em>): Column corresponding to SASA in the report files. This value is used
+plots for the MSM-based spawnings</p></li>
+<li><p><strong>SASA_column</strong> (<em>int</em>): Column corresponding to SASA in the report files. This value is used
 to calculate the SASA of each cluster and create the probability and PMF
-plots for the MSM-based spawnings</li>
+plots for the MSM-based spawnings</p></li>
 </ul>
 </div>
 <div class="section" id="examples">
@@ -869,7 +846,7 @@ plots for the MSM-based spawnings</li>
 <h2>Control File Examples<a class="headerlink" href="#control-file-examples" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="example-1-pele-with-default-parameters">
 <h3>Example 1 – PELE with default parameters<a class="headerlink" href="#example-1-pele-with-default-parameters" title="Permalink to this headline">¶</a></h3>
-<p>The first example makes use of default parameters, using PELE as propagator (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id6">[APELE]</a>).</p>
+<p>The first example makes use of default parameters, using PELE as propagator (used in the AdaptivePELE paper <a class="reference internal" href="#apele" id="id6"><span>[APELE]</span></a>).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;generalParams&quot;</span> <span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
@@ -1125,18 +1102,18 @@ and returns two arguments: <em>clustering</em> and <em>hasChanged</em>. <em>clus
 <div class="section" id="non-pdb-trajectories">
 <h2>Non-PDB trajectories<a class="headerlink" href="#non-pdb-trajectories" title="Permalink to this headline">¶</a></h2>
 <p>Starting from version 1.5, AdaptivePELE supports working with non-PDB
-trajectories by relying on the mdtraj library <a class="reference internal" href="#mdtraj" id="id7">[MDTRAJ]</a>, with only minor changes in
+trajectories by relying on the mdtraj library <a class="reference internal" href="#mdtraj" id="id7"><span>[MDTRAJ]</span></a>, with only minor changes in
 the exposed interface of the atomset module. However, some caution is needed
 when using mdtraj to convert between formats:</p>
 <ul class="simple">
-<li>Mdtraj does not keep the chain names, for example, if we have a pdb with 2
+<li><p>Mdtraj does not keep the chain names, for example, if we have a pdb with 2
 chains, <em>A</em> for the protein and <em>L</em> for the ligand, mdtraj will rewrite the
-PDB chains as <em>A</em> and <em>B</em></li>
-<li>Mdtraj does not keep protonation states, for example, if we have histidines
-with different states (<em>HIS</em>, <em>HID</em> and <em>HIP</em>) all will be written as <em>HIS</em></li>
-<li>Mdtraj stores atomic coordinates in nanometers which leads to lose of
+PDB chains as <em>A</em> and <em>B</em></p></li>
+<li><p>Mdtraj does not keep protonation states, for example, if we have histidines
+with different states (<em>HIS</em>, <em>HID</em> and <em>HIP</em>) all will be written as <em>HIS</em></p></li>
+<li><p>Mdtraj stores atomic coordinates in nanometers which leads to lose of
 precision when converting to Amstrong, however this only affects the second
-or third decimal, so most structures should be fine</li>
+or third decimal, so most structures should be fine</p></li>
 </ul>
 <p>To overcome these issues, the splitTrajectories script in the analysis
 subpackage can be used::</p>
@@ -1165,33 +1142,33 @@ gaff forcefield for the ligand, and the Amberff forcefield for the protein
 <p>Several tasks are applied to the input pdb to ensure compatibility with
 AmberTools:</p>
 <ul class="simple">
-<li>Check for gaps in the structure, this only produces a warning, it’s still the
-users’ responsibility to provide a correct input structure.</li>
-<li>Correct alternative positions. If the input pdb has alternative positions we
-select the ones with higher occupancy.</li>
-<li>Identify disulphide bonds</li>
-<li>Check the protonation states of the histidine residues, the input structure
-should have the correct histidine protonation state for the model.</li>
-<li>Check atom names so that they match the expected names for the amber
-forcefield</li>
+<li><p>Check for gaps in the structure, this only produces a warning, it’s still the
+users’ responsibility to provide a correct input structure.</p></li>
+<li><p>Correct alternative positions. If the input pdb has alternative positions we
+select the ones with higher occupancy.</p></li>
+<li><p>Identify disulphide bonds</p></li>
+<li><p>Check the protonation states of the histidine residues, the input structure
+should have the correct histidine protonation state for the model.</p></li>
+<li><p>Check atom names so that they match the expected names for the amber
+forcefield</p></li>
 </ul>
 <p>Despite all this, there are still several points that the user has to keep in
 mind when providing input for the MD runs:</p>
 <ul class="simple">
-<li>When working whith multiple proteins, each protein <strong>must</strong> be in a separate
+<li><p>When working whith multiple proteins, each protein <strong>must</strong> be in a separate
 chain so that the processing can identify them and the resulting amber
-topology has several molecules as desired.</li>
-<li>The ligand in the input file can’t have a name starting with a digit, since
-AmberTools does not accept residues starting with digits</li>
-<li>Histidines should be name <em>HIS</em> regardless of the protonation state, the code
+topology has several molecules as desired.</p></li>
+<li><p>The ligand in the input file can’t have a name starting with a digit, since
+AmberTools does not accept residues starting with digits</p></li>
+<li><p>Histidines should be name <em>HIS</em> regardless of the protonation state, the code
 will detect and assign the correct template without the need of using
 alternative names such as <em>HIE</em> or <em>HIP</em> (this is particularly important when
 using constraints, see <a class="reference internal" href="#md-parameters">MD Parameters</a> section for more details on the
-constraints options).</li>
-<li>Different cysteine types can be specified by changing the residue name.
+constraints options).</p></li>
+<li><p>Different cysteine types can be specified by changing the residue name.
 Disulphide bonds will be automatically detected, but can be also specified
 manually by renaming the cysteines as <em>CYX</em>. Furthermore, cysteines bound to
-metals should be renamed to <em>CYM</em>.</li>
+metals should be renamed to <em>CYM</em>.</p></li>
 </ul>
 <p>Starting from version v1.6.3, it is possible to use cofactors as well as multiple ligands as input. For more details on how to include them, see the <a class="reference internal" href="#md-parameters">MD Parameters</a> section.</p>
 </div>
@@ -1205,20 +1182,20 @@ structures.</p>
 <p>For each structure the following process is run:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>Energy minimization with constraints on the ligand and protein heavy
+<li><p>Energy minimization with constraints on the ligand and protein heavy
 atoms. The length of the minimiation is determined by the
 <strong>minimizationIterations</strong> parameter and the strength of the constraints
-is determined by the <strong>constraintsMinimization</strong> parameter</li>
-<li>Constant volume and temperature equilibration (NVT) with constraints on the ligand and protein heavy
+is determined by the <strong>constraintsMinimization</strong> parameter</p></li>
+<li><p>Constant volume and temperature equilibration (NVT) with constraints on the ligand and protein heavy
 atoms. The length of the minimiation is determined by the
 <strong>equilibrationLengthNVT</strong> parameter and the strength of the constraints
-is determined by the <strong>constraintsNVT</strong> parameter</li>
-<li>Constant pressure and temperature equilibration (NPT) with constraints on the ligand heavy
+is determined by the <strong>constraintsNVT</strong> parameter</p></li>
+<li><p>Constant pressure and temperature equilibration (NPT) with constraints on the ligand heavy
 atoms and the protein alpha carbons. The length of the minimiation is determined by the
 <strong>equilibrationLengthNPT</strong> parameter and the strength of the constraints
 is determined by the <strong>constraintsNPT</strong> parameter. Note that typically
 the strength of the constraints in this last step will be lower to
-produce a gradual transition into the unconstrained production run</li>
+produce a gradual transition into the unconstrained production run</p></li>
 </ol>
 </div></blockquote>
 </div>
@@ -1324,39 +1301,25 @@ is very similar. An example for this machin would look like:</p>
 <span class="n">srun</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">AdaptivePELE</span><span class="o">.</span><span class="n">adaptiveSampling</span> <span class="n">templetized_PK2_evoCt_md</span><span class="o">.</span><span class="n">conf</span>
 </pre></div>
 </div>
-<table class="docutils citation" frame="void" id="apele" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[APELE]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id6">2</a>)</em> Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="mdtraj" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id7">[MDTRAJ]</a></td><td>Robert&nbsp;T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, <a class="reference external" href="http://mdtraj.org">http://mdtraj.org</a></td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="openmm" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[OPENMM]</a></td><td><ol class="first last upperalpha simple" start="16">
-<li>Eastman, et. al. OpenMM 7: Rapid development of high performance algorithms for molecular dynamics.” PLOS Comp. Biol. 13(7): e1005659. (2017), <a class="reference external" href="http://openmm.org">http://openmm.org</a></li>
+<dl class="citation">
+<dt class="label" id="apele"><span class="brackets">APELE</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id6">2</a>)</span></dt>
+<dd><p>Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, <a class="reference external" href="https://www.nature.com/articles/s41598-017-08445-5">https://www.nature.com/articles/s41598-017-08445-5</a></p>
+</dd>
+<dt class="label" id="mdtraj"><span class="brackets"><a class="fn-backref" href="#id7">MDTRAJ</a></span></dt>
+<dd><p>Robert T. McGibbon et. al. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal, Volume 109, Issue 8, 2015, <a class="reference external" href="http://mdtraj.org">http://mdtraj.org</a></p>
+</dd>
+<dt class="label" id="openmm"><span class="brackets"><a class="fn-backref" href="#id2">OPENMM</a></span></dt>
+<dd><ol class="upperalpha simple" start="16">
+<li><p>Eastman, et. al. OpenMM 7: Rapid development of high performance algorithms for molecular dynamics.” PLOS Comp. Biol. 13(7): e1005659. (2017), <a class="reference external" href="http://openmm.org">http://openmm.org</a></p></li>
 </ol>
-</td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="tica" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id3">[TICA]</a></td><td>Perez-Hernandez G, F Paul, T Giorgino, G De Fabritiis and F Noe. 2013. Identification of slow molecular order parameters for Markov model construction J. Chem. Phys. 139, 015102. doi:10.1063/1.4811489</td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="msm" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id4">[MSM]</a></td><td>Prinz, J H, H Wu, M Sarich, B Keller, M Senne, M Held, J D Chodera, C Schuette and F Noe. 2011. Markov models of molecular kinetics: Generation and validation. J Chem Phys 134: 174105</td></tr>
-</tbody>
-</table>
+</dd>
+<dt class="label" id="tica"><span class="brackets"><a class="fn-backref" href="#id3">TICA</a></span></dt>
+<dd><p>Perez-Hernandez G, F Paul, T Giorgino, G De Fabritiis and F Noe. 2013. Identification of slow molecular order parameters for Markov model construction J. Chem. Phys. 139, 015102. doi:10.1063/1.4811489</p>
+</dd>
+<dt class="label" id="msm"><span class="brackets"><a class="fn-backref" href="#id4">MSM</a></span></dt>
+<dd><p>Prinz, J H, H Wu, M Sarich, B Keller, M Senne, M Held, J D Chodera, C Schuette and F Noe. 2011. Markov models of molecular kinetics: Generation and validation. J Chem Phys 134: 174105</p>
+</dd>
+</dl>
 </div>
 </div>
 

@@ -90,8 +90,8 @@
 <li class="toctree-l1"><a class="reference internal" href="UserManual.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal notranslate"><span class="pre">adaptiveSampling</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal notranslate"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="xref py py-mod docutils literal notranslate"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.analysis.html">analysis Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.atomset.html">atomset Package</a></li>
@@ -99,8 +99,8 @@
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.simulation.html">simulation Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.spawning.html">spawning Package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">utilities Package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.clusteringUtilities"><code class="docutils literal notranslate"><span class="pre">clusteringUtilities</span></code> Module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.utilities"><code class="docutils literal notranslate"><span class="pre">utilities</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.clusteringUtilities"><code class="xref py py-mod docutils literal notranslate"><span class="pre">clusteringUtilities</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.utilities.utilities"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utilities</span></code> Module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.validator.html">validator Package</a></li>
@@ -163,966 +163,818 @@
 <h1>utilities Package<a class="headerlink" href="#utilities-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-AdaptivePELE.utilities.clusteringUtilities">
 <span id="clusteringutilities-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">clusteringUtilities</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.clusteringUtilities" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.clusteringUtilities.writeStructures">
-<code class="descclassname">AdaptivePELE.utilities.clusteringUtilities.</code><code class="descname">writeStructures</code><span class="sig-paren">(</span><em>clusteringObject</em>, <em>listStructures</em>, <em>checker=&lt;function &lt;lambda&gt;&gt;</em>, <em>outputPath='cluster.pdb'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/clusteringUtilities.html#writeStructures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.clusteringUtilities.writeStructures" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.clusteringUtilities.</span></code><code class="sig-name descname"><span class="pre">writeStructures</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">clusteringObject</span></em>, <em class="sig-param"><span class="pre">listStructures</span></em>, <em class="sig-param"><span class="pre">checker=&lt;function</span> <span class="pre">&lt;lambda&gt;&gt;</span></em>, <em class="sig-param"><span class="pre">outputPath='cluster.pdb'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/clusteringUtilities.html#writeStructures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.clusteringUtilities.writeStructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print all clusters in listStructures that meet the condition specified
 by the checker</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal notranslate"><span class="pre">Clustering</span></code></a>) – Clustering object with clusters to print</li>
-<li><strong>checker</strong> (<em>function</em>) – Lambda function with the checker that should evaluate to True for intersted structures</li>
-<li><strong>outputPath</strong> (<em>str</em>) – Output cluster pdb filename</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clusteringObject</strong> (<a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal notranslate"><span class="pre">Clustering</span></code></a>) – Clustering object with clusters to print</p></li>
+<li><p><strong>checker</strong> (<em>function</em>) – Lambda function with the checker that should evaluate to True for intersted structures</p></li>
+<li><p><strong>outputPath</strong> (<em>str</em>) – Output cluster pdb filename</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
 <div class="section" id="module-AdaptivePELE.utilities.utilities">
 <span id="utilities-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">utilities</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.utilities.utilities" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="AdaptivePELE.utilities.utilities.Topology">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">Topology</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">Topology</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Container object that points to the topology used in each trajectory</p>
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.cleanTopologies">
-<code class="descname">cleanTopologies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.cleanTopologies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.cleanTopologies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">cleanTopologies</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.cleanTopologies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.cleanTopologies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove the written topology files</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.getTopology">
-<code class="descname">getTopology</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopology" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">getTopology</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the topology for a particular epoch and trajectory number</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
-<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</p></li>
+<li><p><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with topology information</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list – List with topology information</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.getTopologyFile">
-<code class="descname">getTopologyFile</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopologyFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopologyFile" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">getTopologyFile</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopologyFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopologyFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the topology file for a particular epoch and trajectory number</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
-<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</p></li>
+<li><p><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – Path to the topology file</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>str – Path to the topology file</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.getTopologyFromIndex">
-<code class="descname">getTopologyFromIndex</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopologyFromIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopologyFromIndex" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">getTopologyFromIndex</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopologyFromIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopologyFromIndex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the topology for a particular index</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>int</em>) – Index of the trajectory of interest</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list – List with topology information</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – Index of the trajectory of interest</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list – List with topology information</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.getTopologyIndex">
-<code class="descname">getTopologyIndex</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopologyIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopologyIndex" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">getTopologyIndex</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.getTopologyIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.getTopologyIndex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the topology index for a particular epoch and trajectory number</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
-<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</p></li>
+<li><p><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Index of the corresponding topology</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int – Index of the corresponding topology</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.mapEpochTopologies">
-<code class="descname">mapEpochTopologies</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectoryMapping</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.mapEpochTopologies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.mapEpochTopologies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">mapEpochTopologies</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectoryMapping</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.mapEpochTopologies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.mapEpochTopologies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Map the trajectories for the next epoch and the used topologies</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory selected</li>
-<li><strong>trajectoryMapping</strong> (<em>list</em>) – Mapping of the trajectories and the corresponding topologies</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory selected</p></li>
+<li><p><strong>trajectoryMapping</strong> (<em>list</em>) – Mapping of the trajectories and the corresponding topologies</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.readMappingFromDisk">
-<code class="descname">readMappingFromDisk</code><span class="sig-paren">(</span><em>epochDir</em>, <em>epoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.readMappingFromDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.readMappingFromDisk" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">readMappingFromDisk</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.readMappingFromDisk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.readMappingFromDisk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the processorsToClusterMapping from disk</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) – Name of the folder where to write the
-processorsToClusterMapping</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>epochDir</strong> (<em>str</em>) – Name of the folder where to write the
+processorsToClusterMapping</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.setTopologies">
-<code class="descname">setTopologies</code><span class="sig-paren">(</span><em>topologyFiles</em>, <em>cleanFiles=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.setTopologies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.setTopologies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">setTopologies</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topologyFiles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleanFiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.setTopologies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.setTopologies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the topologies for the simulation. If topologies were set
 before they are deleted and set again</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>topologyFiles</strong> (<em>list</em>) – List of topology files</li>
-<li><strong>cleanFiles</strong> (<em>bool</em>) – Flag wether to remove previous files</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>topologyFiles</strong> (<em>list</em>) – List of topology files</p></li>
+<li><p><strong>cleanFiles</strong> (<em>bool</em>) – Flag wether to remove previous files</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.topologyFilesIterator">
-<code class="descname">topologyFilesIterator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.topologyFilesIterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.topologyFilesIterator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">topologyFilesIterator</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.topologyFilesIterator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.topologyFilesIterator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.writeMappingToDisk">
-<code class="descname">writeMappingToDisk</code><span class="sig-paren">(</span><em>epochDir</em>, <em>epoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.writeMappingToDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.writeMappingToDisk" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">writeMappingToDisk</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.writeMappingToDisk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.writeMappingToDisk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the topology mapping to disk</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochDir</strong> (<em>str</em>) – Name of the folder where to write the
-mapping</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>epochDir</strong> (<em>str</em>) – Name of the folder where to write the
+mapping</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.Topology.writeTopologyObject">
-<code class="descname">writeTopologyObject</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.writeTopologyObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.writeTopologyObject" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">writeTopologyObject</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#Topology.writeTopologyObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.Topology.writeTopologyObject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dump the contents of the topology object using pickle</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="AdaptivePELE.utilities.utilities.TopologyCompat">
-<em class="property">class </em><code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">TopologyCompat</code><span class="sig-paren">(</span><em>pdb_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">TopologyCompat</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.TopologyCompat.getTopology">
-<code class="descname">getTopology</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.getTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.getTopology" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">getTopology</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.getTopology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.getTopology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the topology for a particular epoch and trajectory number</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
-<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</p></li>
+<li><p><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with topology information</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list – List with topology information</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyFile">
-<code class="descname">getTopologyFile</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.getTopologyFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyFile" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">getTopologyFile</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.getTopologyFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyIndex">
-<code class="descname">getTopologyIndex</code><span class="sig-paren">(</span><em>epoch</em>, <em>trajectory_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.getTopologyIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyIndex" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">getTopologyIndex</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.getTopologyIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.getTopologyIndex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the topology index for a particular epoch and trajectory number</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</li>
-<li><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>epoch</strong> (<em>int</em>) – Epoch of the trajectory of interest</p></li>
+<li><p><strong>trajectory_number</strong> (<em>int</em>) – Number of the trajectory to select</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Index of the corresponding topology</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int – Index of the corresponding topology</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="AdaptivePELE.utilities.utilities.TopologyCompat.topologyFilesIterator">
-<code class="descname">topologyFilesIterator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.topologyFilesIterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.topologyFilesIterator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">topologyFilesIterator</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#TopologyCompat.topologyFilesIterator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.TopologyCompat.topologyFilesIterator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.assertSymmetriesDict">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">assertSymmetriesDict</code><span class="sig-paren">(</span><em>symmetries</em>, <em>PDB</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#assertSymmetriesDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.assertSymmetriesDict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">assertSymmetriesDict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symmetries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PDB</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#assertSymmetriesDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.assertSymmetriesDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Asserts the symmetry list in a PDB</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>symmetries</strong> (<em>list of str</em>) – List of symmetry groups</li>
-<li><strong>PDB</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal notranslate"><span class="pre">PDB</span></code></a>) – PDB object to check symmetry list against</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symmetries</strong> (<em>list of str</em>) – List of symmetry groups</p></li>
+<li><p><strong>PDB</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal notranslate"><span class="pre">PDB</span></code></a>) – PDB object to check symmetry list against</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>AssertionError</strong> – If an atom is not found in the structure</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – If an atom is not found in the structure</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.calculateContactMapEigen">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">calculateContactMapEigen</code><span class="sig-paren">(</span><em>contactMap</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#calculateContactMapEigen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.calculateContactMapEigen" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">calculateContactMapEigen</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contactMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#calculateContactMapEigen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.calculateContactMapEigen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates eigenvectors and values of an extended contact map</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contactMap</strong> (<em>np.array</em>) – Contact map</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(numpy.ndarray, numpy.ndarray) – eigenvalues, eigenvectors</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>contactMap</strong> (<em>np.array</em>) – Contact map</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(numpy.ndarray, numpy.ndarray) – eigenvalues, eigenvectors</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.cleanup">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">cleanup</code><span class="sig-paren">(</span><em>tmpFolder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.cleanup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">cleanup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmpFolder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.cleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove folder if exists</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tmpFolder</strong> (<em>str</em>) – Folder to remove</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tmpFolder</strong> (<em>str</em>) – Folder to remove</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.convert_trajectory_to_pdb">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">convert_trajectory_to_pdb</code><span class="sig-paren">(</span><em>trajectory</em>, <em>topology</em>, <em>output</em>, <em>output_folder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#convert_trajectory_to_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.convert_trajectory_to_pdb" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">convert_trajectory_to_pdb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#convert_trajectory_to_pdb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.convert_trajectory_to_pdb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a trajectory from a non-pdb trajectory to pdb format</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>trajectory</strong> (<em>str</em>) – Trajectory to convert</li>
-<li><strong>topology</strong> (<em>str</em>) – Topology file</li>
-<li><strong>output</strong> (<em>str</em>) – Filename of the ouput file</li>
-<li><strong>output_folder</strong> (<em>str</em>) – Folder where to store the output trajectory</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectory</strong> (<em>str</em>) – Trajectory to convert</p></li>
+<li><p><strong>topology</strong> (<em>str</em>) – Topology file</p></li>
+<li><p><strong>output</strong> (<em>str</em>) – Filename of the ouput file</p></li>
+<li><p><strong>output_folder</strong> (<em>str</em>) – Folder where to store the output trajectory</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.distanceCOM">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">distanceCOM</code><span class="sig-paren">(</span><em>coords1</em>, <em>coords2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#distanceCOM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.distanceCOM" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">distanceCOM</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#distanceCOM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.distanceCOM" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.ensure_connectivity_msm">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">ensure_connectivity_msm</code><span class="sig-paren">(</span><em>msm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#ensure_connectivity_msm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.ensure_connectivity_msm" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">ensure_connectivity_msm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#ensure_connectivity_msm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.ensure_connectivity_msm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.gen_atom_name">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">gen_atom_name</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#gen_atom_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.gen_atom_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">gen_atom_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#gen_atom_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.gen_atom_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.generateRotationMatrixAroundAxis">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">generateRotationMatrixAroundAxis</code><span class="sig-paren">(</span><em>axis</em>, <em>angle</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#generateRotationMatrixAroundAxis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.generateRotationMatrixAroundAxis" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">generateRotationMatrixAroundAxis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#generateRotationMatrixAroundAxis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.generateRotationMatrixAroundAxis" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getAtomNames">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getAtomNames</code><span class="sig-paren">(</span><em>values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getAtomNames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getAtomNames" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getAtomNames</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getAtomNames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getAtomNames" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assign to each value an atomname, O for negatives, H for 0 and N for
 positives. This function is created for assign atomnames for custom pdbs</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>values</strong> (<em>iterable</em>) – Collection of numbers to assing an atom name for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list – List of atom names</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>values</strong> (<em>iterable</em>) – Collection of numbers to assing an atom name for</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list – List of atom names</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getCpuCount">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getCpuCount</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getCpuCount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getCpuCount" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getCpuCount</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getCpuCount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getCpuCount" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getFileExtension">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getFileExtension</code><span class="sig-paren">(</span><em>trajectoryFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getFileExtension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getFileExtension" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getFileExtension</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectoryFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getFileExtension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getFileExtension" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract the extension of a trajectory</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajectoryFile</strong> (<em>str</em>) – Name of the trajectory file</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str – Extension of the trajectory</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trajectoryFile</strong> (<em>str</em>) – Name of the trajectory file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>str – Extension of the trajectory</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getFileSuffix">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getFileSuffix</code><span class="sig-paren">(</span><em>filename</em>, <em>separator='_'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getFileSuffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getFileSuffix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getFileSuffix</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getFileSuffix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getFileSuffix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the suffix appendend to a file name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>filename</strong> (<em>str</em>) – filename</li>
-<li><strong>separator</strong> (<em>str</em>) – character used as separator for the suffix</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – filename</p></li>
+<li><p><strong>separator</strong> (<em>str</em>) – character used as separator for the suffix</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Trajectory number</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int – Trajectory number</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getMetricsFromReportsInEpoch">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getMetricsFromReportsInEpoch</code><span class="sig-paren">(</span><em>reportName</em>, <em>outputFolder</em>, <em>nTrajs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getMetricsFromReportsInEpoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getMetricsFromReportsInEpoch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getMetricsFromReportsInEpoch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reportName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputFolder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nTrajs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getMetricsFromReportsInEpoch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getMetricsFromReportsInEpoch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract the metrics in report file from an epoch to a numpy array</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getPELEControlFileDict">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getPELEControlFileDict</code><span class="sig-paren">(</span><em>templetizedControlFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getPELEControlFileDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getPELEControlFileDict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getPELEControlFileDict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">templetizedControlFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getPELEControlFileDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getPELEControlFileDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse a PELE control file into a python dictionary</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getPrmtopNum">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getPrmtopNum</code><span class="sig-paren">(</span><em>prmtopFilename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getPrmtopNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getPrmtopNum" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getPrmtopNum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prmtopFilename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getPrmtopNum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getPrmtopNum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the prmtop number</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajFilename</strong> (<em>str</em>) – prmtop filename</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – prmtop number</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trajFilename</strong> (<em>str</em>) – prmtop filename</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int – prmtop number</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getRMSD">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getRMSD</code><span class="sig-paren">(</span><em>traj</em>, <em>nativePDB</em>, <em>resname</em>, <em>reschain</em>, <em>resnum</em>, <em>symmetries</em>, <em>topology=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getRMSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getRMSD" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getRMSD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nativePDB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reschain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resnum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getRMSD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getRMSD" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the RMSD of a trajectory, given a native and symmetries</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>traj</strong> (<em>str</em>) – Trajecotry filename</li>
-<li><strong>nativePDB</strong> – Native PDB object</li>
-<li><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the system pdb</li>
-<li><strong>reschain</strong> (<em>str</em>) – Chain name of the ligand in the system pdb</li>
-<li><strong>resnum</strong> (<em>int</em>) – Residue number of the ligand in the system pdb</li>
-<li><strong>symmetries</strong> (<em>list of dict</em>) – Symmetries dictionary list with independent symmetry groups</li>
-<li><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>str</em>) – Trajecotry filename</p></li>
+<li><p><strong>nativePDB</strong> – Native PDB object</p></li>
+<li><p><strong>resname</strong> (<em>str</em>) – Residue name of the ligand in the system pdb</p></li>
+<li><p><strong>reschain</strong> (<em>str</em>) – Chain name of the ligand in the system pdb</p></li>
+<li><p><strong>resnum</strong> (<em>int</em>) – Residue number of the ligand in the system pdb</p></li>
+<li><p><strong>symmetries</strong> (<em>list of dict</em>) – Symmetries dictionary list with independent symmetry groups</p></li>
+<li><p><strong>topology</strong> (<em>list</em>) – Topology for non-pdb trajectories</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.array – Array with the rmsd values of the trajectory</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>np.array – Array with the rmsd values of the trajectory</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getReportAndTrajectoryWildcard">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getReportAndTrajectoryWildcard</code><span class="sig-paren">(</span><em>JSONdict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getReportAndTrajectoryWildcard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getReportAndTrajectoryWildcard" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getReportAndTrajectoryWildcard</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSONdict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getReportAndTrajectoryWildcard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getReportAndTrajectoryWildcard" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract the trajectory and report filename from the pele control file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>JSONdict</strong> (<em>dict</em>) – Dictionary containing a parsed PELE control file</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str, str – Report and trajectory wildcards</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>JSONdict</strong> (<em>dict</em>) – Dictionary containing a parsed PELE control file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>str, str – Report and trajectory wildcards</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getReportNum">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getReportNum</code><span class="sig-paren">(</span><em>reportFilename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getReportNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getReportNum" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getReportNum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reportFilename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getReportNum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getReportNum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the report number</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>reportFilename</strong> (<em>str</em>) – Trajectory filename</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – Report number</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>reportFilename</strong> (<em>str</em>) – Trajectory filename</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int – Report number</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getSASAcolumnFromControlFile">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getSASAcolumnFromControlFile</code><span class="sig-paren">(</span><em>JSONdict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getSASAcolumnFromControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getSASAcolumnFromControlFile" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getSASAcolumnFromControlFile</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSONdict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getSASAcolumnFromControlFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getSASAcolumnFromControlFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getSnapshots">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getSnapshots</code><span class="sig-paren">(</span><em>trajectoryFile</em>, <em>verbose=False</em>, <em>topology=None</em>, <em>use_pdb=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getSnapshots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getSnapshots" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getSnapshots</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectoryFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_pdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getSnapshots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getSnapshots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the snapshots</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>trajectoryFile</strong> (<em>str</em>) – Trajectory filename</li>
-<li><strong>verbose</strong> (<em>bool</em>) – Add verbose to snapshots</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectoryFile</strong> (<em>str</em>) – Trajectory filename</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Add verbose to snapshots</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">iterable – Snapshots with information</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>iterable – Snapshots with information</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getSortedEigen">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getSortedEigen</code><span class="sig-paren">(</span><em>T</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getSortedEigen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getSortedEigen" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getSortedEigen</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getSortedEigen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getSortedEigen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getStationaryDistr">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getStationaryDistr</code><span class="sig-paren">(</span><em>lowestEigenvector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getStationaryDistr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getStationaryDistr" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getStationaryDistr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lowestEigenvector</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getStationaryDistr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getStationaryDistr" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getTopologyFile">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getTopologyFile</code><span class="sig-paren">(</span><em>structure</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getTopologyFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getTopologyFile" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getTopologyFile</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getTopologyFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getTopologyFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract the topology information to write structures from xtc format</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>structure</strong> (<em>str</em>) – Pdb file with the topology information</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of str – The lines of the topology file</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>structure</strong> (<em>str</em>) – Pdb file with the topology information</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of str – The lines of the topology file</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getTopologyObject">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getTopologyObject</code><span class="sig-paren">(</span><em>topology_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getTopologyObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getTopologyObject" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getTopologyObject</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topology_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getTopologyObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getTopologyObject" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.getTrajNum">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">getTrajNum</code><span class="sig-paren">(</span><em>trajFilename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getTrajNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getTrajNum" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">getTrajNum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajFilename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#getTrajNum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.getTrajNum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the trajectory number</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trajFilename</strong> (<em>str</em>) – Trajectory filename</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int – Trajectory number</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trajFilename</strong> (<em>str</em>) – Trajectory filename</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int – Trajectory number</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.get_available_backend">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_available_backend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_available_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_available_backend" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">get_available_backend</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_available_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_available_backend" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.get_epoch_folders">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_epoch_folders</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_epoch_folders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_epoch_folders" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">get_epoch_folders</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_epoch_folders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_epoch_folders" title="Permalink to this definition">¶</a></dt>
 <dd><p>List the folders belonging to an adaptive simulation and containing
 trajectories and reports</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – Path where to check for the folders</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list – List of folders belonging to the simulation, sorted</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Path where to check for the folders</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list – List of folders belonging to the simulation, sorted</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.get_file_extension">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_file_extension</code><span class="sig-paren">(</span><em>full_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_file_extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_file_extension" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">get_file_extension</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_file_extension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_file_extension" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the extension of the file pointed by full_path</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>full_path</strong> (<em>str</em>) – Path to the file</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>full_path</strong> (<em>str</em>) – Path to the file</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.get_file_name">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_file_name</code><span class="sig-paren">(</span><em>full_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_file_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">get_file_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_file_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_file_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the name of the file pointed by full_path</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>full_path</strong> (<em>str</em>) – Path to the file</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>full_path</strong> (<em>str</em>) – Path to the file</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.get_file_name_extension">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_file_name_extension</code><span class="sig-paren">(</span><em>full_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_file_name_extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_file_name_extension" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">get_file_name_extension</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_file_name_extension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_file_name_extension" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the name and the extension of the file pointed by full_path</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>full_path</strong> (<em>str</em>) – Path to the file</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>full_path</strong> (<em>str</em>) – Path to the file</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.get_mdtraj_object_PDBstring">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_mdtraj_object_PDBstring</code><span class="sig-paren">(</span><em>conformation</em>, <em>topology</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_mdtraj_object_PDBstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_mdtraj_object_PDBstring" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">get_mdtraj_object_PDBstring</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conformation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_mdtraj_object_PDBstring"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_mdtraj_object_PDBstring" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the pdb string of a snapshot from a xtc trajectory to pdb</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>conformation</strong> – Mdtraj trajectory object to write</li>
-<li><strong>topology</strong> (<em>list</em>) – Topology-like object</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conformation</strong> – Mdtraj trajectory object to write</p></li>
+<li><p><strong>topology</strong> (<em>list</em>) – Topology-like object</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – The pdb representation of a snapshot from a xtc</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>str – The pdb representation of a snapshot from a xtc</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.get_string_from_array">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_string_from_array</code><span class="sig-paren">(</span><em>array</em>, <em>sep='</em>, <em>'</em>, <em>decimals=None</em>, <em>remove_newlines=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_string_from_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_string_from_array" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">get_string_from_array</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">',</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_newlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_string_from_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_string_from_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a string representation of an array, specifiying separator and
 decimal rounding</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>array</strong> (<em>ndarray</em><em> or </em><em>list</em>) – Input array</li>
-<li><strong>sep</strong> (<em>str</em>) – Separator</li>
-<li><strong>decimals</strong> (<em>int</em>) – Number of decimals to round the array</li>
-<li><strong>remove_newlines</strong> (<em>bool</em>) – Wheter to remove the newlines between dimensions</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> (<em>ndarray</em><em> or </em><em>list</em>) – Input array</p></li>
+<li><p><strong>sep</strong> (<em>str</em>) – Separator</p></li>
+<li><p><strong>decimals</strong> (<em>int</em>) – Number of decimals to round the array</p></li>
+<li><p><strong>remove_newlines</strong> (<em>bool</em>) – Wheter to remove the newlines between dimensions</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.get_workers_output">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">get_workers_output</code><span class="sig-paren">(</span><em>workers</em>, <em>wait_time=60</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_workers_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_workers_output" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">get_workers_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#get_workers_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.get_workers_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the output of a pool of workers without serializing the program at the get.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>workers</strong> (<em>list</em>) – List of AsyncResult objects created when passing work to the pool</li>
-<li><strong>wait_time</strong> (<em>int</em>) – Number of second to wait before checking if next worker is finished</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workers</strong> (<em>list</em>) – List of AsyncResult objects created when passing work to the pool</p></li>
+<li><p><strong>wait_time</strong> (<em>int</em>) – Number of second to wait before checking if next worker is finished</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List containing the output of all workers, if the function
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list – List containing the output of all workers, if the function
 passed to the pool had no return value it will be a list of None objects</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.glob_sorted">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">glob_sorted</code><span class="sig-paren">(</span><em>pattern</em>, <em>reverse=False</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#glob_sorted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.glob_sorted" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">glob_sorted</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#glob_sorted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.glob_sorted" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run glob and sort the output to ensure cross-platform compatibility</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pattern</strong> (<em>str</em>) – pathname to match files</li>
-<li><strong>reverse</strong> (<em>bool</em>) – If set to True, then the list elements are sorted as if each comparison were reversed</li>
-<li><strong>key</strong> (<em>function</em>) – Function of one argument that is used to extract a comparison key from each list element</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pattern</strong> (<em>str</em>) – pathname to match files</p></li>
+<li><p><strong>reverse</strong> (<em>bool</em>) – If set to True, then the list elements are sorted as if each comparison were reversed</p></li>
+<li><p><strong>key</strong> (<em>function</em>) – Function of one argument that is used to extract a comparison key from each list element</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List containing the output of all workers, if the function
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list – List containing the output of all workers, if the function
 passed to the pool had no return value it will be a list of None objects</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.isReport">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">isReport</code><span class="sig-paren">(</span><em>reportFilename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#isReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.isReport" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">isReport</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reportFilename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#isReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.isReport" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks whether the file is a PELE report</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>reportFilename</strong> (<em>str</em>) – Trajectory filename</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool – Whether the file is a PELE report</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>reportFilename</strong> (<em>str</em>) – Trajectory filename</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>bool – Whether the file is a PELE report</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.join_coordinates_prob">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">join_coordinates_prob</code><span class="sig-paren">(</span><em>coords</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#join_coordinates_prob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.join_coordinates_prob" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">join_coordinates_prob</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#join_coordinates_prob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.join_coordinates_prob" title="Permalink to this definition">¶</a></dt>
 <dd><p>Join a MxN numpy array representing some cluster center coordinates with
 an 1XN array representing some metric of the clusters</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>coords</strong> (<em>np.array</em>) – Coordinates of the clusters</li>
-<li><strong>p</strong> (<em>np.array</em>) – Metric of the clusters</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coords</strong> (<em>np.array</em>) – Coordinates of the clusters</p></li>
+<li><p><strong>p</strong> (<em>np.array</em>) – Metric of the clusters</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.loadtxtfile">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">loadtxtfile</code><span class="sig-paren">(</span><em>filename</em>, <em>usecols=None</em>, <em>postprocess=True</em>, <em>dtype=&lt;class 'float'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#loadtxtfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.loadtxtfile" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">loadtxtfile</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filename</span></em>, <em class="sig-param"><span class="pre">usecols=None</span></em>, <em class="sig-param"><span class="pre">postprocess=True</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'float'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#loadtxtfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.loadtxtfile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a table file from a text file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>filename</strong> (<em>str</em>) – Name of the file to load</li>
-<li><strong>usecols</strong> (<em>int</em>) – Which columns to read, with 0 being the first</li>
-<li><strong>postprocess</strong> (<em>bool</em>) – Whether to add an extra dimension if only one line present in the txt file</li>
-<li><strong>dtype</strong> (<em>data-type</em>) – Data-type of the resulting array, (default float)</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – Name of the file to load</p></li>
+<li><p><strong>usecols</strong> (<em>int</em>) – Which columns to read, with 0 being the first</p></li>
+<li><p><strong>postprocess</strong> (<em>bool</em>) – Whether to add an extra dimension if only one line present in the txt file</p></li>
+<li><p><strong>dtype</strong> (<em>data-type</em>) – Data-type of the resulting array, (default float)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.ndarray – Contents of the text file</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>np.ndarray – Contents of the text file</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.makeFolder">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">makeFolder</code><span class="sig-paren">(</span><em>outputDir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#makeFolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.makeFolder" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">makeFolder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputDir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#makeFolder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.makeFolder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes folder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>outputDir</strong> (<em>str</em>) – Folder filename</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>outputDir</strong> (<em>str</em>) – Folder filename</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.print_unbuffered">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">print_unbuffered</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#print_unbuffered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.print_unbuffered" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">print_unbuffered</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#print_unbuffered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.print_unbuffered" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call print and immediately after flush the buffer</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.readClusteringObject">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">readClusteringObject</code><span class="sig-paren">(</span><em>clusteringObjectPath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readClusteringObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readClusteringObject" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">readClusteringObject</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clusteringObjectPath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readClusteringObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readClusteringObject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads and returns a clustering object</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clusteringObjectPath</strong> (<em>str</em>) – Clustering object path</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>EOFError</strong> – If the object is empty</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal notranslate"><span class="pre">Clustering</span></code></a> – clusteringObject</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>clusteringObjectPath</strong> (<em>str</em>) – Clustering object path</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>EOFError</strong> – If the object is empty</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="AdaptivePELE.clustering.html#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal notranslate"><span class="pre">Clustering</span></code></a> – clusteringObject</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.readConstraints">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">readConstraints</code><span class="sig-paren">(</span><em>folder</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readConstraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readConstraints" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">readConstraints</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readConstraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readConstraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the new constraints from disk</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the constraints</li>
-<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the constraints</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the constraints</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – Name of the file where to write the constraints</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the new constraints</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list – List with the new constraints</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.readProcessorMappingFromDisk">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">readProcessorMappingFromDisk</code><span class="sig-paren">(</span><em>folder</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readProcessorMappingFromDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readProcessorMappingFromDisk" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">readProcessorMappingFromDisk</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#readProcessorMappingFromDisk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.readProcessorMappingFromDisk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the processorsToClusterMapping from disk</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
-processorsToClusterMapping</li>
-<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the processorMapping</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
+processorsToClusterMapping</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – Name of the file where to write the processorMapping</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list – List with the mapping of the trajectories to processors</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list – List with the mapping of the trajectories to processors</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.sign">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">sign</code><span class="sig-paren">(</span><em>x</em>, <em>tol=1e-07</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.sign" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">sign</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.sign" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the sign of a number</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>numpy.array</em>) – Array of number to evaluate the sign</li>
-<li><strong>tol</strong> (<em>float</em>) – Tolerance to define the zero</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>numpy.array</em>) – Array of number to evaluate the sign</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Tolerance to define the zero</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int – Sign of the number</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int – Sign of the number</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.writeNewConstraints">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">writeNewConstraints</code><span class="sig-paren">(</span><em>folder</em>, <em>filename</em>, <em>constraints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeNewConstraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeNewConstraints" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">writeNewConstraints</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeNewConstraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeNewConstraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the constraints to disk</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
-constraints</li>
-<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the constraints</li>
-<li><strong>constraints</strong> (<em>list</em>) – List of the constraints</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
+constraints</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – Name of the file where to write the constraints</p></li>
+<li><p><strong>constraints</strong> (<em>list</em>) – List of the constraints</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.writeObject">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">writeObject</code><span class="sig-paren">(</span><em>filename</em>, <em>object_to_write</em>, <em>protocol=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeObject" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">writeObject</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_to_write</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeObject" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.writeProcessorMappingToDisk">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">writeProcessorMappingToDisk</code><span class="sig-paren">(</span><em>folder</em>, <em>filename</em>, <em>processorMapping</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeProcessorMappingToDisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeProcessorMappingToDisk" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">writeProcessorMappingToDisk</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processorMapping</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#writeProcessorMappingToDisk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.writeProcessorMappingToDisk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the processorsToClusterMapping to disk</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
-processorsToClusterMapping</li>
-<li><strong>filename</strong> (<em>str</em>) – Name of the file where to write the processorMapping</li>
-<li><strong>processorMapping</strong> (<em>list</em>) – Mapping of the trajectories to processors</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – Name of the folder where to write the
+processorsToClusterMapping</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – Name of the file where to write the processorMapping</p></li>
+<li><p><strong>processorMapping</strong> (<em>list</em>) – Mapping of the trajectories to processors</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.write_PDB_clusters">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">write_PDB_clusters</code><span class="sig-paren">(</span><em>pmf_xyzg</em>, <em>title='clusters.pdb'</em>, <em>use_beta=False</em>, <em>elements=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#write_PDB_clusters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.write_PDB_clusters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">write_PDB_clusters</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pmf_xyzg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'clusters.pdb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#write_PDB_clusters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.write_PDB_clusters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.write_mdtraj_object_PDB">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">write_mdtraj_object_PDB</code><span class="sig-paren">(</span><em>conformation</em>, <em>output</em>, <em>topology</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#write_mdtraj_object_PDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.write_mdtraj_object_PDB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">write_mdtraj_object_PDB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conformation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#write_mdtraj_object_PDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.write_mdtraj_object_PDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a snapshot from a xtc trajectory to pdb</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>conformation</strong> – Mdtraj trajectory object to write</li>
-<li><strong>output</strong> (<em>str</em>) – Output where to write the object</li>
-<li><strong>topology</strong> (<em>list</em>) – Topology-like object</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conformation</strong> – Mdtraj trajectory object to write</p></li>
+<li><p><strong>output</strong> (<em>str</em>) – Output where to write the object</p></li>
+<li><p><strong>topology</strong> (<em>list</em>) – Topology-like object</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.utilities.utilities.write_xtc_to_pdb">
-<code class="descclassname">AdaptivePELE.utilities.utilities.</code><code class="descname">write_xtc_to_pdb</code><span class="sig-paren">(</span><em>filename</em>, <em>output_file</em>, <em>topology</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#write_xtc_to_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.write_xtc_to_pdb" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.utilities.utilities.</span></code><code class="sig-name descname"><span class="pre">write_xtc_to_pdb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/utilities/utilities.html#write_xtc_to_pdb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.utilities.utilities.write_xtc_to_pdb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the pdb string of a snapshot from a xtc trajectory to pdb</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>filename</strong> (<em>str</em>) – Path to the xtc trajectory</li>
-<li><strong>output_file</strong> (<em>str</em>) – Output where to write the object</li>
-<li><strong>topology</strong> (<em>str</em>) – Topology file object</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – Path to the xtc trajectory</p></li>
+<li><p><strong>output_file</strong> (<em>str</em>) – Output where to write the object</p></li>
+<li><p><strong>topology</strong> (<em>str</em>) – Topology file object</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">str – The pdb representation of a snapshot from a xtc</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>str – The pdb representation of a snapshot from a xtc</p>
+</dd>
+</dl>
 </dd></dl>
 
 <div class="toctree-wrapper compound">

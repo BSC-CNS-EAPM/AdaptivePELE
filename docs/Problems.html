@@ -144,7 +144,7 @@
 AdaptivePELE simulation.</p>
 <blockquote>
 <div><ul>
-<li><p class="first">Not having AdaptivePELE in your PYTHONPATH variable. If you get an error like:</p>
+<li><p>Not having AdaptivePELE in your PYTHONPATH variable. If you get an error like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ne">ImportError</span><span class="p">:</span> <span class="n">No</span> <span class="n">module</span> <span class="n">named</span> <span class="n">AdaptivePELE</span>
 </pre></div>
 </div>
@@ -153,7 +153,7 @@ AdaptivePELE simulation.</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Similar to the previous message, if the module affected is one of atomset,
+<li><p>Similar to the previous message, if the module affected is one of atomset,
 freeEnergies.utils, RMSDCalculator or SymmetryContactMapEvaluator, the issue
 might be that the cython extension of AdaptivePELE are not compiled, to do
 so find the setup.py script in the AdaptivePELE repository and run:</p>
@@ -161,7 +161,7 @@ so find the setup.py script in the AdaptivePELE repository and run:</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Simulation dies with no error. This happen sometimes in a PELE simulation,
+<li><p>Simulation dies with no error. This happen sometimes in a PELE simulation,
 almost always is related to a PELE error that was not handled properly. One
 frequent source of this issue in simulation running in the life or nord
 clusters is a bug of mpi that requieres to declare the following environment
@@ -171,7 +171,7 @@ variables:</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">If you get an error including the message:</p>
+<li><p>If you get an error including the message:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>No trajectories to cluster! Matching path:
 </pre></div>
 </div>
@@ -179,7 +179,7 @@ variables:</p>
 tipically because the simulation died before it could produce any
 trajectories, in such case check for PELE errors.</p>
 </li>
-<li><p class="first">If you get an error like:</p>
+<li><p>If you get an error like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">UnsatisfiedDependencyException</span><span class="p">:</span> <span class="n">Missing</span> <span class="n">package</span><span class="o">....</span>
 </pre></div>
 </div>
@@ -189,17 +189,14 @@ particular feature that you are using cannot be found. To solve it ensure
 that the package in question is installed and accessible to the python
 interpreter (e.g check the PYTHONPATH value)</p>
 </li>
-<li><p class="first">There is a weird atom named <em>DUM</em> in my trajectories! When using MD with
+<li><p>There is a weird atom named <em>DUM</em> in my trajectories! When using MD with
 an spherical box for the ligand, a dummy atom is introduced to act as the
 center of the box and is listed in the trajectories as <em>DUM</em> atom in
 a residue also named <em>DUM</em>. This atom is massless so it will not be moved
-during the simulation.</p>
-</li>
-<li><p class="first">Ligand preparation for MD fails with a ligand containing a Cl atom. With
-a tleap error like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FATAL</span><span class="p">:</span>  <span class="n">Atom</span> <span class="o">.</span><span class="n">R</span><span class="o">&lt;</span><span class="n">SCH</span> <span class="mi">218</span><span class="o">&gt;.</span><span class="n">A</span><span class="o">&lt;</span><span class="n">Cl1</span> <span class="mi">22</span><span class="o">&gt;</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">have</span> <span class="n">a</span> <span class="nb">type</span><span class="o">.</span>
-</pre></div>
-</div>
+during the simulation.</p></li>
+<li><p>Ligand preparation for MD fails with a ligand containing a Cl atom. With
+a tleap error like::
+FATAL:  Atom .R&lt;SCH 218&gt;.A&lt;Cl1 22&gt; does not have a type.</p>
 <p>check that the ligand’s Cl atom in named “Cl” and not “CL”, so that
 antechamber recognizes it properly. This might happen with other atoms,
 if so we will update this site with their examples.</p>

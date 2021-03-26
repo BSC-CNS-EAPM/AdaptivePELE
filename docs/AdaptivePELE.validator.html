@@ -90,8 +90,8 @@
 <li class="toctree-l1"><a class="reference internal" href="UserManual.html">User Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Problems.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="AdaptivePELE.html">AdaptivePELE – Package Description</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="docutils literal notranslate"><span class="pre">adaptiveSampling</span></code> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="docutils literal notranslate"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.adaptiveSampling"><code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptiveSampling</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdaptivePELE.html#module-AdaptivePELE.automateRoundsAdaptive"><code class="xref py py-mod docutils literal notranslate"><span class="pre">automateRoundsAdaptive</span></code> Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="AdaptivePELE.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.analysis.html">analysis Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.atomset.html">atomset Package</a></li>
@@ -100,7 +100,7 @@
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.spawning.html">spawning Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AdaptivePELE.utilities.html">utilities Package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">validator Package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.validator.controlFileValidator"><code class="docutils literal notranslate"><span class="pre">controlFileValidator</span></code> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AdaptivePELE.validator.controlFileValidator"><code class="xref py py-mod docutils literal notranslate"><span class="pre">controlFileValidator</span></code> Module</a></li>
 </ul>
 </li>
 </ul>
@@ -162,75 +162,65 @@
 <h1>validator Package<a class="headerlink" href="#validator-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-AdaptivePELE.validator.controlFileValidator">
 <span id="controlfilevalidator-module"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">controlFileValidator</span></code> Module<a class="headerlink" href="#module-AdaptivePELE.validator.controlFileValidator" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.validator.controlFileValidator.check_types">
-<code class="descclassname">AdaptivePELE.validator.controlFileValidator.</code><code class="descname">check_types</code><span class="sig-paren">(</span><em>original_value</em>, <em>dest_str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/validator/controlFileValidator.html#check_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.validator.controlFileValidator.check_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.validator.controlFileValidator.</span></code><code class="sig-name descname"><span class="pre">check_types</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/validator/controlFileValidator.html#check_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.validator.controlFileValidator.check_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.validator.controlFileValidator.validate">
-<code class="descclassname">AdaptivePELE.validator.controlFileValidator.</code><code class="descname">validate</code><span class="sig-paren">(</span><em>control_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/validator/controlFileValidator.html#validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.validator.controlFileValidator.validate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.validator.controlFileValidator.</span></code><code class="sig-name descname"><span class="pre">validate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">control_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/validator/controlFileValidator.html#validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.validator.controlFileValidator.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate an AdaptivePELE control file to ensure that there are no errors</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>controlFile</strong> (<em>str</em>) – Adaptive sampling control file</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ValueError</strong> – If a error is found in the control file</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>controlFile</strong> (<em>str</em>) – Adaptive sampling control file</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If a error is found in the control file</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.validator.controlFileValidator.validateBlock">
-<code class="descclassname">AdaptivePELE.validator.controlFileValidator.</code><code class="descname">validateBlock</code><span class="sig-paren">(</span><em>blockName</em>, <em>controlFileBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/validator/controlFileValidator.html#validateBlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.validator.controlFileValidator.validateBlock" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.validator.controlFileValidator.</span></code><code class="sig-name descname"><span class="pre">validateBlock</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blockName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controlFileBlock</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/validator/controlFileValidator.html#validateBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.validator.controlFileValidator.validateBlock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate the a block of the control file to ensure that
 there are no errors. Raise a warning if an error is found.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>blockName</strong> (<em>dict</em>) – Dictionary containing the parameters and possible
-types for the block</li>
-<li><strong>controlFileBlock</strong> (<em>dict</em>) – Dictionary containing the parameters specified
-in the control file for the block</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blockName</strong> (<em>dict</em>) – Dictionary containing the parameters and possible
+types for the block</p></li>
+<li><p><strong>controlFileBlock</strong> (<em>dict</em>) – Dictionary containing the parameters specified
+in the control file for the block</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool – Wheter and error has been found in a block
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>bool – Wheter and error has been found in a block
 block</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="AdaptivePELE.validator.controlFileValidator.validateGeneralBlock">
-<code class="descclassname">AdaptivePELE.validator.controlFileValidator.</code><code class="descname">validateGeneralBlock</code><span class="sig-paren">(</span><em>blockName</em>, <em>controlFileBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/validator/controlFileValidator.html#validateGeneralBlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#AdaptivePELE.validator.controlFileValidator.validateGeneralBlock" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">AdaptivePELE.validator.controlFileValidator.</span></code><code class="sig-name descname"><span class="pre">validateGeneralBlock</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blockName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controlFileBlock</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/validator/controlFileValidator.html#validateGeneralBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.validator.controlFileValidator.validateGeneralBlock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate the generalParams block of the control file to ensure that
 there are no errors. Raise a warning if an error is found.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>blockName</strong> (<em>dict</em>) – Dictionary containing the parameters and possible
-types for the block</li>
-<li><strong>controlFileBlock</strong> (<em>dict</em>) – Dictionary containing the parameters specified
-in the control file for the block</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blockName</strong> (<em>dict</em>) – Dictionary containing the parameters and possible
+types for the block</p></li>
+<li><p><strong>controlFileBlock</strong> (<em>dict</em>) – Dictionary containing the parameters specified
+in the control file for the block</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool – Wheter and error has been found in the generalParams
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>bool – Wheter and error has been found in the generalParams
 block</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <div class="toctree-wrapper compound">
