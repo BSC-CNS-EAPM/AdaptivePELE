@@ -138,7 +138,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.adaptiveSampling</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">ast</span>
@@ -151,15 +151,15 @@
 <span class="kn">import</span> <span class="nn">errno</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">blockNames</span><span class="p">,</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">atomset</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities.synchronization</span> <span class="k">import</span> <span class="n">ProcessesManager</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.validator</span> <span class="k">import</span> <span class="n">controlFileValidator</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.spawning</span> <span class="k">import</span> <span class="n">spawning</span><span class="p">,</span> <span class="n">spawningTypes</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="k">import</span> <span class="n">simulationrunner</span><span class="p">,</span> <span class="n">simulationTypes</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.clustering</span> <span class="k">import</span> <span class="n">clustering</span><span class="p">,</span> <span class="n">clusteringTypes</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="kn">import</span> <span class="n">blockNames</span><span class="p">,</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="kn">import</span> <span class="n">atomset</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="kn">import</span> <span class="n">utilities</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities.synchronization</span> <span class="kn">import</span> <span class="n">ProcessesManager</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.validator</span> <span class="kn">import</span> <span class="n">controlFileValidator</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.spawning</span> <span class="kn">import</span> <span class="n">spawning</span><span class="p">,</span> <span class="n">spawningTypes</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="kn">import</span> <span class="n">simulationrunner</span><span class="p">,</span> <span class="n">simulationTypes</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.clustering</span> <span class="kn">import</span> <span class="n">clustering</span><span class="p">,</span> <span class="n">clusteringTypes</span>
 
 
 <div class="viewcode-block" id="parseArgs"><a class="viewcode-back" href="../../AdaptivePELE.html#AdaptivePELE.adaptiveSampling.parseArgs">[docs]</a><span class="k">def</span> <span class="nf">parseArgs</span><span class="p">():</span>

@@ -138,7 +138,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for AdaptivePELE.simulation.simulationrunner</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -148,20 +148,20 @@
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">numbers</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">mdtraj</span> <span class="k">as</span> <span class="nn">md</span>
 <span class="kn">import</span> <span class="nn">AdaptivePELE.constants</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="k">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">blockNames</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="k">import</span> <span class="n">simulationTypes</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="k">import</span> <span class="n">atomset</span><span class="p">,</span> <span class="n">RMSDCalculator</span>
-<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="k">import</span> <span class="n">utilities</span><span class="p">,</span> <span class="n">PDBLoader</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.constants</span> <span class="kn">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">blockNames</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="kn">import</span> <span class="n">simulationTypes</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.atomset</span> <span class="kn">import</span> <span class="n">atomset</span><span class="p">,</span> <span class="n">RMSDCalculator</span>
+<span class="kn">from</span> <span class="nn">AdaptivePELE.utilities</span> <span class="kn">import</span> <span class="n">utilities</span><span class="p">,</span> <span class="n">PDBLoader</span>
 <span class="n">SKLEARN</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">OPENMM</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">MDANALYSIS</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">KMeans</span>
+    <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">SKLEARN</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -172,7 +172,7 @@
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">MDAnalysis</span> <span class="k">as</span> <span class="nn">MDA</span>
-    <span class="kn">from</span> <span class="nn">MDAnalysis.analysis</span> <span class="k">import</span> <span class="n">align</span>
+    <span class="kn">from</span> <span class="nn">MDAnalysis.analysis</span> <span class="kn">import</span> <span class="n">align</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">MDANALYSIS</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -181,7 +181,7 @@
 <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
     <span class="n">basestring</span> <span class="o">=</span> <span class="nb">str</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="k">import</span> <span class="n">openmm_simulations</span> <span class="k">as</span> <span class="n">sim</span>
+    <span class="kn">from</span> <span class="nn">AdaptivePELE.simulation</span> <span class="kn">import</span> <span class="n">openmm_simulations</span> <span class="k">as</span> <span class="n">sim</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">OPENMM</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -192,7 +192,7 @@
 
 
 <div class="viewcode-block" id="SimulationParameters"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationParameters">[docs]</a><span class="k">class</span> <span class="nc">SimulationParameters</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processors</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">executable</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">templetizedControlFile</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -256,7 +256,7 @@
 
 
 <div class="viewcode-block" id="SimulationRunner"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.SimulationRunner">[docs]</a><span class="k">class</span> <span class="nc">SimulationRunner</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processorsToClusterMapping</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -469,7 +469,7 @@
 
 
 <div class="viewcode-block" id="PeleSimulation"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.PeleSimulation">[docs]</a><span class="k">class</span> <span class="nc">PeleSimulation</span><span class="p">(</span><span class="n">SimulationRunner</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">SimulationRunner</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">simulationTypes</span><span class="o">.</span><span class="n">SIMULATION_TYPE</span><span class="o">.</span><span class="n">PELE</span>
 
@@ -1027,7 +1027,7 @@
 
 
 <div class="viewcode-block" id="MDSimulation"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MDSimulation">[docs]</a><span class="k">class</span> <span class="nc">MDSimulation</span><span class="p">(</span><span class="n">SimulationRunner</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">SimulationRunner</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">simulationTypes</span><span class="o">.</span><span class="n">SIMULATION_TYPE</span><span class="o">.</span><span class="n">MD</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">antechamberTemplate</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">AmberTemplates</span><span class="o">.</span><span class="n">antechamberTemplate</span>
@@ -1456,7 +1456,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Class used for testing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">SimulationRunner</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">simulationTypes</span><span class="o">.</span><span class="n">SIMULATION_TYPE</span><span class="o">.</span><span class="n">TEST</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">copied</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1506,7 +1506,7 @@
 
 
 <div class="viewcode-block" id="ClusteringExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.ClusteringExitCondition">[docs]</a><span class="k">class</span> <span class="nc">ClusteringExitCondition</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntrajs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntrajs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clusterNum</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ntrajs</span> <span class="o">=</span> <span class="n">ntrajs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">simulationTypes</span><span class="o">.</span><span class="n">EXITCONDITION_TYPE</span><span class="o">.</span><span class="n">CLUSTERING</span>
@@ -1528,7 +1528,7 @@
 
 
 <div class="viewcode-block" id="MetricExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MetricExitCondition">[docs]</a><span class="k">class</span> <span class="nc">MetricExitCondition</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metricCol</span><span class="p">,</span> <span class="n">metricValue</span><span class="p">,</span> <span class="n">condition</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metricCol</span><span class="p">,</span> <span class="n">metricValue</span><span class="p">,</span> <span class="n">condition</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span> <span class="o">=</span> <span class="n">metricCol</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metricValue</span> <span class="o">=</span> <span class="n">metricValue</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">simulationTypes</span><span class="o">.</span><span class="n">EXITCONDITION_TYPE</span><span class="o">.</span><span class="n">METRIC</span>
@@ -1556,7 +1556,7 @@
 
 
 <div class="viewcode-block" id="MetricMultipleTrajsExitCondition"><a class="viewcode-back" href="../../../AdaptivePELE.simulation.html#AdaptivePELE.simulation.simulationrunner.MetricMultipleTrajsExitCondition">[docs]</a><span class="k">class</span> <span class="nc">MetricMultipleTrajsExitCondition</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metricCol</span><span class="p">,</span> <span class="n">metricValue</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">reportWildCard</span><span class="p">,</span> <span class="n">numTrajs</span><span class="p">,</span> <span class="n">nProcessors</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metricCol</span><span class="p">,</span> <span class="n">metricValue</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">reportWildCard</span><span class="p">,</span> <span class="n">numTrajs</span><span class="p">,</span> <span class="n">nProcessors</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metricCol</span> <span class="o">=</span> <span class="n">metricCol</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metricValue</span> <span class="o">=</span> <span class="n">metricValue</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">simulationTypes</span><span class="o">.</span><span class="n">EXITCONDITION_TYPE</span><span class="o">.</span><span class="n">METRICMULTIPLETRAJS</span>
