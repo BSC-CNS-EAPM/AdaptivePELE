@@ -432,6 +432,19 @@ class PeleSimulation(SimulationRunner):
         PDBinitial.initialise(initialStruct, resname=resname, chain=reschain, resnum=resnum)
         return repr(PDBinitial.getCOM())
 
+    def generatePELECommand(self, runningControlFile):
+        """
+        Generate the command to run PELE using the given parameters
+
+        :param runningControlFile: Path of the control file to run
+        :type runningControlFile: str
+        """
+
+        if self.parameters.srun:
+            return ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
+        else:
+            return ["mpirun", "-np", str(self.parameters.processors)] + self.parameters.mpiParameters + [self.parameters.executable, runningControlFile]
+
     def runEquilibrationPELE(self, runningControlFile):
         """
         Run a short PELE equilibration simulation
@@ -441,10 +454,7 @@ class PeleSimulation(SimulationRunner):
         """
 
         self.createSymbolicLinks()
-        if self.parameters.srun:
-            toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
-        else:
-            toRun = ["mpirun", "-np", str(self.parameters.processors)] + self.parameters.mpiParameters + [self.parameters.executable, runningControlFile]
+        toRun = self.generatePELECommand(runningControlFile)
 
         utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
@@ -482,10 +492,8 @@ class PeleSimulation(SimulationRunner):
         self.prepareControlFile(epoch, outputPathConstants, ControlFileDictionary)
         self.createSymbolicLinks()
         runningControlFile = outputPathConstants.tmpControlFilename % epoch
-        if self.parameters.srun:
-            toRun = ["srun", "-n", str(self.parameters.processors)] + self.parameters.srunParameters + [self.parameters.executable, runningControlFile]
-        else:
-            toRun = ["mpirun", "-np", str(self.parameters.processors)] + self.parameters.mpiParameters + [self.parameters.executable, runningControlFile]
+        toRun = self.generatePELECommand(runningControlFile)
+
         utilities.print_unbuffered(" ".join(toRun))
         startTime = time.time()
         if self.parameters.time:
