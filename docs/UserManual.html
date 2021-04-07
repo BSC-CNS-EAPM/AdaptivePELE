@@ -344,6 +344,12 @@ best energy structures in the equilibration by the center of mass.</p></li>
 <li><p><strong>numberEquilibrationStructures</strong> (<em>int</em>, default=10): Number of clusters to
 obtain from the <em>equilibrationCluster</em> structure selection (see
 <strong>equilibrationMode</strong> for more details)</p></li>
+<li><p><strong>equilibrationBoxRadius</strong> (<em>float</em>, default=2.0): Value of the simulation box
+radius for the equilibration (in angstroms)</p></li>
+<li><p><strong>equilibrationRotationRange</strong> (<em>float</em>, default=0.05): Value of the rotation
+magnitude in the equilibration simulation</p></li>
+<li><p><strong>equilibrationTranslationRange</strong> (<em>float</em>, default=0.5): Value of the
+translation magnitude in the equilibration simulation</p></li>
 <li><p><strong>useSrun</strong> (<em>bool</em>, default=False): Whether to use srun to launch the PELE
 simulation instead of mpirun. Using srun allows a finer control over the
 resources used and might be helpful to deal with different cluster

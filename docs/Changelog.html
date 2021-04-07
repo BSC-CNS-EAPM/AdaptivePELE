@@ -235,6 +235,30 @@
 <h3>New features:<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <div><ul class="simple">
+<li><p>Add equilibrationRotationRange, equilibrationTranslationRange and
+equilibrationBoxRadius parameters to tune equilibration
+performance</p></li>
+<li><p>Add support to correctly run simulations with PELE interstep reports and trajectories</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="bug-fixes">
+<h3>Bug fixes:<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p>Fix bug reading the ligand information in the adaptiveSampling main,
+which caused to set the equilibration box in the center of mass of the
+whole system</p></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>1.7 - 2021-02-11<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h3>New features:<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
 <li><p>Use residue numbers and chain names in clustering, which makes possible
 to run protein-protein simulations</p></li>
 <li><p>The plotAdaptive script now accepts a path to the simulation folder and
