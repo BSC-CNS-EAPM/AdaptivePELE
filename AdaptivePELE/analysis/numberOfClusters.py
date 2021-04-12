@@ -225,6 +225,8 @@ def plotContactsHistogram(folder, templetizedClusteringSummaryFile):
     """
     allFolders = os.listdir(folder)
     lastEpoch = len([epoch for epoch in allFolders if epoch.isdigit() and os.path.isfile(templetizedClusteringSummaryFile % int(epoch))]) - 1
+    if lastEpoch == -1:
+        raise ValueError("No simulation data in "+os.path.abspath(folder))
     lastSummary = templetizedClusteringSummaryFile % lastEpoch
     contactsColumn = 3
     allContacts = np.loadtxt(lastSummary, usecols=(contactsColumn,), ndmin=1)
