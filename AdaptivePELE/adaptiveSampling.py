@@ -12,6 +12,7 @@ import errno
 import argparse
 import numpy as np
 from builtins import range
+import AdaptivePELE
 from AdaptivePELE.constants import blockNames, constants
 from AdaptivePELE.atomset import atomset
 from AdaptivePELE.utilities import utilities
@@ -634,6 +635,7 @@ def main(jsonParams, clusteringHook=None):
         :type jsonParams: str
     """
 
+    utilities.print_unbuffered("Running AdaptivePELE version %s from %s" % (AdaptivePELE.__version__, AdaptivePELE.__path__))
     controlFileValidator.validate(jsonParams)
     generalParams, spawningBlock, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
 
