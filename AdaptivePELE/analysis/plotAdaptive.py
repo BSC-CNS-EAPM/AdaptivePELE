@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import os
-import glob
 import argparse
 import matplotlib.pyplot as plt
 from AdaptivePELE.utilities import utilities
@@ -14,10 +13,7 @@ def parseArguments():
     """
         Parse command line arguments
 
-        :returns: int, int, int, str, bool, bool, int, str, bool, str, str, str, str -- Number of steps per epoch,
-            column to plot in the X axis, column to plot in the Y axis, name of
-            the files containing the simulation data, whether to plot the data
-            as points, wether to plot the data as lines, column to use as color, range of trajectories to select, whether to color each trajectory differently, path where to store the plot, label of the x-axis, label of the y-axis, label for the colorbar
+        :returns: argparse.Namespace -- Namespace with the input parameters
     """
     desc = "Plot relevant information from a simulation's report files.\n"\
            "It MUST be run from the root epoch folder (i.e., where it can find the folders 0/, 1/, 2/, ... lastEpoch/"
@@ -40,8 +36,11 @@ def parseArguments():
     parser.add_argument("--simulation_path", type=str, default=".", help="Path to the simulation output, defult is the current directory")
     parser.add_argument("--skip_first_step", action="store_true", help="Avoid plotting the first step of each report")
     parser.add_argument("--skip_steps", default=None, type=int, help="Number of steps to skip")
-    args = parser.parse_args()
-    return args.steps, args.xcol, args.ycol, args.filename, args.points, args.lines, args.zcol, args.traj_range, args.traj_col, args.output_path, args.xlabel, args.ylabel, args.cblabel, args.figure_size, args.show_plots, args.simulation_path, args.skip_first_step, args.skip_steps
+    parser.add_argument("--x_left_value", default=None, type=float, help="Value for the left end of the x axis")
+    parser.add_argument("--x_right_value", default=None, type=float, help="Value for the right end of the x axis")
+    parser.add_argument("--y_top_value", default=None, type=float, help="Value for the top end of the x axis")
+    parser.add_argument("--y_bottom_value", default=None, type=float, help="Value for the bottom end of the x axis")
+    return parser.parse_args()
 
 
 def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
@@ -80,7 +79,8 @@ def addLine(data_plot, traj_num, epoch, steps, opt_dict, artists):
 def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
                paletteModifier, trajs_range=None, label_x=None, label_y=None,
                label_colorbar=None, fig_size=(6, 6), simulation_path=".",
-               skip_first_step=False, skip_steps=None):
+               skip_first_step=False, skip_steps=None, y_top=None,
+               y_bottom=None, x_left=None, x_right=None):
     """
         Generate a string to be passed to gnuplot
 
@@ -110,6 +110,14 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
         :type skip_first_step: bool
         :param skip_steps: Number of steps to skip in the plot
         :type skip_steps: int
+        :param y_bottom: Bottom limit of the y axis
+        :type y_bottom: float
+        :param y_top: Top limit of the y axis
+        :type y_top: float
+        :param x_left: Left limit of the x axis
+        :type x_bottom: float
+        :param x_right: Right limit of the x axis
+        :type x_right: float
     """
     epochs = utilities.get_epoch_folders(simulation_path)
     numberOfEpochs = int(len(epochs))
@@ -123,7 +131,7 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
     artists = []
     trajectory_range = set()
     if trajs_range is not None:
-        start, end = map(int, traj_range.split(":"))
+        start, end = map(int, trajs_range.split(":"))
         trajectory_range = set(range(start, end+1))
     cmin = 1e10
     cmax = -1e10
@@ -185,6 +193,8 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
             cbar.set_label("Epoch")
         if label_colorbar is not None:
             cbar.set_label(label_colorbar)
+    ax.set_ylim(bottom=y_bottom, top=y_top)
+    ax.set_xlim(left=x_left, right=x_right)
 
     annot = ax.annotate("", xy=(0, 0), xytext=(20, 20),
                         textcoords="offset points",
@@ -249,7 +259,7 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
 def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier,
                  trajs_range, path_to_save, xlabel, ylabel, cblabel, fig_size=(6, 6),
                  show_plot=True, simulation_path=".", skip_first_step=False,
-                 skip_steps=None):
+                 skip_steps=None, y_top=None, y_bottom=None, x_left=None, x_right=None):
     """
         Generate a template string to use with gnuplot
 
@@ -285,6 +295,16 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         :type skip_first_step: bool
         :param skip_first_step: Whether to avoid plotting the first point in each report
         :type skip_first_step: bool
+        :param skip_steps: Number of steps to skip in the plot
+        :type skip_steps: int
+        :param y_bottom: Bottom limit of the y axis
+        :type y_bottom: float
+        :param y_top: Top limit of the y axis
+        :type y_top: float
+        :param x_left: Left limit of the x axis
+        :type x_bottom: float
+        :param x_right: Right limit of the x axis
+        :type x_right: float
 
         :returns: str -- String to plot using gnuplot
     """
@@ -295,7 +315,8 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
     createPlot(reportName, xcol, ycol, stepsPerRun, printWithLines, paletteModifier,
                trajs_range=trajs_range, label_x=xlabel, label_y=ylabel, label_colorbar=cblabel,
                fig_size=fig_size, simulation_path=simulation_path,
-               skip_first_step=skip_first_step, skip_steps=skip_steps)
+               skip_first_step=skip_first_step, skip_steps=skip_steps,
+               y_top=y_top, y_bottom=y_bottom, x_left=x_left, x_right=x_right)
     if path_to_save is not None:
         folder, _ = os.path.split(path_to_save)
         if folder:
@@ -305,8 +326,15 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         plt.show()
 
 if __name__ == "__main__":
-    steps_Run, Xcol, Ycol, filename, be, rmsd, colModifier, traj_range, color_traj, output_path, xlab, ylab, cblab, figure_size, plots_show, path_simulation, should_skip_first_step, n_skip_steps = parseArguments()
+    args = parseArguments()
+    be = args.points
+    rmsd = args.lines
+    colModifier = args.zcol
+    color_traj = args.traj_col
+    figure_size = args.figure_size
     figure_size = tuple(map(int, figure_size.split("x")))
+    Xcol = args.xcol
+    Ycol = args.ycol
     Xcol -= 1
     Ycol -= 1
     if colModifier is not None:
@@ -319,7 +347,9 @@ if __name__ == "__main__":
     if color_traj:
         colModifier = -1
 
-    generatePlot(steps_Run, Xcol, Ycol, filename, kind_Print, colModifier,
-                 traj_range, output_path, xlab, ylab, cblab, figure_size,
-                 show_plot=plots_show, simulation_path=path_simulation,
-                 skip_first_step=should_skip_first_step, skip_steps=n_skip_steps)
+    generatePlot(args.steps, Xcol, Ycol, args.filename, kind_Print, colModifier,
+                 args.traj_range, args.output_path, args.xlabel, args.ylabel,
+                 args.cblabel, figure_size, show_plot=args.show_plots,
+                 simulation_path=args.simulation_path, skip_first_step=args.skip_first_step,
+                 skip_steps=args.skip_steps, y_top=args.y_top_value, y_bottom=args.y_bottom_value,
+                 x_left=args.x_left_value, x_right=args.x_right_value)
