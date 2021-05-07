@@ -35,7 +35,7 @@ To install from PyPI simply run::
 
 To install from Conda simply run::
 
-    conda install -c nostrumbiodiscovery adaptive_pele 
+    conda install -c nostrumbiodiscovery -c conda-forge adaptive_pele 
 
 To install from source, you need to install and compile cython files in the base folder with::
 
