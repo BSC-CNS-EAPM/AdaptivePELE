@@ -635,7 +635,7 @@ def main(jsonParams, clusteringHook=None):
         :type jsonParams: str
     """
 
-    utilities.print_unbuffered("Running AdaptivePELE version %s from %s" % (AdaptivePELE.__version__, AdaptivePELE.__path__))
+    utilities.print_unbuffered("Running AdaptivePELE version %s from %s" % (AdaptivePELE.__version__, AdaptivePELE.__path__[0]))
     controlFileValidator.validate(jsonParams)
     generalParams, spawningBlock, simulationrunnerBlock, clusteringBlock = loadParams(jsonParams)
 
