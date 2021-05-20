@@ -246,6 +246,10 @@ class PDBManager:
         This is done because Tleap doesn't support chain identifiers, and, if different chains are provided,
         Tleap renumbers them in an aribtary way, making impossible to keep track of the residue numbers.
         """
+        if not self.Protein.hasChilds():
+            # if the protein object has no childs it means that there is no
+            # protein, and thus we don't need to join the chains
+            return
         mainChain = self.Protein[0]
         for chain in self.Protein[1:]:
             chain[0].setNTerminal()
@@ -507,6 +511,9 @@ class PDBase:
         # Method that loads the current object to its father childs list
         self.parent.childs.append(self)
         self.parent.child_dict[self.id] = self
+
+    def hasChilds(self):
+        return len(self.childs) != 0
 
     def rename(self, newname):
         # Method to rename the object
