@@ -638,6 +638,38 @@ class ContactsClusteringEvaluator(ClusteringEvaluator):
         return cluster.threshold2
 
 
+class RMSDOnlyClusteringEvaluator(ContactsClusteringEvaluator):
+    def __init__(self, RMSDCalculator_object):
+        """
+            Helper object to carry out the RMSD clustering
+
+            :param RMSDCalculator: object that calculates the RMSD between two
+                conformations
+            :type RMSDCalculator: :py:class:`.RMSDCalculator`
+        """
+        ContactsClusteringEvaluator.__init__(self, RMSDCalculator_object)
+        self.RMSDCalculator = RMSDCalculator_object
+        # Only here for compatibility purpose
+        self.contacts = None
+        self.contactMap = None
+
+    def checkAttributes(self, pdb, resname, resnum, resChain, contactThresholdDistance):
+        """
+            Check wether all attributes are set for this iteration
+
+            :param pdb: Structure to compare
+            :type pdb: :py:class:`.PDB`
+            :param resname: String containing the three letter name of the ligand in the pdb
+            :type resname: str
+            :param resnum: Integer containing the residue number of the ligand in the pdb
+            :type resnum: int
+            :param resChain: String containing the chain name of the ligand in the pdb
+            :type resChain: str
+            :param contactThreshold: Distance between two atoms to be considered in contact (default 8)
+            :type contactThreshold: float
+        """
+        self.contacts = 0
+
 class CMClusteringEvaluator(ClusteringEvaluator):
     limitSlope = {8: 6, 6: 15, 4: 60, 10: 3}
     limitMax = {8: 2, 6: 0.8, 4: 0.2, 10: 4}
@@ -1259,7 +1291,8 @@ class Clustering(object):
 class ContactsClustering(Clustering):
     def __init__(self, thresholdCalculator, resname="", resnum=0, resChain="",
                  reportBaseFilename=None, columnOfReportFile=None,
-                 contactThresholdDistance=8, symmetries=None, altSelection=False):
+                 contactThresholdDistance=8, symmetries=None,
+                 altSelection=False, useContacts=True):
         """
             Cluster together all snapshots that are closer to the cluster center
             than certain threshold. This threshold is assigned according to the
@@ -1287,6 +1320,9 @@ class ContactsClustering(Clustering):
             :type symmetries: list
             :param altSelection: Flag that controls wether to use the alternative structures (default 8)
             :type altSelection: bool
+            :param useContacts: Flag that controls whether to count the
+                protein ligand contacts (useful mostly for ligand only simulations)
+            :type useContacts: bool
         """
         Clustering.__init__(self, resname=resname, resnum=resnum, resChain=resChain,
                             reportBaseFilename=reportBaseFilename,
@@ -1298,7 +1334,10 @@ class ContactsClustering(Clustering):
         if symmetries is None:
             symmetries = []
         self.symmetries = symmetries
-        self.clusteringEvaluator = ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
+        if useContacts:
+            self.clusteringEvaluator = ContactsClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
+        else:
+            self.clusteringEvaluator = RMSDOnlyClusteringEvaluator(RMSDCalculator.RMSDCalculator(symmetries))
 
     def __getstate__(self):
         # Defining pickling interface to avoid problems when working with old
