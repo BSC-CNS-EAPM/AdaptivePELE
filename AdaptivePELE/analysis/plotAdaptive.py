@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import argparse
+import numpy as np
 import matplotlib.pyplot as plt
 from AdaptivePELE.utilities import utilities
 plt.style.use("ggplot")
@@ -40,6 +41,7 @@ def parseArguments():
     parser.add_argument("--x_right_value", default=None, type=float, help="Value for the right end of the x axis")
     parser.add_argument("--y_top_value", default=None, type=float, help="Value for the top end of the x axis")
     parser.add_argument("--y_bottom_value", default=None, type=float, help="Value for the bottom end of the x axis")
+    parser.add_argument("--filter", type=str, nargs="*", help="Filter the reports according to one or more columns, the format of the filter is columnNumber:minValue:maxValue, separated by a space if more than one filter has to be applied")
     return parser.parse_args()
 
 
@@ -80,7 +82,7 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
                paletteModifier, trajs_range=None, label_x=None, label_y=None,
                label_colorbar=None, fig_size=(6, 6), simulation_path=".",
                skip_first_step=False, skip_steps=None, y_top=None,
-               y_bottom=None, x_left=None, x_right=None):
+               y_bottom=None, x_left=None, x_right=None, filters=None):
     """
         Generate a string to be passed to gnuplot
 
@@ -118,6 +120,8 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
         :type x_bottom: float
         :param x_right: Right limit of the x axis
         :type x_right: float
+        :param filters: Filters to applya to data
+        :type filters: list
     """
     epochs = utilities.get_epoch_folders(simulation_path)
     numberOfEpochs = int(len(epochs))
@@ -156,6 +160,13 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
                 data = data[skip_steps:]
             elif skip_first_step:
                 data = data[1:]
+            if filters is not None:
+                for filter_info in filters:
+                    column, min_value, max_value = filter_info
+                    mask_max = data[:,column] < max_value
+                    mask_min = data[:,column] > min_value
+                    data = data[mask_min & mask_max, :]
+
             if paletteModifier is not None and paletteModifier != -1:
                 cmin = min(cmin, data[:, paletteModifier].min())
                 cmax = max(cmax, data[:, paletteModifier].max())
@@ -259,7 +270,8 @@ def createPlot(reportName, column1, column2, stepsPerRun, printWithLines,
 def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifier,
                  trajs_range, path_to_save, xlabel, ylabel, cblabel, fig_size=(6, 6),
                  show_plot=True, simulation_path=".", skip_first_step=False,
-                 skip_steps=None, y_top=None, y_bottom=None, x_left=None, x_right=None):
+                 skip_steps=None, y_top=None, y_bottom=None, x_left=None,
+                 x_right=None, filters=None):
     """
         Generate a template string to use with gnuplot
 
@@ -305,6 +317,8 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
         :type x_bottom: float
         :param x_right: Right limit of the x axis
         :type x_right: float
+        :param filters: Filters to applya to data
+        :type filters: list
 
         :returns: str -- String to plot using gnuplot
     """
@@ -316,7 +330,8 @@ def generatePlot(stepsPerRun, xcol, ycol, reportName, kindOfPrint, paletteModifi
                trajs_range=trajs_range, label_x=xlabel, label_y=ylabel, label_colorbar=cblabel,
                fig_size=fig_size, simulation_path=simulation_path,
                skip_first_step=skip_first_step, skip_steps=skip_steps,
-               y_top=y_top, y_bottom=y_bottom, x_left=x_left, x_right=x_right)
+               y_top=y_top, y_bottom=y_bottom, x_left=x_left, x_right=x_right,
+               filters=filters)
     if path_to_save is not None:
         folder, _ = os.path.split(path_to_save)
         if folder:
@@ -337,6 +352,14 @@ if __name__ == "__main__":
     Ycol = args.ycol
     Xcol -= 1
     Ycol -= 1
+    all_filters = None
+    if args.filter is not None:
+        all_filters = []
+        for f in args.filter:
+            col, min_val, max_val = f.split(":")
+            min_val = float(min_val) if min_val else -np.inf
+            max_val = float(max_val) if max_val else np.inf
+            all_filters.append([int(col)-1, min_val, max_val])
     if colModifier is not None:
         colModifier -= 1
     # VARIABLES TO SET WHEN PRINTING
@@ -352,4 +375,5 @@ if __name__ == "__main__":
                  args.cblabel, figure_size, show_plot=args.show_plots,
                  simulation_path=args.simulation_path, skip_first_step=args.skip_first_step,
                  skip_steps=args.skip_steps, y_top=args.y_top_value, y_bottom=args.y_bottom_value,
-                 x_left=args.x_left_value, x_right=args.x_right_value)
+                 x_left=args.x_left_value, x_right=args.x_right_value,
+                 filters=all_filters)
