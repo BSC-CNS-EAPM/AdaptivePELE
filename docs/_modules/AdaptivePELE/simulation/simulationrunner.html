@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.7.1
+                v1.7.2
               </div>
             
           
@@ -1077,7 +1077,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Processing trajectories for epoch&quot;</span><span class="p">,</span> <span class="n">epoch</span><span class="p">)</span>
         <span class="n">trajectory_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">AmberTemplates</span><span class="o">.</span><span class="n">trajectoryTemplate</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">format</span><span class="p">))</span>
-        <span class="n">trajectory_files</span> <span class="o">=</span> <span class="p">[(</span><span class="n">traj</span><span class="p">,</span> <span class="n">topology</span><span class="o">.</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTrajNum</span><span class="p">(</span><span class="n">traj</span><span class="p">)))</span> <span class="k">for</span> <span class="n">traj</span> <span class="ow">in</span> <span class="n">trajectory_files</span><span class="p">]</span>
+        <span class="n">trajectory_files</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span> <span class="n">topology</span><span class="o">.</span><span class="n">getTopologyFile</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">utilities</span><span class="o">.</span><span class="n">getTrajNum</span><span class="p">(</span><span class="n">traj</span><span class="p">)))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">traj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trajectory_files</span><span class="p">)]</span>
         <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">trajsPerReplica</span><span class="p">)</span>
         <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">processTraj</span><span class="p">,</span> <span class="n">trajectory_files</span><span class="p">)</span>
         <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -1812,9 +1812,15 @@
 <span class="sd">        :param input_files: Tuple with (trajectory_file, topology_file)</span>
 <span class="sd">        :type input_files: tuple</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">traj_file</span><span class="p">,</span> <span class="n">top_file</span> <span class="o">=</span> <span class="n">input_files</span>
+    <span class="n">index</span><span class="p">,</span> <span class="n">traj_file</span><span class="p">,</span> <span class="n">top_file</span> <span class="o">=</span> <span class="n">input_files</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">traj_file</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">top_file</span><span class="p">)</span>
     <span class="n">backbone_selection</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">top</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;backbone&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">backbone_selection</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># if no protein is found we will not try to align the system, as it is</span>
+        <span class="c1"># not clear what would be the optimal procedure</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Since no receptor is found, system will not be aligned&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
     <span class="n">t</span><span class="o">.</span><span class="n">image_molecules</span><span class="p">()</span>
     <span class="n">t</span><span class="o">.</span><span class="n">superpose</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">atom_indices</span><span class="o">=</span><span class="n">backbone_selection</span><span class="p">)</span>
     <span class="n">t</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">traj_file</span><span class="p">)</span></div>
@@ -1826,10 +1832,17 @@
 <span class="sd">        :param input_files: Tuple with (trajectory_file, topology_file)</span>
 <span class="sd">        :type input_files: tuple</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">traj_file</span><span class="p">,</span> <span class="n">top_file</span> <span class="o">=</span> <span class="n">input_files</span>
+    <span class="n">index</span><span class="p">,</span> <span class="n">traj_file</span><span class="p">,</span> <span class="n">top_file</span> <span class="o">=</span> <span class="n">input_files</span>
     <span class="n">mobile</span> <span class="o">=</span> <span class="n">MDA</span><span class="o">.</span><span class="n">Universe</span><span class="p">(</span><span class="n">top_file</span><span class="p">)</span>
     <span class="n">new_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_new</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">traj_file</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">MDA</span><span class="o">.</span><span class="n">Universe</span><span class="p">(</span><span class="n">top_file</span><span class="p">,</span> <span class="n">traj_file</span><span class="p">)</span>
+    <span class="n">backbone_selection</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">select_atoms</span><span class="p">(</span><span class="s2">&quot;backbone&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">backbone_selection</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># if no protein is found we will not try to align the system, as it is</span>
+        <span class="c1"># not clear what would be the optimal procedure</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Since no receptor is found, system will not be aligned&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
     <span class="n">t</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">compound</span><span class="o">=</span><span class="s2">&quot;residues&quot;</span><span class="p">)</span>
     <span class="n">alignment</span> <span class="o">=</span> <span class="n">align</span><span class="o">.</span><span class="n">AlignTraj</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">mobile</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="s2">&quot;backbone&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">new_file</span><span class="p">)</span>
     <span class="n">alignment</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
