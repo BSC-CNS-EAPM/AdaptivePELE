@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM python:3.7-slim as builder
 LABEL maintainer="cescgina@gmail.com"
 
 RUN apt-get update \
@@ -13,4 +13,8 @@ RUN pip install --no-cache-dir --requirement requirements.txt
 
 COPY . /AdaptivePELE
 
-RUN python setup.py build_ext --inplace && rm -r build
+RUN python setup.py install
+
+FROM python:3.7-slim as adaptivepele
+
+COPY --from=builder /usr/local/lib/python3.7/site-packages /usr/local/lib/python3.7/site-packages
