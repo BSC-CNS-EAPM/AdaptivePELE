@@ -30,3 +30,4 @@ MANIFEST.in
 TODO.txt
 .git
 error.txt
+docker
