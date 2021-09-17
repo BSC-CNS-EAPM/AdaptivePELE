@@ -4,6 +4,7 @@ import argparse
 from AdaptivePELE.tests import testSpawning as tSpawning
 from AdaptivePELE.tests import testAtomset as tAtomset
 from AdaptivePELE.tests import testClustering as tClustering
+from AdaptivePELE.tests import testSimulationRunner as tSimulation
 from AdaptivePELE.tests import testAdaptiveSampling as tAdaptive
 from AdaptivePELE.tests import testThresholdcalculator as tThreshold
 from AdaptivePELE.tests import testDensityCalculator as tDensity
@@ -19,6 +20,7 @@ def parse_args():
     desc = ("Run testing suite. Possible options are:\na  -- Run all tests\n"
             "at -- Run atomset tests\ns  -- Run spawning tests\nth -- Run threshold "
             "calculator tests\nd  -- Run density tests\nc  -- Run clustering tests\n"
+            "sr -- Run simulation runner tests \n"
             "Ad -- Run adaptive integration tests\nMD -- Run adaptive MD tests\nMD_CUDA"
             " -- Run adaptive MD tests with CUDA\nR -- Run reporter tests\n")
     parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawTextHelpFormatter)
@@ -32,7 +34,7 @@ def parse_args():
 def main(run, exclude):
     testSuite = unittest.TestSuite()
     if run is None:
-        run = ["at", "s", "th", "d", "c", "Ad", "MD", "MD_CUDA", "R"]
+        run = ["at", "s", "th", "d", "c", "Ad", "MD", "MD_CUDA", "R", "sr"]
     to_run = set(run)-set(exclude)
 
     if "at" in to_run or "a" in to_run:
@@ -50,6 +52,8 @@ def main(run, exclude):
     if "c" in to_run or "a" in to_run:
         print("Will run clustering tests")
         testSuite.addTest(unittest.makeSuite(tClustering.clusteringTest))
+    if "sr" in to_run or "a" in to_run:
+        testSuite.addTest(unittest.makeSuite(tSimulation.TestSimulationRunner))
     if "Ad" in to_run or "a" in to_run:
         print("Will run integration tests")
         testSuite.addTest(unittest.makeSuite(tAdaptive.TestadaptiveSampling))
