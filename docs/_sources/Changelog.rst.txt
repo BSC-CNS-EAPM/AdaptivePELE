@@ -23,6 +23,7 @@ Bug fixes:
 ..........
 
     - Fix bug in pdb processing for MD simulation when no protein was present
+    - Fix bug extracting the ligand for MD in some weird edge cases
 
 
 1.7.1 - 2021-05-14
