@@ -1149,7 +1149,10 @@ class MDSimulation(SimulationRunner):
 
         with open(PDBtoOpen, "r") as inp:
             for line in inp:
-                if resname in line and (line.startswith("ATOM") or line.startswith("HETATM")):
+                if line.startswith("ATOM") or line.startswith("HETATM"):
+                    line_resname = line[17:20].strip()
+                    if resname != line_resname:
+                        continue
                     if (resname, line[21]) in line_dict:
                         line_dict[(resname, line[21])] += line
                     else:
