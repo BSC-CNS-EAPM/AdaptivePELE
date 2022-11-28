@@ -10,6 +10,22 @@ The format is based on `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_
 .. XXX - Unreleased
 .. ----------------
 
+1.7.2 - Unreleased
+------------------
+
+New features:
+.............
+
+    - Add script to run RMSD clustering from scratch
+    - Add filters for plotAdaptive script
+
+Bug fixes:
+..........
+
+    - Fix bug in pdb processing for MD simulation when no protein was present
+    - Fix bug extracting the ligand for MD in some weird edge cases
+
+
 1.7.1 - 2021-05-14
 ------------------
 

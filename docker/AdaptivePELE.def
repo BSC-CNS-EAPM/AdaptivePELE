@@ -1,0 +1,29 @@
+Bootstrap: localimage
+From: /home/jgilaber/AdaptivePELE/docker/pele.sif
+
+%environment
+    export CONTAINER_HOME="/opt/adaptivepele_container/"
+    export PYTHONPATH=""
+
+%files
+    ../../AdaptivePELE /opt/AdaptivePELE
+
+%post
+    yum install -y python3 python3-devel python3-pip python3-libs gcc-c++.x86_64 blas-devel lapack-devel openssh-clients
+    python3 -m venv ${CONTAINER_HOME}builds/.virtualenvs/adaptivepele
+    source ${CONTAINER_HOME}builds/.virtualenvs/adaptivepele/bin/activate
+    cd /opt/AdaptivePELE
+    pip install --no-cache-dir --requirement requirements.txt
+    python setup.py install
+    rm -r /opt/AdaptivePELE
+    echo "export PELE_EXECUTABLE=/opt/PELE/bin/Pele_mpi" >> $SINGULARITY_ENVIRONMENT
+    echo "export PELE_DATA=/opt/PELE/Data" >> $SINGULARITY_ENVIRONMENT
+    echo "export PELE_DOCUMENTS=/opt/PELE/Documents" >> $SINGULARITY_ENVIRONMENT
+    echo ". /builds/.virtualenvs/adaptivepele/bin/activate" >> $SINGULARITY_ENVIRONMENT
+
+%labels
+    Author cescgina@gmail.com
+    MyLabel AdaptivePELE-PELE version
+
+%help
+    This is a container to run AdaptivePELE with PELE as the propagator

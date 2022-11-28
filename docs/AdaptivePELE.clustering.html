@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.7.1
+                v1.7.2
               </div>
             
           
@@ -948,7 +948,7 @@ considered in contact(default 8)</p></li>
 
 <dl class="py class">
 <dt id="AdaptivePELE.clustering.clustering.ContactsClustering">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">AdaptivePELE.clustering.clustering.</span></code><code class="sig-name descname"><span class="pre">ContactsClustering</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thresholdCalculator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resnum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resChain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reportBaseFilename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columnOfReportFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contactThresholdDistance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">altSelection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ContactsClustering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ContactsClustering" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">AdaptivePELE.clustering.clustering.</span></code><code class="sig-name descname"><span class="pre">ContactsClustering</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thresholdCalculator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resnum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resChain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reportBaseFilename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columnOfReportFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contactThresholdDistance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">altSelection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useContacts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#ContactsClustering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.ContactsClustering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.clustering.clustering.Clustering" title="AdaptivePELE.clustering.clustering.Clustering"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptivePELE.clustering.clustering.Clustering</span></code></a></p>
 <p>Cluster together all snapshots that are closer to the cluster center
 than certain threshold. This threshold is assigned according to the
@@ -969,6 +969,8 @@ metric of interest</p></li>
 considered in contact(default 8)</p></li>
 <li><p><strong>symmetries</strong> (<em>list</em>) – List of symmetric groups</p></li>
 <li><p><strong>altSelection</strong> (<em>bool</em>) – Flag that controls wether to use the alternative structures (default 8)</p></li>
+<li><p><strong>useContacts</strong> (<em>bool</em>) – Flag that controls whether to count the
+protein ligand contacts (useful mostly for ligand only simulations)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1210,6 +1212,36 @@ as in the self.clusters list</p></li>
 <li><p><strong>outputObject</strong> (<em>str</em>) – Output name for the pickle object</p></li>
 <li><p><strong>writeAll</strong> (<em>bool</em>) – Wether to write pdb files for all cluster in addition
 of the summary</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="AdaptivePELE.clustering.clustering.RMSDOnlyClusteringEvaluator">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">AdaptivePELE.clustering.clustering.</span></code><code class="sig-name descname"><span class="pre">RMSDOnlyClusteringEvaluator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">RMSDCalculator_object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#RMSDOnlyClusteringEvaluator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.RMSDOnlyClusteringEvaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator" title="AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptivePELE.clustering.clustering.ContactsClusteringEvaluator</span></code></a></p>
+<p>Helper object to carry out the RMSD clustering</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>RMSDCalculator</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.RMSDCalculator.RMSDCalculator" title="AdaptivePELE.atomset.RMSDCalculator.RMSDCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">RMSDCalculator</span></code></a>) – object that calculates the RMSD between two
+conformations</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="AdaptivePELE.clustering.clustering.RMSDOnlyClusteringEvaluator.checkAttributes">
+<code class="sig-name descname"><span class="pre">checkAttributes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resnum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resChain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contactThresholdDistance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AdaptivePELE/clustering/clustering.html#RMSDOnlyClusteringEvaluator.checkAttributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AdaptivePELE.clustering.clustering.RMSDOnlyClusteringEvaluator.checkAttributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check wether all attributes are set for this iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdb</strong> (<a class="reference internal" href="AdaptivePELE.atomset.html#AdaptivePELE.atomset.atomset.PDB" title="AdaptivePELE.atomset.atomset.PDB"><code class="xref py py-class docutils literal notranslate"><span class="pre">PDB</span></code></a>) – Structure to compare</p></li>
+<li><p><strong>resname</strong> (<em>str</em>) – String containing the three letter name of the ligand in the pdb</p></li>
+<li><p><strong>resnum</strong> (<em>int</em>) – Integer containing the residue number of the ligand in the pdb</p></li>
+<li><p><strong>resChain</strong> (<em>str</em>) – String containing the chain name of the ligand in the pdb</p></li>
+<li><p><strong>contactThreshold</strong> (<em>float</em>) – Distance between two atoms to be considered in contact (default 8)</p></li>
 </ul>
 </dd>
 </dl>

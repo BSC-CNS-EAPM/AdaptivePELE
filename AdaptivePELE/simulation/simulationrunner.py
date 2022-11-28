@@ -937,7 +937,7 @@ class MDSimulation(SimulationRunner):
         """
         print("Processing trajectories for epoch", epoch)
         trajectory_files = glob.glob(os.path.join(output_path, constants.AmberTemplates.trajectoryTemplate.replace("%d", "*") % self.parameters.format))
-        trajectory_files = [(traj, topology.getTopologyFile(epoch, utilities.getTrajNum(traj))) for traj in trajectory_files]
+        trajectory_files = [(i, traj, topology.getTopologyFile(epoch, utilities.getTrajNum(traj))) for i, traj in enumerate(trajectory_files)]
         pool = mp.Pool(self.parameters.trajsPerReplica)
         pool.map(processTraj, trajectory_files)
         pool.close()
@@ -1149,7 +1149,10 @@ class MDSimulation(SimulationRunner):
 
         with open(PDBtoOpen, "r") as inp:
             for line in inp:
-                if resname in line and (line.startswith("ATOM") or line.startswith("HETATM")):
+                if line.startswith("ATOM") or line.startswith("HETATM"):
+                    line_resname = line[17:20].strip()
+                    if resname != line_resname:
+                        continue
                     if (resname, line[21]) in line_dict:
                         line_dict[(resname, line[21])] += line
                     else:
@@ -1672,9 +1675,15 @@ def processTraj_mdtraj(input_files):
         :param input_files: Tuple with (trajectory_file, topology_file)
         :type input_files: tuple
     """
-    traj_file, top_file = input_files
+    index, traj_file, top_file = input_files
     t = md.load(traj_file, top=top_file)
     backbone_selection = t.top.select("backbone")
+    if backbone_selection.size == 0:
+        # if no protein is found we will not try to align the system, as it is
+        # not clear what would be the optimal procedure
+        if index == 0:
+            print("Since no receptor is found, system will not be aligned")
+        return
     t.image_molecules()
     t.superpose(t, atom_indices=backbone_selection)
     t.save(traj_file)
@@ -1686,10 +1695,17 @@ def processTraj_mdanalysis(input_files):
         :param input_files: Tuple with (trajectory_file, topology_file)
         :type input_files: tuple
     """
-    traj_file, top_file = input_files
+    index, traj_file, top_file = input_files
     mobile = MDA.Universe(top_file)
     new_file = "%s_new%s" % os.path.splitext(traj_file)
     t = MDA.Universe(top_file, traj_file)
+    backbone_selection = t.select_atoms("backbone")
+    if backbone_selection.n_atoms == 0:
+        # if no protein is found we will not try to align the system, as it is
+        # not clear what would be the optimal procedure
+        if index == 0:
+            print("Since no receptor is found, system will not be aligned")
+        return
     t.atoms.wrap(compound="residues")
     alignment = align.AlignTraj(t, mobile, select="backbone", filename=new_file)
     alignment.run()

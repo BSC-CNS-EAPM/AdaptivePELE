@@ -40,6 +40,13 @@ else:
     DATA_FOLDER = None
     DOCUMENTS_FOLDER = None
 
+if os.getenv("PELE_EXECUTABLE") is not None:
+    # asume that if any of the three environment variables is set, all will be
+    # set, also they take preference over the default ones, set above
+    PELE_EXECUTABLE = os.environ.get("PELE_EXECUTABLE")
+    DATA_FOLDER = os.environ.get("PELE_DATA")
+    DOCUMENTS_FOLDER = os.environ.get("PELE_DOCUMENTS")
+
 
 inputFileTemplate = "{ \"files\" : [ { \"path\" : \"%s\" } ] }"
 trajectoryBasename = "*traj*"
