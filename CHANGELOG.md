@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
     - Add script to run RMSD clustering from scratch
     - Add filters for plotAdaptive script
+    - Add support for multiple control files
     
 ## Bug fixes:
 
