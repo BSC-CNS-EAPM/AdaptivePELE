@@ -1238,20 +1238,20 @@ Similarly, the CTE-POWER cluster also has 4 gpus per node, so the configuration
 is very similar. An example for this machine would look like::
 
     #!/bin/bash
-    #SBATCH --job-name="md_PK2_evoCt"
+    #SBATCH --job-name="3ptb_Ad_MD_mt"
     #SBATCH -D .
-    #SBATCH --output=md_PK2_evoCt.out
-    #SBATCH --error=md_PK2_evoCt.err
-    #SBATCH --ntasks=1
-    #SBATCH --nodes=1
-    #SBATCH --gres gpu:4
+    #SBATCH --output=test_3ptb_Ad_MD_mt.out
+    #SBATCH --error=test_3ptb_Ad_MD_mt.err
+    #SBATCH --ntasks=2
+    #SBATCH --nodes=2
     #SBATCH --cpus-per-task=160
-    #SBATCH --time=14:00:00
+    #SBATCH --time=01:00:00
+    #SBATCH --gres gpu:4
 
     module load python/3.6.5
     module load ambertools/18
     export PYTHONPATH="/gpfs/projects/bsc72/adaptiveSampling/bin_cte/v1.6.2:/gpfs/projects/bsc72/lib/site-packages-cte"
-    srun python -m AdaptivePELE.adaptiveSampling templetized_PK2_evoCt_md.conf
+    srun python -m AdaptivePELE.adaptiveSampling control_file_MD_3ptb_mt.conf
 
 
 .. [APELE] Daniel Lecina, Joan F. Gilabert, and Victor Guallar. Adaptive simulations, towards interactive protein-ligand modeling. Scientific Reports, 7(1):8466, 2017, https://www.nature.com/articles/s41598-017-08445-5
