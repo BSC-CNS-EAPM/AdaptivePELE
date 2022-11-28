@@ -131,7 +131,7 @@ class SimulationParams:
     types = {
         "pele": {
             "processors": "numbers.Real",
-            "controlFile": "basestring",
+            "controlFile": "basestring|list",
             "seed": "numbers.Real",
             "peleSteps": "numbers.Real",
             "iterations": "numbers.Real"
@@ -159,7 +159,7 @@ class SimulationParams:
         "origin": "basestring",
         "time": "numbers.Real",
         "processors": "numbers.Real",
-        "controlFile": "basestring",
+        "controlFile": "basestring|list",
         "seed": "numbers.Real",
         "peleSteps": "numbers.Real",
         "iterations": "numbers.Real",
