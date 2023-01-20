@@ -50,7 +50,7 @@ Also, if AdaptivePELE was not installed in a typical library directory, a common
 Documentation
 -------------
 
-The documentation for AdaptivePELE can be found `here <https://adaptivepele.github.io/AdaptivePELE/>`_
+The documentation for AdaptivePELE can be found `here <https://bsc-cns-eapm.github.io/AdaptivePELE/>`_
 
 
 Contributors
