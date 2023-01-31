@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 
 [//] : # ## [1.x] - Unreleased
+
+## [1.7.3] - 2023-01-31
+
+### Bug fixes:
+
+    - Fix compatibility issues with networkx
+
     
 ## [1.7.2] - 2022-11-28
 
