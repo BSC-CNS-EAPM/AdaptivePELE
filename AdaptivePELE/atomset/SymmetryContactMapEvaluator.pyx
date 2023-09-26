@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import atomset
+#import atomset
 import numpy as np
 cimport cython
 cimport numpy as np
