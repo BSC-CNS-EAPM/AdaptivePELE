@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 [//] : # ## [1.x] - Unreleased
 
+## [1.7.4] - 2023-09-29
+
+### Bug fixes:
+
+    - Fix compatibility with latest Cython version
+
 ## [1.7.3] - 2023-01-31
 
 ### Bug fixes:
