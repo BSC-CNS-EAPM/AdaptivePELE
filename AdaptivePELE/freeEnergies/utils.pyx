@@ -205,7 +205,7 @@ cdef int binary_search(double rnd, double[:] prob):
     cdef Py_ssize_t r = prob.shape[0]-1
     cdef int mid
     while l < r:
-        mid =  (l+r) / 2
+        mid =  (l+r) // 2
         if prob[mid] < rnd:
             l = mid + 1
         else:

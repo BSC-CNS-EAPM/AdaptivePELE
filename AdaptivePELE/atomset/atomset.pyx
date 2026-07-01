@@ -347,7 +347,7 @@ cdef class Atom:
         """
             Print Atom information
         """
-        print self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.x, self.y, self.z, self.type, self.mass
+        print(self.atomSerial, self.name, self.resname, self.resChain, self.resnum, self.x, self.y, self.z, self.type, self.mass)
 
     def __richcmp__(self, Atom atom2, int op):
         if op == 2:
@@ -476,7 +476,7 @@ cdef class PDB:
                         return False
                 return True
         else:
-            print "No boolean operator available for PDB apart from equality"
+            print("No boolean operator available for PDB apart from equality")
 
     def __getstate__(self):
         # Copy the object's state from
@@ -693,7 +693,7 @@ cdef class PDB:
         """
         cdef Atom atom
         for atom in self.atoms.values():
-            print atom  # atom.printAtom()
+            print(atom)  # atom.printAtom()
 
     def getNumberOfAtoms(self):
         """
