@@ -153,7 +153,8 @@ class ConformationNetwork(object):
         self.network = state['network']
         if NETWORK and int(nx.__version__.split(".")[0]) > 1 and 'adj' in self.network.__dict__:
             for attr in ['node', 'adj', 'graph', 'pred', 'succ']:
-                self.network.__dict__["_"+attr] = self.network.__dict__.pop(attr)
+                if attr in self.network.__dict__:
+                    self.network.__dict__["_"+attr] = self.network.__dict__.pop(attr)
 
     def add_node(self, node, **kwargs):
         """
