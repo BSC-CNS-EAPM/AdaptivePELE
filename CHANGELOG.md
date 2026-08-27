@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 [//] : # ## [1.x] - Unreleased
 
+## [Unreleased]
+
+### Bug fixes:
+
+    - Wait between two polls of the lock file while synchronizing replicas,
+      instead of busy waiting
+
 ## [1.7.4] - 2023-09-29
 
 ### Bug fixes:

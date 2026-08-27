@@ -19,6 +19,9 @@ class ProcessesManager:
     RUNNING = "RUNNING"
     WAITING = "WAITING"
     INIT = "INIT"
+    # initial interval between two polls of the lock file, it is doubled after
+    # every poll up to sleepTime
+    MIN_SLEEP_TIME = 0.01
 
     def __init__(self, output_path, num_replicas):
         self.syncFolder =  os.path.join(os.path.abspath(output_path), "synchronization")
@@ -106,6 +109,7 @@ class ProcessesManager:
                     self.id = i
             break
         file_lock = open(self.lockFile, "r+")
+        sleepTime = self.MIN_SLEEP_TIME
         while True:
             if self.lock_available:
                 # if the filesystem does not support locks but only one replica
@@ -126,6 +130,9 @@ class ProcessesManager:
                 if sorted(list(lock_info)) == sorted(list(self.lockInfo)):
                     file_lock.close()
                     return
+                # wait before polling again, the lock is already released
+                time.sleep(sleepTime)
+                sleepTime = min(2*sleepTime, self.sleepTime)
 
     def getLockInfo(self, file_descriptor):
         """
@@ -213,9 +220,15 @@ class ProcessesManager:
         """
             Create a barrier-like situation to wait for all processes to finish
         """
+        sleepTime = self.MIN_SLEEP_TIME
         while True:
             if self.isSynchronized(status):
                 return
+            # wait before polling again, otherwise a process that reaches the
+            # barrier early keeps a core busy and floods the shared filesystem
+            # with lock operations for as long as the barrier lasts
+            time.sleep(sleepTime)
+            sleepTime = min(2*sleepTime, self.sleepTime)
             file_lock = open(self.lockFile, "r+")
             if self.lock_available:
                 fcntl.lockf(file_lock, fcntl.LOCK_EX)
