@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import unittest
+from AdaptivePELE import adaptiveSampling
 from AdaptivePELE.clustering import clustering
 
 
@@ -135,3 +136,74 @@ class clusteringTest(unittest.TestCase):
         self.assertAlmostEqual(allClusters[1].getMetric(), goldenEnergyCluster2, 2)
         self.assertEqual(allClusters[0].elements, goldenElementsCluster1)
         self.assertEqual(allClusters[1].elements, goldenElementsCluster2)
+
+    def buildContactMapClustering(self, similarityEvaluator, thresholdValue=0.15,
+                                  contactThresholdDistance=8):
+        params = {"type": "contactMap",
+                  "params": {"ligandResname": "AIN",
+                             "contactThresholdDistance": contactThresholdDistance,
+                             "similarityEvaluator": similarityEvaluator},
+                  "thresholdCalculator": {"type": "constant",
+                                          "params": {"value": thresholdValue}}}
+        return clustering.ClusteringBuilder().buildClustering(params)
+
+    def testNeedToReclusterOnSimilarityEvaluatorChange(self):
+        # Changing only the similarity evaluator of a contactMap clustering
+        # has to trigger a reclustering, everything else being equal
+        old = self.buildContactMapClustering("Jaccard")
+        new = self.buildContactMapClustering("correlation")
+
+        self.assertTrue(adaptiveSampling.needToRecluster(old, new))
+
+    def testNeedToReclusterOnContactMapThresholdChange(self):
+        old = self.buildContactMapClustering("Jaccard", thresholdValue=0.15)
+        new = self.buildContactMapClustering("Jaccard", thresholdValue=0.30)
+
+        self.assertTrue(adaptiveSampling.needToRecluster(old, new))
+
+    def testNoNeedToReclusterWithIdenticalParameters(self):
+        old = self.buildContactMapClustering("Jaccard")
+        new = self.buildContactMapClustering("Jaccard")
+
+        self.assertFalse(adaptiveSampling.needToRecluster(old, new))
+
+    def testNeedToReclusterOnClusteringTypeChange(self):
+        params = {"type": "rmsd",
+                  "params": {"ligandResname": "AIN",
+                             "contactThresholdDistance": 8}}
+        old = clustering.ClusteringBuilder().buildClustering(params)
+        new = self.buildContactMapClustering("Jaccard")
+
+        self.assertTrue(adaptiveSampling.needToRecluster(old, new))
+
+    def testLastSnapshotClusteringStoresEpoch(self):
+        # The epoch is used to look up the topology of each trajectory, so it
+        # has to be set from the argument like in the base class
+        params = {"type": "lastSnapshot",
+                  "params": {"ligandResname": "AIN",
+                             "contactThresholdDistance": 8}}
+        clusteringInstance = clustering.ClusteringBuilder().buildClustering(params)
+        trajNames = ["tests/data/aspirin_data/traj*"]
+
+        clusteringInstance.cluster(trajNames, epoch=3)
+
+        self.assertEqual(clusteringInstance.epoch, 3)
+
+    def testLastSnapshotClusteringIncrementsEpochByDefault(self):
+        params = {"type": "lastSnapshot",
+                  "params": {"ligandResname": "AIN",
+                             "contactThresholdDistance": 8}}
+        clusteringInstance = clustering.ClusteringBuilder().buildClustering(params)
+        trajNames = ["tests/data/aspirin_data/traj*"]
+
+        clusteringInstance.cluster(trajNames)
+        clusteringInstance.cluster(trajNames)
+
+        self.assertEqual(clusteringInstance.epoch, 1)
+
+    def testClusteringBuilderMissingTypeRaisesKeyError(self):
+        params = {"params": {"ligandResname": "AIN"}}
+
+        with self.assertRaises(KeyError) as context:
+            clustering.ClusteringBuilder().buildClustering(params)
+        self.assertIn("mandatory parameter", str(context.exception))
