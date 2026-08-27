@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 [//] : # ## [1.x] - Unreleased
 
+## [Unreleased]
+
+### Bug fixes:
+
+    - Fix change of similarity evaluator being ignored when deciding whether to
+      recluster on restart (contactMap clustering)
+
+    - Set the epoch in SequentialLastSnapshotClustering.cluster, so the topology
+      of each trajectory is looked up with the right epoch
+
+    - Fix Python 3 errors on two error-reporting paths that used the Python 2
+      only Exception.message
+
 ## [1.7.4] - 2023-09-29
 
 ### Bug fixes:

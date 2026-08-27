@@ -1490,6 +1490,10 @@ class SequentialLastSnapshotClustering(Clustering):
             :param outputPathConstants: Contains outputPath-related constants
             :type outputPathConstants: :py:class:`.OutputPathConstants`
         """
+        if epoch is None:
+            self.epoch += 1
+        else:
+            self.epoch = epoch
         # Clean clusters at every step, so we only have the last snapshot of
         # each trajectory as clusters
         self.clusters = Clusters()
@@ -1919,8 +1923,7 @@ class ClusteringBuilder(object):
         try:
             clusteringType = clusteringBlock[blockNames.ClusteringTypes.type]
         except KeyError as err:
-            err.message += ": Need to provide mandatory parameter in clustering block"
-            raise KeyError(err.message)
+            raise KeyError("%s: Need to provide mandatory parameter in clustering block" % err)
         contactThresholdDistance = paramsBlock.get(blockNames.ClusteringTypes.contactThresholdDistance, 8)
         altSelection = paramsBlock.get(blockNames.ClusteringTypes.alternativeStructure, False)
         resname = str(paramsBlock.get(blockNames.ClusteringTypes.ligandResname, "")).upper()

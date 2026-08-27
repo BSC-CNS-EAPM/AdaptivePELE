@@ -239,7 +239,7 @@ cdef class SymmetryContactMapEvaluator:
                     line21 = contactMap[atom1Row]
                     line22 = contactMap[atom2Row]
                 except KeyError as err:
-                    raise KeyError(u"Atom %s not found in symmetries" % err.message)
+                    raise KeyError(u"Atom %s not found in symmetries" % err)
                 d2 = (line11 == line21).sum() + (line12 == line22).sum()
                 d2sm = (line12 == line21).sum() + (line11 == line22).sum()
                 if d2sm > d2:

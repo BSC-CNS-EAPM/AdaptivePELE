@@ -408,19 +408,26 @@ def needToRecluster(oldClusteringMethod, newClusteringMethod):
         :returns: bool -- If clustering needs to be redone
     """
 
+    old, new = oldClusteringMethod, newClusteringMethod
+    clusterTypes = clusteringTypes.CLUSTERING_TYPES
+
     # Check 1: change of type
-    if oldClusteringMethod.type != newClusteringMethod.type:
+    if old.type != new.type:
         return True
 
     # Check 2: Change of thresholdCalculator and thresholdDistance
-    if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.rmsd or\
-       oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMap:
-        return oldClusteringMethod.thresholdCalculator != newClusteringMethod.thresholdCalculator or\
-            abs(oldClusteringMethod.contactThresholdDistance - newClusteringMethod.contactThresholdDistance) > 1e-7
+    if old.type in (clusterTypes.rmsd, clusterTypes.contactMap):
+        if old.thresholdCalculator != new.thresholdCalculator:
+            return True
+        if abs(old.contactThresholdDistance - new.contactThresholdDistance) > 1e-7:
+            return True
 
     # Check 3: Change of similarity Evaluator in contactMap clustering
-    if oldClusteringMethod.type == clusteringTypes.CLUSTERING_TYPES.contactMap:
-        return oldClusteringMethod.similarityEvaluator.typeEvaluator != newClusteringMethod.similarityEvaluator.typeEvaluator
+    if old.type == clusterTypes.contactMap:
+        if old.similarityEvaluator.typeEvaluator != new.similarityEvaluator.typeEvaluator:
+            return True
+
+    return False
 
 
 def clusterEpochTrajs(clusteringMethod, epoch, epochOutputPathTempletized, topologies, outputPathConstants=None):
